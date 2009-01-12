@@ -1,0 +1,3 @@
+[ test: test ]
+
+-- Should be invalid as items within are not quoted.

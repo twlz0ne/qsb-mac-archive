@@ -1,0 +1,22 @@
+[
+  { "name": "square1",
+    "points": [ { "x": 1, "y": 1 }, { "x": 2, "y": 1 },
+                { "x": 2, "y": 2 }, { "x": 1, "y": 2 } ]
+  },
+  { "name": "square2",
+    "points": [ { "x": 5, "y": 5 }, { "x": 8, "y": 5 },
+                { "x": 8, "y": 8 }, { "x": 5, "y": 8 } ]
+  },
+  { "name": "hexagon",
+    "points": [ { "x": 5, "y": 2 }, { "x": 6, "y": 1 },
+                { "x": 7, "y": 1 }, { "x": 8, "y": 2 },
+                { "x": 7, "y": 3 }, { "x": 6, "y": 3 } ]
+  },
+  { "name": "triangle",
+    "points": [ { "x": -3, "y": -2 }, { "x": -1, "y": 1 },
+                { "x": 0, "y": 0 } ]
+  }
+]
+
+-- Top-level array.
+-- Array of objects containing arrays of objects.
