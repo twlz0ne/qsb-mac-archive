@@ -1,0 +1,111 @@
+//
+//  HGSOpenSearchSuggestSource.m
+//
+//  Copyright (c) 2008 Google Inc. All rights reserved.
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are
+//  met:
+//
+//    * Redistributions of source code must retain the above copyright
+//  notice, this list of conditions and the following disclaimer.
+//    * Redistributions in binary form must reproduce the above
+//  copyright notice, this list of conditions and the following disclaimer
+//  in the documentation and/or other materials provided with the
+//  distribution.
+//    * Neither the name of Google Inc. nor the names of its
+//  contributors may be used to endorse or promote products derived from
+//  this software without specific prior written permission.
+//
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+//  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+//  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+//  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+
+#import "HGSOpenSearchSuggestSource.h"
+
+#import "GTMMethodCheck.h"
+#import "GTMNSString+URLArguments.h"
+
+#if TARGET_OS_IPHONE
+#import "GMOCompletionSourceNotifications.h"
+#import "GMOSourceConfigProvider.h"
+#endif  // TARGET_OS_IPHONE
+
+#if ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
+#import "GMOSQLiteBackedCache.h"
+#endif  // ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
+
+static const int kGMODefaultMaxResults = 1;
+
+@implementation HGSOpenSearchSuggestSource
+GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
+
+- (BOOL)isValidSourceForQuery:(HGSQuery *)query {
+  // We are a valid source for any web page with a suggest template
+  HGSObject *pivotObject = [query pivotObject];
+  return [pivotObject valueForKey:kHGSObjectAttributeWebSuggestTemplateKey] != nil;
+}
+
+- (NSURL *)suggestUrl:(HGSSearchOperation *)operation {
+  HGSQuery *query = [operation query];
+  HGSObject *pivotObject = [query pivotObject];
+  NSString *urlFormat = [pivotObject valueForKey:kHGSObjectAttributeWebSuggestTemplateKey];
+  urlFormat = [urlFormat stringByReplacingOccurrencesOfString:@"{searchterms}" withString:@"%@"];
+
+  // use the raw query so the server can do it's own parsing of it.
+  NSString *suggestUrlString = [NSString stringWithFormat:urlFormat,
+                                [[[operation query] rawQueryString] gtm_stringByEscapingForURLArgument]];
+  return [NSURL URLWithString:suggestUrlString];
+}
+
+- (NSArray *)filteredSuggestionsWithResponse:(NSArray *)response
+                                   withQuery:(HGSQuery *)query {
+  if ([response count] < 2) return [NSArray array];
+  NSArray* jsonSuggestions = [response objectAtIndex:1];
+
+  if (![jsonSuggestions isKindOfClass:[NSArray class]]) return [NSArray array];
+
+  NSMutableArray *suggestions =
+    [[[NSMutableArray alloc] initWithCapacity:[jsonSuggestions count]] autorelease];
+  NSEnumerator *suggestionsEnum = [jsonSuggestions objectEnumerator];
+  NSString *suggestion = nil;
+  HGSObject *pivotObject = [query pivotObject];
+  id image = [pivotObject displayIconWithLazyLoad:NO];
+  NSString *urlFormat = [pivotObject valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
+  urlFormat = [urlFormat stringByReplacingOccurrencesOfString:@"{searchterms}" withString:@"%@"];
+
+  while ((suggestion = [suggestionsEnum nextObject])) {
+    NSString *urlString = [NSString stringWithFormat:urlFormat,
+                           [suggestion gtm_stringByEscapingForURLArgument]];
+    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                image, kHGSObjectAttributeIconKey, nil];
+    HGSObject *object = [HGSObject objectWithIdentifier:[NSURL URLWithString:urlString]
+                                                   name:suggestion
+                                                   type:HGS_SUBTYPE(kHGSTypeWebpage, @"opensearch") // TODO(alcor): more complete/better type
+                                                 source:self
+                                             attributes:attributes];
+    [suggestions addObject:object];
+  }
+  return suggestions;
+}
+
+#pragma mark Caching
+
+- (void)initializeCache {
+  cache_ = [[NSMutableDictionary alloc] init];  // Runtime cache only.
+}
+
+- (void)cacheValue:(id)cacheValue forKey:(NSString *)key {
+  [cache_ setValue:cacheValue forKey:key];
+}
+
+@end

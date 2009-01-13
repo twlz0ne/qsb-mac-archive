@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>HGSAppleScriptPListVersionKey</key>
+	<integer>1</integer>
+	<key>HGSAppleScriptScriptsKey</key>
+	<array>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Get IP</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>getIP.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>getIP</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Get External IP</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>getExternalIP.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>getExternalIP</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<false/>
+		</dict>
+	</array>
+</dict>
+</plist>

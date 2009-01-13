@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>HGSAppleScriptPListVersionKey</key>
+	<integer>1</integer>
+	<key>HGSAppleScriptScriptsKey</key>
+	<array>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Close Disk Tray</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>closeDiskTray.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>closeDiskTray</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Eject Disk Tray</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>ejectDiskTray.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>ejectDiskTray</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Empty Trash</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>emptyTrash.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>emptyTrash</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Hide Others</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>hideOthers.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>hideOthers</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Lock Screen</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>lockScreen.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>lockScreen</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Log Out</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>logout.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>logout</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Quit Visible Applcations</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>quitVisibleApps.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>quitVisibleApps</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Restart</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>restart.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>restart</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Show All Applications</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>showAll.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>showAll</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Shut Down</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>shutDown.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>shutDown</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Sleep</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>sleep.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>sleep</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<true/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+		</dict>
+	</array>
+</dict>
+</plist>

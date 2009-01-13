@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>kHGSObjectAttributeName</key>
+		<string>%@ Mail</string>
+		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<string>gmail</string>
+		<key>Id</key>
+		<string>gmail</string>
+		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<string>http://mail.google.com/a/%@/#search/{searchterms}</string>
+		<key>kHGSCorporaSourceAttributeURIString</key>
+		<string>http://mail.google.com/a/%@/</string>
+		<key>AcceptsSource</key>
+		<true/>
+	</dict>
+	<dict>
+		<key>kHGSObjectAttributeName</key>
+		<string>%@ Calendar</string>
+		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<string>calendar</string>
+		<key>Id</key>
+		<string>calendar</string>
+		<key>kHGSCorporaSourceAttributeURIString</key>
+		<string>http://www.google.com/calendar/hosted/%@/</string>
+		<key>AcceptsSource</key>
+		<true/>
+	</dict>
+	<dict>
+		<key>kHGSObjectAttributeName</key>
+		<string>%@ Docs</string>
+		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<string>docs</string>
+		<key>Id</key>
+		<string>docs</string>
+		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<string>http://docs.google.com/a/%@/#search/{searchterms}</string>
+		<key>kHGSCorporaSourceAttributeURIString</key>
+		<string>http://docs.google.com/a/%@/</string>
+	</dict>
+	<dict>
+		<key>SupportedLanguages</key>
+		<dict>
+			<key>en</key>
+			<string></string>
+		</dict>
+		<key>AcceptsHL</key>
+		<true/>
+		<key>kHGSObjectAttributeName</key>
+		<string>%@ Talk</string>
+		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<string>talk</string>
+		<key>Id</key>
+		<string>talk</string>
+		<key>AcceptsSource</key>
+		<true/>
+		<key>kHGSCorporaSourceAttributeURIString</key>
+		<string>http://hostedtalkgadget.google.com/a/%@/talkgadget/popout</string>
+		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<string>http://hostedtalkgadget.google.com/a/%@/talkgadget/m</string>
+	</dict>
+</array>
+</plist>

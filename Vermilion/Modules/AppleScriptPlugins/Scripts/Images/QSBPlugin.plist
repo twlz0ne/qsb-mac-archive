@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>HGSAppleScriptPListVersionKey</key>
+	<integer>1</integer>
+	<key>HGSAppleScriptScriptsKey</key>
+	<array>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Rotate Clockwise 90 Degrees</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>rotateCW.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>rotateCW</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<false/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+			<key>HGSAppleScriptSupportedTypesKey</key>
+			<array>
+				<string>file.media.image</string>
+			</array>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Rotate Counter Clockwise 90 Degrees</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>rotateCCW.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>rotateCCW</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<false/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+			<key>HGSAppleScriptSupportedTypesKey</key>
+			<array>
+				<string>file.media.image</string>
+			</array>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Scale Image</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>scale.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>scale</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<false/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+			<key>HGSAppleScriptSupportedTypesKey</key>
+			<array>
+				<string>file.media.image</string>
+			</array>
+		</dict>
+		<dict>
+			<key>HGSAppleScriptDisplayNameKey</key>
+			<string>Convert</string>
+			<key>HGSAppleScriptIconKey</key>
+			<string>convert.icns</string>
+			<key>HGSAppleScriptHandlerKey</key>
+			<string>convert</string>
+			<key>HGSAppleScriptDisplayInGlobalResultsKey</key>
+			<false/>
+			<key>HGSAppleScriptSwitchContextsKey</key>
+			<true/>
+			<key>HGSAppleScriptSupportedTypesKey</key>
+			<array>
+				<string>file.media.image</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dictionary SYSTEM "file://localhost/System/Library/DTDs/sdef.dtd">
+
+<!--
+
+QSB.sdef
+Copyright 2007-2008 Google, Inc. All rights reserved.
+
+-->
+
+<dictionary>
+
+ <!-- STANDARD SUITE -->
+ 
+  <suite name="Standard Suite" code="????"
+      description="Common classes and commands for all applications.">
+
+    <command name="quit" code="aevtquit" description="Quit the application.">
+      <cocoa class="NSQuitCommand"/>
+    </command>
+
+    <class name="application" code="capp"
+           description="The application's top-level scripting object.">
+     
+      <cocoa class="QSBApplication"/>
+      
+      <property name="name" code="pnam" type="text" access="r"
+                description="The name of the application."/>
+                
+      <property name="frontmost" code="pisf" type="boolean" access="r"
+                description="Is this the frontmost (active) application?">
+        <cocoa key="isActive"/>
+      </property>
+      
+      <property name="version" code="vers" type="text" access="r"
+                description="The version of the application."/>
+      
+      <element name="plugins" code="QSPl" type="plugin" access="r"
+               description="The plugins installed in the application.">
+        <cocoa key="plugins"/>
+      </element>
+
+      <element name="search source" code="QSSS" type="extension" access="r"
+               description="The search sources installed in the application.">
+        <cocoa key="sourceExtensions"/>
+      </element>
+
+      <responds-to command="quit">
+        <cocoa method="handleQuitScriptCommand:"/>
+      </responds-to>
+      
+    </class>
+  </suite>
+  
+ <!-- Google Quick Search Suite -->
+ 
+ <suite name="Google Quick Search Suite" code="QSBS"
+        description="Classes and commands for Google Quick Search.">
+  <cocoa name="QSBSuite"/>
+
+  <command name="open preferences" code="QSBSOpPr" description="Display our preferences">
+    <cocoa class="QSBOpenPreferencesCommand"/>
+  </command>
+
+  <command name="open desktop homepage" code="QSBSOpPH" description="Open the Google Quick Search homepage">
+    <cocoa class="QSBOpenProductHomepageCommand"/>
+  </command>
+
+  <command name="show large type" code="QSBSLaTy" description="Display text in large type">
+    <cocoa class="QSBLargeTypeCommand"/>
+    <direct-parameter type="text" description="The text to display."/>
+  </command>
+  
+  <command name="search for" code="QSBSSeFo" description="Search for something">
+    <cocoa class="QSBSearchForCommand"/>
+    <direct-parameter type="text" description="The string to search for."/>
+    <parameter name="handler" code="Hand" type="script" optional="yes"
+               description="Callback handling script for search.">
+      <cocoa key="Handler"/>
+    </parameter>
+    <result>
+      <type type="search result" list="yes"/>
+    </result>
+  </command>
+
+  <event name="results received" code="QSBSReRe" 
+           description="This handler is called when results come back from a search">
+    <cocoa name="ResultsReceived" class="EventHandlerCommand"/>
+    <direct-parameter description="The search results.">
+      <type type="search result" list="yes"/>
+    </direct-parameter>
+    <parameter name="for" code="Fore" type="text" 
+               description="The text of the original query">
+      <cocoa key="forQuery"/>
+    </parameter>
+  </event>
+  
+  <class name="plugin" code="HGPl"
+         description="A plugin.">
+     <cocoa class="HGSPlugin"/>
+     <property name="enabled" code="Enab" type="boolean" access="rw"
+               description="Is this plugin enabled?">
+        <cocoa key="isEnabled"/>
+     </property>
+     <property name="name" code="pnam" type="text" access="r"
+               description="Name of the plugin.">
+        <cocoa key="displayName"/>
+     </property>
+     <property name="id" code="ID  " type="text" access="r"
+               description="Plugin ID">
+        <cocoa key="bundleIdentifier"/>
+     </property>
+   </class>
+   
+   <class name="extension" code="HGEx"
+         description="An extension.">
+     <cocoa class="HGSProtoExtension"/>
+     <property name="name" code="pnam" type="text" access="r"
+               description="Name of the extension.">
+        <cocoa key="displayName"/>
+     </property>
+     <property name="version" code="vers" type="text" access="r"
+               description="Version of the extension.">
+        <cocoa key="extensionVersion"/>
+     </property>
+     <property name="description" code="Desc" type="text" access="r"
+               description="Description of the extension.">
+        <cocoa key="extensionDescription"/>
+     </property>
+     <property name="id" code="ID  " type="text" access="r"
+               description="Extension ID">
+        <cocoa key="extensionIdentifier"/>
+     </property>
+     <property name="installed" code="Enab" type="boolean" access="rw"
+               description="Is this search source installed?">
+        <cocoa key="isInstalled"/>
+     </property>
+   </class>
+   
+   <value-type name="script" code="scpt">
+     <cocoa class="NSAppleScript"/>
+   </value-type>
+
+   <record-type name="search result" code="SeRe">
+     <property name="name" code="pnam" type="text"
+               description="name of the result">
+       <cocoa key="title"/>
+    </property>
+
+     <property name="URL" code="pURL" type="text"
+               description="url of the result">
+       <cocoa key="link"/>
+     </property>
+   </record-type>
+ </suite>
+
+</dictionary>
