@@ -928,7 +928,6 @@
 		8BC3F4C90F17C7C000896770 /* blogger.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4690F17C7BF00896770 /* blogger.icns */; };
 		8BC3F4CA0F17C7C000896770 /* blogger.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F46A0F17C7BF00896770 /* blogger.png */; };
 		8BC3F4CB0F17C7C000896770 /* blogger_128.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F46B0F17C7BF00896770 /* blogger_128.png */; };
-		8BC3F4CC0F17C7C000896770 /* buganizer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F46C0F17C7BF00896770 /* buganizer.icns */; };
 		8BC3F4CD0F17C7C000896770 /* calendar.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F46D0F17C7BF00896770 /* calendar.icns */; };
 		8BC3F4CE0F17C7C000896770 /* calendar.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F46E0F17C7BF00896770 /* calendar.png */; };
 		8BC3F4CF0F17C7C000896770 /* calendar_128.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F46F0F17C7BF00896770 /* calendar_128.png */; };
@@ -946,7 +945,6 @@
 		8BC3F4DC0F17C7C000896770 /* maps.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F47C0F17C7BF00896770 /* maps.icns */; };
 		8BC3F4DD0F17C7C000896770 /* maps.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F47D0F17C7C000896770 /* maps.png */; };
 		8BC3F4DE0F17C7C000896770 /* maps_128.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F47E0F17C7C000896770 /* maps_128.png */; };
-		8BC3F4DF0F17C7C000896770 /* moma.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F47F0F17C7C000896770 /* moma.icns */; };
 		8BC3F4E00F17C7C000896770 /* news.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4800F17C7C000896770 /* news.icns */; };
 		8BC3F4E10F17C7C000896770 /* news.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4810F17C7C000896770 /* news.png */; };
 		8BC3F4E20F17C7C000896770 /* news_128.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4820F17C7C000896770 /* news_128.png */; };
@@ -965,7 +963,6 @@
 		8BC3F4EF0F17C7C000896770 /* sync.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F48F0F17C7C000896770 /* sync.png */; };
 		8BC3F4F00F17C7C000896770 /* talk.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4900F17C7C000896770 /* talk.icns */; };
 		8BC3F4F10F17C7C000896770 /* talk.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4910F17C7C000896770 /* talk.png */; };
-		8BC3F4F20F17C7C000896770 /* ux.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4920F17C7C000896770 /* ux.icns */; };
 		8BC3F4F30F17C7C000896770 /* youtube.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4930F17C7C000896770 /* youtube.icns */; };
 		8BC3F4F40F17C7C000896770 /* youtube.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4940F17C7C000896770 /* youtube.png */; };
 		8BC3F4F50F17C7C000896770 /* youtube_128.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4950F17C7C000896770 /* youtube_128.png */; };
@@ -2503,7 +2500,6 @@
 		8BC3F4690F17C7BF00896770 /* blogger.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = blogger.icns; sourceTree = "<group>"; };
 		8BC3F46A0F17C7BF00896770 /* blogger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blogger.png; sourceTree = "<group>"; };
 		8BC3F46B0F17C7BF00896770 /* blogger_128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blogger_128.png; sourceTree = "<group>"; };
-		8BC3F46C0F17C7BF00896770 /* buganizer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = buganizer.icns; sourceTree = "<group>"; };
 		8BC3F46D0F17C7BF00896770 /* calendar.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = calendar.icns; sourceTree = "<group>"; };
 		8BC3F46E0F17C7BF00896770 /* calendar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = calendar.png; sourceTree = "<group>"; };
 		8BC3F46F0F17C7BF00896770 /* calendar_128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = calendar_128.png; sourceTree = "<group>"; };
@@ -2522,7 +2518,6 @@
 		8BC3F47C0F17C7BF00896770 /* maps.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = maps.icns; sourceTree = "<group>"; };
 		8BC3F47D0F17C7C000896770 /* maps.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = maps.png; sourceTree = "<group>"; };
 		8BC3F47E0F17C7C000896770 /* maps_128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = maps_128.png; sourceTree = "<group>"; };
-		8BC3F47F0F17C7C000896770 /* moma.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = moma.icns; sourceTree = "<group>"; };
 		8BC3F4800F17C7C000896770 /* news.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = news.icns; sourceTree = "<group>"; };
 		8BC3F4810F17C7C000896770 /* news.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = news.png; sourceTree = "<group>"; };
 		8BC3F4820F17C7C000896770 /* news_128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = news_128.png; sourceTree = "<group>"; };
@@ -2541,7 +2536,6 @@
 		8BC3F48F0F17C7C000896770 /* sync.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sync.png; sourceTree = "<group>"; };
 		8BC3F4900F17C7C000896770 /* talk.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = talk.icns; sourceTree = "<group>"; };
 		8BC3F4910F17C7C000896770 /* talk.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = talk.png; sourceTree = "<group>"; };
-		8BC3F4920F17C7C000896770 /* ux.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ux.icns; sourceTree = "<group>"; };
 		8BC3F4930F17C7C000896770 /* youtube.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = youtube.icns; sourceTree = "<group>"; };
 		8BC3F4940F17C7C000896770 /* youtube.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = youtube.png; sourceTree = "<group>"; };
 		8BC3F4950F17C7C000896770 /* youtube_128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = youtube_128.png; sourceTree = "<group>"; };
@@ -4536,7 +4530,6 @@
 				8BC3F4690F17C7BF00896770 /* blogger.icns */,
 				8BC3F46A0F17C7BF00896770 /* blogger.png */,
 				8BC3F46B0F17C7BF00896770 /* blogger_128.png */,
-				8BC3F46C0F17C7BF00896770 /* buganizer.icns */,
 				8BC3F46D0F17C7BF00896770 /* calendar.icns */,
 				8BC3F46E0F17C7BF00896770 /* calendar.png */,
 				8BC3F46F0F17C7BF00896770 /* calendar_128.png */,
@@ -4555,7 +4548,6 @@
 				8BC3F47C0F17C7BF00896770 /* maps.icns */,
 				8BC3F47D0F17C7C000896770 /* maps.png */,
 				8BC3F47E0F17C7C000896770 /* maps_128.png */,
-				8BC3F47F0F17C7C000896770 /* moma.icns */,
 				8BC3F4800F17C7C000896770 /* news.icns */,
 				8BC3F4810F17C7C000896770 /* news.png */,
 				8BC3F4820F17C7C000896770 /* news_128.png */,
@@ -4574,7 +4566,6 @@
 				8BC3F48F0F17C7C000896770 /* sync.png */,
 				8BC3F4900F17C7C000896770 /* talk.icns */,
 				8BC3F4910F17C7C000896770 /* talk.png */,
-				8BC3F4920F17C7C000896770 /* ux.icns */,
 				8BC3F4930F17C7C000896770 /* youtube.icns */,
 				8BC3F4940F17C7C000896770 /* youtube.png */,
 				8BC3F4950F17C7C000896770 /* youtube_128.png */,
@@ -5958,7 +5949,6 @@
 				8BC3F4C90F17C7C000896770 /* blogger.icns in Resources */,
 				8BC3F4CA0F17C7C000896770 /* blogger.png in Resources */,
 				8BC3F4CB0F17C7C000896770 /* blogger_128.png in Resources */,
-				8BC3F4CC0F17C7C000896770 /* buganizer.icns in Resources */,
 				8BC3F4CD0F17C7C000896770 /* calendar.icns in Resources */,
 				8BC3F4CE0F17C7C000896770 /* calendar.png in Resources */,
 				8BC3F4CF0F17C7C000896770 /* calendar_128.png in Resources */,
@@ -5976,7 +5966,6 @@
 				8BC3F4DC0F17C7C000896770 /* maps.icns in Resources */,
 				8BC3F4DD0F17C7C000896770 /* maps.png in Resources */,
 				8BC3F4DE0F17C7C000896770 /* maps_128.png in Resources */,
-				8BC3F4DF0F17C7C000896770 /* moma.icns in Resources */,
 				8BC3F4E00F17C7C000896770 /* news.icns in Resources */,
 				8BC3F4E10F17C7C000896770 /* news.png in Resources */,
 				8BC3F4E20F17C7C000896770 /* news_128.png in Resources */,
@@ -5995,7 +5984,6 @@
 				8BC3F4EF0F17C7C000896770 /* sync.png in Resources */,
 				8BC3F4F00F17C7C000896770 /* talk.icns in Resources */,
 				8BC3F4F10F17C7C000896770 /* talk.png in Resources */,
-				8BC3F4F20F17C7C000896770 /* ux.icns in Resources */,
 				8BC3F4F30F17C7C000896770 /* youtube.icns in Resources */,
 				8BC3F4F40F17C7C000896770 /* youtube.png in Resources */,
 				8BC3F4F50F17C7C000896770 /* youtube_128.png in Resources */,
