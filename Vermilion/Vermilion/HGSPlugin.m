@@ -107,6 +107,8 @@ static BOOL gValidatingPlugins = NO;
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     gValidatingPlugins = [ud boolForKey:@"HGSValidatePlugins"];
     #endif  // DEBUG
+    HGSModuleLoader *loader = [HGSModuleLoader sharedModuleLoader];
+    [loader registerClass:self forExtensions:[NSArray arrayWithObject:@"hgs"]];
   }
 }
 
@@ -114,14 +116,14 @@ static BOOL gValidatingPlugins = NO;
   return gValidatingPlugins;
 }
 
-- (id)initWithBundleAtPath:(NSString *)bundlePath {
+- (id)initWithPath:(NSString *)path {
   if ((self = [super init])) {
     BOOL debugPlugins = [HGSPlugin validatePlugins];
 
-    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
+    NSBundle *bundle = [NSBundle bundleWithPath:path];
     if (bundle) {
       [self setBundle:bundle];
-      [self setBundlePath:[bundlePath stringByStandardizingPath]];
+      [self setBundlePath:[path stringByStandardizingPath]];
       NSString *bundleName
         = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
       if (!bundleName) {
@@ -170,7 +172,7 @@ static BOOL gValidatingPlugins = NO;
         if (debugPlugins) {
           HGSLog(@"No extensions found in plugin at path %@. "
                  @"Directly loading. NOTE: This is not necessarily an error.",
-                 bundlePath);
+                 path);
         }
         Class principal = [bundle principalClass];
         if (principal) {
@@ -202,7 +204,7 @@ static BOOL gValidatingPlugins = NO;
       }
     } else {
       if (debugPlugins) {
-        HGSLog(@"Unable to get bundle for path %@", bundlePath);
+        HGSLog(@"Unable to get bundle for path %@", path);
       }
       [self release];
       self = nil;
@@ -417,6 +419,19 @@ static BOOL gValidatingPlugins = NO;
   [extensionsToUninstall makeObjectsPerformSelector:@selector(uninstall)];
 }
 
+- (void)removeExtension:(HGSProtoExtension *)protoExtension {
+  [protoExtension uninstall];
+  
+  // The proto extension will be released when removed from the array so
+  // hold on to it through this cycle.
+  [[protoExtension retain] autorelease];
+  
+  NSArray *oldProtoExtensions = [self protoExtensions];
+  NSMutableArray *newProtoExtensions = [oldProtoExtensions mutableCopy];
+  [newProtoExtensions removeObject:protoExtension];
+  [self setProtoExtensions:newProtoExtensions];
+}
+
 - (void)stripOldUnmergedExtensions {
   // This will not uninstall extensions because none should have been
   // installed at this point.
@@ -518,7 +533,7 @@ static BOOL gValidatingPlugins = NO;
 - (void)setProtoExtensions:(NSArray *)protoExtensions {
   [protoExtensions_ autorelease];
   protoExtensions_ = [protoExtensions retain];
-  
+
   // Calculate the source and action count.  Also, set the plugin for
   // each extension to be myself.
   NSUInteger sourceCount = 0;

@@ -58,9 +58,12 @@ static NSString* const kCachedNameTerms = @"NameTerms";
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
     NSString *path = [kSafariBookmarksPath stringByStandardizingPath];
+    GTMFileSystemKQueueEvents safariEvents = (kGTMFileSystemKQueueDeleteEvent 
+                                              | kGTMFileSystemKQueueWriteEvent);
+
     fileKQueue_ 
       = [[GTMFileSystemKQueue alloc] initWithPath:path
-                                        forEvents:kGTMFileSystemKQueueAllEvents
+                                        forEvents:safariEvents
                                     acrossReplace:YES
                                            target:self
                                            action:@selector(fileChanged:event:)];

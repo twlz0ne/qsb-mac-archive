@@ -87,6 +87,17 @@
 @end
 
 
+// A protocol to which extensions wanting access to an account must adhere.
+//
+@protocol HGSAccountClientProtocol
+
+// Inform an account clients that an account is going to be removed.  The
+// client should return YES if it should be shut down and deleted.
+- (BOOL)accountWillBeRemoved:(id<HGSAccount>)account;
+
+@end
+
+
 @interface HGSAccount : HGSExtension <HGSAccount> {
  @private
   NSString *accountName_;
@@ -119,7 +130,8 @@
 - (void)setAccountPassword:(NSString *)password;
 
 // Do what is appropriate in order to remove the account.  The default
-// does nothing.
+// removes the account from the accounts extensions point.  If you derive
+// a subclass then you should call super's (this) remove.
 - (void)remove;
 
 // Determine if the account is editable.  The default returns YES.
@@ -129,6 +141,7 @@
 - (BOOL)isAuthenticated;
 
 @end
+
 
 // Notification sent whenever an account has been changed.  The |object|
 // sent with the notification is the HGSAccount instance that has been changed.

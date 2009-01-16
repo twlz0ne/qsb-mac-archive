@@ -32,6 +32,7 @@
 
 #import "HGSAccount.h"
 #import "HGSAccountsExtensionPoint.h"
+#import "HGSLog.h"
 
 
 NSString *const kHGSAccountDisplayNameFormat = @"%@ (%@)";
@@ -86,7 +87,7 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 
 - (void) dealloc {
   [accountName_ release];
-  [accountType_ release];  
+  [accountType_ release]; 
   [super dealloc];
 }
 
@@ -107,12 +108,11 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
                                object:[self identifier]];
 }
 
-// TODO(mrossetti): Move this functionality into the base class and have
-// the derived class provide the notification key.
 - (void)remove {
-  NSString *accountIdentifier = [self identifier];
-  [[HGSAccountsExtensionPoint accountsExtensionPoint]
-   removeExtensionWithIdentifier:accountIdentifier];
+  // Remove the account extension.
+  HGSAccountsExtensionPoint *accountsExtensionPoint
+    = [HGSAccountsExtensionPoint accountsExtensionPoint];
+  [accountsExtensionPoint removeExtension:self];
 }
 
 - (BOOL)isEditable {

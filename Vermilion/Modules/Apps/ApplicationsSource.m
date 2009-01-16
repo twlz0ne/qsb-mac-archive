@@ -42,7 +42,7 @@
 
 static NSString *const kPredicateString 
   = @"(kMDItemContentTypeTree == 'com.apple.application') "
-    @"OR (kMDItemContentTypeTree == 'com.apple.systempreference.prefpane')";
+    @"|| (kMDItemContentTypeTree == 'com.apple.systempreference.prefpane')";
 
 @implementation ApplicationsSource
 
@@ -115,6 +115,15 @@ static NSString *const kPredicateString
                                (NSString*)kMDItemLastUsedDate,
                                nil];
   NSUInteger resultCount = [query resultCount];
+  //TODO(dmaclach): remove this once real ranking is in
+  NSNumber *rank = [NSNumber numberWithFloat:0.9f];
+  NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag];
+  NSMutableDictionary *attributes
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       rankFlags, kHGSObjectAttributeRankFlagsKey,
+       rank, kHGSObjectAttributeRankKey,
+       nil];
+  
   for (NSUInteger i = 0; i < resultCount; ++i) {
     NSMetadataItem *result = [query resultAtIndex:i];
     NSDictionary *mdAttributes = [result valuesForAttributes:mdAttributeNames];
@@ -123,7 +132,6 @@ static NSString *const kPredicateString
     if ([self pathShouldBeSuppressed:path])
       continue;
     
-    NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag];
     NSString *name = [mdAttributes objectForKey:(NSString*)kMDItemTitle];
     if (!name) {
       name = [mdAttributes objectForKey:(NSString*)kMDItemDisplayName];
@@ -155,17 +163,10 @@ static NSString *const kPredicateString
       date = [NSDate distantPast];
     }
     
-    //TODO(dmaclach): remove this once real ranking is in
-    NSNumber *rank = [NSNumber numberWithFloat:0.9f];
-    NSMutableDictionary *attributes
-      = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-         date, kHGSObjectAttributeLastUsedDateKey, 
-         rankFlags, kHGSObjectAttributeRankFlagsKey,
-         rank, kHGSObjectAttributeRankKey,
-         nil];
-    
+    [attributes setObject:date forKey:kHGSObjectAttributeLastUsedDateKey];
+
     // create a HGSObject to talk to the rest of the application
-    HGSObject *gdResult 
+    HGSObject *hgsResult 
       = [HGSObject objectWithIdentifier:[NSURL fileURLWithPath:path]
                                    name:name
                                    type:kHGSTypeFileApplication
@@ -173,9 +174,37 @@ static NSString *const kPredicateString
                              attributes:attributes];
     
     // add it to the result array for searching
-    [self indexResult:gdResult
+    [self indexResult:hgsResult
            nameString:name
           otherString:nil];
+  }
+  
+  // Due to a bug in 10.5.6 we can't find the network prefpane
+  // add it by hand
+  // Radar 6495591 Can't find network prefpane using spotlight
+  NSString *networkPath = @"/System/Library/PreferencePanes/Network.prefPane";
+  NSBundle *networkBundle = [NSBundle bundleWithPath:networkPath];
+
+  if (networkBundle) {
+    NSString *name 
+      = [networkBundle objectForInfoDictionaryKey:@"NSPrefPaneIconLabel"];
+    
+    NSURL *networkURL = [NSURL fileURLWithPath:networkPath];
+    // Unfortunately last used date is hidden from us.
+    [attributes removeObjectForKey:kHGSObjectAttributeLastUsedDateKey];
+
+    HGSObject *hgsResult 
+      = [HGSObject objectWithIdentifier:networkURL
+                                   name:name
+                                   type:kHGSTypeFileApplication
+                                 source:self
+                             attributes:attributes];
+
+    [self indexResult:hgsResult
+           nameString:name
+          otherString:nil];
+  } else {
+    HGSLog(@"Unable to find Network.prefpane");
   }
   
   indexing_ = NO;

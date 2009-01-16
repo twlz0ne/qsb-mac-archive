@@ -30,8 +30,24 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
+#import "HGSLog.h"
+#import <GoogleBreakpad/GoogleBreakpad.h>
 
 int main(int argc, const char *argv[]) {
-  return NSApplicationMain(argc,  (const char **) argv);
+  // Need a local pool for breakpad plumbing
+  NSAutoreleasePool *localPool = [[NSAutoreleasePool alloc] init];
+  NSDictionary *plist = [[NSBundle mainBundle] infoDictionary];
+  HGSAssert(plist, @"Unable to get our Info.plist");
+  GoogleBreakpadRef breakpad = GoogleBreakpadCreate(plist);
+  HGSAssert(breakpad, @"Unable to initialize breakpad");
+  
+  // Go!
+  int appValue = NSApplicationMain(argc,  (const char **) argv);
+  
+  if (breakpad) {
+    GoogleBreakpadRelease(breakpad);
+  }
+  [localPool release];
+  return appValue;
 }

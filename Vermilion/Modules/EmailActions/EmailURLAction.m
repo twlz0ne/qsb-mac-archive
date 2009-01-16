@@ -93,4 +93,14 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return wasGood;
 }
 
+- (BOOL)doesActionApplyTo:(HGSObject*)result {
+  // We don't want to sent fileURLs
+  BOOL isGood = NO;
+  NSURL *urlToSend = [result valueForKey:kHGSObjectAttributeURIKey];
+  if (urlToSend) {
+    isGood = [urlToSend isFileURL] ? NO : YES;
+  }
+  return isGood;
+}
+
 @end

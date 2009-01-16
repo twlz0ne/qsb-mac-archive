@@ -42,7 +42,7 @@
   IBOutlet NSSecureTextField *passField_;
   IBOutlet NSPopUpButton *colorPopUp_;
   IBOutlet NSTabView *settingsTabView_;
-
+  
   BOOL prefsColorWellWasShowing_;  // YES if color well was showing.
   NSInteger pluginsTabIndex_;
   NSColorList *colors_;
@@ -60,6 +60,9 @@
   NSString *accountType_;
   
   id<HGSAccount> accountBeingEdited_;  // Weak
+  
+  LSSharedFileListRef openAtLoginItemsList_;
+  UInt32 openAtLoginItemsSeedValue_;
 }
 
 @property (nonatomic, copy) NSString *accountName;

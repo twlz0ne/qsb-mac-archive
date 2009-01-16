@@ -77,10 +77,13 @@
 @interface HGSModuleLoader : NSObject {
  @private
   __weak id<HGSDelegate> delegate_;
+  NSMutableDictionary *extensionMap_;
 }
 
 // Return the shared module Loader.
 + (HGSModuleLoader*)sharedModuleLoader;
+
+- (void)registerClass:(Class)cls forExtensions:(NSArray *)extensions;
 
 // Given a path to a folder where modules may live, identify all modules and
 // their sources and actions, and return them as mutable plugins.

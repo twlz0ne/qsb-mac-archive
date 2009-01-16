@@ -113,6 +113,7 @@ static NSString *const kiPhoneReferenceDocSetPath
   nodes = [nodes filteredArrayUsingPredicate:pred];  
 
   for (id node in nodes) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSString *name = [node valueForKey:@"name"];
     NSString *path = [node valueForKey:@"path"];
     NSURL *url = nil;
@@ -145,6 +146,7 @@ static NSString *const kiPhoneReferenceDocSetPath
     [self indexResult:result
            nameString:name
           otherString:nil];
+    [pool release];
   }
 }
 

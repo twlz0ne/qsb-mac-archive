@@ -31,6 +31,8 @@
 //
 
 #import "HGSGoogleAccount.h"
+#import "GTMMethodCheck.h"
+#import "GTMNSString+URLArguments.h"
 #import "HGSLog.h"
 #import "KeychainItem.h"
 
@@ -146,6 +148,7 @@
   KeychainItem *item = [KeychainItem keychainItemForService:keychainServiceName 
                                                    username:nil];
   [item removeFromKeychain];
+  [super remove];
 }
 
 - (NSString *)accountPassword {
@@ -169,6 +172,8 @@
 
 @implementation HGSGoogleAccount (HGSGoogleAccountPrivateMethods)
 
+GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
+
 - (KeychainItem *)keychainItem {
   NSString *keychainServiceName = [self identifier];
   KeychainItem *item = [KeychainItem keychainItemForService:keychainServiceName 
@@ -182,8 +187,11 @@
   NSString * const accountTestFormat
     = @"https://www.google.com/accounts/ClientLogin?Email=%@&Passwd=%@"
       @"&source=GoogleQuickSearch&accountType=HOSTED_OR_GOOGLE";
+  NSString *accountName = [self accountName];
+  NSString *encodedAccountName = [accountName gtm_stringByEscapingForURLArgument];
+  NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
   NSString *accountTestString = [NSString stringWithFormat:accountTestFormat,
-                                 [self accountName], password];
+                                 encodedAccountName, encodedPassword];
   NSURL *accountTestURL = [NSURL URLWithString:accountTestString];
   NSURLRequest *accountRequest = [NSURLRequest requestWithURL:accountTestURL];
   NSURLResponse *accountResponse = nil;

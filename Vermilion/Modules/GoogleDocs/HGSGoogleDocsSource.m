@@ -39,7 +39,7 @@ static NSString* const kDocCategoryDocument = @"document";
 static NSString* const kDocCategorySpreadsheet = @"spreadsheet";
 static NSString* const kDocCategoryPresentation = @"presentation";
 
-@interface HGSGoogleDocsSource : HGSMemorySearchSource {
+@interface HGSGoogleDocsSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
   GDataServiceGoogleDocs* docService_;
   GDataServiceTicket *    serviceTicket_;
@@ -93,10 +93,6 @@ static NSString* const kDocCategoryPresentation = @"presentation";
       [nc addObserver:self
              selector:@selector(loginCredentialsChanged:)
                  name:kHGSDidChangeAccountNotification
-               object:nil];
-      [nc addObserver:self
-             selector:@selector(willRemoveLoginCredentials:)
-                 name:kHGSWillRemoveAccountNotification
                object:nil];
     } else {
       HGSLogDebug(@"Missing account identifier for HGSGoogleDocsSource '%@'",
@@ -190,18 +186,6 @@ static NSString* const kDocCategoryPresentation = @"presentation";
     // credentials were incorrect).
     [self startAsynchronousDocsListFetch];
     [self setUpPeriodicRefresh];
-  }
-}
-
-- (void)willRemoveLoginCredentials:(id)object {
-  if ([accountIdentifier_ isEqualToString:object]) {
-    if (currentlyFetching_) {
-      [serviceTicket_ cancelTicket];
-    }
-    [serviceTicket_ release];
-    serviceTicket_ = nil;
-    [docService_ release];
-    docService_ = nil;
   }
 }
 
@@ -357,6 +341,25 @@ static NSString* const kDocCategoryPresentation = @"presentation";
     }
   }
   return peopleTerms;
+}
+
+#pragma mark -
+#pragma mark HGSAccountClientProtocol Methods
+
+- (BOOL)accountWillBeRemoved:(id<HGSAccount>)account {
+  BOOL removeMe = NO;
+  NSString *accountIdentifier = [account identifier];
+  if ([accountIdentifier_ isEqualToString:accountIdentifier]) {
+    if (currentlyFetching_) {
+      [serviceTicket_ cancelTicket];
+    }
+    [serviceTicket_ release];
+    serviceTicket_ = nil;
+    [docService_ release];
+    docService_ = nil;
+    removeMe = YES;
+  }
+  return removeMe;
 }
 
 @end

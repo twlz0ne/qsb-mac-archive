@@ -186,7 +186,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
     directObjectKey = kITunesAttributePlaylistKey;
   }
   if (handler && directObjectKey) {
-    id directObjectVal = [directObject valueForKey:kITunesAttributePlaylistKey];
+    id directObjectVal = [directObject valueForKey:directObjectKey];
     NSArray *parameters 
       = [NSArray arrayWithObjects:directObjectVal, extraArg, nil];
     NSDictionary *scriptParams = [NSDictionary dictionaryWithObjectsAndKeys:

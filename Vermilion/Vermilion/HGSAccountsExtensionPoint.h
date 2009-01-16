@@ -82,4 +82,6 @@ extern NSString *const kHGSAccountsExtensionPoint;
 // HGSAccount instance that has been added, changed or will be removed.
 extern NSString *const kHGSDidAddAccountNotification;
 extern NSString *const kHGSWillRemoveAccountNotification;
+// The didRemove |object| is the account identifier since the account
+// will no longer be valid.
 extern NSString *const kHGSDidRemoveAccountNotification;

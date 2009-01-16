@@ -34,12 +34,17 @@
 #import <Vermilion/Vermilion.h>
 #import "GTMMethodCheck.h"
 #import "GTMNSString+URLArguments.h"
-#import "QSBConstants.h"
 #import "NSAttributedString+Attributes.h"
 #import "GTMNSString+HTML.h"
 #import "QSBQueryController.h"
 #import "QSBMoreResultsViewDelegate.h"
 #import "NSString+ReadableURL.h"
+
+typedef enum {
+  kQSBResultDescriptionTitle = 0,
+  kQSBResultDescriptionSnippet,
+  kQSBResultDescriptionSourceURL
+} QSBResultDescriptionItemType;
 
 @interface QSBTableResult (QSBTableResultPrivateMethods)
 

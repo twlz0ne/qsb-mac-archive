@@ -73,9 +73,11 @@ static NSURL* domainURLForURLString(NSString* urlString) {
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
     NSString *path = [kCaminoBookmarksPath stringByStandardizingPath];
+    GTMFileSystemKQueueEvents caminoEvents = (kGTMFileSystemKQueueDeleteEvent 
+                                              | kGTMFileSystemKQueueWriteEvent);
     fileKQueue_
       = [[GTMFileSystemKQueue alloc] initWithPath:path
-                                        forEvents:kGTMFileSystemKQueueAllEvents
+                                        forEvents:caminoEvents
                                     acrossReplace:YES
                                            target:self
                                            action:@selector(fileChanged:event:)];

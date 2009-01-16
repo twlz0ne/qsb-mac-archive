@@ -145,7 +145,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   if (wasGood) {
     NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
     [defaultCenter postNotificationName:kHGSDidAddAccountNotification 
-                                 object:[account identifier]];
+                                 object:account];
   }
   return wasGood;
 }
@@ -155,7 +155,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   NSString *accountIdentifier = [extension identifier];
   NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
   [defaultCenter postNotificationName:kHGSWillRemoveAccountNotification 
-                               object:accountIdentifier];
+                               object:extension];
   
   [super removeExtension:extension];
   [defaultCenter postNotificationName:kHGSDidRemoveAccountNotification 

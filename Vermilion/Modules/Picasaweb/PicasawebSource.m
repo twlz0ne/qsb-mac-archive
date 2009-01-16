@@ -54,7 +54,7 @@ static NSString *const kHGSPicasawebFetchOperationPhoto
 
 static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
 
-@interface PicasawebSource : HGSMemorySearchSource {
+@interface PicasawebSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
   GDataServiceGooglePhotos *picasawebService_;
   NSMutableSet *activeTickets_;
@@ -108,10 +108,6 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
       [nc addObserver:self
              selector:@selector(loginCredentialsChanged:)
                  name:kHGSDidChangeAccountNotification
-               object:nil];
-      [nc addObserver:self
-             selector:@selector(willRemoveLoginCredentials:)
-                 name:kHGSWillRemoveAccountNotification
                object:nil];
     } else {
       HGSLogDebug(@"Missing account identifier for HGSGoogleDocsSource '%@'",
@@ -215,17 +211,6 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
     // credentials were incorrect).
     [self startAlbumInfoFetch];
     [self setUpPeriodicRefresh];
-  }
-}
-
-- (void)willRemoveLoginCredentials:(id)object {
-  if ([accountIdentifier_ isEqualToString:object]) {
-    // Cancel any outstanding fetches.
-    [self cancelAllTickets];
-
-    // And get rid of the service.
-    [picasawebService_ release];
-    picasawebService_ = nil;
   }
 }
 
@@ -496,6 +481,7 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
   }
 }
 
+#pragma mark -
 #pragma mark Thumbnails
 
 + (void)setBestFitThumbnailFromMediaGroup:(GDataMediaGroup *)mediaGroup
@@ -517,8 +503,28 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
   }
 }
 
+#pragma mark -
+#pragma mark HGSAccountClientProtocol Methods
+
+- (BOOL)accountWillBeRemoved:(id<HGSAccount>)account {
+  BOOL removeMe = NO;
+  NSString *accountIdentifier = [account identifier];
+  if ([accountIdentifier_ isEqualToString:accountIdentifier]) {
+    // Cancel any outstanding fetches.
+    [self cancelAllTickets];
+    
+    // And get rid of the service.
+    [picasawebService_ release];
+    picasawebService_ = nil;
+    removeMe = YES;
+  }
+  return removeMe;
+}
+
 @end
 
+
+#pragma mark -
 
 @implementation GDataMediaGroup (VermillionAdditions)
 

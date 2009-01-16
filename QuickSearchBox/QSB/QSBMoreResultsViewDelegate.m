@@ -36,7 +36,6 @@
 #import "QSBQuery.h"
 #import "QSBQueryController.h"
 #import "QSBPreferences.h"
-#import "QSBConstants.h"
 #import "QSBTableResult.h"
 #import "QSBResultsViewTableView.h"
 #import "QSBSearchWindowController.h"

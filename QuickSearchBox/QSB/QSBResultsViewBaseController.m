@@ -35,7 +35,6 @@
 #import "QSBApplicationDelegate.h"
 #import "QSBMoreStandardRowViewController.h"
 #import "QSBQueryController.h"
-#import "QSBConstants.h"
 #import "QSBTableResult.h"
 #import "QSBResultsViewTableView.h"
 #import "QSBSearchWindowController.h"
@@ -43,7 +42,7 @@
 #import "GTMGeometryUtils.h"
 
 static const CGFloat kScrollViewMinusTableHeight = 7.0;
-
+static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 
 @interface QSBResultsViewBaseController (QSBResultsViewBaseControllerPrivateMethods)
 
@@ -60,10 +59,6 @@ static const CGFloat kScrollViewMinusTableHeight = 7.0;
                             forKeyPath:kQSBArrangedObjectsKVOKey
                                options:NSKeyValueObservingOptionNew
                                context:NULL];
-  [resultsArrayController_ addObserver:self
-                            forKeyPath:kQSBSelectionIndexesKVOKey
-                               options:NSKeyValueObservingOptionNew
-                               context:NULL];
   resultsNeedUpdating_ = YES;
   [resultsTableView_ setDoubleAction:@selector(openResultsTableItem:)];
   QSBSearchWindowController *controller = [self searchWindowController];
@@ -74,8 +69,6 @@ static const CGFloat kScrollViewMinusTableHeight = 7.0;
   [rowViewControllers_ release];
   [resultsArrayController_ removeObserver:self
                                forKeyPath:kQSBArrangedObjectsKVOKey];
-  [resultsArrayController_ removeObserver:self
-                               forKeyPath:kQSBSelectionIndexesKVOKey];
   [queryString_ release];
   [super dealloc];
 }
@@ -295,8 +288,6 @@ static const CGFloat kScrollViewMinusTableHeight = 7.0;
       rowCount_ = [newArrangedObjects count];
       [[self resultsTableView] reloadData];
       [queryController_ updateResultsView];
-    } else if ([keyPath isEqualToString:kQSBSelectionIndexesKVOKey]) {
-      [[self searchWindowController] completeQueryText];    
     }
   } 
 }

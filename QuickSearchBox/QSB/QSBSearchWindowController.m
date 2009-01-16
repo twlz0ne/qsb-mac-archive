@@ -108,7 +108,7 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 
 // Pops off and releases the top view controller and returns the popped
 // view controller if is it isn't the base controller.
-- (NSViewController *)popViewController;
+- (NSViewController *)popViewControllerAnimate:(BOOL)animate;
 
 // Flush all stacked view/query controllers and clear the search text
 // without any user visible view changes.
@@ -476,7 +476,7 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
     [activeQueryController_ setQueryString:nil];
   } else if ([activeQueryController_ pivotObject]) {
     // Otherwise, if there's a pivot then pop that pivot.
-    [self popViewController];
+    [self popViewControllerAnimate:NO];
   } else {
     // Else hide the results window if it's showing.
     if ([resultsWindow_ isVisible]) {
@@ -596,7 +596,7 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
 - (BOOL)insertBacktabQSB {
   BOOL handled = NO;
   if (![[NSApp currentEvent] isARepeat]) {
-    [self popViewController];
+    [self popViewControllerAnimate:YES];
     handled = YES;
   }
   return handled;
@@ -616,7 +616,7 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
   BOOL handled = NO;
   if ([searchTextFieldEditor_ isAtBeginning]
       && ![[NSApp currentEvent] isARepeat]) {
-    [self popViewController];
+    [self popViewControllerAnimate:YES];
     handled = YES;
   }
   return handled;
@@ -627,7 +627,7 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
   if (![[NSApp currentEvent] isARepeat]) {
     if ([searchTextFieldEditor_ isAtBeginning]) {
       NSString *currentQueryString = [activeQueryController_ queryString];
-      while([self popViewController]) { }
+      while([self popViewControllerAnimate:YES]) { }
       
       [searchTextField_ setStringValue:currentQueryString ? 
                    currentQueryString : @""];
@@ -1076,17 +1076,23 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)finished {
   if (finished) {
-    NSString *notification = nil;
-    if ([[self window] alphaValue] > 0.0) {
-     notification = kQSBSearchWindowDidShowNotification;
-    } else {
-      [[self window] orderOut:self];
-      notification = kQSBSearchWindowDidHideNotification;
-    }
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc postNotificationName:notification
-                      object:[self window]];
+   [self performSelector:@selector(animationStopped)
+              withObject:nil 
+              afterDelay:0.0];
   }
+}
+
+- (void)animationStopped {
+  NSString *notification = nil;
+  if ([[self window] alphaValue] > 0.0) {
+    notification = kQSBSearchWindowDidShowNotification;
+  } else {
+    [[self window] orderOut:self];
+    notification = kQSBSearchWindowDidHideNotification;
+  }
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:notification
+                    object:[self window]];
 }
 
 @end
@@ -1247,7 +1253,7 @@ doCommandBySelector:(SEL)commandSelector {
   [searchTextField_ setStringValue:@""];
 }
 
-- (NSViewController *)popViewController {
+- (NSViewController *)popViewControllerAnimate:(BOOL)animate {
   QSBQueryController *parentQueryController
     = [activeQueryController_ parentQueryController];
   if (parentQueryController) {
@@ -1272,15 +1278,25 @@ doCommandBySelector:(SEL)commandSelector {
     [[self resultsView] addSubview:[parentQueryController view]];
 
     // Slide the top controller out and the parent controller in.
-    [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:kQSBPushPopDuration];
-    [[[activeQueryController_ view] animator] 
-      setFrame:[self rightOffscreenViewRect]];
-    [[[parentQueryController view] animator] setFrame:[self mainViewRect]];
-    [NSAnimationContext endGrouping];
+    NSTimeInterval delay = 0;
+    NSView *activeView = [activeQueryController_ view];
+    NSView *parentView = [parentQueryController view];
+    NSRect mainViewRect = [self mainViewRect];
+    NSRect rightOffscreenViewRect = [self rightOffscreenViewRect];
+    if (animate) {
+      [NSAnimationContext beginGrouping];
+      [[NSAnimationContext currentContext] setDuration:kQSBPushPopDuration];
+      [[activeView animator] setFrame:rightOffscreenViewRect];
+      [[parentView animator] setFrame:mainViewRect];
+      [NSAnimationContext endGrouping];
+      delay = kQSBPushPopDuration;
+    } else {
+      [activeView setFrame:rightOffscreenViewRect];
+      [parentView setFrame:mainViewRect];
+    }
     [self performSelector:@selector(removeQueryView:)
                withObject:activeQueryController_
-               afterDelay:kQSBPushPopDuration];
+               afterDelay:delay];
     
     [activeQueryController_ setParentQueryController:nil];
     [self setActiveQueryController:parentQueryController];
@@ -1289,7 +1305,7 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (void)clearAllViewControllersAndSearchString {
-  while([self popViewController]) { }
+  while([self popViewControllerAnimate:NO]) { }
   [activeQueryController_ setQueryString:nil];
   [searchTextField_ setStringValue:@""];
 }
@@ -1300,7 +1316,7 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (void)resetQuery:(NSTimer *)timer {
   queryResetTimer_ = nil;
-  while([self popViewController]) { }
+  while([self popViewControllerAnimate:NO]) { }
   [activeQueryController_ setQueryString:nil];
   [searchTextField_ setStringValue:@""];
 }

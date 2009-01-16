@@ -36,7 +36,7 @@
 
 // This constant is the name for the app that should be used w/in the a Google
 // folder (for w/in Application Support, etc.)
-static NSString *const kQSBFolderNameWithGoogleFolder = @"Search App";
+static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
 
 @implementation QSBHGSDelegate
 - (id)init {

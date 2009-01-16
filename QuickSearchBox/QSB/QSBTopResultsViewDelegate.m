@@ -33,7 +33,6 @@
 #import "QSBTopResultsViewDelegate.h"
 #import <Vermilion/Vermilion.h>
 #import "QSBApplicationDelegate.h"
-#import "QSBConstants.h"
 #import "QSBTableResult.h"
 #import "QSBQueryController.h"
 #import "QSBResultRowViewController.h"
@@ -95,8 +94,6 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
     if (selectedRow == NSNotFound
         && ![[self queryController] pivotObject]) {
       [resultsTableView selectFirstSelectableRow];
-    } else {
-      [resultsTableView selectRow:selectedRow byExtendingSelection:NO];
     }
   }
   return tableHeight;

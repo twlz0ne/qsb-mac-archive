@@ -64,6 +64,12 @@ static NSString *const kQSBPluginConfigurationPrefKey
 static NSString *const kQSBHomepageKey = @"QSBHomepageURL";
 static NSString *const kQSBFeedbackKey = @"QSBFeedbackURL";
 
+// KVO Keys
+// Observe each plugins protoExtensions so that we can update sourceExtensions.
+static NSString *const kQSBProtoExtensionsKVOKey = @"protoExtensions";
+// Signal a sourceExtensions change in response to a protoExtension change.
+static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
+
 @interface QSBApplicationDelegate ()
 
 // sets us up so we're looking for the right hotkey
@@ -109,6 +115,12 @@ static NSString *const kQSBFeedbackKey = @"QSBFeedbackURL";
 
 // Called when we want to update menus with a proper app name
 - (void)updateMenuWithAppName:(NSMenu* )menu;
+
+// Each plugin's protoExtensions must be monitored in order for the app
+// delegate's list of sourceExtensions to be properly updated.
+- (void)observeProtoExtensions;
+- (void)stopObservingProtoExtensions;
+
 @end
 
 
@@ -181,6 +193,7 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_filteredEnumeratorByMakingEachObjectPerformSe
 }
 
 - (void)dealloc {
+  [self stopObservingProtoExtensions];
   [statusItem_ release];
   NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
   [prefs removeObserver:self forKeyPath:kQSBHotKeyKey];
@@ -576,7 +589,7 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_filteredEnumeratorByMakingEachObjectPerformSe
 // Reroute certain properties off to our delegate for scripting purposes.
 - (BOOL)application:(NSApplication *)sender delegateHandlesKey:(NSString *)key
 {
-  if ([key isEqual:@"plugins"] || [key isEqual:@"sourceExtensions"]) {
+  if ([key isEqual:@"plugins"] || [key isEqual:kQSBSourceExtensionsKVOKey]) {
     return YES;
   } else {
     return NO;
@@ -786,8 +799,10 @@ GTM_METHOD_CHECK(NSEnumerator,
 }
 
 - (void)setPlugins:(NSArray *)plugins {
+  [self stopObservingProtoExtensions];
   [plugins_ autorelease];
   plugins_ = [plugins retain];
+  [self observeProtoExtensions];
   [self updatePluginPreferences];
 }
 
@@ -846,6 +861,34 @@ GTM_METHOD_CHECK(NSEnumerator,
     }
   }
 }
+
+- (void)observeProtoExtensions {
+  NSArray *plugins = [self plugins];
+  for (HGSPlugin *plugin in plugins) {
+    [plugin addObserver:self
+             forKeyPath:kQSBProtoExtensionsKVOKey
+                options:0
+                context:nil];
+  }
+}
+
+- (void)stopObservingProtoExtensions {
+  NSArray *plugins = [self plugins];
+  for (HGSPlugin *plugin in plugins) {
+    [plugin removeObserver:self forKeyPath:kQSBProtoExtensionsKVOKey];
+  }
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context {
+  if ([keyPath isEqualToString:kQSBProtoExtensionsKVOKey]) {
+    [self willChangeValueForKey:kQSBSourceExtensionsKVOKey];
+    [self didChangeValueForKey:kQSBSourceExtensionsKVOKey];
+  }
+}
+
 @end
 
 

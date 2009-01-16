@@ -164,12 +164,12 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
     NSString *source = @"on getFileInfo(x)\r"
-    @"tell application \"Finder\"\r"
-    @"activate\r"
-    @"set macpath to POSIX file x as text\r"
-    @"open information window of item macpath\r"
-    @"end tell\r"
-    @"end getInfo\r";
+      @"tell application \"Finder\"\r"
+      @"activate\r"
+      @"set macpath to POSIX file x as text\r"
+      @"open information window of item macpath\r"
+      @"end tell\r"
+      @"end getFileInfo\r";
     script_ = [[NSAppleScript alloc] initWithSource:source];
   }
   return self;

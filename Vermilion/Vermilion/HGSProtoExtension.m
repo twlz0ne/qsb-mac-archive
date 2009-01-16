@@ -50,6 +50,7 @@
 
 - (BOOL)isValid;
 
+// Private setters.
 - (void)setExtension:(HGSExtension *)extension;
 - (void)setClassName:(NSString *)className;
 - (void)setModuleName:(NSString *)moduleName;
@@ -57,6 +58,10 @@
 - (void)setExtensionPointKey:(NSString *)extensionPointKey;
 - (void)setProtoIdentifier:(NSString *)protoIdentifier;
 - (void)setExtensionDictionary:(NSDictionary *)extensionDict;
+
+// Respond to the pending removal of an account by shutting down our
+// extension, if any, and removing ourself from the list of sources.
+- (void)willRemoveAccount:(NSNotification *)notification;
 
 @end
 
@@ -168,6 +173,8 @@
 }
 
 - (void)dealloc {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self];
   [plugin_ release];
   [extension_ release];
   [className_ release];
@@ -237,6 +244,15 @@
         = [[self copyWithFactor:account
                          forKey:kHGSExtensionAccountIdentifier] autorelease];
       [factoredExtensions addObject:factoredExtension];
+      
+      // Register this protoExtension to receive notifications of pending
+      // removal of the account so that the removal can be propogated to 
+      // the extension.
+      NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+      [nc addObserver:factoredExtension
+             selector:@selector(willRemoveAccount:)
+                 name:kHGSWillRemoveAccountNotification
+               object:nil];
     }
     factors = factoredExtensions;
   } else {
@@ -443,11 +459,13 @@
 }
 
 - (void)uninstall {
-  NSString *extensionPointKey = [self extensionPointKey];
-  HGSExtensionPoint *point
-    = [HGSExtensionPoint pointWithIdentifier:extensionPointKey];
-  [point removeExtension:extension_];
-  [self setExtension:nil];
+  if ([self isInstalled]) {
+    NSString *extensionPointKey = [self extensionPointKey];
+    HGSExtensionPoint *point
+      = [HGSExtensionPoint pointWithIdentifier:extensionPointKey];
+    [point removeExtension:extension_];
+    [self setExtension:nil];
+  }
 }
 
 - (BOOL)isInstalled {
@@ -583,6 +601,36 @@
 - (void)setExtensionDictionary:(NSDictionary *)extensionDict {
   [extensionDict_ release];
   extensionDict_ = [extensionDict copy];
+}
+
+#pragma mark Notification Handling
+
+- (void)willRemoveAccount:(NSNotification *)notification {
+  BOOL alsoRemoveClient = YES;  // Remove ourself unless our installed
+  // extension tells us otherwise.
+  if ([self isInstalled]) {
+    // Inform our extension that the account is going away.
+    HGSExtension *extension = [self extension];
+    if ([extension conformsToProtocol:@protocol(HGSAccountClientProtocol)]) {
+      id<HGSAccountClientProtocol> accountClient
+      = (id<HGSAccountClientProtocol>)extension;
+      HGSAccount *account = [notification object];
+      alsoRemoveClient = [accountClient accountWillBeRemoved:account];
+      if (alsoRemoveClient) {
+        HGSPlugin *plugin = [self plugin];
+        [plugin removeExtension:self];
+      }
+    } else {
+      HGSLogDebug(@"Attempt to remove an account for an extension that "
+                  @"does not support the HGSAccountClientProtocol. "
+                  @"Extension identifier: '%@'", 
+                  [self protoIdentifier]);
+    }
+  }
+  if (alsoRemoveClient) {
+    HGSPlugin *plugin = [self plugin];
+    [plugin removeExtension:self]; 
+  }
 }
 
 @end

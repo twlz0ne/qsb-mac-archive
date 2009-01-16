@@ -79,7 +79,7 @@
 // Provide an archivable dictionary for the extension.
 - (NSDictionary *)dictionaryValue;
 
-// Return one or more protoExtensions by factoring based on desired accounts.
+// Return zero or more protoExtensions by factoring based on desired accounts.
 - (NSArray *)factor;
 
 // Return a description for the extension.

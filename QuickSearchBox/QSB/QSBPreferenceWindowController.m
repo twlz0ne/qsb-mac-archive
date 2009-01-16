@@ -42,10 +42,13 @@
 #import "NSColor+Naming.h"
 #import "KeychainItem.h"
 #import "GTMMethodCheck.h"
+#import "HGSLog.h"
+#import "GTMGarbageCollection.h"
 
 // The preference containing a list of knwon accounts.
 NSString *const kQSBAccountsPrefKey = @"QSBAccountsPrefKey";
 
+static void OpenAtLoginItemsChanged(LSSharedFileListRef inList, void *context);
 
 @interface QSBPreferenceWindowController (QSBPreferenceWindowControllerPrivateMethods)
 
@@ -108,8 +111,37 @@ GTM_METHOD_CHECK(NSColor, crayonName);
                                       selector:@selector(caseInsensitiveCompare:)]
                               autorelease];
     [self setSourceSortDescriptor:[NSArray arrayWithObject:sortDesc]];
+    openAtLoginItemsList_ 
+      = LSSharedFileListCreate(NULL, 
+                               kLSSharedFileListSessionLoginItems, 
+                               NULL);
+    if (!openAtLoginItemsList_) {
+      HGSLog(@"Unable to create kLSSharedFileListSessionLoginItems");
+    } else {
+      LSSharedFileListAddObserver(openAtLoginItemsList_,
+                                  CFRunLoopGetMain(),
+                                  kCFRunLoopDefaultMode,
+                                  OpenAtLoginItemsChanged,
+                                  self);
+      openAtLoginItemsSeedValue_ 
+        = LSSharedFileListGetSeedValue(openAtLoginItemsList_);
+  }
   }
   return self;
+}
+
+- (void) dealloc {
+  [colors_ release];
+  [sourceSortDescriptor_ release];
+  if (openAtLoginItemsList_) {
+    LSSharedFileListRemoveObserver(openAtLoginItemsList_,
+                                   CFRunLoopGetMain(), 
+                                   kCFRunLoopDefaultMode, 
+                                   OpenAtLoginItemsChanged,
+                                   self);
+    CFRelease(openAtLoginItemsList_);
+  }
+  [super dealloc];
 }
 
 - (void)windowDidLoad {
@@ -159,11 +191,6 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   [[self window] setHidesOnDeactivate:YES];
 }
 
-- (void) dealloc {
-  [colors_ release];
-  [sourceSortDescriptor_ release];
-  [super dealloc];
-}
 
 #pragma mark Color Menu
 
@@ -318,13 +345,25 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   NSArray *selections = [accountsListController_ selectedObjects];
   if ([selections count]) {
     id<HGSAccount> accountToRemove = [selections objectAtIndex:0];
-    NSUInteger selection = [accountsListController_ selectionIndex];
-    if (selection > 0) {
-      [accountsListController_ setSelectionIndex:(selection - 1)];
-    }
-    [[HGSAccountsExtensionPoint accountsExtensionPoint]
-     removeExtension:accountToRemove];
-    [accountToRemove remove];
+    NSString *summary = NSLocalizedString(@"About to remove an account.",
+                                          nil);
+    NSString *format
+    = NSLocalizedString(@"Removing the account '%@' will disable and remove "
+                        @"all search sources associated with this account.",
+                        nil);
+    NSString *accountName = [accountToRemove accountName];
+    NSString *explanation = [NSString stringWithFormat:format, accountName];
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setMessageText:summary];
+    [alert setInformativeText:explanation];
+    [alert addButtonWithTitle:NSLocalizedString(@"Remove", nil)];
+    [alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
+    [alert beginSheetModalForWindow:[self window]
+                      modalDelegate:self
+                     didEndSelector:@selector(removeAccountAlertDidEnd:
+                                              returnCode:contextInfo:)
+                        contextInfo:accountToRemove];
   }
 }
 
@@ -487,6 +526,107 @@ GTM_METHOD_CHECK(NSColor, crayonName);
                contextInfo:(void *)contextInfo {
   [self setAccountPassword:nil];
   [sheet orderOut:self];
+}
+
+- (void)removeAccountAlertDidEnd:(NSWindow *)sheet
+                      returnCode:(int)returnCode
+                     contextInfo:(void *)contextInfo {
+  if (returnCode == NSAlertFirstButtonReturn) {
+    id<HGSAccount> accountToRemove = (id<HGSAccount>)contextInfo;
+    NSUInteger selection = [accountsListController_ selectionIndex];
+    if (selection > 0) {
+      [accountsListController_ setSelectionIndex:(selection - 1)];
+    }
+    [accountToRemove remove];
+  }
+}
+
+#pragma mark Bindings
+
+// Tied to the Open QSB At Login checkbox
+- (UInt32)openedAtLoginSeedValue {
+  return openAtLoginItemsSeedValue_;
+}
+
+- (BOOL)openedAtLogin {
+  BOOL opened = NO;
+  if (openAtLoginItemsList_) {
+    NSBundle *ourBundle = [NSBundle mainBundle];
+    NSString *bundlePath = [ourBundle bundlePath];
+    NSURL *bundleURL = [NSURL fileURLWithPath:bundlePath];
+    CFArrayRef cfItems = LSSharedFileListCopySnapshot(openAtLoginItemsList_, 
+                                                      &openAtLoginItemsSeedValue_);
+    NSArray *items = GTMCFAutorelease(cfItems);
+    for (id item in items) {
+      CFURLRef itemURL;
+      if (LSSharedFileListItemResolve((LSSharedFileListItemRef)item, 
+                                      0, &itemURL, NULL) == 0) {
+        if ([bundleURL isEqual:(NSURL *)itemURL]) {
+          opened = YES;
+          break;
+        }
+        CFRelease(itemURL);
+      }
+    }
+  }
+  return opened;
+}
+
+- (void)setOpenedAtLogin:(BOOL)opened {
+  if (!openAtLoginItemsList_) return;
+  NSBundle *ourBundle = [NSBundle mainBundle];
+  NSString *bundlePath = [ourBundle bundlePath];
+  NSURL *bundleURL = [NSURL fileURLWithPath:bundlePath];
+  if (opened) {
+    // Hidden isn't set in 10.5.6
+    // http://openradar.appspot.com/6482251
+    NSNumber *nsTrue = [NSNumber numberWithBool:YES];
+    NSDictionary *propertiesToSet 
+      = [NSDictionary dictionaryWithObject:nsTrue 
+                                    forKey:(id)kLSSharedFileListItemHidden];
+    LSSharedFileListItemRef item 
+      = LSSharedFileListInsertItemURL(openAtLoginItemsList_, 
+                                      kLSSharedFileListItemLast, 
+                                      NULL,
+                                      NULL, 
+                                      (CFURLRef)bundleURL, 
+                                      (CFDictionaryRef)propertiesToSet, 
+                                      NULL);
+    CFRelease(item);
+    openAtLoginItemsSeedValue_ 
+      = LSSharedFileListGetSeedValue(openAtLoginItemsList_);
+  } else {
+    CFArrayRef cfItems = LSSharedFileListCopySnapshot(openAtLoginItemsList_, 
+                                                      &openAtLoginItemsSeedValue_);
+    NSArray *items = GTMCFAutorelease(cfItems);
+    for (id item in items) {
+      CFURLRef itemURL;
+      if (LSSharedFileListItemResolve( (LSSharedFileListItemRef)item, 
+                                      0, &itemURL, NULL) == 0) {
+        if ([bundleURL isEqual:(NSURL *)itemURL]) {
+          OSStatus status 
+            = LSSharedFileListItemRemove(openAtLoginItemsList_, 
+                                         (LSSharedFileListItemRef)item);
+          if (status) {
+            HGSLog(@"Unable to remove %@ from open at login (%d)", 
+                   itemURL, status);
+          }
+        }
+        CFRelease(itemURL);
+      }
+    }
+  }
+}
+
+void OpenAtLoginItemsChanged(LSSharedFileListRef inList, void *context) {
+  UInt32 seedValue = LSSharedFileListGetSeedValue(inList);
+  QSBPreferenceWindowController *controller
+    = (QSBPreferenceWindowController *)context;
+  UInt32 contextSeedValue = [controller openedAtLoginSeedValue];
+  if (contextSeedValue != seedValue) {
+    [controller willChangeValueForKey:@"openedAtLogin"];
+    [controller didChangeValueForKey:@"openedAtLogin"];
+  }
 }
 
 @end

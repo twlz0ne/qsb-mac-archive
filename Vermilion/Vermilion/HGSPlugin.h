@@ -42,6 +42,8 @@
 #define kHGSPluginConfigurationVersion 1
 
 
+@class HGSProtoExtension;
+
 // A class that represents an object containing source and action
 // extensions along with location, type, enablement, etc.  Objects
 // of this class are usually reconstituted from plugin bundles or
@@ -77,8 +79,8 @@
 @property (nonatomic, readonly) NSUInteger sourceCount;
 @property (nonatomic, readonly) NSUInteger actionCount;
 
-// Reconstitute a plugin from a bundle.
-- (id)initWithBundleAtPath:(NSString *)bundlePath;
+// Reconstitute a plugin at a path.
+- (id)initWithPath:(NSString *)path;
 
 // Reconstitute a plugin from a dictionary, usually from preferences, marking
 // all plugins and extensions as 'old'.
@@ -96,6 +98,9 @@
 // Install/uninstall extensions.
 - (void)installExtensions;
 - (void)uninstallExtensions;
+
+// Remove and discard an extension.
+- (void)removeExtension:(HGSProtoExtension *)extension;
 
 // Remove all old extensions for which there was no new extension.
 - (void)stripOldUnmergedExtensions;

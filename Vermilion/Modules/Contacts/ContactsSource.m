@@ -45,7 +45,7 @@ static NSString *const kMetaDataFilePath
 static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 
 @interface HGSContactsSource : HGSMemorySearchSource <ABImageClient> {
-@private
+ @private
   NSCondition *condition_;
   BOOL indexing_;
   NSMutableDictionary *imageLoadingTags_;
@@ -117,6 +117,8 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
       name = lastName;
     } else if (firstName) {
       name = firstName;
+    } else {
+      name = [person valueForProperty:kABOrganizationProperty];
     }
     if (name) {
       NSString *urlString = [NSString stringWithFormat:kMetaDataFilePath, [person uniqueId]];
@@ -398,20 +400,18 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     NSString *contactName = [result valueForKey:kHGSObjectAttributeNameKey];
     NSURL *contactURL = [result identifier];
     if ([contactURL isFileURL]) {
-      CFURLRef appURL;
+      CFURLRef appURL = NULL;
       OSStatus osStatus = LSGetApplicationForURL((CFURLRef)contactURL,
                                                  kLSRolesViewer + kLSRolesEditor,
-                                                 nil,  // Ignore NSRef
+                                                 NULL,  // Ignore FSRef
                                                  &appURL);
-      serviceURL = GTMCFAutorelease(appURL);
-      if (osStatus == noErr && serviceURL) {
+      if (osStatus == noErr && appURL) {
+        serviceURL = GTMCFAutorelease(appURL);
         NSString *servicePath = [serviceURL path];
         NSBundle *serviceBundle = [NSBundle bundleWithPath:servicePath];
         if (serviceBundle) {
           serviceName = [serviceBundle objectForInfoDictionaryKey:@"CFBundleName"];
         }
-      } else {
-        serviceURL = nil;
       }
     }
     
