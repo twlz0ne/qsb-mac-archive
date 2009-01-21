@@ -225,40 +225,70 @@
   return extDict;
 }
 
+- (BOOL)isFactorable {
+  // We are factorable if we are looking for accounts.  
+  // TODO(mrossetti): Additional types of factors may be added in the future.
+  NSDictionary *extensionDictionary = [self extensionDictionary];
+  NSString *desiredAccountType
+    = [extensionDictionary objectForKey:kHGSExtensionDesiredAccountType];
+  BOOL factorsByAccount = (desiredAccountType != nil);
+  return factorsByAccount;
+}
+
 - (NSArray *)factor {
   // Determine if this protoExtension should be factored and, if so,
-  // create one or more factored protoextensions, otherwise just return
-  // this proto extension.
-  NSArray *factors = nil;
+  // create one or more factored protoextensions, otherwise return 
+  // and empty array.
+  // NOTE: This approach is linear, that is, it does not lend itself to
+  //       an N x N expansion based on multiple factor types.
+  NSMutableArray *factoredExtensions = [NSMutableArray array];
+  // Create a copy of self for each account that's available.
   NSString *desiredAccountType
     = [[self extensionDictionary] objectForKey:kHGSExtensionDesiredAccountType];
   if (desiredAccountType) {
-    NSMutableArray *factoredExtensions = [NSMutableArray array];
-    // Create a copy of self for each account that's available.
     HGSAccountsExtensionPoint *aep
       = [HGSAccountsExtensionPoint accountsExtensionPoint];
     NSEnumerator *accountEnum = [aep accountsEnumForType:desiredAccountType];
     id<HGSAccount> account = nil;
     while ((account = [accountEnum nextObject])) {
-      HGSProtoExtension *factoredExtension
-        = [[self copyWithFactor:account
-                         forKey:kHGSExtensionAccountIdentifier] autorelease];
-      [factoredExtensions addObject:factoredExtension];
-      
-      // Register this protoExtension to receive notifications of pending
-      // removal of the account so that the removal can be propogated to 
-      // the extension.
-      NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-      [nc addObserver:factoredExtension
-             selector:@selector(willRemoveAccount:)
-                 name:kHGSWillRemoveAccountNotification
-               object:nil];
+      HGSProtoExtension *factoredExtension = [self factorForAccount:account];
+      if (factoredExtension) {
+        [factoredExtensions addObject:factoredExtension];
+      }
     }
-    factors = factoredExtensions;
-  } else {
-    factors = [NSArray arrayWithObject:self];
   }
-  return factors;
+  return factoredExtensions;
+}
+
+- (HGSProtoExtension *)factorForAccount:(id<HGSAccount>)account {
+  HGSProtoExtension *factoredExtension = nil;
+  NSString *accountType = [account accountType];
+  NSString *desiredAccountType
+    = [[self extensionDictionary] objectForKey:kHGSExtensionDesiredAccountType];
+  if ([accountType isEqualToString:desiredAccountType]) {
+    factoredExtension = [[self copyWithFactor:account
+                                       forKey:kHGSExtensionAccountIdentifier]
+                         autorelease];
+    // For account-based extensions we disable unless this has been
+    // specifically overridden in the plist.
+    NSNumber *isEnabledByDefaultValue = [[self extensionDictionary]
+                                         objectForKey:kHGSIsEnabledByDefault];
+    BOOL doEnable = [isEnabledByDefaultValue boolValue];
+    if (!doEnable) {
+      // Set isEnabled_ directly--we don't want the setter side-effects.
+      factoredExtension->isEnabled_ = NO;
+    }
+    
+    // Register this protoExtension to receive notifications of pending
+    // removal of the account so that the removal can be propogated to 
+    // the extension.
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:factoredExtension
+           selector:@selector(willRemoveAccount:)
+               name:kHGSWillRemoveAccountNotification
+             object:account];
+  }
+  return factoredExtension;
 }
 
 - (NSAttributedString *)extensionDescription {
@@ -613,13 +643,9 @@
     HGSExtension *extension = [self extension];
     if ([extension conformsToProtocol:@protocol(HGSAccountClientProtocol)]) {
       id<HGSAccountClientProtocol> accountClient
-      = (id<HGSAccountClientProtocol>)extension;
+        = (id<HGSAccountClientProtocol>)extension;
       HGSAccount *account = [notification object];
       alsoRemoveClient = [accountClient accountWillBeRemoved:account];
-      if (alsoRemoveClient) {
-        HGSPlugin *plugin = [self plugin];
-        [plugin removeExtension:self];
-      }
     } else {
       HGSLogDebug(@"Attempt to remove an account for an extension that "
                   @"does not support the HGSAccountClientProtocol. "
@@ -629,7 +655,13 @@
   }
   if (alsoRemoveClient) {
     HGSPlugin *plugin = [self plugin];
-    [plugin removeExtension:self]; 
+    [plugin removeExtension:self];
+    // Make sure our preferences are updated.
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    NSNotification *notification
+      = [NSNotification notificationWithName:kHGSExtensionDidChangeEnabledNotification
+                                      object:self];
+    [nc postNotification:notification];
   }
 }
 

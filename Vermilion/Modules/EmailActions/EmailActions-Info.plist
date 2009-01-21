@@ -28,7 +28,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.email.action.emailurl</string>
 			<key>HGSActionDirectObjectTypes</key>
-			<string>file</string>
+			<string>webpage</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Email URL</string>
 		</dict>

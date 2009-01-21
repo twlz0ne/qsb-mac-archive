@@ -43,6 +43,7 @@
 
 static const CGFloat kScrollViewMinusTableHeight = 7.0;
 static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
+static NSString * const kQSBSelectionIndexesKVOKey = @"selectionIndexes";
 
 @interface QSBResultsViewBaseController (QSBResultsViewBaseControllerPrivateMethods)
 
@@ -59,6 +60,10 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
                             forKeyPath:kQSBArrangedObjectsKVOKey
                                options:NSKeyValueObservingOptionNew
                                context:NULL];
+  [resultsArrayController_ addObserver:self
+                            forKeyPath:kQSBSelectionIndexesKVOKey
+                               options:NSKeyValueObservingOptionNew
+                               context:NULL];
   resultsNeedUpdating_ = YES;
   [resultsTableView_ setDoubleAction:@selector(openResultsTableItem:)];
   QSBSearchWindowController *controller = [self searchWindowController];
@@ -69,6 +74,8 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
   [rowViewControllers_ release];
   [resultsArrayController_ removeObserver:self
                                forKeyPath:kQSBArrangedObjectsKVOKey];
+  [resultsArrayController_ removeObserver:self
+                               forKeyPath:kQSBSelectionIndexesKVOKey];
   [queryString_ release];
   [super dealloc];
 }
@@ -288,6 +295,8 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
       rowCount_ = [newArrangedObjects count];
       [[self resultsTableView] reloadData];
       [queryController_ updateResultsView];
+    } else if ([keyPath isEqualToString:kQSBSelectionIndexesKVOKey]) {
+      [[self searchWindowController] completeQueryText];    
     }
   } 
 }

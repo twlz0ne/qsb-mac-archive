@@ -32,7 +32,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class GDataHTTPFetcher;
+@class GTMHTTPFetcher;
 
 @interface NSOperation(HGSInvocationOperation)
 - (BOOL)isDiskOperation;
@@ -62,19 +62,19 @@ typedef enum {
                                                      selector:(SEL)sel
                                                        object:(id)arg;
 
-// Helper for GDataHTTPFetcher which calls the finish selectors using
+// Helper for GTMHTTPFetcher which calls the finish selectors using
 // NSOperations rather than running them on the same thread that made
-// the initial async request. This call replaces GDataHTTPFetcher's
+// the initial async request. This call replaces GTMHTTPFetcher's
 // beginFetchWithDelegate method. For instance:
 //
-// GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:req];
+// GTMHTTPFetcher *fetcher = [GTMHTTPFetcher httpFetcherWithRequest:req];
 // [fetcher beginFetchWithDelegate:self
 //               didFinishSelector:@selector(httpFetcher:finishedWithData:)
 //                 didFailSelector:@selector(httpFetcher:failedWithError:)];
 //
 // Becomes:
 //
-// GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:req];
+// GTMHTTPFetcher *fetcher = [GTMHTTPFetcher httpFetcherWithRequest:req];
 // HGSInvocationOperation *op = [HGSInvocationOperation
 //   networkInvocationOperationWithTarget:self
 //                             forFetcher:fetcher
@@ -82,7 +82,7 @@ typedef enum {
 //                        didFailSelector:@selector(httpFetcher:failedWithError:)];
 // [[HGSOperationQueue sharedOperationQueue] addOperation:op];
 + (HGSInvocationOperation *)networkInvocationOperationWithTarget:(id)target
-                                                      forFetcher:(GDataHTTPFetcher *)fetcher
+                                                      forFetcher:(GTMHTTPFetcher *)fetcher
                                                didFinishSelector:(SEL)didFinishSel
                                                  didFailSelector:(SEL)failedSEL;
 

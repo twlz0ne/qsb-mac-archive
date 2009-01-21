@@ -31,7 +31,7 @@
 //
 
 #import <Vermilion/Vermilion.h>
-#import "GDataDocs.h"
+#import <GData/GData.h>
 #import "KeychainItem.h"
 
 // Google Docs categories

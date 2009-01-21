@@ -39,7 +39,7 @@
 #import "GTMGeometryUtils.h"
 #import "GTMNSImage+Scaling.h"
 #import "GTMNSBezierPath+CGPath.h"
-#import "GDataHTTPFetcher.h"
+#import "GTMHTTPFetcher.h"
 #import "HGSLog.h"
 
 static const void *LRURetain(CFAllocatorRef allocator, const void *value);
@@ -67,10 +67,10 @@ static HGSLRUCacheCallBacks kLRUCacheCallbacks = {
 
 @interface HGSIconOperation : NSObject {
  @protected
-  HGSInvocationOperation  *operation_; // STRONG
-  GDataHTTPFetcher        *fetcher_;   // STRONG
-  HGSObject               *result_;    // WEAK
-  BOOL                    useCache_;
+  HGSInvocationOperation *operation_; // STRONG
+  GTMHTTPFetcher *fetcher_;   // STRONG
+  HGSObject *result_;    // WEAK
+  BOOL useCache_;
 }
 + (HGSIconOperation *)iconOperationForResult:(HGSObject*)result
                                     useCache:(BOOL)useCache;
@@ -132,7 +132,7 @@ static HGSLRUCacheCallBacks kLRUCacheCallbacks = {
       NSString *scheme = [url scheme];
       if ([scheme hasPrefix:@"http"]) {
         NSURLRequest *request = [NSURLRequest requestWithURL:url];
-        fetcher_ = [GDataHTTPFetcher httpFetcherWithRequest:request];
+        fetcher_ = [GTMHTTPFetcher httpFetcherWithRequest:request];
         operation_ = [[HGSInvocationOperation
                        networkInvocationOperationWithTarget:self
                                                  forFetcher:fetcher_
@@ -210,7 +210,7 @@ static HGSLRUCacheCallBacks kLRUCacheCallbacks = {
   }
 }
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData {
   @synchronized(self) {
     if ([operation_ isCancelled]) {
@@ -232,7 +232,7 @@ static HGSLRUCacheCallBacks kLRUCacheCallbacks = {
   }
 }
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
     failedWithError:(NSError *)error {
   HGSLogDebug(@"http icon fetch failed for %@ with error %@",
               [[[fetcher request] URL] absoluteString], error);

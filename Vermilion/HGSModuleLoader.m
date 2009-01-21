@@ -39,23 +39,6 @@
 
 GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
 
-- (id)init {
-  if ((self = [super init])) {
-    extensionMap_ = [[NSMutableDictionary alloc] init];
-    if (!extensionMap_) {
-      HGSLog(@"Unable to create extensionMap_");
-      [self release];
-      self = nil;
-    }
-  }
-  return self;
-}
-
-- (void)dealloc {
-  [extensionMap_ release];
-  [super dealloc];
-}
-
 - (NSArray *)loadPluginsAtPath:(NSString*)pluginPath {
   NSMutableArray *plugins = nil;
   if (pluginPath) {
@@ -65,10 +48,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
     while ((path = [dirEnum nextObject])) {
       [dirEnum skipDescendents];
       NSString* fullPath = [pluginPath stringByAppendingPathComponent:path];
-      NSString *extension = [fullPath pathExtension];
-      Class pluginClass = [extensionMap_ objectForKey:extension];
-      if (pluginClass) {
-        HGSPlugin *plugin = [[[pluginClass alloc] initWithPath:fullPath]
+      if ([[fullPath pathExtension] isEqualToString:@"hgs"]) {
+        HGSPlugin *plugin = [[[HGSPlugin alloc] initWithBundleAtPath:fullPath]
                              autorelease];
         if (plugin) {
           if (!plugins) {
@@ -81,19 +62,6 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
     }
   }
   return plugins;
-}
-
-- (void)registerClass:(Class)cls forExtensions:(NSArray *)extensions {
-  for (id extension in extensions) {
-    #if DEBUG
-    Class oldCls = [extensionMap_ objectForKey:extension];
-    if (oldCls) {
-      HGSLogDebug(@"Replacing %@ with %@ for extension %@", 
-                  NSStringFromClass(oldCls), NSStringFromClass(cls), extension);
-    }
-    #endif
-    [extensionMap_ setObject:cls forKey:extension];
-  }
 }
 
 #pragma mark -

@@ -149,6 +149,11 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
         [otherTermStrings addObject:nickname];
       }
       
+      NSString *companyName = [person valueForProperty:kABOrganizationProperty];
+      if (companyName && ![companyName isEqualToString:name]) {
+        [otherTermStrings addObject:companyName];
+      }
+      
       //TODO(dmaclach): remove this once real ranking is in
       NSNumber *rank = [NSNumber numberWithFloat:0.9f];
       NSDictionary *attributes

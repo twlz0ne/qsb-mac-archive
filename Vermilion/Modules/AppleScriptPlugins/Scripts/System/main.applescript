@@ -50,7 +50,7 @@ on hideOthers()
 end hideOthers
 
 on lockScreen()
-	do shell script "/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession -suspend > /dev/null"
+	do shell script "'/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession' -suspend > /dev/null"
 end lockScreen
 
 on logout()

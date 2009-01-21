@@ -32,8 +32,7 @@
 
 #import "Vermilion/Vermilion.h"
 
-#import "GDataHTTPFetcher.h"
-#import "GDataHTTPFetcherLogging.h"
+#import "GTMHTTPFetcher.h"
 #import "GTMMethodCheck.h"
 #import "GTMNSDictionary+URLArguments.h"
 #import "GTMNSString+HTML.h"
@@ -49,7 +48,7 @@
 
 @interface HGSGoogleWebSearchOperation : HGSSearchOperation {
  @private
-  GDataHTTPFetcher *fetcher_;
+  GTMHTTPFetcher *fetcher_;
   id<HGSSearchSource> source_;
 }
 @end
@@ -190,16 +189,15 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   [request setValue:@"http://google-mobile-internal.google.com" forHTTPHeaderField:@"Referer"];
 
   if (!fetcher_) {
-    fetcher_ = [[GDataHTTPFetcher httpFetcherWithRequest:request] retain];
+    fetcher_ = [[GTMHTTPFetcher httpFetcherWithRequest:request] retain];
     [fetcher_ setUserData:self];
     [fetcher_ beginFetchWithDelegate:self
                    didFinishSelector:@selector(httpFetcher:finishedWithData:)
-           didFailWithStatusSelector:@selector(httpFetcher:failedWithStatus:data:)
-            didFailWithErrorSelector:@selector(httpFetcher:failedWithNetworkError:)];
+                     didFailSelector:@selector(httpFetcher:didFail:)];
   }
 }
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData {
   NSString *jsonResponse = [[NSString alloc] initWithData:retrievedData
                                                  encoding:NSUTF8StringEncoding];
@@ -311,17 +309,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   fetcher_ = nil;
 }
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   failedWithStatus:(int)status
-               data:(NSData *)data {
-  HGSLog(@"httpFetcher failed: %d %@", status, [[fetcher request] URL]);
-  [self finishQuery];
-  [fetcher_ release];
-  fetcher_ = nil;
-}
-
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-failedWithNetworkError:(NSError *)error {
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+            didFail:(NSError *)error {
   HGSLog(@"httpFetcher failed: %@ %@", error, [[fetcher request] URL]);
   [self finishQuery];
   [fetcher_ release];

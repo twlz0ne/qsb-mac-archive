@@ -31,13 +31,7 @@
 //
 
 #import <Vermilion/Vermilion.h>
-#import "GDataEntryPhoto.h"
-#import "GDataEntryPhotoAlbum.h"
-#import "GDataFeedPhotoAlbum.h"
-#import "GDataFeedPhotoUser.h"
-#import "GDataMediaKeywords.h"
-#import "GDataMediaThumbnail.h"
-#import "GDataServiceGooglePhotos.h"
+#import <GData/GData.h>
 #import "KeychainItem.h"
 
 static NSString *const kPhotosAlbumKey = @"kPhotosAlbumKey";

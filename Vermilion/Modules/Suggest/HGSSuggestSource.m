@@ -32,8 +32,7 @@
 
 #import "HGSSuggestSource.h"
 
-#import "GDataHTTPFetcher.h"
-#import "GDataHTTPFetcherLogging.h"
+#import "GTMHTTPFetcher.h"
 #import "GTMDefines.h"
 #import "GTMGarbageCollection.h"
 #import "GTMMethodCheck.h"
@@ -417,19 +416,18 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   [request setHTTPShouldHandleCookies:NO];
 
   // Start the http fetch.
-  GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
+  GTMHTTPFetcher *fetcher = [GTMHTTPFetcher httpFetcherWithRequest:request];
   [fetcher setUserData:operation];
   [fetcher beginFetchWithDelegate:self
                 didFinishSelector:@selector(httpFetcher:finishedWithData:)
-        didFailWithStatusSelector:@selector(httpFetcher:failedWithStatus:data:)
-         didFailWithErrorSelector:@selector(httpFetcher:failedWithNetworkError:)];
+                  didFailSelector:@selector(httpFetcher:didFail:)];
 
 #if TARGET_OS_IPHONE
   [[GMONetworkIndicator sharedNetworkIndicator] pushEvent];
 #endif  // TARGET_OS_IPHONE
 }
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData {
   HGSSearchOperation *fetchedOperation = (HGSSearchOperation *)[[[fetcher userData] retain] autorelease];
   [fetcher setUserData:nil];  // Make sure this operation isn't retained.
@@ -447,18 +445,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   [self signalOperationCompletion];
 }
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   failedWithStatus:(int)status
-               data:(NSData *)data {
-  HGSLog(@"httpFetcher failed: %d %@", status, [[fetcher request] URL]);
-  [self signalOperationCompletion];
-
-  HGSSearchOperation *fetchedOperation = (HGSSearchOperation *)[fetcher userData];
-  [self suggestionsRequestFailed:fetchedOperation];
-}
-
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-        failedWithNetworkError:(NSError *)error {
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+            didFail:(NSError *)error {
   HGSLog(@"httpFetcher failed: %@ %@", [error description], [[fetcher request] URL]);
   [self signalOperationCompletion];
 

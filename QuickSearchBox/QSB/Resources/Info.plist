@@ -30,7 +30,7 @@
 	<key>CFBundleIconFile</key>
 	<string>QSBIcon</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.google.qsb</string>
+	<string>${QSB_BUNDLE_ID}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

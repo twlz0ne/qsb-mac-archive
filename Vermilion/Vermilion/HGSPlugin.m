@@ -34,6 +34,8 @@
 #import "GTMMethodCheck.h"
 #import "GTMNSArray+Merge.h"
 #import "GTMNSEnumerator+Filter.h"
+#import "HGSAccount.h"
+#import "HGSAccountsExtensionPoint.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
 #import "HGSModule.h"
@@ -62,6 +64,13 @@ static NSString *const kHGSPluginExtensionsDicts = @"HGSPluginExtensionsDicts";
 - (BOOL)isValid;
 - (BOOL)extensionIsEnabled:(HGSProtoExtension *)extension;
 
+// Respond to new accounts being added by factoring our extension.
+- (void)addProtoExtensionForAccount:(NSNotification *)notification;
+
+// Add extension(s) to our instantiated protoExtensions.
+- (void)addProtoExtension:(HGSProtoExtension *)protoExtension;
+- (void)addProtoExtensions:(NSArray *)protoExtensions;
+
 // Private property setters.
 - (void)setBundle:(NSBundle *)bundle;
 - (void)setBundlePath:(NSString *)bundlePath;
@@ -69,10 +78,12 @@ static NSString *const kHGSPluginExtensionsDicts = @"HGSPluginExtensionsDicts";
 - (void)setBundleIdentifier:(NSString *)bundleIdentifier;
 - (void)setDisplayName:(NSString *)displayName;
 - (void)setProtoExtensions:(NSArray *)protoExtensions;
+- (void)setFactorableExtensions:(NSArray *)factorableExtensions;
 - (void)setIsOld:(BOOL)isOld;
 - (void)setIsNew:(BOOL)isNew;
 - (void)setSourceCount:(NSUInteger)sourceCount;
 - (void)setActionCount:(NSUInteger)actionCount;
+- (void)setServiceCount:(NSUInteger)serviceCount;
 
 @end
 
@@ -91,11 +102,13 @@ GTM_METHOD_CHECK(NSEnumerator,
 @synthesize bundleIdentifier = bundleIdentifier_;
 @synthesize displayName = displayName_;
 @synthesize protoExtensions = protoExtensions_;
+@synthesize factorableExtensions = factorableExtensions_;
 @synthesize isEnabled = isEnabled_;
 @synthesize isOld = isOld_;
 @synthesize isNew = isNew_;
 @synthesize sourceCount = sourceCount_;
 @synthesize actionCount = actionCount_;
+@synthesize serviceCount = serviceCount_;
 
 static BOOL gValidatingPlugins = NO;
 
@@ -107,8 +120,6 @@ static BOOL gValidatingPlugins = NO;
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     gValidatingPlugins = [ud boolForKey:@"HGSValidatePlugins"];
     #endif  // DEBUG
-    HGSModuleLoader *loader = [HGSModuleLoader sharedModuleLoader];
-    [loader registerClass:self forExtensions:[NSArray arrayWithObject:@"hgs"]];
   }
 }
 
@@ -116,14 +127,14 @@ static BOOL gValidatingPlugins = NO;
   return gValidatingPlugins;
 }
 
-- (id)initWithPath:(NSString *)path {
+- (id)initWithBundleAtPath:(NSString *)bundlePath {
   if ((self = [super init])) {
     BOOL debugPlugins = [HGSPlugin validatePlugins];
 
-    NSBundle *bundle = [NSBundle bundleWithPath:path];
+    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
     if (bundle) {
       [self setBundle:bundle];
-      [self setBundlePath:[path stringByStandardizingPath]];
+      [self setBundlePath:[bundlePath stringByStandardizingPath]];
       NSString *bundleName
         = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
       if (!bundleName) {
@@ -152,27 +163,37 @@ static BOOL gValidatingPlugins = NO;
       // Discover all plist based extensions
       NSArray *standardExtensions
         = [bundle objectForInfoDictionaryKey:kHGSExtensionsKey];
-      if (standardExtensions) {
-        for (NSDictionary *bundleExtension in standardExtensions) {
-          HGSProtoExtension *extension
-            = [[[HGSProtoExtension alloc] initWithBundleExtension:bundleExtension
-                                                           plugin:self]
-               autorelease];
-          if (extension) {
+      NSMutableArray *factorableExtensions = nil;
+      for (NSDictionary *bundleExtension in standardExtensions) {
+        HGSProtoExtension *extension
+          = [[[HGSProtoExtension alloc] initWithBundleExtension:bundleExtension
+                                                         plugin:self]
+             autorelease];
+        if (extension) {
+          if ([extension isFactorable]) {
             NSArray *factoredExtensions = [extension factor];
             [protoExtensions addObjectsFromArray:factoredExtensions];
+            if (!factorableExtensions) {
+              factorableExtensions = [NSMutableArray arrayWithObject:extension];
+            } else {
+              [factorableExtensions addObject:extension];
+            }
+          } else {
+            // Not factorable so just add the extension.
+            [protoExtensions addObject:extension];
           }
-        } 
-      }
+        }
+      } 
       
-      if ([protoExtensions count]) {
+      if ([protoExtensions count] || [factorableExtensions count]) {
         [self setProtoExtensions:protoExtensions];
+        [self setFactorableExtensions:factorableExtensions];
       } else {
-        // TODO(mrossetti): Move this back into the module loader.
         if (debugPlugins) {
-          HGSLog(@"No extensions found in plugin at path %@. "
-                 @"Directly loading. NOTE: This is not necessarily an error.",
-                 path);
+          HGSLog(@"No standard extensions or factorable extensions found "
+                 @"in plugin at path %@. Directly loading. NOTE: This is "
+                 @"not necessarily an error.",
+                 bundlePath);
         }
         Class principal = [bundle principalClass];
         if (principal) {
@@ -204,7 +225,7 @@ static BOOL gValidatingPlugins = NO;
       }
     } else {
       if (debugPlugins) {
-        HGSLog(@"Unable to get bundle for path %@", path);
+        HGSLog(@"Unable to get bundle for path %@", bundlePath);
       }
       [self release];
       self = nil;
@@ -299,10 +320,18 @@ static BOOL gValidatingPlugins = NO;
          autorelease];
     [copiedPlugin setProtoExtensions:copiedExtensions];
     
+    if ([factorableExtensions_ count]) {
+      NSArray *copiedFactorableExtensions
+        = [[[NSArray allocWithZone:zone] initWithArray:factorableExtensions_
+                                             copyItems:YES]
+         autorelease];
+      [copiedPlugin setFactorableExtensions:copiedFactorableExtensions];
+    }
+    
     [copiedPlugin setIsOld:[self isOld]];
     [copiedPlugin setIsNew:[self isNew]];
     copiedPlugin->isEnabled_ = isEnabled_;  // Do not use setter.
-     if (![copiedPlugin isValid]) {
+    if (![copiedPlugin isValid]) {
       [copiedPlugin release];
       copiedPlugin = nil;
     }
@@ -311,11 +340,14 @@ static BOOL gValidatingPlugins = NO;
 }
 
 - (void)dealloc {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self];
   [bundlePath_ release];
   [bundleName_ release];
   [bundleIdentifier_ release];
   [displayName_ release];
   [protoExtensions_ release];
+  [factorableExtensions_ release];
   [bundle_ release];
   
   [super dealloc];
@@ -395,6 +427,11 @@ static BOOL gValidatingPlugins = NO;
     = [oldProtoExtensions gtm_mergeArray:newProtoExtensions
                            mergeSelector:@selector(replaceWithProtoExtension:)];
   [mergedPlugin setProtoExtensions:mergedProtoExtensions];
+  
+  // Replace our factorableExtensions.
+  NSArray *oldFactorableExtensions = [pluginB factorableExtensions];
+  [mergedPlugin setFactorableExtensions:oldFactorableExtensions];
+  
   return mergedPlugin;
 }
 
@@ -465,10 +502,12 @@ static BOOL gValidatingPlugins = NO;
 
 - (NSString *)description {
   return [NSString stringWithFormat:@"<%@:%p displayName='%@', isEnabled=%d, "
-          @"isOld=%d, isNew=%d, \n protoExtensions={%@} bundleIdentifier='%@', "
+          @"isOld=%d, isNew=%d, sources=%d, actions=%d, services=%d\n"
+          @"protoExtensions={%@}\nfactorableExtensions={%@}\nbundleIdentifier='%@', "
           @"bundlePath='%@', bundleName='%@', bundle=%@>",
           [self class], self, displayName_, isEnabled_, isOld_, isNew_,
-          protoExtensions_, bundleIdentifier_, bundlePath_, bundleName_,
+          sourceCount_, actionCount_, serviceCount_, protoExtensions_,
+          factorableExtensions_, bundleIdentifier_, bundlePath_, bundleName_,
           bundle_];
 }
 
@@ -502,6 +541,50 @@ static BOOL gValidatingPlugins = NO;
   }
   return isEnabled;
 }
+
+- (void)addProtoExtensionForAccount:(NSNotification *)notification {
+  // See if any of our factorable extensions are interested in a newly
+  // added account and, if so, add them to our sources.
+  id<HGSAccount> account = [notification object];
+  NSArray *factorableExtensions = [self factorableExtensions];
+  NSMutableArray *newExtensions = [NSMutableArray array];
+  for (HGSProtoExtension *factorableExtension in factorableExtensions) {
+    HGSProtoExtension *newProtoExtension
+      = [factorableExtension factorForAccount:account];
+    if (newProtoExtension) {
+      [newExtensions addObject:newProtoExtension];
+    } else {
+      HGSLogDebug(@"HGSPlugin '%@' was asked to factor an extension for "
+                  @"account '%@' but failed to do so.", 
+                  [self displayName], [account displayName]);
+    }
+  }
+  [self addProtoExtensions:newExtensions];
+}
+
+- (void)addProtoExtension:(HGSProtoExtension *)protoExtension {
+  NSArray *oldProtoExtensions = [self protoExtensions];
+  NSArray *newProtoExtensions = nil;
+  if (oldProtoExtensions) {
+    newProtoExtensions = [oldProtoExtensions arrayByAddingObject:protoExtension];
+  } else {
+    newProtoExtensions = [NSArray arrayWithObject:protoExtension];
+  }
+  [self setProtoExtensions:newProtoExtensions];
+}
+  
+- (void)addProtoExtensions:(NSArray *)protoExtensions {
+  NSArray *oldProtoExtensions = [self protoExtensions];
+  NSArray *newProtoExtensions = nil;
+  if (oldProtoExtensions) {
+    newProtoExtensions
+      = [oldProtoExtensions arrayByAddingObjectsFromArray:protoExtensions];
+  } else {
+    newProtoExtensions = [NSArray arrayWithArray:protoExtensions];
+  }
+  [self setProtoExtensions:newProtoExtensions];
+}
+
 
 #pragma mark Private Property Setters
 
@@ -538,6 +621,7 @@ static BOOL gValidatingPlugins = NO;
   // each extension to be myself.
   NSUInteger sourceCount = 0;
   NSUInteger actionCount = 0;
+  NSUInteger serviceCount = 0;
   for (HGSProtoExtension *extension in protoExtensions) {
     [extension setPlugin:self];
     NSString *extensionPointKey = [extension extensionPointKey];
@@ -547,7 +631,7 @@ static BOOL gValidatingPlugins = NO;
       } else if ([extensionPointKey isEqualToString:kHGSActionsExtensionPoint]) {
         ++actionCount;
       } else if ([extensionPointKey isEqualToString:kHGSServicesExtensionPoint]) {
-        // TODO(mrossetti): Do we want to count services?
+        ++serviceCount;
       } else {
         if ([HGSPlugin validatePlugins]) {
           HGSLog(@"Unrecognized extension point '%@' for extension %@",
@@ -558,6 +642,31 @@ static BOOL gValidatingPlugins = NO;
   }
   [self setSourceCount:sourceCount];
   [self setActionCount:actionCount];
+  [self setServiceCount:serviceCount];
+}
+
+- (void)setFactorableExtensions:(NSArray *)factorableExtensions {
+  BOOL stopObserving = ([factorableExtensions_ count] != 0
+                        && [factorableExtensions count] == 0);
+  BOOL startObserving = ([factorableExtensions_ count] == 0
+                         && [factorableExtensions count] != 0);
+  [factorableExtensions_  autorelease];
+  factorableExtensions_ = [factorableExtensions retain];
+
+  // Manage our observing of account additions. 
+  if (stopObserving) {
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc removeObserver:self
+                  name:kHGSDidAddAccountNotification
+                object:nil];
+  }
+  if (startObserving) {
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self
+           selector:@selector(addProtoExtensionForAccount:)
+               name:kHGSDidAddAccountNotification
+             object:nil];
+  }
 }
 
 - (void)setIsOld:(BOOL)isOld {
@@ -574,6 +683,10 @@ static BOOL gValidatingPlugins = NO;
 
 - (void)setActionCount:(NSUInteger)actionCount {
   actionCount_ = actionCount;
+}
+
+- (void)setServiceCount:(NSUInteger)serviceCount {
+  serviceCount_ = serviceCount;
 }
 
 @end

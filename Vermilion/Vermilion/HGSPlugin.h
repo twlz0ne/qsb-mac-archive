@@ -44,10 +44,44 @@
 
 @class HGSProtoExtension;
 
-// A class that represents an object containing source and action
-// extensions along with location, type, enablement, etc.  Objects
-// of this class are usually reconstituted from plugin bundles or
-// from preferences.
+// A class that manages a collection of source, action and service
+// extensions along with location, type, enablement, etc.
+//
+// When an instance of HGSPlugin is initially loaded, either from a bundle or
+// from preferences, an inventory of all potential extensions is collected 
+// from the HGSPlugin specification.
+//
+// Each potential extensions falls into one of two categories: 'simple' and
+// 'factorable'.  'Simple' extensions are immediately added to a list of
+// extensions that will be automatically installed during application
+// startup.  These are HGSProtoExtensions.  This list is contained in
+// |protoExtensions_|.  This list is what is presented to the user in
+// the 'Searchable Items' table found in Preferences.  A HGSProtoExtension
+// is an extension that can be installed and made active either automatically
+// at QSB startup or manually through user interaction.
+//
+// 'Factorable' extensions are those that require 'factors' before they can
+// be considered for installation and activation.  During the inventory
+// process, a list of these 'factorable' extensions is kept
+// in |factorableExtensions_|.  One such 'factor' (and the only one we
+// currently implement) is 'account'  (see HGSAccount).  During the
+// inventory process, the factor desired by a factorable extensions is
+// identified and, if available, a new copy of the factorable extension
+// is created for that factor and added to |protoExtensions_|.  So, for
+// example, a copy the Picasaweb search source extension will be created
+// for each instance of HGSGoogleAccount that can be found; it is then
+// placed in the list of searchable items which the user can  enable via
+// Preferences.
+//
+// The |factorableExtensions_| list is kept so that new extensions can be
+// created during runtime should a new 'factor' be recognized.  For example,
+// if the user sets up a new Google acccount a new Picasaweb search source
+// using that account will be added to |protoExtensions_| and the user will
+// see that search source appear in Preferences.
+//
+// An extension (search source, aka HGSExtension) is not actually installed
+// until the user enables one of the 'Searchable Items' in Preferences.  (See
+// HGSProtoExtension for more on this topic.)
 // 
 @interface HGSPlugin : NSObject {
  @private
@@ -57,14 +91,16 @@
   NSString *bundleIdentifier_;
   NSString *displayName_;  // Human-readable plugin name.
   
-  NSArray *protoExtensions_;  // ProtoExtensions of this plugin.
+  NSArray *protoExtensions_;  // Instantiated protoExtensions of this plugin.
+  NSArray *factorableExtensions_;  // Factorable protoExtensions.
   
   BOOL isOld_;  // YES for old until we find an installed plugin that matches.
   BOOL isNew_;  // YES for new until matched with an existing plugin. 
-  BOOL isEnabled_;  // Plugin master swtich.
+  BOOL isEnabled_;  // Plugin master switch.
 
   NSUInteger sourceCount_;  // Cached
   NSUInteger actionCount_;  // Cached
+  NSUInteger serviceCount_;  // Cached
 }
 
 @property (nonatomic, retain, readonly) NSBundle *bundle;
@@ -73,14 +109,16 @@
 @property (nonatomic, copy, readonly) NSString *bundleIdentifier;
 @property (nonatomic, copy, readonly) NSString *displayName;
 @property (nonatomic, retain, readonly) NSArray *protoExtensions;
+@property (nonatomic, retain, readonly) NSArray *factorableExtensions;
 @property (nonatomic) BOOL isEnabled;
 @property (nonatomic, readonly) BOOL isOld;
 @property (nonatomic, readonly) BOOL isNew;
 @property (nonatomic, readonly) NSUInteger sourceCount;
 @property (nonatomic, readonly) NSUInteger actionCount;
+@property (nonatomic, readonly) NSUInteger serviceCount;
 
-// Reconstitute a plugin at a path.
-- (id)initWithPath:(NSString *)path;
+// Reconstitute a plugin from a bundle.
+- (id)initWithBundleAtPath:(NSString *)bundlePath;
 
 // Reconstitute a plugin from a dictionary, usually from preferences, marking
 // all plugins and extensions as 'old'.

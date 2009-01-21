@@ -20,7 +20,9 @@
 
 
 #import <Foundation/Foundation.h>
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 #import <dlfcn.h>
+#endif
 #import "GTMSQLiteDatabase.h"
 #import "GTMMethodCheck.h"
 #import "GTMDefines.h"
@@ -43,6 +45,7 @@ typedef struct {
   int             textRep;
 } LikeGlobUserArgs;
 
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 // While we want to be compatible with Tiger, some operations are more
 // efficient when implemented with Leopard APIs. We look those up dynamically.
 // CFStringCreateWithBytesNoCopy
@@ -56,6 +59,7 @@ typedef CFStringRef (*CFStringCreateWithBytesNoCopyPtrType)(CFAllocatorRef,
                                                             Boolean,
                                                             CFAllocatorRef);
 static CFStringCreateWithBytesNoCopyPtrType gCFStringCreateWithBytesNoCopySymbol = NULL;
+#endif  // MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 
 // Notifications
 NSString * const kGTMSQLiteDatabaseWillCloseNotification =
@@ -143,11 +147,13 @@ static CFLocaleRef gCurrentLocale = NULL;
   // Need the locale for some CFString enhancements
   gCurrentLocale = CFLocaleCopyCurrent();
 
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
   // Compiling pre-Leopard try to find some symbols dynamically
   gCFStringCreateWithBytesNoCopySymbol =
       (CFStringCreateWithBytesNoCopyPtrType)dlsym(
         RTLD_DEFAULT,
         kCFStringCreateWithBytesNoCopySymbolName);
+#endif  // MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 }
 
 + (int)sqliteVersionNumber {
@@ -881,6 +887,7 @@ static int Collate8(void *userContext, int length1, const void *str1,
   // creation function, we'll use it when we can but we want to stay compatible
   // with Tiger.
   CFStringRef string1 = NULL, string2 = NULL;
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
   if (gCFStringCreateWithBytesNoCopySymbol) {
     string1 = gCFStringCreateWithBytesNoCopySymbol(kCFAllocatorDefault,
                                                    str1,
@@ -907,6 +914,20 @@ static int Collate8(void *userContext, int length1, const void *str1,
                                       kCFStringEncodingUTF8,
                                       false);
   }
+#else  // MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+  string1 = CFStringCreateWithBytesNoCopy(kCFAllocatorDefault,
+                                          str1,
+                                          length1,
+                                          kCFStringEncodingUTF8,
+                                          false,
+                                          kCFAllocatorNull);
+  string2 = CFStringCreateWithBytesNoCopy(kCFAllocatorDefault,
+                                          str2,
+                                          length2,
+                                          kCFStringEncodingUTF8,
+                                          false,
+                                          kCFAllocatorNull);
+#endif  // MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
   GTMCFAutorelease(string1);
   GTMCFAutorelease(string2);
   // Allocation failures can't really be sanely handled from a collator

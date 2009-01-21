@@ -317,6 +317,8 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   [self setAccountType:@"Google"];
   [self setAccountName:nil];
   [self setAccountPassword:nil];
+  // Make sure the username field has first focus when sheet presented.
+  [setupAccountSheet_ makeFirstResponder:userField_];
   [NSApp beginSheet:setupAccountSheet_
      modalForWindow:[self window]
       modalDelegate:self
@@ -375,6 +377,11 @@ GTM_METHOD_CHECK(NSColor, crayonName);
     HGSAccountsExtensionPoint *accountsExtensionPoint
       = [HGSAccountsExtensionPoint accountsExtensionPoint];
     NSString *accountType = [self accountType];
+    // The password field (NSSecureTextField) fails to stop editing regardless
+    // of xib setting, validateImmediately, so we must force it to validate
+    // and refresh the bound instance variable to prevent stale data when
+    // authenticating.
+    [passField_ selectText:self];  // Force password to freshen.
     Class accountClass
       = [accountsExtensionPoint classForAccountType:accountType];
     id<HGSAccount> newAccount
@@ -388,51 +395,81 @@ GTM_METHOD_CHECK(NSColor, crayonName);
       accountName = revisedAccountName;
       [self setAccountName:accountName];
     }
+    BOOL isGood = YES;
     
-    BOOL isGood = [newAccount isAuthenticated];
-    if (isGood) {
-      isGood = [accountsExtensionPoint extendWithObject:newAccount];
-      if (isGood) {
-        NSArray *accounts = [NSArray arrayWithObject:newAccount];
-        [accountsListController_ setSelectedObjects:accounts];
-      }
-    }
-    if (isGood) {
-      [sheet makeFirstResponder:userField_];
-      [self setAccountName:nil];
-      [self setAccountPassword:nil];
-      [NSApp endSheet:sheet];
-
-      NSString *summary = NSLocalizedString(@"Relaunch required to activate account.",
+    // Make sure we don't already have this account registered.
+    NSString *accountIdentifier = [newAccount identifier];
+    if ([accountsExtensionPoint extensionWithIdentifier:accountIdentifier]) {
+      isGood = NO;
+      NSString *summary = NSLocalizedString(@"Account already set up.",
                                             nil);
       NSString *format
-        = NSLocalizedString(@"Relaunch Google Quick Search in order to activate "
-                            @"account '%@'. It may be necessary to manually "
-                            @"enable search sources which uses this account "
-                            @"via the 'Search Sources' tab in Preferences "
-                            @"after relaunching.", nil);
-      NSString *explanation = [NSString stringWithFormat:format, accountName];
-      NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-      [alert setAlertStyle:NSWarningAlertStyle];
-      [alert setMessageText:summary];
-      [alert setInformativeText:explanation];
-      [alert beginSheetModalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:nil
-                          contextInfo:nil];
-    } else {
-      NSString *summary = NSLocalizedString(@"Could not set up that account.",
-                                            nil);
-      NSString *format
-        = NSLocalizedString(@"The account ‘%@’ could not be set up for use.  "
-                            @"Please insure that you have used the correct "
-                            @"account name and password.", nil);
+        = NSLocalizedString(@"The account ‘%@’ has already been set up for "
+                            @"use in Quick Search Box.", nil);
       NSString *explanation = [NSString stringWithFormat:format, accountName];
       NSAlert *alert = [[[NSAlert alloc] init] autorelease];
       [alert setAlertStyle:NSWarningAlertStyle];
       [alert setMessageText:summary];
       [alert setInformativeText:explanation];
       [alert beginSheetModalForWindow:sheet
+                        modalDelegate:self
+                       didEndSelector:nil
+                          contextInfo:nil];
+    }
+    
+    // Authenticate the account.
+    if (isGood) {
+      isGood = [newAccount isAuthenticated];
+      if (!isGood) {
+        NSString *summary = NSLocalizedString(@"Could not authenticate that "
+                                              @"account.", nil);
+        NSString *format
+          = NSLocalizedString(@"The account ‘%@’ could not be authenticated.  "
+                              @"Please insure that you have used the correct "
+                              @"account name and password.", nil);
+        NSString *explanation = [NSString stringWithFormat:format, accountName];
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setMessageText:summary];
+        [alert setInformativeText:explanation];
+        [alert beginSheetModalForWindow:sheet
+                          modalDelegate:self
+                         didEndSelector:nil
+                            contextInfo:nil];
+      }
+    }
+    
+    if (isGood) {
+      isGood = [accountsExtensionPoint extendWithObject:newAccount];
+      if (isGood) {
+        NSArray *accounts = [NSArray arrayWithObject:newAccount];
+        [accountsListController_ setSelectedObjects:accounts];
+      } else {
+        HGSLogDebug(@"Failed to install account extension for account '%@'.",
+                    accountName);
+      }
+    }
+    
+    if (isGood) {
+      [sheet makeFirstResponder:userField_];
+      [self setAccountName:nil];
+      [self setAccountPassword:nil];
+      [NSApp endSheet:sheet];
+
+      NSString *summary = NSLocalizedString(@"Enable searchable items for this account.",
+                                            nil);
+      NSString *format
+        = NSLocalizedString(@"One or more search sources may have been added "
+                            @"for the account '%@'. It may be necessary to "
+                            @"manually enable each search source that uses "
+                            @"this account.  Do so via the 'Searchable Items' "
+                            @"tab in Preferences.", nil);
+      NSString *explanation = [NSString stringWithFormat:format, accountName];
+      NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+      [alert setAlertStyle:NSWarningAlertStyle];
+      [alert setMessageText:summary];
+      [alert setInformativeText:explanation];
+      [alert beginSheetModalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:nil
                           contextInfo:nil];
@@ -448,6 +485,11 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 - (IBAction)acceptEditAccountSheet:(id)sender {
   NSWindow *sheet = [sender window];
   id<HGSAccount> account = accountBeingEdited_;
+  // The password field (NSSecureTextField) fails to stop editing regardless
+  // of xib setting, validateImmediately, so we must force it to validate
+  // and refresh the bound instance variable to prevent stale data when
+  // authenticating.
+  [passField_ selectText:self];  // Force password to freshen.
   [account setAccountPassword:[self accountPassword]];
   // See if the new password authenticates.
   if ([account isAuthenticated]) {
