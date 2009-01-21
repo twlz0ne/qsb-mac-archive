@@ -24,7 +24,6 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 8B637BB20F27784F00997738 /* Build configuration list for PBXAggregateTarget "GData" */;
 			buildPhases = (
-				8B637BC10F277CE900997738 /* CopyFiles */,
 				8B637BA40F27784900997738 /* ShellScript */,
 			);
 			dependencies = (
@@ -462,7 +461,6 @@
 		8B637A420F27706A00997738 /* GTMShading.h in Headers */ = {isa = PBXBuildFile; fileRef = 332AD8AA0DC93E880009A7E9 /* GTMShading.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B637A430F27706A00997738 /* GTMSystemVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 332AD7380DC910A20009A7E9 /* GTMSystemVersion.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B637A440F27706A00997738 /* GTMTestTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BCB416D0E82E879007F8FD6 /* GTMTestTimer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8B637BBA0F277CE300997738 /* GData.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B637B570F2777C300997738 /* GData.framework */; };
 		8B63DD910D9458E500395A2B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		8B63DD980D9458E500395A2B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
 		8B6F2D740DA2B8AF0052CA40 /* HGSAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D600DA2B88E0052CA40 /* HGSAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1302,16 +1300,6 @@
 				8B6F2F710DA2C42C0052CA40 /* Vermilion.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8B637BC10F277CE900997738 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 16;
-			files = (
-				8B637BBA0F277CE300997738 /* GData.framework in CopyFiles */,
-			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F4EF8F730ECB3EFF008DD6DA /* CopyFiles */ = {
@@ -6687,14 +6675,14 @@
 		8B637B9D0F27781900997738 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				PRODUCT_NAME = GData.framework;
+				PRODUCT_NAME = "GData Framework (with Breakpad)";
 			};
 			name = Debug;
 		};
 		8B637B9E0F27781900997738 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				PRODUCT_NAME = GData.framework;
+				PRODUCT_NAME = "GData Framework (with Breakpad)";
 			};
 			name = Release;
 		};
