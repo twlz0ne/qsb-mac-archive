@@ -47,6 +47,9 @@ extern NSString* const kHGSObjectAttributeNameKey;  // NSString
 extern NSString* const kHGSObjectAttributeURIKey;  // NSURL
 extern NSString* const kHGSObjectAttributeUniqueIdentifiersKey; // NSArray (of NSStrings)
 extern NSString* const kHGSObjectAttributeTypeKey;  // NSString
+
+// Last Used Date can be set using the key, but should be retrieved using
+// the [HGSObject lastUsedDate] method. It will not be in the value dictionary.
 extern NSString* const kHGSObjectAttributeLastUsedDateKey;  // NSDate
 extern NSString* const kHGSObjectAttributeSnippetKey;  // NSString
 extern NSString* const kHGSObjectAttributeSourceURLKey;  // NSString
@@ -111,7 +114,7 @@ extern NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey;  // NS
 #define kHGSTypeSuggest @"suggestion"
 #define kHGSTypeSearch  @"search"
 #define kHGSTypeScript  @"script"
-#define kHGSTypeUserInput @"userinput"
+#define kHGSTypeText    @"text"
 #define kHGSTypeDirectory        HGS_SUBTYPE(kHGSTypeFile, @"directory")
 #define kHGSTypeTextFile         HGS_SUBTYPE(kHGSTypeFile, @"text")
 #define kHGSTypeFileApplication  HGS_SUBTYPE(kHGSTypeFile, @"application")
@@ -134,9 +137,10 @@ extern NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey;  // NS
 // TODO(dmaclach): should album inherit from image?
 #define kHGSTypeFilePhotoAlbum   HGS_SUBTYPE(kHGSTypeFileImage,   @"album") 
 #define kHGSTypeWebPhotoAlbum    HGS_SUBTYPE(kHGSTypeWebImage,   @"album") 
-#define kHGSTypeUserInputText    HGS_SUBTYPE(kHGSTypeUserInput, @"text")
-
-
+#define kHGSTypeTextUserInput    HGS_SUBTYPE(kHGSTypeText, @"userinput")
+#define kHGSTypeTextPhoneNumber  HGS_SUBTYPE(kHGSTypeText, @"phonenumber")
+#define kHGSTypeTextEmailAddress HGS_SUBTYPE(kHGSTypeText, @"emailaddress")
+#define kHGSTypeTextInstantMessage HGS_SUBTYPE(kHGSTypeText, @"instantmessage")
 //
 // HGSObject
 //
@@ -161,6 +165,7 @@ enum {
   eHGSUnderDesktopRankFlag = 1 << 6,
   eHGSSpamRankFlag = 1 << 7,
   eHGSHomeChildRankFlag = 1 << 8,
+  eHGSBelowFoldRankFlag = 1 << 9,
 };
 
 typedef NSUInteger HGSRankFlags;
@@ -170,7 +175,8 @@ typedef NSUInteger HGSRankFlags;
   // Used for global ranking, set by the Search Source that creates it.
   HGSRankFlags rankFlags_;
   CGFloat rank_;
-  NSURL *identifier_;
+  NSString *identifier_;
+  NSUInteger idHash_;
   NSString *name_;
   NSString *type_;
   id <HGSSearchSource> source_;
@@ -181,6 +187,9 @@ typedef NSUInteger HGSRankFlags;
   //    seem like something anyone outside of the providing SearchSource should
   //    have to care about.
   NSMutableDictionary* values_;  // All accesses to values_ must be synchronized
+  BOOL conformsToContact_;
+  NSString *normalizedIdentifier_; // Only webpages have normalizedIdentifiers
+  NSDate *lastUsedDate_;
 };
 
 // Convenience methods 
@@ -245,6 +254,8 @@ typedef NSUInteger HGSRankFlags;
 
 - (HGSRankFlags)rankFlags;
 
+- (NSDate *)lastUsedDate;
+
 // merge the attributes of |result| into this one. Single values that overlap
 // are lost, arrays and dictionaries are merged together to form the union.
 // TODO(dmaclach): get rid of mergewith
@@ -268,3 +279,8 @@ typedef NSUInteger HGSRankFlags;
 
 extern NSString* const kHGSObjectAttributeVisitedCountKey;  // NSValue (NSInteger)
 
+
+// Convenience methods for getting file paths out of HGSObjects
+@interface HGSObject (HGSFileConvenienceMethods)
+- (NSArray *)filePaths; // Array of strings
+@end

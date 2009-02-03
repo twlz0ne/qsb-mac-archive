@@ -141,7 +141,7 @@ static const char *const kPerformAction = "PerformAction";
     PyObject *pyPrimary = [[HGSPython sharedPython] objectForResult:primary];
     PyObject *pyIndirect = nil;
     if (indirect) {
-      pyIndirect = [[HGSPython sharedPython] objectForResult:primary];
+      pyIndirect = [[HGSPython sharedPython] objectForResult:indirect];
     }
     if (pyPrimary) {
       // TODO(hawk): add pivot object to the call
@@ -154,9 +154,9 @@ static const char *const kPerformAction = "PerformAction";
         Py_DECREF(pythonResult);
       }
       Py_DECREF(pyPrimary);
-      if (pyIndirect) {
-        Py_DECREF(pyIndirect);
-      }
+    }
+    if (pyIndirect) {
+      Py_DECREF(pyIndirect);
     }
   }
   

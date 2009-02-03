@@ -32,6 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import <AddressBook/AddressBook.h>
+#import <AddressBook/ABAddressBookC.h>
 #if !TARGET_OS_IPHONE
 #import "GTMGarbageCollection.h"
 #endif
@@ -44,6 +45,8 @@ static NSString *const kMetaDataFilePath
   = @"~/Library/Application Support/AddressBook/Metadata/%@.abcdp";
 static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 
+#define kTypeContactAddressBook HGS_SUBTYPE(kHGSTypeContact, @"addressbook")
+
 @interface HGSContactsSource : HGSMemorySearchSource <ABImageClient> {
  @private
   NSCondition *condition_;
@@ -54,7 +57,29 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 }
 - (void)loadAddressBookContactsOperation;
 - (void)addressBookChanged:(NSNotification *)notification;
+
+// Return an ABPerson for a given result
 - (ABRecord *)personForResult:(HGSObject *)result;
+
+// Take a phone number [(123)456-7890] and clean it to 1234567890
+- (NSString *)cleanPhoneNumber:(NSString *)dirtyPhone;
+
+// Clean up a URL. Currently just prepends http:// if it is missing
+- (NSString *)cleanURL:(NSString *)dirtyURL;
+
+// Given an ABPerson and a property name, creates an array of HGSObjects
+// to match. You can specify the type of the HGSObjects, how to create the
+// URL, and an appropriate cleaner method [(NSString *)cleaner:(NSString *)]
+// to help create the URL.
+- (NSArray *)objectsForMultiValueProperty:(NSString *)property 
+                               fromPerson:(ABPerson *)person 
+                                     type:(NSString *)type 
+                                urlFormat:(NSString *)urlFormat 
+                              cleanMethod:(SEL)cleaner;
+
+// Given an HGSObject we "explode" it into it's internal HGSObjects
+// i.e. phone numbers, addressess, email, etc.
+- (NSArray *)explodeContactForSearchOperation:(HGSObject *)contact;
 @end
 
 @implementation HGSContactsSource
@@ -164,7 +189,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
       HGSObject* hgsResult 
         = [HGSObject objectWithIdentifier:[NSURL fileURLWithPath:urlString]
                                      name:name
-                                     type:HGS_SUBTYPE(kHGSTypeContact, @"addressbook")
+                                     type:kTypeContactAddressBook
                                    source:self
                                attributes:attributes];
       [newResults addObject:hgsResult];
@@ -207,7 +232,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
                       forQuery:(HGSQuery *)query {
   // if we had a pivot object, we filter the results w/ the pivot info
   HGSObject *pivotObject = [query pivotObject];
-  if (pivotObject) {
+  if (pivotObject && ![pivotObject isOfType:kTypeContactAddressBook]) {
     // To suvive the pivot, the contact has to have our a matching email
     // address.
 
@@ -257,17 +282,133 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   }
 }
 
-- (void)performSearchOperation:(HGSSearchOperation *)operation {
-  // Put a hold on queries while indexing
-  [condition_ lock];
-  while (indexing_) {
-    [condition_ wait];
+- (NSArray *)objectsForMultiValueProperty:(NSString *)property 
+                               fromPerson:(ABPerson *)person 
+                                     type:(NSString *)type 
+                                urlFormat:(NSString *)urlFormat 
+                              cleanMethod:(SEL)cleaner {
+  NSMutableArray *results = [NSMutableArray array];
+  NSString *localizedProperty
+    = GTMCFAutorelease(ABCopyLocalizedPropertyOrLabel((CFStringRef)property));
+  if (!localizedProperty) {
+    localizedProperty = property;
   }
-  [condition_ signal];
-  [condition_ unlock];
+  ABMultiValue *multiValue = [person valueForProperty:property];
+  if (multiValue) {
+    NSString *primary = [multiValue primaryIdentifier];
+    NSUInteger count = [multiValue count];
+    // Iterate through the multivalue getting all the subvalues
+    for (NSUInteger i = 0; i < count; ++i) {
+      id value = [multiValue valueAtIndex:i];
+      NSString *label = [multiValue labelAtIndex:i];
+      NSString *identifier = [multiValue identifierAtIndex:i];
+      if (label) {
+        CFStringRef cfLabel = (CFStringRef)label;
+        NSString *localizedLabel 
+          = GTMCFAutorelease(ABCopyLocalizedPropertyOrLabel(cfLabel));
+        if (!localizedLabel) {
+          localizedLabel = label;
+        }
+        NSString *cleanValue;
+        if (cleaner) {
+          cleanValue = [self performSelector:cleaner withObject:value];
+        } else {
+          cleanValue = value;
+        }
+        NSString *urlString = [NSString stringWithFormat:urlFormat, cleanValue];
+        
+        NSURL *uri = [NSURL URLWithString:urlString];
+        // We rank the primary identifiers higher so they show up better
+        CGFloat rank = [identifier isEqualToString:primary] ? 1.0 : 0.0;
+        NSNumber *nsRank = [NSNumber numberWithFloat:rank];
+        // Snippets look like phone: home
+        NSString *snippet = [NSString stringWithFormat:@"%@: %@",
+                             localizedProperty, localizedLabel];
+        // Need to get some decent icons
+        NSDictionary *attr = [NSDictionary dictionaryWithObjectsAndKeys:
+                              snippet, kHGSObjectAttributeSnippetKey,
+                              nsRank, kHGSObjectAttributeRankKey,
+                              nil];
+        HGSObject *object = [HGSObject objectWithIdentifier:uri
+                                                       name:value 
+                                                       type:type 
+                                                     source:self 
+                                                 attributes:attr];
+        [results addObject:object];
+      }
+    }
+  }
+  return results;
+}
+    
+- (NSArray *)explodeContactForSearchOperation:(HGSObject *)contact {
+  struct ContactMap {
+    NSString *property_;
+    NSString *type_;
+    NSString *urlFormat_;
+    NSString *selName_;
+  };
+  
+  struct ContactMap contactMap[] = {
+    { kABPhoneProperty, kHGSTypeTextPhoneNumber, @"callto:+%@", @"cleanPhoneNumber:" },
+    { kABEmailProperty, kHGSTypeTextEmailAddress, @"mailto:%@", nil },
+    { kABJabberInstantProperty, kHGSTypeTextInstantMessage, @"xmpp:%@", nil },
+    { kABAIMInstantProperty, kHGSTypeTextInstantMessage, @"aim:%@", nil },
+    { kABICQInstantProperty, kHGSTypeTextInstantMessage, @"icq:%@", nil },
+    { kABYahooInstantProperty, kHGSTypeTextInstantMessage, @"ymsgr:%@", nil },
+    { kABMSNInstantProperty, kHGSTypeTextInstantMessage, @"msn:%@", nil },
+    { kABURLsProperty, kHGSTypeWebpage, @"%@", @"cleanURL:" }
+  };
+    
+  NSMutableArray *results = [NSMutableArray array];
+  ABPerson *person = (ABPerson *)[self personForResult:contact];
+  if (!person) return results;
+  
+  for (size_t i = 0; i < sizeof(contactMap) / sizeof(contactMap[0]); ++i) {
+    SEL cleaner = NULL;
+    if (contactMap[i].selName_) {
+      cleaner = NSSelectorFromString(contactMap[i].selName_);
+    }
+    NSArray *objectResults 
+      = [self objectsForMultiValueProperty:contactMap[i].property_
+                                fromPerson:person 
+                                      type:contactMap[i].type_
+                                 urlFormat:contactMap[i].urlFormat_
+                               cleanMethod:cleaner];
+    [results addObjectsFromArray:objectResults];
+  }
+  return results;
+}
 
-  // now do the query
-  [super performSearchOperation:operation];
+- (void)performSearchOperation:(HGSSearchOperation *)operation {
+  HGSQuery *query = [operation query];
+  HGSObject *pivotObject = [query pivotObject];
+  if ([pivotObject conformsToType:kTypeContactAddressBook]) {
+    NSArray *results = [self explodeContactForSearchOperation:pivotObject];
+    NSString *queryString = [query rawQueryString];
+    if ([queryString length]) {
+      NSMutableArray *filteredResults = [NSMutableArray array];
+      for (HGSObject *object in results) {
+        NSString *stringValue = [object displayName];
+        if ([stringValue hasPrefix:queryString]) {
+          [filteredResults addObject:object];
+        }
+      }
+      results = filteredResults;
+    }
+    [operation setResults:results];
+  } else {
+    // Put a hold on queries while indexing
+    [condition_ lock];
+    while (indexing_) {
+      [condition_ wait];
+    }
+    [condition_ signal];
+    [condition_ unlock];
+
+    // now do the query
+    [super performSearchOperation:operation];
+  }
 }
 
 
@@ -299,12 +440,16 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 }
 
 - (ABRecord *)personForResult:(HGSObject *)result {
-  NSString *uid = [[result identifier] path];
-  uid = [uid lastPathComponent];
-  uid = [uid stringByDeletingPathExtension];
-
-  if (!uid) return nil;
-  return [[ABAddressBook sharedAddressBook] recordForUniqueId:uid];
+  ABRecord *person = nil;
+  if ([result conformsToType:kTypeContactAddressBook]) {
+    NSString *uid = [[result identifier] path];
+    uid = [uid lastPathComponent];
+    uid = [uid stringByDeletingPathExtension];
+    if (uid) {
+      person = [[ABAddressBook sharedAddressBook] recordForUniqueId:uid];
+    }
+  }
+  return person;
 }
 
 - (NSImage *)loadImageForObject:(HGSObject *)result immediately:(BOOL)immediately {
@@ -449,6 +594,8 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     isValidSource = NO;
     if ([pivotObject valueForKey:kHGSObjectAttributeEmailAddressesKey]) {
       isValidSource = YES;
+    } else if ([pivotObject isOfType:kTypeContactAddressBook]) {
+      isValidSource = YES;
     }
   }
   return isValidSource;
@@ -470,7 +617,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 - (HGSObject *)objectWithArchivedRepresentation:(NSDictionary *)representation {
   HGSObject *result = nil;
   NSString *uniqID
-    = [representation valueForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
+    = [representation objectForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
   if (uniqID) {
     @synchronized(self) {
       // Find the result w/ that ID.
@@ -489,4 +636,26 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   return result;
 }
 
+- (NSString *)cleanPhoneNumber:(NSString *)dirtyPhone {
+  NSMutableString *cleanPhone = [NSMutableString string];
+  NSUInteger length = [dirtyPhone length];
+  NSCharacterSet *digits = [NSCharacterSet decimalDigitCharacterSet];
+  
+  for (NSUInteger i = 0; i < length; ++i) {
+    unichar digit = [dirtyPhone characterAtIndex:i];
+    if ([digits characterIsMember:digit]) {
+      [cleanPhone appendFormat:@"%C", digit];
+    }
+  }
+  return cleanPhone;
+}
+  
+- (NSString *)cleanURL:(NSString *)dirtyURL {
+  NSString *cleanURL = dirtyURL;
+  NSString *lowerDirty = [dirtyURL lowercaseString];
+  if (![lowerDirty hasPrefix:@"http"]) {
+    cleanURL = [NSString stringWithFormat:@"http://%@", dirtyURL];
+  }
+  return cleanURL;
+}
 @end

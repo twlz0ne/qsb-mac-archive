@@ -261,4 +261,7 @@
   return key;
 }
 
+- (NSImage *)defaultIconForObject:(HGSObject *)object {
+  return nil;
+}
 @end

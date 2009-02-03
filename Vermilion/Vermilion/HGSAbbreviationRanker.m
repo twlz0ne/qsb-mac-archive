@@ -148,13 +148,13 @@ CGFloat HGSScoreForAbbreviationWithRanges(CFStringRef str, // The string
                                - remainingStrRange.location;
     
     // Search what is left of the string with the rest of the abbreviation
-    CFRange abbrRange = CFRangeMake(abbrRange.location + i, 
-                                    abbrRange.length - i);
+    CFRange remainingAbbrRange = CFRangeMake(abbrRange.location + i, 
+                                             abbrRange.length - i);
     CGFloat remainingScore = HGSScoreForAbbreviationWithRanges(str, 
                                                                abbr,
                                                                mask,
                                                                remainingStrRange,
-                                                               abbrRange);
+                                                               remainingAbbrRange);
     
     // If there was a match from the remaining letters, then score ourselves
     if (remainingScore > kNoMatchScore) {

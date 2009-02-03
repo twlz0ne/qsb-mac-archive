@@ -112,8 +112,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(ITunesActionSupport, sharedSupport);
 - (NSAppleEventDescriptor *)execute:(NSDictionary *)params {
   NSDictionary *errorDictionary = nil;
   NSAppleEventDescriptor *result;
-  NSString *handler = [params valueForKey:kITunesAppleScriptHandlerKey];
-  NSArray *args = [params valueForKey:kITunesAppleScriptParametersKey];
+  NSString *handler = [params objectForKey:kITunesAppleScriptHandlerKey];
+  NSArray *args = [params objectForKey:kITunesAppleScriptParametersKey];
   result = [[self appleScript] gtm_executePositionalHandler:handler
                                                  parameters:args
                                                       error:&errorDictionary];
@@ -156,7 +156,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
 
 
 - (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *directObject = [info valueForKey:kHGSActionPrimaryObjectKey];
+  HGSObject *directObject = [info objectForKey:kHGSActionPrimaryObjectKey];
   NSString *handler = nil;
   NSString *directObjectKey = nil;
   id extraArg = nil;
@@ -207,7 +207,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
 @implementation ITunesPlayInPartyShuffleAction
 
 - (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *directObject = [info valueForKey:kHGSActionPrimaryObjectKey];
+  HGSObject *directObject = [info objectForKey:kHGSActionPrimaryObjectKey];
   NSString *trackID = [directObject valueForKey:kITunesAttributeTrackIdKey];
   NSDictionary *scriptParams = [NSDictionary dictionaryWithObjectsAndKeys:
                                 @"playInPartyShuffle", kITunesAppleScriptHandlerKey,
@@ -226,7 +226,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
 @implementation ITunesAddToPartyShuffleAction
 
 - (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *directObject = [info valueForKey:kHGSActionPrimaryObjectKey];
+  HGSObject *directObject = [info objectForKey:kHGSActionPrimaryObjectKey];
   NSString *trackID = [directObject valueForKey:kITunesAttributeTrackIdKey];
   NSDictionary *scriptParams = [NSDictionary dictionaryWithObjectsAndKeys:
                                 @"addToPartyShuffle", kITunesAppleScriptHandlerKey,
@@ -283,4 +283,18 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_isAppWithIdentifierRunning:);
   return [[ITunesActionSupport sharedSupport] iTunesIsRunning];
 }
 
+- (BOOL)doesActionApplyTo:(HGSObject*)result {
+  BOOL doesApply = NO;
+  _GTMDevAssert([result conformsToType:kHGSTypeFileApplication], nil);
+  if ([[ITunesActionSupport sharedSupport] iTunesIsRunning]) {
+    NSURL *url = [result identifier];
+    NSString *path = [url path];
+    // I only check the suffix here instead of a more comprehensive check
+    // of the bundle ID, because grabbing the bundle each time is expensive
+    // at pivot time,  and we don't want to slow ourselves down. This is a 
+    // "weaker" check, but is sufficient for our purposes.
+    doesApply = [path hasSuffix:@"/iTunes.app"];
+  }
+  return doesApply;
+}
 @end

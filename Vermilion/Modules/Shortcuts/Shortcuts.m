@@ -176,7 +176,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
 
 - (NSMutableArray *)arrayForShortcut:(NSString *)key {
   NSMutableDictionary *shortcutDB = [self readShortcutData];
-  NSMutableArray *valueArray = [shortcutDB valueForKey:key];
+  NSMutableArray *valueArray = [shortcutDB objectForKey:key];
   return valueArray;
 }
 

@@ -34,6 +34,8 @@
 #import "HGSObject.h"
 #import "HGSQuery.h"
 #import "HGSLog.h"
+#import "HGSBundle.h"
+#import "HGSIconProvider.h"
 
 // The result is already retained for you
 static NSSet *CopyStringSetFromId(id value) {
@@ -63,7 +65,7 @@ static NSSet *CopyStringSetFromId(id value) {
       = [NSDictionary dictionaryWithObject:validateBehaviors
                                     forKey:kHGSValidateSearchSourceBehaviorsPrefKey];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults registerDefaults:dict];
+    [defaults registerDefaults:dict]; 
   }
 }
 
@@ -160,6 +162,10 @@ static NSSet *CopyStringSetFromId(id value) {
   if (cannotArchive_) return nil;
 
   return [HGSObject objectWithDictionary:representation source:self];
+}
+
+- (NSImage *)defaultIconForObject:(HGSObject *)object {
+  return [[HGSIconProvider sharedIconProvider] placeHolderIcon];
 }
 
 @end

@@ -57,7 +57,10 @@
 }
 @end
 
-@interface MyAction : HGSAction
+@interface MyAction : HGSAction {
+ @private
+  NSImage *localIcon_;
+}
 @end
 
 @implementation MyAction : HGSAction
@@ -67,6 +70,25 @@
   return (primary != nil) ? YES : NO;
 }
 
+- (id)defaultObjectForKey:(NSString *)key {
+  id value = nil;
+  if ([key isEqualToString:kHGSExtensionIconImageKey]) {
+    value = localIcon_;
+  }
+  return value;
+}
+
+- (id)initWithConfiguration:(NSDictionary *)configuration {
+  if ((self = [super initWithConfiguration:configuration])) {
+    localIcon_ = [[NSImage alloc] initWithSize:NSMakeSize(128, 128)];
+  }
+  return self;
+}
+
+- (void)dealloc {
+  [localIcon_ release];
+  [super dealloc];
+}
 @end
 
 #pragma mark -
@@ -145,6 +167,7 @@
     = [NSDictionary dictionaryWithObjectsAndKeys:
        @"action name", kHGSExtensionUserVisibleNameKey,
        @"test3", kHGSExtensionIdentifierKey,
+       image, kHGSExtensionIconImageKey,
        nil];
   HGSAction* myAction = [[[MyAction alloc] initWithConfiguration:configuration]
                          autorelease];

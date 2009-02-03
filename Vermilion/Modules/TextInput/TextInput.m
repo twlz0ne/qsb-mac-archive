@@ -44,7 +44,7 @@ static NSString *const kDateTimeMarker = @"[DTS]";
 @implementation TextInput
 
 - (NSSet *)resultTypes {
-  return [NSSet setWithObject:kHGSTypeUserInputText];
+  return [NSSet setWithObject:kHGSTypeTextUserInput];
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
@@ -86,7 +86,7 @@ static NSString *const kDateTimeMarker = @"[DTS]";
   HGSObject *hgsObject
     = [HGSObject objectWithIdentifier:[NSURL URLWithString:@"userinput:text"]
                                  name:userText
-                                 type:kHGSTypeUserInputText
+                                 type:kHGSTypeTextUserInput
                                source:self
                            attributes:attributes];
 
@@ -135,7 +135,7 @@ static NSString *const kDateTimeMarker = @"[DTS]";
     NSURL *url = [NSURL URLWithString:@"userinput:text/stamped"];
     hgsObject2 = [HGSObject objectWithIdentifier:url
                                             name:worker
-                                            type:kHGSTypeUserInputText
+                                            type:kHGSTypeTextUserInput
                                           source:self
                                       attributes:attributes];
   }

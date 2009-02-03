@@ -413,6 +413,7 @@
 }
 
 - (void)install {
+  NSDate *startDate = [NSDate date];
   HGSPlugin *plugin = [self plugin];
   NSBundle *bundle = [plugin bundle];
   BOOL debugPlugins = [HGSPlugin validatePlugins];
@@ -420,11 +421,6 @@
 
   NSMutableDictionary *configuration
     = [NSMutableDictionary dictionaryWithDictionary:[self extensionDictionary]];
-
-  // TODO(mikro): why do we need to set class name back in?
-  NSString *className = [self className];
-  [configuration setObject:className forKey:kHGSExtensionClassKey];
-  
   // Ensure it's got a user visible name set in it (since we default it if the
   // key wasn't in the config dict).
   NSString *displayName = [self displayName];
@@ -445,7 +441,9 @@
       HGSLog(@"Unable to load bundle %@", bundle);
     }
   }
+  
   // Create it now
+  NSString *className = [self className];
   Class extensionPointClass = NSClassFromString(className);
   if (extensionPointClass 
       && [extensionPointClass
@@ -486,6 +484,9 @@
              className, bundle);
     }
   }
+  NSTimeInterval loadTime = -[startDate timeIntervalSinceNow];
+  if (loadTime > 0.1f)
+    HGSLog(@"Loading %@ took %3.0fms", displayName, loadTime * 1000);
 }
 
 - (void)uninstall {
@@ -535,6 +536,28 @@
     }
   }
   return doesExtend;
+}
+
+- (void)installAccountTypes {
+  NSString *extensionPointKey = [self extensionPointKey];
+  if ([extensionPointKey isEqualToString:kHGSAccountsExtensionPoint]) {
+    // Ensure the bundle is loaded
+    HGSPlugin *plugin = [self plugin];
+    NSBundle *bundle = [plugin bundle];
+    if (![bundle isLoaded]) {
+      BOOL debugPlugins = [HGSPlugin validatePlugins];
+      if (![bundle load] && debugPlugins) {
+        HGSLog(@"Unable to load bundle %@", bundle);
+      }
+    }
+    NSString *accountType
+      = [extensionDict_ objectForKey:kHGSExtensionOfferedAccountType];
+    NSString *className = [self className];
+    Class accountClass = NSClassFromString(className);
+    HGSAccountsExtensionPoint *accountsExtensionPoint
+      = [HGSAccountsExtensionPoint accountsExtensionPoint];
+    [accountsExtensionPoint addAccountType:accountType withClass:accountClass];
+  }
 }
 
 - (NSString *)description {
@@ -658,10 +681,10 @@
     [plugin removeExtension:self];
     // Make sure our preferences are updated.
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    NSNotification *notification
+    NSNotification *didChangeNotification
       = [NSNotification notificationWithName:kHGSExtensionDidChangeEnabledNotification
                                       object:self];
-    [nc postNotification:notification];
+    [nc postNotification:didChangeNotification];
   }
 }
 
@@ -669,5 +692,4 @@
 
 // Notification sent when extension has been enabled/disabled.
 NSString *const kHGSExtensionDidChangeEnabledNotification
-   =@"HGSExtensionDidChangeEnabledNotification";
-
+   =@ "HGSExtensionDidChangeEnabledNotification";

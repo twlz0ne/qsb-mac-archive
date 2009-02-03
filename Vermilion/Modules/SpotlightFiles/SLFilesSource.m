@@ -678,8 +678,10 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
 }
 
 - (void)operationCompleted:(SLFilesOperation*)operation {
-  NSMutableArray *accumulatedResults = [operation accumulatedResults];
-  [operation setResults:accumulatedResults];
+  if (![operation isCancelled]) {
+    NSMutableArray *accumulatedResults = [operation accumulatedResults];
+    [operation setResults:accumulatedResults];
+  }
 }
 
 - (void)extensionPointSourcesChanged:(NSNotification*)notification {

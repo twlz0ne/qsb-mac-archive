@@ -48,11 +48,15 @@ NSString *const kITunesAttributePlaylistKey = @"kITunesAttributePlaylistKey";
 NSString *const kITunesAttributePlaylistIdKey = @"kITunesAttributePlaylistIdKey";
 
 static const NSUInteger kMaxSearchResults = 100;
-static const NSTimeInterval kUpdateTimeInterval = 3600; // 10 minutes
+static const NSTimeInterval kInitialIndexDelay = 10; // 10 seconds
+static const NSTimeInterval kUpdateTimeInterval = 600; // 10 minutes
 static const NSInteger kInsertsPerTransaction = 100;
-static const NSStringCompareOptions kResultStringCompareOptions =
-  NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch | NSWidthInsensitiveSearch;
-static NSString* const kITunesXmlPath = @"~/Music/iTunes/iTunes Music Library.xml";
+static const NSStringCompareOptions kResultStringCompareOptions 
+  = NSCaseInsensitiveSearch 
+  | NSDiacriticInsensitiveSearch 
+  | NSWidthInsensitiveSearch;
+static NSString* const kITunesXmlPath 
+  = @"~/Music/iTunes/iTunes Music Library.xml";
 static NSString* const kTracksKey = @"Tracks";
 static NSString* const kPlaylistsKey = @"Playlists";
 static NSString* const kSqlCreateStatement =
@@ -80,9 +84,12 @@ static NSString* const kSqlCreateStatement =
    "CREATE INDEX composer_index ON tracks (composer);"
    "CREATE INDEX genre_index ON tracks (genre);"
    "CREATE INDEX playlist_index ON playlists (name);";
-static NSString* const kTrackInsertSql = @"INSERT INTO tracks VALUES (%i,%@,%@,%@,%@,%@,%@);\n";
-static NSString* const kPlaylistInsertSql = @"INSERT INTO playlists VALUES (%i,%@);\n";
-static NSString* const kPlaylistTrackInsertSql = @"INSERT INTO playlist_tracks VALUES (%i,%i);\n";
+static NSString* const kTrackInsertSql 
+  = @"INSERT INTO tracks VALUES (%i,%@,%@,%@,%@,%@,%@);\n";
+static NSString* const kPlaylistInsertSql 
+  = @"INSERT INTO playlists VALUES (%i,%@);\n";
+static NSString* const kPlaylistTrackInsertSql 
+  = @"INSERT INTO playlist_tracks VALUES (%i,%i);\n";
 static NSString* const kSqlSelectStatement =
   @"SELECT * FROM tracks WHERE "
    "name LIKE %@ OR "
@@ -90,19 +97,25 @@ static NSString* const kSqlSelectStatement =
    "album LIKE %@ OR "
    "composer LIKE %@ OR "
    "genre LIKE %@;";
-static NSString* const kPlaylistSelectStatement = @"SELECT * FROM playlists WHERE name LIKE %@;";
+static NSString* const kPlaylistSelectStatement 
+  = @"SELECT * FROM playlists WHERE name LIKE %@;";
 static NSString* const kPlaylistFromTrackSelectStatement =
-  @"SELECT * FROM playlists WHERE playlistid IN (SELECT playlistid from playlist_tracks WHERE trackid=%i);";
+  @"SELECT * FROM playlists WHERE playlistid IN (SELECT playlistid from "
+  @"playlist_tracks WHERE trackid=%i);";
 static NSString* const kTracksFromAlbumSelectStatement =
   @"SELECT * FROM tracks WHERE album=%@;";
 static NSString* const kTracksFromPlaylistSelectStatement =
-  @"SELECT * FROM tracks WHERE trackid IN (SELECT trackid FROM playlist_tracks WHERE playlistid=%i);";
+  @"SELECT * FROM tracks WHERE trackid IN (SELECT trackid FROM playlist_tracks "
+  @"WHERE playlistid=%i);";
 static NSString* const kPivotFromArtistSelectStatement =
-  @"SELECT DISTINCT album,artist,composer,genre,location FROM tracks WHERE artist=%@;";
+  @"SELECT DISTINCT album,artist,composer,genre,location FROM tracks WHERE "
+  @"artist=%@;";
 static NSString* const kPivotFromComposerSelectStatement =
-  @"SELECT DISTINCT album,artist,composer,genre,location FROM tracks WHERE composer=%@;";
+  @"SELECT DISTINCT album,artist,composer,genre,location FROM tracks WHERE "
+  @"composer=%@;";
 static NSString* const kPivotFromGenreSelectStatement =
-  @"SELECT DISTINCT album,artist,composer,genre,location FROM tracks WHERE genre=%@;";
+  @"SELECT DISTINCT album,artist,composer,genre,location FROM tracks WHERE "
+  @"genre=%@;";
 static NSString* const kArtistUrlFormat = @"googletunes://artist/%@";
 static NSString* const kAlbumUrlFormat = @"googletunes://album/%@";
 static NSString* const kComposerUrlFormat = @"googletunes://composer/%@";
@@ -193,11 +206,12 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
     playlistIcon_= [[NSImage alloc] initByReferencingFile:path];
     
     // Periodically update the index
-    updateTimer_ = [[NSTimer scheduledTimerWithTimeInterval:kUpdateTimeInterval
-                                                     target:self
-                                                   selector:@selector(updateIndexTimerFired:)
-                                                   userInfo:nil
-                                                    repeats:YES] retain];
+    updateTimer_ 
+      = [[NSTimer scheduledTimerWithTimeInterval:kUpdateTimeInterval
+                                          target:self
+                                        selector:@selector(updateIndexTimerFired:)
+                                        userInfo:nil
+                                         repeats:YES] retain];
     
     genreIconCache_ = [[NSMutableDictionary alloc] init];
 
@@ -210,8 +224,11 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
     HGSAssert(updateTimer_, nil);
     HGSAssert(genreIconCache_, nil);
     
-    // Perform the first index of the iTunes library now
-    [self updateIndex];
+    // Perform the first index of the iTunes library after a small delay
+    // to avoid the synchronous hit at startup time
+    [self performSelector:@selector(updateIndexTimerFired:)
+               withObject:nil
+               afterDelay:kInitialIndexDelay];
   }
   return self;
 }
@@ -233,8 +250,8 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
 
 - (NSString *)libraryLocation {
   NSArray *paths
-    = GTMCFAutorelease(CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabasePaths",
-                                                 (CFStringRef)@"com.apple.iApps"));
+    = GTMCFAutorelease(CFPreferencesCopyAppValue(CFSTR("iTunesRecentDatabasePaths"),
+                                                 CFSTR("com.apple.iApps")));
   
   NSString *libraryLocation = [paths count] ? [paths objectAtIndex:0] : nil;
   if (!libraryLocation) {
@@ -278,21 +295,36 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
       NSAutoreleasePool *loopPool = [[NSAutoreleasePool alloc] init];
       NSString *trackSql = @"BEGIN TRANSACTION;\n";
       for (NSInteger trackIteration = 0;
-           trackIteration < kInsertsPerTransaction && chunkIteration < trackCount;
+           trackIteration < kInsertsPerTransaction 
+             && chunkIteration < trackCount;
            trackIteration++, chunkIteration++) {
         NSDictionary *track = [trackEnumerator nextObject];
         NSString *trackName = [track objectForKey:@"Name"];
-        trackName = [GTMSQLiteStatement quoteAndEscapeString:trackName];
+        if (trackName) {
+          trackName = [GTMSQLiteStatement quoteAndEscapeString:trackName];
+        }
         NSString *trackArtist = [track objectForKey:@"Artist"];
-        trackArtist = [GTMSQLiteStatement quoteAndEscapeString:trackArtist];
+        if (trackArtist) {
+          trackArtist = [GTMSQLiteStatement quoteAndEscapeString:trackArtist];
+        }
         NSString *trackAlbum = [track objectForKey:@"Album"];
-        trackAlbum = [GTMSQLiteStatement quoteAndEscapeString:trackAlbum];
+        if (trackAlbum) {
+          trackAlbum = [GTMSQLiteStatement quoteAndEscapeString:trackAlbum];
+        }
         NSString *trackComposer = [track objectForKey:@"Composer"];
-        trackComposer = [GTMSQLiteStatement quoteAndEscapeString:trackComposer];
+        if (trackComposer) {
+          trackComposer 
+            = [GTMSQLiteStatement quoteAndEscapeString:trackComposer];
+        }
         NSString *trackGenre = [track objectForKey:@"Genre"];
-        trackGenre = [GTMSQLiteStatement quoteAndEscapeString:trackGenre];
+        if (trackGenre) {
+          trackGenre = [GTMSQLiteStatement quoteAndEscapeString:trackGenre];
+        }
         NSString *trackLocation = [track objectForKey:@"Location"];
-        trackLocation = [GTMSQLiteStatement quoteAndEscapeString:trackLocation];
+        if (trackLocation) {
+          trackLocation 
+            = [GTMSQLiteStatement quoteAndEscapeString:trackLocation];
+        }
         trackSql = [trackSql stringByAppendingFormat:kTrackInsertSql,
                     [[track objectForKey:@"Track ID"] intValue],
                     trackName ? trackName : @"''",
@@ -304,16 +336,14 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
       }
       trackSql = [trackSql stringByAppendingString:@"COMMIT;\n"];
       if ((sqliteErr = [db executeSQL:trackSql]) != SQLITE_OK) {
-        HGSLog(@"iTunes source could not insert track info into its database (%i, %@)",
-               sqliteErr, [db lastErrorString]);
+        HGSLog(@"iTunes source could not insert track info into its database "
+               @"(%i, %@)", sqliteErr, [db lastErrorString]);
         HGSLogDebug(@"%@", trackSql);
       }
       [loopPool release];
     }
-    
-    NSEnumerator *playlistEnumerator = [[rootDictionary objectForKey:kPlaylistsKey] objectEnumerator];
-    NSDictionary *playlist;
-    while ((playlist = [playlistEnumerator nextObject])) {
+    NSArray *playlists = [rootDictionary objectForKey:kPlaylistsKey];
+    for (NSDictionary *playlist in playlists) {
       if ([[playlist objectForKey:@"Master"] boolValue]) {
         // Don't index the master playlist, it's a rehash of everything we've
         // already indexed above
@@ -326,26 +356,30 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                                 playlistId,
                                 playlistName ? playlistName : @"''"];
       if ((sqliteErr = [db executeSQL:playlistSql]) != SQLITE_OK) {
-        HGSLog(@"iTunes source could not insert playlist info into its database (%i, %@)",
-               sqliteErr, [db lastErrorString]);
+        HGSLog(@"iTunes source could not insert playlist info into its "
+               @"database (%i, %@)", sqliteErr, [db lastErrorString]);
         HGSLogDebug(@"%@", playlistSql);
       }
-      trackCount = [[playlist objectForKey:@"Playlist Items"] count];
-      trackEnumerator = [[playlist objectForKey:@"Playlist Items"] objectEnumerator];
+      NSArray *playlistItems = [playlist objectForKey:@"Playlist Items"];
+      trackCount = [playlistItems count];
+      trackEnumerator = [playlistItems objectEnumerator];
       for (NSInteger chunkIteration = 0; chunkIteration < trackCount;) {
         NSAutoreleasePool *loopPool = [[NSAutoreleasePool alloc] init];
         NSString *playlistTrackSql = @"BEGIN TRANSACTION;\n";
         for (NSInteger trackIteration = 0;
-             trackIteration < kInsertsPerTransaction && chunkIteration < trackCount;
+             trackIteration < kInsertsPerTransaction
+               && chunkIteration < trackCount;
              trackIteration++, chunkIteration++) {
           NSDictionary *track = [trackEnumerator nextObject];
-          playlistTrackSql = [playlistTrackSql stringByAppendingFormat:kPlaylistTrackInsertSql,
-                              playlistId, [[track objectForKey:@"Track ID"] intValue]];
+          playlistTrackSql 
+            = [playlistTrackSql stringByAppendingFormat:kPlaylistTrackInsertSql,
+               playlistId, [[track objectForKey:@"Track ID"] intValue]];
         }
-        playlistTrackSql = [playlistTrackSql stringByAppendingString:@"COMMIT;\n"];
+        playlistTrackSql 
+          = [playlistTrackSql stringByAppendingString:@"COMMIT;\n"];
         if ((sqliteErr = [db executeSQL:playlistTrackSql]) != SQLITE_OK) {
-          HGSLog(@"iTunes source could not insert playlist track info into its database (%i, %@)",
-                 sqliteErr, [db lastErrorString]);
+          HGSLog(@"iTunes source could not insert playlist track info into "
+                 @"its database (%i, %@)", sqliteErr, [db lastErrorString]);
           HGSLogDebug(@"%@", playlistTrackSql);
         }
         [loopPool release];
@@ -365,7 +399,11 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
 }
 
 - (void)updateIndexTimerFired:(NSTimer *)timer {
-  [self updateIndex];
+  NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
+  [queue addOperation:[HGSInvocationOperation
+   diskInvocationOperationWithTarget:self
+                            selector:@selector(updateIndex)
+                              object:nil]];
 }
 
 - (GTMSQLiteDatabase *)createDatabase {
@@ -422,8 +460,9 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   
   // Add all playlists to which the track belongs
   NSNumber *trackID = [pivotObject valueForKey:kITunesAttributeTrackIdKey];
-  NSString *sqlSelect = [NSString stringWithFormat:kPlaylistFromTrackSelectStatement,
-                         [trackID intValue]];
+  NSString *sqlSelect 
+    = [NSString stringWithFormat:kPlaylistFromTrackSelectStatement,
+       [trackID intValue]];
   @synchronized (self) {
     int sqliteErr;
     GTMSQLiteStatement *statement 
@@ -451,10 +490,12 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                forAlbumObject:(HGSObject *)pivotObject
                     withQuery:(NSString *)query  {
   // For albums, return tracks from the album
-  NSString *pivotObjectAlbum = [pivotObject valueForKey:kITunesAttributeAlbumKey];
+  NSString *pivotObjectAlbum 
+    = [pivotObject valueForKey:kITunesAttributeAlbumKey];
   pivotObjectAlbum = [GTMSQLiteStatement quoteAndEscapeString:pivotObjectAlbum];
-  NSString *sqlSelect = [NSString stringWithFormat:kTracksFromAlbumSelectStatement,
-                         pivotObjectAlbum];
+  NSString *sqlSelect 
+    = [NSString stringWithFormat:kTracksFromAlbumSelectStatement, 
+       pivotObjectAlbum];
   @synchronized (self) {
     int sqliteErr;
     GTMSQLiteStatement *statement 
@@ -468,8 +509,10 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
           break;
         }
         NSString *track = [statement resultStringAtPosition:1];
-        if (![query length] || [track rangeOfString:query
-                                            options:kResultStringCompareOptions].location != NSNotFound) {
+        if (![query length] 
+            || [track rangeOfString:query
+                            options:kResultStringCompareOptions].location 
+            != NSNotFound) {
           int trackId = [[statement resultStringAtPosition:0] intValue];
           NSString *artist = [statement resultStringAtPosition:2];
           NSString *album = [statement resultStringAtPosition:3];
@@ -496,9 +539,11 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
             forPlaylistObject:(HGSObject *)pivotObject
                     withQuery:(NSString *)query {
   // For playlists, return tracks from the playlist
-  NSInteger pivotObjectPlaylistId = [[pivotObject valueForKey:kITunesAttributePlaylistIdKey] intValue];
-  NSString *sqlSelect = [NSString stringWithFormat:kTracksFromPlaylistSelectStatement,
-                         pivotObjectPlaylistId];
+  NSInteger pivotObjectPlaylistId 
+    = [[pivotObject valueForKey:kITunesAttributePlaylistIdKey] intValue];
+  NSString *sqlSelect 
+    = [NSString stringWithFormat:kTracksFromPlaylistSelectStatement,
+       pivotObjectPlaylistId];
   @synchronized (self) {
     int sqliteErr;
     GTMSQLiteStatement *statement 
@@ -512,15 +557,18 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
           break;
         }
         NSString *track = [statement resultStringAtPosition:1];
-        if (![query length] || [track rangeOfString:query
-                                            options:kResultStringCompareOptions].location != NSNotFound) {
+        if (![query length] 
+            || [track rangeOfString:query
+                            options:kResultStringCompareOptions].location 
+            != NSNotFound) {
           int trackId = [[statement resultStringAtPosition:0] intValue];
           NSString *artist = [statement resultStringAtPosition:2];
           NSString *album = [statement resultStringAtPosition:3];
           NSString *composer = [statement resultStringAtPosition:4];
           NSString *genre = [statement resultStringAtPosition:5];
           NSString *location = [statement resultStringAtPosition:6];
-          NSString *playListID = [pivotObject valueForKey:kITunesAttributePlaylistIdKey];
+          NSString *playListID 
+            = [pivotObject valueForKey:kITunesAttributePlaylistIdKey];
           HGSObject *result =  [self trackResult:track
                                  withTrackNumber:trackId
                                          onAlbum:album
@@ -563,7 +611,8 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   }
   
   @synchronized (self) {
-    // Synchronized because sqlite allows only single thread access to a in-memory db
+    // Synchronized because sqlite allows only single thread access to an 
+    // in-memory db
     int sqliteErr;
     GTMSQLiteStatement *statement
       = [GTMSQLiteStatement statementWithSQL:sqlSelect
@@ -571,13 +620,16 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                                    errorCode:&sqliteErr];
     NSMutableArray *results = [NSMutableArray array];
     if (statement && !sqliteErr) {
-      while ([statement stepRow] == SQLITE_ROW && [results count] < kMaxSearchResults) {
+      while ([statement stepRow] == SQLITE_ROW 
+             && [results count] < kMaxSearchResults) {
         if ([operation isCancelled]) {
           break;
         }
         NSString *album = [statement resultStringAtPosition:0];
-        if (![query length] || [album rangeOfString:query
-                                            options:kResultStringCompareOptions].location != NSNotFound) {
+        if (![query length] 
+            || [album rangeOfString:query
+                            options:kResultStringCompareOptions].location 
+            != NSNotFound) {
           NSString *artist = [statement resultStringAtPosition:1];
           NSString *composer = [statement resultStringAtPosition:2];
           NSString *genre = [statement resultStringAtPosition:3];
@@ -631,7 +683,8 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                  likeString, likeString, likeString, likeString, likeString];
     NSMutableSet *results = [NSMutableSet set];
     @synchronized (self) {
-      // Synchronized because sqlite allows only single thread access to a in-memory db
+      // Synchronized because sqlite allows only single thread access to an 
+      // in-memory db
       int sqliteErr;
       GTMSQLiteStatement *statement 
         = [GTMSQLiteStatement statementWithSQL:sqlSelect
@@ -653,10 +706,12 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
           // We matched at least one column, figure out which column(s) matched
           // and create an appropriate result object for it
           if ([track rangeOfString:query 
-                           options:kResultStringCompareOptions].location != NSNotFound) {
+                           options:kResultStringCompareOptions].location 
+              != NSNotFound) {
             // Track name matched
+            int trackNumber = [[statement resultStringAtPosition:0] intValue];
             [results addObject:[self trackResult:track
-                                 withTrackNumber:[[statement resultStringAtPosition:0] intValue]
+                                 withTrackNumber:trackNumber
                                          onAlbum:album
                                         byArtist:artist
                                       byComposer:composer
@@ -798,7 +853,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        [NSURL URLWithString:iconFilePath], kHGSObjectAttributeIconPreviewFileKey,
-       albumIcon_, kHGSObjectAttributeImmediateIconKey,
+       albumIcon_, kHGSObjectAttributeIconKey,
        nil];
   if ([artist length]) {
     [attributes setObject:artist forKey:kHGSObjectAttributeSnippetKey];
@@ -825,10 +880,11 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   NSString *artistUrlString 
     = [NSString stringWithFormat:kArtistUrlFormat,
        [artist stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+  HGSAction *action = [self defaultAction];
   NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                               artist, kITunesAttributeArtistKey,
-                              artistIcon_, kHGSObjectAttributeImmediateIconKey,
-                              [self defaultAction], kHGSObjectAttributeDefaultActionKey,
+                              artistIcon_, kHGSObjectAttributeIconKey,
+                              action, kHGSObjectAttributeDefaultActionKey,
                               nil];
   return [HGSObject objectWithIdentifier:[NSURL URLWithString:artistUrlString]
                                     name:artist
@@ -841,10 +897,11 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   NSString *composerUrlString 
     = [NSString stringWithFormat:kComposerUrlFormat,
        [composer stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+  HGSAction *action = [self defaultAction];
   NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                               composer, kITunesAttributeComposerKey,
-                              composerIcon_, kHGSObjectAttributeImmediateIconKey,
-                              [self defaultAction], kHGSObjectAttributeDefaultActionKey,
+                              composerIcon_, kHGSObjectAttributeIconKey,
+                              action, kHGSObjectAttributeDefaultActionKey,
                               nil];
   
   return [HGSObject objectWithIdentifier:[NSURL URLWithString:composerUrlString]
@@ -869,7 +926,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
         = [NSString stringWithFormat:@"genre-%@", [genre lowercaseString]];
       NSString *imagePath = [iTunesBundle pathForImageResource:imageName];
       if (imagePath) {
-        icon = [[[NSImage alloc] initWithContentsOfFile:imagePath] autorelease];
+        icon = [[[NSImage alloc] initByReferencingFile:imagePath] autorelease];
       }
       if (!icon) {
         icon = genreIcon_;
@@ -889,7 +946,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   NSDictionary *attributes 
     = [NSDictionary dictionaryWithObjectsAndKeys:
        genre, kITunesAttributeGenreKey,
-       icon, kHGSObjectAttributeImmediateIconKey, 
+       icon, kHGSObjectAttributeIconKey, 
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        nil];
   return [HGSObject objectWithIdentifier:[NSURL URLWithString:genreUrlString]
@@ -908,7 +965,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
     = [NSDictionary dictionaryWithObjectsAndKeys:
        playlistId, kITunesAttributePlaylistIdKey,
        playlist, kITunesAttributePlaylistKey,
-       playlistIcon_, kHGSObjectAttributeImmediateIconKey,
+       playlistIcon_, kHGSObjectAttributeIconKey,
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        nil];
   return [HGSObject objectWithIdentifier:[NSURL URLWithString:playlistUrlString]

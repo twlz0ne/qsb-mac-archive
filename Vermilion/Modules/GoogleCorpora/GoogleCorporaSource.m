@@ -82,7 +82,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   HGSAccountsExtensionPoint *aep
     = [HGSAccountsExtensionPoint accountsExtensionPoint];
   NSEnumerator *accountEnum
-    = [aep accountsEnumForType:kHGSGoogleAccountTypeName];
+    = [aep accountsEnumForType:@"Google"];
   NSMutableArray *domains = [NSMutableArray array];
   for (id<HGSAccount> account in accountEnum) {
     NSString *name = [account accountName];
@@ -99,11 +99,11 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
 - (HGSObject *)corpusObjectForDictionary:(NSDictionary *)corpusDict 
                                 inDomain:(NSString *)domain {
-  if ([corpusDict valueForKey:kHGSCorporaSourceAttributeHideCorpusKey]) {
+  if ([corpusDict objectForKey:kHGSCorporaSourceAttributeHideCorpusKey]) {
     return nil;
   }
 #if !TARGET_OS_IPHONE
-  if ([corpusDict valueForKey:kHGSCorporaSourceAttributeHideFromDesktopKey]) {
+  if ([corpusDict objectForKey:kHGSCorporaSourceAttributeHideFromDesktopKey]) {
     return nil;
   }
 #endif
@@ -147,7 +147,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
                  forKey:kHGSObjectAttributeTypeKey];
   
   NSString *iconName 
-    = [objectDict valueForKey:kHGSCorporaSourceAttributeIconNameKey];
+    = [objectDict objectForKey:kHGSCorporaSourceAttributeIconNameKey];
   if (iconName) {
 #if TARGET_OS_IPHONE
     // For mobile, we must append .png
@@ -246,7 +246,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 }
 
 - (HGSObject *)objectWithArchivedRepresentation:(NSDictionary *)representation {
-  NSString *identifier = [representation valueForKey:kHGSObjectAttributeURIKey];
+  NSString *identifier = [representation objectForKey:kHGSObjectAttributeURIKey];
   for (HGSObject *corpus in searchableCorpora_) {
     NSURL *url = [corpus valueForKey:kHGSObjectAttributeURIKey];
     if ([url isEqual:identifier])

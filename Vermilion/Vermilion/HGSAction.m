@@ -133,6 +133,10 @@ static NSSet *CopyStringSetFromId(id value) {
   return [self name];
 }
 
+- (NSString *)defaultIconName {
+  return @"red-gear";
+}
+
 - (id)displayIconForResult:(HGSObject*)result {
   // default to our init icon
   return [self icon];

@@ -41,12 +41,13 @@ static NSString* const kDocCategoryPresentation = @"presentation";
 
 @interface HGSGoogleDocsSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
-  GDataServiceGoogleDocs* docService_;
-  GDataServiceTicket *    serviceTicket_;
-  NSTimer*                updateTimer_;
-  NSDictionary*           docIcons_;
-  BOOL                    currentlyFetching_;
-  NSString *              accountIdentifier_;
+  GDataServiceGoogleDocs *docService_;
+  GDataServiceTicket *serviceTicket_;
+  NSTimer *updateTimer_;
+  NSDictionary *docIcons_;
+  BOOL currentlyFetching_;
+  NSString *accountIdentifier_;
+  NSString *accountName_;
 }
 
 - (void)setUpPeriodicRefresh;
@@ -84,6 +85,7 @@ static NSString* const kDocCategoryPresentation = @"presentation";
     id<HGSAccount> account
       = [configuration objectForKey:kHGSExtensionAccountIdentifier];
     accountIdentifier_ = [[account identifier] retain];
+    accountName_ = [[account accountName] copy];
     if (accountIdentifier_) {
       // Get a doc listing now, and schedule a timer to update it every hour.
       [self startAsynchronousDocsListFetch];
@@ -113,6 +115,7 @@ static NSString* const kDocCategoryPresentation = @"presentation";
     [updateTimer_ invalidate];
   [updateTimer_ release];
   [accountIdentifier_ release];
+  [accountName_ release];
   [super dealloc];
 }
 
@@ -303,9 +306,10 @@ static NSString* const kDocCategoryPresentation = @"presentation";
       date, kHGSObjectAttributeLastUsedDateKey,
       icon, kHGSObjectAttributeIconKey,
       nil];
-  
+  NSString *docTitleWithAccount = [docTitle stringByAppendingFormat:@" (%@)",
+                                   accountName_];
   HGSObject* result = [HGSObject objectWithIdentifier:docURL
-                                                 name:docTitle
+                                                 name:docTitleWithAccount
                                                  type:kHGSTypeWebpage
                                                source:self
                                            attributes:attributes];

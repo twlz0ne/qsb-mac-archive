@@ -77,14 +77,13 @@ NSString *const kHGSAppleScriptSwitchContextsKey = @"HGSAppleScriptSwitchContext
       }
     }
     if (iconPath) {
-      icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
+      icon = [[[NSImage alloc] initByReferencingFile:iconPath] autorelease];
     }
   }
   if (!icon) {
     NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-    icon = [[[ws iconForFile:path] copy] autorelease];
+    icon = [ws iconForFile:path];
   }
-  [icon setSize:NSMakeSize(128, 128)];
   NSString *description 
     = [attributes objectForKey:kHGSAppleScriptDescriptionKey];
   BOOL displayInGlobalResults

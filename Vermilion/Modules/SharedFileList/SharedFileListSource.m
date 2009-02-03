@@ -33,38 +33,74 @@
 #import <Vermilion/Vermilion.h>
 #import "GTMGarbageCollection.h"
 
+// This is the LSSharedFileListItemRef for the item. Allows us to get at
+// the icon and other properties as needed.
 static NSString* const kObjectAttributeSharedFileListItem = 
   @"ObjectAttributeSharedFileListItem";
 
-@interface SharedFileListSource : HGSMemorySearchSource
+@interface SharedFileListSource : HGSMemorySearchSource {
+@private
+  NSArray *fileLists_;
+}
 - (void)loadFileLists;
+- (void)observeFileLists:(BOOL)doObserve;
+- (void)listChanged:(LSSharedFileListRef)list;
+- (void)indexObjectsForList:(LSSharedFileListRef)list;
 @end
+
+static void ListChanged(LSSharedFileListRef inList, void *context);
 
 @implementation SharedFileListSource
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
+    CFStringRef ourLists[] = {
+      kLSSharedFileListFavoriteVolumes,
+      kLSSharedFileListFavoriteItems,
+      kLSSharedFileListRecentApplicationItems,
+      kLSSharedFileListRecentDocumentItems
+    };
+    NSMutableArray *monitoredLists = [NSMutableArray array];
+    for (size_t i = 0; i < sizeof(ourLists) / sizeof(ourLists[0]); ++i) {
+      LSSharedFileListRef list = LSSharedFileListCreate(NULL, 
+                                                        ourLists[i], 
+                                                        NULL);
+      if (!list) continue;
+      [monitoredLists addObject:GTMCFAutorelease(list)];
+    }
+    fileLists_ = [monitoredLists retain];
     [self loadFileLists];
-   }
+    [self observeFileLists:YES];
+  }
   return self;
 }
 
-- (NSArray *)activeLists {
-  return [NSArray arrayWithObjects:
-          (id)kLSSharedFileListFavoriteVolumes,
-          (id)kLSSharedFileListFavoriteItems,
-          (id)kLSSharedFileListRecentApplicationItems,
-          (id)kLSSharedFileListRecentDocumentItems,
-          (id)kLSSharedFileListRecentServerItems,
-          nil];
+- (void)dealloc {
+  [self observeFileLists:NO];
+  [fileLists_ release];
+  [super dealloc];
 }
 
-- (NSArray *)indexObjectsForList:(NSString *)listName {
-  
-  LSSharedFileListRef list =
-    LSSharedFileListCreate(NULL, (CFStringRef) listName, NULL);
-  
-  if (!list) return nil;
-  
+- (void)observeFileLists:(BOOL)doObserve {
+  CFRunLoopRef mainLoop = CFRunLoopGetMain();
+  for (id list in fileLists_) {
+    LSSharedFileListRef listRef = (LSSharedFileListRef)list;
+    if (doObserve) {
+      LSSharedFileListAddObserver(listRef,
+                                  mainLoop,
+                                  kCFRunLoopDefaultMode,
+                                  ListChanged,
+                                  self);
+    } else {
+      LSSharedFileListRemoveObserver(listRef,
+                                     mainLoop,
+                                     kCFRunLoopDefaultMode,
+                                     ListChanged,
+                                     self);
+    }      
+  }
+}
+
+- (void)indexObjectsForList:(LSSharedFileListRef)list {
   UInt32 seed;
   NSArray *items =
     (NSArray *)GTMCFAutorelease(LSSharedFileListCopySnapshot(list, &seed));
@@ -80,23 +116,13 @@ static NSString* const kObjectAttributeSharedFileListItem =
     
     if (err) continue;
     NSURL *url = GTMCFAutorelease(cfURL);
-    IconRef iconRef = LSSharedFileListItemCopyIconRef(itemRef);
-    
-    NSImage *image = nil;
-    if (iconRef) {
-      [[[NSImage alloc] initWithIconRef:iconRef] autorelease];
-      ReleaseIconRef(iconRef);
-    }
+
     
     NSString *name = 
       (NSString *)GTMCFAutorelease(LSSharedFileListItemCopyDisplayName(itemRef));
     
-    // TODO(alcor): kObjectAttributeSharedFileListItem is not used. it 
-    // should be used for demand loading of results.
-    
     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                 item, kObjectAttributeSharedFileListItem,
-                                image, kHGSObjectAttributeIconKey,
                                 nil];
     
     HGSObject *object = [HGSObject objectWithFilePath:[url path]
@@ -106,43 +132,40 @@ static NSString* const kObjectAttributeSharedFileListItem =
            nameString:name
           otherString:nil];
   }
-  
-  CFRelease(list);
-  return nil;
 }
 
-- (void)loadFileLists {
-  NSArray *lists = [self activeLists];
-  
-  for (id list in lists) {
+- (id)provideValueForKey:(NSString *)key result:(HGSObject *)result {
+  id value = nil;
+  if ([key isEqualToString:kHGSObjectAttributeIconKey] 
+      || [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
+    id item = [result valueForKey:kObjectAttributeSharedFileListItem];
+    if (item) {
+      LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef)item;
+      IconRef iconRef = LSSharedFileListItemCopyIconRef(itemRef);
+      if (iconRef) {
+        value = [[[NSImage alloc] initWithIconRef:iconRef] autorelease];
+        ReleaseIconRef(iconRef);
+      }
+    }
+  }
+  return value;
+}
     
-    // TODO(alcor): watch for notifications and recache
-    //
-    //LSSharedFileListAddObserver(list,
-    //                            [[NSRunLoop mainRunLoop] getCFRunLoop],
-    //                            kCFRunLoopDefaultMode,
-    //                            listChanged, 
-    //                            self);
-    //
-    //LSSharedFileListRemoveObserver(list,
-    //                               [[NSRunLoop mainRunLoop] getCFRunLoop],
-    //                               kCFRunLoopDefaultMode, 
-    //                               listChanged,
-    //                               self);
-    //
-    
-    [self indexObjectsForList:list];
+- (void)loadFileLists {  
+  [self clearResultIndex];
+  for (id list in fileLists_) {
+    LSSharedFileListRef listRef = (LSSharedFileListRef)list;
+    [self indexObjectsForList:listRef];
   }
 }
 
-//- (void)listChanged:(LSSharedFileListRef)list {
-//  UInt32 seed;
-//  NSArray *items = (NSArray *)LSSharedFileListCopySnapshot(list, &seed);
-//  [items release];
-//}
-//
-//static void listChanged(LSSharedFileListRef list, void *context) {
-//  [(id)context listChanged:list];
-//}
+- (void)listChanged:(LSSharedFileListRef)list {
+  [self loadFileLists];
+}
+
+static void ListChanged(LSSharedFileListRef inList, void *context) {
+  SharedFileListSource *object = (SharedFileListSource *)context;
+  [object listChanged:inList];
+}
 
 @end

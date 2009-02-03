@@ -45,9 +45,17 @@
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    path_ = [configuration valueForKey:@"rootPath"];
+    path_ = [configuration objectForKey:@"rootPath"];
     path_ = [[path_ stringByStandardizingPath] retain];
-    [self recacheContents];
+    [self loadResultsCache];
+
+    if (![resultsArray_ count]) {
+      [self recacheContents];
+    } else {
+      [self performSelector:@selector(recacheContents)
+                   withObject:nil
+                   afterDelay:10.0];
+    }
 
     kQueue_ = [[GTMFileSystemKQueue alloc] initWithPath:path_
                                               forEvents:kGTMFileSystemKQueueWriteEvent
@@ -109,6 +117,7 @@
            nameString:[object displayName]
           otherString:nil];
   }
+  [self saveResultsCache];
 }
 
 @end

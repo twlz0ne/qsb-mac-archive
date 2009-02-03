@@ -63,7 +63,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     } else {
       NSBundle *bundle = HGSGetPluginBundle();
       NSString *path = [bundle pathForResource:@"emailURL" ofType:@"icns"];
-      icon = [[[NSImage alloc] initWithContentsOfFile:path] autorelease]; 
+      icon = [[[NSImage alloc] initByReferencingFile:path] autorelease]; 
       if (!icon) {
         HGSLogDebug(@"Icon for EmailURL is missing from the EmailActions "
                     @"module bundle.");

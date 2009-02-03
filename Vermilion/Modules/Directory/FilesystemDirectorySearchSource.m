@@ -32,6 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import "NSString+CaseInsensitive.h"
+#import "HGSAbbreviationRanker.h"
 
 // This source provides results for directory restricted searches:
 // If a pivot object is a folder, it will find direct children with a prefix
@@ -59,7 +60,7 @@
   // use the raw query since we're trying to match paths to specific folders.
   NSString *queryString = [query rawQueryString];
   HGSObject *pivotObject = [query pivotObject];
-  
+  BOOL isApplication = [pivotObject conformsToType:kHGSTypeFileApplication];
   if (pivotObject) {
     NSURL *url = [pivotObject identifier];
     NSString *path = [url path];
@@ -69,17 +70,34 @@
     NSArray *contents = [fm directoryContentsAtPath:path];
     NSEnumerator *enumerator = [contents objectEnumerator];
     NSString *subpath;
+    BOOL showInvisibles = ([query flags] & eHGSQueryShowAlternatesFlag) != 0;
     while ((subpath = [enumerator nextObject])) {
-      if ([subpath hasPrefix:@"."]) continue;
+      if (!showInvisibles && [subpath hasPrefix:@"."]) continue;
+      
+      float score = HGSScoreForAbbreviation((CFStringRef)subpath, 
+                                            (CFStringRef)queryString, nil);
+      
       // if we have a query string, we exact prefix match (no tokenize, etc.)
-      if ([queryString length] && ![subpath hasCaseInsensitivePrefix:queryString]) continue;
+      //if ([queryString length] && ![subpath hasCaseInsensitivePrefix:queryString]) continue;
+      if (score <= 0.0) continue;
+      
       subpath = [path stringByAppendingPathComponent:subpath];
       
+      NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+      if (isApplication && ![queryString length]) {
+        [attributes setObject:[NSNumber numberWithInt:eHGSBelowFoldRankFlag] 
+                       forKey:kHGSObjectAttributeRankFlagsKey];
+      }
+      [attributes setObject:[NSNumber numberWithFloat:score] 
+                     forKey:kHGSObjectAttributeRankKey];
+
       HGSObject *result = [HGSObject objectWithFilePath:subpath 
                                                  source:self 
-                                             attributes:nil];
+                                             attributes:attributes];
+  
       [results addObject:result];
     }
+
     [operation setResults:results];
   } else {
     // we treat the input as a raw path, so no tokenizing, etc.
@@ -127,7 +145,6 @@
               [contents addObject:object];
             }
           }
-          
           [operation setResults:contents]; 
         }
       }

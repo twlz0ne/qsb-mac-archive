@@ -87,7 +87,6 @@ NSString* const kHGSIMBuddyInformationKey = @"kHGSIMBuddyInformationKey";
 @interface HGSObject (HGSObjectPrivate)
 - (NSDictionary *)values;
 + (NSString *)hgsTypeForPath:(NSString*)path;
-- (NSString*)normalizedURIForResult:(HGSObject*)result;
 @end
 
 @implementation HGSObject
@@ -152,10 +151,15 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     }
     values_ = [[NSMutableDictionary alloc] initWithCapacity:4 ];
 
-    identifier_ = [uri retain];
+    identifier_ = [[uri absoluteString] retain];
+    idHash_ = [identifier_ hash];
     name_ = [name retain];
     type_ = [typeStr retain];
     source_ = [source retain];
+    conformsToContact_ = [self conformsToType:kHGSTypeContact];
+    if ([self conformsToType:kHGSTypeWebpage]) {
+      normalizedIdentifier_ = [[identifier_ readableURLString] retain];
+    }
     if (attributes) {
       [values_ addEntriesFromDictionary:attributes];
     }
@@ -166,9 +170,16 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     }
     NSNumber *rankFlags = [values_ objectForKey:kHGSObjectAttributeRankFlagsKey];
     if (rankFlags) {
-      rankFlags_ = [rank unsignedIntValue];
+      rankFlags_ = [rankFlags unsignedIntValue];
       [values_ removeObjectForKey:kHGSObjectAttributeRankFlagsKey];
     }
+    lastUsedDate_ = [values_ objectForKey:kHGSObjectAttributeLastUsedDateKey];
+    if (lastUsedDate_) {
+      [values_ removeObjectForKey:kHGSObjectAttributeLastUsedDateKey];
+    } else {
+      lastUsedDate_ = [NSDate distantPast];
+    }
+    [lastUsedDate_ retain];
   }
   return self;
 }
@@ -209,8 +220,10 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   [source_ release];
   [values_ release];
   [identifier_ release];
+  [normalizedIdentifier_ release];
   [name_ release];
   [type_ release];
+  [lastUsedDate_ release];
   [super dealloc];
 }
 
@@ -330,7 +343,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 }
 
 - (NSURL*)identifier {
-  return identifier_;
+  return [NSURL URLWithString:identifier_];
 }
 
 - (NSString*)stringValue {
@@ -364,13 +377,12 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 }
 
 - (NSString*)type {
-  return [[type_ retain] autorelease];
+  return type_;
 }
 
 - (BOOL)isOfType:(NSString *)typeStr {
-  NSString *myType = [self type];
   // Exact match
-  BOOL result = [myType isEqualToString:typeStr];
+  BOOL result = [type_ isEqualToString:typeStr];
   return result;
 }
 
@@ -448,8 +460,8 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   // be equal at a base impl layer.
   BOOL intersects = NO;
   
-  if ([self conformsToType:kHGSTypeContact] 
-      && [compareTo conformsToType:kHGSTypeContact]) {
+  if (self->conformsToContact_ 
+      && compareTo->conformsToContact_) {
     
     NSArray *identifiers = [self valueForKey:kHGSObjectAttributeUniqueIdentifiersKey];
     NSArray *identifiers2 = [compareTo valueForKey:kHGSObjectAttributeUniqueIdentifiersKey];
@@ -466,21 +478,17 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
       }
     }
   } else {
-    NSString *ourURL = [[self identifier] absoluteString];
-    NSString *theirURL = [[compareTo identifier] absoluteString];
-    intersects = [ourURL isEqualToString:theirURL];
+    if (self->idHash_ == compareTo->idHash_) {
+      intersects = [self->identifier_ isEqualToString:compareTo->identifier_];
+    }
   }
-  if (!intersects 
-      && [self conformsToType:kHGSTypeWebpage] 
-      && [compareTo conformsToType:kHGSTypeWebpage]) {
+  if (!intersects) {
     // URL get special checks to enable matches to reduce duplicates, we remove
     // some things that tend to be "optional" to get a "normalized" url, and
     // compare those.
-    
-    // We store the normalized urls back in the results, so if we compare this
-    // result again, we can save the work.
-    NSString *myNormURLString = [self normalizedURIForResult:self];
-    NSString *compareNormURLString = [self normalizedURIForResult:compareTo];
+
+    NSString *myNormURLString = self->normalizedIdentifier_;
+    NSString *compareNormURLString = compareTo->normalizedIdentifier_;
     
     // if we got strings, compare
     if (myNormURLString && compareNormURLString) {
@@ -490,6 +498,9 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   return intersects;
 }
 
+- (NSDate *)lastUsedDate {
+  return lastUsedDate_;
+}
 @end
 
 @implementation HGSObject (HGSObjectPrivate)
@@ -545,11 +556,6 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   return outType;
 }
 
-- (NSString*)normalizedURIForResult:(HGSObject*)result {
-  NSString *resultURI = [[result identifier] absoluteString];
-  return [resultURI readableURLString];
-}
-
 @end
 
 @implementation HGSMutableObject
@@ -571,3 +577,14 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
 }
 @end
 
+@implementation HGSObject (HGSFileConvenienceMethods)
+- (NSArray *)filePaths {
+  // TODO(alcor): Eventually these will need to return arrays, better to get
+  // the actions in the habit of handling an array rather than a single item.
+  NSURL *url = [self valueForKey:kHGSObjectAttributeURIKey];
+  if (![url isFileURL]) return nil;
+  NSString *path = [url path];
+  return [NSArray arrayWithObject:path];
+}
+
+@end

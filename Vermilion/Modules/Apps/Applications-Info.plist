@@ -27,6 +27,10 @@
 			<string>com.google.qsb.applications.source</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
+			<key>HGSSearchSourcePivotableTypes</key>
+			<string>file.application</string>
+			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
+			<string>com.apple.application</string>
 		</dict>
 	</array>
 </dict>

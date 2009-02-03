@@ -43,6 +43,7 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 
 @synthesize accountName = accountName_;
 @synthesize accountType = accountType_;
+@synthesize isAuthenticated = isAuthenticated_;
 
 - (id)initWithName:(NSString *)accountName
           password:(NSString *)password
@@ -108,6 +109,19 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
                                object:[self identifier]];
 }
 
++ (NSView *)accountSetupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
+  HGSLogDebug(@"Class '%@', deriving from HGSAccount, should override "
+              @"accountSetupViewToInstallWithParentWindow: if it has an "
+              @"interface for setting up new accounts.", [self class]);
+  return nil;
+}
+
+- (void)editWithParentWindow:(NSWindow *)parentWindow {
+  HGSLogDebug(@"Class '%@', deriving from HGSAccount, should override "
+              @"editWithParentWindow: if it has an interface "
+              @"for editing its account type.", [self class]);
+}
+
 - (void)remove {
   // Remove the account extension.
   HGSAccountsExtensionPoint *accountsExtensionPoint
@@ -117,10 +131,6 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 
 - (BOOL)isEditable {
   return YES;
-}
-
-- (BOOL)isAuthenticated {
-  return NO;
 }
 
 - (BOOL)isAccountTypeAndActive:(NSString *)type {

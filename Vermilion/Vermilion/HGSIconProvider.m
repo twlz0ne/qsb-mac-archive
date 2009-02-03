@@ -34,6 +34,7 @@
 #import "HGSIconProvider.h"
 #import "HGSLRUCache.h"
 #import "HGSObject.h"
+#import "HGSSearchSource.h"
 #import "HGSOperation.h"
 #import "GTMObjectSingleton.h"
 #import "GTMGeometryUtils.h"
@@ -41,6 +42,7 @@
 #import "GTMNSBezierPath+CGPath.h"
 #import "GTMHTTPFetcher.h"
 #import "HGSLog.h"
+#import "GTMDebugThreadValidation.h"
 
 static const void *LRURetain(CFAllocatorRef allocator, const void *value);
 static void LRURelease(CFAllocatorRef allocator, const void *value);
@@ -59,8 +61,11 @@ static HGSLRUCacheCallBacks kLRUCacheCallbacks = {
   nil          // evict
 };
 
+static NSString *const kHGSIconProviderResultKey = @"HGSIconProviderResultKey";
+static NSString *const kHGSIconProviderValueKey = @"HGSIconProviderValueKey";
+static NSString *const kHGSIconProviderAttrKey = @"kHGSIconProviderAttrKey";
 
-@interface HGSIconProvider(PrivateMethods)
+@interface HGSIconProvider()
 - (void)beginLazyLoadForResult:(HGSObject*)result useCache:(BOOL)useCache;
 @end
 
@@ -77,6 +82,7 @@ static HGSLRUCacheCallBacks kLRUCacheCallbacks = {
 - (id)initWithResult:(HGSObject*)result useCache:(BOOL)useCache;
 - (void)beginLoading;
 - (void)cancel;
+- (void)setValueOnMainThread:(NSDictionary *)args;
 @end
 
 
@@ -205,9 +211,24 @@ static HGSLRUCacheCallBacks kLRUCacheCallbacks = {
   
   @synchronized(self) {
     if (icon && ![operation_ isCancelled]) {
-      [result_ setValue:icon forKey:kHGSObjectAttributeIconKey];
+      NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
+                            result_, kHGSIconProviderResultKey,
+                            icon, kHGSIconProviderValueKey,
+                            kHGSObjectAttributeIconKey, kHGSIconProviderAttrKey,
+                            nil];
+      [self performSelectorOnMainThread:@selector(setValueOnMainThread:)
+                             withObject:args
+                          waitUntilDone:NO];
     }
   }
+}
+
+- (void)setValueOnMainThread:(NSDictionary *)args {
+  GTMAssertRunningOnMainThread();
+  HGSObject *result = [args objectForKey:kHGSIconProviderResultKey];
+  id value = [args objectForKey:kHGSIconProviderValueKey];
+  NSString *key = [args objectForKey:kHGSIconProviderAttrKey];
+  [result setValue:value forKey:key];
 }
 
 - (void)httpFetcher:(GTMHTTPFetcher *)fetcher
@@ -227,7 +248,14 @@ static HGSLRUCacheCallBacks kLRUCacheCallbacks = {
   
   @synchronized(self) {
     if (icon && ![operation_ isCancelled]) {
-      [result_ setValue:icon forKey:kHGSObjectAttributeIconKey];
+      NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
+                            result_, kHGSIconProviderResultKey,
+                            icon, kHGSIconProviderValueKey,
+                            kHGSObjectAttributeIconKey, kHGSIconProviderAttrKey,
+                            nil];
+      [self performSelectorOnMainThread:@selector(setValueOnMainThread:)
+                             withObject:args
+                          waitUntilDone:NO];
     }
   }
 }
@@ -287,7 +315,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
     if (!icon) {
       if (loadLazily) {
         [self beginLazyLoadForResult:result useCache:useCache];
-        icon = [result valueForKey:kHGSObjectAttributeImmediateIconKey];
+        icon = [[result source] defaultIconForObject:result];
         if (!icon) {
           icon = [self placeHolderIcon];
         }
@@ -332,20 +360,23 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 
 - (NSImage *)cachedIconForKey:(NSString *)key {
   NSImage *icon = nil;
-  NSData *iconData = nil;
   @synchronized(self) {
-    iconData = (NSData *)[cache_ valueForKey:key];
+    icon = (NSImage *)[cache_ valueForKey:key];
   }
-  if (iconData) {
-    icon = [NSUnarchiver unarchiveObjectWithData:iconData];
-  }
-  return icon;
+  return [[icon retain] autorelease];
 }
 
 - (void)cacheIcon:(NSImage *)icon forKey:(NSString *)key {
-  NSData *iconData = [NSArchiver archivedDataWithRootObject:icon];
-  if ([iconData length]) {
-    [cache_ setValue:iconData forKey:key size:[iconData length]];
+  if (icon) {
+    // Figure out rough size of image
+    size_t size = 0;
+    for (NSBitmapImageRep *rep in [icon representations]) {
+      size_t repSize = ([rep pixelsHigh] 
+                        * [rep pixelsWide] 
+                        * [rep bitsPerPixel] / 8);
+      size += repSize;
+    }
+    [cache_ setValue:icon forKey:key size:size];
   }
 }
 

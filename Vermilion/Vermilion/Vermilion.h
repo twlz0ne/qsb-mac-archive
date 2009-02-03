@@ -56,4 +56,4 @@
 #import <Vermilion/HGSDelegate.h>
 #import <Vermilion/HGSAccount.h>
 #import <Vermilion/HGSAccountsExtensionPoint.h>
-#import <Vermilion/HGSGoogleAccount.h>
+#import <Vermilion/HGSSimpleAccount.h>

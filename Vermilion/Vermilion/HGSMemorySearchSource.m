@@ -68,7 +68,7 @@ static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *t
       self = nil;
     }
     id<HGSDelegate> delegate = [[HGSModuleLoader sharedModuleLoader] delegate];
-    NSString *appSupportPath = [delegate userApplicationSupportFolderForApp];
+    NSString *appSupportPath = [delegate userCacheFolderForApp];
     NSString *filename =
       [NSString stringWithFormat:@"%@.cache.db", [self identifier]];
     cachePath_ =
@@ -174,7 +174,7 @@ static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *t
         otherString:(NSString*)otherString {
   // must have result and name string
   if (hgsResult && ([nameString length] > 0)) {
-
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     // do our normalization...
     NSString *prepedNameString
       = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:nameString];
@@ -206,6 +206,7 @@ static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *t
         [resultsArray_ addObject:resultsArrayObject];
       }
     }
+    [pool release];
   }
 }
 

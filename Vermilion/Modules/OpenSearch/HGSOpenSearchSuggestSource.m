@@ -105,7 +105,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (void)cacheValue:(id)cacheValue forKey:(NSString *)key {
-  [cache_ setValue:cacheValue forKey:key];
+  [cache_ setObject:cacheValue forKey:key];
 }
 
 @end

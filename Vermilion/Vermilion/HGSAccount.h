@@ -70,6 +70,14 @@
 // function in order to insure notifications are sent.
 - (void)setAccountPassword:(NSString *)password;
 
+// Provide a view that will be installed in an account setup window.
+// |parentWindow| is provided as a place off which to hang alerts. 
++ (NSView *)accountSetupViewToInstallWithParentWindow:(NSWindow *)parentWindow;
+
+// Do whatever is appropriate in order to edit the account.  |parentWindow|
+// is provided as a place off which to hang an edit sheet, if desired.
+- (void)editWithParentWindow:(NSWindow *)parentWindow;
+
 // Do what is appropriate in order to remove the account.  Derived classes
 // should either call this base function in order to insure notifications
 // are sent, or send both notifications itself.
@@ -80,6 +88,7 @@
 
 // Return YES if the account is valid (i.e. has been authenticated).
 - (BOOL)isAuthenticated;
+- (void)setIsAuthenticated:(BOOL)isAuthenticated;
 
 // Convenience function for testing account type and availability.
 - (BOOL)isAccountTypeAndActive:(NSString *)type;
@@ -98,14 +107,18 @@
 @end
 
 
+// A concrete representation of the HGSAccount protocol.
+//
 @interface HGSAccount : HGSExtension <HGSAccount> {
  @private
   NSString *accountName_;
   NSString *accountType_;
+  BOOL isAuthenticated_;
 }
 
 @property (nonatomic, copy) NSString *accountName;
 @property (nonatomic, copy) NSString *accountType;
+@property (nonatomic) BOOL isAuthenticated;
 
 // Initialize a new account entry.
 - (id)initWithName:(NSString *)accountName
@@ -129,6 +142,12 @@
 - (NSString *)accountPassword;
 - (void)setAccountPassword:(NSString *)password;
 
+// The default view provider returns nil.
++ (NSView *)accountSetupViewToInstallWithParentWindow:(NSWindow *)parentWindow;
+
+// The default account edit function does nothing.
+- (void)editWithParentWindow:(NSWindow *)parentWindow;
+
 // Do what is appropriate in order to remove the account.  The default
 // removes the account from the accounts extensions point.  If you derive
 // a subclass then you should call super's (this) remove.
@@ -136,9 +155,6 @@
 
 // Determine if the account is editable.  The default returns YES.
 - (BOOL)isEditable;
-
-// Determine if the account has been authenticated.  The default returns NO.
-- (BOOL)isAuthenticated;
 
 @end
 

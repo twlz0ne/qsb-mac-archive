@@ -42,6 +42,9 @@
 @interface FileSystemOpenAction : HGSAction
 @end
 
+@interface FileSystemOpenWithAction : FileSystemOpenAction
+@end
+
 @interface FileSystemShowInFinderAction : HGSAction
 @end
 
@@ -54,8 +57,17 @@
 }
 @end
 
+@interface FileSystemEjectAction : HGSAction
+@end
+
 const OSType kToolbarAppsFolderIcon = 'tAps';
 const OSType kToolbarInfoIcon = 'tbin';
+
+@implementation FileSystemOpenWithAction
+
+// TODO(alcor): for now this behaves as Open, support indirects.
+
+@end
 
 @implementation FileSystemOpenAction
 
@@ -73,7 +85,7 @@ const OSType kToolbarInfoIcon = 'tbin';
 }
 
 - (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info valueForKey:kHGSActionPrimaryObjectKey];
+  HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
   NSURL *url = [object valueForKey:kHGSObjectAttributeURIKey];
   BOOL wasGood = [ws openURL:url];
@@ -81,16 +93,29 @@ const OSType kToolbarInfoIcon = 'tbin';
 }
 
 - (id)displayIconForResult:(HGSObject*)result {
-  CFURLRef url = (CFURLRef)[result valueForKey:kHGSObjectAttributeURIKey];
-  CFURLRef appURL = NULL;
-  if (url && noErr == LSGetApplicationForURL(url,
-                                             kLSRolesViewer,
-                                             NULL, &appURL)) {
-    
-    GTMCFAutorelease(appURL);
-    return [[NSWorkspace sharedWorkspace] iconForFile:[(NSURL *)appURL path]];
+  NSURL *url = [result valueForKey:kHGSObjectAttributeURIKey];
+  
+    BOOL isDirectory = NO;
+  if ([url isFileURL]) {
+    [[NSFileManager defaultManager] fileExistsAtPath:[url path]
+                                         isDirectory:&isDirectory];
   }
-  return nil;
+  NSImage *icon = nil;
+  if (isDirectory) {
+    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+    NSString *finderPath
+      = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
+    icon = [ws iconForFile:finderPath];
+  } else {
+    CFURLRef appURL = NULL;
+    if (url && noErr == LSGetApplicationForURL((CFURLRef)url,
+                                               kLSRolesViewer,
+                                               NULL, &appURL)) {
+      GTMCFAutorelease(appURL);
+      icon =  [[NSWorkspace sharedWorkspace] iconForFile:[(NSURL *)appURL path]];
+    }
+  }
+  return icon;
 }
 
 @end
@@ -113,7 +138,7 @@ const OSType kToolbarInfoIcon = 'tbin';
 }
 
 - (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info valueForKey:kHGSActionPrimaryObjectKey];
+  HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
   NSURL *url = [object valueForKey:kHGSObjectAttributeURIKey];
   return [ws selectFile:[url path] inFileViewerRootedAtPath:@""];
@@ -129,7 +154,7 @@ const OSType kToolbarInfoIcon = 'tbin';
 }
 
 - (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info valueForKey:kHGSActionPrimaryObjectKey];
+  HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
   NSURL *url = [object valueForKey:kHGSObjectAttributeURIKey];
   NSArray *urls = [NSArray arrayWithObject:url];
   QLPreviewPanel *panel = [QLPreviewPanel sharedPreviewPanel];
@@ -195,7 +220,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
 }
 
 - (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info valueForKey:kHGSActionPrimaryObjectKey];
+  HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
   NSURL *url = [object valueForKey:kHGSObjectAttributeURIKey];
   HGSAssert([url isFileURL], @"Must be file URL");
   NSDictionary *dictionary = nil;
@@ -210,5 +235,73 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
   }
   return YES;
 }
+
+@end
+
+@implementation FileSystemEjectAction
+
+- (id)defaultObjectForKey:(NSString *)key {
+  id defaultObject = nil;
+  if ([key isEqualToString:kHGSExtensionIconImageKey]) {
+    
+    IconRef iconRef = NULL;
+    GetIconRef(kOnSystemDisk,
+               kSystemIconsCreator,
+               kEjectMediaIcon, 
+               &iconRef);
+    
+    NSImage *image = nil;
+    if (iconRef) {
+      image = [[[NSImage alloc] initWithIconRef:iconRef] autorelease];
+      ReleaseIconRef(iconRef);
+    } 
+    
+    defaultObject = image;
+  }
+  if (!defaultObject) {
+    defaultObject = [super defaultObjectForKey:key];
+  }
+  return defaultObject;
+}
+
+- (BOOL)performActionWithInfo:(NSDictionary*)info {
+  HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
+  
+  NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+  NSArray *filePaths = [object filePaths];
+  
+  BOOL success = YES;
+  for (NSString *path in filePaths) {
+    // if workspace can't do it, try the finder.
+    if (![workspace unmountAndEjectDeviceAtPath:path]){
+      NSString *displayName
+        = [[NSFileManager defaultManager] displayNameAtPath:path];
+      NSString *source = [NSString stringWithFormat:
+        @"tell application \"Finder\" to eject disk \"%@\"",displayName];
+      NSAppleScript *ejectScript
+        = [[[NSAppleScript alloc] initWithSource:source] autorelease]; 
+      NSDictionary *errorDict = nil;
+      [ejectScript executeAndReturnError:&errorDict];
+      if (errorDict) {
+        NSString *error
+        = [errorDict objectForKey:NSAppleScriptErrorBriefMessage];
+        HGSLog(@"Error ejecting disk %@: %@", path, error);
+        NSBeep();
+        success = NO;
+      }
+    }
+  }
+  return success;
+}
+
+- (BOOL)doesActionApplyTo:(HGSObject*)object {
+  NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+  NSArray *filePaths = [object filePaths];
+  NSArray *volumes = [workspace mountedLocalVolumePaths];
+  NSSet *volumesSet = [NSSet setWithArray:volumes];
+  NSSet *pathsSet = [NSSet setWithArray:filePaths];
+  return [pathsSet intersectsSet:volumesSet];
+}
+
 
 @end

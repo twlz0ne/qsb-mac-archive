@@ -82,11 +82,13 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.itunes.action.playapp</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Play</string>
+			<string>Play iTunes</string>
 			<key>iTunesCommand</key>
 			<string>playNow</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>Play.icns</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file.application</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -96,11 +98,13 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.itunes.action.pauseapp</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Pause</string>
+			<string>Pause iTunes</string>
 			<key>iTunesCommand</key>
 			<string>pauseNow</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>Pause.icns</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file.application</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -110,11 +114,13 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.itunes.action.nextapp</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Next</string>
+			<string>Next iTunes Track</string>
 			<key>iTunesCommand</key>
 			<string>goForward</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>NextSong.icns</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file.application</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -124,11 +130,13 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Previous</string>
+			<string>Previous iTunes Track</string>
 			<key>iTunesCommand</key>
 			<string>goBack</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>PreviousSong.icns</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file.application</string>
 		</dict>
 	</array>
 </dict>

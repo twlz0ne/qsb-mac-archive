@@ -152,6 +152,9 @@
 // and for which the HGSIsUserVisible flas is not set to NO.
 - (BOOL)isUserVisibleAndExtendsExtensionPoint:(NSString *)extensionPoint;
 
+// Install all account types that we offer.
+- (void)installAccountTypes;
+
 // Convenience methods for setting a factor.
 - (void)setExtensionDictionaryObject:(id)factor forKey:(NSString *)key;
 

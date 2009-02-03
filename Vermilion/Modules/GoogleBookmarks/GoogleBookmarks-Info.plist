@@ -29,6 +29,10 @@
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Google Bookmarks</string>
+			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
+			<array>
+				<string>com.googlecode.precipitate.bookmark</string>
+			</array>
 		</dict>
 	</array>
 </dict>

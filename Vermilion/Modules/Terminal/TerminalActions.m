@@ -81,7 +81,7 @@ static NSString *const kTerminalBundleID = @"com.apple.Terminal";
 }
 
 - (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *directObject = [info valueForKey:kHGSActionPrimaryObjectKey];
+  HGSObject *directObject = [info objectForKey:kHGSActionPrimaryObjectKey];
   NSString *path = [[directObject identifier] path];
   NSDictionary *errorDictionary = nil;
   [[self appleScript] gtm_executePositionalHandler:@"openDirectory"

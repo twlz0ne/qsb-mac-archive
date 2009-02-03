@@ -32,15 +32,21 @@
 
 #import <Vermilion/Vermilion.h>
 
+// Indexes Applications and Preference Panes. Allows pivoting on the
+// System Preferences to find preference panes inside it.
+
 @interface ApplicationsSource : HGSMemorySearchSource {
-@private
+ @private
   NSMetadataQuery *query_;
   NSCondition *condition_;
   BOOL indexing_;
 }
+
+- (void)startQuery:(NSTimer *)timer;
+
 @end
 
-static NSString *const kPredicateString 
+static NSString *const kApplicationSourcePredicateString 
   = @"(kMDItemContentTypeTree == 'com.apple.application') "
     @"|| (kMDItemContentTypeTree == 'com.apple.systempreference.prefpane')";
 
@@ -51,7 +57,8 @@ static NSString *const kPredicateString
     // kick off a spotlight query for applications. it'll be a standing
     // query that we keep around for the duration of this source.
     query_ = [[NSMetadataQuery alloc] init];
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:kPredicateString];
+    NSPredicate *predicate 
+      = [NSPredicate predicateWithFormat:kApplicationSourcePredicateString];
     NSArray *scope = [NSArray arrayWithObject:NSMetadataQueryLocalComputerScope];
     [query_ setSearchScopes:scope];
     NSSortDescriptor *desc 
@@ -67,14 +74,37 @@ static NSString *const kPredicateString
                name:nil 
              object:query_];
     [self loadResultsCache];
+    condition_ = [[NSCondition alloc] init];
     if (![resultsArray_ count]) {
       // Cache didn't exist, hold queries until the first indexing run completes
       indexing_ = YES;
+      [self startQuery:nil];
+    } else {
+      // TODO(alcor): this retains us even if everyone else releases. 
+      // add a teardown function for sources where they can invalidate
+      [self performSelector:@selector(startQuery:) 
+                 withObject:nil
+                 afterDelay:10];
     }
-    condition_ = [[NSCondition alloc] init];
-    [query_ startQuery];
   }
   return self;
+}
+
+- (void)dealloc {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self];
+  [query_ release];
+  [condition_ release];
+  [super dealloc];
+}
+
+- (void)startQuery:(NSTimer *)timer {
+  [query_ startQuery];
+}
+
+- (BOOL)pathIsPrefPane:(NSString *)path {
+  NSString *ext = [path pathExtension];
+  return [ext caseInsensitiveCompare:@"prefPane"] == NSOrderedSame;
 }
 
 // Returns YES if the application is something a user would never realistically
@@ -85,19 +115,28 @@ static NSString *const kPredicateString
   BOOL suppress = NO;
   if (!path) {
     suppress = YES;
-  } else if ([[path pathExtension] caseInsensitiveCompare:@"prefPane"] 
-             == NSOrderedSame) {
+  } else if ([self pathIsPrefPane:path]) {
     // Only match pref panes if they are installed.
     // TODO(stuartmorgan): This should actually be looking specifically in the
     // boot volume
     suppress = ([path rangeOfString:@"/PreferencePanes/"].location 
                 == NSNotFound);
-  } else if (([path rangeOfString:@"/Library/"].location != NSNotFound &&
-       [path rangeOfString:@"Finder.app"].location == NSNotFound) ||
-      [path rangeOfString:@"/Developer/Platforms/"].location != NSNotFound) {
-    // Quick and dirty blacklist of some polluting app locations. "/Library/" as 
-    // a non-prefix may have false positives, but we punt for now in favor of
-    // easily handling of user Library and non-boot volumes.
+  } else if ([path rangeOfString:@"/Library/"].location != NSNotFound) {
+    // TODO(alcor): verify that these paths actually exist, or filter on bndleid
+    NSArray *whitelist
+      = [NSArray arrayWithObjects:
+         @"/System/Library/CoreServices/Software Update.app",
+         @"/System/Library/CoreServices/Finder.app",
+         @"/System/Library/CoreServices/Archive Utility.app",
+         @"/System/Library/CoreServices/Screen Sharing.app",
+         @"/System/Library/CoreServices/Network Diagnostics.app",
+         @"/System/Library/CoreServices/Network Setup Assistant.app",
+         @"/System/Library/CoreServices/Installer.app",
+         @"/System/Library/CoreServices/Kerberos.app",
+         @"/System/Library/CoreServices/Dock.app",
+         nil];
+    if (![whitelist containsObject:path]) suppress = YES;
+  } else if ([path rangeOfString:@"/Developer/Platforms/"].location != NSNotFound) {
     suppress = YES;
   }
   return suppress;
@@ -106,7 +145,6 @@ static NSString *const kPredicateString
 - (void)parseResultsOperation:(NSMetadataQuery *)query {
   [condition_ lock];
   indexing_ = YES;
-  
   [self clearResultIndex];
   NSArray *mdAttributeNames = [NSArray arrayWithObjects:
                                (NSString*)kMDItemTitle,
@@ -123,7 +161,8 @@ static NSString *const kPredicateString
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        rank, kHGSObjectAttributeRankKey,
        nil];
-  
+  NSString *prefPaneString = HGSLocalizedString(@"Preference Pane", 
+                                                @"Preference Pane");
   for (NSUInteger i = 0; i < resultCount; ++i) {
     NSMetadataItem *result = [query resultAtIndex:i];
     NSDictionary *mdAttributes = [result valuesForAttributes:mdAttributeNames];
@@ -139,18 +178,15 @@ static NSString *const kPredicateString
     if (!name) {
       name = [[path lastPathComponent] stringByDeletingPathExtension];
     }
-    
-    NSString *pathExtension = [path pathExtension];
-    if ([pathExtension caseInsensitiveCompare:@"prefPane"] == NSOrderedSame) {
+        
+    if ([self pathIsPrefPane:path]) {
       // Some prefpanes forget to localize their names and end up with
       // foo.prefpane as their kMDItemTitle. foo.prefPane Preference Pane looks
       // ugly.
-      NSString *nameExtension = [name pathExtension];
-      if ([nameExtension caseInsensitiveCompare:@"prefPane"] == NSOrderedSame) {
+      if ([self pathIsPrefPane:name]) {
         name = [name stringByDeletingPathExtension];
       }
-      name = [name stringByAppendingFormat:@" %@",
-              HGSLocalizedString(@"Preference Pane", @"Preference Pane")];
+      name = [name stringByAppendingFormat:@" %@", prefPaneString];
     }
 
     if ([[path pathExtension] caseInsensitiveCompare:@"app"] == NSOrderedSame) {
@@ -188,7 +224,7 @@ static NSString *const kPredicateString
   if (networkBundle) {
     NSString *name 
       = [networkBundle objectForInfoDictionaryKey:@"NSPrefPaneIconLabel"];
-    
+    name = [name stringByAppendingFormat:@" %@", prefPaneString];
     NSURL *networkURL = [NSURL fileURLWithPath:networkPath];
     // Unfortunately last used date is hidden from us.
     [attributes removeObjectForKey:kHGSObjectAttributeLastUsedDateKey];
@@ -229,14 +265,21 @@ static NSString *const kPredicateString
   }
 }
 
-- (void)dealloc {
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [query_ release];
-  [condition_ release];
-  [super dealloc];
-}
-
 #pragma mark -
+
+- (BOOL)isValidSourceForQuery:(HGSQuery *)query {
+  BOOL isGood = YES;
+  HGSObject *pivotObject = [query pivotObject];
+  if (pivotObject) {
+    isGood = NO;
+    NSURL *url = [pivotObject identifier];
+    NSString *appName = [[url absoluteString] lastPathComponent];
+    if ([appName isEqualToString:@"System%20Preferences.app"]) {
+      isGood = YES;
+    }
+  }
+  return isGood;
+}
 
 - (void)performSearchOperation:(HGSSearchOperation *)operation {
   // Put a hold on queries while indexing
@@ -246,9 +289,30 @@ static NSString *const kPredicateString
   }
   [condition_ signal];
   [condition_ unlock];
-  
   [super performSearchOperation:operation];
 }
 
+- (void)processMatchingResults:(NSMutableArray*)results
+                      forQuery:(HGSQuery *)query {
+  HGSObject *pivotObject = [query pivotObject];
+  if (pivotObject) {
+    if ([self isValidSourceForQuery:query]) {
+      // Remove things that aren't preference panes
+      NSMutableIndexSet *itemsToRemove = [NSMutableIndexSet indexSet];
+      NSUInteger indexToRemove = 0;
+      for (HGSObject *result in results) {
+        NSURL *url = [result identifier];
+        NSString *absolutePath = [url absoluteString];
+        // TODO(alcor): ignore invalid preference panes
+        if (![self pathIsPrefPane:absolutePath]) {
+          [itemsToRemove addIndex:indexToRemove];
+        }
+        ++indexToRemove;
+      }
+      [results removeObjectsAtIndexes:itemsToRemove];
+    }
+  }
+}
+  
 @end
 

@@ -42,13 +42,16 @@
 
 - (void)testInit {
   STAssertNil([[[HGSQuery alloc] initWithString:nil
-                                    pivotObject:nil] autorelease],
+                                    pivotObject:nil
+                                     queryFlags:0] autorelease],
               nil);
   STAssertNotNil([[[HGSQuery alloc] initWithString:@""
-                                       pivotObject:nil] autorelease],
+                                       pivotObject:nil
+                                        queryFlags:0] autorelease],
                  nil);
   STAssertNotNil([[[HGSQuery alloc] initWithString:@"a"
-                                       pivotObject:nil] autorelease],
+                                       pivotObject:nil
+                                        queryFlags:0] autorelease],
                  nil);
 }
 
@@ -62,7 +65,8 @@
   
   // empty
   query = [[[HGSQuery alloc] initWithString:@""
-                                pivotObject:nil] autorelease];
+                                pivotObject:nil
+                                 queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"", nil);
   expectedWords = [NSSet set];
@@ -71,7 +75,8 @@
   
   // white space
   query = [[[HGSQuery alloc] initWithString:@"  "
-                                pivotObject:nil] autorelease];
+                                pivotObject:nil
+                                 queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"  ", nil);
   expectedWords = [NSSet set];
@@ -80,7 +85,8 @@
   
   // one word
   query = [[[HGSQuery alloc] initWithString:@"a"
-                                pivotObject:nil] autorelease];
+                                pivotObject:nil
+                                 queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a", nil);
   expectedWords = [NSSet setWithObject:@"a"];
@@ -89,7 +95,8 @@
   
   // word repeated
   query = [[[HGSQuery alloc] initWithString:@"a A"
-                                pivotObject:nil] autorelease];
+                                pivotObject:nil
+                                 queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a A", nil);
   expectedWords = [NSSet setWithObject:@"a"];
@@ -97,7 +104,8 @@
   STAssertEqualObjects([query uniqueWords], expectedWords, nil);
   
   query = [[[HGSQuery alloc] initWithString:@"a B"
-                                pivotObject:nil] autorelease];
+                                pivotObject:nil
+                                 queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a B", nil);
   expectedWords = [NSSet setWithObjects:@"a", @"b", nil];
@@ -106,7 +114,8 @@
   
   // word repeated and another word
   query = [[[HGSQuery alloc] initWithString:@"a a b"
-                                pivotObject:nil] autorelease];
+                                pivotObject:nil
+                                 queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a a b", nil);
   expectedWords = [NSSet setWithObjects:@"a", @"b", nil];
@@ -115,7 +124,8 @@
   
   // two words and a phrase
   query = [[[HGSQuery alloc] initWithString:@"a \"b c\" d"
-                                pivotObject:nil] autorelease];
+                                pivotObject:nil
+                                 queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a \"b c\" d", nil);
   expectedWords = [NSSet setWithObjects:@"a", @"b", @"c", @"d", nil];
@@ -124,7 +134,8 @@
   
   // two words and a phrase that isn't closed
   query = [[[HGSQuery alloc] initWithString:@"a d \"b c"
-                                pivotObject:nil] autorelease];
+                                pivotObject:nil
+                                 queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a d \"b c", nil);
   expectedWords = [NSSet setWithObjects:@"a", @"b", @"c", @"d", nil];
@@ -133,7 +144,8 @@
   
   // an empty phrase, unclosed
   query = [[[HGSQuery alloc] initWithString:@"\""
-                                pivotObject:nil] autorelease];
+                                pivotObject:nil
+                                 queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"\"", nil);
   expectedWords = [NSSet set];
@@ -142,7 +154,8 @@
   
   // an empty phrase
   query = [[[HGSQuery alloc] initWithString:@"\" \""
-                                pivotObject:nil] autorelease];
+                                pivotObject:nil
+                                 queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"\" \"", nil);
   expectedWords = [NSSet set];
@@ -151,7 +164,8 @@
   
   // some words, phrase and some random punct and numbers
   query = [[[HGSQuery alloc] initWithString:@"a1 23 a-d% \"b$c"
-                                pivotObject:nil] autorelease];
+                                pivotObject:nil
+                                 queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a1 23 a-d% \"b$c", nil);
   expectedWords
@@ -166,10 +180,12 @@
   HGSQuery *query2;
   
   query1 = [[[HGSQuery alloc] initWithString:@"abc"
-                                 pivotObject:nil] autorelease];
+                                 pivotObject:nil
+                                  queryFlags:0] autorelease];
   STAssertNotNil(query1, nil);
   query2 = [[[HGSQuery alloc] initWithString:@"xyz"
-                                 pivotObject:nil] autorelease];
+                                 pivotObject:nil
+                                  queryFlags:0] autorelease];
   STAssertNotNil(query2, nil);
   
   STAssertNil([query1 parent], nil);

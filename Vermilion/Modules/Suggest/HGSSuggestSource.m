@@ -196,7 +196,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 #if TARGET_OS_IPHONE
     NSString *iconName = @"web-nav.png";
 #else
-    NSString *iconName = @"blue-nav.icns";
+    NSString *iconName = @"blue-nav";
 #endif
     [newConfig setObject:iconName forKey:kHGSExtensionIconImagePathKey];
     configuration = newConfig;

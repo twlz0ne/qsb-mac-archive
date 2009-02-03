@@ -407,16 +407,22 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     if ([screenName length]) {
       // See if we already know about this buddy.
       @synchronized(buddyResults_) {
-        NSEnumerator *buddyResultEnum = [buddyResults_ objectEnumerator];
         HGSObject *buddyResult = nil;
-        NSMutableDictionary *imBuddyInfo = nil;
-        while ((buddyResult = [buddyResultEnum nextObject])
-               && ((imBuddyInfo = [buddyResult
-                                   valueForKey:kHGSIMBuddyInformationKey]))
-               && (([[imBuddyInfo objectForKey:IMPersonScreenNameKey]
-                     caseInsensitiveCompare:screenName] != NSOrderedSame)
-                   || ![[imBuddyInfo objectForKey:IMPersonServiceNameKey]
-                        isEqualToString:serviceName])) { }
+        for (buddyResult in buddyResults_) {
+          NSDictionary *imBuddyInfo 
+            = [buddyResult valueForKey:kHGSIMBuddyInformationKey];
+          NSString *buddyService 
+            = [imBuddyInfo objectForKey:IMPersonServiceNameKey];
+          if ([buddyService isEqualToString:serviceName]) {
+            NSString *buddyName 
+              = [imBuddyInfo objectForKey:IMPersonScreenNameKey];
+            BOOL sameName = (buddyName != nil)
+              && [buddyName caseInsensitiveCompare:screenName] == NSOrderedSame;
+            if (sameName) {
+              break;
+            }
+          }
+        }
         if (buddyResult) {
           // Remove the results and add it new to pick up the changes
           [buddyResults_ removeObjectIdenticalTo:buddyResult];
@@ -429,10 +435,9 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
           rebuildIndex_ = YES;
         } else {
           // This must be a new buddy but if it's a |statusChange| do nothing.
-          HGSObject *newBuddy
-            = [self contactResultFromIMBuddy:userInfo
-                                                 service:service
-                                                  source:self];
+          HGSObject *newBuddy = [self contactResultFromIMBuddy:userInfo
+                                                       service:service
+                                                        source:self];
           [buddyResults_ addObject:newBuddy];
           // Add it to the index
           NSString *name = [self nameStringForBuddy:newBuddy];
@@ -487,8 +492,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSString *serviceName = [service name];
   
   if ([screenName length] == 0 || [serviceName length] == 0) {
-    self = [super init];
-    [self release];
     return nil;
   }
   
@@ -542,11 +545,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
        uniqueIdentifiers, kHGSObjectAttributeUniqueIdentifiersKey,
        imBuddyInfo, kHGSIMBuddyInformationKey,
        nil];
-  return [[[HGSObject alloc] initWithIdentifier:url
-                                           name:displayName
-                                           type:HGS_SUBTYPE(kHGSTypeContact, @"ichat")
-                                         source:source
-                                     attributes:attributes] autorelease];
+  return [HGSObject objectWithIdentifier:url
+                                    name:displayName
+                                    type:HGS_SUBTYPE(kHGSTypeContact, @"ichat")
+                                  source:source
+                              attributes:attributes];
 }
 
 @end

@@ -32,7 +32,10 @@
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<string>com.apple.addressbook.person</string>
 			<key>HGSSearchSourcePivotableTypes</key>
-			<string>email</string>
+			<array>
+				<string>email</string>
+				<string>contact.addressbook</string>
+			</array>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -42,7 +45,10 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.contacts.action.email</string>
 			<key>HGSActionDirectObjectTypes</key>
-			<string>contact</string>
+			<array>
+				<string>contact</string>
+				<string>text.emailaddress</string>
+			</array>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Email</string>
 			<key>HGSExtensionIconImagePath</key>
@@ -56,7 +62,10 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.contacts.action.chat.text</string>
 			<key>HGSActionDirectObjectTypes</key>
-			<string>contact</string>
+			<array>
+				<string>contact</string>
+				<string>text.instantmessage</string>
+			</array>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Instant Message</string>
 			<key>HGSExtensionIconImagePath</key>

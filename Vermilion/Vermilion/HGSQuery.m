@@ -43,11 +43,14 @@ static NSString * const kEmptyQuery = @"";
 
 @implementation HGSQuery
 
-- (id)initWithString:(NSString*)query pivotObject:(HGSObject *)pivotObject {
+- (id)initWithString:(NSString*)query 
+         pivotObject:(HGSObject *)pivotObject
+          queryFlags:(HGSQueryFlags)flags{
   if ((self = [super init])) {
     rawQuery_ = [query copy];
     pivotObject_ = [pivotObject retain];
     maxDesiredResults_ = -1;
+    flags_ = flags;
 
     // If we got nil for a query, but had a pivot, turn it into an empty query.
     if (!rawQuery_ && pivotObject_) {
@@ -107,6 +110,10 @@ static NSString * const kEmptyQuery = @"";
 - (NSString*)description {
   return [NSString stringWithFormat:@"[%@ - Q='%@' PO=%@ P=<%@>]",
           [self class], rawQuery_, pivotObject_, parent_];
+}
+
+- (HGSQueryFlags)flags {
+  return flags_;
 }
 
 @end

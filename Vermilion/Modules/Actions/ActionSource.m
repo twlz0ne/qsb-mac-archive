@@ -92,7 +92,8 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   rebuildCache_ = YES;
 }
 
-- (HGSObject *)objectFromAction:(id<HGSAction>)action {
+- (HGSObject *)objectFromAction:(id<HGSAction>)action 
+                         result:(HGSObject *)result {
   // Set some of the flags to bump them up in the result's ranks
   NSNumber *rankFlags 
     = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag 
@@ -104,7 +105,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        action, kHGSObjectAttributeDefaultActionKey,
        nil];
-  NSImage *icon = [action displayIconForResult:nil];
+  NSImage *icon = [action displayIconForResult:result];
   if (icon) {
     [attributes setObject:icon forKey:kHGSObjectAttributeIconKey];
   }
@@ -129,7 +130,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   HGSExtensionPoint* actionPoint = [HGSExtensionPoint actionsPoint];
   for (id<HGSAction> action in [actionPoint extensions]) {
     // Create a result object that wraps our action
-    HGSObject *actionObject = [self objectFromAction:action];
+    HGSObject *actionObject = [self objectFromAction:action result:nil];
     // Index our result
     [self indexResult:actionObject
            nameString:[actionObject displayName]
@@ -154,14 +155,14 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 - (HGSObject *)objectWithArchivedRepresentation:(NSDictionary *)representation {
   HGSObject *result = nil;
   NSString *extensionIdentifier
-    = [representation valueForKey:kActionIdentifierArchiveKey];
+    = [representation objectForKey:kActionIdentifierArchiveKey];
   if (extensionIdentifier) {
     HGSExtensionPoint* actionPoint = [HGSExtensionPoint actionsPoint];
     id<HGSAction> action
       = [actionPoint extensionWithIdentifier:extensionIdentifier];
     if (action) {
       // We create a new result, but it should fold based out the url
-      result = [self objectFromAction:action];
+      result = [self objectFromAction:action result:nil];
     }
   }
   
@@ -183,9 +184,11 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   NSMutableArray *filteredResults
     = [NSMutableArray arrayWithCapacity:[results count]];
 
+  
   HGSObject *pivotObject = [query pivotObject];
   if (pivotObject) {
-
+    BOOL emptyQuery = [[query rawQueryString] length] == 0;
+    
     // Pivot: filter to actions that support this object as the target of the
     // action.
 
@@ -217,11 +220,13 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
                                                     query:query]
              autorelease];
         
-        actionObject = [self objectFromAction:(id<HGSAction>)proxy];
+        actionObject = [self objectFromAction:(id<HGSAction>)proxy
+                                       result:pivotObject];
         
-        NSImage *icon = [action displayIconForResult:pivotObject];
-        if (icon) {
-          [actionObject setValue:icon forKey:kHGSObjectAttributeIconKey];
+        if (emptyQuery) {
+          HGSMutableObject *mutable = [[actionObject mutableCopy] autorelease];
+          [mutable addRankFlags:eHGSBelowFoldRankFlag];
+          actionObject = mutable;
         }
         
         [filteredResults addObject:actionObject];

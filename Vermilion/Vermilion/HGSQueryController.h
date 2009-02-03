@@ -57,6 +57,7 @@
   NSTimer* slowSourceTimer_;
   CFMutableDictionaryRef sourceResults_; // keyed by source
   BOOL hasRealResults_;
+  NSArray *rankedResults_;
 }
 
 - initWithQuery:(HGSQuery*)query

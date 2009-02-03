@@ -46,7 +46,7 @@ static NSString *const kiPhoneReferenceDocSetPath
     @"com.apple.adc.documentation.AppleiPhone2_2.iPhoneLibrary.docset";
 
 @interface DeveloperDocumentationSource : HGSMemorySearchSource {
-@private
+ @private
   NSCondition *condition_;
   BOOL indexed_;
   NSImage *docSetIcon_;
@@ -66,9 +66,8 @@ static NSString *const kiPhoneReferenceDocSetPath
                                                 object:nil]
        autorelease];
     [[HGSOperationQueue sharedOperationQueue] addOperation:op];
-    docSetIcon_ 
-      = [[[NSWorkspace sharedWorkspace] iconForFileType:@"docset"] copy];
-    [docSetIcon_ setSize:NSMakeSize(128, 128)];
+    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+    docSetIcon_ = [[ws iconForFileType:@"docset"] retain];
   }
   return self;
 }
@@ -189,6 +188,10 @@ static NSString *const kiPhoneReferenceDocSetPath
 #pragma mark -
 
 - (void)performSearchOperation:(HGSSearchOperation *)operation {
+  HGSQuery *query = [operation query];
+  NSString *queryString = [query rawQueryString];
+  if ([queryString length] < 4) return;
+  
   // make sure we're done any parsing
   [condition_ lock];
   while (!indexed_) {

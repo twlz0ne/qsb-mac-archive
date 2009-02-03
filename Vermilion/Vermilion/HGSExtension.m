@@ -45,6 +45,8 @@ NSString *const kHGSExtensionEnabledKey = @"HGSExtensionEnabled";
 NSString *const kHGSExtensionBundleKey = @"HGSExtensionBundle";
 NSString *const kHGSExtensionDesiredAccountType
   = @"HGSExtensionDesiredAccountType";
+NSString *const kHGSExtensionOfferedAccountType
+  = @"HGSExtensionOfferedAccountType";
 NSString *const kHGSIsUserVisible = @"HGSIsUserVisible";
 NSString *const kHGSIsEnabledByDefault = @"HGSIsEnabledByDefault";
 NSString *const kHGSExtensionAccountIdentifier
@@ -123,6 +125,10 @@ NSString *const kHGSExtensionAccountIdentifier
   [super dealloc];
 }
 
+- (NSString *)defaultIconName {
+  return @"NSApplicationIcon";
+}
+
 // Return an icon that can be displayed 128x128.
 - (NSImage *)icon {
   @synchronized(self) {
@@ -142,7 +148,7 @@ NSString *const kHGSExtensionAccountIdentifier
       static NSImage *defaultIcon = nil;
       @synchronized([self class]) {
         if (!defaultIcon) {
-          defaultIcon = [[NSImage imageNamed:@"NSApplicationIcon"] copy];
+          defaultIcon = [[NSImage imageNamed:[self defaultIconName]] copy];
           [defaultIcon setSize:NSMakeSize(128,128)];
         }
       }

@@ -37,6 +37,9 @@
 // Returns the path to the user level app support folder for the running app.
 - (NSString *)userApplicationSupportFolderForApp;
 
+// Returns the path to the user level cache folder for the running app.
+- (NSString *)userCacheFolderForApp;
+
 // Returns an array of strings w/ the plugin folders.
 - (NSArray*)pluginFolders;
 

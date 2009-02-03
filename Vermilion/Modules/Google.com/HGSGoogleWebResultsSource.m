@@ -229,19 +229,19 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   NSEnumerator *resultEnumerator = [googleResultArray objectEnumerator];
   NSDictionary *resultDict;
   while ((resultDict  = [resultEnumerator nextObject])) {
-    NSString *name = [resultDict valueForKey:@"titleNoFormatting"];
+    NSString *name = [resultDict objectForKey:@"titleNoFormatting"];
     name = [name gtm_stringByUnescapingFromHTML];
 
-    NSString *resultClass = [resultDict valueForKey:@"GsearchResultClass"];
+    NSString *resultClass = [resultDict objectForKey:@"GsearchResultClass"];
 
-    NSString *content = [[resultDict valueForKey:@"content"] gtm_stringByUnescapingFromHTML];
-    NSString *urlString = [[resultDict valueForKey:@"url"] gtm_stringByUnescapingFromHTML];
+    NSString *content = [[resultDict objectForKey:@"content"] gtm_stringByUnescapingFromHTML];
+    NSString *urlString = [[resultDict objectForKey:@"url"] gtm_stringByUnescapingFromHTML];
     if (!urlString) continue;
     NSURL *url = [NSURL URLWithString:urlString];
     NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
     if ([resultClass isEqualToString:@"GlocalSearch"]) {
-      NSString *address = [resultDict valueForKey:@"streetAddress"];
-      NSString *city = [resultDict valueForKey:@"city"];
+      NSString *address = [resultDict objectForKey:@"streetAddress"];
+      NSString *city = [resultDict objectForKey:@"city"];
       if ([city length]) address = [NSString stringWithFormat:@"%@, %@", address, city];
       if (![name length]) {
         name = address;
@@ -253,7 +253,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
       }
     } else {
       
-      [attributes setObject:[resultDict valueForKey:@"unescapedUrl"]
+      [attributes setObject:[resultDict objectForKey:@"unescapedUrl"]
                      forKey:kHGSObjectAttributeSnippetKey];
       
 #if TARGET_OS_IPHONE

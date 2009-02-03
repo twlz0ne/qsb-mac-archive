@@ -31,6 +31,13 @@
 			<string>Google</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Google Docs</string>
+			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
+			<array>
+				<string>com.googlecode.precpitate.docs.pdf</string>
+				<string>com.googlecode.precpitate.docs.presentation</string>
+				<string>com.googlecode.precpitate.docs.spreadsheet</string>
+				<string>com.googlecode.precpitate.docs.document</string>
+			</array>
 		</dict>
 	</array>
 </dict>

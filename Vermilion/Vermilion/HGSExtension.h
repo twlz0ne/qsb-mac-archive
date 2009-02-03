@@ -127,6 +127,8 @@ extern NSString *const kHGSExtensionEnabledKey;
 extern NSString *const kHGSExtensionBundleKey;
 // Type of accounts in which the extension is interested.
 extern NSString *const kHGSExtensionDesiredAccountType;
+// Type of accounts in which the extension is offering.
+extern NSString *const kHGSExtensionOfferedAccountType;
 // YES if the extension presented to the user in the preferences panel.
 // If this is not present then YES is assumed.
 extern NSString *const kHGSIsUserVisible;

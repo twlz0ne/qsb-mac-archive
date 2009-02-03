@@ -40,8 +40,7 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
 // these methods can be overridden to customize the behavior of the ranking
 // and de-duping.
 - (void)sortObjectsInSitu:(NSMutableArray*)objects;
-- (void)mergeDuplicatesInSitu:(NSMutableArray*)objects
-                    withLimit:(NSUInteger)scanLimit;
+- (void)mergeDuplicatesInSitu:(NSMutableArray*)objects;
 @end
 
 @implementation HGSMixer
@@ -63,17 +62,7 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
   
   // merge/remove duplicates
   //
-  // If there is a max results requested, then we do merges up to twice that
-  // number.  This is so if we happen to have a dup after the requested result,
-  // we have a better chance of merging any info into the result we'll display.
-  // This thing could enable more/better pivots/actions/etc on the result we
-  // are showing.
-  NSInteger maxDesiredResults = [query maxDesiredResults];
-  NSUInteger scanLimit = UINT_MAX;
-  if (maxDesiredResults > 0) {
-    scanLimit = (NSUInteger)(maxDesiredResults * 2);
-  }
-  [self mergeDuplicatesInSitu:results withLimit:scanLimit];
+  [self mergeDuplicatesInSitu:results];
   
   return results;
 }
@@ -95,21 +84,16 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
 }
 
 //
-// -mergeDuplicatesInSitu:withLimit:
+// -mergeDuplicatesInSitu:
 //
 // merges/removes duplicate results, but only up to |scanLimit| non-duplicates.
 // Since this is O(n^2), |scanLimit| should be as small as possible.
 // |scanLimit| can safely be > the number of items in the list.
 //
-- (void)mergeDuplicatesInSitu:(NSMutableArray*)results
-                    withLimit:(NSUInteger)scanLimit {
+- (void)mergeDuplicatesInSitu:(NSMutableArray*)results {
   NSMutableIndexSet* duplicateIndexes = [NSMutableIndexSet indexSet];
-  NSEnumerator* resultEnumerator = [results objectEnumerator];
-  NSUInteger goodResults = 0;
   NSUInteger currentResultIndex = 0;
-  HGSObject* currentResult = nil;
-  while (((currentResult = [resultEnumerator nextObject])) &&
-         goodResults < scanLimit) {
+  for (HGSObject *currentResult in results) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     // Check to see if it's a duplicate of any of the confirmed results
     BOOL isDuplicate = NO;
@@ -117,8 +101,6 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
       if ([duplicateIndexes containsIndex:i])
         continue;
       HGSObject* goodResult = [results objectAtIndex:i];
-      //TODO(dmaclach): handle isDuplicate better with HGSObject being non
-      //subclassable.
       if ([currentResult isDuplicate:goodResult]) {
         // We've got a match; merge this into the existing result and
         // mark it for deletion.
@@ -129,8 +111,6 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
       }
     }
     ++currentResultIndex;
-    if (!isDuplicate)
-      ++goodResults;
     [pool release];
   }
   
@@ -354,17 +334,21 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context) {
   //  Last used date
   ////////////////////////////////////////////////////////////
 RelevanceCompareLastUsed:
-  // Barring any better information, sort by last used date
   // Set sort so that more recent wins, we can do this in one step by inverting
   // the comparison order (we want newer things to be less than)
   
-  dateOne = [item2 valueForKey:kHGSObjectAttributeLastUsedDateKey]; 
-  dateTwo = [item1 valueForKey:kHGSObjectAttributeLastUsedDateKey];
-  
-  if (!dateOne) dateOne = [NSDate distantPast];
-  if (!dateTwo) dateTwo = [NSDate distantPast];
+  dateOne = [item2 lastUsedDate]; 
+  dateTwo = [item1 lastUsedDate];
   
   compareResult = (CFComparisonResult)[dateOne compare:dateTwo];
+
+  // Barring any better information, sort by name
+  if (compareResult == kCFCompareEqualTo) {
+    NSString *name1 = [item1 displayName];
+    NSString *name2 = [item2 displayName];
+    compareResult = (CFComparisonResult)[name1 caseInsensitiveCompare:name2]; 
+  }
+  
   
   // Finished, all comparisons done
 RelevanceCompareComplete:

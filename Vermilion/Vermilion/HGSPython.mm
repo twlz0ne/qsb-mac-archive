@@ -609,43 +609,48 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                 } else if (pyValue) {
                   HGSPythonObject *pyObj 
                     = [HGSPythonObject pythonObjectWithObject:pyValue];
-                  [privateValues setValue:pyObj forKey:key];
+                  [privateValues setObject:pyObj forKey:key];
                 }
               }
             }
             if (identifier) {
+              NSMutableDictionary *attributes 
+                = [NSMutableDictionary dictionary];
               NSString *urlString = [NSString stringWithUTF8String:identifier];
               NSString *displayNameString = nil;
               if (displayName) {
                 displayNameString = [NSString stringWithUTF8String:displayName];
               }
               NSURL *url = [NSURL URLWithString:urlString];
-              HGSObject *result 
-                = [HGSObject objectWithIdentifier:url
-                                             name:displayNameString
-                                             type:kHGSTypePython
-                                           source:[self->operation_ source]
-                                       attributes:nil];
               if (snippet && strlen(snippet) > 0) {
-                [result setValue:[NSString stringWithUTF8String:snippet]
-                          forKey:kHGSObjectAttributeSnippetKey];
+                [attributes setObject:[NSString stringWithUTF8String:snippet]
+                               forKey:kHGSObjectAttributeSnippetKey];
               }
               if (defaultAction && strlen(defaultAction) > 0) {
                 HGSAction *action 
                   = [[HGSExtensionPoint actionsPoint] extensionWithIdentifier:
                      [NSString stringWithUTF8String:defaultAction]];
                 if (action) {
-                  [result setValue:action forKey:kHGSObjectAttributeDefaultActionKey];
+                  [attributes setObject:action 
+                                 forKey:kHGSObjectAttributeDefaultActionKey];
                 }
               }
               if (image && strlen(image) > 0) {
                 url = [NSURL URLWithString:[NSString stringWithUTF8String:image]];
                 if (url) {
-                  [result setValue:url 
-                            forKey:kHGSObjectAttributeIconPreviewFileKey];
+                  [attributes setObject:url 
+                                 forKey:kHGSObjectAttributeIconPreviewFileKey];
                 }
               }
-              [result setValue:privateValues forKey:kHGSPythonPrivateValuesKey];
+              [attributes setObject:privateValues 
+                             forKey:kHGSPythonPrivateValuesKey];
+              HGSObject *result 
+                = [HGSObject objectWithIdentifier:url
+                                             name:displayNameString
+                                             type:kHGSTypePython
+                                           source:[self->operation_ source]
+                                       attributes:attributes];
+              
               [results addObject:result];
             }
           }

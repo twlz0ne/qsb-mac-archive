@@ -1,7 +1,7 @@
 //
-//  HGSGoogleAccount.h
+//  TwitterAccount.h
 //
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,22 +30,26 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSAccount.h"
+#import <Vermilion/Vermilion.h>
 
-// A class which manages an account with which a search source or action
-// can be associated.
+// A controller which manages a window used to edit the passowrd
+// for a Twitter account.  Exposed publicly so that Interface
+// Builder can see the action.
 //
-@interface HGSGoogleAccount : HGSAccount {
- @private
-  BOOL isAuthenticated_;
-}
+@interface TwitterAccountEditController : HGSSimpleAccountEditController
 
-@property BOOL isAuthenticated;
+// Open twitter.com in the user's preferred browser.
+- (IBAction)goToTwitter:(id)sender;
 
 @end
 
-
-// Strings used to describe the google account.
+// A controller which manages a view used to specify a Twitter account
+// name and password during the setup process.  Exposed publicly so that 
+// Interface Builder can see the action.
 //
-// The type of the account, which matches the popup menu item.
-extern NSString *const kHGSGoogleAccountTypeName;
+@interface SetUpTwitterAccountViewController : HGSSetUpSimpleAccountViewController
+
+// Open twitter.com in the user's preferred browser.
+- (IBAction)goToTwitter:(id)sender;
+
+@end

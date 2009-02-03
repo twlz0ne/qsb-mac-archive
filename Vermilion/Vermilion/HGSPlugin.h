@@ -69,7 +69,7 @@
 // identified and, if available, a new copy of the factorable extension
 // is created for that factor and added to |protoExtensions_|.  So, for
 // example, a copy the Picasaweb search source extension will be created
-// for each instance of HGSGoogleAccount that can be found; it is then
+// for each instance of GoogleAccount that can be found; it is then
 // placed in the list of searchable items which the user can  enable via
 // Preferences.
 //
@@ -101,6 +101,7 @@
   NSUInteger sourceCount_;  // Cached
   NSUInteger actionCount_;  // Cached
   NSUInteger serviceCount_;  // Cached
+  NSUInteger accountTypeCount_;  // Cached
 }
 
 @property (nonatomic, retain, readonly) NSBundle *bundle;
@@ -116,9 +117,10 @@
 @property (nonatomic, readonly) NSUInteger sourceCount;
 @property (nonatomic, readonly) NSUInteger actionCount;
 @property (nonatomic, readonly) NSUInteger serviceCount;
+@property (nonatomic, readonly) NSUInteger accountTypeCount;
 
-// Reconstitute a plugin from a bundle.
-- (id)initWithBundleAtPath:(NSString *)bundlePath;
+// Reconstitute a plugin at a path.
+- (id)initWithPath:(NSString *)path;
 
 // Reconstitute a plugin from a dictionary, usually from preferences, marking
 // all plugins and extensions as 'old'.
@@ -133,6 +135,9 @@
 // Merge |pluginB| into self.
 - (HGSPlugin *)merge:(HGSPlugin *)pluginB;
 
+// Factor our extensions, if appropriate.
+- (void)factorExtensions;
+
 // Install/uninstall extensions.
 - (void)installExtensions;
 - (void)uninstallExtensions;
@@ -145,6 +150,9 @@
 
 // Automatically set up the enabled-ness of new extensions.
 - (void)autoSetEnabledForNewExtensions;
+
+// Install all of our account types, if any.
+- (void)installAccountTypes;
 
 // Helper functions for filtering out plugins we previously knew about but
 // which have now gone missing and vice versa.

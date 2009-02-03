@@ -34,6 +34,7 @@
 #import <Foundation/Foundation.h>
 
 @class HGSObject;
+@class HGSAction;
 
 //
 // HGSQuery
@@ -49,6 +50,13 @@
 // prefix, ie: "S P" matches "System Preferences".  TODO: does this open the
 // door to invisible quotes for CJK to get good results?
 //
+
+enum {
+  eHGSQueryShowAlternatesFlag = 1 << 0,
+};
+
+typedef NSUInteger HGSQueryFlags;
+
 @interface HGSQuery : NSObject {
  @private
   NSString *rawQuery_;
@@ -56,9 +64,12 @@
   HGSObject *pivotObject_;
   HGSQuery *parent_;
   NSInteger maxDesiredResults_;
+  HGSQueryFlags flags_;
 }
 
-- (id)initWithString:(NSString*)query pivotObject:(HGSObject *)pivotObject;
+- (id)initWithString:(NSString*)query 
+         pivotObject:(HGSObject *)pivotObject
+          queryFlags:(HGSQueryFlags)flags;
 
 // Returns a set of unique words found in the query string
 // ie: query ::  "Foo Bar" baz "mumble foo"
@@ -88,4 +99,6 @@
 - (NSInteger)maxDesiredResults;
 - (void)setMaxDesiredResults:(NSInteger)maxResults;
 
+// Various flags that modify some queries
+- (HGSQueryFlags)flags;
 @end

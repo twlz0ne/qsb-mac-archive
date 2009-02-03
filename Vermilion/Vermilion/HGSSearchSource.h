@@ -102,6 +102,11 @@
 - (NSMutableDictionary *)archiveRepresentationForObject:(HGSObject*)object;
 - (HGSObject *)objectWithArchivedRepresentation:(NSDictionary *)representation;
 
+// Return a default icon for the source that applies to this object.
+// This is meant to be ultra fast, and should NOT require hitting the disk 
+// or network. It is meant to return a precached icon to display while the
+// "real" icon is being loaded.
+- (NSImage *)defaultIconForObject:(HGSObject *)object;
 @end
 
 // The HGSSearchSource class is provided as a convenience class for people doing

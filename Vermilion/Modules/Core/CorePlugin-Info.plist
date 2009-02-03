@@ -44,7 +44,10 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>File System Directories</string>
 			<key>HGSSearchSourcePivotableTypes</key>
-			<string>file.directory</string>
+			<array>
+				<string>file.directory</string>
+				<string>file.application</string>
+			</array>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -125,6 +128,42 @@
 			<string>*</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.filesystem.action.open</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>TextLargeTypeAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>Show Large Type</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>*</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.text.action.largetype</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>FileSystemOpenWithAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>Open With…</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>*</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.filesystem.action.openwith</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>FileSystemEjectAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>Eject</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file.directory.volume</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.filesystem.action.eject</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>

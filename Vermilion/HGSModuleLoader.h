@@ -77,10 +77,19 @@
 @interface HGSModuleLoader : NSObject {
  @private
   __weak id<HGSDelegate> delegate_;
+  
+  // Extension map maps a particular extension (.hgs) to a type of plugin
+  // to instantiate. This allows us to extend Vermiliion to accept other
+  // types of plugins like (.py) or (.scpt) and have those act
+  // as real plugins.
+  NSMutableDictionary *extensionMap_;  
 }
 
 // Return the shared module Loader.
 + (HGSModuleLoader*)sharedModuleLoader;
+
+// Registers a plugin class for a given set of extensions.
+- (void)registerClass:(Class)cls forExtensions:(NSArray *)extensions;
 
 // Given a path to a folder where modules may live, identify all modules and
 // their sources and actions, and return them as mutable plugins.

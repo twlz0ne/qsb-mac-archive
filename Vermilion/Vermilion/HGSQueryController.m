@@ -33,6 +33,7 @@
 #import "HGSQueryController.h"
 #import "HGSQuery.h"
 #import "HGSObject.h"
+#import "HGSAction.h"
 #import "HGSSearchSource.h"
 #import "HGSSearchOperation.h"
 #import "HGSCoreExtensionPoints.h"
@@ -107,6 +108,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self];
   [self cancel];
+  [rankedResults_ release];
   [slowSourceTimer_ invalidate];
   [slowSourceTimer_ release];
   [queryOperations_ release];
@@ -123,6 +125,11 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   // Spin through the Sources checking to see if they are valid for the source
   // and kick off the SearchOperations.
   HGSObject *pivotObject = [parsedQuery_ pivotObject];
+  HGSAction *actionObject = nil;
+  if ([pivotObject conformsToType:kHGSTypeAction]) {
+    actionObject = (HGSAction *)pivotObject;
+  }
+  
   NSSet *allPivots = [NSSet setWithObject:@"*"];
   HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -208,16 +215,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
         HGSLog(@"Took too much time, canceling SearchOperation %@", operation);
       }
       [operation cancel];
-      [pendingQueryOperations_ removeObjectAtIndex:(idx - 1)];
     }
-  }
-
-  // If the pending list is now empty, go ahead and signal the observer that
-  // we're all done.
-  if ([self queriesFinished]) {
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc postNotificationName:kHGSQueryControllerDidFinishNotification 
-                      object:self];
   }
 }
 
@@ -280,18 +278,21 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
 //      the top M from each source to get the top N later.
 // TODO(pinkerton) - should annotations re-rank?
 - (NSArray*)rankedResults {
-  // gather all the results at the current time
-  NSDictionary *nsSourceResults = (NSDictionary *)sourceResults_;
-  NSArray* operationResultArrays = [nsSourceResults allValues];
-  // mix and de-dupe
-  NSMutableArray* results = [mixer_ mix:operationResultArrays
-                                  query:parsedQuery_];
+  if (!rankedResults_) {
+    
+    // gather all the results at the current time
+    NSDictionary *nsSourceResults = (NSDictionary *)sourceResults_;
+    NSArray* operationResultArrays = [nsSourceResults allValues];
+    // mix and de-dupe
+    NSMutableArray* results = [mixer_ mix:operationResultArrays
+                                    query:parsedQuery_];
 
-#if !TARGET_OS_IPHONE
-  [self annotateResults:results];
-#endif
-  
-  return results;
+  #if !TARGET_OS_IPHONE
+    [self annotateResults:results];
+  #endif
+    rankedResults_ = [results retain];
+  }
+  return rankedResults_;
 }
 
 + (NSString *)categoryForType:(NSString *)type {
@@ -423,6 +424,8 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     }
   }
   CFDictionarySetValue(sourceResults_, [notification object], operationResults);
+  [rankedResults_ release];
+  rankedResults_ = nil;
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kHGSQueryControllerDidUpdateResultsNotification 
                     object:self];
