@@ -121,8 +121,8 @@
 - (void)scrollPageUp:(id)sender;
 - (void)scrollPageDown:(id)sender;
 
-// Derived classes must provide a xib file name given a results.
-- (NSString *)rowViewNibNameForResult:(QSBTableResult *)result;
+// Derived classes must provide a view controller class for a given result
+- (Class)rowViewControllerClassForResult:(QSBTableResult *)result;
 
 // Respond to a click in the path control.
 - (void)pathControlClick:(id)sender;

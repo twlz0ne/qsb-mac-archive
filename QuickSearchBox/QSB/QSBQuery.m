@@ -32,21 +32,21 @@
 //
 
 #import "QSBQuery.h"
-#import "HGSLog.h"
 #import "QSBApplication.h"
 #import "QSBApplicationDelegate.h"
 #import "QSBMoreResultsViewDelegate.h"
 #import "QSBPreferences.h"
 #import "QSBTableResult.h"
 #import "QSBResultsViewBaseController.h"
-#import "HGSLog.h"
 #import "GTMMethodCheck.h"
 #import "GoogleCorporaSource.h"
-#import "HGSExtensionPoint.h"
-#import "HGSModuleLoader.h"
 #import "NSString+CaseInsensitive.h"
 #import "NSString+ReadableURL.h"
 #import "HGSOpenSearchSuggestSource.h"
+
+// Notifications
+NSString *kHGSQueryDidFinishNotification = @"HGSQueryDidFinishNotification";
+
 
 // KVO Selector strings.
 static NSString *const kDesktopResultsKVOKey = @"desktopResults";
@@ -79,6 +79,8 @@ static const NSUInteger kDefaultMaximumResultsToCollect = 500;
 
 
 @implementation QSBQuery
+
+@synthesize pushModifierFlags = pushModifierFlags_;
 
 GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
 
@@ -166,7 +168,12 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
     if ([mainHGSResults indexOfObjectIdenticalTo:result] == NSNotFound) {
       QSBSourceTableResult *sourceResult
         = [QSBSourceTableResult resultWithObject:result];
-      [mainResults addObject:sourceResult];
+        
+      if (([result rankFlags] & eHGSBelowFoldRankFlag) == 0) {
+        [mainResults addObject:sourceResult];
+      } else {
+        hasMoreStandardResults = YES; 
+      }
     }
   }
 
@@ -427,8 +434,15 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
   [self cancelDisplayTimers];
   
   if (queryString_ || pivotObject_) {
+  
+    HGSQueryFlags flags = 0;
+    if (pushModifierFlags_ & NSAlternateKeyMask) {
+      flags |= eHGSQueryShowAlternatesFlag;
+    }
+    
     HGSQuery *query = [[[HGSQuery alloc] initWithString:queryString_
-                                            pivotObject:pivotObject_]
+                                            pivotObject:pivotObject_
+                                             queryFlags:flags]
                        autorelease];
     [query setMaxDesiredResults:[self maximumResultsToCollect]];
     
@@ -487,6 +501,11 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
     HGSLog(@"QSB: More Results:\n%@", [self moreResults]);
   }
 #endif
+  // Notify that the results are complete.
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:kHGSQueryDidFinishNotification 
+                    object:self];
+  
   [self setQueryIsInProcess:NO];
   [self cancelDisplayTimers];
 }
@@ -585,7 +604,8 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
 - (BOOL)updateMoreResultsWithInterval:(NSTimeInterval)minimumInterval {
   NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
   if (fpclassify(minimumInterval) == FP_ZERO
-      || (lastMoreUpdateTime_ + minimumInterval) < currentTime) {
+      || (lastMoreUpdateTime_ + minimumInterval) < currentTime
+      || [queryController_ queriesFinished]) {
     lastMoreUpdateTime_ = currentTime;
     // TODO(dmaclach): figure out why this is causing crashes running on a 
     // separate thread. For right now push it on main. Left code in here for

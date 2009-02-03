@@ -1,5 +1,5 @@
 //
-//  QSBMoreStandardRowViewController.h
+//  QSBResultIconView.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,13 +30,17 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBDetailedRowViewController.h"
+#import <Cocoa/Cocoa.h>
 
-// A row view controller for standard results showm in the Top results
-// view.  When the result is assigned to the row the view layout is
-// adjusted based on how much text is shown in the description.
-//
-@interface QSBMoreStandardRowViewController : QSBDetailedRowViewController
-// return the detail string for a given result.
-- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result;
+@class QSBDetailedRowViewController;
+
+// A QSBResultIconView is an icon view in a result row that updates based on
+// the represented object for the row. It delays actually loading the icon
+// until the row is displayed.
+
+@interface QSBResultIconView : NSImageView {
+ @private
+  IBOutlet QSBDetailedRowViewController *controller_;
+  BOOL iconNeedsUpdating_;
+}
 @end

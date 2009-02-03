@@ -48,6 +48,7 @@
 #import "QSBTableResult.h"
 #import "GTMNSWorkspace+Running.h"
 #import "QLUIPrivate.h"
+#import "GTMNSObject+KeyValueObserving.h"
 
 static const NSTimeInterval kQSBShowDuration = 0.1;
 static const NSTimeInterval kQSBHideDuration = 0.333;
@@ -64,8 +65,8 @@ static NSString * const kQSBSearchWindowFrameTopPrefKey
   = @"QSBSearchWindow Top QSBSearchResultsWindow";
 static NSString * const kQSBSearchWindowFrameLeftPrefKey
   = @"QSBSearchWindow Left QSBSearchResultsWindow";
-static NSString * const kQSBUserPrefBackgroundColor
-  = @"backgroundColor";
+static NSString * const kQSBUserPrefBackgroundColorKey = @"backgroundColor";
+static NSString * const kQSBQueryStringKey = @"queryString";
 
 // NSNumber value in seconds that controls how fast the QSB clears out
 // an old query once it's put in the background.
@@ -83,9 +84,6 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 - (void)updateLogoView;
 - (void)updateImageView;
 - (BOOL)firstLaunch;
-@end
-
-@interface QSBSearchWindowController (QSBSearchWindowControllerPrivate)
 
 // Utility function to update the shadows around our custom table view
 - (void)updateShadows;
@@ -162,8 +160,12 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 
 
 @implementation QSBSearchWindowController
+
 @synthesize activeQueryController = activeQueryController_;
+
 GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
+GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
+GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (id)init {
   if ((self = [self initWithWindowNibName:@"ResultsWindow"])) {
@@ -203,15 +205,18 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
   [self hideResultsWindow];
   
   NSUserDefaults *userPrefs = [NSUserDefaults standardUserDefaults];
-  [userPrefs addObserver:self
-              forKeyPath:kQSBSnippetsKey
-                 options:NSKeyValueObservingOptionNew
-                 context:NULL];
+  [userPrefs gtm_addObserver:self
+                  forKeyPath:kQSBSnippetsKey
+                    selector:@selector(snippetsChanged:)
+                    userInfo:nil
+                 options:0];
 
-  [userPrefs addObserver:self
-              forKeyPath:kQSBUserPrefBackgroundColor
-                 options:NSKeyValueObservingOptionNew
-                 context:nil];
+  [userPrefs gtm_addObserver:self
+                  forKeyPath:kQSBUserPrefBackgroundColorKey
+                    selector:@selector(backgroundColorChanged:)
+                    userInfo:nil
+                     options:0];
+  
   [self updateLogoView];
 
   [nc addObserver:self 
@@ -310,10 +315,18 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
 }
 
 - (void)dealloc {
-  [[NSUserDefaults standardUserDefaults] removeObserver:self 
-                                             forKeyPath:kQSBSnippetsKey];
-  [[activeQueryController_ query] removeObserver:self
-                                      forKeyPath:@"queryString"];
+  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+  [ud gtm_removeObserver:self 
+              forKeyPath:kQSBSnippetsKey
+                selector:@selector(snippetsChanged:)];
+  [ud gtm_removeObserver:self 
+              forKeyPath:kQSBUserPrefBackgroundColorKey
+                selector:@selector(backgroundColorChanged:)];
+  
+  QSBQuery *query = [activeQueryController_ query];
+  [query gtm_removeObserver:self
+                 forKeyPath:kQSBQueryStringKey
+                   selector:@selector(queryStringChanged:)];
   [queryResetTimer_ invalidate];
   [findPasteBoardChangedTimer_ invalidate];
   [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -328,38 +341,34 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
   return !beenLaunched;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object 
-                        change:(NSDictionary *)change
-                       context:(void *)context {
-  if (object == [NSUserDefaults standardUserDefaults] 
-             && [keyPath isEqualToString:kQSBSnippetsKey]) {
-    // if they've changed the way we show results, we have to resize our table
+- (void)backgroundColorChanged:(GTMKeyValueChangeNotification *)notification {
+  [self updateLogoView];
+}
+
+- (void)snippetsChanged:(GTMKeyValueChangeNotification *)notification {
+  // if they've changed the way we show results, we have to resize our table
+  [self updateResultsView];
+}
+
+- (void)queryStringChanged:(GTMKeyValueChangeNotification *)notification {
+  // The query text has changed so cancel any outstanding display
+  // operations and kick off another or clear.
+  [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                           selector:@selector(displayResults:)
+                                             object:nil];
+  if ([activeQueryController_ queryString]
+      || [activeQueryController_ pivotObject]) {
+    BOOL likelyResult = [[self selection] rank] > 1.0;
+    NSTimeInterval delay 
+      = likelyResult ? kQSBLongerAppearDelay : kQSBAppearDelay;
+    [self performSelector:@selector(displayResults:)
+               withObject:nil 
+               afterDelay:delay];
+  } else {
+    showResults_ = NO;
     [self updateResultsView];
-  } else if (object == [NSUserDefaults standardUserDefaults] 
-             && [keyPath isEqualToString:kQSBUserPrefBackgroundColor]) {
-    [self updateLogoView];
-  } else if (object == [activeQueryController_ query]
-             && [keyPath isEqualToString:@"queryString"]) {
-    // The query text has changed so cancel any outstanding display
-    // operations and kick off another or clear.
-    [NSObject cancelPreviousPerformRequestsWithTarget:self
-                                             selector:@selector(displayResults:)
-                                               object:nil];
-    if ([activeQueryController_ queryString]
-        || [activeQueryController_ pivotObject]) {
-      BOOL likelyResult = [[self selection] rank] > 1.0;
-      NSTimeInterval delay 
-        = likelyResult ? kQSBLongerAppearDelay : kQSBAppearDelay;
-      [self performSelector:@selector(displayResults:)
-                 withObject:nil 
-                 afterDelay:delay];
-    } else {
-      showResults_ = NO;
-      [self updateResultsView];
-    }
-    [self updateImageView];
   }
+  [self updateImageView];
 }
 
 - (QSBQueryController *)activeQueryController {
@@ -382,7 +391,7 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
   NSImage *logoImage = nil;
   NSColor *color = [NSColor whiteColor];
   NSData *data = [[NSUserDefaults standardUserDefaults]
-                  dataForKey:kQSBUserPrefBackgroundColor];
+                  dataForKey:kQSBUserPrefBackgroundColorKey];
   if (data) 
     color = [NSUnarchiver unarchiveObjectWithData:data];
   color = [color colorUsingColorSpaceName:NSDeviceRGBColorSpace];
@@ -567,6 +576,8 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
     QSBQueryController *pivotResultsController
       = [[[QSBQueryController alloc] initWithNibName:@"BaseResultsViews"
                                    windowController:self] autorelease];
+    NSUInteger flags = [[NSApp currentEvent] modifierFlags];
+    [[pivotResultsController query] setPushModifierFlags:flags];
     [self pushViewController:pivotResultsController];
     [nc postNotificationName:kQSBDidPivotNotification
                       object:pivotObject 
@@ -593,6 +604,10 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
   return handled;
 }
 
+- (BOOL)insertTabIgnoringFieldEditorQSB {
+  return [self insertTabQSB];
+}
+
 - (BOOL)insertBacktabQSB {
   BOOL handled = NO;
   if (![[NSApp currentEvent] isARepeat]) {
@@ -612,6 +627,16 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
   return YES;
 }
 
+- (BOOL)moveWordRightQSB {
+  if ([searchTextFieldEditor_ isAtEnd]
+      && ![[NSApp currentEvent] isARepeat]) {
+    [self pivotOnSelection];
+  } else {
+    [searchTextFieldEditor_ moveWordRight:nil];
+  }
+  return YES;
+}
+
 - (BOOL)moveLeftQSB {
   BOOL handled = NO;
   if ([searchTextFieldEditor_ isAtBeginning]
@@ -620,6 +645,10 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
     handled = YES;
   }
   return handled;
+}
+
+- (BOOL)moveWorldLeftQSB {
+  return [self moveLeftQSB];
 }
 
 - (BOOL)deleteBackwardQSB {
@@ -1095,11 +1124,6 @@ doCommandBySelector:(SEL)commandSelector {
                     object:[self window]];
 }
 
-@end
-
-
-@implementation QSBSearchWindowController (QSBSearchWindowControllerPrivate)
-
 - (void)updateShadows {
   // We invalidate the shadow here so that it looks right after we have adjusted
   // our tables. Note that we force a display BEFORE we invalidate, as we need
@@ -1171,35 +1195,47 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (void)setActiveQueryController:(QSBQueryController *)queryController {
-  if (activeQueryController_) {
-    [[activeQueryController_ query] removeObserver:self
-                                        forKeyPath:@"queryString"];
-    // We are no longer interested in the current controller producing results.
-    [activeQueryController_ stopQuery];
-    [activeQueryController_ autorelease];
-  }
+  QSBQuery *query = [activeQueryController_ query];
+  [query gtm_removeObserver:self
+                 forKeyPath:kQSBQueryStringKey
+                   selector:@selector(queryStringChanged:)];
+  // We are no longer interested in the current controller producing results.
+  [activeQueryController_ stopQuery];
+  [activeQueryController_ autorelease];
   activeQueryController_ = [queryController retain];
-  [[activeQueryController_ query] addObserver:self
-                                   forKeyPath:@"queryString"
-                                      options:NSKeyValueObservingOptionNew
-                                      context:NULL];
+  query = [activeQueryController_ query];
+  [query gtm_addObserver:self
+              forKeyPath:kQSBQueryStringKey
+                selector:@selector(queryStringChanged:)
+                userInfo:nil
+                 options:0];
   
   // Place a text box with the pivot term into the query search box.
   HGSObject *pivotObject = [activeQueryController_ pivotObject];
   NSString *pivotString = [pivotObject displayName];
   [searchMenu_ setTitle:pivotString];
-  NSImage *image = [[[pivotObject displayIconWithLazyLoad:YES] copy] autorelease];
-  [searchMenu_ setImage:image];
+  NSImage *image = [pivotObject displayIconWithLazyLoad:NO];
+  NSRect frame;
   if (image) {
-    [image setSize:NSMakeSize(16, 16)];
+    // We go through this instead of copying the image so we don't
+    // copy a 512x512 icon needlessly.
+    NSSize imageSquare = NSMakeSize(16, 16);
+    NSImageRep *smallImage = [image gtm_bestRepresentationForSize:imageSquare];
+    if (smallImage) {
+      smallImage = [[smallImage copy] autorelease];
+      image = [[[NSImage alloc] initWithSize:imageSquare] autorelease];
+      [image addRepresentation:smallImage];
+    }
     [searchMenu_ setImage:image];
     [searchMenu_ sizeToFit];
+    frame = [searchMenu_ frame];
   } else {
-    NSRect frame = [searchMenu_ frame];
+    frame = [searchMenu_ frame];
+    [searchMenu_ setImage:nil];
     frame.size.width = 0;
     [searchMenu_ setFrame:frame];
   }
-  NSRect frame = [searchMenu_ frame];
+  
   NSRect textFrame = [searchTextField_ frame];
   textFrame.origin.x = NSMaxX(frame) + kTextFieldPadding;
   textFrame.size.width = NSWidth([[searchTextField_ superview] frame])

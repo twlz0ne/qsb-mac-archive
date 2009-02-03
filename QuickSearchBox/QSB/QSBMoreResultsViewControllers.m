@@ -1,5 +1,5 @@
 //
-//  QSBFirstQuery.m
+//  QSBMoreResultsViewControllers.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,50 +30,53 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBFirstQuery.h"
-#import "QSBPreferences.h"
-#import "GTMNSObject+KeyValueObserving.h"
-#import "GTMMethodCheck.h"
+#import "QSBMoreResultsViewControllers.h"
+#import "QSBTableResult.h"
 
-@interface QSBFirstQuery ()
-- (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification;
+@implementation QSBMoreDetailedRowViewController
+- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result {
+  return [result titleSourceURLString];
+}
 @end
 
-@implementation QSBFirstQuery
-GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
-GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
-
-- (void)dealloc {
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_removeObserver:self 
-                 forKeyPath:kQSBResultCountKey
-                   selector:@selector(resultCountValueChanged:)];
-  [super dealloc];
+@implementation QSBMoreStandardRowViewController
+- (id)initWithController:(QSBQueryController *)controller {
+  return [super initWithNibName:@"MoreStandardResultView" 
+                     controller:controller];
 }
+@end
 
-- (void)awakeFromNib {  
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_addObserver:self 
-              forKeyPath:kQSBResultCountKey 
-                selector:@selector(resultCountValueChanged:)
-                userInfo:nil
-                 options:NSKeyValueObservingOptionNew];
-  totalResultDisplayCount_ = [prefs integerForKey:kQSBResultCountKey];
+@implementation QSBMoreCategoryRowViewController
+- (id)initWithController:(QSBQueryController *)controller {
+  return [super initWithNibName:@"MoreCategoryResultView" 
+                     controller:controller];
 }
+@end
 
-- (NSUInteger)maximumResultsToCollect {
-  return totalResultDisplayCount_;
+@implementation QSBMoreSeparatorRowViewController
+- (id)initWithController:(QSBQueryController *)controller {
+  return [super initWithNibName:@"MoreSeparatorResultView" 
+                     controller:controller];
 }
+@end
 
-- (BOOL)suppressMoreIfTopShowsAll {
-  return YES;
+@implementation QSBMoreFoldRowViewController
+- (id)initWithController:(QSBQueryController *)controller {
+  return [super initWithNibName:@"MoreFoldResultView" 
+                     controller:controller];
 }
+@end
 
-- (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification {
-  NSDictionary *change = [notification change];
-  NSNumber *valueOfChange = [change valueForKey:NSKeyValueChangeNewKey];
-  totalResultDisplayCount_ = [valueOfChange unsignedIntegerValue];
-  [self doDesktopQuery:nil];
+@implementation QSBMoreShowAllTableRowViewController
+- (id)initWithController:(QSBQueryController *)controller {
+  return [super initWithNibName:@"MoreShowAllTableResultView" 
+                     controller:controller];
 }
+@end
 
+@implementation QSBMorePlaceHolderRowViewController
+- (id)initWithController:(QSBQueryController *)controller {
+  return [super initWithNibName:@"MorePlaceHolderResultView" 
+                     controller:controller];
+}
 @end

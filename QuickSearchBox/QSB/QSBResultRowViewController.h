@@ -44,8 +44,7 @@
 }
 
 // Designated initializer.
-- (id)initWithNibName:(NSString *)nibNameOrNil
-               bundle:(NSBundle *)nibBundleOrNil
+- (id)initWithNibName:(NSString *)name
            controller:(QSBQueryController *)queryController;
 
 // After instantiating and initing this class you need to set its

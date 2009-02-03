@@ -174,22 +174,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: representedObject.displayIcon</string>
-						<reference key="source" ref="628807962"/>
-						<reference key="destination" ref="1001"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="628807962"/>
-							<reference key="NSDestination" ref="1001"/>
-							<string key="NSLabel">value: representedObject.displayIcon</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">representedObject.displayIcon</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">39</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: representedObject.categoryName</string>
 						<reference key="source" ref="774154779"/>
 						<reference key="destination" ref="1001"/>
@@ -219,6 +203,14 @@
 						</object>
 					</object>
 					<int key="connectionID">41</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">controller_</string>
+						<reference key="source" ref="628807962"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">42</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -327,6 +319,7 @@
 					<string>32.IBPluginDependency</string>
 					<string>33.IBPluginDependency</string>
 					<string>34.IBPluginDependency</string>
+					<string>4.CustomClassName</string>
 					<string>4.IBPluginDependency</string>
 					<string>5.IBPluginDependency</string>
 				</object>
@@ -344,6 +337,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>QSBResultIconView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
@@ -368,65 +362,65 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">41</int>
+			<int key="maxID">42</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSApplication</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="431071246">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="1069859855">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../opensource/google-toolbox-for-mac/UnitTesting/GTMAppKit+UnitTesting.h</string>
+						<string key="minorKey">../externals/google-toolbox-for-mac/UnitTesting/GTMAppKit+UnitTesting.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSCell</string>
-					<reference key="sourceIdentifier" ref="431071246"/>
+					<reference key="sourceIdentifier" ref="1069859855"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSControl</string>
-					<reference key="sourceIdentifier" ref="431071246"/>
+					<reference key="sourceIdentifier" ref="1069859855"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSMenu</string>
-					<reference key="sourceIdentifier" ref="431071246"/>
+					<reference key="sourceIdentifier" ref="1069859855"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../ThirdParty/UndocumentedGoodness/QuickLookUI/QLUIPrivate.h</string>
+						<string key="minorKey">../externals/UndocumentedGoodness/QuickLookUI/QLUIPrivate.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../opensource/google-toolbox-for-mac/AppKit/GTMCarbonEvent.h</string>
+						<string key="minorKey">../externals/google-toolbox-for-mac/AppKit/GTMCarbonEvent.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../opensource/google-toolbox-for-mac/Foundation/GTMNSAppleEventDescriptor+Foundation.h</string>
+						<string key="minorKey">../externals/google-toolbox-for-mac/Foundation/GTMNSAppleEventDescriptor+Foundation.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../opensource/google-toolbox-for-mac/UnitTesting/GTMNSObject+UnitTesting.h</string>
+						<string key="minorKey">../externals/google-toolbox-for-mac/UnitTesting/GTMNSObject+UnitTesting.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSTextField</string>
-					<reference key="sourceIdentifier" ref="431071246"/>
+					<reference key="sourceIdentifier" ref="1069859855"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSView</string>
-					<reference key="sourceIdentifier" ref="431071246"/>
+					<reference key="sourceIdentifier" ref="1069859855"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">QSBDetailedRowViewController</string>
@@ -437,7 +431,7 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBDetailedRowViewController.h</string>
+						<string key="minorKey">QSBDetailedRowViewController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -449,19 +443,36 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">QSBMoreStandardRowViewController</string>
+					<string key="className">QSBMoreDetailedRowViewController</string>
 					<string key="superclassName">QSBDetailedRowViewController</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="867023791">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBMoreStandardRowViewController.h</string>
+						<string key="minorKey">QSBMoreResultsViewControllers.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">QSBMoreStandardRowViewController</string>
-					<string key="superclassName">QSBDetailedRowViewController</string>
+					<string key="superclassName">QSBMoreDetailedRowViewController</string>
+					<reference key="sourceIdentifier" ref="867023791"/>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">QSBMoreStandardRowViewController</string>
+					<string key="superclassName">QSBMoreDetailedRowViewController</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">QSBResultIconView</string>
+					<string key="superclassName">NSImageView</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">controller_</string>
+						<string key="NS.object.0">QSBDetailedRowViewController</string>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">QSBIconRowView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -469,7 +480,7 @@
 					<string key="superclassName">NSViewController</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBResultRowViewController.h</string>
+						<string key="minorKey">QSBResultRowViewController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -483,7 +494,7 @@
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
-		<string key="IBDocument.LastKnownRelativeProjectPath">../../../../QSB2.xcodeproj</string>
+		<string key="IBDocument.LastKnownRelativeProjectPath">../../QSB.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 	</data>
 </archive>

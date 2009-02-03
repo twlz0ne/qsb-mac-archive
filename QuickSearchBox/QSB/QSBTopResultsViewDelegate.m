@@ -115,8 +115,8 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   }
 }
 
-- (NSString *)rowViewNibNameForResult:(QSBTableResult *)result {
-  return [result topResultsRowViewNibName];
+- (Class)rowViewControllerClassForResult:(QSBTableResult *)result {
+  return [result topResultsRowViewControllerClass];
 }
 
 #if TO_BE_IMPLEMENTED

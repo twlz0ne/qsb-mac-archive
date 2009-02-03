@@ -1,5 +1,5 @@
 //
-//  QSBFirstQuery.m
+//  QSBResultIconView.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,50 +30,62 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBFirstQuery.h"
-#import "QSBPreferences.h"
+
+#import "QSBResultIconView.h"
+#import <Vermilion/Vermilion.h>
+#import "QSBTableResult.h"
+#import "QSBDetailedRowViewController.h"
 #import "GTMNSObject+KeyValueObserving.h"
 #import "GTMMethodCheck.h"
 
-@interface QSBFirstQuery ()
-- (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification;
+static NSString *const kQSBDisplayIconKVOKey = @"representedObject.displayIcon";
+
+@interface QSBResultIconView ()
+- (void)displayIconValueChanged:(GTMKeyValueChangeNotification *)notification;
 @end
 
-@implementation QSBFirstQuery
+@implementation QSBResultIconView
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
 GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
+- (void)awakeFromNib {
+  [controller_ gtm_addObserver:self 
+                    forKeyPath:kQSBDisplayIconKVOKey
+                      selector:@selector(displayIconValueChanged:)
+                      userInfo:nil
+                       options:0];
+  [controller_ retain];
+}
+
 - (void)dealloc {
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_removeObserver:self 
-                 forKeyPath:kQSBResultCountKey
-                   selector:@selector(resultCountValueChanged:)];
+  [controller_ gtm_removeObserver:self 
+                       forKeyPath:kQSBDisplayIconKVOKey
+                         selector:@selector(displayIconValueChanged:)];
+  [controller_ release];
   [super dealloc];
 }
 
-- (void)awakeFromNib {  
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_addObserver:self 
-              forKeyPath:kQSBResultCountKey 
-                selector:@selector(resultCountValueChanged:)
-                userInfo:nil
-                 options:NSKeyValueObservingOptionNew];
-  totalResultDisplayCount_ = [prefs integerForKey:kQSBResultCountKey];
+- (void)displayIconValueChanged:(GTMKeyValueChangeNotification *)notification {
+  iconNeedsUpdating_ = YES;
+  [self setNeedsDisplay:YES];
 }
 
-- (NSUInteger)maximumResultsToCollect {
-  return totalResultDisplayCount_;
+- (void)viewDidMoveToWindow{
+  if (iconNeedsUpdating_ && [self window]) {
+    // We can't just call setNeedsDisplay here because we are currently in the
+    // middle of an update loop and it will be ignored.
+    [self display];
+  }
 }
 
-- (BOOL)suppressMoreIfTopShowsAll {
-  return YES;
+- (void)viewWillDraw {
+  [super viewWillDraw];
+  if (iconNeedsUpdating_) {
+    QSBSourceTableResult *result = [controller_ representedObject];
+    HGSObject *object = [result representedObject];
+    NSImage *icon = [object valueForKey:kHGSObjectAttributeIconKey];
+    [self setImage:icon];
+    iconNeedsUpdating_ = NO;
+  }
 }
-
-- (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification {
-  NSDictionary *change = [notification change];
-  NSNumber *valueOfChange = [change valueForKey:NSKeyValueChangeNewKey];
-  totalResultDisplayCount_ = [valueOfChange unsignedIntegerValue];
-  [self doDesktopQuery:nil];
-}
-
 @end

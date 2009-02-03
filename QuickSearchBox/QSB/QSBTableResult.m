@@ -39,6 +39,10 @@
 #import "QSBQueryController.h"
 #import "QSBMoreResultsViewDelegate.h"
 #import "NSString+ReadableURL.h"
+#import "QSBTopResultsViewControllers.h"
+#import "QSBMoreResultsViewControllers.h"
+#import "GTMNSObject+KeyValueObserving.h"
+#import "GTMMethodCheck.h"
 
 typedef enum {
   kQSBResultDescriptionTitle = 0,
@@ -46,7 +50,7 @@ typedef enum {
   kQSBResultDescriptionSourceURL
 } QSBResultDescriptionItemType;
 
-@interface QSBTableResult (QSBTableResultPrivateMethods)
+@interface QSBTableResult ()
 
 - (void)addAttributes:(NSMutableAttributedString*)string
           elementType:(QSBResultDescriptionItemType)itemType;
@@ -73,7 +77,6 @@ typedef enum {
 // Return a string containing the sourceURL/URL, if any, to be presented for a
 // result, otherwise return nil.
 - (NSAttributedString*)sourceURLString;
-
 @end
 
 
@@ -92,6 +95,27 @@ GTM_METHOD_CHECK(NSMutableAttributedString,
                  addAttributes:fontTraits:toTextDelimitedBy:postDelimiter:);
 GTM_METHOD_CHECK(NSString, qsb_displayPath);
 GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromHTML);
+GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
+GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
+
+static NSDictionary *gBaseStringAttributes_ = nil;
+
++ (void)initialize {
+  if (self == [QSBTableResult class]) {
+    NSMutableParagraphStyle *style 
+    = [[[NSMutableParagraphStyle alloc] init] autorelease];
+    [style setLineBreakMode:NSLineBreakByTruncatingTail];
+    [style setParagraphSpacing:0];
+    [style setParagraphSpacingBefore:0];
+    [style setLineSpacing:0];
+    [style setMaximumLineHeight:14.0];
+    
+    gBaseStringAttributes_ 
+    = [NSDictionary dictionaryWithObject:style
+                                  forKey:NSParagraphStyleAttributeName];
+    [gBaseStringAttributes_ retain];
+  }
+}
 
 - (BOOL)isPivotable {
   return NO;
@@ -137,13 +161,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromHTML);
   return -1.0;
 }
 
-- (NSString *)topResultsRowViewNibName {
-  HGSLogDebug(@"Need to handle QSBTableResult result %@.", self);
+- (Class)topResultsRowViewControllerClass {
+  HGSLogDebug(@"Need to handle [%@ %s] result %@.", [self class], _cmd, self);
   return nil;
 }
 
-- (NSString *)moreResultsRowViewNibName {
-  HGSLogDebug(@"Need to handle QSBTableResult result %@.", self);
+- (Class)moreResultsRowViewControllerClass {
+  HGSLogDebug(@"Need to handle [%@ %s] result %@.", [self class], _cmd, self);
   return nil;
 }
 
@@ -157,28 +181,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromHTML);
 
 - (NSString *)displayPath {
   return nil;
-}
-
-@end
-
-
-@implementation QSBTableResult (QSBTableResultPrivateMethods)
-static NSDictionary *gBaseStringAttributes_ = nil;
-+ (void)initialize {
-  if (self == [QSBTableResult class]) {
-    NSMutableParagraphStyle *style 
-      = [[[NSMutableParagraphStyle alloc] init] autorelease];
-    [style setLineBreakMode:NSLineBreakByTruncatingTail];
-    [style setParagraphSpacing:0];
-    [style setParagraphSpacingBefore:0];
-    [style setLineSpacing:0];
-    [style setMaximumLineHeight:14.0];
-    
-    gBaseStringAttributes_ 
-      = [NSDictionary dictionaryWithObject:style
-                                    forKey:NSParagraphStyleAttributeName];
-    [gBaseStringAttributes_ retain];
-  }
 }
 
 - (void)addAttributes:(NSMutableAttributedString*)string
@@ -288,6 +290,9 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 
 @implementation QSBSourceTableResult : QSBTableResult
 
+GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
+GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
+
 @synthesize representedObject = representedObject_;
 @synthesize categoryName = categoryName_;
 
@@ -298,25 +303,26 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 - (id)initWithObject:(HGSObject *)object {
   if ((self = [super init])) {
     representedObject_ = [object retain];
-    [representedObject_ addObserver:self
-                         forKeyPath:kHGSObjectAttributeIconKey
-                            options:0
-                            context:NULL];
+    [representedObject_ gtm_addObserver:self
+                             forKeyPath:kHGSObjectAttributeIconKey
+                               selector:@selector(objectIconChanged:)
+                               userInfo:nil
+                                options:0];
   }
   return self;
 }
-- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-  if ([keyPath isEqualToString:kHGSObjectAttributeIconKey]) {
-    [self willChangeValueForKey:@"displayIcon"];
-    [self didChangeValueForKey:@"displayIcon"]; 
-    [self willChangeValueForKey:@"displayThumbnail"];
-    [self didChangeValueForKey:@"displayThumbnail"];
-  }
+
+- (void)objectIconChanged:(GTMKeyValueChangeNotification *)notification {
+  [self willChangeValueForKey:@"displayIcon"];
+  [self didChangeValueForKey:@"displayIcon"]; 
+  [self willChangeValueForKey:@"displayThumbnail"];
+  [self didChangeValueForKey:@"displayThumbnail"];
 }
 
 - (void)dealloc {
-  [representedObject_ removeObserver:self 
-                          forKeyPath:kHGSObjectAttributeIconKey];
+  [representedObject_ gtm_removeObserver:self 
+                              forKeyPath:kHGSObjectAttributeIconKey
+                                selector:@selector(objectIconChanged:)];
   [representedObject_ release];
   [super dealloc];
 }
@@ -324,8 +330,10 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 - (BOOL)isPivotable {
   // We want to pivot on non-suggestions, non-qsb stuff, and non-actions.
   HGSObject *object = [self representedObject];
-  return (![object conformsToType:kHGSTypeGoogleSuggest] 
-          && ![object conformsToType:kHGSTypeAction]);
+  BOOL pivotable = YES;
+  if ([object conformsToType:kHGSTypeGoogleSuggest]) pivotable = NO;
+  if ([object conformsToType:kHGSTypeAction]) pivotable = NO;
+  return pivotable;
 }
 
 - (void)addAttributes:(NSMutableAttributedString*)string
@@ -349,29 +357,31 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   return [[self representedObject] rank];
 }
 
-- (NSString *)topResultsRowViewNibName {
-  NSString *rowViewNibName = nil;
+- (Class)topResultsRowViewControllerClass {
+  Class rowViewClass = Nil;
   HGSObject *result = [self representedObject];
   if ([result conformsToType:kHGSTypeSuggest]) {
-    rowViewNibName = @"TopStandardResultView";
+    rowViewClass = [QSBTopStandardRowViewController class];
   } else if ([result isKindOfClass:[HGSObject class]]) {
-    rowViewNibName = @"TopStandardResultView";
+    rowViewClass = [QSBTopStandardRowViewController class];
   }
-  return rowViewNibName;
+  return rowViewClass;
 }
 
-- (NSString *)moreResultsRowViewNibName {
-  NSString *rowViewNibName = nil;
+- (Class)moreResultsRowViewControllerClass {
+  Class rowViewClass = Nil;
   HGSObject *result = [self representedObject];
   if (!([result conformsToType:kHGSTypeSuggest]
         || [result conformsToType:kHGSTypeSearch])) {
     if ([self categoryName]) {
-      rowViewNibName = @"MoreCategoryResultView";
+      rowViewClass = [QSBMoreCategoryRowViewController class];
     } else {
-      rowViewNibName = @"MoreStandardResultView";
+      rowViewClass = [QSBMoreStandardRowViewController class];
     }
+  } else {
+    rowViewClass = [QSBMorePlaceHolderRowViewController class];
   }
-  return rowViewNibName;
+  return rowViewClass;
 }
 
 - (BOOL)performDefaultActionWithQueryController:(QSBQueryController*)controller {
@@ -399,6 +409,14 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 - (NSImage *)displayIcon {
   HGSObject *result = [self representedObject];
   return [result displayIconWithLazyLoad:YES];
+}
+
+- (NSString*)displayToolTip {
+  // TODO(alcor): for now add in rank info to help with debugging. remove.
+  return [NSString stringWithFormat:@"%@ (Rank: %.2f, %d)", 
+                                    [self displayName],
+                                    [self rank],
+                                    [[self representedObject] rankFlags]];
 }
 
 - (NSImage *)displayThumbnail {
@@ -479,16 +497,20 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     NSString *cleanedQuery = [query gtm_stringByEscapingForURLArgument];
     urlString = [NSString stringWithFormat:formatString, cleanedQuery];
   }
-  HGSObject *object = [[[HGSObject alloc] initWithIdentifier:[NSURL URLWithString:urlString] 
-                                                        name:name 
-                                                        type:kHGSTypeGoogleSearch
-                                                      source:nil
-                                                  attributes:nil] autorelease];
+  NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                              [self displayIcon], kHGSObjectAttributeIconKey, 
+                              nil];
+  NSURL *identifier = [NSURL URLWithString:urlString];
+  HGSObject *object = [HGSObject objectWithIdentifier:identifier 
+                                                 name:name 
+                                                 type:kHGSTypeGoogleSearch
+                                               source:nil
+                                           attributes:attributes];
   return [super initWithObject:object];
 }
 
-- (NSString *)topResultsRowViewNibName {
-  return @"TopStandardResultView";
+- (Class)topResultsRowViewControllerClass {
+  return [QSBTopStandardRowViewController class];
 }
 
 // We want to inherit the google logo, so don't return an icon
@@ -497,7 +519,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (NSImage *)displayThumbnail {
-  return nil;
+  return [self displayIcon];
 }
 
 - (id)displayPath {
@@ -529,12 +551,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return [[[[self class] alloc] init] autorelease];
 }
 
-- (NSString *)topResultsRowViewNibName {
-  return @"TopSeparatorResultView";
+- (Class)topResultsRowViewControllerClass {
+  return [QSBTopSeparatorRowViewController class];
 }
 
-- (NSString *)moreResultsRowViewNibName {
-  return @"MoreSeparatorResultView";
+- (Class)moreResultsRowViewControllerClass {
+  return [QSBMoreSeparatorRowViewController class];
 }
 
 @end
@@ -546,12 +568,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return [[[[self class] alloc] init] autorelease];
 }
 
-- (NSString *)topResultsRowViewNibName {
-  return @"TopFoldResultView";
+- (Class)topResultsRowViewControllerClass {
+  return [QSBTopFoldRowViewController class];
 }
 
-- (NSString *)moreResultsRowViewNibName {
-  return @"MoreFoldResultView";
+- (Class)moreResultsRowViewControllerClass {
+  return [QSBMoreFoldRowViewController class];
 }
 
 - (BOOL)performDefaultActionWithQueryController:(QSBQueryController*)controller {
@@ -567,12 +589,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return [[[[self class] alloc] init] autorelease];
 }
 
-- (NSString *)topResultsRowViewNibName {
-  return @"TopSearchStatusResultView";
+- (Class)topResultsRowViewControllerClass {
+  return [QSBTopSearchStatusRowViewController class];
 }
 
-- (NSString *)moreResultsRowViewNibName {
-  return @"TopSearchStatusResultView";
+- (Class)moreResultsRowViewControllerClass {
+  // Yes, we are using QSBTopSearchStatusRowViewController intentionally here
+  return [QSBTopSearchStatusRowViewController class];
 }
 
 - (BOOL)performDefaultActionWithQueryController:(QSBQueryController*)controller {
@@ -613,8 +636,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return [NSString stringWithFormat:format, categoryCount_, [self categoryName]];
 }
 
-- (NSString *)moreResultsRowViewNibName {
-  return @"MoreShowAllTableResultView";
+- (Class)moreResultsRowViewControllerClass {
+  return [QSBMoreShowAllTableRowViewController class];
 }
 
 - (BOOL)performDefaultActionWithQueryController:(QSBQueryController*)controller {
@@ -656,8 +679,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return titleSnippet;
 }
 
-- (NSString *)topResultsRowViewNibName {
-  return @"TopMessageResultView";
+- (Class)topResultsRowViewControllerClass {
+  return [QSBTopMessageRowViewController class];
 }
 
 - (void)addAttributes:(NSMutableAttributedString*)string

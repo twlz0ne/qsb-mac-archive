@@ -52,6 +52,7 @@
 #import "GTMNSWorkspace+Running.h"
 #import "QSBHGSDelegate.h"
 #import "QSBQueryController.h"
+#import "GTMNSObject+KeyValueObserving.h"
 
 // Local pref set once we've been launched. Used to control whether or not we
 // show the help window at startup.
@@ -81,13 +82,12 @@ static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 // Called when we should update how our status icon appears
 - (void)updateIconInMenubar;
 
-@end
-
-@interface QSBApplicationDelegate (QSBApplicationDelegatePrivateMethods)
+- (void)hotKeyValueChanged:(GTMKeyValueChangeNotification *)note;
+- (void)iconInMenubarValueChanged:(GTMKeyValueChangeNotification *)note;
 
 // Reconcile what we previously knew about accounts and saved in our
 // preferences with what we now know about accounts.
-- (void)inventoryAccountsAndTypes;
+- (void)inventoryAccounts;
 
 // Reconcile what we previously knew about plugins and extensions
 // and had saved in our preferences with a new inventory
@@ -120,7 +120,7 @@ static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 // delegate's list of sourceExtensions to be properly updated.
 - (void)observeProtoExtensions;
 - (void)stopObservingProtoExtensions;
-
+- (void)protoExtensionsValueChanged:(GTMKeyValueChangeNotification *)note;
 @end
 
 
@@ -135,7 +135,18 @@ static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 
 GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionaryForActiveApp);
 GTM_METHOD_CHECK(GTMHotKeyTextField, stringForKeycode:useGlyph:resourceBundle:);
-GTM_METHOD_CHECK(NSEnumerator, gtm_filteredEnumeratorByMakingEachObjectPerformSelector:withObject:);
+GTM_METHOD_CHECK(NSEnumerator, 
+                 gtm_filteredEnumeratorByMakingEachObjectPerformSelector:
+                 withObject:);
+GTM_METHOD_CHECK(NSArray, gtm_mergeArray:mergeSelector:);
+GTM_METHOD_CHECK(NSEnumerator,
+                 gtm_filteredEnumeratorByMakingEachObjectPerformSelector:
+                 withObject:);
+GTM_METHOD_CHECK(NSEnumerator,
+                 gtm_enumeratorByMakingEachObjectPerformSelector:
+                 withObject:);
+GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
+GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 + (NSSet *)keyPathsForValuesAffectingSourceExtensions {
   NSSet *affectingKeys = [NSSet setWithObject:@"plugins"];
@@ -196,8 +207,12 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_filteredEnumeratorByMakingEachObjectPerformSe
   [self stopObservingProtoExtensions];
   [statusItem_ release];
   NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs removeObserver:self forKeyPath:kQSBHotKeyKey];
-  [prefs removeObserver:self forKeyPath:kQSBIconInMenubarKey];
+  [prefs gtm_removeObserver:self 
+                 forKeyPath:kQSBHotKeyKey
+                   selector:@selector(hotKeyValueChanged:)];
+  [prefs gtm_removeObserver:self 
+                 forKeyPath:kQSBIconInMenubarKey
+                   selector:@selector(iconInMenubarValueChanged:)];
   NSNotificationCenter *workspaceNC 
     = [[NSWorkspace sharedWorkspace] notificationCenter];
   [workspaceNC removeObserver:self];
@@ -220,31 +235,28 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_filteredEnumeratorByMakingEachObjectPerformSe
   
   // watch for prefs changing
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  [defaults addObserver:self
-             forKeyPath:kQSBHotKeyKey
-                options:0
-                context:nil];
-  [defaults addObserver:self
-             forKeyPath:kQSBIconInMenubarKey
-                options:0
-                context:nil];
+  [defaults gtm_addObserver:self
+                 forKeyPath:kQSBHotKeyKey
+                   selector:@selector(hotKeyValueChanged:)
+                   userInfo:nil
+                    options:0];
+  [defaults gtm_addObserver:self
+                 forKeyPath:kQSBIconInMenubarKey
+                   selector:@selector(iconInMenubarValueChanged:)
+                   userInfo:nil
+                    options:0];
   [statusShowSearchBoxItem_ setTarget:searchWindowController_];
   [statusShowSearchBoxItem_ setAction:@selector(showSearchWindow:)];
   [dockShowSearchBoxItem_ setTarget:searchWindowController_];
   [dockShowSearchBoxItem_ setAction:@selector(showSearchWindow:)];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object
-                        change:(NSDictionary *)change
-                       context:(void *)context {
-  if (object == [NSUserDefaults standardUserDefaults]) {
-    if ([keyPath isEqualToString:kQSBHotKeyKey]) {
-      [self updateHotKeyRegistration];
-    } else if ([keyPath isEqualToString:kQSBIconInMenubarKey]) {
-      [self updateIconInMenubar];
-    }
-  }
+- (void)hotKeyValueChanged:(GTMKeyValueChangeNotification *)note {
+  [self updateHotKeyRegistration];
+}
+
+- (void)iconInMenubarValueChanged:(GTMKeyValueChangeNotification *)note {
+  [self updateIconInMenubar];
 }
 
 // method that is called when the modifier keys are hit and we are inactive
@@ -334,10 +346,10 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_filteredEnumeratorByMakingEachObjectPerformSe
   if (!hotModifiers_) {
     return;
   }
-  NSTimeInterval lastStamp = lastHotModifiersEventCheckedTime_;
+  NSTimeInterval lastTime = lastHotModifiersEventCheckedTime_;
   lastHotModifiersEventCheckedTime_ = [event timestamp];
   if (hotModifiersState_
-      && lastHotModifiersEventCheckedTime_ > lastStamp + hotModifierDeltaTime_) {
+      && lastHotModifiersEventCheckedTime_ > lastTime + hotModifierDeltaTime_) {
     // Timed out. Reset.
     hotModifiersState_ = 0;
     return;
@@ -509,10 +521,176 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_filteredEnumeratorByMakingEachObjectPerformSe
                     object:NSApp];
 }
 
+- (BOOL)isScreenSaverActive {
+  NSDictionary *processInfo 
+  = [[NSWorkspace sharedWorkspace] gtm_processInfoDictionaryForActiveApp];    
+  NSString *bundlePath 
+  = [processInfo objectForKey:kGTMWorkspaceRunningBundlePath];
+  // ScreenSaverEngine is the frontmost app if the screen saver is actually
+  // running Security Agent is the frontmost app if the "enter password"
+  // dialog is showing
+  return ([bundlePath hasSuffix:@"ScreenSaverEngine.app"] 
+          || [bundlePath hasSuffix:@"SecurityAgent.app"]);
+}
+
+- (BOOL)frontRowActive {
+  // Can't use NSWorkspace here because of
+  // rdar://5049713 When FrontRow is frontmost app, 
+  // [NSWorkspace -activeApplication] returns nil
+  NSDictionary *processDict 
+  = [[NSWorkspace sharedWorkspace] gtm_processInfoDictionaryForActiveApp];
+  NSString *bundleID 
+  = [processDict objectForKey:kGTMWorkspaceRunningBundleIdentifier];
+  return [bundleID isEqualToString:@"com.apple.frontrow"];
+}
+
+- (void)updateMenuWithAppName:(NSMenu* )menu {
+  NSBundle *bundle = [NSBundle mainBundle];
+  NSString *newName = [bundle objectForInfoDictionaryKey:@"CFBundleName"];
+  NSArray *items = [menu itemArray];
+  for (NSMenuItem *item in items) {
+    NSString *appName = @"$APPNAME$";
+    NSString *title = [item title];
+    
+    if ([title rangeOfString:appName].length != 0) {
+      NSString *newTitle = [title stringByReplacingOccurrencesOfString:appName
+                                                            withString:newName];
+      [item setTitle:newTitle];
+    }
+    NSMenu *subMenu = [item submenu];
+    if (subMenu) {
+      [self updateMenuWithAppName:subMenu];
+    }
+  }
+}
+
+
+
 #pragma mark Plugins & Extensions Management
 
 - (NSArray *)plugins {
   return [[plugins_ retain] autorelease];
+}
+
+- (void)inventoryPlugins {
+  // Retrieve list of and configuration information for previously
+  // inventoried plug-ins and mark as undiscovered.
+  NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
+  NSArray *pluginsFromPrefs = [standardDefaults
+                               objectForKey:kQSBPluginConfigurationPrefKey];
+  NSUInteger pluginCount = [pluginsFromPrefs count];
+  NSMutableArray *oldPlugins = [NSMutableArray arrayWithCapacity:pluginCount];
+  for (NSDictionary *pluginFromPrefs in pluginsFromPrefs) {
+    id oldPlugin = [[[HGSPlugin alloc] initWithDictionary:pluginFromPrefs]
+                    autorelease];
+    if (oldPlugin) {
+      [oldPlugins addObject:oldPlugin];
+    }
+  }
+  
+  // Rediscover plug-ins by scanning all plugin folders.
+  NSMutableArray *factorablePlugins = [NSMutableArray array];
+  NSArray *pluginPaths = [hgsDelegate_ pluginFolders];
+  for (NSString *pluginPath in pluginPaths) {
+    NSArray *pathPlugins
+    = [[HGSModuleLoader sharedModuleLoader] loadPluginsAtPath:pluginPath];
+    [factorablePlugins addObjectsFromArray:pathPlugins];
+  }
+  
+  // Install the account type extensions.  We do this here because we 
+  // want the account types to be available before factoring extensions  
+  // that rely on those account types.
+  [factorablePlugins makeObjectsPerformSelector:@selector(installAccountTypes)];
+  
+  // Identify our accounts now that we know about available account types.
+  [self inventoryAccounts];
+  
+  // Factor the new extensions now that we know all available accounts.
+  [factorablePlugins makeObjectsPerformSelector:@selector(factorExtensions)];
+  
+  oldPlugins = [self mergePlugins:factorablePlugins intoPlugins:oldPlugins];
+  
+  // Review our plugins and see if there are any that have gone missing.
+  // TODO(mrossetti): We just strip those out for now.  Should we do
+  // something else?
+  NSEnumerator *oldPluginsEnum = [oldPlugins objectEnumerator];
+  NSEnumerator *availablePluginsEnum
+  = [oldPluginsEnum
+     gtm_filteredEnumeratorByMakingEachObjectPerformSelector:@selector(notIsOld)
+     withObject:nil];
+  NSArray *availablePlugins = [availablePluginsEnum allObjects];
+  
+  // Tell all non-new plugins to strip unmatched old extensions.
+  // TODO(mrossetti): Do we want to review with the user before doing this?
+  NSEnumerator *allAvailablePluginsEnum = [availablePlugins objectEnumerator];
+  NSEnumerator *mergedPluginsEnum
+  = [allAvailablePluginsEnum
+     gtm_filteredEnumeratorByMakingEachObjectPerformSelector:@selector(notIsNew)
+     withObject:nil];
+  NSArray *allMergedPlugins = [mergedPluginsEnum allObjects];
+  [allMergedPlugins
+   makeObjectsPerformSelector:@selector(stripOldUnmergedExtensions)];
+  
+  // TODO(mrossetti): Implement special configurating when required.
+  // Review our plugins and see if there are any new modules which require
+  // configuration before enabling.
+  
+  // Review plugins for new extensions that should not automatically be
+  // enabled.
+  [availablePlugins
+   makeObjectsPerformSelector:@selector(autoSetEnabledForNewExtensions)];
+  
+  
+  // Save the current plugin/extension configuration.
+  [self setPlugins:availablePlugins];
+  
+  // Lock and load all enabled modules, sources and actions.
+  NSEnumerator *availableEnum = [availablePlugins objectEnumerator];
+  NSEnumerator *pluginsToEnableEnum
+  = [availableEnum
+     gtm_filteredEnumeratorByMakingEachObjectPerformSelector:@selector(isEnabled)
+     withObject:nil];
+  for (HGSPlugin *plugin in pluginsToEnableEnum) {
+    [plugin installExtensions];
+  }
+}
+
+- (NSMutableArray *)mergePlugins:(NSArray *)factorablePlugins
+                     intoPlugins:(NSArray *)oldPlugins {
+  // Match up extensions in |modules| with those already in |oldPlugins| by
+  // identifier, path.  If there's an exact match then treat it as 'known'.
+  // Otherwise, treat it as 'new'.  No plugin loading and enabling occurs
+  // in this method.
+  // TODO(mrossetti): Enhance the merge function in the future to handle
+  // updated versions, plugins which appear in multiple paths, plugins
+  // which have moved, and plugins which have updated versions.
+  // TODO(mrossetti): This might be a good spot for reconciling extensions
+  // that require account access.
+  NSMutableArray *mergedPlugins
+  = [[[oldPlugins gtm_mergeArray:factorablePlugins
+                   mergeSelector:@selector(merge:)] mutableCopy] autorelease];
+  return mergedPlugins;
+}
+
+- (void)setPlugins:(NSArray *)plugins {
+  [self stopObservingProtoExtensions];
+  [plugins_ autorelease];
+  plugins_ = [plugins retain];
+  [self observeProtoExtensions];
+  [self updatePluginPreferences];
+}
+
+- (void)updatePluginPreferences {
+  // Save these plugins in preferences.
+  NSEnumerator *archivePluginEnum
+  = [[[self plugins] objectEnumerator]
+     gtm_enumeratorByMakingEachObjectPerformSelector:@selector(dictionaryValue)
+     withObject:nil];
+  NSArray *archivablePlugins = [archivePluginEnum allObjects]; 
+  NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
+  [standardDefaults setObject:archivablePlugins
+                       forKey:kQSBPluginConfigurationPrefKey];
+  [standardDefaults synchronize];
 }
 
 - (NSArray *)sourceExtensions {
@@ -526,9 +704,35 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_filteredEnumeratorByMakingEachObjectPerformSe
          gtm_filteredEnumeratorByMakingEachObjectPerformSelector:
            @selector(isUserVisibleAndExtendsExtensionPoint:)
          withObject:kHGSSourcesExtensionPoint];
-    [protoExtensions addObjectsFromArray:[sourceProtoExtensionsEnum allObjects]];
+    NSArray *allsourceProtoExtensions = [sourceProtoExtensionsEnum allObjects];
+    [protoExtensions addObjectsFromArray:allsourceProtoExtensions];
   }
   return protoExtensions;
+}
+
+- (void)observeProtoExtensions {
+  NSArray *plugins = [self plugins];
+  for (HGSPlugin *plugin in plugins) {
+    [plugin gtm_addObserver:self
+                 forKeyPath:kQSBProtoExtensionsKVOKey
+                   selector:@selector(protoExtensionsValueChanged:) 
+                   userInfo:nil
+                    options:0];
+  }
+}
+
+- (void)stopObservingProtoExtensions {
+  NSArray *plugins = [self plugins];
+  for (HGSPlugin *plugin in plugins) {
+    [plugin gtm_removeObserver:self 
+                    forKeyPath:kQSBProtoExtensionsKVOKey
+                      selector:@selector(protoExtensionsValueChanged:)];
+  }
+}
+
+- (void)protoExtensionsValueChanged:(GTMKeyValueChangeNotification *)note {
+  [self willChangeValueForKey:kQSBSourceExtensionsKVOKey];
+  [self didChangeValueForKey:kQSBSourceExtensionsKVOKey];
 }
 
 #pragma mark Account Management
@@ -540,13 +744,20 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_filteredEnumeratorByMakingEachObjectPerformSe
   return accounts;
 }
 
+- (void)inventoryAccounts {
+  HGSAccountsExtensionPoint *accountsExtensionPoint
+  = [HGSAccountsExtensionPoint accountsExtensionPoint];
+  // Retrieve list of known accounts.
+  NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
+  NSArray *accountsFromPrefs = [standardDefaults
+                                objectForKey:kQSBAccountsPrefKey];
+  [accountsExtensionPoint addAccountsFromArray:accountsFromPrefs];
+}
+
 #pragma mark Application Delegate Methods
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
   [self updateHotKeyRegistration];
-  
-  // Identify our account types and accounts.
-  [self inventoryAccountsAndTypes];
   
   // Inventory and process all plugins and extensions.
   [self inventoryPlugins];
@@ -686,208 +897,8 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_filteredEnumeratorByMakingEachObjectPerformSe
   [self didChangeValueForKey:@"accounts"];
 }
 
-@end
 
 
-@implementation QSBApplicationDelegate (QSBApplicationDelegatePrivateMethods)
-
-GTM_METHOD_CHECK(NSArray, gtm_mergeArray:mergeSelector:);
-GTM_METHOD_CHECK(NSEnumerator,
-                 gtm_filteredEnumeratorByMakingEachObjectPerformSelector:withObject:);
-GTM_METHOD_CHECK(NSEnumerator,
-                 gtm_enumeratorByMakingEachObjectPerformSelector:withObject:);
-
-- (void)inventoryAccountsAndTypes {
-  // TODO(mrossetti): Hard-code for Google account right now.  Others to
-  // be supported (dynamically) in the future.
-  HGSAccountsExtensionPoint *accountsExtensionPoint
-    = [HGSAccountsExtensionPoint accountsExtensionPoint];
-  [accountsExtensionPoint addAccountType:kHGSGoogleAccountTypeName
-                               withClass:[HGSGoogleAccount class]];
-
-  // Retrieve list of known accounts.
-  NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-  NSArray *accountsFromPrefs = [standardDefaults
-                                objectForKey:kQSBAccountsPrefKey];
-  [accountsExtensionPoint addAccountsFromArray:accountsFromPrefs];
-}
-
-- (void)inventoryPlugins {
-  // Retrieve list of and configuration information for previously
-  // inventoried plug-ins and mark as undiscovered.
-  NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-  NSArray *pluginsFromPrefs = [standardDefaults
-                               objectForKey:kQSBPluginConfigurationPrefKey];
-  NSUInteger pluginCount = [pluginsFromPrefs count];
-  NSMutableArray *oldPlugins = [NSMutableArray arrayWithCapacity:pluginCount];
-  for (NSDictionary *pluginFromPrefs in pluginsFromPrefs) {
-    id oldPlugin = [[[HGSPlugin alloc] initWithDictionary:pluginFromPrefs]
-                    autorelease];
-    if (oldPlugin) {
-      [oldPlugins addObject:oldPlugin];
-    }
-  }
-  
-  // Rediscover plug-ins by scanning all plugin folders.
-  NSArray *pluginPaths = [hgsDelegate_ pluginFolders];
-  for (NSString *pluginPath in pluginPaths) {
-    NSArray *pathPlugins
-      = [[HGSModuleLoader sharedModuleLoader] loadPluginsAtPath:pluginPath];
-    oldPlugins = [self mergePlugins:pathPlugins intoPlugins:oldPlugins];
-  }
-  
-  // Review our plugins and see if there are any that have gone missing.
-  // TODO(mrossetti): We just strip those out for now.  Should we do
-  // something else?
-  NSEnumerator *oldPluginsEnum = [oldPlugins objectEnumerator];
-  NSEnumerator *availablePluginsEnum
-    = [oldPluginsEnum
-       gtm_filteredEnumeratorByMakingEachObjectPerformSelector:@selector(notIsOld)
-                                                    withObject:nil];
-  NSArray *availablePlugins = [availablePluginsEnum allObjects];
-  
-  // Tell all non-new plugins to strip unmatched old extensions.
-  // TODO(mrossetti): Do we want to review with the user before doing this?
-  NSEnumerator *allAvailablePluginsEnum = [availablePlugins objectEnumerator];
-  NSEnumerator *mergedPluginsEnum
-    = [allAvailablePluginsEnum
-       gtm_filteredEnumeratorByMakingEachObjectPerformSelector:@selector(notIsNew)
-                                                    withObject:nil];
-  NSArray *allMergedPlugins = [mergedPluginsEnum allObjects];
-  [allMergedPlugins
-   makeObjectsPerformSelector:@selector(stripOldUnmergedExtensions)];
-
-  // TODO(mrossetti): Implement special configurating when required.
-  // Review our plugins and see if there are any new modules which require
-  // configuration before enabling.
-  
-  // Review plugins for new extensions that should not automatically be
-  // enabled.
-  [availablePlugins
-   makeObjectsPerformSelector:@selector(autoSetEnabledForNewExtensions)];
-  
-  
-  // Save the current plugin/extension configuration.
-  [self setPlugins:availablePlugins];
-  
-  // Lock and load all enabled modules, sources and actions.
-  NSEnumerator *availableEnum = [availablePlugins objectEnumerator];
-  NSEnumerator *pluginsToEnableEnum
-    = [availableEnum
-       gtm_filteredEnumeratorByMakingEachObjectPerformSelector:@selector(isEnabled)
-                                                    withObject:nil];
-  for (HGSPlugin *plugin in pluginsToEnableEnum) {
-    [plugin installExtensions];
-  }
-}
-
-- (NSMutableArray *)mergePlugins:(NSArray *)newPlugins
-                     intoPlugins:(NSArray *)oldPlugins {
-  // Match up extensions in |modules| with those already in |oldPlugins| by
-  // identifier, path.  If there's an exact match then treat it as 'known'.
-  // Otherwise, treat it as 'new'.  No plugin loading and enabling occurs
-  // in this method.
-  // TODO(mrossetti): Enhance the merge function in the future to handle
-  // updated versions, plugins which appear in multiple paths, plugins
-  // which have moved, and plugins which have updated versions.
-  // TODO(mrossetti): This might be a good spot for reconciling extensions
-  // that require account access.
-  NSMutableArray *mergedPlugins
-    = [[[oldPlugins gtm_mergeArray:newPlugins
-                     mergeSelector:@selector(merge:)] mutableCopy] autorelease];
-  return mergedPlugins;
-}
-
-- (void)setPlugins:(NSArray *)plugins {
-  [self stopObservingProtoExtensions];
-  [plugins_ autorelease];
-  plugins_ = [plugins retain];
-  [self observeProtoExtensions];
-  [self updatePluginPreferences];
-}
-
-- (void)updatePluginPreferences {
-  // Save these plugins in preferences.
-  NSEnumerator *archivePluginEnum
-    = [[[self plugins] objectEnumerator]
-       gtm_enumeratorByMakingEachObjectPerformSelector:@selector(dictionaryValue)
-                                            withObject:nil];
-  NSArray *archivablePlugins = [archivePluginEnum allObjects]; 
-  NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-  [standardDefaults setObject:archivablePlugins
-                       forKey:kQSBPluginConfigurationPrefKey];
-  [standardDefaults synchronize];
-}
-
-- (BOOL)isScreenSaverActive {
-  NSDictionary *processInfo 
-    = [[NSWorkspace sharedWorkspace] gtm_processInfoDictionaryForActiveApp];    
-  NSString *bundlePath 
-    = [processInfo objectForKey:kGTMWorkspaceRunningBundlePath];
-  // ScreenSaverEngine is the frontmost app if the screen saver is actually
-  // running Security Agent is the frontmost app if the "enter password"
-  // dialog is showing
-  return ([bundlePath hasSuffix:@"ScreenSaverEngine.app"] 
-          || [bundlePath hasSuffix:@"SecurityAgent.app"]);
-}
-
-- (BOOL)frontRowActive {
-  // Can't use NSWorkspace here because of
-  // rdar://5049713 When FrontRow is frontmost app, 
-  // [NSWorkspace -activeApplication] returns nil
-  NSDictionary *processDict 
-    = [[NSWorkspace sharedWorkspace] gtm_processInfoDictionaryForActiveApp];
-  NSString *bundleID 
-    = [processDict objectForKey:kGTMWorkspaceRunningBundleIdentifier];
-  return [bundleID isEqualToString:@"com.apple.frontrow"];
-}
-
-- (void)updateMenuWithAppName:(NSMenu* )menu {
-  NSBundle *bundle = [NSBundle mainBundle];
-  NSString *newName = [bundle objectForInfoDictionaryKey:@"CFBundleName"];
-  NSArray *items = [menu itemArray];
-  for (NSMenuItem *item in items) {
-    NSString *appName = @"$APPNAME$";
-    NSString *title = [item title];
-    
-    if ([title rangeOfString:appName].length != 0) {
-      NSString *newTitle = [title stringByReplacingOccurrencesOfString:appName
-                                                            withString:newName];
-      [item setTitle:newTitle];
-    }
-    NSMenu *subMenu = [item submenu];
-    if (subMenu) {
-      [self updateMenuWithAppName:subMenu];
-    }
-  }
-}
-
-- (void)observeProtoExtensions {
-  NSArray *plugins = [self plugins];
-  for (HGSPlugin *plugin in plugins) {
-    [plugin addObserver:self
-             forKeyPath:kQSBProtoExtensionsKVOKey
-                options:0
-                context:nil];
-  }
-}
-
-- (void)stopObservingProtoExtensions {
-  NSArray *plugins = [self plugins];
-  for (HGSPlugin *plugin in plugins) {
-    [plugin removeObserver:self forKeyPath:kQSBProtoExtensionsKVOKey];
-  }
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object
-                        change:(NSDictionary *)change
-                       context:(void *)context {
-  if ([keyPath isEqualToString:kQSBProtoExtensionsKVOKey]) {
-    [self willChangeValueForKey:kQSBSourceExtensionsKVOKey];
-    [self didChangeValueForKey:kQSBSourceExtensionsKVOKey];
-  }
-}
 
 @end
 

@@ -66,11 +66,13 @@
 // return the rank of the result
 - (CGFloat)rank;
 
-// return the name of the nib used to display the result at the top level
-- (NSString *)topResultsRowViewNibName;
+// return the class of the view controller used to display the result at 
+// the top level
+- (Class)topResultsRowViewControllerClass;
 
-// return the name of the nib used to display the result at the more level
-- (NSString *)moreResultsRowViewNibName;
+// return the class of the view controller used to display the result at 
+// the more level
+- (Class)moreResultsRowViewControllerClass;
 
 // attempt to perform the default action on the item
 - (BOOL)performDefaultActionWithQueryController:(QSBQueryController*)controller;

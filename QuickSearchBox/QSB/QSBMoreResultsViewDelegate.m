@@ -156,8 +156,8 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   NSMutableDictionary *localizedDict
     = [NSMutableDictionary dictionaryWithCapacity:[rawDict count]];
   for (NSString *rawCategoryName in [rawDict allKeys]) {
-    [localizedDict setValue:[rawDict objectForKey:rawCategoryName]
-                     forKey:NSLocalizedString(rawCategoryName, nil)];
+    [localizedDict setObject:[rawDict objectForKey:rawCategoryName]
+                      forKey:NSLocalizedString(rawCategoryName, nil)];
   }
   NSArray *sortedCategories = [[localizedDict allKeys]
                                sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
@@ -324,8 +324,8 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   [super moveDown:sender];
 }
 
-- (NSString *)rowViewNibNameForResult:(QSBTableResult *)result {
-  return [result moreResultsRowViewNibName];
+- (Class)rowViewControllerClassForResult:(QSBTableResult *)result {
+  return [result moreResultsRowViewControllerClass];
 }
 
 @end

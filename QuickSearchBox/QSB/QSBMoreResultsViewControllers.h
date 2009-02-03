@@ -1,5 +1,5 @@
 //
-//  QSBFirstQuery.m
+//  QSBMoreResultsViewControllers.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,50 +30,35 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBFirstQuery.h"
-#import "QSBPreferences.h"
-#import "GTMNSObject+KeyValueObserving.h"
-#import "GTMMethodCheck.h"
+#import "QSBDetailedRowViewController.h"
 
-@interface QSBFirstQuery ()
-- (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification;
+@interface QSBMoreDetailedRowViewController : QSBResultRowViewController
+// return the detail string for a given result.
+- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result;
 @end
 
-@implementation QSBFirstQuery
-GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
-GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
-
-- (void)dealloc {
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_removeObserver:self 
-                 forKeyPath:kQSBResultCountKey
-                   selector:@selector(resultCountValueChanged:)];
-  [super dealloc];
-}
-
-- (void)awakeFromNib {  
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_addObserver:self 
-              forKeyPath:kQSBResultCountKey 
-                selector:@selector(resultCountValueChanged:)
-                userInfo:nil
-                 options:NSKeyValueObservingOptionNew];
-  totalResultDisplayCount_ = [prefs integerForKey:kQSBResultCountKey];
-}
-
-- (NSUInteger)maximumResultsToCollect {
-  return totalResultDisplayCount_;
-}
-
-- (BOOL)suppressMoreIfTopShowsAll {
-  return YES;
-}
-
-- (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification {
-  NSDictionary *change = [notification change];
-  NSNumber *valueOfChange = [change valueForKey:NSKeyValueChangeNewKey];
-  totalResultDisplayCount_ = [valueOfChange unsignedIntegerValue];
-  [self doDesktopQuery:nil];
-}
-
+@interface QSBMoreStandardRowViewController : QSBMoreDetailedRowViewController
+- (id)initWithController:(QSBQueryController *)controller;
 @end
+
+@interface QSBMoreCategoryRowViewController : QSBMoreDetailedRowViewController
+- (id)initWithController:(QSBQueryController *)controller;
+@end
+
+@interface QSBMoreSeparatorRowViewController : QSBResultRowViewController
+- (id)initWithController:(QSBQueryController *)controller;
+@end
+
+@interface QSBMoreFoldRowViewController : QSBResultRowViewController
+- (id)initWithController:(QSBQueryController *)controller;
+@end
+
+@interface QSBMoreShowAllTableRowViewController : QSBResultRowViewController
+- (id)initWithController:(QSBQueryController *)controller;
+@end
+
+@interface QSBMorePlaceHolderRowViewController : QSBResultRowViewController
+- (id)initWithController:(QSBQueryController *)controller;
+@end
+
+

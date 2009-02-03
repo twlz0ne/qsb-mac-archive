@@ -1,7 +1,7 @@
 //
-//  QSBTopStandardRowViewController.h
+//  QSBSetUpAccountWindowController.h
 //
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,13 +30,32 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBDetailedRowViewController.h"
+#import <Cocoa/Cocoa.h>
 
-// A row view controller for standard results showm in the Top results
-// view.  When the result is assigned to the row the view layout is
-// adjusted based on how much text is shown in the description.
+// A window controller that manages the account setup sheet that drops
+// out of the preferences window.
 //
-@interface QSBTopStandardRowViewController : QSBDetailedRowViewController
-// return the detail string for a given result.
-- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result;
+// The "Set Up Account Sheet" provides the core of a window in which there
+// is a control for specifying the type of account to be created and a
+// placeholder view into which a custom view of the specified account class
+// is inserted.  The window height is adjusted to accommodate the custom
+// view; the custom view width is asjusted to match the window.
+//
+@interface QSBSetUpAccountWindowController : NSWindowController {
+ @private
+  IBOutlet NSWindow *parentWindow_;  // Window to which alerts are attached.
+  IBOutlet NSWindow *setupAccountSheet_;
+  IBOutlet NSView *setupContainerView_;  // Account view inserts here.
+  IBOutlet NSTextField *setupAccountNameField_;
+  IBOutlet NSSecureTextField *setupPasswordField_;
+  NSString *accountType_;  // Bound to the popup control.
+  NSView *installedSetupView_;  // The currently inserted account view.
+  NSArray *accountTypes_;  // List of account type names for popup.
+}
+
+@property (nonatomic, retain, readonly) NSArray *accountTypes;
+
+// Present the account setup sheet.
+- (void)presentSetUpAccountSheet;
+
 @end

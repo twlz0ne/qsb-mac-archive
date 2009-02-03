@@ -1,5 +1,5 @@
 //
-//  QSBMoreStandardRowViewController.m
+//  QSBTopResultsViewControllers.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,13 +30,45 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBMoreStandardRowViewController.h"
+#import "QSBTopResultsViewControllers.h"
 #import "QSBTableResult.h"
 
-@implementation QSBMoreStandardRowViewController
+@implementation QSBTopStandardRowViewController
 
-- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result {
-  return [result titleSourceURLString];
+- (id)initWithController:(QSBQueryController *)controller {
+  return [super initWithNibName:@"TopStandardResultView"
+                     controller:controller];
 }
 
+- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result {
+  return [result titleSnippetSourceURLString];
+}
+
+@end
+
+@implementation QSBTopSeparatorRowViewController
+- (id)initWithController:(QSBQueryController *)controller {
+  return [super initWithNibName:@"TopSeparatorResultView" 
+                     controller:controller];
+}
+@end
+
+@implementation QSBTopFoldRowViewController
+- (id)initWithController:(QSBQueryController *)controller {
+  return [super initWithNibName:@"TopFoldResultView" controller:controller];
+}
+@end
+
+@implementation QSBTopSearchStatusRowViewController
+- (id)initWithController:(QSBQueryController *)controller {
+  return [super initWithNibName:@"TopSearchStatusResultView" 
+                     controller:controller];
+}
+@end
+
+@implementation QSBTopMessageRowViewController
+- (id)initWithController:(QSBQueryController *)controller {
+  return [super initWithNibName:@"TopMessageResultView" 
+                     controller:controller];
+}
 @end

@@ -33,11 +33,10 @@
 #import "QSBResultRowViewController.h"
 
 @implementation QSBResultRowViewController
-- (id)initWithNibName:(NSString *)nibNameOrNil
-               bundle:(NSBundle *)nibBundleOrNil
+- (id)initWithNibName:(NSString *)name
            controller:(QSBQueryController *)queryController {
-  if ((self = [super initWithNibName:nibNameOrNil
-                              bundle:nibBundleOrNil])) {
+  if ((self = [super initWithNibName:name
+                              bundle:nil])) {
     [self setQueryController:queryController];
   }
   return self;

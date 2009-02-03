@@ -31,19 +31,20 @@
 //
 
 #import "QSBPreferenceWindowController.h"
+#import "GTMGarbageCollection.h"
+#import "GTMHotKeyTextField.h"
+#import "GTMMethodCheck.h"
 #import "HGSAccount.h"
 #import "HGSAccountsExtensionPoint.h"
+#import "HGSCoreExtensionPoints.h"
+#import "HGSLog.h"
+#import "KeychainItem.h"
+#import "NSColor+Naming.h"
 #import "QSBApplicationDelegate.h"
-#import "QSBUISettings.h"
 #import "QSBPreferences.h"
 #import "QSBSearchWindowController.h"
-#import "GTMHotKeyTextField.h"
-#import "HGSCoreExtensionPoints.h"
-#import "NSColor+Naming.h"
-#import "KeychainItem.h"
-#import "GTMMethodCheck.h"
-#import "HGSLog.h"
-#import "GTMGarbageCollection.h"
+#import "QSBSetUpAccountWindowController.h"
+#import "QSBUISettings.h"
 
 // The preference containing a list of knwon accounts.
 NSString *const kQSBAccountsPrefKey = @"QSBAccountsPrefKey";
@@ -51,11 +52,6 @@ NSString *const kQSBAccountsPrefKey = @"QSBAccountsPrefKey";
 static void OpenAtLoginItemsChanged(LSSharedFileListRef inList, void *context);
 
 @interface QSBPreferenceWindowController (QSBPreferenceWindowControllerPrivateMethods)
-
-// Account setup handlers.
-- (void)accountSheetDidEnd:(NSWindow *)sheet
-                returnCode:(int)returnCode
-               contextInfo:(void *)contextInfo;
 
 // Adjust color popup to the corect color
 - (void)updateColorPopup;
@@ -97,9 +93,6 @@ static const NSInteger kCustomColorTag = -1;
 @implementation QSBPreferenceWindowController
 
 @synthesize selectedColor = selectedColor_;
-@synthesize accountName = accountName_;
-@synthesize accountPassword = accountPassword_;
-@synthesize accountType = accountType_;
 
 GTM_METHOD_CHECK(NSColor, crayonName);
 
@@ -125,12 +118,21 @@ GTM_METHOD_CHECK(NSColor, crayonName);
                                   self);
       openAtLoginItemsSeedValue_ 
         = LSSharedFileListGetSeedValue(openAtLoginItemsList_);
-  }
+    }
+    
+    // Notify us when an account is added so we can highlight it.
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self 
+           selector:@selector(didAddAccount:) 
+               name:kHGSDidAddAccountNotification
+             object:nil];
   }
   return self;
 }
 
 - (void) dealloc {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self];
   [colors_ release];
   [sourceSortDescriptor_ release];
   if (openAtLoginItemsList_) {
@@ -312,34 +314,14 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 #pragma mark Account Management
 
 - (IBAction)setupAccount:(id)sender {
-  // TODO(mrossetti):Accommodate different types of accounts, preferably 
-  // dynamically.
-  [self setAccountType:@"Google"];
-  [self setAccountName:nil];
-  [self setAccountPassword:nil];
-  // Make sure the username field has first focus when sheet presented.
-  [setupAccountSheet_ makeFirstResponder:userField_];
-  [NSApp beginSheet:setupAccountSheet_
-     modalForWindow:[self window]
-      modalDelegate:self
-     didEndSelector:@selector(accountSheetDidEnd:returnCode:contextInfo:)
-        contextInfo:nil];
+  [setUpAccountWindowController_ presentSetUpAccountSheet];
 }
 
 - (IBAction)editAccount:(id)sender {
   NSArray *selections = [accountsListController_ selectedObjects];
   id<HGSAccount> account = [selections objectAtIndex:0];
   if ([account isEditable]) {
-    accountBeingEdited_ = account;
-    [self setAccountType:[account accountType]];
-    [self setAccountName:[account accountName]];
-    NSString *password = [account accountPassword];
-    [self setAccountPassword:password];
-    [NSApp beginSheet:editAccountSheet_
-       modalForWindow:[self window]
-        modalDelegate:self
-       didEndSelector:@selector(accountSheetDidEnd:returnCode:contextInfo:)
-          contextInfo:account];
+    [account editWithParentWindow:[self window]];
   }
 }
 
@@ -367,155 +349,6 @@ GTM_METHOD_CHECK(NSColor, crayonName);
                                               returnCode:contextInfo:)
                         contextInfo:accountToRemove];
   }
-}
-
-- (IBAction)acceptSetupAccountSheet:(id)sender {
-  NSWindow *sheet = [sender window];
-  NSString *accountName = [self accountName];
-  if ([accountName length] > 0) {
-    // Create the new account entry.
-    HGSAccountsExtensionPoint *accountsExtensionPoint
-      = [HGSAccountsExtensionPoint accountsExtensionPoint];
-    NSString *accountType = [self accountType];
-    // The password field (NSSecureTextField) fails to stop editing regardless
-    // of xib setting, validateImmediately, so we must force it to validate
-    // and refresh the bound instance variable to prevent stale data when
-    // authenticating.
-    [passField_ selectText:self];  // Force password to freshen.
-    Class accountClass
-      = [accountsExtensionPoint classForAccountType:accountType];
-    id<HGSAccount> newAccount
-      = [[accountClass alloc] initWithName:accountName
-                                  password:[self accountPassword]
-                                      type:[self accountType]];
-    
-    // Update the account name in case initWithName: adjusted it.
-    NSString *revisedAccountName = [newAccount accountName];
-    if ([revisedAccountName length]) {
-      accountName = revisedAccountName;
-      [self setAccountName:accountName];
-    }
-    BOOL isGood = YES;
-    
-    // Make sure we don't already have this account registered.
-    NSString *accountIdentifier = [newAccount identifier];
-    if ([accountsExtensionPoint extensionWithIdentifier:accountIdentifier]) {
-      isGood = NO;
-      NSString *summary = NSLocalizedString(@"Account already set up.",
-                                            nil);
-      NSString *format
-        = NSLocalizedString(@"The account ‘%@’ has already been set up for "
-                            @"use in Quick Search Box.", nil);
-      NSString *explanation = [NSString stringWithFormat:format, accountName];
-      NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-      [alert setAlertStyle:NSWarningAlertStyle];
-      [alert setMessageText:summary];
-      [alert setInformativeText:explanation];
-      [alert beginSheetModalForWindow:sheet
-                        modalDelegate:self
-                       didEndSelector:nil
-                          contextInfo:nil];
-    }
-    
-    // Authenticate the account.
-    if (isGood) {
-      isGood = [newAccount isAuthenticated];
-      if (!isGood) {
-        NSString *summary = NSLocalizedString(@"Could not authenticate that "
-                                              @"account.", nil);
-        NSString *format
-          = NSLocalizedString(@"The account ‘%@’ could not be authenticated.  "
-                              @"Please insure that you have used the correct "
-                              @"account name and password.", nil);
-        NSString *explanation = [NSString stringWithFormat:format, accountName];
-        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-        [alert setAlertStyle:NSWarningAlertStyle];
-        [alert setMessageText:summary];
-        [alert setInformativeText:explanation];
-        [alert beginSheetModalForWindow:sheet
-                          modalDelegate:self
-                         didEndSelector:nil
-                            contextInfo:nil];
-      }
-    }
-    
-    if (isGood) {
-      isGood = [accountsExtensionPoint extendWithObject:newAccount];
-      if (isGood) {
-        NSArray *accounts = [NSArray arrayWithObject:newAccount];
-        [accountsListController_ setSelectedObjects:accounts];
-      } else {
-        HGSLogDebug(@"Failed to install account extension for account '%@'.",
-                    accountName);
-      }
-    }
-    
-    if (isGood) {
-      [sheet makeFirstResponder:userField_];
-      [self setAccountName:nil];
-      [self setAccountPassword:nil];
-      [NSApp endSheet:sheet];
-
-      NSString *summary = NSLocalizedString(@"Enable searchable items for this account.",
-                                            nil);
-      NSString *format
-        = NSLocalizedString(@"One or more search sources may have been added "
-                            @"for the account '%@'. It may be necessary to "
-                            @"manually enable each search source that uses "
-                            @"this account.  Do so via the 'Searchable Items' "
-                            @"tab in Preferences.", nil);
-      NSString *explanation = [NSString stringWithFormat:format, accountName];
-      NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-      [alert setAlertStyle:NSWarningAlertStyle];
-      [alert setMessageText:summary];
-      [alert setInformativeText:explanation];
-      [alert beginSheetModalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:nil
-                          contextInfo:nil];
-    }
-  }
-}
-
-- (IBAction)cancelSetupAccountSheet:(id)sender {
-  NSWindow *sheet = [sender window];
-  [NSApp endSheet:sheet returnCode:NSAlertSecondButtonReturn];
-}
-
-- (IBAction)acceptEditAccountSheet:(id)sender {
-  NSWindow *sheet = [sender window];
-  id<HGSAccount> account = accountBeingEdited_;
-  // The password field (NSSecureTextField) fails to stop editing regardless
-  // of xib setting, validateImmediately, so we must force it to validate
-  // and refresh the bound instance variable to prevent stale data when
-  // authenticating.
-  [passField_ selectText:self];  // Force password to freshen.
-  [account setAccountPassword:[self accountPassword]];
-  // See if the new password authenticates.
-  if ([account isAuthenticated]) {
-    [NSApp endSheet:sheet];
-  } else {
-    NSString *summary = NSLocalizedString(@"Could not set up that account.", nil);
-    NSString *format
-      = NSLocalizedString(@"The account ‘%@’ could not be set up for use.  "
-                          @"Please insure that you have used the correct "
-                          @"password.", nil);
-    NSString *explanation = [NSString stringWithFormat:format,
-                             [self accountName]];
-    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-    [alert setAlertStyle:NSWarningAlertStyle];
-    [alert setMessageText:summary];
-    [alert setInformativeText:explanation];
-    [alert beginSheetModalForWindow:sheet
-                      modalDelegate:self
-                     didEndSelector:nil
-                        contextInfo:account];
-  }
-}
-
-- (IBAction)cancelEditAccountSheet:(id)sender {
-  NSWindow *sheet = [sender window];
-  [NSApp endSheet:sheet returnCode:NSAlertSecondButtonReturn];
 }
 
 #pragma mark Delegate Methods
@@ -563,13 +396,6 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 
 #pragma mark Account Management
 
-- (void)accountSheetDidEnd:(NSWindow *)sheet
-                returnCode:(int)returnCode
-               contextInfo:(void *)contextInfo {
-  [self setAccountPassword:nil];
-  [sheet orderOut:self];
-}
-
 - (void)removeAccountAlertDidEnd:(NSWindow *)sheet
                       returnCode:(int)returnCode
                      contextInfo:(void *)contextInfo {
@@ -580,6 +406,17 @@ GTM_METHOD_CHECK(NSColor, crayonName);
       [accountsListController_ setSelectionIndex:(selection - 1)];
     }
     [accountToRemove remove];
+  }
+}
+
+- (void)didAddAccount:(NSNotification *)notification {
+  id<HGSAccount> newAccount = [notification object];
+  if (newAccount) {
+    NSArray *accounts = [NSArray arrayWithObject:newAccount];
+    [accountsListController_ setSelectedObjects:accounts];
+  } else {
+    HGSLogDebug(@"Could not highlight newly added account '%@' because "
+                @"it seems to be missing.", [newAccount accountName]);
   }
 }
 

@@ -6,12 +6,12 @@
 
 
 # Strip "*.h" files
-find "${BUILD_ROOT}/${CONFIGURATION}/${WRAPPER_NAME}" -iname '*.h' -delete
+find "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}" -iname '*.h' -delete
 
 # Strip "Headers" links
-find "${BUILD_ROOT}/${CONFIGURATION}/${WRAPPER_NAME}" -iname 'Headers' -type l -delete
+find "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}" -iname 'Headers' -type l -delete
 
 # Strip "Headers" directories
-find "${BUILD_ROOT}/${CONFIGURATION}/${WRAPPER_NAME}" -iname 'Headers' -type d -prune -delete
+find "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}" -iname 'Headers' -type d -prune -delete
 
 

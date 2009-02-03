@@ -68,7 +68,10 @@
   NSTimeInterval lastMoreUpdateTime_;
 
   BOOL queryIsInProcess_;  // Yes while a query is under way.
+  NSUInteger pushModifierFlags_; // NSEvent Modifiers at pivot time
 }
+
+@property(nonatomic, assign) NSUInteger pushModifierFlags;
 
 // Returns the desktop results
 - (NSArray *)desktopResults;
@@ -110,3 +113,7 @@
 - (BOOL)queryIsInProcess;
 
 @end
+
+// Sent when the query has completed and the results have been processed. 
+// Object is the QSBQuery.
+GTM_EXTERN NSString *kHGSQueryDidFinishNotification;

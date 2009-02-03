@@ -98,7 +98,8 @@
   
   // set up our internals
   HGSQuery *query = [[[HGSQuery alloc] initWithString:text 
-                                          pivotObject:nil] autorelease];
+                                          pivotObject:nil
+                                           queryFlags:0] autorelease];
   [query setMaxDesiredResults:100];
   
   HGSMixer* mixer = [[[HGSMixer alloc] init] autorelease];

@@ -33,37 +33,45 @@
 #import "QSBResultsViewBaseController.h"
 #import <Vermilion/Vermilion.h>
 #import "QSBApplicationDelegate.h"
-#import "QSBMoreStandardRowViewController.h"
+#import "QSBMoreResultsViewControllers.h"
 #import "QSBQueryController.h"
 #import "QSBTableResult.h"
 #import "QSBResultsViewTableView.h"
 #import "QSBSearchWindowController.h"
-#import "QSBTopStandardRowViewController.h"
+#import "QSBTopResultsViewControllers.h"
 #import "GTMGeometryUtils.h"
+#import "GTMNSObject+KeyValueObserving.h"
+#import "GTMMethodCheck.h"
 
 static const CGFloat kScrollViewMinusTableHeight = 7.0;
 static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
-static NSString * const kQSBSelectionIndexesKVOKey = @"selectionIndexes";
 
-@interface QSBResultsViewBaseController (QSBResultsViewBaseControllerPrivateMethods)
+@interface QSBResultsViewBaseController ()
 
 // Return our main search window controller.
 - (QSBSearchWindowController *)searchWindowController;
-
+- (void)resultsObjectsChanged:(GTMKeyValueChangeNotification *)notification;
+- (void)resultsIndicesChanged:(GTMKeyValueChangeNotification *)notification;
 @end
 
 
 @implementation QSBResultsViewBaseController
+GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
+GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
+
 - (void)awakeFromNib {
   rowViewControllers_ = [[NSMutableDictionary dictionary] retain];
-  [resultsArrayController_ addObserver:self
-                            forKeyPath:kQSBArrangedObjectsKVOKey
-                               options:NSKeyValueObservingOptionNew
-                               context:NULL];
-  [resultsArrayController_ addObserver:self
-                            forKeyPath:kQSBSelectionIndexesKVOKey
-                               options:NSKeyValueObservingOptionNew
-                               context:NULL];
+  [resultsArrayController_ gtm_addObserver:self
+                                forKeyPath:kQSBArrangedObjectsKVOKey
+                                  selector:@selector(resultsObjectsChanged:)
+                                  userInfo:nil
+                                   options:0];
+  [resultsArrayController_ gtm_addObserver:self
+                                forKeyPath:NSSelectionIndexesBinding
+                                  selector:@selector(resultsIndicesChanged:)
+                                  userInfo:nil
+                                   options:0];
+
   resultsNeedUpdating_ = YES;
   [resultsTableView_ setDoubleAction:@selector(openResultsTableItem:)];
   QSBSearchWindowController *controller = [self searchWindowController];
@@ -72,10 +80,12 @@ static NSString * const kQSBSelectionIndexesKVOKey = @"selectionIndexes";
 
 - (void)dealloc {
   [rowViewControllers_ release];
-  [resultsArrayController_ removeObserver:self
-                               forKeyPath:kQSBArrangedObjectsKVOKey];
-  [resultsArrayController_ removeObserver:self
-                               forKeyPath:kQSBSelectionIndexesKVOKey];
+  [resultsArrayController_ gtm_removeObserver:self
+                                   forKeyPath:kQSBArrangedObjectsKVOKey
+                                     selector:@selector(resultsObjectsChanged:)];
+  [resultsArrayController_ gtm_removeObserver:self
+                                   forKeyPath:NSSelectionIndexesBinding
+                                     selector:@selector(resultsIndicesChanged:)];
   [queryString_ release];
   [super dealloc];
 }
@@ -279,26 +289,27 @@ static NSString * const kQSBSelectionIndexesKVOKey = @"selectionIndexes";
     NSInteger newRow = visibleRows.location + visibleRows.length - 1;
     if ([resultsTableView_ selectFirstSelectableRowByIncrementing:YES
                                              startingAt:newRow]) {
-      [resultsTableView_ scrollRowToVisible:[resultsTableView_ numberOfRows] - 1];
+      NSUInteger rowCount = [resultsTableView_ numberOfRows];
+      [resultsTableView_ scrollRowToVisible:rowCount - 1];
       [resultsTableView_ scrollRowToVisible:newRow];
     }
   }
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object 
-                        change:(NSDictionary *)change
-                       context:(void *)context {
-  if (object == resultsArrayController_) {
-    if ([keyPath isEqualToString:kQSBArrangedObjectsKVOKey]) {
-      NSArray *newArrangedObjects = [object arrangedObjects];
-      rowCount_ = [newArrangedObjects count];
-      [[self resultsTableView] reloadData];
-      [queryController_ updateResultsView];
-    } else if ([keyPath isEqualToString:kQSBSelectionIndexesKVOKey]) {
-      [[self searchWindowController] completeQueryText];    
-    }
-  } 
+- (QSBSearchWindowController *)searchWindowController {
+  return [queryController_ searchWindowController];
+}
+
+- (void)resultsObjectsChanged:(GTMKeyValueChangeNotification *)notification {
+  id object = [notification object];
+  NSArray *newArrangedObjects = [object arrangedObjects];
+  rowCount_ = [newArrangedObjects count];
+  [[self resultsTableView] reloadData];
+  [queryController_ updateResultsView];
+}
+
+- (void)resultsIndicesChanged:(GTMKeyValueChangeNotification *)notification {
+  [[self searchWindowController] completeQueryText];    
 }
 
 #pragma mark QSBViewTableViewDelegateProtocol methods
@@ -306,27 +317,6 @@ static NSString * const kQSBSelectionIndexesKVOKey = @"selectionIndexes";
 - (NSView*)tableView:(NSTableView*)tableView
        viewForColumn:(NSTableColumn*)column
                  row:(NSInteger)row {
-  // Initialize our custom view controller mapping.
-  // NOTE: This leaks, but it's a very minor leak.
-  // The default view controller for a row results view is
-  // QSBResultRowViewController, so be sure to set the custom class
-  // appropriately in your xib file.  If you need special behavior
-  // in a row results view then make sure you use QSBResultRowViewController
-  // as the base class and then add a mapping from the name of your .xib
-  // file to the customized view controller class in the map below.
-  // Not that there may be multiple views mapped to the same
-  // view controller class.
-  static NSDictionary *gCustomViewControllers = nil;
-  if (!gCustomViewControllers) {
-    gCustomViewControllers
-      = [[NSDictionary dictionaryWithObjectsAndKeys:
-          [QSBTopStandardRowViewController class], @"TopStandardResultView",
-          // The following 2 views both use QSBMoreStandardRowViewController. 
-          [QSBMoreStandardRowViewController class], @"MoreStandardResultView",
-          [QSBMoreStandardRowViewController class], @"MoreCategoryResultView",
-          nil] retain];
-  }
-  
   // Creating our views lazily.
   QSBResultRowViewController *oldController
     = [rowViewControllers_ objectForKey:[NSNumber numberWithInteger:row]];
@@ -334,58 +324,40 @@ static NSString * const kQSBSelectionIndexesKVOKey = @"selectionIndexes";
   
   // Decide what kind of view we want to use based on the result.
   QSBTableResult *result = [self objectForRow:row];
-  if (result) {
-    NSString *desiredRowViewName = [self rowViewNibNameForResult:result];
-    if (desiredRowViewName) {
-      if (!oldController
-          || ![[oldController nibName] isEqualToString:desiredRowViewName]) {
-        // We cannot reuse the old controller.
-        Class newControllerClass
-          = [gCustomViewControllers objectForKey:desiredRowViewName];
-        if (!newControllerClass) {
-          newControllerClass = [QSBResultRowViewController class];
-        }
-        newController
-          = [[[newControllerClass alloc] initWithNibName:desiredRowViewName
-                                                  bundle:nil
-                                              controller:[self queryController]]
-             autorelease];          
-        [rowViewControllers_ setObject:newController
-                                forKey:[NSNumber numberWithInteger:row]];
-        [newController loadView];
-        oldController = nil;
-      } else {
-        newController = oldController;
-      }
-      if ([newController representedObject] != result) {
-        [newController setRepresentedObject:result];
-      }
-    } else {
-      HGSLogDebug(@"\r  Unable to determine result row view for result %@ (row %d).",
-                  result, row);
-    }
-  }
-  
-  if (!newController) {
-    if (oldController
-        && [[oldController nibName] isEqualToString:@"MorePlaceHolderResultView"]) {
-      newController = oldController;
-    } else {
-      newController = [[[NSViewController alloc]
-                        initWithNibName:@"MorePlaceHolderResultView"
-                        bundle:nil] autorelease];
+  Class aRowViewControllerClass 
+    = [self rowViewControllerClassForResult:result];
+  if (aRowViewControllerClass) {
+    if (!oldController 
+        || [oldController class] != aRowViewControllerClass) {
+      // We cannot reuse the old controller.
+      QSBQueryController *queryController = [self queryController];
+      newController
+        = [[[aRowViewControllerClass alloc] initWithController:queryController]
+           autorelease];          
       [rowViewControllers_ setObject:newController
                               forKey:[NSNumber numberWithInteger:row]];
+      [newController loadView];
       oldController = nil;
+    } else {
+      newController = oldController;
     }
+    if ([newController representedObject] != result) {
+      [newController setRepresentedObject:result];
+    }
+  } 
+  
+  if (!newController) {
+    HGSLogDebug(@"Unable to determine result row view for result %@ (row %d).",
+                result, row);
   }
   
   NSView *newView = [newController view];
   return newView;
 }
 
-- (NSString *)rowViewNibNameForResult:(QSBTableResult *)result {
-  HGSLogDebug(@"Your child class needs to handle this method.");
+- (Class)rowViewControllerClassForResult:(QSBTableResult *)result {
+  HGSLogDebug(@"Your child class needs to handle this method ([%@ %s]",
+              [self class], _cmd);
   return nil;
 }
 
@@ -394,7 +366,8 @@ static NSString * const kQSBSelectionIndexesKVOKey = @"selectionIndexes";
   // ask the object if it wants to handle the click and, if so, tell it
   // which cell was clicked.
   NSPathControl *pathControl = sender;
-  NSPathComponentCell *clickedComponentCell = [pathControl clickedPathComponentCell];
+  NSPathComponentCell *clickedComponentCell 
+    = [pathControl clickedPathComponentCell];
   if (clickedComponentCell) {
     NSURL *pathURL = [clickedComponentCell URL];
     if (!pathURL || ![[NSWorkspace sharedWorkspace] openURL:pathURL]) {
@@ -402,11 +375,12 @@ static NSString * const kQSBSelectionIndexesKVOKey = @"selectionIndexes";
       QSBTableResult *selectedObject = [[[self arrayController] selectedObjects]
                                         objectAtIndex:0];
       SEL cellClickHandler
-      = NSSelectorFromString([selectedObject
-                              valueForKey:kHGSObjectAttributePathCellClickHandlerKey]);
+        = NSSelectorFromString([selectedObject
+                                valueForKey:kHGSObjectAttributePathCellClickHandlerKey]);
       if (cellClickHandler) {
         NSArray *pathComponentCells = [pathControl pathComponentCells];
-        NSUInteger clickedCell = [pathComponentCells indexOfObject:clickedComponentCell];
+        NSUInteger clickedCell 
+          = [pathComponentCells indexOfObject:clickedComponentCell];
         NSNumber *cellNumber = [NSNumber numberWithUnsignedInteger:clickedCell];
         [selectedObject performSelector:cellClickHandler withObject:cellNumber];
       }
@@ -478,10 +452,3 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 @end
 
 
-@implementation QSBResultsViewBaseController (QSBResultsViewBaseControllerPrivateMethods)
-
-- (QSBSearchWindowController *)searchWindowController {
-  return [queryController_ searchWindowController];
-}
-
-@end

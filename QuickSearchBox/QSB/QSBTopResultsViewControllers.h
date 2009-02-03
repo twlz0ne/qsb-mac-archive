@@ -1,5 +1,5 @@
 //
-//  QSBTopStandardRowViewController.m
+//  QSBTopResultsViewControllers.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,13 +30,30 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBTopStandardRowViewController.h"
-#import "QSBTableResult.h"
+#import "QSBDetailedRowViewController.h"
 
-@implementation QSBTopStandardRowViewController
+// A row view controller for standard results showm in the Top results
+// view.  When the result is assigned to the row the view layout is
+// adjusted based on how much text is shown in the description.
+//
+@interface QSBTopStandardRowViewController : QSBDetailedRowViewController
+- (id)initWithController:(QSBQueryController *)controller;
+// return the detail string for a given result.
+- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result;
+@end
 
-- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result {
-  return [result titleSnippetSourceURLString];
-}
+@interface QSBTopSeparatorRowViewController : QSBResultRowViewController
+- (id)initWithController:(QSBQueryController *)controller;
+@end
 
+@interface QSBTopFoldRowViewController : QSBResultRowViewController
+- (id)initWithController:(QSBQueryController *)controller;
+@end
+
+@interface QSBTopSearchStatusRowViewController : QSBResultRowViewController
+- (id)initWithController:(QSBQueryController *)controller;
+@end
+
+@interface QSBTopMessageRowViewController : QSBResultRowViewController
+- (id)initWithController:(QSBQueryController *)controller;
 @end

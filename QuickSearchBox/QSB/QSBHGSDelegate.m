@@ -59,10 +59,10 @@ static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
   [super dealloc];
 }
 
-- (NSString*)userApplicationSupportFolderForApp {
+- (NSString*)userFolderForType:(OSType)type {
   NSString *result = nil;
   FSRef folderRef;
-  if (FSFindFolder(kUserDomain, kApplicationSupportFolderType, YES,
+  if (FSFindFolder(kUserDomain, type, YES,
                    &folderRef) == noErr) {
     NSURL *folderURL
       = GTMCFAutorelease(CFURLCreateFromFSRef(kCFAllocatorSystemDefault,
@@ -87,6 +87,14 @@ static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
     }
   }
   return result;
+}
+
+- (NSString*)userApplicationSupportFolderForApp {
+  return [self userFolderForType:kApplicationSupportFolderType];
+}
+
+- (NSString*)userCacheFolderForApp {
+  return [self userFolderForType:kCachedDataFolderType];
 }
 
 - (NSArray*)pluginFolders {

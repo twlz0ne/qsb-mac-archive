@@ -32,14 +32,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-@protocol HGSAccount;
+@class QSBSetUpAccountWindowController;
 
 // Manage the Quick Search App preferences window.
 //
 @interface QSBPreferenceWindowController : NSWindowController {
  @private
-  IBOutlet NSTextField *userField_;
-  IBOutlet NSSecureTextField *passField_;
   IBOutlet NSPopUpButton *colorPopUp_;
   IBOutlet NSTabView *settingsTabView_;
   
@@ -49,25 +47,12 @@
   NSColor *selectedColor_;
   NSArray *sourceSortDescriptor_;
   
-  // Account setup-related items
   IBOutlet NSArrayController *accountsListController_;
-  IBOutlet NSWindow *setupAccountSheet_;
-  IBOutlet NSTextField *setupAccountNameField_;
-  IBOutlet NSWindow *editAccountSheet_;
-  IBOutlet NSTextField *editPasswordField_;
-  NSString *accountName_;
-  NSString *accountPassword_;
-  NSString *accountType_;
-  
-  id<HGSAccount> accountBeingEdited_;  // Weak
-  
+  IBOutlet QSBSetUpAccountWindowController *setUpAccountWindowController_;
   LSSharedFileListRef openAtLoginItemsList_;
   UInt32 openAtLoginItemsSeedValue_;
 }
 
-@property (nonatomic, copy) NSString *accountName;
-@property (nonatomic, copy) NSString *accountPassword;
-@property (nonatomic, copy) NSString *accountType;
 @property (nonatomic, retain) NSColor *selectedColor;
 
 // Designated initializer.
@@ -78,15 +63,11 @@
 - (void)hidePreferences;
 - (BOOL)preferencesWindowIsShowing;
 
-// Account management actions.
+// Account management.
 - (IBAction)setupAccount:(id)sender;
 - (IBAction)editAccount:(id)sender;
 - (IBAction)removeAccount:(id)sender;
-- (IBAction)acceptSetupAccountSheet:(id)sender;
-- (IBAction)cancelSetupAccountSheet:(id)sender;
-- (IBAction)acceptEditAccountSheet:(id)sender;
-- (IBAction)cancelEditAccountSheet:(id)sender;
-  
+
 // Reset the hotkey to cmd-cmd.
 - (IBAction)resetHotKey:(id)sender;
 
