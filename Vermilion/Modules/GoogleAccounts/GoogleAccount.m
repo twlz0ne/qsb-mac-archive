@@ -42,11 +42,6 @@
 static NSString *const kSetUpGoogleAccountViewNibName = @"SetUpGoogleAccountView";
 static NSString *const kGoogleAccountTypeName = @"Google";;
 
-// A class which manages a Google account.
-//
-@interface GoogleAccount : HGSSimpleAccount
-@end
-
 @implementation GoogleAccount
 
 GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
@@ -56,10 +51,10 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 + (NSView *)accountSetupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
-  static HGSSetUpSimpleAccountViewController *sSetUpGoogleAccountViewController = nil;
+  static SetUpGoogleAccountViewController *sSetUpGoogleAccountViewController = nil;
   if (!sSetUpGoogleAccountViewController) {
     NSBundle *ourBundle = HGSGetPluginBundle();
-    HGSSetUpSimpleAccountViewController *loadedViewController
+    SetUpGoogleAccountViewController *loadedViewController
       = [[[SetUpGoogleAccountViewController alloc]
           initWithNibName:kSetUpGoogleAccountViewNibName bundle:ourBundle]
          autorelease];
@@ -133,6 +128,10 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   [self setIsAuthenticated:authenticated];
   return authenticated;  // Return as convenience.
 }
+
+@end
+
+@implementation GoogleAccountEditController
 
 @end
 

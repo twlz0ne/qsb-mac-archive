@@ -112,7 +112,8 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
     // if our search string appears at the beginning of a word later in the
     // string, pull the remainder of the word out as a completion
     } else if (substringRange.location != NSNotFound 
-          && [completion characterAtIndex:substringRange.location - 1] == ' ') {
+               && substringRange.location
+               && [completion characterAtIndex:substringRange.location - 1] == ' ') {
       NSRange wordRange = NSMakeRange(NSMaxRange(substringRange), 
                               [completion length] - NSMaxRange(substringRange));
       // Complete the current word

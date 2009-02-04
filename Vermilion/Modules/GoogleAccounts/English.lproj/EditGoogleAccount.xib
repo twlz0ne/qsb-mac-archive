@@ -215,30 +215,6 @@
 			<object class="NSMutableArray" key="connectionRecords">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">cancelEditAccountSheet:</string>
-						<reference key="source" ref="186018340"/>
-						<reference key="destination" ref="952175564"/>
-					</object>
-					<int key="connectionID">23</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">acceptEditAccountSheet:</string>
-						<reference key="source" ref="186018340"/>
-						<reference key="destination" ref="688240970"/>
-					</object>
-					<int key="connectionID">24</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">editPasswordField_</string>
-						<reference key="source" ref="186018340"/>
-						<reference key="destination" ref="550720424"/>
-					</object>
-					<int key="connectionID">25</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: accountPassword</string>
 						<reference key="source" ref="550720424"/>
@@ -256,27 +232,35 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: googleAccount_.accountName</string>
+						<string key="label">value: account_.accountName</string>
 						<reference key="source" ref="221488347"/>
 						<reference key="destination" ref="186018340"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="221488347"/>
 							<reference key="NSDestination" ref="186018340"/>
-							<string key="NSLabel">value: googleAccount_.accountName</string>
+							<string key="NSLabel">value: account_.accountName</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">googleAccount_.accountName</string>
+							<string key="NSKeyPath">account_.accountName</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">27</int>
+					<int key="connectionID">30</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">googleAccount_</string>
+						<string key="label">account_</string>
 						<reference key="source" ref="186018340"/>
 						<reference key="destination" ref="1001"/>
 					</object>
-					<int key="connectionID">28</int>
+					<int key="connectionID">31</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">window</string>
+						<reference key="source" ref="186018340"/>
+						<reference key="destination" ref="1005"/>
+					</object>
+					<int key="connectionID">32</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -284,7 +268,23 @@
 						<reference key="source" ref="186018340"/>
 						<reference key="destination" ref="1005"/>
 					</object>
-					<int key="connectionID">29</int>
+					<int key="connectionID">33</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">acceptEditAccountSheet:</string>
+						<reference key="source" ref="186018340"/>
+						<reference key="destination" ref="688240970"/>
+					</object>
+					<int key="connectionID">34</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">cancelEditAccountSheet:</string>
+						<reference key="source" ref="186018340"/>
+						<reference key="destination" ref="952175564"/>
+					</object>
+					<int key="connectionID">35</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -480,9 +480,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{487, 912}, {417, 152}}</string>
+					<string>{{139, 107}, {417, 152}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{487, 912}, {417, 152}}</string>
+					<string>{{139, 107}, {417, 152}}</string>
 					<integer value="0"/>
 					<string>{196, 240}</string>
 					<string>{{357, 418}, {480, 270}}</string>
@@ -524,14 +524,14 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">29</int>
+			<int key="maxID">35</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBPartialClassDescription">
 					<string key="className">GoogleAccount</string>
-					<string key="superclassName">HGSAccount</string>
+					<string key="superclassName">HGSSimpleAccount</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="992335589">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">../../Vermilion/Modules/GoogleAccounts/GoogleAccount.h</string>
@@ -539,6 +539,35 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">GoogleAccountEditController</string>
+					<string key="superclassName">HGSSimpleAccountEditController</string>
+					<reference key="sourceIdentifier" ref="992335589"/>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">HGSAccount</string>
+					<string key="superclassName">HGSExtension</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../../Vermilion/Vermilion/HGSAccount.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">HGSExtension</string>
+					<string key="superclassName">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../../Vermilion/Vermilion/HGSExtension.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">HGSSimpleAccount</string>
+					<string key="superclassName">HGSAccount</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="974211115">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../../Vermilion/Vermilion/HGSSimpleAccount.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">HGSSimpleAccountEditController</string>
 					<string key="superclassName">NSWindowController</string>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -557,34 +586,18 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>account_</string>
 							<string>editAccountSheet_</string>
 							<string>editPasswordField_</string>
-							<string>googleAccount_</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>HGSSimpleAccount</string>
 							<string>NSWindow</string>
 							<string>NSSecureTextField</string>
-							<string>GoogleAccount</string>
 						</object>
 					</object>
-					<reference key="sourceIdentifier" ref="992335589"/>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">HGSAccount</string>
-					<string key="superclassName">HGSExtension</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../Vermilion/Vermilion/HGSAccount.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">HGSExtension</string>
-					<string key="superclassName">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../Vermilion/Vermilion/HGSExtension.h</string>
-					</object>
+					<reference key="sourceIdentifier" ref="974211115"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSApplication</string>
@@ -624,6 +637,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">../externals/google-toolbox-for-mac/Foundation/GTMNSAppleEventDescriptor+Foundation.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../externals/google-toolbox-for-mac/Foundation/GTMNSObject+KeyValueObserving.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

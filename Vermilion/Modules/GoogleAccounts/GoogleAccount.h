@@ -32,8 +32,18 @@
 
 #import <Vermilion/Vermilion.h>
 
+// These classes exposed here only to support Interface Builder.
+
+// A class which manages a Google account.
+//
+@interface GoogleAccount : HGSSimpleAccount
+@end
+
 // A controller which manages a view used to specify a Google account
 // name and password during the setup process.
 //
 @interface SetUpGoogleAccountViewController : HGSSetUpSimpleAccountViewController
+@end
+
+@interface GoogleAccountEditController : HGSSimpleAccountEditController
 @end
