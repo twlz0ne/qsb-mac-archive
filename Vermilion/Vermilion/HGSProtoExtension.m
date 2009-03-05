@@ -357,10 +357,12 @@
   
   NSString *factorIdentifier = [factor identifier];
   
+  NSString *newIdentifier = [self identifier];
   // Recalculate the proto extension identifier.
-  NSString *newIdentifier
-    = [[self identifier] stringByAppendingFormat:@".%@",
-       factorIdentifier];
+  HGSAssert([newIdentifier rangeOfString:@"?"].length == 0, @"We shouldn't have"
+            @"any other args in our identifier yet");
+  newIdentifier = [newIdentifier stringByAppendingFormat:@"?ACCOUNT=%@",
+                   factorIdentifier];
   [newConfiguration setObject:newIdentifier forKey:kHGSExtensionIdentifierKey];
   
   
