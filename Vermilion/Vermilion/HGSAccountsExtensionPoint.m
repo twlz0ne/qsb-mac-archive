@@ -42,8 +42,6 @@
 
 GTM_METHOD_CHECK(NSEnumerator,
                  gtm_enumeratorByMakingEachObjectPerformSelector:withObject:);
-GTM_METHOD_CHECK(NSEnumerator, 
-                 gtm_filteredEnumeratorByMakingEachObjectPerformSelector:withObject:);
 
 - (void)dealloc {
   [accountTypes_ release];
@@ -100,12 +98,11 @@ GTM_METHOD_CHECK(NSEnumerator,
   return accountTypeNames;
 }
 
-- (NSEnumerator *)accountsEnumForType:(NSString *)type {
-  NSEnumerator *accountsEnum
-    = [[[self extensions] objectEnumerator]
-       gtm_filteredEnumeratorByMakingEachObjectPerformSelector:@selector(isAccountType:)
-                                                    withObject:type];
-  return accountsEnum;
+- (NSArray *)accountsForType:(NSString *)type {
+  NSPredicate *pred = [NSPredicate predicateWithFormat:@"type == %@", type];
+  NSArray *array = [self extensions];
+  array = [array filteredArrayUsingPredicate:pred];
+  return array;
 }
 
 - (NSString *)description {

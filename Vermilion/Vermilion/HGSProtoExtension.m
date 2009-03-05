@@ -113,6 +113,11 @@
     NSNumber *enabled = [configuration objectForKey:kHGSExtensionEnabledKey];
     if (enabled) {
       enabled_ = [enabled boolValue]; 
+    } else {
+      enabled = [configuration objectForKey:kHGSExtensionIsEnabledByDefault];
+      if (enabled) {
+        enabled_ = [enabled boolValue];
+      }
     }
   }
   return self;
@@ -148,9 +153,8 @@
     = [configuration_ objectForKey:kHGSExtensionDesiredAccountType];
   if (desiredAccountType) {
     HGSAccountsExtensionPoint *aep = [HGSExtensionPoint accountsPoint];
-    NSEnumerator *accountEnum = [aep accountsEnumForType:desiredAccountType];
-    id<HGSAccount> account = nil;
-    while ((account = [accountEnum nextObject])) {
+    NSArray *accounts = [aep accountsForType:desiredAccountType];
+    for (id<HGSAccount> account in accounts) {
       HGSProtoExtension *factoredExtension = [self factorForAccount:account];
       if (factoredExtension) {
         [factoredExtensions addObject:factoredExtension];

@@ -46,7 +46,6 @@
 #import "GTMGarbageCollection.h"
 #import "GTMGeometryUtils.h"
 #import "GTMMethodCheck.h"
-#import "GTMNSEnumerator+Filter.h"
 #import "GTMSystemVersion.h"
 #import "QSBSearchWindowController.h"
 #import "GTMHotKeyTextField.h"
@@ -60,8 +59,31 @@
 NSString *const kQSBBeenLaunchedPrefKey = @"QSBBeenLaunchedPrefKey";
 
 // The preference containing the configuration for each plugin.
+// It is a dictionary with two keys:
+// kQSBPluginConfigurationPrefVersionKey
+// and kQSBPluginConfigurationPrefPluginsKey.
 static NSString *const kQSBPluginConfigurationPrefKey 
   = @"QSBPluginConfigurationPrefKey";
+// The version of the preferences data stored in the dictionary (NSNumber).
+static NSString *const kQSBPluginConfigurationPrefVersionKey 
+  = @"QSBPluginConfigurationPrefVersionKey";
+// The key for an NSArray of plugin configuration information.
+static NSString *const kQSBPluginConfigurationPrefPluginsKey 
+  = @"QSBPluginConfigurationPrefPluginsKey";
+static const NSInteger kQSBPluginConfigurationPrefCurrentVersion = 1;
+
+// The preference containing the information about our known
+// accounts. It is a dictionary with two keys:
+// kQSBAccountsPrefVersionKey and kQSBAccountsPrefAccountsKey.
+static NSString *const kQSBAccountsPrefKey = @"QSBAccountsPrefKey";
+// The version of the preferences data stored in the dictionary (NSNumber).
+static NSString *const kQSBAccountsPrefVersionKey 
+= @"QSBAccountsPrefVersionKey";
+// The key for an NSArray of account information.
+static NSString *const kQSBAccountsPrefAccountsKey 
+= @"QSBAccountsPrefAccountsKey";
+static const NSInteger kQSBAccountsPrefCurrentVersion = 1;
+
 
 static NSString *const kQSBHomepageKey = @"QSBHomepageURL";
 static NSString *const kQSBFeedbackKey = @"QSBFeedbackURL";
@@ -139,9 +161,6 @@ static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 
 GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionaryForActiveApp);
 GTM_METHOD_CHECK(GTMHotKeyTextField, stringForKeycode:useGlyph:resourceBundle:);
-GTM_METHOD_CHECK(NSEnumerator,
-                 gtm_enumeratorByMakingEachObjectPerformSelector:
-                 withObject:);
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
 GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
@@ -568,9 +587,19 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // Retrieve list of and configuration information for previously
   // inventoried plug-ins and mark as undiscovered.
   NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-  NSArray *pluginsFromPrefs = [standardDefaults
-                               objectForKey:kQSBPluginConfigurationPrefKey];
-  
+  NSArray *pluginsFromPrefs = nil;
+  NSDictionary *pluginPrefs 
+    = [standardDefaults objectForKey:kQSBPluginConfigurationPrefKey];
+  // Check to make sure our plugin data is valid.
+  if ([pluginPrefs isKindOfClass:[NSDictionary class]]) {
+    NSNumber *version 
+      = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefVersionKey];
+    if ([version integerValue] == kQSBPluginConfigurationPrefCurrentVersion) {
+      pluginsFromPrefs 
+        = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefPluginsKey];
+    }
+  }
+  // TODO(dmaclach): alert user that their prefs have been ignored.
   // Rediscover plug-ins by scanning all plugin folders.
   NSArray *pluginPaths = [hgsDelegate_ pluginFolders];
   HGSModuleLoader *moduleLoader = [HGSModuleLoader sharedModuleLoader];
@@ -652,9 +681,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       }
       // Due to us moving code around, an extension may have moved from one
       // plugin to another
-      [protoExtension setEnabled:pluginEnabled && protoExtensionEnabled];
+      if (oldExtensionDict) {
+        [protoExtension setEnabled:protoExtensionEnabled];
+      }
     }
-    [plugin install];
+    if ([plugin isEnabled]) {
+      [plugin install];
+    }
   }
   [self setPlugins:factorablePlugins];
   
@@ -698,7 +731,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     [archivablePlugins addObject:archiveValues];
   }
   NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-  [standardDefaults setObject:archivablePlugins
+  NSNumber *version 
+    = [NSNumber numberWithInteger:kQSBPluginConfigurationPrefCurrentVersion];
+  NSDictionary *pluginsDict 
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       archivablePlugins, kQSBPluginConfigurationPrefPluginsKey,
+       version, kQSBPluginConfigurationPrefVersionKey,
+       nil];
+  [standardDefaults setObject:pluginsDict
                        forKey:kQSBPluginConfigurationPrefKey];
   [standardDefaults synchronize];
 }
@@ -747,6 +787,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (NSArray *)accounts {
   HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
   NSArray *accounts = [accountsPoint extensions];
+  // TODO(dmaclach): get rid of this once we separate the concept of accounts
+  // and account types. Right now an account without a "userName" is an
+  // account type that we don't want to show the user.
+  NSPredicate *pred = [NSPredicate predicateWithFormat:@"userName != NULL"];
+  accounts = [accounts filteredArrayUsingPredicate:pred];
   return accounts;
 }
 
@@ -754,9 +799,15 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
   // Retrieve list of known accounts.
   NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-  NSArray *accountsFromPrefs = [standardDefaults
-                                objectForKey:kQSBAccountsPrefKey];
-  [accountsPoint addAccountsFromArray:accountsFromPrefs];
+  NSDictionary *dict = [standardDefaults objectForKey:kQSBAccountsPrefKey];
+  if ([dict isKindOfClass:[NSDictionary class]]) {
+    NSNumber *version = [dict valueForKey:kQSBAccountsPrefVersionKey];
+    if ([version integerValue] == kQSBAccountsPrefCurrentVersion) {
+      NSArray *accounts = [dict objectForKey:kQSBAccountsPrefAccountsKey];
+      [accountsPoint addAccountsFromArray:accounts];
+    }
+  }
+  // TODO(dmaclach): alert user that their prefs have been ignored.
 }
 
 #pragma mark Application Delegate Methods
@@ -949,8 +1000,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // Update preferences to current account knowledge.
   NSArray *archivableAccounts
     = [[HGSExtensionPoint accountsPoint] accountsAsArray]; 
+  NSNumber *vers = [NSNumber numberWithInteger:kQSBAccountsPrefCurrentVersion];
+  NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                        archivableAccounts, kQSBAccountsPrefAccountsKey,
+                        vers, kQSBAccountsPrefVersionKey,
+                        nil];
   NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-  [standardDefaults setObject:archivableAccounts
+  [standardDefaults setObject:dict
                        forKey:kQSBAccountsPrefKey];
   [standardDefaults synchronize];
 

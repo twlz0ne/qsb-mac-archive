@@ -62,6 +62,6 @@
 - (NSArray *)accountTypeNames;
 
 // Convenience method to retrieve all acccount with a given type.
-- (NSEnumerator *)accountsEnumForType:(NSString *)type;
+- (NSArray *)accountsForType:(NSString *)type;
 
 @end

@@ -93,9 +93,6 @@
 - (BOOL)isAuthenticated;
 - (void)setAuthenticated:(BOOL)isAuthenticated;
 
-// Convenience function for testing account type.
-- (BOOL)isAccountType:(NSString *)type;
-
 @end
 
 

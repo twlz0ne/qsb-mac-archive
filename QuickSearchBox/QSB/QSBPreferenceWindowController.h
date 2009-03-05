@@ -73,6 +73,3 @@
 - (IBAction)setColorFromMenu:(id)sender;
 
 @end
-
-// The preference containing a list of known accounts.
-extern NSString *const kQSBAccountsPrefKey;

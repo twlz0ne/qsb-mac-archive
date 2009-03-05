@@ -139,10 +139,6 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 - (void)authenticate {
 }
 
-- (BOOL)isAccountType:(NSString *)type {
-  return [type isEqualToString:[self type]];
-}
-
 - (NSString *)description {
   return [NSString stringWithFormat:@"<%@:%p account='%@', type='%@'>",
           [self class], self, [self userName], type_];
@@ -155,8 +151,6 @@ NSString *const kHGSAccountDidChangeNotification
 NSString *const kHGSAccountWillBeRemovedNotification
   = @"HGSAccountWillBeRemovedNotification";
 
-// Difference between kHGSAccountUserNameKey and HGSAccountName is
-// due to legacy naming and is intentional.
-NSString *const kHGSAccountUserNameKey = @"HGSAccountName";
+NSString *const kHGSAccountUserNameKey = @"HGSAccountUserNameKey";
 NSString *const kHGSAccountConnectionErrorKey = @"HGSAccountConnectionErrorKey";
-NSString *const kHGSAccountTypeKey = @"HGSAccountType";
+NSString *const kHGSAccountTypeKey = @"HGSAccountTypeKey";

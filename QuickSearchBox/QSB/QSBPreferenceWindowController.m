@@ -46,9 +46,6 @@
 #import "QSBSetUpAccountWindowController.h"
 #import "QSBUISettings.h"
 
-// The preference containing a list of knwon accounts.
-NSString *const kQSBAccountsPrefKey = @"QSBAccountsPrefKey";
-
 static void OpenAtLoginItemsChanged(LSSharedFileListRef inList, void *context);
 
 @interface QSBPreferenceWindowController ()
