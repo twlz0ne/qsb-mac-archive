@@ -69,6 +69,7 @@
 				7F94178B0EEF53CD0049AE06 /* PBXTargetDependency */,
 				622911BD0F2E8034005D34CE /* PBXTargetDependency */,
 				62A4AD580F2FCFC50007CD99 /* PBXTargetDependency */,
+				5AF0EC1C0F6075420041E0B9 /* PBXTargetDependency */,
 				8B77DF400F284A5A00FA2A3C /* PBXTargetDependency */,
 			);
 			name = "Build All";
@@ -218,6 +219,15 @@
 		5AED32BD0EAFDF2C004C7187 /* HGSOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AED32BC0EAFDF2C004C7187 /* HGSOperationTest.m */; };
 		5AED35E70EB7D978004C7187 /* HGSIconProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AED35E50EB7D978004C7187 /* HGSIconProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5AED35E80EB7D978004C7187 /* HGSIconProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AED35E60EB7D978004C7187 /* HGSIconProvider.m */; };
+		5AF0EB6F0F6074A00041E0B9 /* DictionaryActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0EB6C0F6074A00041E0B9 /* DictionaryActions.m */; };
+		5AF0EB700F6074A00041E0B9 /* DictionarySearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0EB6D0F6074A00041E0B9 /* DictionarySearchSource.m */; };
+		5AF0EC5D0F6075820041E0B9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
+		5AF0EC5E0F6075820041E0B9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
+		5AF0EC600F6075900041E0B9 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		5AF0EC640F6075A30041E0B9 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
+		5AF0EC680F6075B80041E0B9 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796A438C0976F3B5000659B6 /* CoreServices.framework */; };
+		5AF0EC6A0F6075C70041E0B9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
+		5AF0EC900F6076000041E0B9 /* Dictionary.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5AF0EB630F60744E0041E0B9 /* Dictionary.hgs */; };
 		5AF2C4800E5E19A400F4D546 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
 		5AF2C4810E5E19A400F4D546 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		5AF2C4820E5E19A400F4D546 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -862,6 +872,13 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
+		5AF0EC1B0F6075420041E0B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5AF0EB620F60744E0041E0B9 /* Dictionary */;
+			remoteInfo = Dictionary;
+		};
 		5AF2C47A0E5E19A400F4D546 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1471,6 +1488,7 @@
 				F4EF90DD0ECB4529008DD6DA /* Volume.scptd in CopyFiles */,
 				F4EF90DE0ECB4529008DD6DA /* Networking.scptd in CopyFiles */,
 				F4EF90DF0ECB4529008DD6DA /* Images.scptd in CopyFiles */,
+				5AF0EC900F6076000041E0B9 /* Dictionary.hgs in CopyFiles */,
 				7FE9628E0F5F06D800CBBA8D /* action-audiochat-icon.pdf in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1543,6 +1561,10 @@
 		5AED32BC0EAFDF2C004C7187 /* HGSOperationTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSOperationTest.m; sourceTree = "<group>"; };
 		5AED35E50EB7D978004C7187 /* HGSIconProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSIconProvider.h; sourceTree = "<group>"; };
 		5AED35E60EB7D978004C7187 /* HGSIconProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSIconProvider.m; sourceTree = "<group>"; };
+		5AF0EB630F60744E0041E0B9 /* Dictionary.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Dictionary.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AF0EB6B0F6074A00041E0B9 /* Dictionary-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Dictionary-Info.plist"; sourceTree = "<group>"; };
+		5AF0EB6C0F6074A00041E0B9 /* DictionaryActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DictionaryActions.m; sourceTree = "<group>"; };
+		5AF0EB6D0F6074A00041E0B9 /* DictionarySearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DictionarySearchSource.m; sourceTree = "<group>"; };
 		5AF2C4860E5E19A400F4D546 /* iTunes.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iTunes.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AF2C5A70E5E1C5700F4D546 /* iTunesAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iTunesAction.m; sourceTree = "<group>"; };
 		5AF2C5AA0E5E1C5700F4D546 /* iTunesSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunesSource.h; sourceTree = "<group>"; };
@@ -2145,6 +2167,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AF0EB610F60744E0041E0B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AF0EC5D0F6075820041E0B9 /* AppKit.framework in Frameworks */,
+				5AF0EC5E0F6075820041E0B9 /* Foundation.framework in Frameworks */,
+				5AF0EC600F6075900041E0B9 /* Vermilion.framework in Frameworks */,
+				5AF0EC680F6075B80041E0B9 /* CoreServices.framework in Frameworks */,
+				5AF0EC6A0F6075C70041E0B9 /* Carbon.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AF2C47F0E5E19A400F4D546 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2512,6 +2546,7 @@
 				62A4AC8A0F2FCD950007CD99 /* Twitter.hgs */,
 				8BCCD2DD0EC8F8C200688D64 /* Volume.scptd */,
 				F4E3B70B0EB66AA900CB713D /* Weather.hgs */,
+				5AF0EB630F60744E0041E0B9 /* Dictionary.hgs */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2635,6 +2670,16 @@
 				33EEA60F0DD0CC49005766AB /* CaminoBookmarksSource.m */,
 			);
 			path = CaminoBookmarks;
+			sourceTree = "<group>";
+		};
+		5AF0EB6A0F6074A00041E0B9 /* Dictionary */ = {
+			isa = PBXGroup;
+			children = (
+				5AF0EB6B0F6074A00041E0B9 /* Dictionary-Info.plist */,
+				5AF0EB6C0F6074A00041E0B9 /* DictionaryActions.m */,
+				5AF0EB6D0F6074A00041E0B9 /* DictionarySearchSource.m */,
+			);
+			path = Dictionary;
 			sourceTree = "<group>";
 		};
 		5AF274610F155D3700C087B2 /* GData */ = {
@@ -3283,6 +3328,7 @@
 				8B3EF7660EF2C7CB0036FFBD /* Shortcuts */,
 				62EA8C190F2E7E5E00C92E0B /* GoogleAccounts */,
 				62A4AD0C0F2FCE0E0007CD99 /* Twitter */,
+				5AF0EB6A0F6074A00041E0B9 /* Dictionary */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -3949,6 +3995,23 @@
 			name = "Camino Bookmarks";
 			productName = CaminoBookmarks;
 			productReference = 33EEA68B0DD0D9C0005766AB /* CaminoBookmarks.hgs */;
+			productType = "com.apple.product-type.bundle";
+		};
+		5AF0EB620F60744E0041E0B9 /* Dictionary */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AF0EB670F60744F0041E0B9 /* Build configuration list for PBXNativeTarget "Dictionary" */;
+			buildPhases = (
+				5AF0EB5F0F60744E0041E0B9 /* Resources */,
+				5AF0EB600F60744E0041E0B9 /* Sources */,
+				5AF0EB610F60744E0041E0B9 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Dictionary;
+			productName = Dictionary;
+			productReference = 5AF0EB630F60744E0041E0B9 /* Dictionary.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
 		5AF2C4780E5E19A400F4D546 /* iTunes */ = {
@@ -4676,6 +4739,7 @@
 				F4E3B6FC0EB66AA900CB713D /* Weather */,
 				62EA8BBD0F2E7DE200C92E0B /* GoogleAccounts */,
 				62A4AC790F2FCD950007CD99 /* Twitter */,
+				5AF0EB620F60744E0041E0B9 /* Dictionary */,
 			);
 		};
 /* End PBXProject section */
@@ -4765,6 +4829,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		33EEA6870DD0D9C0005766AB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AF0EB5F0F60744E0041E0B9 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -5790,6 +5861,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AF0EB600F60744E0041E0B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AF0EB6F0F6074A00041E0B9 /* DictionaryActions.m in Sources */,
+				5AF0EB700F6074A00041E0B9 /* DictionarySearchSource.m in Sources */,
+				5AF0EC640F6075A30041E0B9 /* HGSBundle.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AF2C47C0E5E19A400F4D546 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -6209,6 +6290,11 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 33EEA6BC0DD0DA12005766AB /* PBXContainerItemProxy */;
+		};
+		5AF0EC1C0F6075420041E0B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5AF0EB620F60744E0041E0B9 /* Dictionary */;
+			targetProxy = 5AF0EC1B0F6075420041E0B9 /* PBXContainerItemProxy */;
 		};
 		5AF2C4790E5E19A400F4D546 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -6863,6 +6949,26 @@
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/CaminoBookmarks/CaminoBookmarks-Info.plist";
 				PRODUCT_NAME = CaminoBookmarks;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Release;
+		};
+		5AF0EB650F60744F0041E0B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Dictionary/Dictionary-Info.plist";
+				PRODUCT_NAME = Dictionary;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Debug;
+		};
+		5AF0EB660F60744F0041E0B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Dictionary/Dictionary-Info.plist";
+				PRODUCT_NAME = Dictionary;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = Release;
@@ -7718,6 +7824,15 @@
 			buildConfigurations = (
 				33EEA68D0DD0D9C1005766AB /* Debug */,
 				33EEA68E0DD0D9C1005766AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AF0EB670F60744F0041E0B9 /* Build configuration list for PBXNativeTarget "Dictionary" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AF0EB650F60744F0041E0B9 /* Debug */,
+				5AF0EB660F60744F0041E0B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
