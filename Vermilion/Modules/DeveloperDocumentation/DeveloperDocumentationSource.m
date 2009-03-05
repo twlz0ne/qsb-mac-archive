@@ -100,7 +100,13 @@ static NSString *const kiPhoneReferenceDocSetPath
     HGSLogDebug(@"Unable to get DSADocSet class");
     return;
   }
-
+  
+  // The next couple of operations allocate a lot of memory into autorelease
+  // pools. We want that memory cleaned up as soon as possible, so we have
+  // an autorelease pool outside the loop to clean up the array of nodes
+  // and the filtered array, and an innerpool to clean up the processing
+  // on the nodes themselves.
+  NSAutoreleasePool *outerPool = [[NSAutoreleasePool alloc] init];
   id docSet 
     = [[[dsaDocSetClass alloc] performSelector:@selector(initWithDocRootDirectory:) 
                                     withObject:docsURL] 
@@ -112,7 +118,7 @@ static NSString *const kiPhoneReferenceDocSetPath
   nodes = [nodes filteredArrayUsingPredicate:pred];  
 
   for (id node in nodes) {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
     NSString *name = [node valueForKey:@"name"];
     NSString *path = [node valueForKey:@"path"];
     NSURL *url = nil;
@@ -125,28 +131,30 @@ static NSString *const kiPhoneReferenceDocSetPath
       path = [rootDirDocuments stringByAppendingPathComponent:path];
       url = [NSURL fileURLWithPath:path];
     }
-    if (!url) continue;
-    NSDictionary *docCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                             name, kHGSPathCellDisplayTitleKey,
-                             url, kHGSPathCellURLKey,
-                             nil];
-    NSArray *docCells = [NSArray arrayWithObjects:docSetCell, docCell, nil];
-    NSDictionary *attributes
-      = [NSDictionary dictionaryWithObjectsAndKeys:
-         docCells, kHGSObjectAttributePathCellsKey, 
-         docSetIcon_, kHGSObjectAttributeIconKey,
-         nil];
-    HGSObject *result 
-      = [HGSObject objectWithIdentifier:url
-                                   name:name
-                                   type:HGS_SUBTYPE(kHGSTypeFile, @"developerdocs")
-                                 source:self
-                             attributes:attributes];  
-    [self indexResult:result
-           nameString:name
-          otherString:nil];
-    [pool release];
+    if (url) {
+      NSDictionary *docCell = [NSDictionary dictionaryWithObjectsAndKeys:
+                               name, kHGSPathCellDisplayTitleKey,
+                               url, kHGSPathCellURLKey,
+                               nil];
+      NSArray *docCells = [NSArray arrayWithObjects:docSetCell, docCell, nil];
+      NSDictionary *attributes
+        = [NSDictionary dictionaryWithObjectsAndKeys:
+           docCells, kHGSObjectAttributePathCellsKey, 
+           docSetIcon_, kHGSObjectAttributeIconKey,
+           nil];
+      HGSResult *result 
+        = [HGSResult resultWithURL:url
+                              name:name
+                              type:HGS_SUBTYPE(kHGSTypeFile, @"developerdocs")
+                            source:self
+                        attributes:attributes];  
+      [self indexResult:result
+             nameString:name
+            otherString:nil];
+    }
+    [innerPool release];
   }
+  [outerPool release];
 }
 
 - (void)indexDocumentationOperation {
@@ -162,7 +170,8 @@ static NSString *const kiPhoneReferenceDocSetPath
       NSString *frameworkPath 
         = [developerPath stringByAppendingPathComponent:kDocSetFrameworkPath];
       [[NSBundle bundleWithPath:frameworkPath] load];
-      dsaDocSetClass = NSClassFromString(@"DSADocSet");
+      HGSAssert(NSClassFromString(@"DSADocSet"), 
+                @"Unable to instantiate DSADocSet");
     }
     
     // TODO(dmaclach): add support for other docsets

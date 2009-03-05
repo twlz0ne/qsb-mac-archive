@@ -110,11 +110,11 @@
     if ([[subpath lastPathComponent] hasPrefix:@"."]) continue;
     
     
-    HGSObject *object = [HGSObject objectWithFilePath:subpath
+    HGSResult *result = [HGSResult resultWithFilePath:subpath
                                                source:self
                                            attributes:nil];
-    [self indexResult:object
-           nameString:[object displayName]
+    [self indexResult:result
+           nameString:[result displayName]
           otherString:nil];
   }
   [self saveResultsCache];

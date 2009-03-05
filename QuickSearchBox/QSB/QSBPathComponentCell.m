@@ -48,7 +48,6 @@
 
 // Draw the cell with some special highlighting: a gray underline.
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView {
-
   NSColor *startColor = nil;
   NSColor *endColor = nil;
   
@@ -103,7 +102,6 @@
   
   NSRectFill(borderRect);
   [NSGraphicsContext saveGraphicsState];
-  [fillPath setClip];
   [super drawInteriorWithFrame:cellFrame inView:controlView];
   [NSGraphicsContext restoreGraphicsState];
 }

@@ -65,42 +65,22 @@
 //
 @interface HGSProtoExtension : NSObject {
  @private
-  HGSPlugin *plugin_;  // The plugin to which we belong.
+  __weak HGSPlugin *plugin_;  // The plugin to which we belong.
   HGSExtension *extension_; // Installed extension.
-  NSString *className_;  // The name of the extension class.
-  NSString *moduleName_;  // Module name if python extension.
-  NSString *displayName_;
-  NSString *extensionPointKey_;  // Typically, 'source' or 'action'.
-  NSString *protoIdentifier_;  // Cached, and initialized from extension.
-  NSDictionary *extensionDict_;  // The dict from w/in the info.plist.  We don't
-                                 // want to store this, we want the "current"
-                                 // info from the plugin's info.plist each run.
-  BOOL isEnabled_;
-  BOOL isOld_;  // YES for old until we inventory an extension that matches.
-  BOOL isNew_;  // YES for new until matched with an old extension.
+  NSMutableDictionary *configuration_;  
+                                
+  BOOL enabled_;  // YES if this extension has been turned on.
 }
 
-@property (nonatomic, retain) HGSPlugin *plugin;
-@property (nonatomic, retain, readonly) HGSExtension *extension;
-@property (nonatomic, copy, readonly) NSString *className;
-@property (nonatomic, copy, readonly) NSString *moduleName;
+
 @property (nonatomic, copy, readonly) NSString *displayName;
-@property (nonatomic, copy, readonly) NSString *extensionPointKey;
-@property (nonatomic, copy, readonly) NSString *protoIdentifier;
-@property (nonatomic, copy, readonly) NSDictionary *extensionDictionary;
-@property (nonatomic) BOOL isEnabled;
-@property (nonatomic) BOOL isOld;
-@property (nonatomic) BOOL isNew;
+@property (nonatomic, readonly) NSString *extensionPointKey;
+@property (nonatomic, copy, readonly) NSString *identifier;
+@property (nonatomic, getter=isEnabled) BOOL enabled;
 
 // Initialize a prototype extension given a dictionary.
-- (id)initWithBundleExtension:(NSDictionary *)bundleExtension
-                       plugin:(HGSPlugin *)plugin;
-
-// Initialize a prototype extension given a dictionary from preferences.
-- (id)initWithPreferenceDictionary:(NSDictionary *)bundleExtension;
-
-// Provide an archivable dictionary for the extension.
-- (NSDictionary *)dictionaryValue;
+- (id)initWithConfiguration:(NSDictionary *)bundleExtension
+                     plugin:(HGSPlugin *)plugin;
 
 // Return YES if this protoExtension is factorable.  Sources are currently
 // only factorable by instances of HGSAccount.
@@ -117,7 +97,7 @@
 
 // Return a description for the extension.
 // By default looks for a file named "Description.html", "Description.rtf", 
-// and "Description.rtfd", in that order, in the bundleof the class that this 
+// and "Description.rtfd", in that order, in the bundle of the class that this 
 // object is an instance of.
 - (NSAttributedString *)extensionDescription;
 
@@ -126,14 +106,10 @@
 // the info.plist of the bundle of the class that this object is an instance of.
 - (NSString *)extensionVersion;
 
-// Helper functions for filtering out plugins we previously knew about but
-// which have now gone missing, and vice versa.
-- (BOOL)notIsNew;
-- (BOOL)notIsOld;
-
-// Set isEnabled for the extension based on its HGSIsEnabledByDefault setting
-// and its desire for an account.  Return YES if the extension was disabled.
-- (BOOL)autoSetIsEnabled;
+// Returns YES if the extension can be enabled or disabled.  This is used to
+// check account-dependent extensions to see if the account has been
+// authenticated.
+- (BOOL)canSetEnabled;
 
 // Returns if the extension has been installed.
 - (BOOL)isInstalled;
@@ -142,21 +118,12 @@
 - (void)install;
 - (void)uninstall;
 
-// Compare the names of the extensions.
-- (NSComparisonResult)compare:(HGSProtoExtension *)extensionB;
-
-// Return an objectForInfoDictionaryKey for this extension
-- (id)objectForInfoDictionaryKey:(NSString *)key;
-
 // Returns YES if the extension's extension point is of the type specified
 // and for which the HGSIsUserVisible flas is not set to NO.
 - (BOOL)isUserVisibleAndExtendsExtensionPoint:(NSString *)extensionPoint;
 
 // Install all account types that we offer.
 - (void)installAccountTypes;
-
-// Convenience methods for setting a factor.
-- (void)setExtensionDictionaryObject:(id)factor forKey:(NSString *)key;
 
 @end
 

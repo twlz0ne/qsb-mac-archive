@@ -34,10 +34,15 @@
 
 #import "HGSSearchSource.h"
 #import "HGSAction.h"
+#import "HGSAccount.h"
+#import "HGSAccountsExtensionPoint.h"
+#import "HGSPlugin.h"
 
 NSString* const kHGSActionsExtensionPoint = @"HGSActionsExtensionPoint";
 NSString* const kHGSSourcesExtensionPoint = @"HGSSourcesExtensionPoint";
 NSString* const kHGSServicesExtensionPoint = @"HGSServicesExtensionPoint";
+NSString *const kHGSAccountsExtensionPoint = @"HGSAccountsExtensionPoint";
+NSString *const kHGSPluginsExtensionPoint = @"HGSPluginsExtensionPoint";
 
 static BOOL isInitialized = NO;
 
@@ -49,6 +54,10 @@ static void InitializeCategory(void) {
   [ep setProtocol:@protocol(HGSSearchSource)];
   ep = [HGSExtensionPoint pointWithIdentifier:kHGSServicesExtensionPoint];
   [ep setProtocol:@protocol(HGSExtension)];
+  ep = [HGSExtensionPoint pointWithIdentifier:kHGSPluginsExtensionPoint];
+  [ep setProtocol:@protocol(HGSPlugin)];
+  ep = [HGSAccountsExtensionPoint pointWithIdentifier:kHGSAccountsExtensionPoint];
+  [ep setProtocol:@protocol(HGSAccount)];
   isInitialized = YES;
 }
 
@@ -67,6 +76,17 @@ static void InitializeCategory(void) {
 + (HGSExtensionPoint*)servicesPoint {
   if (!isInitialized) InitializeCategory();
   return [self pointWithIdentifier:kHGSServicesExtensionPoint];
+}
+
++ (HGSExtensionPoint*)pluginsPoint {
+  if (!isInitialized) InitializeCategory();
+  return [self pointWithIdentifier:kHGSPluginsExtensionPoint];
+}
+
++ (HGSAccountsExtensionPoint*)accountsPoint {
+  if (!isInitialized) InitializeCategory();
+  HGSExtensionPoint *ep = [self pointWithIdentifier:kHGSAccountsExtensionPoint];
+  return (HGSAccountsExtensionPoint *)ep;
 }
 
 @end

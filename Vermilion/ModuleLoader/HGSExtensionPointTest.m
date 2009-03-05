@@ -240,8 +240,8 @@
   STAssertNil(result, @"found something with an identifier that was nil");
 
   NSString *description = [newPoint description];
-  STAssertTrue([description hasPrefix:@"HGSExtensionPoint - testExtendingPoint"],
-               nil);
+  STAssertTrue([description hasPrefix:@"HGSExtensionPoint <nil>"],
+               @"Bad Description: %@", description);
 }
 
 - (void)pointNotification:(NSNotification *)notification {
@@ -272,7 +272,7 @@
 
   NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
   [nc addObserver:self selector:@selector(pointNotification:)
-             name:kHGSExtensionPointDidChangeNotification
+             name:kHGSExtensionPointDidAddExtensionNotification
            object:newPoint];
 
   // add on a thread, and make sure we get the notification
@@ -284,7 +284,7 @@
   STAssertTrue(gotNotification_, @"failed to get notification for add");
 
   [nc removeObserver:self
-                name:kHGSExtensionPointDidChangeNotification
+                name:kHGSExtensionPointDidAddExtensionNotification
               object:newPoint];
 }
 

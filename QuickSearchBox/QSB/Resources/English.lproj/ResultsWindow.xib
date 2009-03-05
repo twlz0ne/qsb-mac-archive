@@ -8,6 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -112,14 +113,14 @@
 				</object>
 				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<object class="NSView" key="NSWindowView" id="1053078706">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">292</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSCustomView" id="534655545">
 							<reference key="NSNextResponder" ref="1053078706"/>
 							<int key="NSvFlags">-2147483382</int>
-							<string key="NSFrame">{{12, 28}, {426, 52}}</string>
+							<string key="NSFrame">{{20, 28}, {410, 54}}</string>
 							<reference key="NSSuperview" ref="1053078706"/>
 							<string key="NSClassName">NSView</string>
 						</object>
@@ -317,6 +318,7 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{450, 128}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{3.40282e+38, 3.40282e+38}</string>
@@ -866,9 +868,9 @@
 					<string>{{280, -110}, {480, 385}}</string>
 					<reference ref="8"/>
 					<string>{3.40282e+38, 3.40282e+38}</string>
-					<string>{{100, 573}, {450, 128}}</string>
+					<string>{{100, 624}, {450, 128}}</string>
 					<boolean value="YES"/>
-					<string>{{100, 573}, {450, 128}}</string>
+					<string>{{100, 624}, {450, 128}}</string>
 					<reference ref="9"/>
 					<reference ref="8"/>
 					<string>{{12, 668}, {552, 480}}</string>
@@ -971,10 +973,25 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">NSApplication</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="596669387">
+					<string key="className">HGSResultArray</string>
+					<string key="superclassName">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../opensource/google-toolbox-for-mac/UnitTesting/GTMAppKit+UnitTesting.h</string>
+						<string key="minorKey">../../Vermilion/Vermilion/HGSResult.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">HGSResultArray</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">QSBHGSResult+NSPasteboard.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSApplication</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="73551370">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../externals/google-toolbox-for-mac/UnitTesting/GTMAppKit+UnitTesting.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -987,7 +1004,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSCell</string>
-					<reference key="sourceIdentifier" ref="596669387"/>
+					<reference key="sourceIdentifier" ref="73551370"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSCell</string>
@@ -999,7 +1016,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSControl</string>
-					<reference key="sourceIdentifier" ref="596669387"/>
+					<reference key="sourceIdentifier" ref="73551370"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSControl</string>
@@ -1011,7 +1028,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSMenu</string>
-					<reference key="sourceIdentifier" ref="596669387"/>
+					<reference key="sourceIdentifier" ref="73551370"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSMenu</string>
@@ -1023,7 +1040,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSMenuItem</string>
-					<reference key="sourceIdentifier" ref="596669387"/>
+					<reference key="sourceIdentifier" ref="73551370"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSMenuItem</string>
@@ -1037,28 +1054,42 @@
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../ThirdParty/UndocumentedGoodness/QuickLookUI/QLUIPrivate.h</string>
+						<string key="minorKey">../externals/UndocumentedGoodness/QuickLookUI/QLUIPrivate.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../opensource/google-toolbox-for-mac/AppKit/GTMCarbonEvent.h</string>
+						<string key="minorKey">../externals/google-toolbox-for-mac/AppKit/GTMCarbonEvent.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../opensource/google-toolbox-for-mac/Foundation/GTMNSAppleEventDescriptor+Foundation.h</string>
+						<string key="minorKey">../externals/google-toolbox-for-mac/Foundation/GTMNSAppleEventDescriptor+Foundation.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../opensource/google-toolbox-for-mac/UnitTesting/GTMNSObject+UnitTesting.h</string>
+						<string key="minorKey">../externals/google-toolbox-for-mac/Foundation/GTMNSObject+KeyValueObserving.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../externals/google-toolbox-for-mac/UnitTesting/GTMNSObject+UnitTesting.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../externals/json-framework/Source/NSObject+SBJSON.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1070,7 +1101,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSTextField</string>
-					<reference key="sourceIdentifier" ref="596669387"/>
+					<reference key="sourceIdentifier" ref="73551370"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSTextField</string>
@@ -1082,7 +1113,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSView</string>
-					<reference key="sourceIdentifier" ref="596669387"/>
+					<reference key="sourceIdentifier" ref="73551370"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSView</string>
@@ -1094,7 +1125,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSWindow</string>
-					<reference key="sourceIdentifier" ref="596669387"/>
+					<reference key="sourceIdentifier" ref="73551370"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSWindow</string>
@@ -1128,12 +1159,14 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>dockMenu_</string>
 							<string>dockShowSearchBoxItem_</string>
 							<string>statusItemMenu_</string>
 							<string>statusShowSearchBoxItem_</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSMenu</string>
 							<string>NSMenuItem</string>
 							<string>NSMenu</string>
 							<string>NSMenuItem</string>
@@ -1141,7 +1174,7 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBApplicationDelegate.h</string>
+						<string key="minorKey">QSBApplicationDelegate.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1161,7 +1194,7 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBBackgroundView.h</string>
+						<string key="minorKey">QSBBackgroundView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1177,7 +1210,7 @@
 					<string key="superclassName">NSPanel</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBCustomPanel.h</string>
+						<string key="minorKey">QSBCustomPanel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1193,7 +1226,7 @@
 					<string key="superclassName">NSImageView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBDraggableImageView.h</string>
+						<string key="minorKey">QSBDraggableImageView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1201,7 +1234,7 @@
 					<string key="superclassName">NSView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBGrayView.h</string>
+						<string key="minorKey">QSBGrayView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1217,7 +1250,15 @@
 					<string key="superclassName">NSImageView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBLargeIconView.h</string>
+						<string key="minorKey">QSBLargeIconView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">QSBMenuButton</string>
+					<string key="superclassName">NSButton</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">QSBMenuButton.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1233,7 +1274,7 @@
 					<string key="superclassName">NSButtonCell</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBMenuButtonCell.h</string>
+						<string key="minorKey">QSBMenuButtonCell.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1251,8 +1292,6 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>acceptAccountSheet:</string>
-							<string>cancelAccountSheet:</string>
 							<string>editAccount:</string>
 							<string>removeAccount:</string>
 							<string>resetHotKey:</string>
@@ -1268,8 +1307,6 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
-							<string>id</string>
-							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
@@ -1278,30 +1315,20 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>accountsListController_</string>
 							<string>colorPopUp_</string>
-							<string>editAccountSheet_</string>
-							<string>editPasswordField_</string>
-							<string>passField_</string>
+							<string>setUpAccountWindowController_</string>
 							<string>settingsTabView_</string>
-							<string>setupAccountNameField_</string>
-							<string>setupAccountSheet_</string>
-							<string>userField_</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSArrayController</string>
 							<string>NSPopUpButton</string>
-							<string>NSWindow</string>
-							<string>NSTextField</string>
-							<string>NSSecureTextField</string>
+							<string>QSBSetUpAccountWindowController</string>
 							<string>NSTabView</string>
-							<string>NSTextField</string>
-							<string>NSWindow</string>
-							<string>NSTextField</string>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBPreferenceWindowController.h</string>
+						<string key="minorKey">QSBPreferenceWindowController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1317,7 +1344,7 @@
 					<string key="superclassName">NSView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBQueryBoundingView.h</string>
+						<string key="minorKey">QSBQueryBoundingView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1336,10 +1363,13 @@
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>clearTextOrLastPivot:</string>
+							<string>dropSelection:</string>
+							<string>grabSelection:</string>
 							<string>hideSearchWindow:</string>
 							<string>openResultsTableItem:</string>
 							<string>performSearch:</string>
 							<string>selectCorpus:</string>
+							<string>selectResults:</string>
 							<string>showSearchWindow:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
@@ -1349,6 +1379,9 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>HGSResultArray</string>
 							<string>id</string>
 						</object>
 					</object>
@@ -1383,7 +1416,7 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBSearchWindowController.h</string>
+						<string key="minorKey">QSBSearchWindowController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1395,11 +1428,38 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">QSBSetUpAccountWindowController</string>
+					<string key="superclassName">NSWindowController</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSMutableArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>parentWindow_</string>
+							<string>setupAccountNameField_</string>
+							<string>setupAccountSheet_</string>
+							<string>setupContainerView_</string>
+							<string>setupPasswordField_</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSWindow</string>
+							<string>NSTextField</string>
+							<string>NSWindow</string>
+							<string>NSView</string>
+							<string>NSSecureTextField</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">QSBSetUpAccountWindowController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">QSBTextFieldEditor</string>
 					<string key="superclassName">NSTextView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">UserInterface/QSB2/QSBTextField.h</string>
+						<string key="minorKey">QSBTextField.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1413,7 +1473,7 @@
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
-		<string key="IBDocument.LastKnownRelativeProjectPath">../../../../QSB2.xcodeproj</string>
+		<string key="IBDocument.LastKnownRelativeProjectPath">../../QSB.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 	</data>
 </archive>

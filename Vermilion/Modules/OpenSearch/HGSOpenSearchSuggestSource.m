@@ -50,14 +50,19 @@ static const int kGMODefaultMaxResults = 1;
 GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  // We are a valid source for any web page with a suggest template
-  HGSObject *pivotObject = [query pivotObject];
-  return [pivotObject valueForKey:kHGSObjectAttributeWebSuggestTemplateKey] != nil;
+  BOOL isValid = [super isValidSourceForQuery:query];
+  if (isValid) {
+    // We are a valid source for any web page with a suggest template
+    HGSResult *pivotObject = [query pivotObject];
+    isValid 
+      = [pivotObject valueForKey:kHGSObjectAttributeWebSuggestTemplateKey] != nil;
+  }
+  return isValid;
 }
 
 - (NSURL *)suggestUrl:(HGSSearchOperation *)operation {
   HGSQuery *query = [operation query];
-  HGSObject *pivotObject = [query pivotObject];
+  HGSResult *pivotObject = [query pivotObject];
   NSString *urlFormat = [pivotObject valueForKey:kHGSObjectAttributeWebSuggestTemplateKey];
   urlFormat = [urlFormat stringByReplacingOccurrencesOfString:@"{searchterms}" withString:@"%@"];
 
@@ -78,7 +83,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     [[[NSMutableArray alloc] initWithCapacity:[jsonSuggestions count]] autorelease];
   NSEnumerator *suggestionsEnum = [jsonSuggestions objectEnumerator];
   NSString *suggestion = nil;
-  HGSObject *pivotObject = [query pivotObject];
+  HGSResult *pivotObject = [query pivotObject];
   id image = [pivotObject displayIconWithLazyLoad:NO];
   NSString *urlFormat = [pivotObject valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
   urlFormat = [urlFormat stringByReplacingOccurrencesOfString:@"{searchterms}" withString:@"%@"];
@@ -88,12 +93,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                            [suggestion gtm_stringByEscapingForURLArgument]];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                 image, kHGSObjectAttributeIconKey, nil];
-    HGSObject *object = [HGSObject objectWithIdentifier:[NSURL URLWithString:urlString]
-                                                   name:suggestion
-                                                   type:HGS_SUBTYPE(kHGSTypeWebpage, @"opensearch") // TODO(alcor): more complete/better type
-                                                 source:self
-                                             attributes:attributes];
-    [suggestions addObject:object];
+    HGSResult *result = [HGSResult resultWithURL:[NSURL URLWithString:urlString]
+                                            name:suggestion
+                                            type:HGS_SUBTYPE(kHGSTypeWebpage, @"opensearch") // TODO(alcor): more complete/better type
+                                          source:self
+                                      attributes:attributes];
+    [suggestions addObject:result];
   }
   return suggestions;
 }

@@ -64,30 +64,52 @@ static NSString *const kWeatherPrefix = @"weather ";
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  // Must be "weather [something]" or just a 5 digit zip code (all numbers)
-  // TODO(dmaclach): any other zipcode/postal codes (CA, ???)
-  NSString *rawQuery = [query rawQueryString];
-  NSUInteger len = [rawQuery length];
-  if (len == 5) {
-    NSRange range = [rawQuery rangeOfCharacterFromSet:nonDigitSet_];
-    return (range.location == NSNotFound);
-  } else {
-    NSUInteger prefixLen = [kWeatherPrefix length];
-    if (len > prefixLen) {
-      BOOL result = [rawQuery compare:kWeatherPrefix
-                              options:NSCaseInsensitiveSearch
-                                range:NSMakeRange(0, prefixLen)] == NSOrderedSame;
-      return result;
+  BOOL isValid = [super isValidSourceForQuery:query];
+  if (isValid) {
+    // Must be "weather [something]"
+    // or a US zip code or a British or Canadian Postal Code.
+    NSString *rawQuery = [query rawQueryString];
+    NSUInteger len = [rawQuery length];
+    if (len == 5) {
+      NSRange range = [rawQuery rangeOfCharacterFromSet:nonDigitSet_];
+      isValid = (range.location == NSNotFound);
+    } else if (len > 5 && len <= 8) {
+      NSString *canadianPostalCodeRE 
+        = @"^[:letter:][0-9][:letter:]\\s?[0-9][:letter:][0-9]$";
+      NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", 
+                           canadianPostalCodeRE];
+      isValid = [pred evaluateWithObject:rawQuery];
+      if (!isValid) {
+        // TODO(dmaclach): Add support for SAN[ ]{0,1}TA1 once 1691089 is fixed.
+        NSString *britishPostalCodeRE
+          = @"^([A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]|[A-HK-Y][0-9]([0-9]|"
+            @"[ABEHMNPRV-Y]))|[0-9][A-HJKS-UW])[ ]{0,1}[0-9]"
+            @"[ABD-HJLNP-UW-Z]{2})$";
+        pred = [NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", 
+                             britishPostalCodeRE];
+        isValid = [pred evaluateWithObject:rawQuery];
+      }
+    } else {
+      NSString *localizedPrefix = HGSLocalizedString(kWeatherPrefix, nil);  
+      NSUInteger prefixLen = [localizedPrefix length];
+      if (len > prefixLen) {
+        isValid = [rawQuery compare:localizedPrefix
+                            options:NSCaseInsensitiveSearch
+                              range:NSMakeRange(0, prefixLen)] == NSOrderedSame;
+      } else {
+        isValid = NO;
+      }
     }
   }
-  return NO;
+  return isValid;
 }
 
 - (void)performSearchOperation:(HGSSearchOperation *)operation {
   NSString *rawQuery = [[operation query] rawQueryString];
   NSString *location;
-  if ([rawQuery length] == 5) {
-    // It's a zip
+  NSUInteger rawQueryLength = [rawQuery length];
+  if (rawQueryLength >= 5 && rawQueryLength <= 8) {
+    // It's a zip (US) or postal code (Canadian or British)
     location = rawQuery;
   } else {
     // Extract what's after our marker
@@ -95,68 +117,91 @@ static NSString *const kWeatherPrefix = @"weather ";
   }
   NSString *escapedLocation = [location gtm_stringByEscapingForURLArgument];
   
-  NSString *urlStr = [NSString stringWithFormat:kWeatherDataURL, escapedLocation];
+  NSString *urlStr = [NSString stringWithFormat:kWeatherDataURL, 
+                      escapedLocation];
   NSURL *url = [NSURL URLWithString:urlStr];
   if (url) {
     // TODO: make this an async using GDataHTTPFetcher (means this search op is
     // concurrent), instead of blocking here.
     NSXMLDocument *xmlDoc
       = [[[NSXMLDocument alloc] initWithContentsOfURL:url
-                                              options:0
+                                              options:NSXMLDocumentTidyXML
                                                 error:nil] autorelease];
     if (xmlDoc) {
+      NSString *xPath 
+        = @"/xml_api_reply/weather/forecast_information/city/@data";
       NSString *city
-        = [[[xmlDoc nodesForXPath:@"/xml_api_reply/weather/forecast_information/city/@data"
-                            error:nil] lastObject] stringValue];
+        = [[[xmlDoc nodesForXPath:xPath error:nil] lastObject] stringValue];
+      
+      NSLocale *locale = [NSLocale currentLocale];
+      BOOL metric = [[locale objectForKey:NSLocaleUsesMetricSystem] boolValue];
+      NSString *units = nil;
+      if (metric) {
+        xPath = @"/xml_api_reply/weather/current_conditions/temp_c/@data";
+        units = HGSLocalizedString(@"C", @"Celsius");
+      } else {
+        xPath = @"/xml_api_reply/weather/current_conditions/temp_f/@data";
+        units = HGSLocalizedString(@"F", @"Farenheit");
+      }
       NSString *temp
-        = [[[xmlDoc nodesForXPath:@"/xml_api_reply/weather/current_conditions/temp_f/@data"
-                            error:nil] lastObject] stringValue];
+        = [[[xmlDoc nodesForXPath:xPath error:nil] lastObject] stringValue];
       
+      xPath = @"/xml_api_reply/weather/current_conditions/condition/@data";
       NSString *condition
-        = [[[xmlDoc nodesForXPath:@"/xml_api_reply/weather/current_conditions/condition/@data"
-                            error:nil] lastObject] stringValue];
+        = [[[xmlDoc nodesForXPath:xPath error:nil] lastObject] stringValue];
       
+      xPath = @"/xml_api_reply/weather/current_conditions/wind_condition/@data";
       NSString *wind
-        = [[[xmlDoc nodesForXPath:@"/xml_api_reply/weather/current_conditions/wind_condition/@data"
-                            error:nil] lastObject] stringValue];
+        = [[[xmlDoc nodesForXPath:xPath error:nil] lastObject] stringValue];
       
-      if ([city length] && [temp length] && [condition length] && [wind length]) {
-        // TODO(dmaclach): add localization support for these
+      if ([city length] && [temp length]&& [wind length]) {
+        NSString *localizedString = HGSLocalizedString(@"Weather for %@", nil);
         NSString *title
-          = [NSString stringWithFormat:@"Weather for %@", city];
-        NSString *details
-          = [NSString stringWithFormat:@"%@° - %@ - %@", temp, condition, wind];
+          = [NSString stringWithFormat:localizedString, city];
+        NSString *details = nil;
+        if ([condition length]) {
+          localizedString = HGSLocalizedString(@"%@°%@ - %@ - %@",
+                                               @"Weather condition details");
+          details = [NSString stringWithFormat:localizedString, temp, units, 
+                     condition, wind];
+        } else {
+          localizedString = HGSLocalizedString(@"%@°%@ - %@",
+                                               @"Weather details");
+          details = [NSString stringWithFormat:localizedString, temp, units, 
+                     wind];
+        }          
         
         // build an open url
         NSString *resultURLStr
           = [NSString stringWithFormat:kWeatherResultURL, escapedLocation];
         NSURL *resultURL = [NSURL URLWithString:resultURLStr];
         // Cheat, force this result high in the list.
-        // TODO(dmaclach): figure out a cleaner way to get results like this high
-        // in the results.
+        // TODO(dmaclach): figure out a cleaner way to get results like this 
+        // high in the results.
         NSMutableDictionary *attributes
           = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              [NSNumber numberWithFloat:2.0f], kHGSObjectAttributeRankKey,
              details, kHGSObjectAttributeSnippetKey,
              nil];
+        xPath = @"/xml_api_reply/weather/current_conditions/icon/@data";
         NSString *imageSRL
-          = [[[xmlDoc nodesForXPath:@"/xml_api_reply/weather/current_conditions/icon/@data"
-                              error:nil] lastObject] stringValue];
-        if (imageSRL) {
+          = [[[xmlDoc nodesForXPath:xPath error:nil] lastObject] stringValue];
+        if ([imageSRL length]) {
           NSURL *imgURL = [NSURL URLWithString:imageSRL relativeToURL:url];
           // TODO: do we really want to use initByReferencingURL or should we
           // just fetch the image some other way?
-          NSImage *image = [[[NSImage alloc] initByReferencingURL:imgURL] autorelease];
+          NSImage *image 
+            = [[[NSImage alloc] initByReferencingURL:imgURL] autorelease];
           if (image) {
             [attributes setObject:image forKey:kHGSObjectAttributeIconKey];
           }
         }
-        HGSObject *hgsObject
-          = [HGSObject objectWithIdentifier:resultURL
-                                       name:title
-                                       type:HGS_SUBTYPE(kHGSTypeOnebox, @"weather")
-                                     source:self
-                                 attributes:attributes];
+        HGSResult *hgsObject
+          = [HGSResult resultWithURL:resultURL
+                                name:title
+                                type:HGS_SUBTYPE(kHGSTypeOnebox, @"weather")
+                              source:self
+                          attributes:attributes];
         NSArray *resultsArray = [NSArray arrayWithObject:hgsObject];
         [operation setResults:resultsArray];
       }

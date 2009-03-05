@@ -33,11 +33,14 @@
 #import <Cocoa/Cocoa.h>
 #import <Vermilion/Vermilion.h>
 
+@class QSBPluginVerifyWindowController;
+
 // Class that acts as the delegate for the HGS framework providing some
 // simple services.
 @interface QSBHGSDelegate : NSObject <HGSDelegate> {
  @private
   NSArray *pluginPaths_;
   NSString *preferredLanguage_;  // The language our user prefers
+  QSBPluginVerifyWindowController *pluginVerifyWindowController_;
 }
 @end

@@ -59,7 +59,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 - (void)addressBookChanged:(NSNotification *)notification;
 
 // Return an ABPerson for a given result
-- (ABRecord *)personForResult:(HGSObject *)result;
+- (ABRecord *)personForResult:(HGSResult *)result;
 
 // Take a phone number [(123)456-7890] and clean it to 1234567890
 - (NSString *)cleanPhoneNumber:(NSString *)dirtyPhone;
@@ -77,9 +77,9 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
                                 urlFormat:(NSString *)urlFormat 
                               cleanMethod:(SEL)cleaner;
 
-// Given an HGSObject we "explode" it into it's internal HGSObjects
+// Given an HGSResult we "explode" it into it's internal HGSObjects
 // i.e. phone numbers, addressess, email, etc.
-- (NSArray *)explodeContactForSearchOperation:(HGSObject *)contact;
+- (NSArray *)explodeContactForSearchOperation:(HGSResult *)contact;
 @end
 
 @implementation HGSContactsSource
@@ -125,10 +125,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   NSMutableArray *newResults = [NSMutableArray array];
   
   ABAddressBook *sab = [ABAddressBook sharedAddressBook];
-  NSArray *people = [sab people];
-  NSEnumerator *peopleEnumerator = [people objectEnumerator];
-  ABPerson *person;
-  while ((person = [peopleEnumerator nextObject])) {
+  for (ABPerson *person in [sab people]) {
     NSString *name = nil;
     NSString *firstName = [person valueForProperty:kABFirstNameProperty];
     NSString *lastName = [person valueForProperty:kABLastNameProperty];
@@ -186,12 +183,12 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
            otherTermStrings, kHGSObjectAttributeUniqueIdentifiersKey,
            rank, kHGSObjectAttributeRankKey,
            nil];
-      HGSObject* hgsResult 
-        = [HGSObject objectWithIdentifier:[NSURL fileURLWithPath:urlString]
-                                     name:name
-                                     type:kTypeContactAddressBook
-                                   source:self
-                               attributes:attributes];
+      HGSResult* hgsResult 
+        = [HGSResult resultWithURL:[NSURL fileURLWithPath:urlString]
+                              name:name
+                              type:kTypeContactAddressBook
+                            source:self
+                        attributes:attributes];
       [newResults addObject:hgsResult];
       [self indexResult:hgsResult
              nameString:name
@@ -231,7 +228,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 - (void)processMatchingResults:(NSMutableArray*)results
                       forQuery:(HGSQuery *)query {
   // if we had a pivot object, we filter the results w/ the pivot info
-  HGSObject *pivotObject = [query pivotObject];
+  HGSResult *pivotObject = [query pivotObject];
   if (pivotObject && ![pivotObject isOfType:kTypeContactAddressBook]) {
     // To suvive the pivot, the contact has to have our a matching email
     // address.
@@ -244,7 +241,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     NSUInteger resultCount = [results count];
     for (NSUInteger idx = 0; idx < resultCount ; ++idx) {
 
-      HGSObject *hgsResult = [results objectAtIndex:idx];
+      HGSResult *hgsResult = [results objectAtIndex:idx];
       ABRecord *person = [self personForResult:hgsResult];
       if (!person) continue;
       BOOL isMatch = NO;
@@ -317,7 +314,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
         }
         NSString *urlString = [NSString stringWithFormat:urlFormat, cleanValue];
         
-        NSURL *uri = [NSURL URLWithString:urlString];
+        NSURL *url = [NSURL URLWithString:urlString];
         // We rank the primary identifiers higher so they show up better
         CGFloat rank = [identifier isEqualToString:primary] ? 1.0 : 0.0;
         NSNumber *nsRank = [NSNumber numberWithFloat:rank];
@@ -329,19 +326,19 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
                               snippet, kHGSObjectAttributeSnippetKey,
                               nsRank, kHGSObjectAttributeRankKey,
                               nil];
-        HGSObject *object = [HGSObject objectWithIdentifier:uri
-                                                       name:value 
-                                                       type:type 
-                                                     source:self 
-                                                 attributes:attr];
-        [results addObject:object];
+        HGSResult *result = [HGSResult resultWithURL:url
+                                                name:value 
+                                                type:type 
+                                              source:self 
+                                          attributes:attr];
+        [results addObject:result];
       }
     }
   }
   return results;
 }
     
-- (NSArray *)explodeContactForSearchOperation:(HGSObject *)contact {
+- (NSArray *)explodeContactForSearchOperation:(HGSResult *)contact {
   struct ContactMap {
     NSString *property_;
     NSString *type_;
@@ -382,16 +379,16 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 
 - (void)performSearchOperation:(HGSSearchOperation *)operation {
   HGSQuery *query = [operation query];
-  HGSObject *pivotObject = [query pivotObject];
+  HGSResult *pivotObject = [query pivotObject];
   if ([pivotObject conformsToType:kTypeContactAddressBook]) {
     NSArray *results = [self explodeContactForSearchOperation:pivotObject];
     NSString *queryString = [query rawQueryString];
     if ([queryString length]) {
       NSMutableArray *filteredResults = [NSMutableArray array];
-      for (HGSObject *object in results) {
-        NSString *stringValue = [object displayName];
+      for (HGSResult *result in results) {
+        NSString *stringValue = [result displayName];
         if ([stringValue hasPrefix:queryString]) {
-          [filteredResults addObject:object];
+          [filteredResults addObject:result];
         }
       }
       results = filteredResults;
@@ -413,7 +410,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 
 
 - (void)consumeImageData:(NSData *)data forTag:(NSInteger)tag {
-  HGSObject *result = nil;
+  HGSResult *result = nil;
   NSNumber *tagNum = [NSNumber numberWithInteger:tag];
   @synchronized(imageLoadingTags_) {
     if (data) {
@@ -432,17 +429,17 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     if (image) {
       [result setValue:image forKey:kHGSObjectAttributeIconKey];
       
-      NSString *idString = [[result identifier] absoluteString];
+      NSString *idString = [[result url] absoluteString];
       [[HGSIconProvider sharedIconProvider] cacheIcon:image
                                                forKey:idString];
     }
   }
 }
 
-- (ABRecord *)personForResult:(HGSObject *)result {
+- (ABRecord *)personForResult:(HGSResult *)result {
   ABRecord *person = nil;
   if ([result conformsToType:kTypeContactAddressBook]) {
-    NSString *uid = [[result identifier] path];
+    NSString *uid = [[result url] path];
     uid = [uid lastPathComponent];
     uid = [uid stringByDeletingPathExtension];
     if (uid) {
@@ -452,9 +449,9 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   return person;
 }
 
-- (NSImage *)loadImageForObject:(HGSObject *)result immediately:(BOOL)immediately {
+- (NSImage *)loadImageForObject:(HGSResult *)result immediately:(BOOL)immediately {
   NSImage *image = [[HGSIconProvider sharedIconProvider] 
-                    cachedIconForKey:[[result identifier] absoluteString]];
+                    cachedIconForKey:[[result url] absoluteString]];
   
   if (!image) {
     ABPerson *person = (ABPerson *)[self personForResult:result];
@@ -471,7 +468,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
         image = [[[NSImage alloc] initWithData:data] autorelease];
         image = [HGSIconProvider imageWithRoundRectAndDropShadow:image];
         if (image) {
-          NSString *idString = [[result identifier] absoluteString];
+          NSString *idString = [[result url] absoluteString];
           [[HGSIconProvider sharedIconProvider] cacheIcon:image
                                                    forKey:idString];
         }
@@ -483,7 +480,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   return image;    
 }
 
-- (id)provideValueForKey:(NSString *)key result:(HGSObject *)result {
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   id value = nil;
   if ([key isEqualToString:kHGSObjectAttributeAddressBookRecordIdentifierKey]) {
     ABRecord *person = [self personForResult:result];
@@ -548,7 +545,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     NSString *serviceName = HGSLocalizedString(@"Contact", nil);
     NSURL *serviceURL = nil;
     NSString *contactName = [result valueForKey:kHGSObjectAttributeNameKey];
-    NSURL *contactURL = [result identifier];
+    NSURL *contactURL = [result url];
     if ([contactURL isFileURL]) {
       CFURLRef appURL = NULL;
       OSStatus osStatus = LSGetApplicationForURL((CFURLRef)contactURL,
@@ -578,7 +575,10 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     value = [NSArray arrayWithObjects:baseCell, contactCell, nil];
   }
 #endif
-
+  if (!value) {
+    value = [super provideValueForKey:key result:result];
+  }
+  
   return value;
 }
 
@@ -588,7 +588,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   // isValidSourceForQuery instead of processMatchingResults:forQuery:
   // because we want to avoid the extra work when this attribute isn't present
   // at all.
-  HGSObject *pivotObject = [query pivotObject];
+  HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
     // Default to not handling the search when pivoting
     isValidSource = NO;
@@ -601,7 +601,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   return isValidSource;
 }
 
-- (NSMutableDictionary *)archiveRepresentationForObject:(HGSObject*)result {
+- (NSMutableDictionary *)archiveRepresentationForObject:(HGSResult*)result {
   // For address book contacts, we only need to store the Person's unique id
   // to be able to rebuild the result.
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -614,14 +614,14 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   return dict;
 }
 
-- (HGSObject *)objectWithArchivedRepresentation:(NSDictionary *)representation {
-  HGSObject *result = nil;
+- (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
+  HGSResult *result = nil;
   NSString *uniqID
     = [representation objectForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
   if (uniqID) {
     @synchronized(self) {
       // Find the result w/ that ID.
-      for (HGSObject *hgsResult in results_) {
+      for (HGSResult *hgsResult in results_) {
         NSString *testUniqID
           = [hgsResult valueForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
         if ([testUniqID isEqualToString:uniqID]) {

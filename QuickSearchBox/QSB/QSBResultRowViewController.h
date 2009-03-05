@@ -32,7 +32,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class QSBQueryController;
+@class QSBSearchViewController;
 
 // Serves as the base view controller class for the various nibs used to
 // present a row in a results table.  You may create customized child
@@ -40,20 +40,20 @@
 //
 @interface QSBResultRowViewController : NSViewController {
  @private
-  QSBQueryController *queryController_;
+  QSBSearchViewController *searchViewController_;
 }
 
 // Designated initializer.
 - (id)initWithNibName:(NSString *)name
-           controller:(QSBQueryController *)queryController;
+           controller:(QSBSearchViewController *)searchViewController;
 
 // After instantiating and initing this class you need to set its
 // controller (to the query controller) so that the action
 // can be forwarded for handling.  Call this function if you do
 // not use the designated initializer.
-- (void)setQueryController:(QSBQueryController *)queryController;
+- (void)setSearchViewController:(QSBSearchViewController *)queryController;
 
 // Reeturn our query controller.
-- (QSBQueryController *)queryController;
+- (QSBSearchViewController *)searchViewController;
 
 @end

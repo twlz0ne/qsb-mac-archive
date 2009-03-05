@@ -148,15 +148,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">target: self.queryController_</string>
+						<string key="label">target: self.searchViewController_</string>
 						<reference key="source" ref="476867102"/>
 						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="476867102"/>
 							<reference key="NSDestination" ref="1001"/>
-							<string key="NSLabel">target: self.queryController_</string>
+							<string key="NSLabel">target: self.searchViewController_</string>
 							<string key="NSBinding">target</string>
-							<string key="NSKeyPath">self.queryController_</string>
+							<string key="NSKeyPath">self.searchViewController_</string>
 							<object class="NSDictionary" key="NSOptions">
 								<string key="NS.key.0">NSSelectorName</string>
 								<string key="NS.object.0">showMoreResults:</string>
@@ -169,15 +169,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: queryController_.topResultsController_.queryController.query.searchStatus</string>
+						<string key="label">value: searchViewController_.topResultsController_.searchViewController.searchController_.searchStatus</string>
 						<reference key="source" ref="813220357"/>
 						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="813220357"/>
 							<reference key="NSDestination" ref="1001"/>
-							<string key="NSLabel">value: queryController_.topResultsController_.queryController.query.searchStatus</string>
+							<string key="NSLabel">value: searchViewController_.topResultsController_.searchViewController.searchController_.searchStatus</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">queryController_.topResultsController_.queryController.query.searchStatus</string>
+							<string key="NSKeyPath">searchViewController_.topResultsController_.searchViewController.searchController_.searchStatus</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -185,15 +185,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">toolTip: queryController_.topResultsController_.queryController.query.searchStatus</string>
+						<string key="label">toolTip: searchViewController_.topResultsController_.searchViewController.searchController_.searchStatus</string>
 						<reference key="source" ref="813220357"/>
 						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="813220357"/>
 							<reference key="NSDestination" ref="1001"/>
-							<string key="NSLabel">toolTip: queryController_.topResultsController_.queryController.query.searchStatus</string>
+							<string key="NSLabel">toolTip: searchViewController_.topResultsController_.searchViewController.searchController_.searchStatus</string>
 							<string key="NSBinding">toolTip</string>
-							<string key="NSKeyPath">queryController_.topResultsController_.queryController.query.searchStatus</string>
+							<string key="NSKeyPath">searchViewController_.topResultsController_.searchViewController.searchController_.searchStatus</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>

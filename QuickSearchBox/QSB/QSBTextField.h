@@ -42,4 +42,7 @@
 - (NSRange)removeCompletionIfNecessaryFromSelection:(NSRange)selection;
 - (BOOL)isAtBeginning;
 - (BOOL)isAtEnd;
+
+- (void)resetCompletion;
+
 @end

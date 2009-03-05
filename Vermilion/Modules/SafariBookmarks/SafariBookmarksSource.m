@@ -115,12 +115,12 @@ static NSString* const kCachedNameTerms = @"NameTerms";
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        icon, kHGSObjectAttributeIconKey,
        nil];
-  HGSObject* result 
-    = [HGSObject objectWithIdentifier:url
-                                 name:title
-                                 type:HGS_SUBTYPE(kHGSTypeWebBookmark, @"safari")
-                               source:self
-                           attributes:attributes];
+  HGSResult* result 
+    = [HGSResult resultWithURL:url
+                          name:title
+                          type:HGS_SUBTYPE(kHGSTypeWebBookmark, @"safari")
+                        source:self
+                    attributes:attributes];
   [self indexResult:result
          nameString:title
         otherString:nil];

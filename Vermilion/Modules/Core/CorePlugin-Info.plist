@@ -29,13 +29,13 @@
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>URL Detection</string>
-			<key>HGSIsUserVisible</key>
+			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
 			<string>FilesystemDirectorySearchSource</string>
-			<key>HGSIsUserVisible</key>
+			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
@@ -52,7 +52,7 @@
 		<dict>
 			<key>HGSExtensionClass</key>
 			<string>HGSWebSearchSource</string>
-			<key>HGSIsUserVisible</key>
+			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
@@ -66,7 +66,7 @@
 		<dict>
 			<key>HGSExtensionClass</key>
 			<string>HGSGoogleWebResultsSource</string>
-			<key>HGSIsUserVisible</key>
+			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.core.webresults.source</string>
@@ -80,7 +80,7 @@
 		<dict>
 			<key>HGSExtensionClass</key>
 			<string>HGSSuggestSource</string>
-			<key>HGSIsUserVisible</key>
+			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
@@ -92,7 +92,7 @@
 		<dict>
 			<key>HGSExtensionClass</key>
 			<string>HGSOpenSearchSuggestSource</string>
-			<key>HGSIsUserVisible</key>
+			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
@@ -108,7 +108,7 @@
 			<string>TextInput</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
-			<key>HGSIsUserVisible</key>
+			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.core.textinput.source</string>
@@ -204,5 +204,7 @@
 			<string>file</string>
 		</dict>
 	</array>
+	<key>HGSPluginAPIVersion</key>
+	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
 </dict>
 </plist>

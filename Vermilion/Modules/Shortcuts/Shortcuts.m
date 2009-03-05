@@ -30,7 +30,22 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "Shortcuts.h"
+// Shortcuts stores things in our user defaults.
+// The top level is a dictionary keyed by "shortcut" where a shortcut is the
+// series of characters entered by the user for them to get a object (i.e. 
+// 'ipho' could correspond to iPhoto. The value associated with the key is
+// an array of object identifiers. These identifiers match an entry in
+// a sqlite cache that holds the data needed to rebuild the object.
+// When a user associates a object (ex 'ipho') with a object (ex 'iphoto') 
+// and there is nothing else keyed to 'ipho' in the DB, the array for 'ipho'
+// will have a single entry 'iphoto'. If the user then associates 'iphone' with
+// 'ipho' the array for 'ipho' will have two objects (iphoto and iphone). If
+// the user again associates ipho with iPhone then the array will change to
+// (iPhone, iPhoto). If the user then associates ipho with iphonizer the array
+// will change to (iphone, iponizer). Object for shortcut will always return the
+// first element in the array for a given key.
+
+#import <Vermilion/Vermilion.h>
 #import "HGSSQLiteBackedCache.h"
 #import "HGSStringUtil.h"
 
@@ -39,15 +54,13 @@
 #else
 #import "GTMNSFileManager+Carbon.h"
 #import "QSBSearchWindowController.h"
-#import "QSBQueryController.h"
-#import "QSBQuery.h"
+#import "QSBSearchViewController.h"
+#import "QSBSearchController.h"
+#import "QSBTableResult.h"
 #endif
 #import "GTMMethodCheck.h"
 #import "GTMObjectSingleton.h"
 #import "GTMExceptionalInlines.h"
-
-NSString *const kShortcutsSourceExtensionIdentifier 
-  = @"com.google.qsb.shortcuts.source";
 
 static NSString *const kHGSShortcutsKey = @"kHGSShortcutsKey";
 static NSString *const kHGSShortcutsArchiveKey = @"kHGSShortcutsArchiveKey";
@@ -63,18 +76,23 @@ static NSString* const kHGSShortcutsVersion = @"0.92";
 // Maximum number of entries per shortcut.
 static const unsigned int kMaxEntriesPerShortcut = 3;
 
-@interface ShortcutsSource (HGSShortcutsPrivate)
+@interface ShortcutsSource : HGSCallbackSearchSource {
+@private
+  HGSSQLiteBackedCache *cache_;
+}
+
+// Tell the database that "object" was selected for shortcut, and let it do its
+// magic internally to update itself.
+- (BOOL)updateShortcutFromController:(QSBSearchController *)searchController 
+                          withResult:(HGSResult *)result;
 // Reads in our shortcut info, and/or creates a new DB for us.
 - (NSMutableDictionary *)readShortcutData;
-
-// Create an entry suitable for inserting in the DB for object
-- (NSDictionary*)shortcutDBEntryFor:(HGSObject *)object;
 
 - (NSArray *)rankedIdentifiersForNormalizedShortcut:(NSString *)shortcut;
 - (NSArray *)rankedObjectsForShortcut:(NSString *)shortcut;
 @end
 
-int KeyLength(NSString *a, NSString *b, void *c) {
+static inline int KeyLength(NSString *a, NSString *b, void *c) {
   int lengthA = [a length];
   int lengthB = [b length];
   if (lengthA < lengthB) {
@@ -142,7 +160,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
   return cache_;
 }
 
-- (HGSObject *)unarchiveObjectForIdentifier:(NSString *)identifier {
+- (HGSResult *)unarchiveResultForIdentifier:(NSString *)identifier {
   id object = [[self cache] valueForKey:identifier];
   
   // Make sure we get out dictionary we expect of source name and object
@@ -154,13 +172,11 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
     if ([archivedRep isKindOfClass:[NSDictionary class]]) {
       HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
       id<HGSSearchSource> source = [sourcesPoint extensionWithIdentifier:sourceName];
-      HGSObject *result = [source objectWithArchivedRepresentation:archivedRep];
+      HGSResult *result = [source resultWithArchivedRepresentation:archivedRep];
       return result;
     } else {
       HGSLogDebug(@"didn't have a dictionary for the hgsobject's archived rep");
     }
-  } else {
-    HGSLogDebug(@"didn't have a dictionary for our shortcut data");
   }
   return nil;
 }
@@ -180,28 +196,38 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
   return valueArray;
 }
 
-- (BOOL)updateShortcut:(NSString *)shortcut 
-            withObject:(HGSObject *)object {
+- (BOOL)updateShortcutFromController:(QSBSearchController *)searchController  
+                          withResult:(HGSResult *)result {
   // Check to see if the args we got are reasonable
-  if (![shortcut length] || !object) {
+  if (!searchController || !result) {
     HGSLogDebug(@"Bad Args");
     return NO;
   }
   
+  // right now we only store shortcuts at the top level
+  if ([searchController parentSearchController]) {
+    return NO;
+  }
+  
+  NSString *shortcut = [searchController queryString];
+  if (![shortcut length]) {
+    return NO;
+  }
+
   NSString *normalizeShortcut
     = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:shortcut];
   if ([normalizeShortcut length] == 0) {
     return NO;
   }
   
-  NSURL *identifier = [object identifier];
+  NSURL *identifier = [result url];
   if (!identifier) {
-    HGSLogDebug(@"hgsobject had no identifier (%@)", object);
+    HGSLogDebug(@"HGSResult had no identifier (%@)", result);
     return NO;
   }
   
-  id<HGSSearchSource> source = [object source];
-  NSMutableDictionary *archiveDict = [source archiveRepresentationForObject:object];
+  id<HGSSearchSource> source = [result source];
+  NSMutableDictionary *archiveDict = [source archiveRepresentationForResult:result];
   if (!archiveDict || [archiveDict count] == 0) {
     return NO;
   }
@@ -246,48 +272,10 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
     NSDictionary *archiveData = [NSDictionary dictionaryWithObject:archiveDict 
                                                             forKey:srcId];
     [[self cache] setValue:archiveData forKey:idString];
-    HGSLogDebug(@"Shortcut recorded: %@ = %@", shortcut, object);
+    HGSLogDebug(@"Shortcut recorded: %@ = %@", shortcut, result);
   }
   return YES;
-}  // updateShortcut:withObject:
-
-- (NSDictionary*)shortcutDBEntryFor:(HGSObject *)object {
-  NSData *aliasData = nil;
-  NSURL *url = [object valueForKey:kHGSObjectAttributeURIKey];
-  if (!url) {
-    HGSLogDebug(@"No URL in object: %@", object);
-    return nil;
-  }
-  
-#if !TARGET_OS_IPHONE
-  if ([url isFileURL]) {
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    aliasData = [fileManager gtm_aliasDataForPath:[url path]];
-  }
-#endif
-  
-  NSMutableDictionary *entry = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                [object valueForKey:kHGSObjectAttributeNameKey],
-                                kHGSObjectAttributeNameKey,
-                                [url absoluteString],
-                                kHGSObjectAttributeURIKey,
-                                nil];
-    
-  NSString *snippet = [object valueForKey:kHGSObjectAttributeSnippetKey];
-  if (snippet) {
-    [entry setObject:snippet forKey:kHGSObjectAttributeSnippetKey];
-  }
-
-  NSString *type = [object type];
-  if (type) {
-    [entry setObject:type forKey:kHGSObjectAttributeTypeKey];
-  }
-  
-  if (aliasData) {
-    [entry setObject:aliasData forKey:kHGSShortcutsAliasKey];
-  }
-  return entry;
-}
+}  // updateShortcutFromController:withObject:
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
   // shortcuts start w/ the raw query so anything can get remembered.
@@ -297,10 +285,10 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
   NSMutableArray *rankedResults 
     = [NSMutableArray arrayWithCapacity:[results count]];
   NSEnumerator *enumerator = [results objectEnumerator];
-  HGSObject *result;
+  HGSResult *result;
   for (NSUInteger i = 0; (result = [enumerator nextObject]); ++i) {
     // Decrease the score for each
-    HGSMutableObject *mutableResult = [[result mutableCopy] autorelease];
+    HGSMutableResult *mutableResult = [[result mutableCopy] autorelease];
     [mutableResult setRank:1000 - i];
     [rankedResults addObject:mutableResult];
   }
@@ -340,18 +328,18 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
   NSArray *identifiers 
     = [self rankedIdentifiersForNormalizedShortcut:normalizeShortcut];
   
-  NSMutableArray *objects = [NSMutableArray array];
+  NSMutableArray *results = [NSMutableArray array];
   
   NSEnumerator *idEnumerator = [identifiers objectEnumerator];
   NSString *identifier = nil;
   while ((identifier = [idEnumerator nextObject])) {
     
-    HGSObject *object = [self unarchiveObjectForIdentifier:identifier];
-    if (object) {
-      [objects addObject:object];
+    HGSResult *result = [self unarchiveResultForIdentifier:identifier];
+    if (result) {
+      [results addObject:result];
     }
   }
-  return objects;
+  return results;
 }  
 
 - (NSMutableDictionary *)readShortcutData {
@@ -360,10 +348,11 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
   NSString* version = [defaults objectForKey:kHGSShortcutsVersionStringKey];
   @synchronized ([self class]) {
     if ([version isEqualToString:kHGSShortcutsVersion]) {
-      shortcutData = [[defaults dictionaryForKey:kHGSShortcutsKey] mutableCopy];
+      NSDictionary *shortCuts = [defaults dictionaryForKey:kHGSShortcutsKey];
+      shortcutData = [NSMutableDictionary dictionaryWithDictionary:shortCuts];
     }
     if (!shortcutData) {
-      shortcutData = [[NSMutableDictionary alloc] init];
+      shortcutData = [NSMutableDictionary dictionary];
       [defaults setObject:kHGSShortcutsVersion 
                    forKey:kHGSShortcutsVersionStringKey];
       [defaults setObject:shortcutData 
@@ -371,7 +360,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
       [defaults synchronize];
     }
   }
-  return [shortcutData autorelease];
+  return shortcutData;
 }  // readShortcutData
 
 #if TARGET_OS_IPHONE
@@ -388,35 +377,27 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
 
 - (void)qsbWillPivot:(NSNotification *)notification {
   NSDictionary *userDict = [notification userInfo];
-  QSBQuery *query = [userDict objectForKey:kQSBNotificationQueryKey];
-  // right now we only store shortcuts at the top level
-  if (![query parentQuery]) {
-    id result = [notification object];
-    if ([result respondsToSelector:@selector(representedObject)]) {
-      HGSObject *hgsResult = [result representedObject];
-      if ([hgsResult isKindOfClass:[HGSObject class]]) {
-        NSString *queryString = [query queryString];
-        if (hgsResult && [queryString length]) {
-          [self updateShortcut:queryString withObject:hgsResult];
-        }
-      }
+  QSBSearchController *searchController 
+    = [userDict objectForKey:kQSBNotificationSearchControllerKey];
+  id result = [notification object];
+  if ([result respondsToSelector:@selector(representedResult)]) {
+    HGSResult *hgsResult = [result representedResult];
+    if ([hgsResult isKindOfClass:[HGSResult class]]) {
+      [self updateShortcutFromController:searchController withResult:hgsResult];
     }
   }  
 }
 
 - (void)qsbWillPerformAction:(NSNotification *)notification {
   NSDictionary *userDict = [notification userInfo];
-  QSBQuery *query = [userDict objectForKey:kQSBNotificationQueryKey];
-  // right now we only store shortcuts at the top level
-  if (![query parentQuery]) {
-    HGSObject *directObject 
-      = [userDict objectForKey:kQSBNotificationDirectObjectKey];
-    if (directObject) {
-      NSString *queryString = [query queryString];
-      if ([queryString length]) {
-        [self updateShortcut:queryString withObject:directObject];
-      }
-    }
+  QSBSearchController *searchController 
+    = [userDict objectForKey:kQSBNotificationSearchControllerKey];
+  HGSResultArray *directObjects 
+    = [userDict objectForKey:kQSBNotificationDirectObjectsKey];
+  if ([directObjects count] == 1) {
+    HGSResult *directObject = [directObjects objectAtIndex:0];
+    [self updateShortcutFromController:searchController 
+                            withResult:directObject];
   }
 }
 

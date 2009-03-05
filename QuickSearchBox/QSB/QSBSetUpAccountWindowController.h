@@ -43,19 +43,11 @@
 //
 @interface QSBSetUpAccountWindowController : NSWindowController {
  @private
-  IBOutlet NSWindow *parentWindow_;  // Window to which alerts are attached.
-  IBOutlet NSWindow *setupAccountSheet_;
+  IBOutlet NSArrayController *accountTypesController_;
   IBOutlet NSView *setupContainerView_;  // Account view inserts here.
-  IBOutlet NSTextField *setupAccountNameField_;
-  IBOutlet NSSecureTextField *setupPasswordField_;
-  NSString *accountType_;  // Bound to the popup control.
   NSView *installedSetupView_;  // The currently inserted account view.
   NSArray *accountTypes_;  // List of account type names for popup.
+  NSString *selectedAccountType_;
 }
-
-@property (nonatomic, retain, readonly) NSArray *accountTypes;
-
-// Present the account setup sheet.
-- (void)presentSetUpAccountSheet;
 
 @end

@@ -38,27 +38,27 @@
 @end
 
 @interface QSBMoreStandardRowViewController : QSBMoreDetailedRowViewController
-- (id)initWithController:(QSBQueryController *)controller;
+- (id)initWithController:(QSBSearchViewController *)controller;
 @end
 
 @interface QSBMoreCategoryRowViewController : QSBMoreDetailedRowViewController
-- (id)initWithController:(QSBQueryController *)controller;
+- (id)initWithController:(QSBSearchViewController *)controller;
 @end
 
 @interface QSBMoreSeparatorRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBQueryController *)controller;
+- (id)initWithController:(QSBSearchViewController *)controller;
 @end
 
 @interface QSBMoreFoldRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBQueryController *)controller;
+- (id)initWithController:(QSBSearchViewController *)controller;
 @end
 
 @interface QSBMoreShowAllTableRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBQueryController *)controller;
+- (id)initWithController:(QSBSearchViewController *)controller;
 @end
 
 @interface QSBMorePlaceHolderRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBQueryController *)controller;
+- (id)initWithController:(QSBSearchViewController *)controller;
 @end
 
 

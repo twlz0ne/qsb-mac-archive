@@ -36,7 +36,7 @@
 				<string>file.application</string>
 				<string>appui</string>
 			</array>
-			<key>HGSIsEnabledByDefault</key>
+			<key>HGSExtensionIsEnabledByDefault</key>
 			<false/>
 		</dict>
 		<dict>
@@ -50,7 +50,7 @@
 			<string>Application UI Content Source</string>
 			<key>HGSSearchSourceCannotArchive</key>
 			<true/>
-			<key>HGSIsEnabledByDefault</key>
+			<key>HGSExtensionIsEnabledByDefault</key>
 			<false/>
 		</dict>
 		<dict>
@@ -160,5 +160,7 @@
 			<string>appui.item</string>
 		</dict>
 	</array>
+	<key>HGSPluginAPIVersion</key>
+	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
 </dict>
 </plist>

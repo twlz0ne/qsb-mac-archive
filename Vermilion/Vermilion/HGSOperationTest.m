@@ -33,7 +33,7 @@
 #import <Foundation/Foundation.h>
 #import "GTMSenTestCase.h"
 #import "HGSOperation.h"
-#import "GTMHTTPFetcher.h"
+#import <GData/GDataHTTPFetcher.h>
 
 static const int kDiskOperationLength = 2; // seconds
 static const int kNetworkOperationLength = 2; // seconds
@@ -93,10 +93,10 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   }
 }
 
-- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData {
   finishedWithData_ = YES;
-  STAssertNotNil(fetcher, @"finishedWithData got a nil GTMHTTPFetcher");
+  STAssertNotNil(fetcher, @"finishedWithData got a nil GDataHTTPFetcher");
   STAssertNotNil(fetcher, @"finishedWithData got a nil retrievedData");
   STAssertTrue([retrievedData length] != 0,
                @"finishedWithData got an empty retrievedData");
@@ -120,11 +120,11 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
                @"finishedWithData operation was not cancelled");
 }
 
-- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
     failedWithError:(NSError *)error {
-  // Just confirm that both GTMHTTPFetcher's status errors and network errors
+  // Just confirm that both GDataHTTPFetcher's status errors and network errors
   // come to this callback.
-  if ([[error domain] isEqual:kGTMHTTPFetcherStatusDomain]) {
+  if ([[error domain] isEqual:kGDataHTTPFetcherStatusDomain]) {
     failedWithStatus_ = YES;
 
     NSInteger status = [error code];
@@ -219,7 +219,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   // Request Google's home page
   NSURL *url = [NSURL URLWithString:kGoogleUrl];
   NSURLRequest *request = [NSURLRequest requestWithURL:url];
-  GTMHTTPFetcher *fetcher = [GTMHTTPFetcher httpFetcherWithRequest:request];
+  GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
   [fetcher setUserData:condition];
   NSOperation *networkOp = [HGSInvocationOperation
      networkInvocationOperationWithTarget:self
@@ -238,7 +238,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   // Request a non-existent Google page
   url = [NSURL URLWithString:kGoogle404Url];
   request = [NSURLRequest requestWithURL:url];
-  fetcher = [GTMHTTPFetcher httpFetcherWithRequest:request];
+  fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
   networkOp = [HGSInvocationOperation
      networkInvocationOperationWithTarget:self
                                forFetcher:fetcher
@@ -250,7 +250,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   // Request a non-existent web site
   url = [NSURL URLWithString:kGoogleNonExistentUrl];
   request = [NSURLRequest requestWithURL:url];
-  fetcher = [GTMHTTPFetcher httpFetcherWithRequest:request];
+  fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
   networkOp = [HGSInvocationOperation
      networkInvocationOperationWithTarget:self
                                forFetcher:fetcher

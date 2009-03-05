@@ -98,7 +98,7 @@
   
   // set up our internals
   HGSQuery *query = [[[HGSQuery alloc] initWithString:text 
-                                          pivotObject:nil
+                                              results:nil
                                            queryFlags:0] autorelease];
   [query setMaxDesiredResults:100];
   
@@ -173,25 +173,25 @@
   NSArray *results = [queryController_ rankedResults];
   NSUInteger count = [results count];
   NSMutableArray *appleScriptResults = [NSMutableArray arrayWithCapacity:count];
-  for (HGSObject *hgsResult in results) {
-    NSURL *identifier = [hgsResult identifier];
-    NSString *idString = [identifier absoluteString];
+  for (HGSResult *hgsResult in results) {
+    NSURL *url = [hgsResult url];
+    NSString *urlString = [url absoluteString];
     NSString *title = [hgsResult displayName];
     if (handler_ ) {
       // If we have a handler, we store them as AERecords
-      NSAppleEventDescriptor *idDesc = [idString gtm_appleEventDescriptor];
+      NSAppleEventDescriptor *urlDesc = [urlString gtm_appleEventDescriptor];
       NSAppleEventDescriptor *titleDesc = [title gtm_appleEventDescriptor];
       NSAppleEventDescriptor *record 
         = [NSAppleEventDescriptor recordDescriptor];
       [record setDescriptor:titleDesc forKeyword:pName];
-      [record setDescriptor:idDesc forKeyword:pURL];
+      [record setDescriptor:urlDesc forKeyword:pURL];
       [appleScriptResults addObject:record];
     } else {
       // If we are just returning, we can use AppleScript's internal handling
       // to convert them.
       NSDictionary *asResult 
         = [NSDictionary dictionaryWithObjectsAndKeys:
-           idString, @"link",
+           urlString, @"link",
            title, @"title",
            nil];
       [appleScriptResults addObject:asResult];

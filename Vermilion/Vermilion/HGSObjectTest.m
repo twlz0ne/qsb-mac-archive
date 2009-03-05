@@ -32,7 +32,7 @@
 
 
 #import "GTMSenTestCase.h"
-#import "HGSObject.h"
+#import "HGSResult.h"
 #import "HGSSearchSource.h"
 
 @interface HGSObjectTest : GTMTestCase <HGSSearchSource>
@@ -43,14 +43,14 @@
 - (void)testStaticInit {
   NSURL* path = [NSURL URLWithString:@"file://url/to/path"];
   // create an object with the full gamut and check the values
-  HGSObject* obj1 = [HGSObject objectWithIdentifier:path 
-                                               name:@"everything"
-                                               type:@"text"
-                                             source:nil
-                                         attributes:nil];
+  HGSResult* obj1 = [HGSResult resultWithURL:path 
+                                        name:@"everything"
+                                        type:@"text"
+                                      source:nil
+                                  attributes:nil];
   STAssertNotNil(obj1, @"can't create object");
   STAssertEqualObjects(path, 
-                       [obj1 valueForKey:kHGSObjectAttributeURIKey], 
+                       [obj1 url], 
                        @"invalid uri");
   STAssertEqualStrings(@"everything", 
                        [obj1 valueForKey:kHGSObjectAttributeNameKey], 
@@ -61,19 +61,19 @@
   
   // create an object with missing values and make sure they go through our
   // source, which will mirror the value as the provided key.
-  HGSObject* obj2 = [HGSObject objectWithIdentifier:nil 
-                                               name:nil
-                                               type:NULL
-                                             source:self
-                                         attributes:nil];
+  HGSResult* obj2 = [HGSResult resultWithURL:nil 
+                                        name:nil
+                                        type:NULL
+                                      source:self
+                                  attributes:nil];
   STAssertNil(obj2, @"created object");
 
   // create an object with everything nil
-  HGSObject* obj3 = [HGSObject objectWithIdentifier:nil 
-                                               name:nil
-                                               type:NULL
-                                             source:nil
-                                         attributes:nil];
+  HGSResult* obj3 = [HGSResult resultWithURL:nil 
+                                        name:nil
+                                        type:NULL
+                                      source:nil
+                                  attributes:nil];
   STAssertNil(obj3, @"created object");
 }
 
@@ -83,13 +83,13 @@
   // create an object from a dictionary and validate the keys are present. Since
   // we're setting the source, values we don't set should return non-nil.
   NSMutableDictionary* info = [NSMutableDictionary dictionary];
-  [info setValue:path forKey:kHGSObjectAttributeURIKey];
-  [info setValue:@"foo" forKey:kHGSObjectAttributeNameKey];
-  [info setValue:@"bar" forKey:kHGSObjectAttributeTypeKey];
-  HGSObject* infoObject = [HGSObject objectWithDictionary:info source:self];
+  [info setObject:path forKey:kHGSObjectAttributeURIKey];
+  [info setObject:@"foo" forKey:kHGSObjectAttributeNameKey];
+  [info setObject:@"bar" forKey:kHGSObjectAttributeTypeKey];
+  HGSResult* infoObject = [HGSResult resultWithDictionary:info source:self];
   STAssertNotNil(infoObject, @"can't create object from dict");
   STAssertEqualObjects([NSURL URLWithString:path], 
-                       [infoObject valueForKey:kHGSObjectAttributeURIKey], 
+                       [infoObject url], 
                        @"didn't find uri");
   STAssertEqualStrings(kHGSPathCellDisplayTitleKey, 
                        [infoObject valueForKey:kHGSPathCellDisplayTitleKey], 
@@ -98,21 +98,21 @@
   // create an object from a dictionary where the source doesn't implement
   // the correct protocol. This shouldn't throw or crash.
   NSMutableDictionary* info2 = [NSMutableDictionary dictionary];
-  [info2 setValue:path forKey:kHGSObjectAttributeURIKey];
-  [info2 setValue:@"foo" forKey:kHGSObjectAttributeNameKey];
-  [info2 setValue:@"bar" forKey:kHGSObjectAttributeTypeKey];
-  HGSObject* infoObject2 = [HGSObject objectWithDictionary:info2 source:nil];
+  [info2 setObject:path forKey:kHGSObjectAttributeURIKey];
+  [info2 setObject:@"foo" forKey:kHGSObjectAttributeNameKey];
+  [info2 setObject:@"bar" forKey:kHGSObjectAttributeTypeKey];
+  HGSResult* infoObject2 = [HGSResult resultWithDictionary:info2 source:nil];
   STAssertNotNil(infoObject2, @"can't create object from dict");
   STAssertNil([infoObject2 valueForKey:kHGSPathCellDisplayTitleKey], 
               @"found a title");
  
   // create an object wil a nil dictionary
-  HGSObject* nilObject = [HGSObject objectWithDictionary:nil source:nil];
+  HGSResult* nilObject = [HGSResult resultWithDictionary:nil source:nil];
   STAssertNil(nilObject, @"created object from nil dict");
   
   // create an object with an empty dictionary
-  HGSObject* emptyObject 
-    = [HGSObject objectWithDictionary:[NSDictionary dictionary]
+  HGSResult* emptyObject 
+    = [HGSResult resultWithDictionary:[NSDictionary dictionary]
                                source:nil];
   STAssertNil(emptyObject, @"created object from empty dict");
 }
@@ -138,11 +138,11 @@
   for (size_t i = 0; i < sizeof(data) / sizeof(TestData); i++) {
 
     // Create an object
-    HGSObject* obj = [HGSObject objectWithIdentifier:url 
-                                                name:@"name"
-                                                type:data[i].theType
-                                              source:nil
-                                          attributes:nil];
+    HGSResult* obj = [HGSResult resultWithURL:url 
+                                         name:@"name"
+                                         type:data[i].theType
+                                       source:nil
+                                   attributes:nil];
     STAssertNotNil(obj, @"type %@", data[i].theType);
     STAssertEqualObjects(data[i].theType, 
                          [obj type], @"type %@", 
@@ -202,11 +202,15 @@
   return [super init];
 }
 
+- (NSBundle *)bundle {
+  return nil;
+}
+
 - (NSImage *)icon {
   return nil;
 }
 
-- (NSString *)name {
+- (NSString *)displayName {
   return @"fakeSource";
 }
 
@@ -240,28 +244,28 @@
   return nil;
 }
 
-- (void)annotateObject:(HGSObject *)object withQuery:(HGSQuery *)query {
+- (void)annotateResult:(HGSResult *)result withQuery:(HGSQuery *)query {
 }
 
 - (NSSet *)utisToExcludeFromDiskSources {
   return nil;
 }
 
-- (NSMutableDictionary*)archiveRepresentationForObject:(HGSObject*)object {
+- (NSMutableDictionary*)archiveRepresentationForResult:(HGSResult*)result {
   return nil;
 }
 
-- (HGSObject *)objectWithArchivedRepresentation:(NSDictionary*)representation {
+- (HGSResult *)resultWithArchivedRepresentation:(NSDictionary*)representation {
   return nil;
 }
 
 // simply fills in the same value as the given |key|. Won't be called if the
 // value is already set.
-- (id)provideValueForKey:(NSString*)key result:(HGSObject*)result {
+- (id)provideValueForKey:(NSString*)key result:(HGSResult*)result {
   return key;
 }
 
-- (NSImage *)defaultIconForObject:(HGSObject *)object {
+- (NSImage *)defaultIconForResult:(HGSResult *)result {
   return nil;
 }
 @end

@@ -30,6 +30,14 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+@class HGSCodeSignature;
+
+typedef enum {
+  eHGSAllowAlways = 1,  // Permanently allow the plugin
+  eHGSAllowOnce = 2,    // Allow the plugin for this run of the application
+  eHGSDisallow = 3      // Don't allow the plugin (ask again at next launch)
+} HGSPluginLoadResult;
+
 // This protocol is used for a delegate so the core HGS code can get information
 // from the application it's running in w/o knowing about the packaging.
 @protocol HGSDelegate
@@ -52,5 +60,12 @@
 
 // Return the ID for the default action 
 - (NSString *)defaultActionID;
+
+// When a new plugin is loaded, this method is called to approve it. certRef
+// will contain the certificate that was used to code sign the plugin
+// bundle, or nil if the plugin bundle was unsigned or has an invalid
+// signature.
+- (HGSPluginLoadResult)shouldLoadPluginAtPath:(NSString *)path
+                                withSignature:(HGSCodeSignature *)signature;
 
 @end

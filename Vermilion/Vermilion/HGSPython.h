@@ -31,7 +31,7 @@
 //
 
 #import <Python/Python.h>
-#import "HGSObject.h"
+
 
 #ifdef __cplusplus
 
@@ -53,6 +53,8 @@ public:
 
 @class HGSQuery;
 @class HGSSearchOperation;
+@class HGSResult;
+@class HGSResultArray;
 
 @interface HGSPythonObject : NSObject {
  @private
@@ -70,7 +72,8 @@ public:
 + (HGSPython *)sharedPython;
 + (NSString *)stringAttribute:(NSString *)attr fromObject:(PyObject *)obj;
 + (NSString *)lastErrorString;
-- (PyObject *)objectForResult:(HGSObject *)result;
+- (PyObject *)objectForResult:(HGSResult *)result;
+- (PyObject *)tupleForResults:(HGSResultArray *)results;
 - (PyObject *)objectForQuery:(HGSQuery *)query
          withSearchOperation:(HGSSearchOperation *)operation;
 - (PyObject *)loadModule:(NSString *)moduleName;

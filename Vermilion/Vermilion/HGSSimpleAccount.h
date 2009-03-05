@@ -40,18 +40,32 @@
 // provided for setting up a new account and editing an existing account.
 //
 // Use this as your account's base class if your account has the common
-// pattern of requiring an account name and password for setup.  The
-// minimum that you must provide when using HGSSimpleAccount are:
+// pattern of requiring an account name and password for setup.  Your
+// specialization of HGSSimpleAccount should have:
 //
-//  - Concrete account class (see GoogleAccount)
-//    - with a +[accountType] method returning the name of the account
+//  - Concrete account class (see GoogleAccount) providing:
+//    - an +[accountType] method returning the name of the account
 //      type which this account offers to sources and actions adhering to
 //      the HGSAccountClientProtocol
-//    - with a +[accountSetupViewToInstallWithParentWindow:] method
+//    - an +[accountSetupViewToInstallWithParentWindow:] method
 //      that loads, sets up, and returns an account edit view that gets
 //      inserted into the client's setup account window.
-//    - with a -[editNibName] method that returns the name of the nib file
+//    - an -[editNibName] method that returns the name of the nib file
 //      containing the window with which an account is edited.
+//    - an -[accountURLRequestForUserName:password:] method that composes
+//      an NSURLRequest suitable for synchronously authenticating the
+//      account.
+//    - and -[authenticateWithPassword:] method that performs a synchronous
+//      authentication of the account.  (Note: this method _should not_
+//      set |authenticated|.
+//    Optional:
+//    - an -[accountURLRequest] method that composes an NSURLRequest 
+//      suitable for asynchronously authenticating the account. 
+//      (The default implementation retrieves the userName and
+//      password from the keychain and calls through to
+//      -[accountURLRequestForUserName:password:].)
+//    - an -[authenticate] method that performs an asynchronous authentication
+//      of the account and sets |authenticated|.
 //  - A controller class deriving from HGSSetUpSimpleAccountViewController
 //    that provides:
 //    - an -[initWithNibName:bundle:] method that calls through to the
@@ -70,24 +84,35 @@
 @interface HGSSimpleAccount : HGSAccount {
  @private
   HGSSimpleAccountEditController *accountEditController_;
+  NSURLConnection *connection_; // Used by async authentication.
 }
 
 @property (nonatomic, retain, readonly)
   HGSSimpleAccountEditController *accountEditController;
+@property (nonatomic, retain) NSURLConnection *connection;
 
 // Adjust the account name, if desired.  The default implementation
 // returns the original string.
-- (NSString *)adjustAccountName:(NSString *)accountName;
+- (NSString *)adjustUserName:(NSString *)userName;
 
 // Provide the name of the edit nib.  Your implementation should
 // return a valid nib name.
 - (NSString *)editNibName;
 
-// Test the account and password to see if they authenticate, sets
-// |isAuthenticated| and returns |isAuthenticated| as a convenience.
+// Test the account and password to see if they authenticate.
 // The default implementation assumes the account is valid.  You
-// should provide your own implementation.
+// should provide your own implementation.  Do not set
+// authenticated_ in this method.
 - (BOOL)authenticateWithPassword:(NSString *)password;
+
+// Return an NSURLRequest appropriate for authenticating the account
+// using the credentials currently stored in the keychain.
+- (NSURLRequest *)accountURLRequest;
+
+// Return an NSURLRequest appropriate for authenticating the account
+// using the proposed account name and password.
+- (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
+                                      password:(NSString *)password;
 
 @end
 
@@ -99,12 +124,14 @@
  @private
   IBOutlet HGSSimpleAccount *account_;
   IBOutlet NSWindow *editAccountSheet_;
-  IBOutlet NSSecureTextField *editPasswordField_;
   
-  NSString *accountPassword_;
+  NSString *password_;
 }
 
-@property (nonatomic, copy) NSString *accountPassword;
+@property (nonatomic, copy) NSString *password;
+
+// Returns the account associated with this edit controller.
+- (HGSSimpleAccount *)account;
 
 // Gets the edit window associated with this controller.
 - (NSWindow *)editAccountSheet;
@@ -114,6 +141,13 @@
 
 // Called when user presses 'Cancel'.
 - (IBAction)cancelEditAccountSheet:(id)sender;
+
+// Called when authentication fails, to see if remediation is possible.
+// The default returns NO.  Override this to determine if some additional
+// action can be performed (within the setup process) to fix the
+// authentication.  One common remediation is to respond to a captcha
+// request.
+- (BOOL)canGiveUserAnotherTry;
 
 @end
 
@@ -125,14 +159,14 @@
 //
 @interface HGSSetUpSimpleAccountViewController : NSViewController {
  @private
-  IBOutlet NSTextField *setupAccountNameField_;
-  IBOutlet NSSecureTextField *setupPasswordField_;
+  HGSSimpleAccount *account_;  // The account, once created.
   NSString *accountName_;
   NSString *accountPassword_;
   NSWindow *parentWindow_;  // WEAK
   Class accountTypeClass_;
 }
 
+@property (nonatomic, retain) HGSSimpleAccount *account;
 @property (nonatomic, copy) NSString *accountName;
 @property (nonatomic, copy) NSString *accountPassword;
 
@@ -150,5 +184,11 @@
 
 // Called when user presses 'Cancel'.
 - (IBAction)cancelSetupAccountSheet:(id)sender;
+
+// Called when authentication fails to, see if remediation is possible.  Pass 
+// along the window off of which we can hang an alert, if so desired.
+// See description of -[HGSSimpleAccountEditController canGiveUserAnotherTry]
+// for an explanation.
+- (BOOL)canGiveUserAnotherTryOffWindow:(NSWindow *)window;
 
 @end

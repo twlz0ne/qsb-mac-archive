@@ -33,7 +33,7 @@
 #import "HGSOperation.h"
 #import "GTMObjectSingleton.h"
 #import "GTMDebugSelectorValidation.h"
-#import "GTMHTTPFetcher.h"
+#import <GData/GDataHTTPFetcher.h>
 #import "HGSLog.h"
 
 static const NSOperationQueuePriority kDiskQueuePriority = NSOperationQueuePriorityNormal;
@@ -51,7 +51,7 @@ static NSString * const kCallbackErrorKey = @"kCallbackErrorKey";
 static const CFTimeInterval kNetworkOperationTimeout = 60; // seconds
 
 
-@interface HGSInvocationOperation(PrivateMethods)
+@interface HGSInvocationOperation()
 - (id)initWithTarget:(id)target selector:(SEL)sel object:(id)arg;
 - (id)initWithInvocation:(NSInvocation *)inv;
 - (InvocationType)invocationType;
@@ -65,14 +65,14 @@ static const CFTimeInterval kNetworkOperationTimeout = 60; // seconds
 
 @interface HGSNetworkOperation : HGSInvocationOperation {
   NSDictionary *callbackDict_;  // STRONG
-  GTMHTTPFetcher *fetcher_;  // STRONG
+  GDataHTTPFetcher *fetcher_;  // STRONG
   id fetcherTarget_;  // STRONG
   BOOL isReady_;
   SEL didFinishSel_;
   SEL didFailSel_;
 }
 - (id)initWithTarget:(id)target
-                 forFetcher:(GTMHTTPFetcher *)fetcher
+                 forFetcher:(GDataHTTPFetcher *)fetcher
           didFinishSelector:(SEL)didFinishSel
             didFailSelector:(SEL)didFailWithErrorSel;
 - (void)beginFetch;
@@ -97,7 +97,7 @@ static const CFTimeInterval kNetworkOperationTimeout = 60; // seconds
 //   Application instantiates an HGSNetworkOperation
 //   The HTTP fetch occurs on the HGSFetcherThread
 //   The HGSNetworkOperation isReady method returns NO until the fetch completes
-//   The fetch completes, isReady returns YES, and the GTMHTTPFetcher
+//   The fetch completes, isReady returns YES, and the GDataHTTPFetcher
 //   callbacks run on the HGSNetworkOperation thread
 // All HTTP fetches run on the same HGSFetcherThread, which is instantiated
 // when the first HGSNetworkOperations is created.
@@ -120,7 +120,7 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
     rlSource_ = CFRunLoopSourceCreate(NULL, 0, &context);
     fetchesLock_ = [[NSLock alloc] init];
     fetches_ = [[NSMutableArray alloc] init];
-    NSCondition *runLoopCondition = [[NSCondition alloc] init];
+    NSCondition *runLoopCondition = [[[NSCondition alloc] init] autorelease];
     if (!rlSource_ || !fetchesLock_ || !runLoopCondition) {
       [self release];
       return nil;
@@ -133,7 +133,6 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
       [runLoopCondition wait];
     }
     [runLoopCondition unlock];
-    [runLoopCondition release];
   }
   return self;
 }
@@ -203,7 +202,7 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
 @implementation HGSNetworkOperation
 
 - (id)initWithTarget:(id)target
-          forFetcher:(GTMHTTPFetcher *)fetcher
+          forFetcher:(GDataHTTPFetcher *)fetcher
    didFinishSelector:(SEL)didFinishSel
      didFailSelector:(SEL)didFailSel {
   self = [super init];
@@ -217,12 +216,12 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
 
     GTMAssertSelectorNilOrImplementedWithArguments(target,
                                                    didFinishSel_,
-                                                   @encode(GTMHTTPFetcher *),
+                                                   @encode(GDataHTTPFetcher *),
                                                    @encode(NSData *),
                                                    NULL);
     GTMAssertSelectorNilOrImplementedWithArguments(target,
                                                    didFailSel_,
-                                                   @encode(GTMHTTPFetcher *),
+                                                   @encode(GDataHTTPFetcher *),
                                                    @encode(NSError *),
                                                    NULL);
   }
@@ -281,7 +280,7 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
   [[[NSThread currentThread] threadDictionary] removeObjectForKey:kHGSInvocationOperationThreadKey];
 }
 
-- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData {
   if (callbackDict_) {
     HGSLogDebug(@"httpFetcher:finishedWithData: called after another callback");
@@ -293,7 +292,7 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
   [self setIsReady:YES];
 }
 
-- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
     failedWithError:(NSError *)error {
   if (callbackDict_) {
     HGSLogDebug(@"httpFetcher:failedWithError: called after another callback");
@@ -324,7 +323,7 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
 
 + (HGSInvocationOperation *)
    networkInvocationOperationWithTarget:(id)target
-                             forFetcher:(GTMHTTPFetcher *)fetcher
+                             forFetcher:(GDataHTTPFetcher *)fetcher
                       didFinishSelector:(SEL)didFinishSel
                         didFailSelector:(SEL)didFailSel {
   HGSNetworkOperation *networkOp = [[[HGSNetworkOperation alloc]

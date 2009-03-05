@@ -85,10 +85,10 @@ NSString *const kAppUISourceAttributeElementKey
   [super dealloc];
 }
     
-- (NSDictionary*)getAppInfoFromObject:(HGSObject *)object {
+- (NSDictionary*)getAppInfoFromResult:(HGSResult *)result {
   NSDictionary *appInfo = nil;
-  if (object && [object isOfType:kHGSTypeFileApplication]) {
-    NSURL *appURL = [object valueForKey:kHGSObjectAttributeURIKey];
+  if (result && [result isOfType:kHGSTypeFileApplication]) {
+    NSURL *appURL = [result valueForKey:kHGSObjectAttributeURIKey];
     if ([appURL isFileURL]) {
       NSString *path = [appURL path];
       NSWorkspace *ws = [NSWorkspace sharedWorkspace];
@@ -161,13 +161,13 @@ NSString *const kAppUISourceAttributeElementKey
                          forKey:kHGSObjectAttributeDefaultActionKey];
         }
         // TODO(dmaclach): Build up the path cells for the element
-        HGSObject *object 
-          = [HGSObject objectWithIdentifier:uri
-                                       name:name
-                                       type:kHGSTypeAppUIItem
-                                     source:self
-                                 attributes:attributes];
-        [array addObject:object];
+        HGSResult *result 
+          = [HGSResult resultWithURL:uri
+                                name:name
+                                type:kHGSTypeAppUIItem
+                              source:self
+                          attributes:attributes];
+        [array addObject:result];
       }
     }
   }
@@ -175,7 +175,7 @@ NSString *const kAppUISourceAttributeElementKey
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
   if ([GTMAXUIElement isAccessibilityEnabled]) {
-    HGSObject *pivotObject = [[operation query] pivotObject];
+    HGSResult *pivotObject = [[operation query] pivotObject];
     GTMAXUIElement *element 
       = [pivotObject valueForKey:kAppUISourceAttributeElementKey];
     if (element) {
@@ -188,14 +188,14 @@ NSString *const kAppUISourceAttributeElementKey
    
 // TODO(dmaclach):fix up annotateObject so that it works properly with immutable
 // objects.
-- (void)annotateObject:(HGSObject *)object withQuery:(HGSQuery *)query {
-  NSDictionary *appData = [self getAppInfoFromObject:object];
+- (void)annotateObject:(HGSResult *)result withQuery:(HGSQuery *)query {
+  NSDictionary *appData = [self getAppInfoFromResult:result];
   if (appData) {
     NSNumber *pid = [appData objectForKey:@"NSApplicationProcessIdentifier"];
     GTMAXUIElement *element 
       = [GTMAXUIElement elementWithProcessIdentifier:[pid intValue]];
     if (element) {
-      [object setValue:element forKey:kAppUISourceAttributeElementKey];
+      [result setValue:element forKey:kAppUISourceAttributeElementKey];
     }
   }
 }

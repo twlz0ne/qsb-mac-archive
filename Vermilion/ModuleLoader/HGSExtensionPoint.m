@@ -35,15 +35,18 @@
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
 
-NSString* const kHGSExtensionPointDidChangeNotification =
-  @"com.google.HGSExtensionPoint.changes";
+NSString* const kHGSExtensionPointDidAddExtensionNotification
+  = @"HGSExtensionPointDidAddExtensionNotification";
+NSString* const kHGSExtensionPointWillRemoveExtensionNotification
+  = @"HGSExtensionPointWillRemoveExtensionNotification";
+NSString* const kHGSExtensionPointDidRemoveExtensionNotification
+  = @"HGSExtensionPointDidRemoveExtensionNotification";
+NSString *const kHGSExtensionKey = @"HGSExtension";
 
 static NSMutableDictionary *sHGSExtensionPoints = nil;
 
 @interface HGSExtensionPoint ()
 - (BOOL)verifyExtension:(id<HGSExtension>)extension;
-- (void)queueChangeNotification;
-- (void)sendChangeNotification;
 @end
 
 @implementation HGSExtensionPoint
@@ -78,9 +81,7 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
 - (void)dealloc {
   // Since these get stored away in a static dictionary
   // we never get released.
-  @synchronized(extensions_) {
-    [extensions_ release];
-  }
+  [extensions_ release];
   [super dealloc];
 }
 // COV_NF_END
@@ -109,8 +110,16 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
 }
 
 - (BOOL)extendWithObject:(id<HGSExtension>)extension {
+  BOOL wasGood = YES;
   NSString *identifier = [extension identifier];
-  BOOL wasGood = [identifier length] && [self verifyExtension:extension];
+  if (![identifier length]) {
+    HGSLog(@"Extension %@ has bad identifier", extension);
+    wasGood = NO;
+  }
+  if (![self verifyExtension:extension]) {
+    HGSLog(@"Extension %@ does not conform to protocol", identifier);
+    wasGood = NO;
+  }
   if (wasGood) {
     @synchronized(extensions_) {
       // Make sure it isn't in use and we don't already have this extension
@@ -124,24 +133,23 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
         wasGood = YES;
       }
     }
-    if (wasGood) {
-      [self queueChangeNotification];
-    }
+  }
+  if (wasGood) {
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    NSDictionary *userInfo 
+      = [NSDictionary dictionaryWithObject:extension forKey:kHGSExtensionKey];
+    [nc postNotificationName:kHGSExtensionPointDidAddExtensionNotification 
+                      object:self 
+                    userInfo:userInfo];
+    
   }
   return wasGood;
 }
 
 - (NSString *)description {
-  NSArray *nameArray;
-  @synchronized(sHGSExtensionPoints) {
-    nameArray = [sHGSExtensionPoints allKeysForObject:self];
-  }
-  NSString *name = [nameArray count] ? [nameArray objectAtIndex:0] : nil;
-  NSString *result;
-  @synchronized(self) {
-    result = [NSString stringWithFormat:@"%@ - %@ Extensions: %@",
-              [self class], name, [self extensions]];
-  }
+  NSString *result = [NSString stringWithFormat:@"%@ <%@> - Extensions: %@",
+                      [self class], NSStringFromProtocol(protocol_), 
+                      [self extensions]];
   return result;
 }
 
@@ -176,41 +184,27 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
 #pragma mark Removal
 
 - (void)removeExtensionWithIdentifier:(NSString *)identifier {
+  id extension = [self extensionWithIdentifier:identifier];
+  if (!extension) {
+    HGSLogDebug(@"No such extension with id: %@", identifier);
+    return;
+  }
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  NSDictionary *userInfo = [NSDictionary dictionaryWithObject:extension
+                                                       forKey:kHGSExtensionKey];
+  [nc postNotificationName:kHGSExtensionPointWillRemoveExtensionNotification 
+                    object:self 
+                  userInfo:userInfo];
   @synchronized(extensions_) {
     [extensions_ removeObjectForKey:identifier];
   }
-  [self queueChangeNotification];
+  [nc postNotificationName:kHGSExtensionPointDidRemoveExtensionNotification 
+                    object:self 
+                  userInfo:userInfo];
 }
 
 - (void)removeExtension:(id<HGSExtension>)extension {
-  NSString *identifier = [extension identifier];
-  @synchronized(extensions_) {
-    [extensions_ removeObjectForKey:identifier];
-  }
-  [self queueChangeNotification];
-}
-
-#pragma mark Notification
-
-- (void)queueChangeNotification {
-  // We use a simple BOOL to avoid over sending incase we get a bunch of changes
-  // before the first notification for sequence fires.
-  if (!notificationPending_) {
-    notificationPending_ = YES;
-
-    // Push the notification on the main thread incase changes happened on some
-    // other thread. (also delays a batch of changes on the main thread so we
-    // only notify once.)
-    [self performSelectorOnMainThread:@selector(sendChangeNotification)
-                           withObject:nil
-                        waitUntilDone:NO];
-  }
-}
-
-- (void)sendChangeNotification {
-  notificationPending_ = NO;
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc postNotificationName:kHGSExtensionPointDidChangeNotification object:self];
+  [self removeExtensionWithIdentifier:[extension identifier]];
 }
 
 @end

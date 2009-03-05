@@ -32,7 +32,8 @@
 
 #import "HGSExtension.h"
 #import "HGSLog.h"
-#import "HGSBundle.h"
+
+// Extension keys
 
 NSString *const kHGSExtensionClassKey = @"HGSExtensionClass";
 NSString *const kHGSExtensionPointKey = @"HGSExtensionPoint";
@@ -47,22 +48,41 @@ NSString *const kHGSExtensionDesiredAccountType
   = @"HGSExtensionDesiredAccountType";
 NSString *const kHGSExtensionOfferedAccountType
   = @"HGSExtensionOfferedAccountType";
-NSString *const kHGSIsUserVisible = @"HGSIsUserVisible";
-NSString *const kHGSIsEnabledByDefault = @"HGSIsEnabledByDefault";
-NSString *const kHGSExtensionAccountIdentifier
-  = @"HGSExtensionAccountIdentifier";
+NSString *const kHGSExtensionIsUserVisible = @"HGSExtensionIsUserVisible";
+NSString *const kHGSExtensionIsEnabledByDefault 
+  = @"HGSExtensionIsEnabledByDefault";
+NSString *const kHGSExtensionAccount = @"HGSExtensionAccount";
+
+// Notifications
+
+NSString *const kHGSUserMessageNotification = @"HGSUserMessageNotification";
+
+// Notification content keys
+NSString *const kHGSSummaryMessageKey = @"HGSTextMessageKey";
+NSString *const kHGSDescriptionMessageKey = @"HGSDescriptionMessageKey";
+NSString *const kHGSImageMessageKey = @"HGSImageMessageKey";
+NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
 
 @implementation HGSExtension
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super init])) {
-    NSString *name = nil;
-    NSString *iconPath = nil;
-    NSString *identifier = nil;
-    if (configuration) {
-      name = [configuration objectForKey:kHGSExtensionUserVisibleNameKey];
-      iconPath = [configuration objectForKey:kHGSExtensionIconImagePathKey];
-      identifier = [configuration objectForKey:kHGSExtensionIdentifierKey];
+    bundle_ = [[configuration objectForKey:kHGSExtensionBundleKey] retain];
+    if (!bundle_) {
+      HGSLog(@"Extensions require bundles %@", configuration);
+      [self release];
+      return nil;
+    }
+    NSString *name 
+      = [configuration objectForKey:kHGSExtensionUserVisibleNameKey];
+    NSString *iconPath
+      = [configuration objectForKey:kHGSExtensionIconImagePathKey];
+    NSString *identifier 
+      = [configuration objectForKey:kHGSExtensionIdentifierKey];
+    
+    if ([configuration objectForKey:kHGSExtensionIconImageKey]) {
+      HGSLog(@"We don't support setting kHGSExtensionIconImageKey. Use "
+             @"kHGSExtensionIconImagePathKey instead.");
     }
 
     if (![identifier length]) {
@@ -94,21 +114,16 @@ NSString *const kHGSExtensionAccountIdentifier
         }
       }
     }
-    name_ = [name copy];
+    displayName_ = [name copy];
     if (![iconPath length]) {
       iconPath = [self defaultObjectForKey:kHGSExtensionIconImagePathKey];
     }
     if ([iconPath length]) {
       if (![iconPath isAbsolutePath]) {
-        NSBundle *bundle 
-          = [configuration objectForKey:kHGSExtensionBundleKey];
-        if (!bundle) {
-          bundle = HGSGetPluginBundle();
-        }
         NSString *partialIconPath = iconPath;
-        iconPath = [bundle pathForImageResource:partialIconPath];
+        iconPath = [bundle_ pathForImageResource:partialIconPath];
         if (!iconPath) {
-          HGSLog(@"Unable to locate icon %@ in %@", partialIconPath, bundle);
+          HGSLog(@"Unable to locate icon %@ in %@", partialIconPath, bundle_);
         }
       }
       iconPath_ = [iconPath copy];
@@ -118,10 +133,11 @@ NSString *const kHGSExtensionAccountIdentifier
 }
 
 - (void)dealloc {
-  [name_ release];
+  [displayName_ release];
   [icon_ release];
   [iconPath_ release];
   [identifier_ release];
+  [bundle_ release];
   [super dealloc];
 }
 
@@ -159,8 +175,12 @@ NSString *const kHGSExtensionAccountIdentifier
 }
 
 // Return a display name for the extension.
-- (NSString *)name {
-  return [[name_ retain] autorelease];
+- (NSString *)displayName {
+  return [[displayName_ retain] autorelease];
+}
+
+- (NSBundle *)bundle {
+  return [[bundle_ retain] autorelease];
 }
 
 // Return a display name for the extension.
@@ -175,24 +195,21 @@ NSString *const kHGSExtensionAccountIdentifier
 
 // Return a description for the extension.
 - (NSAttributedString *)extensionDescription {
-  NSBundle *bundle = HGSGetPluginBundle();
   NSAttributedString *description = nil;
-  if (bundle) {
-    NSString *extensions[] = {
-      @"html",
-      @"rtf",
-      @"rtfd"
-    };
-    for (size_t i = 0; i < sizeof(extensions) / sizeof(NSString *); ++i) {
-      NSString *path = [bundle pathForResource:@"Description"
-                                        ofType:extensions[i]];
-      if (path) {
-        description 
-          = [[[NSAttributedString alloc] initWithPath:path
-                                   documentAttributes:nil] autorelease];
-        if (description) {
-          break;
-        }
+  NSString *extensions[] = {
+    @"html",
+    @"rtf",
+    @"rtfd"
+  };
+  for (size_t i = 0; i < sizeof(extensions) / sizeof(NSString *); ++i) {
+    NSString *path = [bundle_ pathForResource:@"Description"
+                                       ofType:extensions[i]];
+    if (path) {
+      description 
+        = [[[NSAttributedString alloc] initWithPath:path
+                                 documentAttributes:nil] autorelease];
+      if (description) {
+        break;
       }
     }
   }
@@ -205,7 +222,7 @@ NSString *const kHGSExtensionAccountIdentifier
 }
 
 - (id)objectForInfoDictionaryKey:(NSString *)key {
-  return [HGSGetPluginBundle() objectForInfoDictionaryKey:key];
+  return [bundle_ objectForInfoDictionaryKey:key];
 }
 
 - (id)defaultObjectForKey:(NSString *)key {

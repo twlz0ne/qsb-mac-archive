@@ -42,13 +42,11 @@
   IBOutlet NSTabView *settingsTabView_;
   
   BOOL prefsColorWellWasShowing_;  // YES if color well was showing.
-  NSInteger pluginsTabIndex_;
   NSColorList *colors_;
   NSColor *selectedColor_;
   NSArray *sourceSortDescriptor_;
   
   IBOutlet NSArrayController *accountsListController_;
-  IBOutlet QSBSetUpAccountWindowController *setUpAccountWindowController_;
   LSSharedFileListRef openAtLoginItemsList_;
   UInt32 openAtLoginItemsSeedValue_;
 }

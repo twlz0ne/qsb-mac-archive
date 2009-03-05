@@ -40,7 +40,7 @@
 #define kHGSTypeSearchCorpus @"searchcorpus"
 
 @interface HGSWebSearchSource : HGSCallbackSearchSource
-+ (NSURL *)urlForQuery:(NSString *)queryString onSiteObject:(HGSObject *)object;
++ (NSURL *)urlForQuery:(NSString *)queryString onSiteResult:(HGSResult *)result;
 @end
 
 #if TARGET_OS_IPHONE
@@ -51,32 +51,44 @@ static NSString *const kWebSourceIconName = @"web-searchsubmit.png";
 static NSString *const kWebSourceIconName = @"blue-searchhistory";
 #endif
 
-static NSString* const kGoogleSiteSearchFormat = @"http://www.google.com/search?q=%@&as_sitesearch=%@";
+static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchURLFormat";
+static NSString* const kGoogleSiteSearchFormat
+  = @"http://www.google.com/search?q=%1$@&as_sitesearch=%2$@";
 
 @implementation HGSWebSearchSource
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  // We are a valid source for any web page
-  HGSObject *pivotObject = [query pivotObject];
-  
-  BOOL isSearchable = ([pivotObject valueForKey:kHGSObjectAttributeWebSearchTemplateKey] != nil) ||
-    [[pivotObject valueForKey:kHGSObjectAttributeAllowSiteSearchKey] boolValue];
-  return isSearchable;
+  BOOL isValid = [super isValidSourceForQuery:query];
+  if (isValid) {
+    // We are a valid source for any web page
+    HGSResult *pivotObject = [query pivotObject];
+    NSString *template
+      = [pivotObject valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
+    BOOL allowsSearchSite = [pivotObject conformsToType:kHGSTypeWebpage];
+    isValid = (template!= nil) || allowsSearchSite;
+  }
+  return isValid;
 }
 
-+ (NSURL *)urlForQuery:(NSString *)queryString onSiteObject:(HGSObject *)object {
-  NSString *searchFormat = [object valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
-
++ (NSURL *)urlForQuery:(NSString *)queryString onSiteResult:(HGSResult *)result {
+  NSString *template
+    = [result valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
+  
   NSString *escapedString = [queryString gtm_stringByEscapingForURLArgument];
-  NSString *fullURLString = nil;
-  if (searchFormat && [escapedString length]) {
-    fullURLString = [searchFormat stringByReplacingOccurrencesOfString:@"{searchterms}" withString:escapedString];
+  NSString *urlString = nil;
+  if (template && [escapedString length]) {
+    urlString = [template stringByReplacingOccurrencesOfString:@"{searchterms}" 
+                                                    withString:escapedString];
   } else {
-    fullURLString = [NSString stringWithFormat:kGoogleSiteSearchFormat,
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSString *searchFormat = [ud stringForKey:kWebSourceSiteSearchOverrideKey];
+    if (!searchFormat) searchFormat = kGoogleSiteSearchFormat;
+    
+    urlString = [NSString stringWithFormat:searchFormat,
                      escapedString,
-                     [[object identifier] host]];
+                     [[result url] host]];
   }
-  return [NSURL URLWithString:fullURLString];
+  return [NSURL URLWithString:urlString];
 }
 
 - (BOOL)isSearchConcurrent {
@@ -85,15 +97,15 @@ static NSString* const kGoogleSiteSearchFormat = @"http://www.google.com/search?
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
   HGSQuery *query = [operation query];
-  HGSObject *pivotObject = [query pivotObject];
+  HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
     NSString *queryString = [query rawQueryString];
-    NSURL *url = [[self class] urlForQuery:queryString onSiteObject:pivotObject];
+    NSURL *url = [[self class] urlForQuery:queryString onSiteResult:pivotObject];
     NSString *searchName = [pivotObject valueForKey:kHGSObjectAttributeWebSearchDisplayStringKey];
     if (!searchName) {
       NSString *searchLabel = HGSLocalizedString(@"Search %@",
                                                  @"Search <website|category> (eg. Wikipedia) (30 chars excluding <website>)");
-      searchName = [NSString stringWithFormat:searchLabel, [[pivotObject identifier] host]];
+      searchName = [NSString stringWithFormat:searchLabel, [[pivotObject url] host]];
     }
     if ([queryString length]) {
       BOOL searchInline = NO;
@@ -112,24 +124,24 @@ static NSString* const kGoogleSiteSearchFormat = @"http://www.google.com/search?
              icon, kHGSObjectAttributeIconKey,
              details, kHGSObjectAttributeSnippetKey,
              nil];
-        HGSObject *placeholderItem 
-          = [HGSObject objectWithIdentifier:url
-                                       name:searchName
-                                       type:kHGSTypeSearchCorpus
-                                     source:nil
-                                 attributes:attributes];
+        HGSResult *placeholderItem 
+          = [HGSResult resultWithURL:url
+                                name:searchName
+                                type:kHGSTypeSearchCorpus
+                              source:nil
+                          attributes:attributes];
         [operation setResults:[NSArray arrayWithObject:placeholderItem]];
       }
     } else {
-      NSURL *identifier = [pivotObject identifier];
+      NSURL *identifier = [pivotObject url];
       NSString *openLabel = HGSLocalizedString(@"Open %@",
                                                @"Open <website> (eg. Wikipedia) (30 chars excluding <website>)");
       NSString *name = [NSString stringWithFormat:openLabel, [pivotObject displayName]];
-      HGSObject *placeholderItem = [HGSObject objectWithIdentifier:identifier
-                                                              name:name 
-                                                              type:kHGSTypeWebpage 
-                                                            source:nil 
-                                                        attributes:nil];
+      HGSResult *placeholderItem = [HGSResult resultWithURL:identifier
+                                                       name:name 
+                                                       type:kHGSTypeWebpage 
+                                                     source:nil 
+                                                 attributes:nil];
       [operation setResults:[NSArray arrayWithObjects:placeholderItem, nil]];
     }
   }

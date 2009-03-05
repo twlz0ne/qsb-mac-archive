@@ -34,27 +34,26 @@
 
 @implementation QSBResultRowViewController
 - (id)initWithNibName:(NSString *)name
-           controller:(QSBQueryController *)queryController {
+           controller:(QSBSearchViewController *)searchViewController {
   if ((self = [super initWithNibName:name
                               bundle:nil])) {
-    [self setQueryController:queryController];
+    [self setSearchViewController:searchViewController];
   }
   return self;
 }
 
 - (void)dealloc {
-  [queryController_ release];
+  [searchViewController_ release];
   [super dealloc];
 }
 
-- (void)setQueryController:(QSBQueryController *)queryController {
-  [queryController_ autorelease];
-  queryController_ = [queryController retain];
+- (void)setSearchViewController:(QSBSearchViewController *)searchViewController {
+  [searchViewController_ autorelease];
+  searchViewController_ = [searchViewController retain];
 }
 
-- (QSBQueryController *)queryController {
-  return [[queryController_ retain] autorelease];
+- (QSBSearchViewController *)searchViewController {
+  return [[searchViewController_ retain] autorelease];
 }
-
 
 @end

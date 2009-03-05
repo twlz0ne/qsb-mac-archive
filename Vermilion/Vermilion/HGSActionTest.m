@@ -38,22 +38,25 @@
 #import "GTMSenTestCase.h"
 
 #import "HGSAction.h"
-#import "HGSObject.h"
+#import "HGSResult.h"
 
-@interface HGSActionTest : GTMTestCase
+@interface HGSActionTest : GTMTestCase {
+ @private
+  NSBundle *bundle_;
+}
 @end
 
-@interface MyObject : HGSObject
+@interface MyObject : HGSResult
 - (id)initWithIdentifier:(NSURL*)identifier;
 @end
 
 @implementation MyObject
 - (id)initWithIdentifier:(NSURL*)identifier {
-  return [super initWithIdentifier:identifier
-                              name:@"MyObject" 
-                              type:@"test" 
-                            source:nil
-                        attributes:nil];
+  return [super initWithURL:identifier
+                       name:@"MyObject" 
+                       type:@"test" 
+                     source:nil
+                 attributes:nil];
 }
 @end
 
@@ -65,9 +68,10 @@
 
 @implementation MyAction : HGSAction
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject* primary = [info objectForKey:kHGSActionPrimaryObjectKey];  
-  return (primary != nil) ? YES : NO;
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directObjects
+     = [info objectForKey:kHGSActionDirectObjectsKey];
+  return (directObjects != nil) ? YES : NO;
 }
 
 - (id)defaultObjectForKey:(NSString *)key {
@@ -95,15 +99,25 @@
 
 @implementation HGSActionTest
 
+- (void)setUp {
+  bundle_ = [[NSBundle bundleForClass:[self class]] retain];
+}
+
+- (void)tearDown {
+  [bundle_ release];
+}
+
 // creates and deletes actions. We explicitly call |-release| here to ensure
 // that |-dealloc| gets covered by the test cases, as opposed to relying on the
 // autorelease pool which may or may not count towards our test coverage.
 - (void)testCreation {
   // test creating a basic HGSAction w/out a handler
+  
   NSDictionary *configuration
     = [NSDictionary dictionaryWithObjectsAndKeys:
        @"designatedInit", kHGSExtensionUserVisibleNameKey,
        @"test1", kHGSExtensionIdentifierKey,
+       bundle_, kHGSExtensionBundleKey,
        nil];
   HGSAction* action = [[HGSAction alloc] initWithConfiguration:configuration];
   STAssertNotNil(action, @"couldn't create action");
@@ -111,13 +125,14 @@
   
   // test passing a nil configuration.
   HGSAction* action1 = [[HGSAction alloc] initWithConfiguration:nil];
-  STAssertNotNil(action1, @"couldn't create action with nil name");
+  STAssertNil(action1, @"Created action without a bundle");
   
   // test creating a subclass with all the trimmings
   NSDictionary *myConfig
     = [NSDictionary dictionaryWithObjectsAndKeys:
        @"designatedInit", kHGSExtensionUserVisibleNameKey,
        @"test2", kHGSExtensionIdentifierKey,
+       bundle_, kHGSExtensionBundleKey,
        nil];
   HGSAction* myAction = [[MyAction alloc] initWithConfiguration:myConfig];
   STAssertNotNil(myAction, @"couldn't create action");
@@ -127,9 +142,7 @@
   // test passing empty configuration
   NSDictionary *emptyConfig = [NSDictionary dictionary];
   HGSAction* emptyAction = [[MyAction alloc] initWithConfiguration:emptyConfig];
-  STAssertNotNil(emptyAction, @"couldn't create action");
-  STAssertEqualStrings([emptyAction identifier], @"com.google.Vermilion", nil);
-  [emptyAction release];
+  STAssertNil(emptyAction, @"Created action without a bundle");
 }
 
 - (void)testDisplayName {
@@ -140,6 +153,7 @@
     = [NSDictionary dictionaryWithObjectsAndKeys:
        @"action name", kHGSExtensionUserVisibleNameKey,
        @"test5", kHGSExtensionIdentifierKey,
+       bundle_, kHGSExtensionBundleKey,
        nil];
   HGSAction* myAction = [[[MyAction alloc] initWithConfiguration:configuration]
                          autorelease];
@@ -147,11 +161,12 @@
   
   // the display name is set as the |name| parameter in the initializer, and
   // since it's already set, it won't go to our handler.
-  NSString* name = [myAction displayNameForResult:obj];
+  HGSResultArray *results = [HGSResultArray arrayWithResult:obj];
+  NSString* name = [myAction displayNameForResults:results];
   STAssertEqualStrings(name, @"action name", @"display name failed");
   
   // should still be the same, even for a nil object
-  name = [myAction displayNameForResult:nil];
+  name = [myAction displayNameForResults:nil];
   STAssertEqualStrings(name, @"action name", @"display name failed");
 
 }
@@ -168,6 +183,7 @@
        @"action name", kHGSExtensionUserVisibleNameKey,
        @"test3", kHGSExtensionIdentifierKey,
        image, kHGSExtensionIconImageKey,
+       bundle_, kHGSExtensionBundleKey,
        nil];
   HGSAction* myAction = [[[MyAction alloc] initWithConfiguration:configuration]
                          autorelease];
@@ -175,7 +191,8 @@
   
   // the display image is set as the |image| parameter in the initializer, and
   // since it's already set, it won't go to our handler.
-  NSImage* resultImage = [myAction displayIconForResult:obj];
+  HGSResultArray *results = [HGSResultArray arrayWithResult:obj];
+  NSImage* resultImage = [myAction displayIconForResults:results];
   // NOTE: We copy the image w/in the base HGSExtension, so EqualObjects here
   // would fail.  At this point we aren't really checking for a specific image
   // we just want to make sure an image is coming back (we could use GTM for an
@@ -183,7 +200,7 @@
   STAssertNotNil(resultImage, @"display image failed");
   
   // should still be the same, even for a nil object
-  resultImage = [myAction displayIconForResult:nil];
+  resultImage = [myAction displayIconForResults:nil];
   // NOTE: same as above test
   STAssertNotNil(resultImage, @"display image failed");
 #endif
@@ -202,16 +219,17 @@
     = [NSDictionary dictionaryWithObjectsAndKeys:
        @"designatedInit", kHGSExtensionUserVisibleNameKey,
        @"test4", kHGSExtensionIdentifierKey,
+       bundle_, kHGSExtensionBundleKey,
        nil];
   HGSAction* myAction = [[[MyAction alloc] initWithConfiguration:configuration]
                          autorelease];
   STAssertNotNil(myAction, @"couldn't create action");
   
   NSMutableDictionary* info = [NSMutableDictionary dictionary];
-  [info setObject:obj forKey:kHGSActionPrimaryObjectKey];
-  [info setObject:obj2 forKey:kHGSActionIndirectObjectKey];
+  [info setObject:obj forKey:kHGSActionDirectObjectsKey];
+  [info setObject:obj2 forKey:kHGSActionIndirectObjectsKey];
   
-  BOOL result = [myAction performActionWithInfo:info];
+  BOOL result = [myAction performWithInfo:info];
   STAssertTrue(result, @"action failed");
 }
 

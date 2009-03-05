@@ -32,14 +32,11 @@
 
 #import <Foundation/Foundation.h>
 
-@class HGSObject;
-@class QSBQueryController;
+@class HGSResult;
+@class QSBSearchViewController;
 
 // Abstract base class for showing results in our tables
-@interface QSBTableResult : NSObject {
- @private
-  NSDictionary *baseStringAttributes_;
-}
+@interface QSBTableResult : NSObject
 
 // Determine if the result can be pivoted on.
 - (BOOL)isPivotable;
@@ -60,8 +57,8 @@
 // return the completion string
 - (NSString *)displayName;
 
-// return the path
-- (NSString *)displayPath;
+// return the path as an array of dictionaries for display in the UI
+- (NSArray *)displayPath;
 
 // return the rank of the result
 - (CGFloat)rank;
@@ -75,29 +72,29 @@
 - (Class)moreResultsRowViewControllerClass;
 
 // attempt to perform the default action on the item
-- (BOOL)performDefaultActionWithQueryController:(QSBQueryController*)controller;
+- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller;
 
 @end
 
 // A result that comes from one of our sources.
 @interface QSBSourceTableResult : QSBTableResult {
  @private
-  HGSObject *representedObject_;
+  HGSResult *representedResult_;
   NSString *categoryName_;
 }
 
-@property (nonatomic, readonly) HGSObject *representedObject;
+@property (nonatomic, readonly) HGSResult *representedResult;
 @property (nonatomic, readwrite, copy) NSString *categoryName;
 
-+ (id)resultWithObject:(HGSObject *)object;
-- (id)initWithObject:(HGSObject *)object;
++ (id)tableResultWithResult:(HGSResult *)result;
+- (id)initWithResult:(HGSResult *)result;
 
 @end
 
 // A "search google" result
 @interface QSBGoogleTableResult : QSBSourceTableResult
 
-+ (id)resultForQuery:(NSString*)query;
++ (id)tableResultForQuery:(NSString*)query;
 - (id)initWithQuery:(NSString*)query;
 
 @end
@@ -105,21 +102,21 @@
 // A separator (horizontal rule)
 @interface QSBSeparatorTableResult : QSBTableResult
 
-+ (id)result;
++ (id)tableResult;
 
 @end
 
 // A fold (eg Show more results or Show Top Results)
 @interface QSBFoldTableResult : QSBTableResult
 
-+ (id)result;
++ (id)tableResult;
 
 @end
 
 // A search status row "Searching Spotlight, Ganesh, etc..."
 @interface QSBSearchStatusTableResult : QSBTableResult
 
-+ (id)result;
++ (id)tableResult;
 
 @end
 
@@ -129,7 +126,7 @@
   NSString *message_;
 }
 
-+ (id)resultWithString:(NSString *)message;
++ (id)tableResultWithString:(NSString *)message;
 
 @end
 
@@ -143,8 +140,8 @@
   NSUInteger categoryCount_;
 }
 
-+ (id)resultWithCategory:(NSString *)categoryName
-                   count:(NSUInteger)categoryCount;
++ (id)tableResultWithCategory:(NSString *)categoryName
+                        count:(NSUInteger)categoryCount;
 - (id)initWithCategory:(NSString *)categoryName
                  count:(NSUInteger)categoryCount;
 - (NSString *)categoryName;

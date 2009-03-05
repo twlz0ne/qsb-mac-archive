@@ -31,6 +31,7 @@
 //
 
 #import "HGSAccount.h"
+#import "HGSCoreExtensionPoints.h"
 #import "HGSAccountsExtensionPoint.h"
 #import "HGSLog.h"
 
@@ -41,26 +42,27 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 
 @implementation HGSAccount
 
-@synthesize accountName = accountName_;
-@synthesize accountType = accountType_;
-@synthesize isAuthenticated = isAuthenticated_;
+@synthesize userName = userName_;
+@synthesize type = type_;
+@synthesize authenticated = authenticated_;
 
-- (id)initWithName:(NSString *)accountName
-          password:(NSString *)password
+- (id)initWithName:(NSString *)userName
               type:(NSString *)accountType {
+  NSBundle *bundle = [NSBundle bundleForClass:[self class]];
   NSString *name = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
-                    accountName, accountType];
+                    userName, accountType];
   NSString *identifier = [NSString stringWithFormat:kHGSAccountIdentifierFormat, 
-                          accountType, accountName];
+                          accountType, userName];
   NSDictionary *configuration
     = [NSDictionary dictionaryWithObjectsAndKeys:
+       bundle, kHGSExtensionBundleKey,
        name, kHGSExtensionUserVisibleNameKey,
        identifier, kHGSExtensionIdentifierKey,
        nil];
   if ((self = [super initWithConfiguration:configuration])) {
-    [self setAccountName:accountName];
-    [self setAccountType:accountType];
-    if (![self accountName] || ![self accountType]) {
+    [self setUserName:userName];
+    [self setType:accountType];
+    if (![self userName] || ![self type]) {
       [self release];
       self = nil;
     }
@@ -69,10 +71,9 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 }
 
 - (id)initWithDictionary:(NSDictionary *)prefDict {
-  NSString *accountName = [prefDict objectForKey:kHGSAccountNameKey];
+  NSString *userName = [prefDict objectForKey:kHGSAccountUserNameKey];
   NSString *accountType = [prefDict objectForKey:kHGSAccountTypeKey];
-  self = [self initWithName:accountName
-                   password:nil
+  self = [self initWithName:userName
                        type:accountType];
   return self;
 }
@@ -80,36 +81,37 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 - (NSDictionary *)dictionaryValue {
   NSDictionary *accountDict
     = [NSDictionary dictionaryWithObjectsAndKeys:
-       [self accountName], kHGSAccountNameKey,
-       [self accountType], kHGSAccountTypeKey,
+       [self userName], kHGSAccountUserNameKey,
+       [self type], kHGSAccountTypeKey,
        nil];
   return accountDict;
 }
 
 - (void) dealloc {
-  [accountName_ release];
-  [accountType_ release]; 
+  [userName_ release];
+  [type_ release]; 
   [super dealloc];
 }
 
 - (NSString *)displayName {
   NSString *displayName
     = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
-       [self accountName], [self accountType]];
+       [self userName], [self type]];
   return displayName;
 }
 
-- (NSString *)accountPassword {
+- (NSString *)password {
   return nil;
 }
 
-- (void)setAccountPassword:(NSString *)password {
+- (BOOL)setPassword:(NSString *)password {
   NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
-  [defaultCenter postNotificationName:kHGSDidChangeAccountNotification 
-                               object:[self identifier]];
+  [defaultCenter postNotificationName:kHGSAccountDidChangeNotification 
+                               object:self];
+  return YES;
 }
 
-+ (NSView *)accountSetupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
++ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
   HGSLogDebug(@"Class '%@', deriving from HGSAccount, should override "
               @"accountSetupViewToInstallWithParentWindow: if it has an "
               @"interface for setting up new accounts.", [self class]);
@@ -124,38 +126,37 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 
 - (void)remove {
   // Remove the account extension.
-  HGSAccountsExtensionPoint *accountsExtensionPoint
-    = [HGSAccountsExtensionPoint accountsExtensionPoint];
-  [accountsExtensionPoint removeExtension:self];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:kHGSAccountWillBeRemovedNotification object:self];
+  HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
+  [accountsPoint removeExtension:self];
 }
 
 - (BOOL)isEditable {
   return YES;
 }
 
-- (BOOL)isAccountTypeAndActive:(NSString *)type {
-  return [self isAuthenticated] && [type isEqualToString:[self accountType]];
+- (void)authenticate {
+}
+
+- (BOOL)isAccountType:(NSString *)type {
+  return [type isEqualToString:[self type]];
 }
 
 - (NSString *)description {
   return [NSString stringWithFormat:@"<%@:%p account='%@', type='%@'>",
-          [self class], self, accountName_, accountType_];
+          [self class], self, [self userName], type_];
 }
 
 @end
 
-// Notification keys.
-NSString *const kHGSDidChangeAccountNotification
-  = @"HGSDidChangeAccountNotification";
-NSString *const kHGSAccountConnectionFailureNotification
-  = @"HGSAccountConnectionFailureNotification";
+NSString *const kHGSAccountDidChangeNotification
+  = @"HGSAccountDidChangeNotification";
+NSString *const kHGSAccountWillBeRemovedNotification
+  = @"HGSAccountWillBeRemovedNotification";
 
-// Keys used in describing an account connection error.
-NSString *const kHGSAccountUsernameKey
-  = @"HGSAccountUsernameKey";
-NSString *const kHGSAccountConnectionErrorKey
-  = @"HGSAccountConnectionErrorKey";
-
-// Dictionary keys for archived HGSAccounts.
+// Difference between kHGSAccountUserNameKey and HGSAccountName is
+// due to legacy naming and is intentional.
+NSString *const kHGSAccountUserNameKey = @"HGSAccountName";
+NSString *const kHGSAccountConnectionErrorKey = @"HGSAccountConnectionErrorKey";
 NSString *const kHGSAccountTypeKey = @"HGSAccountType";
-NSString *const kHGSAccountNameKey = @"HGSAccountName";

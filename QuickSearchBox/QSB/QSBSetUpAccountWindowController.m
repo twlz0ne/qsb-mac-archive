@@ -31,94 +31,59 @@
 //
 
 #import "QSBSetUpAccountWindowController.h"
-#import "HGSAccount.h"
-#import "HGSAccountsExtensionPoint.h"
-#import "HGSLog.h"
+#import <Vermilion/Vermilion.h>
 
-
-@interface QSBSetUpAccountWindowController (QSBSetUpAccountWindowControllerPrivateMethods)
-
-// Get/set the account type which is shown in a popup in the setup window.
-- (NSString *)accountType;
-- (void)setAccountType:(NSString *)accountType;
-
-// Account setup handlers.
-- (void)accountSheetDidEnd:(NSWindow *)sheet
-                returnCode:(int)returnCode
-               contextInfo:(void *)contextInfo;
-
-// Sets/gets the installed account setup view.
-- (void)setInstalledSetupView:(NSView *)setupView;
-- (NSView *)installedSetupView;
-
-// Private setters.
-- (void)setAccountTypes:(NSArray *)accountTypes;
-
+@interface QSBSetUpAccountWindowController ()
+@property (nonatomic, retain, readwrite) NSArray *accountTypes;
+@property (nonatomic, assign, readwrite) NSString *selectedAccountType;
+@property (nonatomic, retain, readwrite) NSView *installedSetupView;
 @end
-
 
 @implementation QSBSetUpAccountWindowController
 
+@synthesize selectedAccountType = selectedAccountType_;
+@synthesize installedSetupView = installedSetupView_;
 @synthesize accountTypes = accountTypes_;
 
+- (id)init {
+  if ((self = [super initWithWindowNibName:@"SetUpAccount"])) {
+    HGSAccountsExtensionPoint *accountsPoint 
+      = [HGSExtensionPoint accountsPoint];
+    accountTypes_ = [[accountsPoint accountTypeNames] retain];
+  }
+  return self;
+}
+
 - (void) dealloc {
-  [accountType_ release];
   [accountTypes_ release];
   [installedSetupView_ release];
   [super dealloc];
 }
 
-- (void)presentSetUpAccountSheet {
-  // Set up the popup.
-  HGSAccountsExtensionPoint *accountsExtensionPoint
-    = [HGSAccountsExtensionPoint accountsExtensionPoint];
-  NSArray *accountTypeNames = [accountsExtensionPoint accountTypeNames];
-  accountTypeNames
-    = [accountTypeNames sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-  [self setAccountTypes:accountTypeNames];
-  
-  // Pick 'Google' if available.
-  if ([accountTypeNames count]) {
-    NSString *firstTypeName = [accountTypeNames objectAtIndex:0];
-    [self setAccountType:firstTypeName];
-  }
-      
-  [setupAccountSheet_ makeFirstResponder:installedSetupView_];
-  [NSApp beginSheet:setupAccountSheet_
-     modalForWindow:parentWindow_
-      modalDelegate:self
-     didEndSelector:@selector(accountSheetDidEnd:returnCode:contextInfo:)
-        contextInfo:nil];
+- (void)awakeFromNib {
+  NSSortDescriptor *sort 
+    = [[[NSSortDescriptor alloc] initWithKey:@"self" 
+                                   ascending:YES] autorelease];
+  [accountTypesController_ setSortDescriptors:[NSArray arrayWithObject:sort]];
+  NSArray *arrangedObjects = [accountTypesController_ arrangedObjects];
+  NSString *type = [arrangedObjects objectAtIndex:0];
+  [self setSelectedAccountType:type];
 }
 
-@end
+- (void)setSelectedAccountType:(NSString *)accountType {
+  selectedAccountType_ = accountType;
+  HGSAccountsExtensionPoint *accountsPoint 
+    = [HGSExtensionPoint accountsPoint];
 
-
-@implementation QSBSetUpAccountWindowController (QSBSetUpAccountWindowControllerPrivateMethods)
-
-- (NSString *)accountType {
-  return [[accountType_ retain] autorelease];
-}
-
-- (void)setAccountType:(NSString *)accountType {
-  // If the account type has changed then we need to swap the presentation.
-  NSString *currentType = [self accountType];
-  if (![currentType isEqualToString:accountType]) {
-    [accountType_ release];
-    accountType_ = [accountType copy];
-    
-    // Install the new account setup view.
-    HGSAccountsExtensionPoint *accountsExtensionPoint
-      = [HGSAccountsExtensionPoint accountsExtensionPoint];
-    Class accountClass = [accountsExtensionPoint classForAccountType:accountType];
-    NSView *viewToInstall
-      = [accountClass accountSetupViewToInstallWithParentWindow:parentWindow_];
-    if (viewToInstall) {
-      [self setInstalledSetupView:viewToInstall];
-    } else {
-      HGSLog(@"Failed to find setupView for account class '%@'",
-             accountClass);
-    }
+  Class accountClass = [accountsPoint classForAccountType:accountType];
+  NSWindow *parentWindow = [[self window] parentWindow];
+  NSView *viewToInstall
+    = [accountClass setupViewToInstallWithParentWindow:parentWindow];
+  if (viewToInstall) {
+    [self setInstalledSetupView:viewToInstall];
+  } else {
+    HGSLog(@"Failed to find setupView for account class '%@'",
+           accountClass);
   }
 }
 
@@ -153,21 +118,6 @@
     NSView *wannabeKeyView = [installedSetupView_ nextKeyView];
     [setupWindow makeFirstResponder:wannabeKeyView];
   }
-}
-
-- (NSView *)installedSetupView {
-  return [[installedSetupView_ retain] autorelease];
-}
-
-- (void)setAccountTypes:(NSArray *)accountTypes {
-  [accountTypes autorelease];
-  accountTypes_ = [accountTypes retain];
-}
-
-- (void)accountSheetDidEnd:(NSWindow *)sheet
-                returnCode:(int)returnCode
-               contextInfo:(void *)contextInfo {
-  [sheet orderOut:self];
 }
 
 @end

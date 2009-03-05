@@ -40,6 +40,9 @@
 // Designated initializer.
 - (id)initWithConfiguration:(NSDictionary *)configuration;
 
+// Bundle for the extension
+- (NSBundle *)bundle;
+
 // Return the unique identifier for this extension (reverse DNS style)
 - (NSString *)identifier;
 
@@ -47,7 +50,7 @@
 - (NSImage *)icon;
 
 // Return a display name for the extension.
-- (NSString *)name;
+- (NSString *)displayName;
 
 // Return a copyright string for the extension.
 - (NSString *)copyright;
@@ -66,11 +69,14 @@
 
 @interface HGSExtension : NSObject <HGSExtension> {
  @private
-  NSString *name_;
+  NSString *displayName_;
   NSString *iconPath_;
   NSImage *icon_;
   NSString *identifier_;
+  NSBundle *bundle_;
 }
+
+- (NSBundle*)bundle;
 
 // Return a copyright string for the extension.
 // By default returns the "NSHumanReadableCopyright" value from
@@ -131,11 +137,56 @@ extern NSString *const kHGSExtensionDesiredAccountType;
 extern NSString *const kHGSExtensionOfferedAccountType;
 // YES if the extension presented to the user in the preferences panel.
 // If this is not present then YES is assumed.
-extern NSString *const kHGSIsUserVisible;
+extern NSString *const kHGSExtensionIsUserVisible;
 // YES if the extension is to be enabled by default.  If this key is _not_
 // present, YES is assumed, except for account-dependent sources, in which
 // case NO is assumed.
-extern NSString *const kHGSIsEnabledByDefault;
-// Identifier of account assigned to the extension.
-extern NSString *const kHGSExtensionAccountIdentifier;
+extern NSString *const kHGSExtensionIsEnabledByDefault;
+// Account assigned to the extension. (id<HGSAccount>)
+extern NSString *const kHGSExtensionAccount;
 
+// Notifications
+
+// Posted by an extension for presenting a short informational message
+// to the user about the success of failure of an operation that may
+// not otherwise manifest itself to the user.  |userInfo| should
+// be a dictionary containing at least one of kHGSPlainTextMessageKey
+// or kHGSAttributedTextMessageKey.  Other items may also be specified,
+// including those given in the next section.  |object| should be the
+// reporting extension.
+extern NSString *const kHGSUserMessageNotification;
+
+// Extension message notification content keys
+
+// An NSString or NSAttributedString giving a very short message to be
+// presented to the user.
+extern NSString *const kHGSSummaryMessageKey;
+// An NSString or NSAttributedString giving a longer, descriptive message to
+// be presented to the user.  This is most valuable for suggesting remedial
+// actions that the user can take or for giving additional information about
+// the message.
+extern NSString *const kHGSDescriptionMessageKey;
+// An NSImage that can be used to give additional context to the
+// message presentation.  This is typically an icon representing the
+// service associated with the reporting extension.
+extern NSString *const kHGSImageMessageKey;
+// An NSNumber containing a whole number giving a success code for the
+// operation performed by the extension.  Non-negative numbers typically 
+// represent success, with negative numbers representing an error
+// of some kind.  The client UI could, for example, apply a tag to the
+// message image for error conditions.
+extern NSString *const kHGSSuccessCodeMessageKey;
+
+// Success Codes for use with kHGSSuccessCodeMessageKey.  Use whatever
+// codes you want but remember the following:
+// - negative numbers mean 'error' while positive numbers mean 'success'
+// - the more negative a number is the more serious the error
+// - Growl uses success codes where positive means 'error'
+// - Growl uses a success code range of -2 to +2
+// - when passing error codes to Growl we change the sign and clamp
+enum {
+  kHGSSuccessCodeBadError = -2,
+  kHGSSuccessCodeError = -1,
+  kHGSSuccessCodeSuccess = 0,
+  kHGSSuccessCodeWildSuccess = 1
+};

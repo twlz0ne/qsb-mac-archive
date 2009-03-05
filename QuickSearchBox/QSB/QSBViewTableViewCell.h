@@ -37,7 +37,9 @@
 @interface QSBViewTableViewCell : NSCell {
  @private
   NSView *contentView_; // The content displayed by this cell (weak)
+  CGFloat leftMargin_;
 }
+@property(assign) CGFloat leftMargin;
 
 //  Returns the content view for the cell.
 //

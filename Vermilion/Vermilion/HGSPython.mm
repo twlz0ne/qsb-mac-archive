@@ -31,6 +31,7 @@
 //
 
 #import "HGSPython.h"
+#import "HGSResult.h"
 #import "HGSSearchOperation.h"
 #import "HGSQuery.h"
 #import "HGSLog.h"
@@ -242,11 +243,11 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPython, sharedPython);
   [super dealloc];
 }
 
-- (PyObject *)objectForResult:(HGSObject *)result {
+- (PyObject *)objectForResult:(HGSResult *)result {
   PyObject *dict = PyDict_New();
   if (dict) {
     // Identifier
-    NSURL *url = [result valueForKey:kHGSObjectAttributeURIKey];
+    NSURL *url = [result url];
     NSString *value = [url absoluteString];
     PyObject *pyValue;
     if (value && (pyValue = PyString_FromString([value UTF8String]))) {
@@ -297,6 +298,24 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPython, sharedPython);
   return dict;
 }
 
+- (PyObject *)tupleForResults:(HGSResultArray *)array {
+  PyObject *pyTuple = NULL;
+  NSUInteger count = [array count];
+  if (count) {
+    pyTuple = PyTuple_New(count);
+    if (pyTuple) {
+      for (NSUInteger i = 0; i < count; ++i) {
+        HGSResult *result = [array objectAtIndex:i];
+        PyObject *pyObj = [self objectForResult:result];
+        if (pyObj) {
+          PyTuple_SetItem(pyTuple, i, pyObj);
+        }
+      }
+    }
+  }
+  return pyTuple;
+}
+
 - (PyObject *)objectForQuery:(HGSQuery *)query
          withSearchOperation:(HGSSearchOperation *)operation {
   PyObject *result = nil;  
@@ -335,7 +354,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPython, sharedPython);
           }
           
           // Create the pivot_object argument
-          HGSObject *pivotObject = [query pivotObject];
+          HGSResult *pivotObject = [query pivotObject];
           PyObject *pyPivotObject = Py_None;
           if (pivotObject) {
             pyPivotObject = [self objectForResult:pivotObject];
@@ -644,12 +663,12 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
               }
               [attributes setObject:privateValues 
                              forKey:kHGSPythonPrivateValuesKey];
-              HGSObject *result 
-                = [HGSObject objectWithIdentifier:url
-                                             name:displayNameString
-                                             type:kHGSTypePython
-                                           source:[self->operation_ source]
-                                       attributes:attributes];
+              HGSResult *result 
+                = [HGSResult resultWithURL:url
+                                      name:displayNameString
+                                      type:kHGSTypePython
+                                    source:[self->operation_ source]
+                                attributes:attributes];
               
               [results addObject:result];
             }

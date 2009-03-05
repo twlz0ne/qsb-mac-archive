@@ -45,9 +45,11 @@
 			<string>com.google.text.action.sendtwittermessage</string>
 			<key>HGSExtensionDesiredAccountType</key>
 			<string>Twitter</string>
-			<key>HGSIsEnabledByDefault</key>
+			<key>HGSExtensionIsEnabledByDefault</key>
 			<true/>
 		</dict>
 	</array>
+	<key>HGSPluginAPIVersion</key>
+	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
 </dict>
 </plist>

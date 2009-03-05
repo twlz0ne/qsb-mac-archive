@@ -31,9 +31,11 @@
 			<string>contact</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Spotlight Results</string>
-			<key>HGSIsEnabledByDefault</key>
+			<key>HGSExtensionIsEnabledByDefault</key>
 			<false/>
 		</dict>
 	</array>
+	<key>HGSPluginAPIVersion</key>
+	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
 </dict>
 </plist>

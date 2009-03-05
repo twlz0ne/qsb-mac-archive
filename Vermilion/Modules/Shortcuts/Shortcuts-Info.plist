@@ -25,7 +25,7 @@
 			<string>ShortcutsSource</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.shortcuts.source</string>
-			<key>HGSIsUserVisible</key>
+			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
@@ -33,5 +33,7 @@
 			<string>Shortcuts</string>
 		</dict>
 	</array>
+	<key>HGSPluginAPIVersion</key>
+	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
 </dict>
 </plist>

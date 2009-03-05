@@ -43,4 +43,8 @@
 // parser when symbols have meaning
 + (NSEnumerator *)tokenEnumeratorForString:(NSString *)stringToTokenize;
 
+// Returns all tokens. If wordsOnly is 'YES', it returns the same tokens that
+// wordEnumeratorForString would return. If wordsOnly is 'NO', it returns
+// the same tokens that tokenEnumeratorForString would return.
++ (NSArray *)tokenizeString:(NSString *)string wordsOnly:(BOOL)wordsOnly;
 @end

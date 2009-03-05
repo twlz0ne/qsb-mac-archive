@@ -69,7 +69,7 @@ typedef enum {
 }
 - (void)operationReceivedNewResults:(SLFilesOperation*)operation
                    withNotification:(NSNotification*)notification;
-- (HGSObject *)hgsObjectFromQueryItem:(MDItemRef)item 
+- (HGSResult *)hgsResultFromQueryItem:(MDItemRef)item 
                             operation:(SLFilesOperation *)operation;
 - (void)operationCompleted:(SLFilesOperation*)operation;
 - (void)startSearchOperation:(HGSSearchOperation*)operation;
@@ -310,7 +310,11 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
     HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
     [dc addObserver:self
            selector:@selector(extensionPointSourcesChanged:)
-               name:kHGSExtensionPointDidChangeNotification
+               name:kHGSExtensionPointDidAddExtensionNotification
+             object:sourcesPoint];
+    [dc addObserver:self
+           selector:@selector(extensionPointSourcesChanged:)
+               name:kHGSExtensionPointDidRemoveExtensionNotification
              object:sourcesPoint];
     
     attributeArray_ = [[NSArray alloc] initWithObjects:
@@ -329,7 +333,6 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
 
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-
   [utiFilter_ release];
   [attributeArray_ release];
   [super dealloc];
@@ -358,7 +361,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   NSMutableArray *predicateSegments = [NSMutableArray array];
 
   HGSQuery* query = [operation query];
-  HGSObject *pivotObject = [query pivotObject];
+  HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
     if ([pivotObject conformsToType:kHGSTypeContact]) {
       NSString *emailAddress = [pivotObject valueForKey:kHGSObjectAttributeContactEmailKey];
@@ -455,12 +458,12 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
     for (CFIndex i = [operation nextQueryItemIndex]; 
          i < currentCount && ![operation isCancelled]; 
          i++) {
-      MDItemRef result = (MDItemRef)MDQueryGetResultAtIndex(mdQuery, i);
-      if (result) {
-        HGSObject *object = [self hgsObjectFromQueryItem:result 
+      MDItemRef mdItem = (MDItemRef)MDQueryGetResultAtIndex(mdQuery, i);
+      if (mdItem) {
+        HGSResult *result = [self hgsResultFromQueryItem:mdItem 
                                                operation:operation];
-        if (object) {
-          [accumulatedResults addObject:object];
+        if (result) {
+          [accumulatedResults addObject:result];
         }
       }
     }
@@ -479,13 +482,13 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   }
 }
 
-- (HGSObject *)hgsObjectFromQueryItem:(MDItemRef)item 
+- (HGSResult *)hgsResultFromQueryItem:(MDItemRef)item 
                             operation:(SLFilesOperation *)operation {
   if ([operation isCancelled]) return nil;
   SLFilesCreateContext* context = [operation context];
   if (!context) return nil;
   
-  HGSObject* result = nil;
+  HGSResult* result = nil;
   NSDictionary *attributes 
     = GTMCFAutorelease(MDItemCopyAttributes(item, (CFArrayRef)attributeArray_));
   // Path is used a lot but can't be obtained from the query
@@ -527,6 +530,8 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
         }
         break;
       case SpotlightGroupPDF:
+        resultType = kHGSTypeFile;
+        break;
       case SpotlightGroupImage:
         resultType = kHGSTypeFileImage;
         break;
@@ -669,11 +674,11 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
        (isURL ? uriPath : nil), kHGSObjectAttributeSourceURLKey,
        nil];
   
-  result = [HGSObject objectWithIdentifier:uri
-                                      name:name
-                                      type:resultType
-                                    source:self
-                                attributes:hgsAttributes];
+  result = [HGSResult resultWithURL:uri
+                               name:name
+                               type:resultType
+                             source:self
+                         attributes:hgsAttributes];
   return result;
 }
 
@@ -754,28 +759,28 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
 
 #pragma mark -
 
-- (MDItemRef)mdItemRefForObject:(HGSObject*)object {
-  MDItemRef result = nil;
-  NSURL *url = [object valueForKey:kHGSObjectAttributeURIKey];
+- (MDItemRef)mdItemRefForResult:(HGSResult*)result {
+  MDItemRef mdItem = nil;
+  NSURL *url = [result url];
   if ([url isFileURL]) {
-    result = MDItemCreate(kCFAllocatorDefault, (CFStringRef)[url path]);
+    mdItem = MDItemCreate(kCFAllocatorDefault, (CFStringRef)[url path]);
     GTMCFAutorelease(result);
   }
-  return result;
+  return mdItem;
 }
 
-- (id)provideValueForKey:(NSString*)key result:(HGSObject*)result {
+- (id)provideValueForKey:(NSString*)key result:(HGSResult*)result {
   MDItemRef mdItemRef = nil;
   id value = nil;
 
   if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
-    NSURL *url = [result valueForKey:kHGSObjectAttributeURIKey];
+    NSURL *url = [result url];
     if (![url isFileURL]) {
       value = [NSImage imageNamed:@"blue-webhistory"];
     }
   }
   if ([key isEqualToString:kHGSObjectAttributeEmailAddressesKey] &&
-      (mdItemRef = [self mdItemRefForObject:result])) {
+      (mdItemRef = [self mdItemRefForResult:result])) {
     NSMutableArray *allEmails = nil;
     NSArray *emails
       = GTMCFAutorelease(MDItemCopyAttribute(mdItemRef,
@@ -797,7 +802,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
       value = allEmails;
     }
   } else if ([key isEqualToString:kHGSObjectAttributeContactsKey] &&
-             (mdItemRef = [self mdItemRefForObject:result])) {
+             (mdItemRef = [self mdItemRefForResult:result])) {
     NSMutableArray *allPeople = nil;
     NSArray *people = GTMCFAutorelease(MDItemCopyAttribute(mdItemRef,
                                                            kMDItemAuthors));
@@ -816,6 +821,10 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
       value = allPeople;
     }
   }
+  if (!value) {
+    value = [super provideValueForKey:key result:result];
+  }
+  
   return value;
 }
 

@@ -35,7 +35,7 @@
 #import "GTMDefines.h"
 
 @class HGSQuery;
-@class HGSObject;
+@class HGSResult;
 @class HGSMixer;
 @class HGSSearchOperation;
 

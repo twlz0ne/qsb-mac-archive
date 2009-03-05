@@ -39,7 +39,7 @@
 @implementation HGSPlugin (QSBHGSObjectSpecifiers)
 
 - (NSScriptObjectSpecifier *)objectSpecifier {
-  NSString *uID = [self bundleIdentifier];
+  NSString *uID = [self identifier];
   NSScriptClassDescription *classDesc 
     = [NSScriptClassDescription classDescriptionForClass:[NSApp class]];
   NSScriptObjectSpecifier * specifier 
@@ -57,7 +57,7 @@
 
 @implementation HGSProtoExtension (QSBHGSObjectSpecifiers)
 - (NSScriptObjectSpecifier *)objectSpecifier {
-  NSString *uID = [self protoIdentifier];
+  NSString *uID = [self identifier];
   NSScriptClassDescription *classDesc 
     = [NSScriptClassDescription classDescriptionForClass:[NSApp class]];
   NSScriptObjectSpecifier * specifier 

@@ -33,8 +33,8 @@
 #import "QSBMoreResultsViewDelegate.h"
 #import "QSBApplicationDelegate.h"
 #import "QSBCategoryTextAttachment.h"
-#import "QSBQuery.h"
-#import "QSBQueryController.h"
+#import "QSBSearchController.h"
+#import "QSBSearchViewController.h"
 #import "QSBPreferences.h"
 #import "QSBTableResult.h"
 #import "QSBResultsViewTableView.h"
@@ -51,7 +51,7 @@ static const NSUInteger kCategoryRowOverhead = 3;
 static const NSTimeInterval kFirstRowDownwardDelay = 0.6;
 static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 
-@interface QSBMoreResultsViewDelegate (QSBMoreResultsViewTableDelegatePrivateMethods)
+@interface QSBMoreResultsViewDelegate ()
 
 // Get/set sorted array of localized category names, suitable
 // for use as keys to the dictionary returned by resultsByCategory.
@@ -102,8 +102,11 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 
   // Nudge the view just out of visibility (by 100).
   CGFloat viewOffset = NSHeight(viewFrame) + 100.0;
-  NSView *contentView
-    = [[[[self queryController] searchWindowController] resultsWindow] contentView];
+  QSBSearchViewController *viewController = [self searchViewController];
+  QSBSearchWindowController *windowController 
+    = [viewController searchWindowController];
+  NSWindow *resultsWindow = [windowController resultsWindow];
+  NSView *contentView = [resultsWindow contentView];
   viewFrame.origin.y -= viewOffset;
   viewFrame.size.width = NSWidth([contentView frame]);
   [resultsView setFrame:viewFrame];
@@ -176,7 +179,7 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
     if (firstCategory) {
       firstCategory = NO;
     } else {
-      [results addObject:[QSBSeparatorTableResult result]];
+      [results addObject:[QSBSeparatorTableResult tableResult]];
     }
     
     BOOL showAllInThisCategory = [self showAllForCategory:categoryName];
@@ -186,12 +189,12 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
     NSUInteger resultCounter = 0;
     
     if ([categoryArray count] == categoryLimit + 1) showAllInThisCategory = YES;
-    for (HGSObject *result in categoryArray) {
+    for (HGSResult *result in categoryArray) {
       if (!showAllInThisCategory && resultCounter >= categoryLimit) {
         break;
       }
       QSBSourceTableResult *sourceResult 
-        = [QSBSourceTableResult resultWithObject:result];
+        = [QSBSourceTableResult tableResultWithResult:result];
       if (resultCounter == 0) {
         // Tag this as the first row for a category so the title will show.
         NSString *localizedCategoryName 
@@ -214,8 +217,8 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
     categoryCount = [categoryArray count];
     if (resultCounter < categoryCount) {
       // Insert a 'Show all n...' cell.
-      [results addObject:[QSBShowAllTableResult resultWithCategory:categoryName
-                                                               count:categoryCount]];
+      [results addObject:[QSBShowAllTableResult tableResultWithCategory:categoryName
+                                                                  count:categoryCount]];
     }
   }
   
@@ -284,7 +287,7 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   
   if (row == 0) {
     // If we're on the first row then transition to the 'Top' results view.
-    [[self queryController] showTopResults:sender];
+    [[self searchViewController] showTopResults:sender];
   } else {
     [super moveUp:sender];
   }
@@ -327,11 +330,6 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 - (Class)rowViewControllerClassForResult:(QSBTableResult *)result {
   return [result moreResultsRowViewControllerClass];
 }
-
-@end
-
-
-@implementation QSBMoreResultsViewDelegate (QSBMoreResultsViewDelegatePrivateMethods)
 
 - (NSArray *)sortedCategoryNames {
   return [[sortedCategoryNames_ retain] autorelease];
@@ -409,7 +407,7 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   [categoryString addAttributes:lineBreakAttributes];
   [self setCategoriesString:categoryString];
   
-  [[[self queryController] topResultsController]
+  [[[self searchViewController] topResultsController]
    setCategorySummaryString:categorySummary];
 }
 

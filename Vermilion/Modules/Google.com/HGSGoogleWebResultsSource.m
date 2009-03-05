@@ -31,13 +31,12 @@
 //
 
 #import "Vermilion/Vermilion.h"
-
-#import "GTMHTTPFetcher.h"
+#import "JSON/JSON.h"
+#import <GData/GDataHTTPFetcher.h>
 #import "GTMMethodCheck.h"
 #import "GTMNSDictionary+URLArguments.h"
 #import "GTMNSString+HTML.h"
 #import "NSArray+HGSCommonPrefixDetection.h"
-#import "NSScanner+BSJSONAdditions.h"
 #import "NSString+ReadableURL.h"
 
 #if TARGET_OS_IPHONE
@@ -48,7 +47,7 @@
 
 @interface HGSGoogleWebSearchOperation : HGSSearchOperation {
  @private
-  GTMHTTPFetcher *fetcher_;
+  GDataHTTPFetcher *fetcher_;
   id<HGSSearchSource> source_;
 }
 @end
@@ -130,9 +129,9 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     return;
   }
 
-  HGSObject *pivotObject = [query pivotObject];
+  HGSResult *pivotObject = [query pivotObject];
   
-  NSURL *identifier = [pivotObject identifier];
+  NSURL *identifier = [pivotObject url];
   NSString *site = nil;
 
   
@@ -189,7 +188,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   [request setValue:@"http://google-mobile-internal.google.com" forHTTPHeaderField:@"Referer"];
 
   if (!fetcher_) {
-    fetcher_ = [[GTMHTTPFetcher httpFetcherWithRequest:request] retain];
+    fetcher_ = [[GDataHTTPFetcher httpFetcherWithRequest:request] retain];
     [fetcher_ setUserData:self];
     [fetcher_ beginFetchWithDelegate:self
                    didFinishSelector:@selector(httpFetcher:finishedWithData:)
@@ -197,17 +196,12 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   }
 }
 
-- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData {
-  NSString *jsonResponse = [[NSString alloc] initWithData:retrievedData
-                                                 encoding:NSUTF8StringEncoding];
-
-  NSScanner *jsonScanner = [[NSScanner alloc] initWithString:jsonResponse];
-  NSDictionary *response = nil;
-  [jsonScanner scanJSONObject:&response];
-  [jsonResponse release];
-  [jsonScanner release];
-
+  NSString *jsonResponse = [[[NSString alloc] initWithData:retrievedData
+                                                  encoding:NSUTF8StringEncoding]
+                            autorelease];
+  NSDictionary *response = [jsonResponse JSONValue];
   if (!response) {
     [self finishQuery];
     return;
@@ -217,7 +211,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   NSArray *googleResultArray = [response valueForKeyPath:@"responseData.results"];
   if (!googleResultArray) return;
 
-  HGSObject *pivotObject = [[self query] pivotObject];
+  HGSResult *pivotObject = [[self query] pivotObject];
   id image = [pivotObject displayIconWithLazyLoad:NO];
 
   NSArray *unescapedNames = [googleResultArray valueForKeyPath:@"titleNoFormatting.gtm_stringByUnescapingFromHTML"];
@@ -291,13 +285,13 @@ GTM_METHOD_CHECK(NSString, readableURLString);
       name = [name substringToIndex:[name length] - [commonSuffix length]];
     }
     
-    HGSObject *object = [HGSObject objectWithIdentifier:url
-                                                   name:name
-                                                   type:kHGSTypeWebpage // TODO: more complete type?
-                                                 source:source_
-                                             attributes:attributes];
-
-    [results addObject:object];
+    HGSResult *result = [HGSResult resultWithURL:url
+                                            name:name
+                                            type:kHGSTypeWebpage // TODO: more complete type?
+                                          source:source_
+                                      attributes:attributes];
+    
+    [results addObject:result];
 
     // Only contribute 1 result to global search
     if (!pivotObject && ([results count] > 0)) break;
@@ -309,7 +303,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   fetcher_ = nil;
 }
 
-- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
             didFail:(NSError *)error {
   HGSLog(@"httpFetcher failed: %@ %@", error, [[fetcher request] URL]);
   [self finishQuery];
@@ -331,28 +325,22 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 @implementation HGSGoogleWebResultsSource
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  HGSObject *pivotObject = [query pivotObject];
-  NSURL *url = [pivotObject identifier];
-
-  if ([[pivotObject valueForKey:@"kHGSObjectAttributeGoogleAPIAlwaysHideResults"] boolValue]) return NO;
-
-#if TARGET_OS_IPHONE
-// Disabled for now
-//  if ([[[GMOUserPreferences defaultUserPreferences] valueForKey:kGMOPrefEnableURLSuggest] boolValue]) return YES;
-//
-//  if ([GMOProduct isGoogleMobile]
-//        && [[pivotObject valueForKey:@"kHGSObjectAttributeGoogleAPIHideResults"] boolValue]) {
-//    return NO;
-//  }
-#endif TARGET_OS_IPHONE
-
-
-  // We only work on URLs that are http and don't already have searchability
-  if ([[url scheme] isEqualToString:@"http"]) {
-      //&& ![pivotObject valueForKey:kHGSObjectAttributeWebSuggestTemplateKey]) {
-    return YES;
+  BOOL isValid = [super isValidSourceForQuery:query];
+  if (isValid) {
+    HGSResult *pivotObject = [query pivotObject];
+    NSURL *url = [pivotObject url];
+    NSNumber *hideResults 
+      = [pivotObject valueForKey:@"kHGSObjectAttributeGoogleAPIAlwaysHideResults"];
+    if ([hideResults boolValue]) {
+      isValid = NO;
+    } else if ([[url scheme] isEqualToString:@"http"]) {
+      // We only work on URLs that are http and don't already have searchability
+      isValid = YES;
+    } else {
+      isValid = NO;
+    }
   }
-  return NO;
+  return isValid;
 }
 
 - (HGSSearchOperation *)searchOperationForQuery:(HGSQuery *)query {

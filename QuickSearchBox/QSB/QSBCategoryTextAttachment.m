@@ -33,7 +33,7 @@
 #import "QSBCategoryTextAttachment.h"
 #import "HGSLog.h"
 
-@interface QSBCategoryTextAttachmentCell (QSBCategoryTextAttachmentCellPrivateMethods)
+@interface QSBCategoryTextAttachmentCell ()
 
 + (id)categoryTextAttachmentCellWithString:(NSString *)categoryString
                                      index:(NSUInteger)index;

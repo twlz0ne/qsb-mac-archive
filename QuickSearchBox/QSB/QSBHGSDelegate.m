@@ -33,6 +33,7 @@
 #import "QSBHGSDelegate.h"
 #import "GTMGarbageCollection.h"
 #import "FilesystemActions.h"
+#import "QSBPluginVerifyWindowController.h"
 
 // This constant is the name for the app that should be used w/in the a Google
 // folder (for w/in Application Support, etc.)
@@ -56,6 +57,7 @@ static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
 - (void)dealloc {
   [preferredLanguage_ release];
   [pluginPaths_ release];
+  [pluginVerifyWindowController_ release];
   [super dealloc];
 }
 
@@ -161,5 +163,15 @@ static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
 
 - (NSString *)defaultActionID {
   return kFileSystemOpenActionIdentifier;
+}
+
+- (HGSPluginLoadResult)shouldLoadPluginAtPath:(NSString *)path
+                                withSignature:(HGSCodeSignature *)signature {
+  if (!pluginVerifyWindowController_) {
+    pluginVerifyWindowController_ =
+      [[QSBPluginVerifyWindowController alloc] init];
+  }
+  return [pluginVerifyWindowController_ runForPluginAtPath:path
+                                             withSignature:signature];
 }
 @end

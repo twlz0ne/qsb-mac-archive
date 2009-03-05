@@ -37,16 +37,25 @@
 
 static NSString *const kMessageBodyFormat = @"status=%@";
 static NSString *const kSendStatusFormat
-  = @"https://%@:%@@twitter.com/statuses/update.xml?status=%@";
+  = @"https://%@:%@@twitter.com/statuses/update.xml?"
+    @"source=googlequicksearchboxmac&status=%@";
 
 // An action that will send a status update message for a Twitter account.
 //
 @interface TwitterSendMessageAction : HGSAction <HGSAccountClientProtocol> {
  @private
-  NSString * accountIdentifier_;
+  HGSSimpleAccount *account_;
+  NSURLConnection *twitterConnection_;
 }
 
+// Called by performActionWithInfo: to actually send the message.
 - (void)sendTwitterStatus:(NSString *)twitterMessage;
+
+// Utility function to send notification so user can be notified of
+// success or failure.
+- (void)informUserWithSummary:(NSString *)message
+                  description:(NSString *)description
+                 successCode:(NSInteger)successCode;
 
 @end
 
@@ -57,10 +66,15 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    id<HGSAccount> account
-      = [configuration objectForKey:kHGSExtensionAccountIdentifier];
-    accountIdentifier_ = [[account identifier] retain];
-    if (!accountIdentifier_) {
+    account_ = [[configuration objectForKey:kHGSExtensionAccount] retain];
+    if (account_) {
+      // Watch for credential changes.
+      NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+      [nc addObserver:self
+             selector:@selector(loginCredentialsChanged:)
+                 name:kHGSAccountDidChangeNotification
+               object:account_];
+    } else {
       HGSLogDebug(@"Missing account identifier for TwitterMessageAction '%@'",
                   [self identifier]);
       [self release];
@@ -71,16 +85,19 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (void)dealloc {
-  [accountIdentifier_ release];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [account_ release];
+  [twitterConnection_ release];
   [super dealloc];
 }
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info valueForKey:kHGSActionPrimaryObjectKey];
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];
   BOOL success = NO;
-  if (object) {
-    // Pull something out of |object| that can be turned into a tweet.
-    NSString *message = [object displayName];
+  if (directObjects) {
+    // Pull something out of |directObjects| that can be turned into a tweet.
+    NSString *message = [directObjects displayName];
     [self sendTwitterStatus:message];
     success = YES;
   }
@@ -90,26 +107,35 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (void)sendTwitterStatus:(NSString *)twitterMessage {
   if (twitterMessage) {
     KeychainItem* keychainItem 
-      = [KeychainItem keychainItemForService:accountIdentifier_
+      = [KeychainItem keychainItemForService:[account_ identifier]
                                     username:nil];
-    if (keychainItem) {
+    NSString *username = [keychainItem username];
+    NSString *password = [keychainItem password];
+    if (username && password) {
       if ([twitterMessage length] > 140) {
-        // TODO(mrossetti): Notify user that their message was truncated.
+        NSString *summary = HGSLocalizedString(@"Twitter", nil);
+        NSString *warningString
+          = HGSLocalizedString(@"Message too long — truncated.", nil);
+        [self informUserWithSummary:summary
+                        description:warningString
+                        successCode:kHGSSuccessCodeError];
         twitterMessage = [twitterMessage substringToIndex:140];
       }
       
-      NSString *encodedMessage = [twitterMessage gtm_stringByEscapingForURLArgument];
-      NSString *encodedMessageBody = [NSString stringWithFormat:kMessageBodyFormat,
-                                      encodedMessage];
-      NSString *accountName = [keychainItem username];
-      NSString *encodedAccountName = [accountName gtm_stringByEscapingForURLArgument];
-      NSString *password = [keychainItem password];
+      NSString *encodedMessage
+        = [twitterMessage gtm_stringByEscapingForURLArgument];
+      NSString *encodedMessageBody
+        = [NSString stringWithFormat:kMessageBodyFormat, encodedMessage];
+      NSString *encodedAccountName
+        = [username gtm_stringByEscapingForURLArgument];
       NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
       NSString *sendStatusString = [NSString stringWithFormat:kSendStatusFormat,
-                                    encodedAccountName, encodedPassword, encodedMessage];
+                                    encodedAccountName, encodedPassword,
+                                    encodedMessage];
       NSURL *sendStatusURL = [NSURL URLWithString:sendStatusString];
       
-      // Construct an NSMutableURLRequest for the URL and set appropriate request method.
+      // Construct an NSMutableURLRequest for the URL and set appropriate
+      // request method.
       NSMutableURLRequest *sendStatusRequest
         = [NSMutableURLRequest requestWithURL:sendStatusURL 
                                   cachePolicy:NSURLRequestReloadIgnoringCacheData 
@@ -123,31 +149,123 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       [sendStatusRequest setValue:@"http://www.google.com/qsb-mac"
                forHTTPHeaderField:@"X-Twitter-Client-URL"];
       
-      // Set request body, if specified (hopefully so), with 'source' parameter if appropriate.
-      NSData *bodyData = [encodedMessageBody dataUsingEncoding:NSUTF8StringEncoding];
+      // Set request body, if specified (hopefully so), with 'source'
+      // parameter if appropriate.
+      NSData *bodyData
+        = [encodedMessageBody dataUsingEncoding:NSUTF8StringEncoding];
       [sendStatusRequest setHTTPBody:bodyData];
-      NSURLResponse *sendStatusResponse = nil;
-      NSError *error = nil;
-      [NSURLConnection sendSynchronousRequest:sendStatusRequest
-                            returningResponse:&sendStatusResponse
-                                        error:&error];
-      // TODO(mrossetti): Notify user that their message was sent or not.
-      if (error) {
-        HGSLogDebug(@"Failed to send Twitter status message due to error: '"
-                    @"%@'.", [error localizedDescription]);
-      }
+      twitterConnection_ 
+        = [[NSURLConnection alloc] initWithRequest:sendStatusRequest 
+                                          delegate:self];
     } else {
+      NSString *summary = HGSLocalizedString(@"Twitter", nil);
+      NSString *errorString
+        = HGSLocalizedString(@"Could not tweet — password issue!", nil);
+      [self informUserWithSummary:summary
+                      description:errorString
+                      successCode:kHGSSuccessCodeError];
       HGSLog(@"Cannot send Twitter status message due to missing keychain "
-             @"item for '%@'.", accountIdentifier_);
+             @"item for '%@'.", account_);
     }
   }
+}
+
+- (void)informUserWithSummary:(NSString *)summary
+                  description:(NSString *)description
+                  successCode:(NSInteger)successCode {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  NSBundle *bundle = HGSGetPluginBundle();
+  NSString *path = [bundle pathForResource:@"twitter_t" ofType:@"png"];
+  NSImage *twitterT
+    = [[[NSImage alloc] initByReferencingFile:path] autorelease];
+  NSNumber *successNumber = [NSNumber numberWithInt:successCode];
+  NSDictionary *messageDict
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       summary, kHGSSummaryMessageKey,
+       twitterT, kHGSImageMessageKey,
+       successNumber, kHGSSuccessCodeMessageKey,
+       // Description last since it might be nil.
+       description, kHGSDescriptionMessageKey,
+       nil];
+  [nc postNotificationName:kHGSUserMessageNotification 
+                    object:self
+                  userInfo:messageDict];
+}
+
+- (void)loginCredentialsChanged:(NSNotification *)notification {
+  id <HGSAccount> account = [notification object];
+  HGSAssert(account == account_, @"Notification from bad account!");
+}
+
+#pragma mark NSURLConnection Delegate Methods
+
+- (void)connection:(NSURLConnection *)connection 
+didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+  HGSAssert(connection == twitterConnection_, nil);
+  KeychainItem* keychainItem 
+    = [KeychainItem keychainItemForService:[account_ identifier]
+                                  username:nil];
+  NSString *userName = [keychainItem username];
+  NSString *password = [keychainItem password];
+  // See if the account still validates.
+  BOOL accountAuthenticates = [account_ authenticateWithPassword:password];
+  if (accountAuthenticates) {
+    id<NSURLAuthenticationChallengeSender> sender = [challenge sender];
+    NSInteger previousFailureCount = [challenge previousFailureCount];
+    if (userName && password && previousFailureCount < 3) {
+      NSURLCredential *creds 
+        = [NSURLCredential credentialWithUser:userName
+                                     password:password
+                                  persistence:NSURLCredentialPersistenceNone];
+      [sender useCredential:creds forAuthenticationChallenge:challenge];
+    } else {
+      [sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+    }
+  } else {
+    NSString *summary = HGSLocalizedString(@"Could not tweet!", nil);
+    NSString *errorFormat
+      = HGSLocalizedString(@"Check password for account '%@'.", nil);
+    NSString *errorString = [NSString stringWithFormat:errorFormat, userName];
+    [self informUserWithSummary:summary
+                    description:errorString
+                    successCode:kHGSSuccessCodeError];
+    HGSLog(@"Twitter status message failed due to authentication failure "
+           @"for account ''.", userName);
+  }
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+  HGSAssert(connection == twitterConnection_, nil);
+  NSString *successString = HGSLocalizedString(@"Message tweeted!", nil);
+  [self informUserWithSummary:successString
+                  description:nil
+                  successCode:0];
+  [twitterConnection_ release];
+  twitterConnection_ = nil;
+}
+
+- (void)connection:(NSURLConnection *)connection
+  didFailWithError:(NSError *)error {
+  HGSAssert(twitterConnection_ == connection, nil);
+  NSString *summary = HGSLocalizedString(@"Twitter", nil);
+  NSString *errorFormat
+    = HGSLocalizedString(@"Could not tweet! (%d)", nil);
+  NSString *errorString = [NSString stringWithFormat:errorFormat,
+                           [error code]];
+  [self informUserWithSummary:summary
+                  description:errorString
+                  successCode:kHGSSuccessCodeBadError];
+  HGSLog(@"Twitter status message failed due to error %d: '%@'.",
+         [error code], [error localizedDescription]);
+  [twitterConnection_ release];
+  twitterConnection_ = nil;
 }
 
 #pragma mark HGSAccountClientProtocol Methods
 
 - (BOOL)accountWillBeRemoved:(id<HGSAccount>)account {
-  BOOL removeMe = YES;
-  return removeMe;
+  HGSAssert(account == account_, @"Notification from bad account!");
+  return YES;
 }
 
 @end

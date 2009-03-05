@@ -40,21 +40,58 @@
 
 
 static NSString *const kSetUpGoogleAccountViewNibName = @"SetUpGoogleAccountView";
-static NSString *const kGoogleAccountTypeName = @"Google";;
+static NSString *const kGoogleURLString = @"http://www.google.com/";
+static NSString *const kGoogleAccountTypeName = @"Google";
+static NSString *const kAccountTestFormat
+  = @"https://www.google.com/accounts/ClientLogin?Email=%@&Passwd=%@"
+    @"&source=GoogleQuickSearch&accountType=HOSTED_OR_GOOGLE";
+static NSString *const accountCaptchaFormat = @"&logintoken=%@&logincaptcha=%@";
+static NSString *const kCaptchaImageURLPrefix
+  = @"http://www.google.com/accounts/";
+
+
+@interface GoogleAccount ()
+
+// Check the authentication results to see if the request authenticated.
+- (BOOL)validateResult:(NSData *)result;
+
+// Open google.com in the user's preferred browser.
++ (BOOL)openGoogleHomePage;
+
+@end
+
+@interface SetUpGoogleAccountViewController ()
+
+// Make sure the captcha portion of the setup view has been obscured.
+- (void)resetCaptchaPresentation;
+
+@end
 
 @implementation GoogleAccount
 
 GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
+@synthesize captchaImage = captchaImage_;
+@synthesize captchaText = captchaText_;
+@synthesize captchaToken = captchaToken_;
+
+- (void)dealloc {
+  [responseData_ release];
+  [captchaImage_ release];
+  [captchaText_ release];
+  [captchaToken_ release];
+  [super dealloc];
+}
+
 + (NSString *)accountType {
   return kGoogleAccountTypeName;
 }
 
-+ (NSView *)accountSetupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
++ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
   static SetUpGoogleAccountViewController *sSetUpGoogleAccountViewController = nil;
   if (!sSetUpGoogleAccountViewController) {
     NSBundle *ourBundle = HGSGetPluginBundle();
-    SetUpGoogleAccountViewController *loadedViewController
+    HGSSetUpSimpleAccountViewController *loadedViewController
       = [[[SetUpGoogleAccountViewController alloc]
           initWithNibName:kSetUpGoogleAccountViewNibName bundle:ourBundle]
          autorelease];
@@ -65,17 +102,17 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       HGSLog(@"Failed to load nib '%@'.", kSetUpGoogleAccountViewNibName);
     }
   }
+  [sSetUpGoogleAccountViewController resetCaptchaPresentation];
   [sSetUpGoogleAccountViewController setParentWindow:parentWindow];
   return [sSetUpGoogleAccountViewController view];
 }
 
-- (NSString *)adjustAccountName:(NSString *)accountName {
-  if ([accountName rangeOfString:@"@"].location == NSNotFound) {
-    // TODO(mrossetti): should we default to @googlemail.com for the UK
-    // and Germany?
-    accountName = [accountName stringByAppendingString:@"@gmail.com"];
+- (NSString *)adjustUserName:(NSString *)userName {
+  if ([userName rangeOfString:@"@"].location == NSNotFound) {
+    NSString *countryGMailCom = HGSLocalizedString(@"@gmail.com", nil);
+    userName = [userName stringByAppendingString:countryGMailCom];
   }
-  return accountName;
+  return userName;
 }
 
 - (NSString *)editNibName {
@@ -83,33 +120,61 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (BOOL)authenticateWithPassword:(NSString *)password {
-  // Test this account to see if we can connect.
   BOOL authenticated = NO;
-  NSString * const accountTestFormat
-    = @"https://www.google.com/accounts/ClientLogin?Email=%@&Passwd=%@"
-      @"&source=GoogleQuickSearch&accountType=HOSTED_OR_GOOGLE";
-  NSString *accountName = [self accountName];
-  NSString *encodedAccountName = [accountName gtm_stringByEscapingForURLArgument];
+  // Test this account to see if we can connect.
+  NSString *userName = [self userName];
+  NSURLRequest *accountRequest = [self accountURLRequestForUserName:userName
+                                                           password:password];
+  if (accountRequest) {
+    NSURLResponse *accountResponse = nil;
+    NSError *error = nil;
+    NSData *result = [NSURLConnection sendSynchronousRequest:accountRequest
+                                           returningResponse:&accountResponse
+                                                       error:&error];
+    authenticated = [self validateResult:result];
+  }
+  return authenticated;
+}
+
+- (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
+                                      password:(NSString *)password {
+  NSString *encodedAccountName = [userName gtm_stringByEscapingForURLArgument];
   NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
-  NSString *accountTestString = [NSString stringWithFormat:accountTestFormat,
+  NSString *accountTestString = [NSString stringWithFormat:kAccountTestFormat,
                                  encodedAccountName, encodedPassword];
+  NSString *captchaText = [self captchaText];
+  if ([captchaText length]) {
+    NSString *captchaToken = [self captchaToken];
+    accountTestString = [accountTestString stringByAppendingFormat:
+                         accountCaptchaFormat, captchaToken, captchaText];
+    // Clear for next time.
+    [self setCaptchaImage:nil];
+    [self setCaptchaText:nil];
+    [self setCaptchaToken:nil];
+  }
   NSURL *accountTestURL = [NSURL URLWithString:accountTestString];
   NSURLRequest *accountRequest
     = [NSURLRequest requestWithURL:accountTestURL
                        cachePolicy:NSURLRequestUseProtocolCachePolicy
                    timeoutInterval:15.0];
-  NSURLResponse *accountResponse = nil;
-  NSError *error = nil;
-  NSData *result = [NSURLConnection sendSynchronousRequest:accountRequest
-                                         returningResponse:&accountResponse
-                                                     error:&error];
+  return accountRequest;
+}
+
+- (BOOL)validateResult:(NSData *)result {
   NSString *answer = [[[NSString alloc] initWithData:result
                                             encoding:NSUTF8StringEncoding]
                       autorelease];
   // Simple test to see if the string contains 'SID=' at the beginning
   // of the first line and 'LSID=' on the beginning of the second.
+  // While we're in here we'll look for a captcha request.
+  BOOL validated = NO;
   BOOL foundSID = NO;
   BOOL foundLSID = NO;
+  NSString *captchaToken = nil;
+  NSString *captchaImageURLString = nil;
+  NSString *const captchaTokenKey = @"CaptchaToken=";
+  NSString *const captchaImageURLKey = @"CaptchaUrl=";
+  
   NSArray *answers = [answer componentsSeparatedByString:@"\n"];
   if ([answers count] >= 2) {
     for (NSString *anAnswer in answers) {
@@ -117,25 +182,152 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         foundSID = YES;
       } else if (!foundLSID && [anAnswer hasPrefix:@"LSID="]) {
         foundLSID = YES;
+      } else if ([anAnswer hasPrefix:captchaTokenKey]) {
+        captchaToken = [anAnswer substringFromIndex:[captchaTokenKey length]];
+      } else if ([anAnswer hasPrefix:captchaImageURLKey]) {
+        captchaImageURLString
+          = [anAnswer substringFromIndex:[captchaImageURLKey length]];
       }
     }
-    authenticated = foundSID && foundLSID;
-    if (!authenticated) {
-      HGSLogDebug(@"Authentication for account <%p>:'%@' failed with an error=%@",
-                  self, [self accountName], answer);
+    validated = foundSID && foundLSID;
+    if (!validated) {
+      if ([captchaToken length] && [captchaImageURLString length]) {
+        // Retrieve the captcha image.
+        NSString *fullURLString
+          = [kCaptchaImageURLPrefix
+             stringByAppendingString:captchaImageURLString];
+        NSURL *captchaImageURL = [NSURL URLWithString:fullURLString];
+        NSImage *captchaImage
+          = [[[NSImage alloc] initWithContentsOfURL:captchaImageURL]
+             autorelease];
+        [self setCaptchaToken:captchaToken];
+        [self setCaptchaImage:captchaImage];
+        HGSLogDebug(@"Authentication for account <%p>:'%@' requires captcha.",
+                    self, [self userName]);
+      } else {
+        HGSLogDebug(@"Authentication for account <%p>:'%@' failed with an "
+                    @"error=%@.", self, [self userName], answer);
+      }
     }
   }
-  [self setIsAuthenticated:authenticated];
-  return authenticated;  // Return as convenience.
+  return validated;
+}
+
++ (BOOL)openGoogleHomePage {
+  NSURL *googleURL = [NSURL URLWithString:kGoogleURLString];
+  BOOL success = [[NSWorkspace sharedWorkspace] openURL:googleURL];
+  if (!success) {
+    HGSLogDebug(@"Failed to open %@", kGoogleURLString);
+    NSBeep();
+  }
+  return success;
+}
+
+#pragma mark NSURLConnection Delegate Methods
+
+- (void)connection:(NSURLConnection *)connection 
+didReceiveResponse:(NSURLResponse *)response {
+  HGSAssert(connection == [self connection], nil);
+  [responseData_ release];
+  responseData_ = [[NSMutableData alloc] init];
+}
+
+- (void)connection:(NSURLConnection *)connection 
+    didReceiveData:(NSData *)data {
+  HGSAssert(connection == [self connection], nil);
+  [responseData_ appendData:data];
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+  HGSAssert(connection == [self connection], nil);
+  [self setConnection:nil];
+  BOOL validated = [self validateResult:responseData_];
+  [self setAuthenticated:validated];
 }
 
 @end
 
 @implementation GoogleAccountEditController
 
+@synthesize captchaImage = captchaImage_;
+@synthesize captchaText = captchaText_;
+
+- (void)dealloc {
+  [captchaImage_ release];
+  [captchaText_ release];
+  [super dealloc];
+}
+
+- (void)awakeFromNib {
+  [super awakeFromNib];
+  // The captcha must be collapsed prior to first presentation.
+  if (![captchaContainerView_ isHidden]) {
+    CGFloat containerHeight = NSHeight([captchaContainerView_ frame]);
+    NSWindow *window = [self window];
+    NSRect windowFrame = [window frame];
+    windowFrame.origin.y += containerHeight;
+    windowFrame.size.height -= containerHeight;
+    [window setFrame:windowFrame display:YES];
+    
+    [captchaContainerView_ setHidden:YES];
+    [captchaTextField_ setEnabled:NO];
+    [self setCaptchaText:@""];
+    [self setCaptchaImage:nil];
+    GoogleAccount *account = (GoogleAccount *)[self account];
+    [account setCaptchaImage:nil];
+  }
+}
+
+- (IBAction)acceptEditAccountSheet:(id)sender {
+  // If we're showing a captcha then we need to pass along the captcha text
+  // to the account for authentication.
+  if ([self captchaImage]) {
+    NSString *captchaText = [self captchaText];
+    GoogleAccount *account = (GoogleAccount *)[self account];
+    [account setCaptchaText:captchaText];
+  }
+  [super acceptEditAccountSheet:sender];
+}
+
+- (BOOL)canGiveUserAnotherTry {
+  BOOL canGiveUserAnotherTry = NO;
+  // If the last authentication attempt resulted in a captcha request then
+  // we want to expand the account setup sheet and show the captcha.
+  GoogleAccount *account = (GoogleAccount *)[self account];
+  NSImage *captchaImage = [account captchaImage];
+  BOOL resizeNeeded = ([self captchaImage] == nil);  // leftover captcha?
+  if (captchaImage) {
+    // Install the captcha image, enable the captcha text field,
+    // expand the window to show the captcha.
+    [captchaTextField_ setEnabled:YES];
+    [self setCaptchaImage:captchaImage];
+    
+    if (resizeNeeded) {
+      CGFloat containerHeight = NSHeight([captchaContainerView_ frame]);
+      NSWindow *window = [self window];
+      NSRect windowFrame = [window frame];
+      windowFrame.origin.y -= containerHeight;
+      windowFrame.size.height += containerHeight;
+      [window setFrame:windowFrame display:YES];
+    }
+    
+    [captchaContainerView_ setHidden:NO];
+    canGiveUserAnotherTry = YES;
+    [account setCaptchaImage:nil];  // We've used it all up.
+  }
+  return canGiveUserAnotherTry;
+}
+
+- (IBAction)goToGoogle:(id)sender {
+  [GoogleAccount openGoogleHomePage];
+}
+
 @end
 
 @implementation SetUpGoogleAccountViewController
+
+@synthesize captchaImage = captchaImage_;
+@synthesize captchaText = captchaText_;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil
                bundle:(NSBundle *)nibBundleOrNil {
@@ -145,4 +337,75 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return self;
 }
 
+- (void)dealloc {
+  [captchaImage_ release];
+  [captchaText_ release];
+  [super dealloc];
+}
+
+- (IBAction)acceptSetupAccountSheet:(id)sender {
+  // If we're showing a captcha then we need to pass along the captcha text
+  // to the account for authentication.
+  if ([self captchaImage]) {
+    NSString *captchaText = [self captchaText];
+    GoogleAccount *account = (GoogleAccount *)[self account];
+    [account setCaptchaText:captchaText];
+  }
+  [super acceptSetupAccountSheet:sender];
+}
+
+- (IBAction)goToGoogle:(id)sender {
+  [GoogleAccount openGoogleHomePage];
+}
+
+- (BOOL)canGiveUserAnotherTryOffWindow:(NSWindow *)window {
+  BOOL canGiveUserAnotherTry = NO;
+  // If the last authentication attempt resulted in a captcha request then
+  // we want to expand the account setup sheet and show the captcha.
+  GoogleAccount *account = (GoogleAccount *)[self account];
+  NSImage *captchaImage = [account captchaImage];
+  BOOL resizeNeeded = ([self captchaImage] == nil);  // leftover captcha?
+  if (captchaImage) {
+    // Install the captcha image, enable the captcha text field,
+    // expand the window to show the captcha.
+    [captchaTextField_ setEnabled:YES];
+    [self setCaptchaImage:captchaImage];
+
+    if (resizeNeeded) {
+      CGFloat containerHeight = NSHeight([captchaContainerView_ frame]);
+      NSRect windowFrame = [window frame];
+      windowFrame.origin.y -= containerHeight;
+      windowFrame.size.height += containerHeight;
+      [window setFrame:windowFrame display:YES];
+    }
+    
+    [captchaContainerView_ setHidden:NO];
+    canGiveUserAnotherTry = YES;
+    [account setCaptchaImage:nil];  // We've used it all up.
+  }
+  return canGiveUserAnotherTry;
+}
+
+#pragma mark SetUpGoogleAccountViewController Private Methods
+
+- (void)resetCaptchaPresentation {
+  // If we previously presented a captcha, resize our view, disable the captcha
+  // text field, and clear our memory of the captcha.
+  if (![captchaContainerView_ isHidden]) {
+    NSView *view = [self view];  // Resize
+    NSSize frameSize = [view frame].size;
+    CGFloat containerHeight = NSHeight([captchaContainerView_ frame]);
+    frameSize.height -= containerHeight;
+    [view setFrameSize:frameSize];
+    
+    [captchaContainerView_ setHidden:YES];
+    [captchaTextField_ setEnabled:NO];
+    [self setCaptchaText:@""];
+    [self setCaptchaImage:nil];
+    GoogleAccount *account = (GoogleAccount *)[self account];
+    [account setCaptchaImage:nil];
+  }
+}
+
 @end
+

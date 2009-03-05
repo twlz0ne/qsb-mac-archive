@@ -35,7 +35,7 @@
 #import "HGSStringUtil.h"
 #import "HGSLog.h"
 
-@interface HGSQuery (PrivateMethods)
+@interface HGSQuery ()
 - (BOOL)parseQuery;
 @end
 
@@ -44,16 +44,16 @@ static NSString * const kEmptyQuery = @"";
 @implementation HGSQuery
 
 - (id)initWithString:(NSString*)query 
-         pivotObject:(HGSObject *)pivotObject
-          queryFlags:(HGSQueryFlags)flags{
+             results:(HGSResultArray *)results
+          queryFlags:(HGSQueryFlags)flags {
   if ((self = [super init])) {
     rawQuery_ = [query copy];
-    pivotObject_ = [pivotObject retain];
+    results_ = [results retain];
     maxDesiredResults_ = -1;
     flags_ = flags;
 
     // If we got nil for a query, but had a pivot, turn it into an empty query.
-    if (!rawQuery_ && pivotObject_) {
+    if (!rawQuery_ && results_) {
       rawQuery_ = [kEmptyQuery copy];
     }
 
@@ -68,7 +68,7 @@ static NSString * const kEmptyQuery = @"";
 - (void)dealloc {
   [rawQuery_ release];
   [uniqueWords_ release];
-  [pivotObject_ release];
+  [results_ release];
   [parent_ release];
   [super dealloc];
 }
@@ -83,17 +83,23 @@ static NSString * const kEmptyQuery = @"";
   return [[rawQuery_ retain] autorelease];
 }
 
-- (HGSObject*)pivotObject {
+- (HGSResult *)pivotObject {
+  HGSResult *result = [results_ lastObject];
   // make sure it ends up in any local pool so the caller is safe threading wise
-  return [[pivotObject_ retain] autorelease];
+  return [[result retain] autorelease];
 }
 
-- (HGSQuery*)parent {
+- (HGSResultArray *)results {
+  // make sure it ends up in any local pool so the caller is safe threading wise
+  return [[results_ retain] autorelease];
+}
+
+- (HGSQuery *)parent {
   // make sure it ends up in any local pool so the caller is safe threading wise
   return [[parent_ retain] autorelease];
 }
 
-- (void)setParent:(HGSQuery*)parent {
+- (void)setParent:(HGSQuery *)parent {
   HGSAssert(parent != self, @"um, we can't be our own parent");
   [parent_ autorelease];
   parent_ = [parent retain];
@@ -108,17 +114,13 @@ static NSString * const kEmptyQuery = @"";
 }
 
 - (NSString*)description {
-  return [NSString stringWithFormat:@"[%@ - Q='%@' PO=%@ P=<%@>]",
-          [self class], rawQuery_, pivotObject_, parent_];
+  return [NSString stringWithFormat:@"[%@ - Q='%@' Rs=%@ P=<%@>]",
+          [self class], rawQuery_, results_, parent_];
 }
 
 - (HGSQueryFlags)flags {
   return flags_;
 }
-
-@end
-
-@implementation HGSQuery (PrivateMethods)
 
 - (BOOL)parseQuery {
   // start out by lowercasing and folding diacriticals

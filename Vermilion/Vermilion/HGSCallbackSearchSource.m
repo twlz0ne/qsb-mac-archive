@@ -33,6 +33,8 @@
 #import "HGSCallbackSearchSource.h"
 #import "HGSLog.h"
 #import "HGSSearchOperation.h"
+#import "HGSStringUtil.h"
+#import "HGSTokenizer.h"
 
 @interface HGSCallbackSearchOperation : HGSSearchOperation {
  @private
@@ -68,6 +70,21 @@
 - (BOOL)isSearchConcurrent {
   return NO;
 }
+
+- (NSSet *)normalizedTokenSetForString:(NSString*)string {
+  NSSet *set = nil;
+  if ([string length]) {
+    // do our normalization...
+    NSString *preppedString
+      = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:string];
+    
+    // now split them into terms and use sets to keep each just once...
+    NSArray *terms = [HGSTokenizer tokenizeString:preppedString
+                                        wordsOnly:YES];
+    set = [NSSet setWithArray:terms];
+  }
+  return set;
+}  
 
 @end
 
@@ -106,7 +123,7 @@
 }
 
 - (NSString *)displayName {
-  return [callbackSource_ name];
+  return [callbackSource_ displayName];
 }
 
 @end

@@ -39,23 +39,24 @@ NSString *const kHGSActionDidPerformNotification = @"HSGActionDidPerformNotifica
 NSString* const kHGSActionCompletedSuccessfully = @"HGSActionCompletedSuccessfully";
 
 @implementation HGSActionOperation
-- (id)initWithAction:(id<HGSAction>)action primaryObject:(HGSObject*)primary {
+- (id)initWithAction:(id<HGSAction>)action 
+       directObjects:(HGSResultArray *)directObjects {
   return [self initWithAction:action
-                 primaryObject:primary
-               indirectObject:nil];
+                directObjects:directObjects
+              indirectObjects:nil];
 }
 
 - (id)initWithAction:(id<HGSAction>)action 
-       primaryObject:(HGSObject*)primary
-      indirectObject:(HGSObject*)indirect {
+       directObjects:(HGSResultArray *)directObjects
+     indirectObjects:(HGSResultArray *)indirectObjects {
   if ((self = [super init])) {
     action_ = [action retain];
     args_
       = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-           primary, kHGSActionPrimaryObjectKey,
-           indirect, kHGSActionIndirectObjectKey,
+           directObjects, kHGSActionDirectObjectsKey,
+           indirectObjects, kHGSActionIndirectObjectsKey,
            nil];
-    if (!action_ || !primary || !args_) {
+    if (!action_ || !directObjects || !args_) {
       [self release];
       return nil;
     }
@@ -86,7 +87,7 @@ NSString* const kHGSActionCompletedSuccessfully = @"HGSActionCompletedSuccessful
   @try {
     // Adding exception handler as we are potentially calling out
     // to third party code here that could be nasty to us.
-    result =[action_ performActionWithInfo:args_];
+    result =[action_ performWithInfo:args_];
   } 
   @catch (NSException *e) {
     result = NO;

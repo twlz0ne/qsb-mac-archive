@@ -36,8 +36,6 @@
 #import "GTMNSAppleScript+Handler.h"
 #import "GTMGarbageCollection.h"
 #import "QLUIPrivate.h"
-#import "QSBApplicationDelegate.h"
-#import "QSBSearchWindowController.h"
 
 @interface FileSystemOpenAction : HGSAction
 @end
@@ -45,23 +43,23 @@
 @interface FileSystemOpenWithAction : FileSystemOpenAction
 @end
 
-@interface FileSystemShowInFinderAction : HGSAction
-@end
-
 @interface FileSystemQuickLookAction : HGSAction
 @end
 
-@interface FileSystemGetInfoAction : HGSAction {
-@private
-  NSAppleScript *script_;
-}
+@interface FileSystemScriptAction : HGSAction
++ (NSAppleScript *)fileSystemActionScript;
+- (NSString *)handlerName;
 @end
+
+@interface FileSystemShowInFinderAction : FileSystemScriptAction
+@end
+
+@interface FileSystemGetInfoAction : FileSystemScriptAction
+@end
+
 
 @interface FileSystemEjectAction : HGSAction
 @end
-
-const OSType kToolbarAppsFolderIcon = 'tAps';
-const OSType kToolbarInfoIcon = 'tbin';
 
 @implementation FileSystemOpenWithAction
 
@@ -84,35 +82,45 @@ const OSType kToolbarInfoIcon = 'tbin';
   return defaultObject;
 }
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directObjects
+     = [info objectForKey:kHGSActionDirectObjectsKey];
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-  NSURL *url = [object valueForKey:kHGSObjectAttributeURIKey];
-  BOOL wasGood = [ws openURL:url];
+  NSArray *urls = [directObjects urls];
+  BOOL wasGood = YES;
+  for (NSURL *url in urls) {
+    wasGood != [ws openURL:url];
+  }
   return wasGood;
 }
 
-- (id)displayIconForResult:(HGSObject*)result {
-  NSURL *url = [result valueForKey:kHGSObjectAttributeURIKey];
+- (id)displayIconForResults:(HGSResultArray*)results {
+  NSImage *icon = nil;
+  if ([results count] > 1) {
+    icon = [super displayIconForResults:results];
+  } else {
+    HGSResult *result = [results objectAtIndex:0];
+    NSURL *url = [result url];
   
     BOOL isDirectory = NO;
-  if ([url isFileURL]) {
-    [[NSFileManager defaultManager] fileExistsAtPath:[url path]
-                                         isDirectory:&isDirectory];
-  }
-  NSImage *icon = nil;
-  if (isDirectory) {
-    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-    NSString *finderPath
-      = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
-    icon = [ws iconForFile:finderPath];
-  } else {
-    CFURLRef appURL = NULL;
-    if (url && noErr == LSGetApplicationForURL((CFURLRef)url,
-                                               kLSRolesViewer,
-                                               NULL, &appURL)) {
-      GTMCFAutorelease(appURL);
-      icon =  [[NSWorkspace sharedWorkspace] iconForFile:[(NSURL *)appURL path]];
+    if ([url isFileURL]) {
+      [[NSFileManager defaultManager] fileExistsAtPath:[url path]
+                                           isDirectory:&isDirectory];
+    }
+    
+    if (isDirectory) {
+      NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+      NSString *finderPath
+        = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
+      icon = [ws iconForFile:finderPath];
+    } else {
+      CFURLRef appURL = NULL;
+      if (url && noErr == LSGetApplicationForURL((CFURLRef)url,
+                                                 kLSRolesViewer,
+                                                 NULL, &appURL)) {
+        GTMCFAutorelease(appURL);
+        icon =  [[NSWorkspace sharedWorkspace] iconForFile:[(NSURL *)appURL path]];
+      }
     }
   }
   return icon;
@@ -120,16 +128,62 @@ const OSType kToolbarInfoIcon = 'tbin';
 
 @end
 
+@implementation FileSystemScriptAction
+
++ (NSAppleScript *)fileSystemActionScript {
+  static NSAppleScript *fileSystemActionScript = nil;
+  if (!fileSystemActionScript) {
+    NSBundle *bundle = HGSGetPluginBundle();
+    NSString *path = [bundle pathForResource:@"FileSystemActions"
+                                      ofType:@"scpt" 
+                                 inDirectory:@"Scripts"];
+    if (path) {
+      NSURL *url = [NSURL fileURLWithPath:path];
+      NSDictionary *error = nil;
+      fileSystemActionScript 
+        = [[NSAppleScript alloc] initWithContentsOfURL:url 
+                                                 error:&error];
+      if (error) {
+        HGSLog(@"Unable to load %@. Error: %@", url, error);
+      }
+    } else {
+      HGSLog(@"Unable to find script FileSystemActions.scpt");
+    }
+  }
+  return fileSystemActionScript;
+}
+
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directObjects
+     = [info objectForKey:kHGSActionDirectObjectsKey];
+  NSArray *args = [directObjects filePaths];
+  NSDictionary *error = nil;
+  NSAppleScript *script = [FileSystemScriptAction fileSystemActionScript];
+  NSString *handlerName = [self handlerName];
+  NSAppleEventDescriptor *answer
+    = [script gtm_executePositionalHandler:handlerName
+                                parameters:args
+                                     error:&error];
+  BOOL isGood = YES;
+  if (!answer || error) {
+    HGSLogDebug(@"Unable to execute handler %@: %@", error);
+    isGood = NO;
+  }
+  return isGood;
+}
+
+- (NSString *)handlerName {
+  HGSAssert(@"handlerName must be overridden by subclasses", nil);
+  return nil;
+}
+@end
+
 @implementation FileSystemShowInFinderAction
 
 - (id)defaultObjectForKey:(NSString *)key {
   id defaultObject = nil;
   if ([key isEqualToString:kHGSExtensionIconImageKey]) {
-    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-    NSString *finderPath
-      = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
-    NSImage *icon = [ws iconForFile:finderPath];
-    defaultObject = icon;
+    defaultObject = [NSImage imageNamed:NSImageNameRevealFreestandingTemplate];
   }
   if (!defaultObject) {
     defaultObject = [super defaultObjectForKey:key];
@@ -137,26 +191,22 @@ const OSType kToolbarInfoIcon = 'tbin';
   return defaultObject;
 }
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
-  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-  NSURL *url = [object valueForKey:kHGSObjectAttributeURIKey];
-  return [ws selectFile:[url path] inFileViewerRootedAtPath:@""];
+- (NSString *)handlerName {
+  return @"showInFinder";
 }
 
 @end
 
-
 @implementation FileSystemQuickLookAction
   
-- (BOOL)doesActionCauseUIContextChange {
+- (BOOL)causesUIContextChange {
   return NO;
 }
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
-  NSURL *url = [object valueForKey:kHGSObjectAttributeURIKey];
-  NSArray *urls = [NSArray arrayWithObject:url];
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  NSArray *urls = [directObjects urls];
   QLPreviewPanel *panel = [QLPreviewPanel sharedPreviewPanel];
   [panel setHidesOnDeactivate:NO];
   BOOL changed = ![urls isEqualToArray:[panel URLs]];
@@ -171,47 +221,16 @@ const OSType kToolbarInfoIcon = 'tbin';
   return YES;
 }
 
-- (NSRect)previewPanel:(NSPanel*)panel frameForURL:(NSURL*)URL {
-  QSBApplicationDelegate *delegate = [NSApp delegate];
-  NSView *previewView = [[delegate searchWindowController] previewImageView];
-  NSRect frame = [previewView bounds];
-  frame.origin = [[previewView window] convertBaseToScreen:
-                  [previewView convertPoint:NSZeroPoint toView:nil]];
-  return  frame;
-}
-
 @end
 
 @implementation FileSystemGetInfoAction
 
 GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
 
-- (id)initWithConfiguration:(NSDictionary *)configuration {
-  if ((self = [super initWithConfiguration:configuration])) {
-    NSString *source = @"on getFileInfo(x)\r"
-      @"tell application \"Finder\"\r"
-      @"activate\r"
-      @"set macpath to POSIX file x as text\r"
-      @"open information window of item macpath\r"
-      @"end tell\r"
-      @"end getFileInfo\r";
-    script_ = [[NSAppleScript alloc] initWithSource:source];
-  }
-  return self;
-}
-
-- (void)dealloc {
-  [script_ release];
-  [super dealloc];
-}
-
 - (id)defaultObjectForKey:(NSString *)key {
   id defaultObject = nil;
   if ([key isEqualToString:kHGSExtensionIconImageKey]) {
-    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-    NSImage *icon 
-      = [ws iconForFileType:NSFileTypeForHFSTypeCode(kToolbarInfoIcon)];
-    defaultObject = icon;
+    defaultObject = [NSImage imageNamed:NSImageNameInfo];
   }
   if (!defaultObject) {
     defaultObject = [super defaultObjectForKey:key];
@@ -219,21 +238,8 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
   return defaultObject;
 }
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
-  NSURL *url = [object valueForKey:kHGSObjectAttributeURIKey];
-  HGSAssert([url isFileURL], @"Must be file URL");
-  NSDictionary *dictionary = nil;
-  NSAppleEventDescriptor *answer;
-  NSArray *args = [NSArray arrayWithObject:[url path]];
-  answer = [script_ gtm_executePositionalHandler:@"getFileInfo" 
-                                      parameters:args
-                                           error:&dictionary];
-  if (!answer || dictionary) {
-    HGSLogDebug(@"Unable to getInfo: %@", dictionary);
-    return NO;
-  }
-  return YES;
+- (NSString *)handlerName {
+  return @"getInfo";
 }
 
 @end
@@ -264,11 +270,12 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
   return defaultObject;
 }
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directObjects
+     = [info objectForKey:kHGSActionDirectObjectsKey];
   
   NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
-  NSArray *filePaths = [object filePaths];
+  NSArray *filePaths = [directObjects filePaths];
   
   BOOL success = YES;
   for (NSString *path in filePaths) {
@@ -294,13 +301,21 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
   return success;
 }
 
-- (BOOL)doesActionApplyTo:(HGSObject*)object {
-  NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
-  NSArray *filePaths = [object filePaths];
-  NSArray *volumes = [workspace mountedLocalVolumePaths];
-  NSSet *volumesSet = [NSSet setWithArray:volumes];
-  NSSet *pathsSet = [NSSet setWithArray:filePaths];
-  return [pathsSet intersectsSet:volumesSet];
+- (BOOL)appliesToResults:(HGSResultArray *)results {
+  BOOL doesApply = [super appliesToResults:results];
+  if (doesApply) {
+    NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+    NSArray *filePaths = [results filePaths];
+    if (filePaths) {
+      NSArray *volumes = [workspace mountedLocalVolumePaths];
+      NSSet *volumesSet = [NSSet setWithArray:volumes];
+      NSSet *pathsSet = [NSSet setWithArray:filePaths];
+      doesApply = [pathsSet intersectsSet:volumesSet];
+    } else {
+      doesApply = NO;
+    }
+  }
+  return doesApply;
 }
 
 

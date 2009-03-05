@@ -57,7 +57,7 @@
 
 @interface ChatBuddiesSource (ChatBuddiesSourcePrivateMethods)
 
-- (HGSObject *)contactResultFromIMBuddy:(NSDictionary *)buddy
+- (HGSResult *)contactResultFromIMBuddy:(NSDictionary *)buddy
                                 service:(IMService *)service
                                  source:(id<HGSSearchSource>)source;
 
@@ -73,9 +73,9 @@
 // Our status has changed.
 - (void)myStatusChangedNotification:(NSNotification*)notification;
 
-- (NSArray *)stringsFromBuddy:(HGSObject *)buddy forKeys:(NSArray *)keys;
-- (NSString *)nameStringForBuddy:(HGSObject *)buddy;
-- (NSArray *)otherTermStringsForBuddy:(HGSObject *)buddy;
+- (NSArray *)stringsFromBuddy:(HGSResult *)buddy forKeys:(NSArray *)keys;
+- (NSString *)nameStringForBuddy:(HGSResult *)buddy;
+- (NSArray *)otherTermStringsForBuddy:(HGSResult *)buddy;
 @end
 
 
@@ -103,7 +103,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       NSEnumerator *buddyEnum = [buddiesForService objectEnumerator];
       NSDictionary *buddy = nil;
       while ((buddy = [buddyEnum nextObject])) {
-        HGSObject *newBuddy
+        HGSResult *newBuddy
           = [self contactResultFromIMBuddy:buddy
                                    service:service
                                     source:self];
@@ -184,7 +184,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   [super dealloc];
 }
 
-- (id)provideValueForKey:(NSString *)key result:(HGSObject *)result {
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   // TODO(mrossetti): break this method up. It's too complex.
   id value = nil;
   if ([key isEqualToString:kHGSObjectAttributeIconKey] 
@@ -257,7 +257,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     // service name, and the third with the screen name.  Only the
     // third cell will respond to clicks.
     // TODO(mrossetti): Make the iChat cell clickable to activate iChat.
-    NSURL *buddyURL = [result identifier];
+    NSURL *buddyURL = [result url];
     NSString *iChatName = @"iChat";
     NSURL *iChatURL = nil;
     CFURLRef iChatCFURL = nil;
@@ -301,16 +301,22 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       value = [NSArray arrayWithObjects:iChatCell, serviceCell, buddyCell, nil];
     }
   }
+  if (!value) {
+    value = [super provideValueForKey:key result:result];
+  }
+  
   return value;
 }
 
 // This source also provides results for ichat
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  if ([query pivotObject]) {
-    NSString *path = [[[query pivotObject] identifier] path];
-    return [path isEqualToString:@"/Applications/iChat.app"];
+  BOOL isValid = [super isValidSourceForQuery:query];
+  HGSResult *pivot = [query pivotObject];
+  if (isValid && [query pivotObject]) {
+    NSString *path = [[pivot url] absoluteString];
+    isValid = [path hasSuffix:@"/iChat.app"];
   }
-  return YES;
+  return isValid;
 }
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
@@ -325,14 +331,14 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   [super performSearchOperation:operation];
 }
 
-- (NSMutableDictionary *)archiveRepresentationForObject:(HGSObject*)object {
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
   // Don't want chat buddy results remembered in shortcuts
   // TODO: revisit when we don't use a subclass and see if we can save a few
   // things to rebuild the real result.
   return nil;
 }
 
-- (HGSObject *)objectWithArchivedRepresentation:(NSDictionary *)representation {
+- (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
   // Don't want chat buddy results remembered in shortcuts
   // TODO: revisit when we don't use a subclass and see if we can save a few
   // things to rebuild the real result.
@@ -344,7 +350,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 @implementation ChatBuddiesSource (ChatBuddiesSourcePrivateMethods)
 
-- (NSArray *)stringsFromBuddy:(HGSObject *)buddy 
+- (NSArray *)stringsFromBuddy:(HGSResult *)buddy 
                       forKeys:(NSArray *)keys {
   NSMutableArray *strings = [NSMutableArray array];
   NSDictionary *imBuddyInfo = [buddy valueForKey:kHGSIMBuddyInformationKey];
@@ -357,7 +363,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return strings;
 }
 
-- (NSString *)nameStringForBuddy:(HGSObject *)buddy {
+- (NSString *)nameStringForBuddy:(HGSResult *)buddy {
   // This is a list of the attributes that we will use
   // to compose the name-related string.
   // (can only be keys listed in init as going into the info dictionary)
@@ -370,7 +376,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return [nameStrings componentsJoinedByString:@" "];
 }
 
-- (NSArray *)otherTermStringsForBuddy:(HGSObject *)buddy {
+- (NSArray *)otherTermStringsForBuddy:(HGSResult *)buddy {
   // This is a list of the attributes that we will use
   // to compose the non-name-related string array.
   // (can only be keys listed in init as going into the info dictionary)
@@ -384,7 +390,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   [self clearResultIndex];
 
   @synchronized(buddyResults_) {
-    for (HGSObject *buddyResult in buddyResults_) {
+    for (HGSResult *buddyResult in buddyResults_) {
       NSString *name = [self nameStringForBuddy:buddyResult];
       NSArray *otherStrings = [self otherTermStringsForBuddy:buddyResult];
       [self indexResult:buddyResult
@@ -407,7 +413,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     if ([screenName length]) {
       // See if we already know about this buddy.
       @synchronized(buddyResults_) {
-        HGSObject *buddyResult = nil;
+        HGSResult *buddyResult = nil;
         for (buddyResult in buddyResults_) {
           NSDictionary *imBuddyInfo 
             = [buddyResult valueForKey:kHGSIMBuddyInformationKey];
@@ -426,7 +432,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         if (buddyResult) {
           // Remove the results and add it new to pick up the changes
           [buddyResults_ removeObjectIdenticalTo:buddyResult];
-          HGSObject *newBuddy
+          HGSResult *newBuddy
             = [self contactResultFromIMBuddy:userInfo
                                      service:service
                                       source:self];
@@ -435,7 +441,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
           rebuildIndex_ = YES;
         } else {
           // This must be a new buddy but if it's a |statusChange| do nothing.
-          HGSObject *newBuddy = [self contactResultFromIMBuddy:userInfo
+          HGSResult *newBuddy = [self contactResultFromIMBuddy:userInfo
                                                        service:service
                                                         source:self];
           [buddyResults_ addObject:newBuddy];
@@ -480,7 +486,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   }
 }
 
-- (HGSObject *)contactResultFromIMBuddy:(NSDictionary *)imBuddy
+- (HGSResult *)contactResultFromIMBuddy:(NSDictionary *)imBuddy
                                 service:(IMService *)service
                                  source:(id<HGSSearchSource>)source {
   // Both a screen name and service name are required.
@@ -545,11 +551,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
        uniqueIdentifiers, kHGSObjectAttributeUniqueIdentifiersKey,
        imBuddyInfo, kHGSIMBuddyInformationKey,
        nil];
-  return [HGSObject objectWithIdentifier:url
-                                    name:displayName
-                                    type:HGS_SUBTYPE(kHGSTypeContact, @"ichat")
-                                  source:source
-                              attributes:attributes];
+  return [HGSResult resultWithURL:url
+                             name:displayName
+                             type:HGS_SUBTYPE(kHGSTypeContact, @"ichat")
+                           source:source
+                       attributes:attributes];
 }
 
 @end

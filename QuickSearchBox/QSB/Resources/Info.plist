@@ -22,6 +22,24 @@
 			<key>LSTypeIsPackage</key>
 			<true/>
 		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>*</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Everything</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>****</string>
+				<string>fold</string>
+				<string>disk</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>None</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
@@ -33,6 +51,42 @@
 	<string>${QSB_BUNDLE_ID}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>NSServices</key>
+	<array>
+		<dict>
+			<key>NSMessage</key>
+			<string>getSelectionFromService</string>
+			<key>NSPortName</key>
+			<string>Quick Search Box</string>
+			<key>NSTimeout</key>
+			<string>10000</string>
+			<key>NSSendTypes</key>
+			<array>
+				<string>NSColorPboardType</string>
+				<string>NSFileContentsPboardType</string>
+				<string>NSFilenamesPboardType</string>
+				<string>NSFontPboardType</string>
+				<string>NSHTMLPboardType</string>
+				<string>NSPDFPboardType</string>
+				<string>NSPICTPboardType</string>
+				<string>NSPostScriptPboardType</string>
+				<string>NSRulerPboardType</string>
+				<string>NSRTFPboardType</string>
+				<string>NSRTFDPboardType</string>
+				<string>NSStringPboardType</string>
+				<string>NSTabularTextPboardType</string>
+				<string>NSTIFFPboardType</string>
+				<string>NSURLPboardType</string>
+				<string>NSVCardPboardType</string>
+				<string>NSFilesPromisePboardType</string>
+			</array>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>Send to Quick Search Box</string>
+			</dict>
+		</dict>
+	</array>
 	<key>CFBundleName</key>
 	<string>${PRODUCT_NAME}</string>
 	<key>CFBundlePackageType</key>
@@ -70,6 +124,8 @@
 	<string>QSBApplication</string>
 	<key>OSAScriptingDefinition</key>
 	<string>QSB.sdef</string>
+	<key>LSHasLocalizedDisplayName</key>
+	<true/>
 	<key>QSBFeedbackURL</key>
 	<string>http://groups.google.com/group/qsb-mac-discuss</string>
 	<key>QSBHomepageURL</key>

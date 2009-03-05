@@ -32,18 +32,64 @@
 
 #import <Vermilion/Vermilion.h>
 
-// These classes exposed here only to support Interface Builder.
+// NOTE: These classes are exposed here purely to satisfy Inteface Builder.
 
 // A class which manages a Google account.
 //
-@interface GoogleAccount : HGSSimpleAccount
+@interface GoogleAccount : HGSSimpleAccount {
+ @private
+  NSMutableData *responseData_;
+  // The presence of a captchaImage_ indicates that one such should be shown
+  // to the user and the resulting captchaText be included in the
+  // authentication reply.  The consumer of this image (i.e. the UI) should
+  // clear the captcha image and text prior to the next authentication attempt.
+  NSImage *captchaImage_;  // The captcha image presented to the user.
+  NSString *captchaText_;  // The user's response.
+  NSString *captchaToken_;  // Captcha token.
+}
+
+@property (nonatomic, retain) NSImage *captchaImage;
+@property (nonatomic, copy) NSString *captchaText;
+@property (nonatomic, copy) NSString *captchaToken;
+
+@end
+
+// A controller which manages a window used to edit the password
+// for a Google account.
+//
+@interface GoogleAccountEditController : HGSSimpleAccountEditController {
+ @private
+  IBOutlet NSView *captchaContainerView_;
+  IBOutlet NSTextField *captchaTextField_;
+  
+  NSImage *captchaImage_;  // The captcha image presented to the user.
+  NSString *captchaText_;  // The captcha text typed by the user.
+}
+
+@property (nonatomic, retain) NSImage *captchaImage;
+@property (nonatomic, copy) NSString *captchaText;
+
+// Open google.com in the user's preferred browser.
+- (IBAction)goToGoogle:(id)sender;
+
 @end
 
 // A controller which manages a view used to specify a Google account
 // name and password during the setup process.
 //
-@interface SetUpGoogleAccountViewController : HGSSetUpSimpleAccountViewController
-@end
+@interface SetUpGoogleAccountViewController : HGSSetUpSimpleAccountViewController {
+ @private
+  IBOutlet NSView *captchaContainerView_;
+  IBOutlet NSTextField *captchaTextField_;
+  
+  NSImage *captchaImage_;  // The captcha image presented to the user.
+  NSString *captchaText_;  // The captcha text typed by the user.
+}
 
-@interface GoogleAccountEditController : HGSSimpleAccountEditController
+@property (nonatomic, retain) NSImage *captchaImage;
+@property (nonatomic, copy) NSString *captchaText;
+
+// Open google.com in the user's preferred browser.
+- (IBAction)goToGoogle:(id)sender;
+
 @end

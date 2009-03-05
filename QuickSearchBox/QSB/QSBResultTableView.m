@@ -44,7 +44,7 @@
 // what to do in the code annotated with IS_THIS_NEEDED_FOR_DRAG_SUPPORT.
 
 
-@interface QSBResultTableView (QSBResultTableViewPrivateMethods)
+@interface QSBResultTableView ()
 - (CGFloat)selectionLeftInset;
 - (CGFloat)selectionRightInset;
 - (CGFloat)selectionCornerRadius;
@@ -141,8 +141,8 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
                                    event:(NSEvent*)dragEvent 
                                   offset:(NSPointPointer)dragImageOffset {
   unsigned row = [dragRows firstIndex];
-  HGSObject *item = [[self delegate] objectForRow:row];
-  return [item displayIconWithLazyLoad:YES];
+  HGSResult *result = [[self delegate] tableResultForRow:row];
+  return [result displayIconWithLazyLoad:YES];
 }
 
 #endif  // IS_THIS_NEEDED_FOR_DRAG_SUPPORT
@@ -252,11 +252,6 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
 - (BOOL)rowIsVisible:(NSInteger)row {
   return (row >= 0 && NSLocationInRange(row, [self visibleRows]));
 }
-
-@end
-
-
-@implementation QSBResultTableView (QSBResultTableViewPrivateMethods)
 
 - (CGFloat)selectionLeftInset {
   //Stroke left and right outside the clipping area

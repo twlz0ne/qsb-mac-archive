@@ -138,31 +138,33 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  PythonStackLock gilLock;
-  BOOL result = YES;  
-  
-  PyObject *pyQuery = [[HGSPython sharedPython] objectForQuery:query
-                                           withSearchOperation:nil];
-    
-  if (instance_ && isValidSourceForQuery_ && pyQuery) {
-    PyObject *pyValid =
-      PyObject_CallMethodObjArgs(instance_,
-                                 isValidSourceForQuery_,
-                                 pyQuery,
-                                 nil);
-    if (pyValid) {
-      if (PyBool_Check(pyValid)) {
-        result = (pyValid == Py_True);
+  BOOL isValid = [super isValidSourceForQuery:query];  
+  if (isValid) {
+    PythonStackLock gilLock;
+
+    PyObject *pyQuery = [[HGSPython sharedPython] objectForQuery:query
+                                             withSearchOperation:nil];
+      
+    if (instance_ && isValidSourceForQuery_ && pyQuery) {
+      PyObject *pyValid =
+        PyObject_CallMethodObjArgs(instance_,
+                                   isValidSourceForQuery_,
+                                   pyQuery,
+                                   nil);
+      if (pyValid) {
+        if (PyBool_Check(pyValid)) {
+          isValid = (pyValid == Py_True);
+        }
+        Py_DECREF(pyValid);
       }
-      Py_DECREF(pyValid);
+    }
+    
+    if (pyQuery) {
+      Py_DECREF(pyQuery);
     }
   }
   
-  if (pyQuery) {
-    Py_DECREF(pyQuery);
-  }
-  
-  return result;
+  return isValid;
 }
 
 - (PyObject *)instance {

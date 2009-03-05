@@ -57,6 +57,9 @@
      // QSB Icon In Menubar
      [NSNumber numberWithBool:kQSBIconInMenubarDefault],
      kQSBIconInMenubarKey,
+     // Use Growl for user messages
+     [NSNumber numberWithBool:kQSBUseGrowlDefault],
+     kQSBUseGrowlKey,
      // done
      nil];
 

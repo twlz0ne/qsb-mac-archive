@@ -32,13 +32,13 @@
 
 #import "HGSSuggestSource.h"
 
-#import "GTMHTTPFetcher.h"
+#import <GData/GDataHTTPFetcher.h>
 #import "GTMDefines.h"
 #import "GTMGarbageCollection.h"
 #import "GTMMethodCheck.h"
 #import "GTMNSString+URLArguments.h"
 #import "GTMNSDictionary+URLArguments.h"
-#import "NSScanner+BSJSONAdditions.h"
+#import "JSON/JSON.h"
 #import "NSString+ReadableURL.h"
 
 #if TARGET_OS_IPHONE
@@ -73,7 +73,7 @@ typedef enum {
 - (void)suggestionsRequestFailed:(HGSSearchOperation *)operation;
 
 // Parses data from an HTTP response (|responseData|), caches the parsed
-// response as a plist and converts it into an array of HGSObject(s).
+// response as a plist and converts it into an array of HGSResult(s).
 //
 // Filtering of the results is also applied to the suggestions.
 - (NSArray *)parseAndCacheResponseData:(NSData *)responseData
@@ -91,7 +91,7 @@ typedef enum {
 // Foundation-based NSArray representation suitable to be passed on to
 // suggestionsWithResponse:withQuery:.
 - (NSArray *)responseWithJSONData:(NSData *)responseData;
-// Convert a parsed JSON response into HGSObject(s).
+// Convert a parsed JSON response into HGSResult(s).
 - (NSMutableArray *)suggestionsWithResponse:(NSArray *)response
                                   withQuery:(HGSQuery *)query;
 // Language of suggestions
@@ -154,7 +154,6 @@ typedef enum {
 
 @implementation HGSSuggestSource
 GTM_METHOD_CHECK(NSString, readableURLString);
-GTM_METHOD_CHECK(NSScanner, scanJSONArray:);
 GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 #if TARGET_OS_IPHONE
@@ -165,19 +164,20 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 #endif
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  int suggestCount = [prefs integerForKey:kQSBSuggestCountKey];
-  int navSuggestCount = [prefs integerForKey:kQSBNavSuggestCountKey];
-  
-  // Don't show suggestions for queries under 3 letters
-  if ([[query rawQueryString] length] < 3) {
-    return NO;
+  BOOL isValid = [super isValidSourceForQuery:query];
+  if (isValid) {
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    int suggestCount = [prefs integerForKey:kQSBSuggestCountKey];
+    int navSuggestCount = [prefs integerForKey:kQSBNavSuggestCountKey];
+    
+    // Don't show suggestions for queries under 3 letters
+    if ([[query rawQueryString] length] < 3) {
+      isValid = NO;
+    } else if (suggestCount + navSuggestCount <= 0) {  
+      isValid = NO;
+    }
   }
-  if (suggestCount + navSuggestCount <= 0) {  
-    return NO;
-  }
-  return YES;
+  return isValid;
 }
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
@@ -192,13 +192,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (id)initWithConfiguration:(NSDictionary *)configuration
                     baseURL:(NSString*)baseURL {
   if (![configuration objectForKey:kHGSExtensionIconImagePathKey]) {
-    NSMutableDictionary *newConfig = [configuration mutableCopy];
-#if TARGET_OS_IPHONE
-    NSString *iconName = @"web-nav.png";
-#else
-    NSString *iconName = @"blue-nav";
-#endif
-    [newConfig setObject:iconName forKey:kHGSExtensionIconImagePathKey];
+    NSMutableDictionary *newConfig 
+      = [NSMutableDictionary dictionaryWithDictionary:configuration];
     configuration = newConfig;
   }
   if ((self = [super initWithConfiguration:configuration])) {
@@ -214,6 +209,14 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     [self startSuggestionFetchingThread];
   }
   return self;
+}
+
+- (NSImage *)navIcon {
+#if TARGET_OS_IPHONE
+  return [UIImage imageNamed:@"web-nav.png"];
+#else
+  return [NSImage imageNamed:@"blue-nav.png"];
+#endif
 }
 
 - (void)dealloc {
@@ -353,8 +356,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (NSURL *)suggestUrl:(HGSSearchOperation *)operation { 
   // use the raw query so the server can try to parse it.
-  NSString *escapedString = 
-    [[[operation query] rawQueryString] gtm_stringByEscapingForURLArgument];
+  // This is escaped by the argument dictionary
+  NSString *string = [[operation query] rawQueryString];
 
   NSMutableDictionary *argumentDictionary =
     [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -366,7 +369,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     @"t",@"hjson", // Horizontal JSON. http://wiki/Main/GoogleSuggestServerAPI
     @"t", @"types", // Add type of suggest (SuggestResults::SuggestType)
     [self suggestLanguage], @"hl", // Language (eg. en)
-    escapedString, @"q", // Partial query.
+    string, @"q", // Partial query.
     nil]; 
   
   // Enable spelling suggestions.
@@ -416,7 +419,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   [request setHTTPShouldHandleCookies:NO];
 
   // Start the http fetch.
-  GTMHTTPFetcher *fetcher = [GTMHTTPFetcher httpFetcherWithRequest:request];
+  GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
   [fetcher setUserData:operation];
   [fetcher beginFetchWithDelegate:self
                 didFinishSelector:@selector(httpFetcher:finishedWithData:)
@@ -427,7 +430,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 #endif  // TARGET_OS_IPHONE
 }
 
-- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData {
   HGSSearchOperation *fetchedOperation = (HGSSearchOperation *)[[[fetcher userData] retain] autorelease];
   [fetcher setUserData:nil];  // Make sure this operation isn't retained.
@@ -445,7 +448,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   [self signalOperationCompletion];
 }
 
-- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
             didFail:(NSError *)error {
   HGSLog(@"httpFetcher failed: %@ %@", [error description], [[fetcher request] URL]);
   [self signalOperationCompletion];
@@ -512,13 +515,10 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 // Parses the JSON response into Foundation objects.
 - (NSArray *)responseWithJSONData:(NSData *)responseData {
   // Parse response.
-  NSString *jsonResponse = [[NSString alloc] initWithData:responseData
-                                                  encoding:NSUTF8StringEncoding];
-  NSScanner *jsonScanner = [[NSScanner alloc] initWithString:jsonResponse];
-  NSArray *response = nil;
-  [jsonScanner scanJSONArray:&response];
-  [jsonResponse release];
-  [jsonScanner release];
+  NSString *jsonResponse = [[[NSString alloc] initWithData:responseData
+                                                  encoding:NSUTF8StringEncoding]
+                            autorelease];
+  NSArray *response = [jsonResponse JSONValue];
 
   if (!response) {
     HGSLog(@"Unable to parse JSON");
@@ -570,7 +570,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         NSMutableDictionary *attributes
           = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              suggestionString, kHGSObjectAttributeStringValueKey,
-             [self icon], kHGSObjectAttributeIconKey,
+             [self navIcon], kHGSObjectAttributeIconKey,
              nil];
         if ([suggestionItem count] > 3) {
           id isDidYouMean = [suggestionItem objectAtIndex:3];
@@ -581,11 +581,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
           }
         }
         
-        HGSObject* suggestion = [HGSObject objectWithIdentifier:completionId
-                                                           name:suggestionString
-                                                           type:kHGSTypeGoogleSuggest
-                                                         source:self
-                                                     attributes:attributes];
+        HGSResult* suggestion = [HGSResult resultWithURL:completionId
+                                                    name:suggestionString
+                                                    type:kHGSTypeGoogleSuggest
+                                                  source:self
+                                              attributes:attributes];
         [suggestions addObject:suggestion];
       } else if (suggestionType == kHGSSuggestTypeNavSuggest) {
         NSString *title = @"";
@@ -608,11 +608,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                [NSNumber numberWithBool:YES], kHGSObjectAttributeIsSyntheticKey,
                [url absoluteString], kHGSObjectAttributeSourceURLKey,
                nil];
-          HGSObject *navsuggestion = [HGSObject objectWithIdentifier:url
-                                                                name:title
-                                                                type:kHGSTypeGoogleNavSuggest
-                                                              source:self
-                                                          attributes:attributes];
+          HGSResult *navsuggestion = [HGSResult resultWithURL:url
+                                                         name:title
+                                                         type:kHGSTypeGoogleNavSuggest
+                                                       source:self
+                                                   attributes:attributes];
           [suggestions addObject:navsuggestion];
         }
       }
@@ -622,19 +622,22 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return suggestions;
 }
 
-- (id)provideValueForKey:(NSString *)key result:(HGSObject *)result {
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   id value = nil;
   if ([key isEqualToString:kHGSObjectAttributeIconKey] 
       || [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
-    value = [self icon];
+    value = [self navIcon];
   }
+  if (!value) {
+    value = [super provideValueForKey:key result:result];
+  }  
   return value;
 }
 //
 - (void)filterWebPageResults:(NSMutableArray*)results {
   NSMutableIndexSet *toRemove = [NSMutableIndexSet indexSet];
   NSEnumerator *enumerator = [results objectEnumerator];
-  HGSObject *result;
+  HGSResult *result;
   for (NSUInteger i = 0; (result = [enumerator nextObject]); ++i) {
     if ([result conformsToType:kHGSTypeWebpage]) {
       [toRemove addIndex:i];
@@ -646,7 +649,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 // Replaces suggestions that look like URLs
 - (void)replaceURLLikeResults:(NSMutableArray *)results {
   for (NSUInteger i = 0; i < [results count]; i++) {
-    HGSObject *result = [results objectAtIndex:i];
+    HGSResult *result = [results objectAtIndex:i];
     if (![result isOfType:kHGSTypeGoogleSuggest])
       continue;
 
@@ -661,14 +664,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                                              path:@"/"] autorelease];
       NSDictionary *attributes
         = [NSDictionary dictionaryWithObjectsAndKeys:
-           url, kHGSObjectAttributeURIKey,
            suggestion, kHGSObjectAttributeStringValueKey,
            nil];
-      HGSObject *urlResult = [HGSObject objectWithIdentifier:url
-                                                        name:suggestion
-                                                        type:kHGSTypeWebpage
-                                                      source:self
-                                                  attributes:attributes];
+      HGSResult *urlResult = [HGSResult resultWithURL:url
+                                                 name:suggestion
+                                                 type:kHGSTypeWebpage
+                                               source:self
+                                           attributes:attributes];
       [results replaceObjectAtIndex:i withObject:urlResult];
     }
   }
@@ -680,7 +682,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSUInteger queryLength = [query length];
   NSUInteger lengthThreshold = 2;
   NSEnumerator *enumerator = [results objectEnumerator];
-  HGSObject *result;
+  HGSResult *result;
   for (NSUInteger i = 0; (result = [enumerator nextObject]); ++i) {
     if ([result isOfType:kHGSTypeGoogleSuggest] &&
         ![result valueForKey:kHGSObjectAttributeIsCorrectionKey] &&
@@ -717,7 +719,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   }
 
   NSEnumerator *enumerator = [results objectEnumerator];
-  HGSObject *result;
+  HGSResult *result;
   while ((result = [enumerator nextObject])) {
     // Only truncate suggestions
     if (![result isOfType:kHGSTypeGoogleSuggest])
@@ -750,7 +752,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (void)filterResults:(NSMutableArray *)results withoutPrefix:(NSString *)prefix {
   NSMutableIndexSet *toRemove = [NSMutableIndexSet indexSet];
   NSEnumerator *enumerator = [results objectEnumerator];
-  HGSObject *result;
+  HGSResult *result;
   for (NSUInteger i = 0; (result = [enumerator nextObject]); ++i) {
     if (([result isOfType:kHGSTypeGoogleNavSuggest]
          || [result isOfType:kHGSTypeGoogleSuggest])
@@ -766,7 +768,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSMutableSet* seenLabels = [NSMutableSet set];
   NSMutableIndexSet* toRemove = [NSMutableIndexSet indexSet];
   NSEnumerator *enumerator = [results objectEnumerator];
-  HGSObject *result;
+  HGSResult *result;
   for (NSUInteger i = 0; (result = [enumerator nextObject]); ++i) {
     if ([result isOfType:kHGSTypeGoogleSuggest]) {
       if ([seenLabels containsObject:[result valueForKey:kHGSObjectAttributeStringValueKey]]) {
@@ -833,7 +835,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   // real result. Uses the last "fetched" result and gives out all the  ones
   // with a matching prefix.
   if (lastResult_) {
-    NSMutableArray *suggestions = [[lastResult_ mutableCopy] autorelease];
+    NSMutableArray *suggestions = [NSMutableArray arrayWithArray:lastResult_];
     [self filterResults:suggestions withoutPrefix:queryTerm];
     [self filterShortResults:suggestions withQueryString:queryTerm];
     if (truncateSuggestions_) {

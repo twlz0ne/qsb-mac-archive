@@ -35,7 +35,7 @@
 
 @implementation QSBTopStandardRowViewController
 
-- (id)initWithController:(QSBQueryController *)controller {
+- (id)initWithController:(QSBSearchViewController *)controller {
   return [super initWithNibName:@"TopStandardResultView"
                      controller:controller];
 }
@@ -47,27 +47,41 @@
 @end
 
 @implementation QSBTopSeparatorRowViewController
-- (id)initWithController:(QSBQueryController *)controller {
+- (id)initWithController:(QSBSearchViewController *)controller {
   return [super initWithNibName:@"TopSeparatorResultView" 
                      controller:controller];
 }
 @end
 
+@implementation QSBTopSearchForRowViewController
+- (id)initWithController:(QSBSearchViewController *)controller {
+  return [super initWithNibName:@"TopSearchForResultView" 
+                     controller:controller];
+}
+@end
+
+@implementation QSBTopSearchIconViewController
+- (id)initWithController:(QSBSearchViewController *)controller {
+  return [super initWithNibName:@"TopSearchIconResultView" 
+                     controller:controller];
+}
+@end
+
 @implementation QSBTopFoldRowViewController
-- (id)initWithController:(QSBQueryController *)controller {
+- (id)initWithController:(QSBSearchViewController *)controller {
   return [super initWithNibName:@"TopFoldResultView" controller:controller];
 }
 @end
 
 @implementation QSBTopSearchStatusRowViewController
-- (id)initWithController:(QSBQueryController *)controller {
+- (id)initWithController:(QSBSearchViewController *)controller {
   return [super initWithNibName:@"TopSearchStatusResultView" 
                      controller:controller];
 }
 @end
 
 @implementation QSBTopMessageRowViewController
-- (id)initWithController:(QSBQueryController *)controller {
+- (id)initWithController:(QSBSearchViewController *)controller {
   return [super initWithNibName:@"TopMessageResultView" 
                      controller:controller];
 }

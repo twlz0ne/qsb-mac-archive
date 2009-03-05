@@ -34,7 +34,7 @@
 #import <Vermilion/Vermilion.h>
 #import "QSBApplicationDelegate.h"
 #import "QSBTableResult.h"
-#import "QSBQueryController.h"
+#import "QSBSearchViewController.h"
 #import "QSBResultRowViewController.h"
 #import "QSBResultsViewTableView.h"
 #import "QSBSearchWindowController.h"
@@ -56,8 +56,11 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   // Adjust the 'Top' results view to properly fit.
   NSView *resultsView = [self resultsView];
   NSRect viewFrame = [resultsView frame];
-  NSView *contentView
-    = [[[[self queryController] searchWindowController] resultsWindow] contentView];
+  QSBSearchViewController *viewController = [self searchViewController];
+  QSBSearchWindowController *windowController 
+    = [viewController searchWindowController];
+  NSWindow *resultsWindow = [windowController resultsWindow];
+  NSView *contentView = [resultsWindow contentView];
   viewFrame.size.width = NSWidth([contentView frame]);
   [resultsView setFrame:viewFrame];
   
@@ -92,7 +95,7 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   if (lastCellRow > -1) {
     NSUInteger selectedRow = [[self arrayController] selectionIndex];
     if (selectedRow == NSNotFound
-        && ![[self queryController] pivotObject]) {
+        && ![[self searchViewController] results]) {
       [resultsTableView selectFirstSelectableRow];
     }
   }
@@ -104,11 +107,11 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 - (void)moveDown:(id)sender {
   NSInteger newRow = [[self resultsTableView] selectedRow] + 1;
   if (newRow >= [self numberOfRowsInTableView:nil]) {
-    QSBTableResult *result = [self selectedObject];
+    QSBTableResult *result = [self selectedTableResult];
     if ([result isKindOfClass:[QSBFoldTableResult class]]) {
       // If we're on the last row and it's a fold then transition
       // to the 'Top' results view.
-      [[self queryController] showMoreResults:sender];
+      [[self searchViewController] showMoreResults:sender];
     }
   } else {
     [super moveDown:sender];
@@ -127,9 +130,9 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   
   BOOL gotData = NO;
   unsigned row = [rowIndexes firstIndex];
-  HGSObject *item = [self objectForRow:row];
+  HGSResult *item = [self objectForRow:row];
   
-  NSURL *url = [item valueForKey:kHGSObjectAttributeURIKey];
+  NSURL *url = [item identifier];
   if (url) {
     NSString *urlString = [url absoluteString];
     [pboard declareTypes:[NSArray arrayWithObjects:kWebURLsWithTitlesPboardType, 

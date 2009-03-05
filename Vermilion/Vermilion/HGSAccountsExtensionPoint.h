@@ -44,10 +44,6 @@
   NSMutableDictionary *accountTypes_;  // NSString
 }
 
-// Return the accounts extension point, creating and initializing it
-// if necessary.
-+ (HGSAccountsExtensionPoint *)accountsExtensionPoint;
-
 // Register all accounts contained in the array of dictionaries as while
 // restoring from preferences.  This method will not send notification of
 // newly added accounts.
@@ -69,19 +65,3 @@
 - (NSEnumerator *)accountsEnumForType:(NSString *)type;
 
 @end
-
-
-// The identifier of this extension point, which can be used to retrieve
-// this extension point via a call to +[HGSExtensionPoint pointWithIdentifier:]
-// but you should use +[HGSAccountsExtensionPoint accountsExtensionPoint]
-// instead.
-extern NSString *const kHGSAccountsExtensionPoint;
-
-// Notifications sent whenever an account has been added, will be or
-// has been removed.  The |object| sent with the notification is the 
-// HGSAccount instance that has been added, changed or will be removed.
-extern NSString *const kHGSDidAddAccountNotification;
-extern NSString *const kHGSWillRemoveAccountNotification;
-// The didRemove |object| is the account identifier since the account
-// will no longer be valid.
-extern NSString *const kHGSDidRemoveAccountNotification;

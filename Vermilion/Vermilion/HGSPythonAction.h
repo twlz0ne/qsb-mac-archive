@@ -37,8 +37,8 @@
  @private
   PyObject *module_;
   PyObject *instance_;
-  PyObject *performAction_;
-  PyObject *doesActionApplyTo_;
+  PyObject *perform_;
+  PyObject *appliesTo_;
 }
 
 - (id)initWithConfiguration:(NSDictionary *)configuration;

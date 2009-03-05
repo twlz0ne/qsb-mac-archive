@@ -145,19 +145,20 @@ static NSURL* domainURLForURLString(NSString* urlString) {
     // appropriately.
     NSRange searchMarkerRange = [urlString rangeOfString:@"%s"];
     if (searchMarkerRange.location != NSNotFound) {
-      NSMutableString* searchTemplate = [urlString mutableCopy];
+      NSMutableString* searchTemplate 
+        = [NSMutableString stringWithString:urlString];
       [searchTemplate replaceCharactersInRange:searchMarkerRange 
                                     withString:@"{searchterms}"];
       [attributes setObject:searchTemplate 
                      forKey:kHGSObjectAttributeWebSearchTemplateKey];
     }
   }
-  HGSObject* result 
-    = [HGSObject objectWithIdentifier:url
-                                 name:title
-                                 type:HGS_SUBTYPE(kHGSTypeWebBookmark, @"camino")
-                               source:self
-                           attributes:attributes];
+  HGSResult* result 
+    = [HGSResult resultWithURL:url
+                          name:title
+                          type:HGS_SUBTYPE(kHGSTypeWebBookmark, @"camino")
+                        source:self
+                    attributes:attributes];
   // Get description terms, and store those as non-title-match data.
   [self indexResult:result
          nameString:nameString

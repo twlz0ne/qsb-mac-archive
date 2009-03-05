@@ -40,42 +40,42 @@
 @end
 
 @implementation QSBMoreStandardRowViewController
-- (id)initWithController:(QSBQueryController *)controller {
+- (id)initWithController:(QSBSearchViewController *)controller {
   return [super initWithNibName:@"MoreStandardResultView" 
                      controller:controller];
 }
 @end
 
 @implementation QSBMoreCategoryRowViewController
-- (id)initWithController:(QSBQueryController *)controller {
+- (id)initWithController:(QSBSearchViewController *)controller {
   return [super initWithNibName:@"MoreCategoryResultView" 
                      controller:controller];
 }
 @end
 
 @implementation QSBMoreSeparatorRowViewController
-- (id)initWithController:(QSBQueryController *)controller {
+- (id)initWithController:(QSBSearchViewController *)controller {
   return [super initWithNibName:@"MoreSeparatorResultView" 
                      controller:controller];
 }
 @end
 
 @implementation QSBMoreFoldRowViewController
-- (id)initWithController:(QSBQueryController *)controller {
+- (id)initWithController:(QSBSearchViewController *)controller {
   return [super initWithNibName:@"MoreFoldResultView" 
                      controller:controller];
 }
 @end
 
 @implementation QSBMoreShowAllTableRowViewController
-- (id)initWithController:(QSBQueryController *)controller {
+- (id)initWithController:(QSBSearchViewController *)controller {
   return [super initWithNibName:@"MoreShowAllTableResultView" 
                      controller:controller];
 }
 @end
 
 @implementation QSBMorePlaceHolderRowViewController
-- (id)initWithController:(QSBQueryController *)controller {
+- (id)initWithController:(QSBSearchViewController *)controller {
   return [super initWithNibName:@"MorePlaceHolderResultView" 
                      controller:controller];
 }

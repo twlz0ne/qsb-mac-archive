@@ -33,13 +33,14 @@
 #import <Cocoa/Cocoa.h>
 
 @class HGSLRUCache;
-@class HGSObject;
+@class HGSResult;
 
 @interface HGSIconProvider : NSObject {
  @private
   NSMutableSet *iconOperations_;
   HGSLRUCache *cache_;
   NSImage *placeHolderIcon_;
+  NSImage *compoundPlaceHolderIcon_;
 }
 
 // Returns the singleton instance of HGSIconProvider
@@ -49,7 +50,11 @@
 // and change it.
 - (NSImage *)placeHolderIcon;
 
-// Returns an NSImage value for a HGSObject.
+// Returns our default compound placeHolderIcon. Do not change this icon. 
+// Make a copy and change it.
+- (NSImage *)compoundPlaceHolderIcon;
+
+// Returns an NSImage value for a HGSResult.
 // Returns the image if the was immediately set (if the cache was able to 
 // provide the icon), or the placeHolder image if it wasn't in the cache.
 //
@@ -59,9 +64,10 @@
 // from the cache. If the icon is not in the cache, and the loadLazily
 // is YES, the icon will be added to the cache after a successful retrieval.
 //
-// The result argument is retained until the lazy operation is completed
-// or cancelOperationsForResult is called.
-- (NSImage *)provideIconForResult:(HGSObject*)result
+// The result argument is not retained; it's very important that for lazy icon
+// retrievals cancelOperationsForResult be called whenever a result is going
+// away.
+- (NSImage *)provideIconForResult:(HGSResult*)result
                        loadLazily:(BOOL)loadLazily
                          useCache:(BOOL)useCache;
 
@@ -70,7 +76,7 @@
 // to cancelOperationsForResult if the icon is no longer needed. Calling
 // this method on a result that does not have a pending lazy load is
 // harmless.
-- (void)cancelOperationsForResult:(HGSObject*)result;
+- (void)cancelOperationsForResult:(HGSResult*)result;
 
 // Anyone can request that an icon be cached and then retrieve it later
 - (NSImage *)cachedIconForKey:(NSString *)key;

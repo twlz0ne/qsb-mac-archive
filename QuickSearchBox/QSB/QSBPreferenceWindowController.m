@@ -51,7 +51,7 @@ NSString *const kQSBAccountsPrefKey = @"QSBAccountsPrefKey";
 
 static void OpenAtLoginItemsChanged(LSSharedFileListRef inList, void *context);
 
-@interface QSBPreferenceWindowController (QSBPreferenceWindowControllerPrivateMethods)
+@interface QSBPreferenceWindowController ()
 
 // Adjust color popup to the corect color
 - (void)updateColorPopup;
@@ -121,11 +121,12 @@ GTM_METHOD_CHECK(NSColor, crayonName);
     }
     
     // Notify us when an account is added so we can highlight it.
+    HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self 
            selector:@selector(didAddAccount:) 
-               name:kHGSDidAddAccountNotification
-             object:nil];
+               name:kHGSExtensionPointDidAddExtensionNotification
+             object:accountsPoint];
   }
   return self;
 }
@@ -150,8 +151,8 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   [super windowDidLoad];
   
   [[colorPopUp_ menu] setDelegate:self];
-  
-  NSData *colorData = [[NSUserDefaults standardUserDefaults] objectForKey:kQSBBackgroundPref];
+  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+  NSData *colorData = [ud objectForKey:kQSBBackgroundPref];
   NSColor *color = colorData ? [NSUnarchiver unarchiveObjectWithData:colorData]
                              : [NSColor whiteColor];
   [self setSelectedColor:color];
@@ -210,8 +211,9 @@ GTM_METHOD_CHECK(NSColor, crayonName);
     }
     
     [menu addItem:[NSMenuItem separatorItem]];
-    NSMenuItem *item = [menu addItemWithTitle:NSLocalizedString(@"Other...", @"") 
-                     action:@selector(chooseOtherColor:)
+    NSString *otherString = NSLocalizedString(@"Other...", @"") ;
+    NSMenuItem *item = [menu addItemWithTitle:otherString
+                                       action:@selector(chooseOtherColor:)
                                 keyEquivalent:@""];
     [item setTarget:self];
     [item setTag:kCustomColorTag];
@@ -219,7 +221,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
     [menu addItem:[NSMenuItem separatorItem]];
     [[menu addItemWithTitle:NSLocalizedString(@"Glossy", @"")
                      action:@selector(setGlossy:)
-              keyEquivalent:@""] setTarget:self];;
+              keyEquivalent:@""] setTarget:self];
   }
 }
 
@@ -235,8 +237,9 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 
 - (void)setColor:(NSColor *)color {
   [self setSelectedColor:color];
-  [[NSUserDefaults standardUserDefaults] setObject:[NSArchiver archivedDataWithRootObject:color]
-                                            forKey:kQSBBackgroundPref]; 
+  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+  NSData *colorData = [NSArchiver archivedDataWithRootObject:color];
+  [ud setObject:colorData forKey:kQSBBackgroundPref]; 
   [self updateColorPopup];
 }
 
@@ -247,7 +250,9 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item {
   if ([item action] == @selector(setGlossy:)) {
-    [item setState:[[NSUserDefaults standardUserDefaults] boolForKey:kQSBBackgroundGlossyPref]];
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    BOOL value = [ud boolForKey:kQSBBackgroundGlossyPref];
+    [item setState:value];
   } else if ([item action] == @selector(chooseOtherColor:))  {
     NSColor *color = [self selectedColor];
     [item setImage:[color menuImage]];
@@ -263,9 +268,9 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 }
 
 - (void)setGlossy:(id)sender {
-  BOOL glossy = [[NSUserDefaults standardUserDefaults] boolForKey:kQSBBackgroundGlossyPref];
-  [[NSUserDefaults standardUserDefaults] setBool:!glossy
-                                          forKey:kQSBBackgroundGlossyPref];
+  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+  BOOL glossy = [ud boolForKey:kQSBBackgroundGlossyPref];
+  [ud setBool:!glossy forKey:kQSBBackgroundGlossyPref];
   
   [self updateColorPopup];
 }
@@ -277,11 +282,12 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 - (void)chooseOtherColor:(id)sender {
   // If the user should decide to change colors on us
   // we want the following settings available.
-  [[NSColorPanel sharedColorPanel] setShowsAlpha:YES];
-  [[NSColorPanel sharedColorPanel] setMode:NSCrayonModeColorPanel];
-  [[NSColorPanel sharedColorPanel] setAction:@selector(changeColor:)];
-  [[NSColorPanel sharedColorPanel] setTarget:self];
-  [[NSColorPanel sharedColorPanel] makeKeyAndOrderFront:sender];
+  NSColorPanel *sharedColorPanel = [NSColorPanel sharedColorPanel];
+  [sharedColorPanel setShowsAlpha:YES];
+  [sharedColorPanel setMode:NSCrayonModeColorPanel];
+  [sharedColorPanel setAction:@selector(changeColor:)];
+  [sharedColorPanel setTarget:self];
+  [sharedColorPanel makeKeyAndOrderFront:sender];
   
 }
 
@@ -293,6 +299,10 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   if (prefsColorWellWasShowing_) {
     [[NSColorPanel sharedColorPanel] setIsVisible:YES];
   }
+  // Validate the accounts so that the user will have up-to-date
+  // knowledge of account status.
+  NSArray *accounts = [accountsListController_ arrangedObjects];
+  [accounts makeObjectsPerformSelector:@selector(authenticate)];
 }
 
 - (void)hidePreferences {
@@ -314,7 +324,14 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 #pragma mark Account Management
 
 - (IBAction)setupAccount:(id)sender {
-  [setUpAccountWindowController_ presentSetUpAccountSheet];
+  QSBSetUpAccountWindowController *controller 
+    = [[[QSBSetUpAccountWindowController alloc] init] autorelease];
+  NSWindow *setUpWindow = [controller window];
+  [NSApp beginSheet:setUpWindow
+     modalForWindow:[self window]
+      modalDelegate:self 
+     didEndSelector:@selector(setupSheetDidEnd:returnCode:contextInfo:)
+        contextInfo:nil];
 }
 
 - (IBAction)editAccount:(id)sender {
@@ -335,8 +352,8 @@ GTM_METHOD_CHECK(NSColor, crayonName);
     = NSLocalizedString(@"Removing the account '%@' will disable and remove "
                         @"all search sources associated with this account.",
                         nil);
-    NSString *accountName = [accountToRemove accountName];
-    NSString *explanation = [NSString stringWithFormat:format, accountName];
+    NSString *userName = [accountToRemove userName];
+    NSString *explanation = [NSString stringWithFormat:format, userName];
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
     [alert setAlertStyle:NSWarningAlertStyle];
     [alert setMessageText:summary];
@@ -369,9 +386,11 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   }
 }
 
-@end
-
-@implementation QSBPreferenceWindowController (QSBPreferenceWindowControllerPrivateMethods)
+- (void)setupSheetDidEnd:(NSWindow *)sheet 
+              returnCode:(NSInteger)returnCode 
+             contextInfo:(void *)contextInfo {
+  [sheet orderOut:self];
+}
 
 - (void)updateColorPopup {
   NSInteger idx = [self indexOfColor:[self selectedColor]];
@@ -410,13 +429,14 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 }
 
 - (void)didAddAccount:(NSNotification *)notification {
-  id<HGSAccount> newAccount = [notification object];
+  NSDictionary *userInfo = [notification userInfo];
+  id<HGSAccount> newAccount = [userInfo objectForKey:kHGSExtensionKey];
   if (newAccount) {
     NSArray *accounts = [NSArray arrayWithObject:newAccount];
     [accountsListController_ setSelectedObjects:accounts];
   } else {
     HGSLogDebug(@"Could not highlight newly added account '%@' because "
-                @"it seems to be missing.", [newAccount accountName]);
+                @"it seems to be missing.", [newAccount userName]);
   }
 }
 
@@ -433,8 +453,9 @@ GTM_METHOD_CHECK(NSColor, crayonName);
     NSBundle *ourBundle = [NSBundle mainBundle];
     NSString *bundlePath = [ourBundle bundlePath];
     NSURL *bundleURL = [NSURL fileURLWithPath:bundlePath];
-    CFArrayRef cfItems = LSSharedFileListCopySnapshot(openAtLoginItemsList_, 
-                                                      &openAtLoginItemsSeedValue_);
+    CFArrayRef cfItems 
+      = LSSharedFileListCopySnapshot(openAtLoginItemsList_, 
+                                     &openAtLoginItemsSeedValue_);
     NSArray *items = GTMCFAutorelease(cfItems);
     for (id item in items) {
       CFURLRef itemURL;
@@ -475,8 +496,9 @@ GTM_METHOD_CHECK(NSColor, crayonName);
     openAtLoginItemsSeedValue_ 
       = LSSharedFileListGetSeedValue(openAtLoginItemsList_);
   } else {
-    CFArrayRef cfItems = LSSharedFileListCopySnapshot(openAtLoginItemsList_, 
-                                                      &openAtLoginItemsSeedValue_);
+    CFArrayRef cfItems 
+      = LSSharedFileListCopySnapshot(openAtLoginItemsList_, 
+                                     &openAtLoginItemsSeedValue_);
     NSArray *items = GTMCFAutorelease(cfItems);
     for (id item in items) {
       CFURLRef itemURL;

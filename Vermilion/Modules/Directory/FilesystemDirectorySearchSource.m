@@ -51,7 +51,13 @@
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   // We accept file: urls as queries, and raw paths starting with '/' or '~'.
   // (So we force yes since default is a word check)
-  return YES;
+  BOOL isValid = YES;
+  HGSResult *pivotObject = [query pivotObject];
+  if (pivotObject) {
+    NSURL *url = [pivotObject url];
+    isValid = [url isFileURL];
+  } 
+  return isValid;
 }
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
@@ -59,10 +65,10 @@
   HGSQuery *query = [operation query];
   // use the raw query since we're trying to match paths to specific folders.
   NSString *queryString = [query rawQueryString];
-  HGSObject *pivotObject = [query pivotObject];
+  HGSResult *pivotObject = [query pivotObject];
   BOOL isApplication = [pivotObject conformsToType:kHGSTypeFileApplication];
   if (pivotObject) {
-    NSURL *url = [pivotObject identifier];
+    NSURL *url = [pivotObject url];
     NSString *path = [url path];
     
     NSMutableArray *results = [NSMutableArray array];
@@ -91,7 +97,7 @@
       [attributes setObject:[NSNumber numberWithFloat:score] 
                      forKey:kHGSObjectAttributeRankKey];
 
-      HGSObject *result = [HGSObject objectWithFilePath:subpath 
+      HGSResult *result = [HGSResult resultWithFilePath:subpath 
                                                  source:self 
                                              attributes:attributes];
   
@@ -117,7 +123,7 @@
         NSDictionary *attributes
           = [NSDictionary dictionaryWithObjectsAndKeys:
              [NSNumber numberWithFloat:1000], kHGSObjectAttributeRankKey, nil];
-        HGSObject *result = [HGSObject objectWithFilePath:path 
+        HGSResult *result = [HGSResult resultWithFilePath:path 
                                                    source:self
                                                attributes:attributes];
         [operation setResults:[NSArray arrayWithObject:result]]; 
@@ -139,10 +145,10 @@
                 if (infoRec.flags & kLSItemInfoIsInvisible) continue;
               }
               path = [container stringByAppendingPathComponent:path];
-              HGSObject *object = [HGSObject objectWithFilePath:path
+              HGSResult *result = [HGSResult resultWithFilePath:path
                                                          source:self
                                                      attributes:nil];
-              [contents addObject:object];
+              [contents addObject:result];
             }
           }
           [operation setResults:contents]; 

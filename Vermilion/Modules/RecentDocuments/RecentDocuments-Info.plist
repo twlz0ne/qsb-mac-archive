@@ -27,11 +27,13 @@
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.recentdocuments.source</string>
-			<key>HGSIsUserVisible</key>
+			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<string>file.application</string>
 		</dict>
 	</array>
+	<key>HGSPluginAPIVersion</key>
+	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
 </dict>
 </plist>

@@ -67,15 +67,68 @@
   return color;
 }
 
--(NSColor *)legibleTextColor {
-  NSColor *textColor = nil;
-  NSColor *calColor = [self colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
-  if ([calColor brightnessComponent] > 0.5) {
-    textColor = [NSColor blackColor];
-  } else {
-    textColor = [NSColor whiteColor];
+- (NSColor *)adjustedFor:(GTMColorationUse)use {
+  NSColor *color = nil;
+  switch (use) {
+    case GTMColorationBaseHighlight:
+      color = [self colorWithLighting:0.2 plasticity:1.0];
+      break;
+    case GTMColorationBaseMidtone:
+      color = self;
+      break;
+    case GTMColorationBaseShadow:
+      color = [self colorWithLighting:-0.20];
+      break;
+    case GTMColorationBasePenumbra:
+      color = [self colorWithLighting:-0.12];
+      break;
+    case GTMColorationLightHighlight:
+      color = [self blendedColorWithFraction:0.9 ofColor:[NSColor whiteColor]];
+      break;
+    case GTMColorationLightMidtone:
+      color = [self blendedColorWithFraction:0.8 ofColor:[NSColor whiteColor]];
+      break;
+    case GTMColorationLightPenumbra:
+      color = [self blendedColorWithFraction:0.75 ofColor:[NSColor whiteColor]];
+      break;
+    case GTMColorationLightShadow:
+      color = [self blendedColorWithFraction:0.7 ofColor:[NSColor whiteColor]];
+      break;
+    case GTMColorationDarkHighlight:
+      color = [self colorWithLighting:-0.20];
+      break;
+    case GTMColorationDarkMidtone:
+      color = [self colorWithLighting:-0.25];
+      break;
+    case GTMColorationDarkShadow:
+      color = [self colorWithLighting:-0.30];
+      break;
+    case GTMColorationDarkPenumbra:
+      color = [self colorWithLighting:-0.25];
+      break;
+    default:
+      color = self;
+      break;
   }
-  return textColor;
+  return color;
+}
+
+- (NSColor *)adjustedFor:(GTMColorationUse)use faded:(BOOL)fade {
+  NSColor *color = [self adjustedFor:use];
+  if (fade) {
+    color = [color blendedColorWithFraction:0.2 ofColor:[NSColor whiteColor]];
+  }
+  return color;
+}
+
+
+- (BOOL)isDarkColor {
+  NSColor *calColor = [self colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+  return [calColor brightnessComponent] < 0.5;
+}
+
+-(NSColor *)legibleTextColor {
+  return [self isDarkColor] ? [NSColor blackColor] : [NSColor whiteColor] ;
 }
 
 @end

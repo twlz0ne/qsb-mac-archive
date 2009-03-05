@@ -39,8 +39,7 @@
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)aView {
   
   if ([[self title] length]) {
-    NSRect tokenRect = cellFrame; 
-    tokenRect = NSInsetRect(cellFrame, 0.5, 0.5);
+    NSRect tokenRect = NSInsetRect(cellFrame, 0.5, 0.5);
     NSBezierPath *path = [NSBezierPath gtm_bezierPathWithRoundRect:tokenRect cornerRadius:2.5];
     
     [[NSColor colorWithCalibratedRed:0.8706f green:0.9059f blue:0.9725f alpha:0.5f] setFill];

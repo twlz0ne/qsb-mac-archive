@@ -42,31 +42,39 @@
 @interface ContactTextChatAction : ContactChatAction
 @end
 
-@interface ContactVideoChatAction : ContactChatAction
-@end
-
 @interface ContactAudioChatAction : ContactChatAction
+- (NSString *)chatStyle;
 @end
 
+@interface ContactVideoChatAction : ContactAudioChatAction
+@end
 
 @implementation ContactEmailAction 
 
-- (BOOL)doesActionApplyTo:(HGSObject*)result {
-  // just check for an email address (since the directObjectType filter will
-  // do the rest).
+- (BOOL)appliesToResult:(HGSResult *)result {
   NSString *emailAddress 
     = [result valueForKey:kHGSObjectAttributeContactEmailKey];
   return emailAddress != nil;
 }
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info valueForKey:kHGSActionPrimaryObjectKey];
-  NSString *emailAddress 
-    = [object valueForKey:kHGSObjectAttributeContactEmailKey];
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directObjects 
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  NSMutableString *emailAddresses = nil;
+  for (HGSResult *result in directObjects) {
+    NSString *emailAddress 
+      = [result valueForKey:kHGSObjectAttributeContactEmailKey];
+    HGSAssert(emailAddress, @"Email addresses should exist for %@", result);
+    if (!emailAddresses) {
+      emailAddresses = [NSMutableString stringWithString:emailAddress];
+    } else {
+      [emailAddresses appendFormat:@",%@", emailAddress];
+    }
+  }
   
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-  NSString *urlString = [NSString stringWithFormat:@"mailto:%@", emailAddress];
-  NSURL *url = [NSURL URLWithString:urlString];
+  NSString *urlStr = [NSString stringWithFormat:@"mailto:%@", emailAddresses];
+  NSURL *url = [NSURL URLWithString:urlStr];
   return [ws openURL:url];
 }
 
@@ -74,10 +82,10 @@
 
 @implementation ContactChatAction
 
-- (BOOL)doesActionApplyTo:(HGSObject*)result {
+- (BOOL)appliesToResult:(HGSResult *)result {
   // just check for a chat. We only check for Jabber and AIM because that's
   // what iChat handles.
-  BOOL isGood = NO;
+  BOOL doesApply = NO;
   NSString *recordIdentifier 
     = [result valueForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
   if (recordIdentifier) {
@@ -89,7 +97,40 @@
       if ([chatAddresses count] == 0) {
         chatAddresses = [person valueForProperty:kABJabberInstantProperty];
       }
-      isGood = [chatAddresses count] > 0;
+      doesApply = [chatAddresses count] > 0;
+    }
+  }
+  return doesApply;
+}
+
+@end
+
+@implementation ContactTextChatAction
+
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directObjects 
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  BOOL isGood = YES;
+  
+  //TODO(dmaclach): any way to make this a group chat?
+  for (HGSResult *result in directObjects) {
+    NSURL *url = nil;
+    if ([result conformsToType:kHGSTypeTextInstantMessage]) {
+      url = [result url];
+    } else {
+      NSString *abID 
+        = [result valueForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
+      if (abID) {
+        NSString *urlString 
+          = [NSString stringWithFormat:@"iChat:compose?card=%@&style=im", abID];
+        // TODO(alcor): add support for ichat:compose?service=AIM&id=Somebody style 
+        // urls so they don't have to be in your address book (google contacts, etc.)
+        url = [NSURL URLWithString:urlString];
+      }
+    }
+    if (url) {
+      NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+      isGood |= [ws openURL:url];
     }
   }
   return isGood;
@@ -97,63 +138,46 @@
 
 @end
 
-
-@implementation ContactTextChatAction
-
-
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info valueForKey:kHGSActionPrimaryObjectKey];
-  NSString *abID 
-    = [object valueForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
-  
-  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-  // TODO(alcor): add support for ichat:compose?service=AIM&id=Somebody style 
-  // urls so they don't have to be in your address book (google contacts, etc.)
-  NSString *urlString 
-    = [NSString stringWithFormat:@"iChat:compose?card=%@&style=im", abID];
-  NSURL *url = [NSURL URLWithString:urlString];
-  return [ws openURL:url];
-}
-
-@end
-
-
-@implementation ContactVideoChatAction
-
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info valueForKey:kHGSActionPrimaryObjectKey];
-  NSString *abID 
-    = [object valueForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
-  
-  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-  // TODO(alcor): add support for ichat:compose?service=AIM&id=Somebody style 
-  // urls so they don't have to be in your address book (google contacts, etc.)
-  NSString *urlString 
-    = [NSString stringWithFormat:@"iChat:compose?card=%@&style=videochat", 
-       abID];
-  NSURL *url = [NSURL URLWithString:urlString];
-  return [ws openURL:url];
-}
-
-@end
-
-
-
 @implementation ContactAudioChatAction
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info valueForKey:kHGSActionPrimaryObjectKey];
-  NSString *abID 
-    = [object valueForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
-  
-  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-  // TODO(alcor): add support for ichat:compose?service=AIM&id=Somebody style 
-  // urls so they don't have to be in your address book (google contacts, etc.)
-  NSString *urlString 
-    = [NSString stringWithFormat:@"iChat:compose?card=%@&style=audiochat", 
-       abID];
-  NSURL *url = [NSURL URLWithString:urlString];
-  return [ws openURL:url];
+- (BOOL)appliesToResults:(HGSResultArray *)results {
+  BOOL doesApply = [results count] == 1;
+  if (doesApply) {
+    doesApply = [super appliesToResults:results];
+  }
+  return doesApply;
 }
 
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  BOOL isGood = YES;
+  HGSResultArray *directObjects 
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  //TODO(dmaclach): any way to make this a group chat?
+  NSString *style = [self chatStyle];
+  for (HGSResult *result in directObjects) {
+    NSString *abID 
+      = [result valueForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
+  
+    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+    // TODO(alcor): add support for ichat:compose?service=AIM&id=Somebody style 
+    // urls so they don't have to be in your address book 
+    // (google contacts, etc.)
+    NSString *urlString 
+      = [NSString stringWithFormat:@"iChat:compose?card=%@&style=%@", 
+         abID, style];
+    NSURL *url = [NSURL URLWithString:urlString];
+    isGood |= [ws openURL:url];
+  }
+  return isGood;
+}
+
+- (NSString *)chatStyle {
+  return @"audiochat";
+}
+@end
+
+@implementation ContactVideoChatAction
+- (NSString *)chatStyle {
+  return @"videochat";
+}
 @end

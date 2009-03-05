@@ -32,7 +32,7 @@
 
 #import "HGSQueryController.h"
 #import "HGSQuery.h"
-#import "HGSObject.h"
+#import "HGSResult.h"
 #import "HGSAction.h"
 #import "HGSSearchSource.h"
 #import "HGSSearchOperation.h"
@@ -63,7 +63,7 @@ static Boolean ResultsDictionaryEqualCallBack(const void *value1,
                                        const void *value2);
 static CFHashCode ResultsDictionaryHashCallBack(const void *value);
 
-@interface HGSQueryController(HGSQueryControllerPrivate)
+@interface HGSQueryController()
 - (void)annotateResults:(NSMutableArray*)results;
 + (NSString *)categoryForType:(NSString *)type;
 - (void)cancelPendingSearchOperations:(NSTimer*)timer;
@@ -123,38 +123,11 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
 
 - (void)startQuery {
   // Spin through the Sources checking to see if they are valid for the source
-  // and kick off the SearchOperations.
-  HGSObject *pivotObject = [parsedQuery_ pivotObject];
-  HGSAction *actionObject = nil;
-  if ([pivotObject conformsToType:kHGSTypeAction]) {
-    actionObject = (HGSAction *)pivotObject;
-  }
-  
-  NSSet *allPivots = [NSSet setWithObject:@"*"];
+  // and kick off the SearchOperations.  
   HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kHGSQueryControllerWillStartNotification object:self];
   for (id<HGSSearchSource> source in [sourcesPoint extensions]) {
-    // If we have a pivot, check the type against the support ones.
-    if (pivotObject) {
-      BOOL typeMatches = NO;
-      NSSet *pivotTypes = [source pivotableTypes];
-      if ([pivotTypes isEqual:allPivots]) {
-        typeMatches = YES;
-      } else {
-        for (NSString *pivotType in pivotTypes) {
-          if ([pivotObject conformsToType:pivotType]) {
-            typeMatches = YES;
-            break;
-          }
-        }
-      }
-      // If it wasn't a valid type for this source, on to the next source
-      if (!typeMatches) {
-        continue;
-      }
-    }
-
     // Check if the source likes the query string
     if ([source isValidSourceForQuery:parsedQuery_]) {
       HGSSearchOperation* operation;
@@ -238,7 +211,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   NSArray *results = [self rankedResults];
   NSMutableDictionary *dictionary = nil;
   NSEnumerator *resultEnumerator = [results objectEnumerator];
-  HGSObject *result = nil;
+  HGSResult *result = nil;
   while ((result = [resultEnumerator nextObject])) {
     NSString *type = [result type];
     if (type &&
@@ -302,6 +275,8 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   // that way.
   GTMAssertRunningOnMainThread();
   
+  if (!type) return nil;
+  
   static NSMutableDictionary *sTypeCategoryDict = nil;
   if (!sTypeCategoryDict) {
     NSBundle *bundle = HGSGetPluginBundle();
@@ -343,13 +318,13 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
 - (void)annotateResults:(NSMutableArray*)results {
   NSEnumerator* resultIt = [results objectEnumerator];
   HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
-  HGSObject* currentResult = nil;
+  HGSResult* currentResult = nil;
   NSInteger resultCount = 0;
   NSInteger maxCount = [parsedQuery_ maxDesiredResults];
   while ((currentResult = [resultIt nextObject])
          && ++resultCount <= maxCount) {
     for (id<HGSSearchSource> source in [sourcesPoint extensions]) {
-      [source annotateObject:currentResult withQuery:parsedQuery_];
+      [source annotateResult:currentResult withQuery:parsedQuery_];
     }
   }
 }
@@ -418,7 +393,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   NSArray *operationResults 
     = [userInfo objectForKey:kHGSSearchOperationNotificationResultsKey];
   if (!hasRealResults_) {
-    for (HGSObject *result in operationResults) {
+    for (HGSResult *result in operationResults) {
       hasRealResults_ = ![result conformsToType:kHGSTypeGoogleSuggest];
       if (hasRealResults_) break;
     }

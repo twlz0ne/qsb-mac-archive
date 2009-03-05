@@ -65,11 +65,11 @@
 // and |otherString|) will be properly broken into terms for the caller, so they
 // don't need to worry about the details.  |otherString| can be nil since it's
 // optional.
-- (void)indexResult:(HGSObject*)hgsResult
+- (void)indexResult:(HGSResult*)hgsResult
          nameString:(NSString*)nameString
         otherString:(NSString*)otherString;
 // Like the above, but takes an array of "other" strings.
-- (void)indexResult:(HGSObject*)hgsResult
+- (void)indexResult:(HGSResult*)hgsResult
          nameString:(NSString*)nameString
   otherStringsArray:(NSArray*)otherStrings;
 

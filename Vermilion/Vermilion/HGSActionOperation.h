@@ -34,7 +34,7 @@
 
 // HGSActionOperation represents a single task performed by an action
 @protocol HGSAction;
-@class HGSObject;
+@class HGSResultArray;
 
 @interface HGSActionOperation : NSObject {
  @private
@@ -42,10 +42,11 @@
   NSMutableDictionary *args_;
 }
 
-- (id)initWithAction:(id<HGSAction>)action primaryObject:(HGSObject*)primary;
 - (id)initWithAction:(id<HGSAction>)action 
-       primaryObject:(HGSObject*)primary
-      indirectObject:(HGSObject*)indirect;
+       directObjects:(HGSResultArray *)directObjects;
+- (id)initWithAction:(id<HGSAction>)action 
+       directObjects:(HGSResultArray *)directObjects
+     indirectObjects:(HGSResultArray *)indirectObjects;
 - (NSDictionary*)performAction;
 @end
 
@@ -53,16 +54,16 @@
 // an action will be performed.
 // Object is action
 // UserInfo is dictionary with following keys
-//   kHGSActionPrimaryObjectKey (reqd)
-//   kHGSActionIndirectObjectKey (opt)
+//   kHGSActionDirectObjectsKey (reqd)
+//   kHGSActionIndirectObjectsKey (opt)
 extern NSString *const kHGSActionWillPerformNotification;
 
 // Notification sent to notification center to announce that
 // an action was attempted (not necessarily that it did succeed)
 // Object is action
 // UserInfo is dictionary with following keys
-//   kHGSActionPrimaryObjectKey (reqd)
-//   kHGSActionIndirectObjectKey (opt)
+//   kHGSActionDirectObjectsKey (reqd)
+//   kHGSActionIndirectObjectsKey (opt)
 //   kHGSActionCompletedSuccessfully (reqd)
 extern NSString *const kHGSActionDidPerformNotification;
 

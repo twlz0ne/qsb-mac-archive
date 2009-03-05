@@ -45,24 +45,6 @@ GTM_METHOD_CHECK(NSEnumerator,
 GTM_METHOD_CHECK(NSEnumerator, 
                  gtm_filteredEnumeratorByMakingEachObjectPerformSelector:withObject:);
 
-+ (HGSAccountsExtensionPoint *)accountsExtensionPoint {
-  static BOOL sIsInitialized = NO;
-  @synchronized([HGSAccountsExtensionPoint class]) {
-    if (!sIsInitialized) {
-      HGSAccountsExtensionPoint *ep
-        = (HGSAccountsExtensionPoint *)[HGSAccountsExtensionPoint
-                                        pointWithIdentifier:
-                                        kHGSAccountsExtensionPoint];
-      [ep setProtocol:@protocol(HGSAccount)];
-      sIsInitialized = YES;
-    }
-  }
-  HGSAccountsExtensionPoint *accountsPoint
-    = (HGSAccountsExtensionPoint *)[HGSExtensionPoint
-                                    pointWithIdentifier:kHGSAccountsExtensionPoint];
-  return accountsPoint;
-}
-
 - (void)dealloc {
   [accountTypes_ release];
   [super dealloc];
@@ -77,9 +59,7 @@ GTM_METHOD_CHECK(NSEnumerator,
                                  initWithDictionary:accountDict]
                                 autorelease];
       if (account) {
-        // Do not call self's extendWithObject: here in that we do not want
-        // to be updating our preferences since we are restoring from prefs.
-        [super extendWithObject:account];
+        [self extendWithObject:account];
       }
     } else {
       HGSLogDebug(@"Did not find account type for account dictionary :%@",
@@ -123,7 +103,7 @@ GTM_METHOD_CHECK(NSEnumerator,
 - (NSEnumerator *)accountsEnumForType:(NSString *)type {
   NSEnumerator *accountsEnum
     = [[[self extensions] objectEnumerator]
-       gtm_filteredEnumeratorByMakingEachObjectPerformSelector:@selector(isAccountTypeAndActive:)
+       gtm_filteredEnumeratorByMakingEachObjectPerformSelector:@selector(isAccountType:)
                                                     withObject:type];
   return accountsEnum;
 }
@@ -135,42 +115,6 @@ GTM_METHOD_CHECK(NSEnumerator,
   return description;
 }
 
-#pragma mark HGSExtensionPoint Overrides
-
-- (BOOL)extendWithObject:(id<HGSExtension>)account {
-  // TODO(mrossetti): It would be a better idea to move all notifications
-  // of extension changes into the base class and have derived classes
-  // provide their own notification keys.
-  BOOL wasGood = [super extendWithObject:account];
-  if (wasGood) {
-    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
-    [defaultCenter postNotificationName:kHGSDidAddAccountNotification 
-                                 object:account];
-  }
-  return wasGood;
-}
-
-- (void)removeExtension:(id<HGSExtension>)extension {
-  // TODO(mrossetti): Move notifications up into HGSExtensionPoint.
-  NSString *accountIdentifier = [extension identifier];
-  NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
-  [defaultCenter postNotificationName:kHGSWillRemoveAccountNotification 
-                               object:extension];
-  
-  [super removeExtension:extension];
-  [defaultCenter postNotificationName:kHGSDidRemoveAccountNotification 
-                               object:accountIdentifier];
-}
 
 @end
 
-// Archive dictionary keys.
-NSString *const kHGSAccountsExtensionPoint = @"HGSAccountsExtensionPoint";
-
-// Notification keys.
-NSString *const kHGSDidAddAccountNotification
-  = @"HGSDidAddAccountNotification";
-NSString *const kHGSWillRemoveAccountNotification
-  = @"HGSWillRemoveAccountNotification";
-NSString *const kHGSDidRemoveAccountNotification
-  = @"HGSDidRemoveAccountNotification";

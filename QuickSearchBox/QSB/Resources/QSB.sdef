@@ -84,7 +84,7 @@ Copyright 2007-2008 Google, Inc. All rights reserved.
   </command>
 
   <event name="results received" code="QSBSReRe" 
-           description="This handler is called when results come back from a search">
+         description="This handler is called when results come back from a search">
     <cocoa name="ResultsReceived" class="EventHandlerCommand"/>
     <direct-parameter description="The search results.">
       <type type="search result" list="yes"/>
@@ -94,6 +94,13 @@ Copyright 2007-2008 Google, Inc. All rights reserved.
       <cocoa key="forQuery"/>
     </parameter>
   </event>
+  
+  <command name="path for file URL" code="QSBSFiUr"
+           description="Returns a posix path to a file if the direct object represents a file URL, otherwise returns an empty string">
+    <cocoa class="QSBPathForFileURLCommand"/>
+    <direct-parameter type="text" description="URL to return file path for"/>
+    <result type="text"/>
+  </command>
   
   <class name="plugin" code="HGPl"
          description="A plugin.">

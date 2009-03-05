@@ -31,6 +31,12 @@
 //
 
 #import "QSBResultTableView.h"
+@class QSBViewTableViewDelegateProxy;
+@class QSBViewTableViewDataSourceProxy;
 
-@interface QSBResultsViewTableView : QSBResultTableView
+@interface QSBResultsViewTableView : QSBResultTableView {
+ @private
+  QSBViewTableViewDelegateProxy *delegateProxy_;
+  QSBViewTableViewDataSourceProxy *dataSourceProxy_;
+}
 @end

@@ -82,15 +82,15 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_enumeratorByTarget:performOnEachSelector:);
   return YES;
 }
 
-- (BOOL)doesActionApplyTo:(HGSObject *)result {
+- (BOOL)doesActionApplyTo:(HGSResult *)result {
   return [result conformsToType:kHGSTypeFileApplication];
 }
 
 - (void)performSearchOperation:(HGSSearchOperation *)operation {
   HGSQuery *query = [operation query];
-  HGSObject *pivotObject = [query pivotObject];
+  HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
-    NSURL *url = [pivotObject identifier];
+    NSURL *url = [pivotObject url];
     NSString *appPath = [url path];
     if (appPath) {
       NSBundle *appBundle = [[[NSBundle alloc]
@@ -176,13 +176,13 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_enumeratorByTarget:performOnEachSelector:);
 
                 if ([[recentPath lowercaseString]
                       rangeOfString:queryWord].length > 0) {
-                  HGSObject *result = [HGSObject objectWithFilePath:recentPath
+                  HGSResult *result = [HGSResult resultWithFilePath:recentPath
                                                  source:self
                                                  attributes:nil];
                   [finalResults addObject:result];
                 }
               } else {
-                HGSObject *result = [HGSObject objectWithFilePath:recentPath
+                HGSResult *result = [HGSResult resultWithFilePath:recentPath
                                                source:self
                                                attributes:nil];
                 [finalResults addObject:result];
@@ -240,8 +240,8 @@ GTM_METHOD_CHECK(NSEnumerator, gtm_enumeratorByTarget:performOnEachSelector:);
   [operation finishQuery];
 }
 
-- (HGSObject *)HGSObjectFromFilePath:(NSString *)docPath {
-  return [HGSObject objectWithFilePath:docPath
+- (HGSResult *)HGSObjectFromFilePath:(NSString *)docPath {
+  return [HGSResult resultWithFilePath:docPath
                                 source:self
                             attributes:nil];
 }

@@ -34,7 +34,7 @@
 #import <Vermilion/Vermilion.h>
 #import "QSBApplicationDelegate.h"
 #import "QSBMoreResultsViewControllers.h"
-#import "QSBQueryController.h"
+#import "QSBSearchViewController.h"
 #import "QSBTableResult.h"
 #import "QSBResultsViewTableView.h"
 #import "QSBSearchWindowController.h"
@@ -90,8 +90,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [super dealloc];
 }
 
-- (QSBQueryController *)queryController {
-  return queryController_;
+- (QSBSearchViewController *)searchViewController {
+  return searchViewController_;
 }
 
 - (NSArrayController *)arrayController {
@@ -172,16 +172,16 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return [[queryString_ retain] autorelease];
 }
 
-- (QSBTableResult *)selectedObject {
-  QSBTableResult *object = nil;
+- (QSBTableResult *)selectedTableResult {
+  QSBTableResult *tableResult = nil;
   NSInteger selectedRow = [resultsTableView_ selectedRow];
   if (selectedRow >= 0) {
-    object = [self objectForRow:selectedRow];
+    tableResult = [self tableResultForRow:selectedRow];
   }
-  return object;
+  return tableResult;
 }
 
-- (QSBTableResult *)objectForRow:(NSInteger)row { 
+- (QSBTableResult *)tableResultForRow:(NSInteger)row { 
   QSBTableResult *object = nil;
   NSArray *objects = [resultsArrayController_ arrangedObjects];
   if (row < [objects count]) {
@@ -297,7 +297,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (QSBSearchWindowController *)searchWindowController {
-  return [queryController_ searchWindowController];
+  return [searchViewController_ searchWindowController];
 }
 
 - (void)resultsObjectsChanged:(GTMKeyValueChangeNotification *)notification {
@@ -305,7 +305,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSArray *newArrangedObjects = [object arrangedObjects];
   rowCount_ = [newArrangedObjects count];
   [[self resultsTableView] reloadData];
-  [queryController_ updateResultsView];
+  [searchViewController_ updateResultsView];
 }
 
 - (void)resultsIndicesChanged:(GTMKeyValueChangeNotification *)notification {
@@ -323,14 +323,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   QSBResultRowViewController *newController = nil;
   
   // Decide what kind of view we want to use based on the result.
-  QSBTableResult *result = [self objectForRow:row];
+  QSBTableResult *result = [self tableResultForRow:row];
   Class aRowViewControllerClass 
     = [self rowViewControllerClassForResult:result];
   if (aRowViewControllerClass) {
     if (!oldController 
         || [oldController class] != aRowViewControllerClass) {
       // We cannot reuse the old controller.
-      QSBQueryController *queryController = [self queryController];
+      QSBSearchViewController *queryController = [self searchViewController];
       newController
         = [[[aRowViewControllerClass alloc] initWithController:queryController]
            autorelease];          
@@ -404,12 +404,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification {
-  [[[self queryController] searchWindowController] completeQueryText];    
+  [[[self searchViewController] searchWindowController] completeQueryText];    
 }
 
 - (BOOL)tableView:(NSTableView *)aTableView
   shouldSelectRow:(NSInteger)rowIndex {
-  QSBTableResult *object = [self objectForRow:rowIndex];
+  QSBTableResult *object = [self tableResultForRow:rowIndex];
   BOOL isSeparator = [object isKindOfClass:[QSBSeparatorTableResult class]];
   BOOL isMessage = [object isKindOfClass:[QSBMessageTableResult class]]; 
   BOOL isSelectable = object && !(isSeparator || isMessage);
@@ -445,7 +445,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (id)tableView:(NSTableView *)tableView
 objectValueForTableColumn:(NSTableColumn *)tableColumn
             row:(NSInteger)row {
-  QSBTableResult *result = [self objectForRow:row];
+  QSBTableResult *result = [self tableResultForRow:row];
   return [result isPivotable] ? [NSImage imageNamed:@"ChildArrow"] : nil;
 }
 

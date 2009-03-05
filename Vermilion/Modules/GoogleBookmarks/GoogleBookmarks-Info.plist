@@ -27,6 +27,8 @@
 			<string>com.google.qsb.googlebookmarks.source</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
+			<key>HGSExtensionDesiredAccountType</key>
+			<string>Google</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Google Bookmarks</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
@@ -35,5 +37,7 @@
 			</array>
 		</dict>
 	</array>
+	<key>HGSPluginAPIVersion</key>
+	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
 </dict>
 </plist>

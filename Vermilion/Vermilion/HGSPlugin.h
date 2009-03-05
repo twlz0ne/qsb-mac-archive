@@ -31,6 +31,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "HGSExtension.h"
 
 // kHGSPluginConfigurationVersionKey is a key into the archived dictionary
 // describing a plugin giving the version of the dictionary when that
@@ -83,98 +84,48 @@
 // until the user enables one of the 'Searchable Items' in Preferences.  (See
 // HGSProtoExtension for more on this topic.)
 // 
-@interface HGSPlugin : NSObject {
- @private
-  NSBundle *bundle_;
-  NSString *bundlePath_;  // Original location of plugin bundle.
-  NSString *bundleName_;
-  NSString *bundleIdentifier_;
-  NSString *displayName_;  // Human-readable plugin name.
-  
-  NSArray *protoExtensions_;  // Instantiated protoExtensions of this plugin.
-  NSArray *factorableExtensions_;  // Factorable protoExtensions.
-  
-  BOOL isOld_;  // YES for old until we find an installed plugin that matches.
-  BOOL isNew_;  // YES for new until matched with an existing plugin. 
-  BOOL isEnabled_;  // Plugin master switch.
 
-  NSUInteger sourceCount_;  // Cached
-  NSUInteger actionCount_;  // Cached
-  NSUInteger serviceCount_;  // Cached
-  NSUInteger accountTypeCount_;  // Cached
+@protocol HGSPlugin
+  + (BOOL)isPluginAtPathValidAPI:(NSString *)path;
+@end
+
+@interface HGSPlugin : HGSExtension <HGSPlugin> {
+ @private
+  NSArray *protoExtensions_;  // Instantiated protoExtensions of this plugin.
+  NSMutableArray *factorableProtoExtensions_;  // Factorable protoExtensions.
+  BOOL enabled_;  // Plugin master switch.
 }
 
-@property (nonatomic, retain, readonly) NSBundle *bundle;
-@property (nonatomic, copy, readonly) NSString *bundlePath;
-@property (nonatomic, copy, readonly) NSString *bundleName;
-@property (nonatomic, copy, readonly) NSString *bundleIdentifier;
-@property (nonatomic, copy, readonly) NSString *displayName;
 @property (nonatomic, retain, readonly) NSArray *protoExtensions;
-@property (nonatomic, retain, readonly) NSArray *factorableExtensions;
-@property (nonatomic) BOOL isEnabled;
-@property (nonatomic, readonly) BOOL isOld;
-@property (nonatomic, readonly) BOOL isNew;
-@property (nonatomic, readonly) NSUInteger sourceCount;
-@property (nonatomic, readonly) NSUInteger actionCount;
-@property (nonatomic, readonly) NSUInteger serviceCount;
-@property (nonatomic, readonly) NSUInteger accountTypeCount;
+@property (nonatomic, getter=isEnabled) BOOL enabled;
 
 // Reconstitute a plugin at a path.
 - (id)initWithPath:(NSString *)path;
 
-// Reconstitute a plugin from a dictionary, usually from preferences, marking
-// all plugins and extensions as 'old'.
-- (id)initWithDictionary:(NSDictionary *)pluginDict;
+// Factor our protoextensions, if appropriate.
+- (void)factorProtoExtensions;
 
-// Provide an archivable dictionary for a plugin.
-- (NSDictionary *)dictionaryValue;
+// Install/uninstall all the enabled extensions belonging to this plugin
+- (void)install;
+- (void)uninstall;
 
-// Compare the identifier and path of each plugin.
-- (NSComparisonResult)compare:(HGSPlugin *)pluginB;
-
-// Merge |pluginB| into self.
-- (HGSPlugin *)merge:(HGSPlugin *)pluginB;
-
-// Factor our extensions, if appropriate.
-- (void)factorExtensions;
-
-// Install/uninstall extensions.
-- (void)installExtensions;
-- (void)uninstallExtensions;
-
-// Remove and discard an extension.
-- (void)removeExtension:(HGSProtoExtension *)extension;
-
-// Remove all old extensions for which there was no new extension.
-- (void)stripOldUnmergedExtensions;
-
-// Automatically set up the enabled-ness of new extensions.
-- (void)autoSetEnabledForNewExtensions;
+// Remove and discard a protoextension.
+- (void)removeProtoExtension:(HGSProtoExtension *)protoExtension;
 
 // Install all of our account types, if any.
 - (void)installAccountTypes;
 
-// Helper functions for filtering out plugins we previously knew about but
-// which have now gone missing and vice versa.
-- (BOOL)notIsOld;
-- (BOOL)notIsNew;
-
-// Return a copyright string for the extension.
-// By default returns the "NSHumanReadableCopyright" value from
-// the info.plist of the bundle of the class that this object is an instance of.
-- (NSString *)copyright;
-
-// For debugging purposes. Allows you to log any problems in plugin loading.
-// HGSValidatePlugins is a boolean preference that the
-// engine can use to enable extra logging while managing plugins
-// and extensions to assist developers in making sure their plugins
-// and extensions are configured properly.  The pref should be set
-// before launch to ensure it is all possible checks are done.
-// defaults write com.google.qsb HGSValidatePlugins 1
-+ (BOOL)validatePlugins;
 @end
 
 // Notification sent when plugin has been enabled/disabled.  The 
 // notification's |object| will contain the HGSPlugin reporting
 // the change.  There will be no |userInfo|.
 extern NSString *const kHGSPluginDidChangeEnabledNotification;
+
+// Array of Cocoa extension descriptions.
+extern NSString *const kHGSExtensionsKey;
+// NSNumber (BOOL) indicating if plugin is enabled (master switch).
+extern NSString *const kHGSPluginEnabledKey;
+// Array containing dictionaries describing the extensions of this plugin.
+extern NSString *const kHGSPluginExtensionsDicts;
+extern NSString *const kHGSBundleIdentifierKey;

@@ -70,31 +70,39 @@
   BOOL atEnd_;
 }
 - (id)initWithString:(NSString *)stringToTokenize wordsOnly:(BOOL)wordsOnly;
+- (void)setString:(NSString *)stringToTokenize wordsOnly:(BOOL)wordsOnly;
 @end
+
+static inline NSString *HGSTokenizerEnumeratorNextWord(CFStringTokenizerRef ref,
+                                                       NSString *string) {
+  // Small little common routine that we want to be really fast.
+  NSString *result = nil;
+  CFStringTokenizerTokenType type;
+  type = CFStringTokenizerAdvanceToNextToken(ref);
+  if (type != kCFStringTokenizerTokenNone) {
+    CFRange cfTokenRange = CFStringTokenizerGetCurrentTokenRange(ref);
+    NSRange nsTokenRange = NSMakeRange(cfTokenRange.location, 
+                                       cfTokenRange.length);
+    result = [string substringWithRange:nsTokenRange];
+  }
+  return result;
+}
 
 @implementation HGSTokenizerEnumerator
 
 - (id)initWithString:(NSString *)stringToTokenize wordsOnly:(BOOL)wordsOnly {
-  self = [super init];
-  if (self != nil) {
-    stringToTokenize_ = [stringToTokenize copy];
-    wordsOnly_ = wordsOnly;
-    savedWordRange_.location = NSNotFound;
-    if (!wordsOnly_) {
-      NSCharacterSet *wsSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-      nonWhiteSpaceCharSet_ = [[wsSet invertedSet] retain];
-    }
-    if (stringToTokenize_) {
-      // The header comments for CFStringTokenizerCreate and
-      // kCFStringTokenizerUnitWord indicate the locale is unused for UnitWord;
-      // so we just pass NULL here to avoid creating one.
-      // Radar 6195821 has been filed to get the docs updated to match.
-      CFRange tokenRange = CFRangeMake(0, [stringToTokenize_ length]);
-      tokenizer_ = CFStringTokenizerCreate(NULL,
-                                           (CFStringRef)stringToTokenize_,
-                                           tokenRange,
-                                           kCFStringTokenizerUnitWord,
-                                           NULL);
+  if ((self = [super init])) {
+    // The header comments for CFStringTokenizerCreate and
+    // kCFStringTokenizerUnitWord indicate the locale is unused for UnitWord;
+    // so we just pass NULL here to avoid creating one.
+    // Radar 6195821 has been filed to get the docs updated to match.    
+    tokenizer_ = CFStringTokenizerCreate(NULL, 
+                                         CFSTR(""), 
+                                         CFRangeMake(0,0), 
+                                         kCFStringTokenizerUnitWord, 
+                                         NULL);
+    if (tokenizer_) {
+      [self setString:stringToTokenize wordsOnly:wordsOnly];
     }
     if (!stringToTokenize_ ||
         !tokenizer_ ||
@@ -106,7 +114,7 @@
   return self;
 }
 
-- (void) dealloc {
+- (void)dealloc {
   if (tokenizer_) {
     CFRelease(tokenizer_);
   }
@@ -116,20 +124,27 @@
   [super dealloc];
 }
 
+- (void)setString:(NSString *)stringToTokenize wordsOnly:(BOOL)wordsOnly {
+  [stringToTokenize_ autorelease];
+  stringToTokenize_ = [stringToTokenize copy];
+  wordsOnly_ = wordsOnly;
+  savedWordRange_.location = NSNotFound;
+  CFStringTokenizerSetString(tokenizer_,
+                             (CFStringRef)stringToTokenize,
+                             CFRangeMake(0, [stringToTokenize length]));
+  if (!wordsOnly_ && !nonWhiteSpaceCharSet_) {
+    NSCharacterSet *wsSet = 
+      [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    nonWhiteSpaceCharSet_ = [[wsSet invertedSet] retain];
+  }
+}
+
 - (id)nextObject {
   NSString *result = nil;
   
   // For wordsOnly we just use what the tokenizer says
   if (wordsOnly_) {
-    CFStringTokenizerTokenType type;
-    type = CFStringTokenizerAdvanceToNextToken(tokenizer_);
-    if (type != kCFStringTokenizerTokenNone) {
-      CFRange cfTokenRange = CFStringTokenizerGetCurrentTokenRange(tokenizer_);
-      NSRange nsTokenRange = NSMakeRange(cfTokenRange.location, 
-                                         cfTokenRange.length);
-      result = [stringToTokenize_ substringWithRange:nsTokenRange];
-    }
-    return result;
+    return HGSTokenizerEnumeratorNextWord(tokenizer_, stringToTokenize_);
   }
   
   // Not wordsOnly gets a little more complicated...
@@ -233,6 +248,26 @@
   return result;
 }
 
+- (NSArray *)allObjects {
+  NSArray *results = nil;
+  if (wordsOnly_) {
+    // Words only is our most common and simplest path, and calling
+    // allObject on our enumerator happens in one of our critical paths
+    // in Vermilion. We have optimized this path so that we get rid of
+    // the NSEnumerator machinary calling nextObject on us a pile of times.
+    NSMutableArray *mutableArray = [NSMutableArray array];
+    NSString *result;
+    while ((result = HGSTokenizerEnumeratorNextWord(tokenizer_, 
+                                                    stringToTokenize_))) {
+      [mutableArray addObject:result];
+    }
+    results = mutableArray;
+  } else {
+    results = [super allObjects];
+  }
+  return results;
+}
+
 @end
 
 @implementation HGSTokenizer
@@ -247,4 +282,19 @@
                                                wordsOnly:NO] autorelease];
 }
 
++ (NSArray *)tokenizeString:(NSString *)string wordsOnly:(BOOL)wordsOnly {
+  NSThread *currentThread = [NSThread currentThread];
+  NSMutableDictionary *threadDictionary = [currentThread threadDictionary];
+  NSString *const kHGSTokenizerThreadTokenizer = @"HGSTokenizerThreadTokenizer";
+  HGSTokenizerEnumerator *enumerator =
+    [threadDictionary objectForKey:kHGSTokenizerThreadTokenizer];
+  if (!enumerator) {
+    enumerator = 
+      [[[HGSTokenizerEnumerator alloc] initWithString:@"" 
+                                            wordsOnly:wordsOnly] autorelease];
+    [threadDictionary setObject:enumerator forKey:kHGSTokenizerThreadTokenizer];
+  }
+  [enumerator setString:string wordsOnly:wordsOnly];
+  return [enumerator allObjects];
+}
 @end

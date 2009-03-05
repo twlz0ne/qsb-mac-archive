@@ -33,7 +33,8 @@
 
 #import <Foundation/Foundation.h>
 
-@class HGSObject;
+@class HGSResult;
+@class HGSResultArray;
 @class HGSAction;
 
 //
@@ -61,14 +62,14 @@ typedef NSUInteger HGSQueryFlags;
  @private
   NSString *rawQuery_;
   NSSet *uniqueWords_;
-  HGSObject *pivotObject_;
+  HGSResultArray *results_;
   HGSQuery *parent_;
   NSInteger maxDesiredResults_;
   HGSQueryFlags flags_;
 }
 
 - (id)initWithString:(NSString*)query 
-         pivotObject:(HGSObject *)pivotObject
+             results:(HGSResultArray *)results
           queryFlags:(HGSQueryFlags)flags;
 
 // Returns a set of unique words found in the query string
@@ -82,17 +83,20 @@ typedef NSUInteger HGSQueryFlags;
 // using the uniqueWords api so they get consistent.
 - (NSString *)rawQueryString;
 
-// A pivot object in the context is any object currently set to filter search
+// A pivot object in the context is any result currently set to filter search
 // this could  a directory (filtering to its contents) or a website (searching
 // data there) or many other types of searchable items.
-- (HGSObject*)pivotObject;
+- (HGSResult *)pivotObject;
+
+// Results is the current set of results that we have accumulated
+- (HGSResultArray *)results;
 
 // A "parent" is a query that has asked for this one to be created.  Usually
 // to pick up an indirect object for an action.  This allows a SearchSource to
 // walk to the parent and fetch it's direct object to return results specific to
 // that object.
-- (HGSQuery*)parent;
-- (void)setParent:(HGSQuery*)parent;
+- (HGSQuery *)parent;
+- (void)setParent:(HGSQuery *)parent;
 
 // Maximum number of results that we are interested in receiving. -1 indicates
 // no limit.

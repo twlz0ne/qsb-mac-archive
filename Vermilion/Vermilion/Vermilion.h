@@ -33,7 +33,7 @@
 #import <Vermilion/HGSLog.h>
 #import <Vermilion/HGSBundle.h>
 #import <Vermilion/HGSExtension.h>
-#import <Vermilion/HGSObject.h>
+#import <Vermilion/HGSResult.h>
 #import <Vermilion/HGSAction.h>
 #import <Vermilion/HGSQuery.h>
 #import <Vermilion/HGSQueryController.h>

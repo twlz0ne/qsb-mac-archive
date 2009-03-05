@@ -69,7 +69,7 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Instant Message</string>
 			<key>HGSExtensionIconImagePath</key>
-			<string>action-chat-icon.png</string>
+			<string>action-chat-icon</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -83,7 +83,7 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Video Chat</string>
 			<key>HGSExtensionIconImagePath</key>
-			<string>action-videochat-icon.png</string>
+			<string>action-videochat-icon</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -97,8 +97,10 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Audio Chat</string>
 			<key>HGSExtensionIconImagePath</key>
-			<string>action-audiochat-icon.png</string>
+			<string>action-audiochat-icon</string>
 		</dict>
 	</array>
+	<key>HGSPluginAPIVersion</key>
+	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
 </dict>
 </plist>

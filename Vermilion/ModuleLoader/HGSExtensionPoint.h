@@ -42,15 +42,10 @@
 
 @protocol HGSExtension;
 
-// This notification is sent by an extension point when extensions are added,
-// remove.  It is always sent on the main thread.
-extern NSString* const kHGSExtensionPointDidChangeNotification;
-
 @interface HGSExtensionPoint : NSObject {
  @private
   NSMutableDictionary* extensions_;
   Protocol* protocol_;
-  BOOL notificationPending_;
 }
 
 // Returns the global extension point with a given identifier
@@ -88,3 +83,17 @@ extern NSString* const kHGSExtensionPointDidChangeNotification;
 - (void)removeExtension:(id<HGSExtension>)extension;
 
 @end
+
+
+// This notification is sent by an extension point when extensions are added.
+// Object is the extension point being modified
+// Dictionary contains kHGSExtensionKey.
+extern NSString* const kHGSExtensionPointDidAddExtensionNotification;
+
+// These notifications are sent by an extension point when extensions are removed.
+extern NSString* const kHGSExtensionPointWillRemoveExtensionNotification;
+extern NSString* const kHGSExtensionPointDidRemoveExtensionNotification;
+
+// Key for the notification dictionary. Represents the extension being added
+// or removed.
+extern NSString *const kHGSExtensionKey;

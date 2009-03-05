@@ -33,6 +33,8 @@
 #import "QSBViewTableViewCell.h"
 
 @implementation QSBViewTableViewCell
+@synthesize leftMargin = leftMargin_;
+
 - (void)setContentView:(NSView *)view {
   contentView_ = view;
 }
@@ -49,6 +51,8 @@
   // If the cell has moved, we need to move our contentView as well.
   // Do this before we add it, otherwise we may get double drawing.
   NSView *contentView = [self contentView];
+  cellFrame.origin.x += leftMargin_;
+  cellFrame.size.width -= leftMargin_;
   [contentView setFrame:cellFrame];
   
   // Make sure our content view is actually part of our control.

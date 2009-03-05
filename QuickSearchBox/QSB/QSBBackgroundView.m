@@ -39,7 +39,7 @@
 #import "QSBUISettings.h"
 #import "NSColor+Lighting.h"
 
-@interface QSBBackgroundView (QSBBackgroundViewPrivate)
+@interface QSBBackgroundView ()
 // Updates our cached version of the gradient.
 - (NSImage*)cachedView;
 

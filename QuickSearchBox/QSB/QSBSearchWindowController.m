@@ -39,22 +39,25 @@
 #import "QSBApplicationDelegate.h"
 #import "QSBTextField.h"
 #import "QSBPreferences.h"
-#import "QSBQuery.h"
-#import "QSBQueryController.h"
+#import "QSBSearchController.h"
+#import "QSBSearchViewController.h"
 #import "QSBCustomPanel.h"
 #import "GTMMethodCheck.h"
 #import "GTMNSImage+Scaling.h"
 #import "GoogleCorporaSource.h"
+#import "QSBResultsViewBaseController.h"
 #import "QSBTableResult.h"
 #import "GTMNSWorkspace+Running.h"
 #import "QLUIPrivate.h"
 #import "GTMNSObject+KeyValueObserving.h"
+#import "GTMNSAppleEventDescriptor+Foundation.h"
+#import "NSString+CaseInsensitive.h"
 
 static const NSTimeInterval kQSBShowDuration = 0.1;
 static const NSTimeInterval kQSBHideDuration = 0.333;
 static const NSTimeInterval kQSBResizeDuration = 0.1;
 static const NSTimeInterval kQSBPushPopDuration = 0.2;
-const NSTimeInterval kQSBAppearDelay = 0.333;
+const NSTimeInterval kQSBAppearDelay = 0.2;
 static const NSTimeInterval kQSBLongerAppearDelay = 0.667;
 const NSTimeInterval kQSBUpdateSizeDelay = 0.333;
 static const NSTimeInterval kQSBReshowResultsDelay = 4.0;
@@ -67,6 +70,9 @@ static NSString * const kQSBSearchWindowFrameLeftPrefKey
   = @"QSBSearchWindow Left QSBSearchResultsWindow";
 static NSString * const kQSBUserPrefBackgroundColorKey = @"backgroundColor";
 static NSString * const kQSBQueryStringKey = @"queryString";
+
+static NSString * const kQSBMainInterfaceNibName
+  = @"MainInterfaceNibName";
 
 // NSNumber value in seconds that controls how fast the QSB clears out
 // an old query once it's put in the background.
@@ -97,9 +103,9 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 // Reposition our window on screen as appropriate
 - (void)forceWindowOnScreen;
 
-// Sets the currently active query controller.  Should only be called by
+// Sets the currently active search view controller.  Should only be called by
 // push/popQueryController.
-- (void)setActiveQueryController:(QSBQueryController *)queryController;
+- (void)setActiveSearchViewController:(QSBSearchViewController *)controller;
 
 // Pushes or pops the top (active) view controller.
 - (void)pushViewController:(NSViewController *)viewController;
@@ -112,8 +118,8 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 // without any user visible view changes.
 - (void)clearAllViewControllersAndSearchString;
 
-// Remove the view associated with the query controller from its parent.
-- (void)removeQueryView:(QSBQueryController *)queryController;
+// Remove the view associated with the search view controller from its parent.
+- (void)removeQueryView:(QSBSearchViewController *)controller;
 
 // Resets the query to blank after a given time interval
 - (void)resetQuery:(NSTimer *)timer;
@@ -156,19 +162,30 @@ static const NSInteger kBaseCorporaTagValue = 10000;
                      respectingDock:(BOOL)respectingDock
                            onScreen:(NSScreen *)screen;
 
+// Update token in text field
+- (void)updatePivotToken;
+
 @end
 
 
 @implementation QSBSearchWindowController
 
-@synthesize activeQueryController = activeQueryController_;
+@synthesize activeSearchViewController = activeSearchViewController_;
 
 GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
-GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
+GTM_METHOD_CHECK(NSObject, 
+                 gtm_addObserver:forKeyPath:selector:userInfo:options:);
 GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
+GTM_METHOD_CHECK(NSAppleEventDescriptor, gtm_arrayValue);
+GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
 
 - (id)init {
-  if ((self = [self initWithWindowNibName:@"ResultsWindow"])) {
+  // Read the nib name from user defaults to allow for ui switching
+  // Defaults to ResultsWindow.xib
+  NSString *nibName = [[NSUserDefaults standardUserDefaults]
+                        stringForKey:kQSBMainInterfaceNibName];
+  if (!nibName) nibName = @"ResultsWindow";
+  if ((self = [self initWithWindowNibName:nibName])) {
     [self loadWindow];
   }
   return self;
@@ -269,8 +286,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   searchWindowSetAlphaAnimation_ 
     = [[searchWindow animationForKey:@"alphaValue"] copy];
   [searchWindowSetAlphaAnimation_ setDelegate:self];
-  NSMutableDictionary *animations
-    = [[[searchWindow animations] mutableCopy] autorelease];
+  NSMutableDictionary *animations 
+    = [NSMutableDictionary dictionaryWithDictionary:[searchWindow animations]];
   if (!animations) {
     animations = [NSMutableDictionary dictionary];
   }
@@ -280,9 +297,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [resultsWindow_ setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces]; 
 
   // Load up the base results views nib and install the subordinate results views.
-  QSBQueryController *baseResultsController
-    = [[[QSBQueryController alloc] initWithNibName:@"BaseResultsViews"
-                                 windowController:self] autorelease];
+  QSBSearchViewController *baseResultsController
+    = [[[QSBSearchViewController alloc] initWithNibName:@"BaseResultsViews"
+                                       windowController:self] autorelease];
   [self pushViewController:baseResultsController];
 
   [self updateImageView];
@@ -323,14 +340,15 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
               forKeyPath:kQSBUserPrefBackgroundColorKey
                 selector:@selector(backgroundColorChanged:)];
   
-  QSBQuery *query = [activeQueryController_ query];
-  [query gtm_removeObserver:self
-                 forKeyPath:kQSBQueryStringKey
-                   selector:@selector(queryStringChanged:)];
+  QSBSearchController *searchController
+    = [activeSearchViewController_ searchController];
+  [searchController gtm_removeObserver:self
+                            forKeyPath:kQSBQueryStringKey
+                              selector:@selector(queryStringChanged:)];
   [queryResetTimer_ invalidate];
   [findPasteBoardChangedTimer_ invalidate];
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [activeQueryController_ release];
+  [activeSearchViewController_ release];
   [corpora_ release];
   [super dealloc];
 }
@@ -356,8 +374,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [NSObject cancelPreviousPerformRequestsWithTarget:self
                                            selector:@selector(displayResults:)
                                              object:nil];
-  if ([activeQueryController_ queryString]
-      || [activeQueryController_ pivotObject]) {
+  if ([activeSearchViewController_ queryString]
+      || [activeSearchViewController_ results]) {
     BOOL likelyResult = [[self selection] rank] > 1.0;
     NSTimeInterval delay 
       = likelyResult ? kQSBLongerAppearDelay : kQSBAppearDelay;
@@ -371,8 +389,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self updateImageView];
 }
 
-- (QSBQueryController *)activeQueryController {
-  return activeQueryController_;
+- (QSBSearchViewController *)activeSearchViewController {
+  return activeSearchViewController_;
 }
 
 - (void)updateImageView {
@@ -422,7 +440,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)openResultsTableItem:(id)sender {
-  [activeQueryController_ performDefaultActionOnSelectedRow];
+  [activeSearchViewController_ performDefaultActionOnSelectedRow];
 }
 
 - (id)windowWillReturnFieldEditor:(NSWindow *)sender toObject:(id)client {
@@ -461,7 +479,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // Add our items.
   NSArray *corpora = [self corpora];
   for (unsigned int i = 0; i < [corpora count]; i++) {
-    HGSObject *corpus = [corpora objectAtIndex:i];
+    HGSResult *corpus = [corpora objectAtIndex:i];
     NSString *key = [[NSNumber numberWithInt:i] stringValue];
     NSMenuItem *item = [[[NSMenuItem alloc] initWithTitle:[corpus displayName]
                                                    action:@selector(selectCorpus:)
@@ -482,14 +500,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if ([savedQueryString length]) {
     // If there is any freestanding text clear that text.
     [searchTextField_ setStringValue:@""];
-    [activeQueryController_ setQueryString:nil];
-  } else if ([activeQueryController_ pivotObject]) {
+    [activeSearchViewController_ setQueryString:nil];
+  } else if ([activeSearchViewController_ results]) {
     // Otherwise, if there's a pivot then pop that pivot.
     [self popViewControllerAnimate:NO];
   } else {
     // Else hide the results window if it's showing.
     if ([resultsWindow_ isVisible]) {
-      [activeQueryController_ setQueryString:nil];
+      [activeSearchViewController_ setQueryString:nil];
       [searchTextField_ setStringValue:@""];
       [self hideResultsWindow];
     } else {
@@ -503,91 +521,136 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // If there's not a current pivot then add one.  Then change the pivot object
   // for the pivot (either the existing one or the newly created one) to the
   // chosen corpus.  Don't alter the search text.
-  NSInteger tag = [sender tag] - kBaseCorporaTagValue;
-  HGSObject *corpus = [[self corpora] objectAtIndex:tag];
-  QSBQueryController *parentQueryController
-    = [activeQueryController_ parentQueryController];
-  NSString *queryString = [activeQueryController_ queryString];
-  if (!parentQueryController) {
-    // Create a pivot with the current text, and set the base query to the
-    // indicated corpus.
-    parentQueryController = activeQueryController_;
-    QSBQueryController *pivotResultsController
-      = [[[QSBQueryController alloc] initWithNibName:@"BaseResultsViews"
-                                   windowController:self] autorelease];
-    [self pushViewController:pivotResultsController];
-  }
-
-  // Set the existing pivot to the indicated corpus.
-  // Note that this subverts the parent's idea of what the pivot object is.
-  [activeQueryController_ setPivotObject:corpus];
-  [searchMenu_ setTitle:[corpus displayName]];
-  NSImage *image = [[[corpus displayIconWithLazyLoad:YES] copy] autorelease];
-  [searchMenu_ setImage:image];
-  if (image) {
-    [image setSize:NSMakeSize(16, 16)];
-    [searchMenu_ setImage:image];
-    [searchMenu_ sizeToFit];
-  } else {
-    NSRect frame = [searchMenu_ frame];
-    frame.size.width = 0;
-    [searchMenu_ setFrame:frame];
-  }
-  NSRect frame = [searchMenu_ frame];
-  NSRect textFrame = [searchTextField_ frame];
-  textFrame.origin.x = NSMaxX(frame) + kTextFieldPadding;
-  textFrame.size.width = NSWidth([[searchTextField_ superview] frame])
-                         - NSMinX(textFrame) - kTextFieldPadding;
   
-  [searchTextField_ setFrame:textFrame];
-  // The following also triggers a query refresh.
-  [activeQueryController_ setQueryString:queryString];
-  if (!queryString) {
-    queryString = @"";
-  }
+  NSString *queryString = [activeSearchViewController_ queryString];
+  
+  NSInteger tag = [sender tag] - kBaseCorporaTagValue;
+  HGSResult *corpus = [[self corpora] objectAtIndex:tag];
+  HGSResultArray *results 
+    = [HGSResultArray arrayWithResult:corpus];
+  [self selectResults:results];
+  
+  // Restore the query string. The following also triggers a query refresh.
+  [activeSearchViewController_ setQueryString:queryString];
+  if (!queryString) queryString = @"";
   [searchTextField_ setStringValue:queryString];
+  
 }
 
 - (IBAction)performSearch:(id)sender {
   // For now we just blindly submit a google search. 
   // TODO(alcor): make this perform a contextual search depending on the pivot
-  NSString *queryString = [activeQueryController_ queryString];
+  NSString *queryString = [activeSearchViewController_ queryString];
   QSBGoogleTableResult *googleResult
-    = [QSBGoogleTableResult resultForQuery:queryString];
-  [googleResult performDefaultActionWithQueryController:activeQueryController_];
+    = [QSBGoogleTableResult tableResultForQuery:queryString];
+  [googleResult performDefaultActionWithSearchViewController:activeSearchViewController_];
 }
 
-- (void)pivotOnSelection {
+- (void)pivotOnObject:(id)pivotObject {
   // Use the currently selected results item as a pivot and clear the search 
   // text by setting up a new query by instantiating a pivot view and creating
   // a query on the pivot.
-  QSBTableResult *pivotObject = [self selection];
   if ([pivotObject isPivotable]) {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    QSBQuery *query = [activeQueryController_ query];
+    QSBSearchController *searchController 
+      = [activeSearchViewController_ searchController];
     NSDictionary *userInfo 
-      = [NSDictionary dictionaryWithObject:query
-                                    forKey:kQSBNotificationQueryKey];
+      = [NSDictionary dictionaryWithObject:searchController
+                                    forKey:kQSBNotificationSearchControllerKey];
     [nc postNotificationName:kQSBWillPivotNotification
                       object:pivotObject 
                     userInfo:userInfo];
     // Load up the pivot results views nib and install
     // the subordinate results views.
-    QSBQueryController *pivotResultsController
-      = [[[QSBQueryController alloc] initWithNibName:@"BaseResultsViews"
-                                   windowController:self] autorelease];
+    QSBSearchViewController *pivotResultsController
+      = [[[QSBSearchViewController alloc] initWithNibName:@"BaseResultsViews"
+                                         windowController:self] autorelease];
     NSUInteger flags = [[NSApp currentEvent] modifierFlags];
-    [[pivotResultsController query] setPushModifierFlags:flags];
+    [[pivotResultsController searchController] setPushModifierFlags:flags];
     [self pushViewController:pivotResultsController];
     [nc postNotificationName:kQSBDidPivotNotification
                       object:pivotObject 
-                    userInfo:userInfo];    
+                    userInfo:userInfo];
+  }  
+}
+
+
+- (void)searchForString:(NSString *)string {
+  // Selecting destroys the stack
+  [self clearAllViewControllersAndSearchString];
+  [searchTextField_ setStringValue:string];
+  [activeSearchViewController_ setQueryString:string];
+  [self showResultsWindow];
+}
+
+- (void)selectResults:(HGSResultArray *)results {
+  
+  // Selecting destroys the stack
+  [self clearAllViewControllersAndSearchString];
+  
+  // Create a pivot with the current text, and set the base query to the
+  // indicated corpus.
+  
+  QSBSearchViewController *pivotResultsController
+    = [[[QSBSearchViewController alloc] initWithNibName:@"BaseResultsViews"
+                                       windowController:self] autorelease];
+  [self pushViewController:pivotResultsController];
+  
+  // Set the existing pivot to the indicated corpus.
+  // Note that this subverts the parent's idea of what the pivot object is.
+  [activeSearchViewController_ setResults:results];
+  [self updatePivotToken];
+  
+}
+
+- (IBAction)grabSelection:(id)sender {
+  NSBundle *bundle = [NSBundle mainBundle];
+  NSString *path = [bundle pathForResource:@"GrabFinderSelectionAsPosixPaths" 
+                                    ofType:@"scpt"
+                               inDirectory:@"Scripts"];
+  HGSAssert(path, @"Can't find GrabFinderSelectionAsPosixPaths.scpt");
+  NSURL *url = [NSURL fileURLWithPath:path];
+  NSDictionary *error = nil;
+  
+  NSAppleScript *grabScript
+    = [[[NSAppleScript alloc] initWithContentsOfURL:url 
+                                              error:&error] autorelease];
+  if (!error) {
+    NSAppleEventDescriptor *desc = [grabScript executeAndReturnError:&error];
+    if (!error) {
+      NSArray *paths = [desc gtm_arrayValue];
+      if (paths) {
+        HGSResultArray *results
+          = [HGSResultArray arrayWithFilePaths:paths];
+        [self selectResults:results];
+}
+    }
   }
 }
 
+- (IBAction)dropSelection:(id)sender {
+  [self selectResults:nil];
+}
+
+- (void)pivotOnSelection {
+  QSBTableResult *pivotObject = [self selection];
+  [self pivotOnObject:pivotObject];
+}
+
 - (BOOL)moveDownQSB {
-  [self displayResults:nil];
-  return NO;
+  BOOL handled = YES;  // Forstall any additional action by default.
+  QSBSearchViewController *activeSearchViewController
+    = [self activeSearchViewController];
+  QSBResultsViewBaseController *activeResultsViewController
+    = [activeSearchViewController activeResultsViewController];
+  NSArrayController *resultsController
+    = [activeResultsViewController arrayController];
+  NSArray *arrangedResults = [resultsController arrangedObjects];
+  if ([arrangedResults count]) {
+    [self displayResults:nil];
+    handled = NO;  // Allow it to proceed to change the selection.
+  }
+  return handled;
 }
 
 - (BOOL)insertNewlineQSB {
@@ -618,8 +681,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (BOOL)moveRightQSB {
-  if ([searchTextFieldEditor_ isAtEnd]
-      && ![[NSApp currentEvent] isARepeat]) {
+  BOOL isAtEnd = [searchTextFieldEditor_ isAtEnd];
+  BOOL isARepeat = [[NSApp currentEvent] isARepeat];
+  if (isAtEnd && !isARepeat) {
     [self pivotOnSelection];
   } else {
     [searchTextFieldEditor_ moveRight:nil];
@@ -655,13 +719,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   BOOL handled = NO;
   if (![[NSApp currentEvent] isARepeat]) {
     if ([searchTextFieldEditor_ isAtBeginning]) {
-      NSString *currentQueryString = [activeQueryController_ queryString];
+      NSString *currentQueryString = [activeSearchViewController_ queryString];
       while([self popViewControllerAnimate:YES]) { }
       
       [searchTextField_ setStringValue:currentQueryString ? 
                    currentQueryString : @""];
       [searchTextFieldEditor_ setSelectedRange:NSMakeRange(0, 0)];
-      [activeQueryController_ setQueryString:currentQueryString];
+      [activeSearchViewController_ setQueryString:currentQueryString];
       handled = YES;
     }
   }
@@ -688,7 +752,7 @@ doCommandBySelector:(SEL)commandSelector {
   } 
   if (!handled) {
     handled 
-      = [activeQueryController_ performSelectionMovementSelector:commandSelector];
+      = [activeSearchViewController_ performSelectionMovementSelector:commandSelector];
   }
   return handled;
 }
@@ -699,14 +763,18 @@ doCommandBySelector:(SEL)commandSelector {
  forPartialWordRange:(NSRange)charRange 
  indexOfSelectedItem:(int *)idx {
   *idx = 0;
-  NSString *completion = @"";
-  id result = [self selection];
-  if (result && [result respondsToSelector:@selector(displayName)]) {
-    completion = [result displayName];
-  }
-  
-  if (![[activeQueryController_ queryString] length]) {
-    completion = nil;
+  NSString *completion = nil;
+  NSString *queryString = [activeSearchViewController_ queryString];
+  if ([queryString length]) {
+    id result = [self selection];
+    if (result && [result respondsToSelector:@selector(displayName)]) {
+      completion = [result displayName];
+      // If the query string is not a prefix of the completion then
+      // ignore the completion.
+      if (![completion hasCaseInsensitivePrefix:queryString]) {
+        completion = nil;
+      }
+    }
   }
   [self updateImageView];
   
@@ -724,8 +792,8 @@ doCommandBySelector:(SEL)commandSelector {
     
     // Mark the current query results view as needing to be updated.
     // Immediately update the active controller and determine window height.
-    [activeQueryController_ updateResultsViewNow];
-    CGFloat newWindowHeight = [activeQueryController_ windowHeight];
+    [activeSearchViewController_ updateResultsViewNow];
+    CGFloat newWindowHeight = [activeSearchViewController_ windowHeight];
     [self setResultsWindowHeight:newWindowHeight animating:isVisible];
     if (isVisible)
       [NSAnimationContext endGrouping];      
@@ -813,7 +881,7 @@ doCommandBySelector:(SEL)commandSelector {
   [[NSAnimationContext currentContext] setDuration:kQSBShowDuration];
   [[searchWindow animator] setAlphaValue:1.0];
   [NSAnimationContext endGrouping];
-  if ([[activeQueryController_ queryString] length]) {
+  if ([[activeSearchViewController_ queryString] length]) {
     [self performSelector:@selector(displayResults:)
                withObject:nil 
                afterDelay:kQSBReshowResultsDelay];
@@ -917,9 +985,13 @@ doCommandBySelector:(SEL)commandSelector {
     NSArray *corpora = [self corpora];
     NSUInteger idx = [menuItem tag] - kBaseCorporaTagValue;
     if (idx < [corpora  count]) {
-      HGSObject *corpus = [corpora objectAtIndex:idx];
-      HGSObject *pivot = [activeQueryController_ pivotObject];
-      [menuItem setState:(corpus == pivot)];
+      HGSResult *corpus = [corpora objectAtIndex:idx];
+      HGSResultArray *results 
+        = [activeSearchViewController_ results];
+      if ([results count] == 1) {
+        HGSResult *result = [results objectAtIndex:0];
+        [menuItem setState:([corpus isEqual:result])];
+      }
     } else {
       valid = NO;
     }
@@ -996,7 +1068,7 @@ doCommandBySelector:(SEL)commandSelector {
   // blow everything away (http://b/issue?id=1567906), otherwise we will
   // select all of the text, so the next time the user brings us up we will
   // immediately replace their selection with what they type.
-  if ([activeQueryController_ parentQueryController]) {
+  if ([activeSearchViewController_ parentSearchViewController]) {
     [self clearAllViewControllersAndSearchString];
   } else {
     [searchTextFieldEditor_ selectAll:self];
@@ -1081,7 +1153,7 @@ doCommandBySelector:(SEL)commandSelector {
     termChangedAndAwaitingAction_ = YES;
   }
 
-  [activeQueryController_ setQueryString:queryString];
+  [activeSearchViewController_ setQueryString:queryString];
 }
 
 #if QSB_CAUTIONARY_TALE
@@ -1193,28 +1265,13 @@ doCommandBySelector:(SEL)commandSelector {
                                              onScreen:[window screen]];
   [window setFrame:exposeRect display:YES animate:YES];
 }
+- (void)updatePivotToken {
 
-- (void)setActiveQueryController:(QSBQueryController *)queryController {
-  QSBQuery *query = [activeQueryController_ query];
-  [query gtm_removeObserver:self
-                 forKeyPath:kQSBQueryStringKey
-                   selector:@selector(queryStringChanged:)];
-  // We are no longer interested in the current controller producing results.
-  [activeQueryController_ stopQuery];
-  [activeQueryController_ autorelease];
-  activeQueryController_ = [queryController retain];
-  query = [activeQueryController_ query];
-  [query gtm_addObserver:self
-              forKeyPath:kQSBQueryStringKey
-                selector:@selector(queryStringChanged:)
-                userInfo:nil
-                 options:0];
-  
   // Place a text box with the pivot term into the query search box.
-  HGSObject *pivotObject = [activeQueryController_ pivotObject];
-  NSString *pivotString = [pivotObject displayName];
+  HGSResultArray *results = [activeSearchViewController_ results];
+  NSString *pivotString = [results displayName];
   [searchMenu_ setTitle:pivotString];
-  NSImage *image = [pivotObject displayIconWithLazyLoad:NO];
+  NSImage *image = [results displayIconWithLazyLoad:NO];
   NSRect frame;
   if (image) {
     // We go through this instead of copying the image so we don't
@@ -1239,30 +1296,51 @@ doCommandBySelector:(SEL)commandSelector {
   NSRect textFrame = [searchTextField_ frame];
   textFrame.origin.x = NSMaxX(frame) + kTextFieldPadding;
   textFrame.size.width = NSWidth([[searchTextField_ superview] frame])
-                         - NSMinX(textFrame) - kTextFieldPadding;
+    - NSMinX(textFrame) - kTextFieldPadding;
   
   [searchTextField_ setFrame:textFrame];
 }
 
+- (void)setActiveSearchViewController:(QSBSearchViewController *)searchViewController {
+  QSBSearchController *searchController
+    = [activeSearchViewController_ searchController];
+  [searchController gtm_removeObserver:self
+                            forKeyPath:kQSBQueryStringKey
+                              selector:@selector(queryStringChanged:)];
+  // We are no longer interested in the current controller producing results.
+  [activeSearchViewController_ stopQuery];
+  [activeSearchViewController_ autorelease];
+  activeSearchViewController_ = [searchViewController retain];
+  searchController = [activeSearchViewController_ searchController];
+  [searchController gtm_addObserver:self
+                         forKeyPath:kQSBQueryStringKey
+                           selector:@selector(queryStringChanged:)
+                           userInfo:nil
+                            options:0];
+  [self updatePivotToken];
+}
+
 - (void)pushViewController:(NSViewController *)viewController {
-  QSBQueryController *queryController = nil;
-  if ([viewController isKindOfClass:[QSBQueryController class]]) 
-    queryController = (QSBQueryController *)viewController;
+  QSBSearchViewController *searchViewController = nil;
+  if ([viewController isKindOfClass:[QSBSearchViewController class]]) {
+    searchViewController = (QSBSearchViewController *)viewController;
+  }
   
-  [queryController setParentQueryController:activeQueryController_];
+  [searchViewController setParentSearchViewController:activeSearchViewController_];
   
   // If there was an active controller then save the current query text
   // and push it out of the way.
-  if (activeQueryController_) {
+  if (activeSearchViewController_) {
     NSRange queryRange = [searchTextFieldEditor_ selectedRange];
-    [activeQueryController_ setSavedPivotQueryRange:queryRange];
+    [activeSearchViewController_ setSavedPivotQueryRange:queryRange];
     NSString *savedQueryString
       = [[searchTextFieldEditor_ string]
          substringToIndex:queryRange.location + queryRange.length];
-    [activeQueryController_ setSavedPivotQueryString:savedQueryString];
+    [activeSearchViewController_ setSavedPivotQueryString:savedQueryString];
+    [searchTextFieldEditor_ resetCompletion];
     
     // Immediately resize the window.
-    [self setResultsWindowHeight:[activeQueryController_ windowHeight]
+    [self setResultsWindowHeight:[activeSearchViewController_ windowHeight]
                        animating:NO];
     
     [[viewController view] setFrame:[self rightOffscreenViewRect]];
@@ -1271,52 +1349,51 @@ doCommandBySelector:(SEL)commandSelector {
     // Slide out the old and slide in the new
     [NSAnimationContext beginGrouping];
     [[NSAnimationContext currentContext] setDuration:kQSBPushPopDuration];
-    [[[activeQueryController_ view] animator] setFrame:[self leftOffscreenViewRect]];
-    [[[queryController view] animator] setFrame:[self mainViewRect]];
+    [[[activeSearchViewController_ view] animator] setFrame:[self leftOffscreenViewRect]];
+    [[[searchViewController view] animator] setFrame:[self mainViewRect]];
     [NSAnimationContext endGrouping];
     [self performSelector:@selector(removeQueryView:)
-               withObject:activeQueryController_
+               withObject:activeSearchViewController_
                afterDelay:kQSBPushPopDuration];
   } else {
     [[viewController view] setFrame:[self mainViewRect]];
     [[self resultsView] addSubview:[viewController view]];
   }
 
-  [self setActiveQueryController:queryController];
+  [self setActiveSearchViewController:searchViewController];
   
   // We're starting a new query so clear the search string.
-  [activeQueryController_ setQueryString:nil];
+  [activeSearchViewController_ setQueryString:nil];
   [searchTextField_ setStringValue:@""];
 }
 
 - (NSViewController *)popViewControllerAnimate:(BOOL)animate {
-  QSBQueryController *parentQueryController
-    = [activeQueryController_ parentQueryController];
-  if (parentQueryController) {
+  QSBSearchViewController *parentSearchViewController
+    = [activeSearchViewController_ parentSearchViewController];
+  if (parentSearchViewController) {
     // Restore the previously typed query string.
     // NOTE: This happens when the 'character' in front of the text cursor
     // is a pivot frame and the user has pressed a deleteBackwards:, so 
     // insert the text to be replaced with an extra character at the end
     // so that the text engine deletes that character when it gets around
     // to processing the deleteBackwards.
-    NSString *savedQueryString = [parentQueryController savedPivotQueryString];
+    NSString *savedQueryString = [parentSearchViewController savedPivotQueryString];
     [searchTextFieldEditor_ selectAll:self];
     [searchTextFieldEditor_ insertText:savedQueryString];
-    [self completeQueryText];
-    NSRange savedQueryRange = [parentQueryController savedPivotQueryRange];
+    NSRange savedQueryRange = [parentSearchViewController savedPivotQueryRange];
     [searchTextFieldEditor_ setSelectedRange:savedQueryRange];
     
     // Immediately resize the window.
-    [self setResultsWindowHeight:[parentQueryController windowHeight]
+    [self setResultsWindowHeight:[parentSearchViewController windowHeight]
                        animating:NO];
     
-    [[parentQueryController view] setFrame:[self leftOffscreenViewRect]];
-    [[self resultsView] addSubview:[parentQueryController view]];
+    [[parentSearchViewController view] setFrame:[self leftOffscreenViewRect]];
+    [[self resultsView] addSubview:[parentSearchViewController view]];
 
     // Slide the top controller out and the parent controller in.
     NSTimeInterval delay = 0;
-    NSView *activeView = [activeQueryController_ view];
-    NSView *parentView = [parentQueryController view];
+    NSView *activeView = [activeSearchViewController_ view];
+    NSView *parentView = [parentSearchViewController view];
     NSRect mainViewRect = [self mainViewRect];
     NSRect rightOffscreenViewRect = [self rightOffscreenViewRect];
     if (animate) {
@@ -1331,29 +1408,31 @@ doCommandBySelector:(SEL)commandSelector {
       [parentView setFrame:mainViewRect];
     }
     [self performSelector:@selector(removeQueryView:)
-               withObject:activeQueryController_
+               withObject:activeSearchViewController_
                afterDelay:delay];
     
-    [activeQueryController_ setParentQueryController:nil];
-    [self setActiveQueryController:parentQueryController];
-  }
-  return parentQueryController;
+    [activeSearchViewController_ setParentSearchViewController:nil];
+    [self setActiveSearchViewController:parentSearchViewController];
+
+    [self completeQueryText];
+}
+  return parentSearchViewController;
 }
 
 - (void)clearAllViewControllersAndSearchString {
   while([self popViewControllerAnimate:NO]) { }
-  [activeQueryController_ setQueryString:nil];
+  [activeSearchViewController_ setQueryString:nil];
   [searchTextField_ setStringValue:@""];
 }
 
-- (void)removeQueryView:(QSBQueryController *)queryController {
+- (void)removeQueryView:(QSBSearchViewController *)queryController {
   [[queryController view] removeFromSuperview];  
 }
 
 - (void)resetQuery:(NSTimer *)timer {
   queryResetTimer_ = nil;
   while([self popViewControllerAnimate:NO]) { }
-  [activeQueryController_ setQueryString:nil];
+  [activeSearchViewController_ setQueryString:nil];
   [searchTextField_ setStringValue:@""];
 }
 
@@ -1373,7 +1452,7 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (QSBTableResult *)selection {
   // TODO(mrossetti): Eliminate this in favor of the query controller.
-  QSBTableResult *result = [activeQueryController_ selectedObject];
+  QSBTableResult *result = [activeSearchViewController_ selectedObject];
   return result;
 }
 

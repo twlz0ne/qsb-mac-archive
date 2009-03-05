@@ -42,25 +42,38 @@ static NSString *const kDateTimeMarker = @"[DTS]";
 @end
 
 @implementation TextInput
+- (HGSAction *)defaultAction {
+  NSString *actionName = @"com.google.text.action.largetype";
+  HGSAction *action 
+    = [[HGSExtensionPoint actionsPoint] extensionWithIdentifier:actionName];
+  if (!action) {
+    HGSLog(@"Unable to get large type action (%@)", actionName);
+  }
+  return action;
+}
 
 - (NSSet *)resultTypes {
   return [NSSet setWithObject:kHGSTypeTextUserInput];
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
+  BOOL isValid = [super isValidSourceForQuery:query];
+  if (isValid) {
   // TODO(thomasvl): support indirect w/o loading space
   
   // For top level, must start w/ our prefix.
-  NSString *rawQuery = [query rawQueryString];
-  NSUInteger len = [rawQuery length];
-  NSUInteger prefixLen = [kInputPrefix length];
-  if (len > prefixLen) {
-    BOOL result = [rawQuery compare:kInputPrefix
-                            options:NSCaseInsensitiveSearch
-                              range:NSMakeRange(0, prefixLen)] == NSOrderedSame;
-    return result;
+    NSString *rawQuery = [query rawQueryString];
+    NSUInteger len = [rawQuery length];
+    NSUInteger prefixLen = [kInputPrefix length];
+    if (len > prefixLen) {
+      isValid = [rawQuery compare:kInputPrefix
+                          options:NSCaseInsensitiveSearch
+                            range:NSMakeRange(0, prefixLen)] == NSOrderedSame;
+    } else {
+      isValid = NO;
+    }
   }
-  return NO;
+  return isValid;
 }
 
 - (void)performSearchOperation:(HGSSearchOperation *)operation {
@@ -69,11 +82,14 @@ static NSString *const kDateTimeMarker = @"[DTS]";
   // TODO(thomasvl): support indirect w/o loading space
   HGSAssert([rawQuery hasPrefix:kInputPrefix], nil);
   NSString *userText = [rawQuery substringFromIndex:[kInputPrefix length]];
-  // TODO(alcor): we need an image we can use here
-  NSString *imagePath = @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ClippingText.icns";
-  NSImage *image = [[[NSImage alloc] initByReferencingFile:imagePath] autorelease];
+  
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+  NSString *fileType = NSFileTypeForHFSTypeCode(kClippingTextType);
+  NSImage *image = [ws iconForFileType:fileType];
+ 
   NSString *details = HGSLocalizedString(@"Text", nil);
-
+  // Default action for text right now is large type
+  HGSAction *largeTypeAction = [self defaultAction];
   // Cheat, force this result high in the list.
   // TODO(dmaclach): figure out a cleaner way to get results like this high
   // in the results.
@@ -82,16 +98,17 @@ static NSString *const kDateTimeMarker = @"[DTS]";
        [NSNumber numberWithFloat:2000.0f], kHGSObjectAttributeRankKey,
        details, kHGSObjectAttributeSnippetKey,
        image, kHGSObjectAttributeIconKey,
+       largeTypeAction, kHGSObjectAttributeDefaultActionKey,
        nil];
-  HGSObject *hgsObject
-    = [HGSObject objectWithIdentifier:[NSURL URLWithString:@"userinput:text"]
-                                 name:userText
-                                 type:kHGSTypeTextUserInput
-                               source:self
-                           attributes:attributes];
+  HGSResult *hgsObject
+    = [HGSResult resultWithURL:[NSURL URLWithString:@"userinput:text"]
+                          name:userText
+                          type:kHGSTypeTextUserInput
+                        source:self
+                    attributes:attributes];
 
   // See if we need a version w/ stamps
-  HGSObject *hgsObject2 = nil;
+  HGSResult *hgsObject2 = nil;
   if (([userText rangeOfString:kDateMarker
                        options:NSCaseInsensitiveSearch].location != NSNotFound) ||
       ([userText rangeOfString:kTimeMarker
@@ -131,13 +148,14 @@ static NSString *const kDateTimeMarker = @"[DTS]";
                   [NSNumber numberWithFloat:2001.0f], kHGSObjectAttributeRankKey,
                   details, kHGSObjectAttributeSnippetKey,
                   image, kHGSObjectAttributeIconKey,
+                  largeTypeAction, kHGSObjectAttributeDefaultActionKey,
                   nil];
     NSURL *url = [NSURL URLWithString:@"userinput:text/stamped"];
-    hgsObject2 = [HGSObject objectWithIdentifier:url
-                                            name:worker
-                                            type:kHGSTypeTextUserInput
-                                          source:self
-                                      attributes:attributes];
+    hgsObject2 = [HGSResult resultWithURL:url
+                                     name:worker
+                                     type:kHGSTypeTextUserInput
+                                   source:self
+                               attributes:attributes];
   }
   
   NSArray *resultsArray = [NSArray arrayWithObjects:hgsObject, hgsObject2, nil];

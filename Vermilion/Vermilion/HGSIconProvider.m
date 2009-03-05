@@ -33,14 +33,14 @@
 #import <QuickLook/QuickLook.h> 
 #import "HGSIconProvider.h"
 #import "HGSLRUCache.h"
-#import "HGSObject.h"
+#import "HGSResult.h"
 #import "HGSSearchSource.h"
 #import "HGSOperation.h"
 #import "GTMObjectSingleton.h"
 #import "GTMGeometryUtils.h"
 #import "GTMNSImage+Scaling.h"
 #import "GTMNSBezierPath+CGPath.h"
-#import "GTMHTTPFetcher.h"
+#import <GData/GDataHTTPFetcher.h>
 #import "HGSLog.h"
 #import "GTMDebugThreadValidation.h"
 
@@ -63,23 +63,50 @@ static HGSLRUCacheCallBacks kLRUCacheCallbacks = {
 
 static NSString *const kHGSIconProviderResultKey = @"HGSIconProviderResultKey";
 static NSString *const kHGSIconProviderValueKey = @"HGSIconProviderValueKey";
-static NSString *const kHGSIconProviderAttrKey = @"kHGSIconProviderAttrKey";
+static NSString *const kHGSIconProviderAttrKey = @"HGSIconProviderAttrKey";
+static NSString *const kHGSIconProviderThumbnailURLFormat = @"HGSIconProviderThumbnailURLFormat";
+
+static NSURL* IconURLForResult(HGSResult *result) {
+  NSURL *url = [result valueForKey:kHGSObjectAttributeIconPreviewFileKey];
+  if (!url) {
+    url = [result url];
+    
+    // For urls, we can specify a thumbnail provider for web sites.
+    // HTTPS sites are usually locked down, so ignore it for those
+    if ([[url scheme] isEqualToString:@"http"]) {
+      NSString *thumbnailURL = [[NSUserDefaults standardUserDefaults]
+                               stringForKey:kHGSIconProviderThumbnailURLFormat]; 
+      if (thumbnailURL) {
+        thumbnailURL
+          = [NSString stringWithFormat:thumbnailURL,[url absoluteString]];
+        url = [NSURL URLWithString:thumbnailURL];
+      }
+    }
+  }
+  return url;
+}
+
+@class HGSIconOperation;
 
 @interface HGSIconProvider()
-- (void)beginLazyLoadForResult:(HGSObject*)result useCache:(BOOL)useCache;
+- (void)beginLazyLoadForResult:(HGSResult*)result useCache:(BOOL)useCache;
+
+// Remove an operation from our list of pending icon fetch operations.
+- (void)removeOperation:(HGSIconOperation *)operation;
+
 @end
 
 
 @interface HGSIconOperation : NSObject {
  @protected
   HGSInvocationOperation *operation_; // STRONG
-  GTMHTTPFetcher *fetcher_;   // STRONG
-  HGSObject *result_;    // WEAK
+  GDataHTTPFetcher *fetcher_;   // STRONG
+  HGSResult *result_;    // WEAK
   BOOL useCache_;
 }
-+ (HGSIconOperation *)iconOperationForResult:(HGSObject*)result
++ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result
                                     useCache:(BOOL)useCache;
-- (id)initWithResult:(HGSObject*)result useCache:(BOOL)useCache;
+- (id)initWithResult:(HGSResult*)result useCache:(BOOL)useCache;
 - (void)beginLoading;
 - (void)cancel;
 - (void)setValueOnMainThread:(NSDictionary *)args;
@@ -88,13 +115,13 @@ static NSString *const kHGSIconProviderAttrKey = @"kHGSIconProviderAttrKey";
 
 @implementation HGSIconOperation
 
-+ (HGSIconOperation *)iconOperationForResult:(HGSObject*)result
++ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result
                                     useCache:(BOOL)useCache {
   return [[[HGSIconOperation alloc] initWithResult:result
                                           useCache:useCache] autorelease];
 }
 
-- (id)initWithResult:(HGSObject*)result useCache:(BOOL)useCache {
+- (id)initWithResult:(HGSResult*)result useCache:(BOOL)useCache {
   self = [super init];
   if (self) {
     result_ = result;
@@ -125,10 +152,7 @@ static NSString *const kHGSIconProviderAttrKey = @"kHGSIconProviderAttrKey";
 
 - (void)beginLoading {
   if (!operation_) {
-    NSURL *url = [result_ valueForKey:kHGSObjectAttributeIconPreviewFileKey];
-    if (!url) {
-      url = [result_ valueForKey:kHGSObjectAttributeURIKey];
-    }
+    NSURL *url = IconURLForResult(result_);
     if ([url isFileURL]) {
       operation_ = [[HGSInvocationOperation
                      diskInvocationOperationWithTarget:self
@@ -138,7 +162,7 @@ static NSString *const kHGSIconProviderAttrKey = @"kHGSIconProviderAttrKey";
       NSString *scheme = [url scheme];
       if ([scheme hasPrefix:@"http"]) {
         NSURLRequest *request = [NSURLRequest requestWithURL:url];
-        fetcher_ = [GTMHTTPFetcher httpFetcherWithRequest:request];
+        fetcher_ = [GDataHTTPFetcher httpFetcherWithRequest:request];
         operation_ = [[HGSInvocationOperation
                        networkInvocationOperationWithTarget:self
                                                  forFetcher:fetcher_
@@ -163,10 +187,7 @@ static NSString *const kHGSIconProviderAttrKey = @"kHGSIconProviderAttrKey";
   NSURL *url = nil;
   @synchronized(self) {
     if (![operation_ isCancelled]) {
-      url = [result_ valueForKey:kHGSObjectAttributeIconPreviewFileKey];
-      if (!url) {
-        url = [result_ valueForKey:kHGSObjectAttributeURIKey];
-      }
+      url = IconURLForResult(result_);
     }
   }
   
@@ -221,50 +242,60 @@ static NSString *const kHGSIconProviderAttrKey = @"kHGSIconProviderAttrKey";
                           waitUntilDone:NO];
     }
   }
+  HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
+  [sharedIconProvider removeOperation:self];
 }
 
 - (void)setValueOnMainThread:(NSDictionary *)args {
   GTMAssertRunningOnMainThread();
-  HGSObject *result = [args objectForKey:kHGSIconProviderResultKey];
+  HGSResult *result = [args objectForKey:kHGSIconProviderResultKey];
   id value = [args objectForKey:kHGSIconProviderValueKey];
   NSString *key = [args objectForKey:kHGSIconProviderAttrKey];
   [result setValue:value forKey:key];
 }
 
-- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData {
+  BOOL cancelled = NO;
   @synchronized(self) {
-    if ([operation_ isCancelled]) {
-      return;
+    cancelled = ([operation_ isCancelled]);
+  }
+  if (!cancelled) {
+    NSImage *icon = [[[NSImage alloc] initWithData:retrievedData] autorelease];
+    icon = [HGSIconProvider imageWithRoundRectAndDropShadow:icon];
+    if (icon && useCache_) {
+      [[HGSIconProvider sharedIconProvider] cacheIcon:icon
+                                 forKey:[[[fetcher request] URL] absoluteString]];
+    }
+    
+    @synchronized(self) {
+      if (icon && ![operation_ isCancelled]) {
+        NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
+                              result_, kHGSIconProviderResultKey,
+                              icon, kHGSIconProviderValueKey,
+                              kHGSObjectAttributeIconKey, kHGSIconProviderAttrKey,
+                              nil];
+        [self performSelectorOnMainThread:@selector(setValueOnMainThread:)
+                               withObject:args
+                            waitUntilDone:NO];
+      }
     }
   }
-  
-  NSImage *icon = [[[NSImage alloc] initWithData:retrievedData] autorelease];
-  
-  if (icon && useCache_) {
-    [[HGSIconProvider sharedIconProvider] cacheIcon:icon
-                               forKey:[[[fetcher request] URL] absoluteString]];
-  }
-  
-  @synchronized(self) {
-    if (icon && ![operation_ isCancelled]) {
-      NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
-                            result_, kHGSIconProviderResultKey,
-                            icon, kHGSIconProviderValueKey,
-                            kHGSObjectAttributeIconKey, kHGSIconProviderAttrKey,
-                            nil];
-      [self performSelectorOnMainThread:@selector(setValueOnMainThread:)
-                             withObject:args
-                          waitUntilDone:NO];
-    }
-  }
+  HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
+  [sharedIconProvider removeOperation:self];
 }
 
-- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
     failedWithError:(NSError *)error {
   HGSLogDebug(@"http icon fetch failed for %@ with error %@",
               [[[fetcher request] URL] absoluteString], error);
 }
+
+- (NSString *)description {
+  return [NSString stringWithFormat:@"<%@:%p> result: %@>", 
+          [self class], self, result_];
+}
+
 @end
 
 
@@ -280,6 +311,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
                                           callBacks:&kLRUCacheCallbacks
                                        evictContext:self];
     placeHolderIcon_ = [[NSImage imageNamed:@"blue-placeholder"] retain];
+    compoundPlaceHolderIcon_ 
+      = [[NSImage imageNamed:NSImageNameMultipleDocuments] retain];
   }
   return self;
 }
@@ -299,15 +332,16 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   return placeHolderIcon_;
 }
 
-- (NSImage *)provideIconForResult:(HGSObject*)result
+- (NSImage *)compoundPlaceHolderIcon {
+  return compoundPlaceHolderIcon_;
+}
+
+- (NSImage *)provideIconForResult:(HGSResult*)result
                        loadLazily:(BOOL)loadLazily
                          useCache:(BOOL)useCache {
   NSImage *icon = nil;
   
-  NSURL *url = [result valueForKey:kHGSObjectAttributeIconPreviewFileKey];
-  if (!url) {
-    url = [result valueForKey:kHGSObjectAttributeURIKey];
-  }
+  NSURL *url = IconURLForResult(result);
   if (url) {
     if (useCache) {
       icon = [self cachedIconForKey:[url absoluteString]];
@@ -315,7 +349,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
     if (!icon) {
       if (loadLazily) {
         [self beginLazyLoadForResult:result useCache:useCache];
-        icon = [[result source] defaultIconForObject:result];
+        icon = [[result source] defaultIconForResult:result];
         if (!icon) {
           icon = [self placeHolderIcon];
         }
@@ -325,6 +359,29 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
             = [HGSIconOperation iconOperationForResult:result
                                               useCache:useCache];
           [op performDiskLoad:nil];
+        } else {
+          NSString *scheme = [url scheme];
+          typedef struct {
+            NSString *scheme;
+            OSType icon;
+          } SchemeMap;
+          SchemeMap map[] = {
+            { @"http", 'tSts' },
+            { @"https", 'tSts' },
+            { @"ftp", kInternetLocationFTPIcon },
+            { @"afp", kInternetLocationAppleShareIcon },
+            { @"mailto", kInternetLocationMailIcon },
+            { @"news", kInternetLocationNewsIcon }
+          };
+          OSType iconType = kInternetLocationGenericIcon;
+          for (size_t i = 0; i < sizeof(map) / sizeof(SchemeMap); ++i) {
+            if ([scheme caseInsensitiveCompare:map[i].scheme] == NSOrderedSame) {
+              iconType = map[i].icon;
+              break;
+            }
+          }
+          NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+          icon = [ws iconForFileType:NSFileTypeForHFSTypeCode(iconType)];
         }
       }
     }
@@ -332,7 +389,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   return icon;
 }
 
-- (void)cancelOperationsForResult:(HGSObject*)result {
+- (void)cancelOperationsForResult:(HGSResult*)result {
   HGSIconOperation *operation = 
     [HGSIconOperation iconOperationForResult:result
                                     useCache:NO];
@@ -341,11 +398,17 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
     if (original) {
       [original cancel];
       [iconOperations_ removeObject:original];
-    }
+    } 
   }
 }
 
-- (void)beginLazyLoadForResult:(HGSObject*)result useCache:(BOOL)useCache {
+- (void)removeOperation:(HGSIconOperation *)operation {
+  @synchronized(self) {
+    [iconOperations_ removeObject:operation];
+  }
+}
+
+- (void)beginLazyLoadForResult:(HGSResult*)result useCache:(BOOL)useCache {
   HGSIconOperation *operation = 
     [HGSIconOperation iconOperationForResult:result
                                     useCache:useCache];
@@ -360,7 +423,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 
 - (NSImage *)cachedIconForKey:(NSString *)key {
   NSImage *icon = nil;
-  @synchronized(self) {
+  @synchronized(cache_) {
     icon = (NSImage *)[cache_ valueForKey:key];
   }
   return [[icon retain] autorelease];
@@ -376,7 +439,9 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
                         * [rep bitsPerPixel] / 8);
       size += repSize;
     }
-    [cache_ setValue:icon forKey:key size:size];
+    @synchronized(cache_) {
+      [cache_ setValue:icon forKey:key size:size];
+    }
   }
 }
 
@@ -420,15 +485,19 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
     CGPathRef path
       = [[NSBezierPath bezierPathWithRoundedRect:NSInsetRect(drawRect, 0.5, 0.5)
                                      xRadius:2.0
-                                     yRadius:2.0] gtm_createCGPath];
+                                     yRadius:2.0] gtm_CGPath];
     CGContextBeginTransparencyLayer(largeContext, NULL);
-    CGContextAddPath(largeContext, path);
+    if (path) {
+      CGContextAddPath(largeContext, path);
+    }
     CGContextSaveGState(largeContext);
     CGContextClip(largeContext);
     CGContextDrawImage(largeContext, GTMNSRectToCGRect(drawRect), imageRef);
     CGContextRestoreGState(largeContext);
     CGContextSetLineWidth(largeContext, 1.0);
-    CGContextAddPath(largeContext, path);  
+    if (path) {
+      CGContextAddPath(largeContext, path);  
+    }
     CGContextSetRGBStrokeColor(largeContext, 0.0, 0.0, 0.0, 0.25);
     CGContextStrokePath(largeContext);
     CGContextEndTransparencyLayer(largeContext);
@@ -468,25 +537,27 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
     CGPathRef path
       = [[NSBezierPath bezierPathWithRoundedRect:smallDrawRect
                                          xRadius:2.0
-                                         yRadius:2.0] gtm_createCGPath];
+                                         yRadius:2.0] gtm_CGPath];
     CGContextBeginTransparencyLayer(smallContext, NULL);
-    if (path) CGContextAddPath(smallContext, path);
+    if (path) {
+      CGContextAddPath(smallContext, path);
+    }
     CGContextSaveGState(smallContext);
     CGContextClip(smallContext);
     CGContextDrawImage(smallContext, GTMNSRectToCGRect(smallDrawRect), imageRef);
     CGContextRestoreGState(smallContext);
-    CFRelease(path);
     
     CGContextSetLineWidth(smallContext, 1.0);
     NSRect insetRect =  NSInsetRect(smallDrawRect, 0.5, 0.5);
     path = [[NSBezierPath bezierPathWithRoundedRect:insetRect
                                             xRadius:2.0
-                                            yRadius:2.0] gtm_createCGPath];
-    if (path) CGContextAddPath(smallContext, path);  
+                                            yRadius:2.0] gtm_CGPath];
+    if (path) {
+      CGContextAddPath(smallContext, path);
+    }
     CGContextSetRGBStrokeColor(smallContext, 0.0, 0.0, 0.0, 0.10);
     CGContextStrokePath(smallContext);
     CGContextEndTransparencyLayer(smallContext);
-    CFRelease(path);
     
     CGImageRef smallImage = CGBitmapContextCreateImage(smallContext);
     

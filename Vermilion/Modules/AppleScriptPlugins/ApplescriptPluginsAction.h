@@ -49,7 +49,6 @@ extern NSString *const kHGSAppleScriptSwitchContextsKey; // BOOL (default YES)
 @interface AppleScriptPluginsAction : HGSAction {
  @private
   NSAppleScript *script_;  // the script we are running
-  NSString *displayName_;  // the display name
   NSString *description_;
   NSString *handler_;  // the handler that this script calls
   BOOL displayInGlobalResults_;  // do we want it displayed in global results

@@ -40,7 +40,6 @@
  @private
   SecKeychainItemRef mKeychainItemRef;
   BOOL mDataLoaded;
-  BOOL mPasswordLoaded;
   NSString* mUsername;
   NSString* mPassword;
 }

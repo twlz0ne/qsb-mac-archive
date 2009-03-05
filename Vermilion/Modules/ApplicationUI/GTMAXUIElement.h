@@ -66,7 +66,7 @@
 - (BOOL)accessibilityIsAttributeSettable:(NSString *)attribute;
 
 // Returns YES if attribute is set to value
-- (BOOL)setAccessibilityValue:(CFTypeRef)value 
+- (BOOL)setAccessibilityValue:(id)value 
                  forAttribute:(NSString *)attribute;
 
 // Returns the number of values in the array of the atribute returns an array.

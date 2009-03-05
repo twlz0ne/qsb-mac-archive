@@ -37,7 +37,7 @@
 #import "HGSAction.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
-#import "HGSObject.h"
+#import "HGSResult.h"
 #import "HGSBundle.h"
 
 // An action which will email an URL.
@@ -79,13 +79,20 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 #pragma mark HGSAction Protocol Methods
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary*)info {
   // TODO(mrossetti): Rework this to accommodate different email products.
   BOOL wasGood = NO;
-  HGSObject *objectWithURL = [info objectForKey:kHGSActionPrimaryObjectKey];
-  NSURL *urlToSend = [objectWithURL valueForKey:kHGSObjectAttributeURIKey];
-  NSString *urlString = [urlToSend absoluteString];
-  urlString = [urlString gtm_stringByEscapingForURLArgument];
+  HGSResultArray *directObjects
+     = [info objectForKey:kHGSActionDirectObjectsKey];
+  NSMutableString *mutableURLString = nil;
+  for (NSURL *url in [directObjects urls]) {
+    if (!mutableURLString) {
+      mutableURLString = [NSMutableString stringWithString:[url absoluteString]];
+    } else {
+      [mutableURLString appendFormat:@"\r%@", [url absoluteString]];
+    }
+  }
+  NSString *urlString = [mutableURLString gtm_stringByEscapingForURLArgument];
   urlString = [NSString stringWithFormat:@"mailto:?body=%@", urlString];
   NSURL *emailURL = [NSURL URLWithString:urlString];
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
@@ -93,14 +100,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return wasGood;
 }
 
-- (BOOL)doesActionApplyTo:(HGSObject*)result {
-  // We don't want to sent fileURLs
-  BOOL isGood = NO;
-  NSURL *urlToSend = [result valueForKey:kHGSObjectAttributeURIKey];
-  if (urlToSend) {
-    isGood = [urlToSend isFileURL] ? NO : YES;
-  }
-  return isGood;
+- (BOOL)appliesToResult:(HGSResult *)result {
+  // We don't want to send fileURLs
+  NSURL *url = [result url];
+  BOOL doesApply = ![url isFileURL];
+  return doesApply;
 }
 
 @end

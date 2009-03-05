@@ -79,13 +79,11 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 }
 
 - (NSArray *)dasherDomains {
-  HGSAccountsExtensionPoint *aep
-    = [HGSAccountsExtensionPoint accountsExtensionPoint];
-  NSEnumerator *accountEnum
-    = [aep accountsEnumForType:@"Google"];
+  HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
+  NSEnumerator *accountEnum = [accountsPoint accountsEnumForType:@"Google"];
   NSMutableArray *domains = [NSMutableArray array];
   for (id<HGSAccount> account in accountEnum) {
-    NSString *name = [account accountName];
+    NSString *name = [account userName];
     NSInteger location = [name rangeOfString:@"@"].location;
     if (location != NSNotFound) {
       NSString *domain = [name substringFromIndex:location + 1]; 
@@ -97,7 +95,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   return domains;
 }
 
-- (HGSObject *)corpusObjectForDictionary:(NSDictionary *)corpusDict 
+- (HGSResult *)corpusObjectForDictionary:(NSDictionary *)corpusDict 
                                 inDomain:(NSString *)domain {
   if ([corpusDict objectForKey:kHGSCorporaSourceAttributeHideCorpusKey]) {
     return nil;
@@ -162,7 +160,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     }
     [objectDict removeObjectForKey:kHGSCorporaSourceAttributeIconNameKey];
   }
-  HGSObject *corpus = [HGSObject objectWithDictionary:objectDict
+  HGSResult *corpus = [HGSResult resultWithDictionary:objectDict
                                               source:self];
   return corpus;  
 }
@@ -184,7 +182,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   NSArray *corporaPlist = [NSArray arrayWithContentsOfFile:plistPath];
   
   for (NSDictionary *corpusDict in corporaPlist) {
-    HGSObject *corpus = [self corpusObjectForDictionary:corpusDict
+    HGSResult *corpus = [self corpusObjectForDictionary:corpusDict
                                                inDomain:nil];
     if (corpus) [allCorpora addObject:corpus];
   }
@@ -196,7 +194,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   
   for (NSString *domain in [self dasherDomains]) {
     for (NSDictionary *corpusDict in corporaPlist) {
-      HGSObject *corpus = [self corpusObjectForDictionary:corpusDict 
+      HGSResult *corpus = [self corpusObjectForDictionary:corpusDict 
                                                  inDomain:domain];
       if (corpus) [allCorpora addObject:corpus];
     }
@@ -207,7 +205,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   corporaPlist = [NSArray arrayWithContentsOfFile:plistPath];
   
   for (NSDictionary *corpusDict in corporaPlist) {
-    HGSObject *corpus = [self corpusObjectForDictionary:corpusDict
+    HGSResult *corpus = [self corpusObjectForDictionary:corpusDict
                                                inDomain:nil];
     if (corpus) [allCorpora addObject:corpus];
   }  
@@ -215,7 +213,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   NSMutableArray *visibleCorpora = [NSMutableArray array];
   NSMutableArray *searchableCorpora = [NSMutableArray array];
   
-  for (HGSObject *corpus in allCorpora) {
+  for (HGSResult *corpus in allCorpora) {
     if ([corpus valueForKey:kHGSObjectAttributeWebSearchTemplateKey]
     && ![[corpus valueForKey:@"kHGSObjectAttributeHideFromDropdown"] boolValue]) {
       [searchableCorpora addObject:corpus];
@@ -230,7 +228,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
  
   [self clearResultIndex];
   
-  for (HGSObject *corpus in visibleCorpora_) {
+  for (HGSResult *corpus in visibleCorpora_) {
     [self indexResult:corpus
            nameString:[corpus displayName]
           otherString:nil];
@@ -239,16 +237,16 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   return YES;
 }
 
-- (NSMutableDictionary *)archiveRepresentationForObject:(HGSObject*)result {
+- (NSMutableDictionary *)archiveRepresentationForObject:(HGSResult*)result {
   return [NSMutableDictionary
-            dictionaryWithObject:[result valueForKey:kHGSObjectAttributeURIKey]
+            dictionaryWithObject:[result url]
                           forKey:kHGSObjectAttributeURIKey];
 }
 
-- (HGSObject *)objectWithArchivedRepresentation:(NSDictionary *)representation {
+- (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
   NSString *identifier = [representation objectForKey:kHGSObjectAttributeURIKey];
-  for (HGSObject *corpus in searchableCorpora_) {
-    NSURL *url = [corpus valueForKey:kHGSObjectAttributeURIKey];
+  for (HGSResult *corpus in searchableCorpora_) {
+    NSURL *url = [corpus url];
     if ([url isEqual:identifier])
       return corpus;
   }

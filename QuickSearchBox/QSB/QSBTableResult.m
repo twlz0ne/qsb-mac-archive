@@ -36,7 +36,7 @@
 #import "GTMNSString+URLArguments.h"
 #import "NSAttributedString+Attributes.h"
 #import "GTMNSString+HTML.h"
-#import "QSBQueryController.h"
+#import "QSBSearchViewController.h"
 #import "QSBMoreResultsViewDelegate.h"
 #import "NSString+ReadableURL.h"
 #import "QSBTopResultsViewControllers.h"
@@ -171,7 +171,7 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   return nil;
 }
 
-- (BOOL)performDefaultActionWithQueryController:(QSBQueryController*)controller {
+- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
   return NO;
 }
 
@@ -179,7 +179,7 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   return nil;
 }
 
-- (NSString *)displayPath {
+- (NSArray *)displayPath {
   return nil;
 }
 
@@ -246,7 +246,8 @@ static NSDictionary *gBaseStringAttributes_ = nil;
                                   options:NSCaseInsensitiveSearch 
                                     range:NSMakeRange(0, [mutableItem length])];
   if (prettyPrintPath) {
-    mutableItem = [[[mutableItem qsb_displayPath] mutableCopy] autorelease];
+    NSString *displayString = [mutableItem qsb_displayPath];
+    mutableItem = [NSMutableString stringWithString:displayString];
   }
   NSString *unescapedItem = [mutableItem gtm_stringByUnescapingFromHTML];
   NSMutableAttributedString* mutableAttributedItem =
@@ -293,17 +294,17 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
 GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
-@synthesize representedObject = representedObject_;
+@synthesize representedResult = representedResult_;
 @synthesize categoryName = categoryName_;
 
-+ (id)resultWithObject:(HGSObject *)object {
-  return [[[[self class] alloc] initWithObject:object] autorelease];
++ (id)tableResultWithResult:(HGSResult *)result {
+  return [[[[self class] alloc] initWithResult:result] autorelease];
 }
 
-- (id)initWithObject:(HGSObject *)object {
+- (id)initWithResult:(HGSResult *)result {
   if ((self = [super init])) {
-    representedObject_ = [object retain];
-    [representedObject_ gtm_addObserver:self
+    representedResult_ = [result retain];
+    [representedResult_ gtm_addObserver:self
                              forKeyPath:kHGSObjectAttributeIconKey
                                selector:@selector(objectIconChanged:)
                                userInfo:nil
@@ -320,19 +321,19 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)dealloc {
-  [representedObject_ gtm_removeObserver:self 
+  [representedResult_ gtm_removeObserver:self 
                               forKeyPath:kHGSObjectAttributeIconKey
                                 selector:@selector(objectIconChanged:)];
-  [representedObject_ release];
+  [representedResult_ release];
   [super dealloc];
 }
 
 - (BOOL)isPivotable {
   // We want to pivot on non-suggestions, non-qsb stuff, and non-actions.
-  HGSObject *object = [self representedObject];
+  HGSResult *result = [self representedResult];
   BOOL pivotable = YES;
-  if ([object conformsToType:kHGSTypeGoogleSuggest]) pivotable = NO;
-  if ([object conformsToType:kHGSTypeAction]) pivotable = NO;
+  if ([result conformsToType:kHGSTypeGoogleSuggest]) pivotable = NO;
+  if ([result conformsToType:kHGSTypeAction]) pivotable = NO;
   return pivotable;
 }
 
@@ -340,29 +341,27 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
           elementType:(QSBResultDescriptionItemType)itemType {
   [super addAttributes:string elementType:itemType];
   if (itemType == kQSBResultDescriptionTitle) {
-    HGSObject *object = [self representedObject];
-    if ([object conformsToType:kHGSTypeAction]) {
+    HGSResult *result = [self representedResult];
+    if ([result conformsToType:kHGSTypeAction]) {
       [string addAttribute:NSForegroundColorAttributeName
                      value:[NSColor colorWithCalibratedRed:0.667
                                                      green:0.0 
                                                       blue:0.0 
                                                      alpha:1.0]];
-      [string addAttribute:NSObliquenessAttributeName
-                     value:[NSNumber numberWithFloat:0.1f]];
     }
   }
 }
 
 - (CGFloat)rank {
-  return [[self representedObject] rank];
+  return [[self representedResult] rank];
 }
 
 - (Class)topResultsRowViewControllerClass {
   Class rowViewClass = Nil;
-  HGSObject *result = [self representedObject];
+  HGSResult *result = [self representedResult];
   if ([result conformsToType:kHGSTypeSuggest]) {
-    rowViewClass = [QSBTopStandardRowViewController class];
-  } else if ([result isKindOfClass:[HGSObject class]]) {
+    rowViewClass = [QSBTopSearchIconViewController class];
+  } else if ([result isKindOfClass:[HGSResult class]]) {
     rowViewClass = [QSBTopStandardRowViewController class];
   }
   return rowViewClass;
@@ -370,7 +369,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (Class)moreResultsRowViewControllerClass {
   Class rowViewClass = Nil;
-  HGSObject *result = [self representedObject];
+  HGSResult *result = [self representedResult];
   if (!([result conformsToType:kHGSTypeSuggest]
         || [result conformsToType:kHGSTypeSearch])) {
     if ([self categoryName]) {
@@ -384,30 +383,31 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return rowViewClass;
 }
 
-- (BOOL)performDefaultActionWithQueryController:(QSBQueryController*)controller {
-  HGSObject *result = [self representedObject];
+- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
+  HGSResult *result = [self representedResult];
   id<HGSAction> action
     = [result valueForKey:kHGSObjectAttributeDefaultActionKey];
   if (action) {
-    [controller performAction:action forObject:result];
+    HGSResultArray *results = [HGSResultArray arrayWithResult:result];
+    [controller performAction:action withResults:results];
   } else {
     HGSLog(@"Unable to get default action for %@", result);
   }
   return YES;
 }
 
-- (NSString *)displayPath {
-  HGSObject *result = [self representedObject];
+- (NSArray *)displayPath {
+  HGSResult *result = [self representedResult];
   return [result displayPath];
 }
 
 - (NSString *)displayName {
-  HGSObject *result = [self representedObject];
+  HGSResult *result = [self representedResult];
   return [result displayName];
 }
 
 - (NSImage *)displayIcon {
-  HGSObject *result = [self representedObject];
+  HGSResult *result = [self representedResult];
   return [result displayIconWithLazyLoad:YES];
 }
 
@@ -416,17 +416,17 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return [NSString stringWithFormat:@"%@ (Rank: %.2f, %d)", 
                                     [self displayName],
                                     [self rank],
-                                    [[self representedObject] rankFlags]];
+                                    [[self representedResult] rankFlags]];
 }
 
 - (NSImage *)displayThumbnail {
-  HGSObject *result = [self representedObject];
+  HGSResult *result = [self representedResult];
   return [result displayIconWithLazyLoad:NO];
 }
 
 - (NSMutableAttributedString*)genericTitleLine {
   // Title is rendered as 12 pt black.
-  HGSObject *result = [self representedObject];
+  HGSResult *result = [self representedResult];
   NSString *html = [result valueForKey:kHGSObjectAttributeNameKey];
   NSMutableAttributedString *title 
     = [self mutableAttributedStringWithString:html];
@@ -442,7 +442,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (NSAttributedString*)snippetString {
   // Snippet is rendered as 12 pt gray (50% black).
   NSMutableAttributedString *snippetString = nil;
-  HGSObject *result = [self representedObject];
+  HGSResult *result = [self representedResult];
   NSString *snippet = [result valueForKey:kHGSObjectAttributeSnippetKey];
   if (snippet) {
     snippetString = [self mutableAttributedStringFromHTMLString:snippet];
@@ -454,7 +454,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (NSAttributedString*)sourceURLString {
   // SourceURL is rendered as 12 pt with a color of 0x9CAC87.
   NSMutableAttributedString *sourceURLString = nil;
-  HGSObject *result = [self representedObject];
+  HGSResult *result = [self representedResult];
   NSString *sourceURL = [result valueForKey:kHGSObjectAttributeSourceURLKey];
   
   sourceURL = [sourceURL readableURLString];
@@ -467,7 +467,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (NSString *)description {
   return [NSString stringWithFormat:@"%@: %p - %@", 
-          [self class], self, representedObject_];
+          [self class], self, representedResult_];
 }
 @end
  
@@ -476,7 +476,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
-+ (id)resultForQuery:(NSString*)query {
++ (id)tableResultForQuery:(NSString*)query {
   return [[[[self class] alloc] initWithQuery:query] autorelease];
 }
 
@@ -500,13 +500,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                               [self displayIcon], kHGSObjectAttributeIconKey, 
                               nil];
-  NSURL *identifier = [NSURL URLWithString:urlString];
-  HGSObject *object = [HGSObject objectWithIdentifier:identifier 
-                                                 name:name 
-                                                 type:kHGSTypeGoogleSearch
-                                               source:nil
-                                           attributes:attributes];
-  return [super initWithObject:object];
+  NSURL *url = [NSURL URLWithString:urlString];
+  HGSResult *result = [HGSResult resultWithURL:url 
+                                          name:name 
+                                          type:kHGSTypeGoogleSearch
+                                        source:nil
+                                    attributes:attributes];
+  return [super initWithResult:result];
 }
 
 - (Class)topResultsRowViewControllerClass {
@@ -519,13 +519,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (NSImage *)displayThumbnail {
-  return [self displayIcon];
+  return nil;
 }
 
-- (id)displayPath {
+- (NSArray *)displayPath {
   NSString *string = NSLocalizedString(@"Search Google for “%@”", @""); 
   string = [NSString stringWithFormat:string, [self displayName]];
-  NSURL *url = [[self representedObject] identifier];
+  NSURL *url = [[self representedResult] url];
   
   return [NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:
                                    string, kHGSPathCellDisplayTitleKey,
@@ -547,7 +547,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 @implementation QSBSeparatorTableResult
 
-+ (id)result {
++ (id)tableResult {
   return [[[[self class] alloc] init] autorelease];
 }
 
@@ -564,7 +564,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 @implementation QSBFoldTableResult
 
-+ (id)result {
++ (id)tableResult {
   return [[[[self class] alloc] init] autorelease];
 }
 
@@ -576,7 +576,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return [QSBMoreFoldRowViewController class];
 }
 
-- (BOOL)performDefaultActionWithQueryController:(QSBQueryController*)controller {
+- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
   [controller toggleTopMoreViews];
   return YES;
 }
@@ -585,7 +585,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 @implementation QSBSearchStatusTableResult
 
-+ (id)result {
++ (id)tableResult {
   return [[[[self class] alloc] init] autorelease];
 }
 
@@ -598,7 +598,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return [QSBTopSearchStatusRowViewController class];
 }
 
-- (BOOL)performDefaultActionWithQueryController:(QSBQueryController*)controller {
+- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
   [controller toggleTopMoreViews];
   return YES;
 }
@@ -607,8 +607,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 @implementation QSBShowAllTableResult
 
-+ (id)resultWithCategory:(NSString *)categoryName
-                   count:(NSUInteger)categoryCount {
++ (id)tableResultWithCategory:(NSString *)categoryName
+                        count:(NSUInteger)categoryCount {
   return [[[[self class] alloc] initWithCategory:categoryName
                                            count:categoryCount] autorelease];
 }
@@ -640,7 +640,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return [QSBMoreShowAllTableRowViewController class];
 }
 
-- (BOOL)performDefaultActionWithQueryController:(QSBQueryController*)controller {
+- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
   NSString *categoryName = [self categoryName];
   QSBMoreResultsViewDelegate *delegate = [controller moreResultsController];
   [delegate addShowAllCategory:categoryName];
@@ -656,7 +656,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 @implementation QSBMessageTableResult
 
-+ (id)resultWithString:(NSString *)message {
++ (id)tableResultWithString:(NSString *)message {
   return [[[[self class] alloc] initWithString:message] autorelease];
 }
 

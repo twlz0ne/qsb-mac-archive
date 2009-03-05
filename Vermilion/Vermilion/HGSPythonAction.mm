@@ -34,8 +34,8 @@
 #import "HGSLog.h"
 #import "HGSBundle.h"
 
-static const char *const kDoesActionApplyTo = "DoesActionApplyTo";
-static const char *const kPerformAction = "PerformAction";
+static const char *const kHGSPythonAppliesToResult = "AppliesToResult";
+static const char *const kHGSPythonPerform = "Perform";
 
 @implementation HGSPythonAction
 
@@ -92,19 +92,19 @@ static const char *const kPerformAction = "PerformAction";
       [self release];
       return nil;
     }
-    performAction_ = PyString_FromString(kPerformAction);
-    if (!performAction_) {
+    perform_ = PyString_FromString(kHGSPythonPerform);
+    if (!perform_) {
       NSString *error = [HGSPython lastErrorString];
       HGSLogDebug(@"could not create Python string %s.\n%@", 
-                  kPerformAction, error);
+                  kHGSPythonPerform, error);
       [self release];
       return nil;
     }
-    doesActionApplyTo_ = PyString_FromString(kDoesActionApplyTo);
-    if (!doesActionApplyTo_) {
+    appliesTo_ = PyString_FromString(kHGSPythonAppliesToResult);
+    if (!appliesTo_) {
       NSString *error = [HGSPython lastErrorString];
       HGSLogDebug(@"could not create Python string %s.\n%@", 
-                  kDoesActionApplyTo, error);
+                  kHGSPythonAppliesToResult, error);
       [self release];
       return nil;
     }
@@ -114,13 +114,13 @@ static const char *const kPerformAction = "PerformAction";
 }
 
 - (void)dealloc {
-  if (performAction_ || doesActionApplyTo_ || instance_ || module_) {
+  if (perform_ || appliesTo_ || instance_ || module_) {
     PythonStackLock gilLock;
-    if (performAction_) {
-      Py_DECREF(performAction_);
+    if (perform_) {
+      Py_DECREF(perform_);
     }
-    if (doesActionApplyTo_) {
-      Py_DECREF(doesActionApplyTo_);
+    if (appliesTo_) {
+      Py_DECREF(appliesTo_);
     }
     if (instance_) {
       Py_DECREF(instance_);
@@ -132,31 +132,31 @@ static const char *const kPerformAction = "PerformAction";
   [super dealloc];
 }
 
-- (NSDictionary*)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *primary = [info valueForKey:kHGSActionPrimaryObjectKey];
-  HGSObject *indirect = [info valueForKey:kHGSActionIndirectObjectKey];
+- (NSDictionary*)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directs 
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  HGSResultArray *indirects 
+    = [info valueForKey:kHGSActionIndirectObjectsKey];
   
-  if (instance_ && primary) {
+  if (instance_ && directs) {
     PythonStackLock gilLock;
-    PyObject *pyPrimary = [[HGSPython sharedPython] objectForResult:primary];
-    PyObject *pyIndirect = nil;
-    if (indirect) {
-      pyIndirect = [[HGSPython sharedPython] objectForResult:indirect];
-    }
-    if (pyPrimary) {
+    HGSPython *sharedPython = [HGSPython sharedPython];
+    PyObject *pyDirects = [sharedPython tupleForResults:directs];
+    PyObject *pyIndirects = [sharedPython tupleForResults:indirects];
+    if (pyDirects) {
       // TODO(hawk): add pivot object to the call
       PyObject *pythonResult =
         PyObject_CallMethodObjArgs(instance_,
-                                   performAction_,
-                                   pyPrimary,
+                                   perform_,
+                                   pyDirects,
                                    nil);
       if (pythonResult) {
         Py_DECREF(pythonResult);
       }
-      Py_DECREF(pyPrimary);
+      Py_DECREF(pyDirects);
     }
-    if (pyIndirect) {
-      Py_DECREF(pyIndirect);
+    if (pyIndirects) {
+      Py_DECREF(pyIndirects);
     }
   }
   
@@ -169,27 +169,29 @@ static const char *const kPerformAction = "PerformAction";
   return [NSSet setWithObject:@"*"];
 }
 
-- (BOOL)doesActionApplyTo:(HGSObject*)result {
-  PythonStackLock gilLock;
-  BOOL applies = NO;
-  
-  PyObject *pyResult = [[HGSPython sharedPython] objectForResult:result];
-  if (pyResult) {
-    PyObject *pyApplies =
-      PyObject_CallMethodObjArgs(instance_,
-                                 doesActionApplyTo_,
-                                 pyResult,
-                                 nil);
-    if (pyApplies) {
-      if (PyBool_Check(pyApplies) && pyApplies == Py_True) {
-        applies = YES;
+- (BOOL)appliesToResults:(HGSResultArray *)results {
+  BOOL doesApply = [super appliesToResults:results];
+  if (doesApply) {
+    PythonStackLock gilLock;
+    doesApply = NO;
+    HGSPython *sharedPython = [HGSPython sharedPython];
+    PyObject *pyResult = [sharedPython tupleForResults:results];
+    if (pyResult) {
+      PyObject *pyApplies =
+        PyObject_CallMethodObjArgs(instance_,
+                                   appliesTo_,
+                                   pyResult,
+                                   nil);
+      if (pyApplies) {
+        if (PyBool_Check(pyApplies) && pyApplies == Py_True) {
+          doesApply = YES;
+        }
+        Py_DECREF(pyApplies);
       }
-      Py_DECREF(pyApplies);
+      Py_DECREF(pyResult);
     }
-    Py_DECREF(pyResult);
   }
-  
-  return applies;
+  return doesApply;
 }
 
 @end

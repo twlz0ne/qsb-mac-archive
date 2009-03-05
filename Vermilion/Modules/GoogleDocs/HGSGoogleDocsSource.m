@@ -39,6 +39,11 @@ static NSString* const kDocCategoryDocument = @"document";
 static NSString* const kDocCategorySpreadsheet = @"spreadsheet";
 static NSString* const kDocCategoryPresentation = @"presentation";
 
+static const NSTimeInterval kRefreshSeconds = 3600.0;  // 60 minutes.
+
+// Only report errors to user once an hour.
+static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
+
 @interface HGSGoogleDocsSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
   GDataServiceGoogleDocs *docService_;
@@ -46,14 +51,16 @@ static NSString* const kDocCategoryPresentation = @"presentation";
   NSTimer *updateTimer_;
   NSDictionary *docIcons_;
   BOOL currentlyFetching_;
-  NSString *accountIdentifier_;
-  NSString *accountName_;
+  id <HGSAccount> account_;
+  NSString *userName_;
+  NSTimeInterval previousErrorReportingTime_;
 }
 
 - (void)setUpPeriodicRefresh;
 - (void)startAsynchronousDocsListFetch;
 - (void)indexDoc:(GDataEntryDocBase*)doc;
 - (NSArray*)authorArrayForGDataPeople:(NSArray*)people;
+
 @end
 
 @implementation HGSGoogleDocsSource
@@ -82,11 +89,9 @@ static NSString* const kDocCategoryPresentation = @"presentation";
                   ssImage, kDocCategorySpreadsheet, 
                   presImage, kDocCategoryPresentation,
                   nil];
-    id<HGSAccount> account
-      = [configuration objectForKey:kHGSExtensionAccountIdentifier];
-    accountIdentifier_ = [[account identifier] retain];
-    accountName_ = [[account accountName] copy];
-    if (accountIdentifier_) {
+    account_ = [[configuration objectForKey:kHGSExtensionAccount] retain];
+    userName_ = [[account_ userName] copy];
+    if (account_) {
       // Get a doc listing now, and schedule a timer to update it every hour.
       [self startAsynchronousDocsListFetch];
       [self setUpPeriodicRefresh];
@@ -94,8 +99,8 @@ static NSString* const kDocCategoryPresentation = @"presentation";
       NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
       [nc addObserver:self
              selector:@selector(loginCredentialsChanged:)
-                 name:kHGSDidChangeAccountNotification
-               object:nil];
+                 name:kHGSAccountDidChangeNotification
+               object:account_];
     } else {
       HGSLogDebug(@"Missing account identifier for HGSGoogleDocsSource '%@'",
                   [self identifier]);
@@ -114,8 +119,8 @@ static NSString* const kDocCategoryPresentation = @"presentation";
   if ([updateTimer_ isValid])
     [updateTimer_ invalidate];
   [updateTimer_ release];
-  [accountIdentifier_ release];
-  [accountName_ release];
+  [account_ release];
+  [userName_ release];
   [super dealloc];
 }
 
@@ -123,73 +128,80 @@ static NSString* const kDocCategoryPresentation = @"presentation";
 #pragma mark Docs Fetching
 
 - (void)startAsynchronousDocsListFetch {
-  if (!docService_) {
-    KeychainItem* keychainItem 
-      = [KeychainItem keychainItemForService:accountIdentifier_
-                                    username:nil];
-    if (!keychainItem ||
-        [[keychainItem username] length] == 0 ||
-        [[keychainItem password] length] == 0) {
-      // Can't do much without a login; invalidate so we stop trying (until
-      // we get a notification that the credentials have changed) and bail.
-      [updateTimer_ invalidate];
-      return;
+  if (!currentlyFetching_) {
+    if (!docService_) {
+      KeychainItem* keychainItem 
+        = [KeychainItem keychainItemForService:[account_ identifier]
+                                      username:nil];
+      NSString *userName = [keychainItem username];
+      NSString *password = [keychainItem password];
+      if (userName && password) {
+        docService_ = [[GDataServiceGoogleDocs alloc] init];
+        [docService_ setUserAgent:@"HGSGoogleDocSource"];
+        [docService_ setUserCredentialsWithUsername: userName
+                                           password: password];
+      } else {
+        // Can't do much without a login; invalidate so we stop trying (until
+        // we get a notification that the credentials have changed) and bail.
+        [updateTimer_ invalidate];
+        return;
+      }
     }
-    docService_ = [[GDataServiceGoogleDocs alloc] init];
-    [docService_ setUserAgent:@"HGSGoogleDocSource"];
-    [docService_ setUserCredentialsWithUsername:[keychainItem username]
-                                       password:[keychainItem password]];
+    // Mark us as in the middle of a fetch so that if credentials change 
+    // during a fetch we don't destroy the service out from under ourselves.
+    currentlyFetching_ = YES;
+    NSURL* docURL
+      = [NSURL URLWithString:kGDataGoogleDocsDefaultPrivateFullFeed];
+    serviceTicket_
+      = [[docService_ fetchDocsFeedWithURL:docURL
+                                  delegate:self
+                         didFinishSelector:@selector(serviceTicket:
+                                                     finishedWithObject:)
+                           didFailSelector:@selector(serviceTicket:
+                                                     failedWithError:)]
+         retain];
   }
-
-  // Mark us as in the middle of a fetch so that if credentials change during
-  // a fetch we don't destroy the service out from under ourselves.
-  currentlyFetching_ = YES;
-  NSURL* docURL = [NSURL URLWithString:kGDataGoogleDocsDefaultPrivateFullFeed];
-  serviceTicket_
-    = [[docService_ fetchDocsFeedWithURL:docURL
-                                delegate:self
-                       didFinishSelector:@selector(serviceTicket:finishedWithObject:)
-                         didFailSelector:@selector(serviceTicket:failedWithError:)]
-       retain];
-  }
+}
 
 - (void)setUpPeriodicRefresh {
-  // if we are already running the scheduled check, we are done.
-  if ([updateTimer_ isValid])
-    return;
-  [updateTimer_ release];
-  updateTimer_ = [[NSTimer scheduledTimerWithTimeInterval:(60 * 60)
-                                                   target:self
-                                                 selector:@selector(refreshDocs:)
-                                                 userInfo:nil
-                                                  repeats:YES] retain];
+  // Kick off a timer if one is not already running.
+  if (![updateTimer_ isValid]) {
+    [updateTimer_ release];
+    updateTimer_
+      = [[NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds
+                                          target:self
+                                        selector:@selector(refreshDocs:)
+                                        userInfo:nil
+                                         repeats:YES] retain];
+  }
 }
 
 - (void)refreshDocs:(NSTimer*)timer {
   [self startAsynchronousDocsListFetch];
 }
 
-- (void)loginCredentialsChanged:(id)object {
-  if ([accountIdentifier_ isEqualToString:object]) {
-    // Make sure we aren't in the middle of waiting for results; if we are, try
-    // again later instead of changing things in the middle of the fetch.
-    if (currentlyFetching_) {
-      [self performSelector:@selector(loginCredentialsChanged:)
-                 withObject:nil
-                 afterDelay:60.0];
-      return;
-    }
-    // Clear the service so that we make a new one with the correct credentials.
-    [serviceTicket_ release];
-    serviceTicket_ = nil;
-    [docService_ release];
-    docService_ = nil;
-    // If the login changes, we should update immediately, and make sure the
-    // periodic refresh is enabled (it would have been shut down if the previous
-    // credentials were incorrect).
-    [self startAsynchronousDocsListFetch];
-    [self setUpPeriodicRefresh];
+- (void)loginCredentialsChanged:(NSNotification *)notification {
+  id <HGSAccount> account = [notification object];
+  HGSAssert(account == account_, @"Notification from bad account!");
+  
+  // Make sure we aren't in the middle of waiting for results; if we are, try
+  // again later instead of changing things in the middle of the fetch.
+  if (currentlyFetching_) {
+    [self performSelector:@selector(loginCredentialsChanged:)
+               withObject:notification
+               afterDelay:60.0];
+    return;
   }
+  // Clear the service so that we make a new one with the correct credentials.
+  [serviceTicket_ release];
+  serviceTicket_ = nil;
+  [docService_ release];
+  docService_ = nil;
+  // If the login changes, we should update immediately, and make sure the
+  // periodic refresh is enabled (it would have been shut down if the previous
+  // credentials were incorrect).
+  [self startAsynchronousDocsListFetch];
+  [self setUpPeriodicRefresh];
 }
 
 - (void)serviceTicket:(GDataServiceTicket *)ticket
@@ -207,25 +219,54 @@ static NSString* const kDocCategoryPresentation = @"presentation";
 - (void)serviceTicket:(GDataServiceTicket *)ticket
       failedWithError:(NSError *)error {
    currentlyFetching_ = NO;
-  if ([error code] == 403) {
+  NSInteger errorCode = [error code];
+  if (errorCode == kGDataBadAuthentication) {
     // If the login credentials are bad, don't keep trying.
     [updateTimer_ invalidate];
+    // Tickle the account so that if the preferences window is showing
+    // the user will see the proper account status.
+    [account_ authenticate];
   }
-  KeychainItem* keychainItem
-    = [KeychainItem keychainItemForService:accountIdentifier_
+  KeychainItem* keychainItem 
+    = [KeychainItem keychainItemForService:[account_ identifier]
                                   username:nil];
-  NSString *username = [keychainItem username];
+  NSString *userName = [keychainItem username];
+  NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
+  NSTimeInterval timeSinceLastErrorReport
+    = currentTime - previousErrorReportingTime_;
+  if (timeSinceLastErrorReport > kErrorReportingInterval) {
+    previousErrorReportingTime_ = currentTime;
+    NSString *errorSummary
+      = HGSLocalizedString(@"Google Docs fetch problem.", nil);
+    NSString *errorString = nil;
+    if (errorCode == kGDataBadAuthentication) {
+      NSString *errorFormat
+        = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
+                             @"password.", nil);
+      errorString = [NSString stringWithFormat:errorFormat,
+                               userName];
+      
+    } else {
+      NSString *errorFormat = HGSLocalizedString(@"Fetch for '%@' failed. (%d)",
+                                                 nil);
+      errorString = [NSString stringWithFormat:errorFormat,
+                     userName, [error code]];
+    }
+    NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    NSDictionary *messageDict
+      = [NSDictionary dictionaryWithObjectsAndKeys:
+         errorSummary, kHGSSummaryMessageKey,
+         errorString, kHGSDescriptionMessageKey,
+         successCode, kHGSSuccessCodeMessageKey,
+         nil];
+    [nc postNotificationName:kHGSUserMessageNotification 
+                      object:self
+                    userInfo:messageDict];
+  }
   HGSLogDebug(@"HGSGoogleDocSource doc fetcher failed: error=%d, "
-              @"username=%@.",
-              [error code], username);
-  NSDictionary *noteDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                            kHGSExtensionIdentifierKey, [self identifier],
-                            kHGSAccountUsernameKey, username,
-                            kHGSAccountConnectionErrorKey, error,
-                            nil];
-  NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
-  [defaultCenter postNotificationName:kHGSAccountConnectionFailureNotification 
-                               object:noteDict];
+              @"userName=%@.",
+              [error code], userName);
 }
 
 #pragma mark -
@@ -266,11 +307,12 @@ static NSString* const kDocCategoryPresentation = @"presentation";
   
   // See if there's an intervening folder.
   KeychainItem* keychainItem 
-    = [KeychainItem keychainItemForService:accountIdentifier_
+    = [KeychainItem keychainItemForService:[account_ identifier]
                                   username:nil];
+  NSString *userName = [keychainItem username];
   NSString *folderScheme = [kGDataNamespaceDocuments
                             stringByAppendingFormat:@"/folders/%@",
-                            [keychainItem username]];
+                            userName];
   NSArray *folders = [GDataCategory categoriesWithScheme:folderScheme
                                           fromCategories:[doc categories]];
   if (folders && [folders count]) {
@@ -307,12 +349,12 @@ static NSString* const kDocCategoryPresentation = @"presentation";
       icon, kHGSObjectAttributeIconKey,
       nil];
   NSString *docTitleWithAccount = [docTitle stringByAppendingFormat:@" (%@)",
-                                   accountName_];
-  HGSObject* result = [HGSObject objectWithIdentifier:docURL
-                                                 name:docTitleWithAccount
-                                                 type:kHGSTypeWebpage
-                                               source:self
-                                           attributes:attributes];
+                                   userName_];
+  HGSResult* result = [HGSResult resultWithURL:docURL
+                                          name:docTitleWithAccount
+                                          type:kHGSTypeWebpage
+                                        source:self
+                                    attributes:attributes];
   
   // Also get author names and address, and store those as non-title-match data.
   NSArray* authorArray = [self authorArrayForGDataPeople:[doc authors]];
@@ -351,19 +393,15 @@ static NSString* const kDocCategoryPresentation = @"presentation";
 #pragma mark HGSAccountClientProtocol Methods
 
 - (BOOL)accountWillBeRemoved:(id<HGSAccount>)account {
-  BOOL removeMe = NO;
-  NSString *accountIdentifier = [account identifier];
-  if ([accountIdentifier_ isEqualToString:accountIdentifier]) {
-    if (currentlyFetching_) {
-      [serviceTicket_ cancelTicket];
-    }
-    [serviceTicket_ release];
-    serviceTicket_ = nil;
-    [docService_ release];
-    docService_ = nil;
-    removeMe = YES;
+  HGSAssert(account == account_, @"Notification from bad account!");
+  if (currentlyFetching_) {
+    [serviceTicket_ cancelTicket];
   }
-  return removeMe;
+  [serviceTicket_ release];
+  serviceTicket_ = nil;
+  [docService_ release];
+  docService_ = nil;
+  return YES;
 }
 
 @end

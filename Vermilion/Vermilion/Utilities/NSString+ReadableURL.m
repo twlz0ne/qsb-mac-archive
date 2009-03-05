@@ -37,7 +37,7 @@
 
 // NOTE: NSURL+DisplayHelpers in shared is similiar to this.
 - (NSString*)readableURLString {
-  NSMutableString* readableURL = [[self mutableCopy] autorelease];
+  NSMutableString* readableURL = [NSMutableString stringWithString:self];
 
   // 1. remove "http://"
   if ([readableURL hasPrefix:@"http://"]) {

@@ -38,7 +38,7 @@
 + (NSString *)stringByLowercasingAndStrippingDiacriticals:(NSString *)str {
   if (![str length]) return [[str copy] autorelease];
   
-  NSString *mutableStr = [[str mutableCopy] autorelease];
+  NSMutableString *mutableStr = [NSMutableString stringWithString:str];
 
   if (mutableStr) {
     

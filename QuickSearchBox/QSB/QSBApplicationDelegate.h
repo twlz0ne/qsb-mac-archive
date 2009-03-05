@@ -33,15 +33,17 @@
 
 #import <Cocoa/Cocoa.h>
 #import <Carbon/Carbon.h>
+#import <Growl/Growl.h>
 #import "GTMDefines.h"
 
 @class QSBSearchWindowController;
 @class QSBPreferenceWindowController;
 @class QSBHGSDelegate;
+@class QSBUserMessenger;
 
 extern NSString *const kQSBBeenLaunchedPrefKey;
 
-@interface QSBApplicationDelegate : NSObject {
+@interface QSBApplicationDelegate : NSObject <GrowlApplicationBridgeDelegate> {
  @private
   IBOutlet NSMenu *statusItemMenu_;
   IBOutlet NSMenu *dockMenu_;
@@ -59,6 +61,7 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
   QSBPreferenceWindowController *prefsWindowController_;
   QSBHGSDelegate *hgsDelegate_;
   NSArray *plugins_;  // All available plug-in modules, enabled or not.
+  QSBUserMessenger *userMessenger_;
 }
 
 // Manage our application preferences.
@@ -97,6 +100,14 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
 
 // Returns the accounts.
 - (NSArray *)accounts;
+
+// Returns YES if the user wants us to report messages using Growl
+// and Growl is active.
+- (BOOL)useGrowl;
+- (void)setUseGrowl:(BOOL)value;
+
+// Returns YES if Growl is available.
+- (BOOL)growlIsInstalledAndRunning;
 
 @end
 

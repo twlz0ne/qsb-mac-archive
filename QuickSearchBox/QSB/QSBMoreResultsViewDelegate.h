@@ -32,14 +32,10 @@
 
 #import "QSBResultsViewBaseController.h"
 
-@class QSBQuery;
-
 // A controller that manages the view-based 'More' results view.
 //
 @interface QSBMoreResultsViewDelegate : QSBResultsViewBaseController {
- @private
-  IBOutlet QSBQuery *query_;
-  
+ @private  
   // The results we are presenting.
   NSArray *moreResults_;
   NSArray *sortedCategoryNames_;

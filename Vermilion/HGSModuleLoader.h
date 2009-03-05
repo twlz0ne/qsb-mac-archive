@@ -73,6 +73,7 @@
 
 @protocol HGSExtension;
 @protocol HGSDelegate;
+@class HGSCodeSignature;
 
 @interface HGSModuleLoader : NSObject {
  @private
@@ -82,7 +83,14 @@
   // to instantiate. This allows us to extend Vermiliion to accept other
   // types of plugins like (.py) or (.scpt) and have those act
   // as real plugins.
-  NSMutableDictionary *extensionMap_;  
+  NSMutableDictionary *extensionMap_;
+  
+  // The code signature on the executable hosting this framework
+  HGSCodeSignature *executableSignature_;
+  
+  // A dictionary containing the whitelist of untrusted-but-OK'd-by-the-user
+  // plugins. The whitelist is stored in persistent form in an encrypted file.
+  NSMutableDictionary *pluginSignatureInfo_;
 }
 
 // Return the shared module Loader.
@@ -93,7 +101,7 @@
 
 // Given a path to a folder where modules may live, identify all modules and
 // their sources and actions, and return them as mutable plugins.
-- (NSArray *)loadPluginsAtPath:(NSString*)pluginsPath;
+- (void)loadPluginsAtPath:(NSString*)pluginsPath errors:(NSArray **)errors;
 - (BOOL)extendPoint:(NSString *)extensionPointID
          withObject:(id<HGSExtension>)extension;
 
@@ -101,3 +109,17 @@
 - (void)setDelegate:(id<HGSDelegate>)delegate;
 
 @end
+
+// Keys for the error dictionaries for the loadPluginsAtPath:errors: method
+// Path of the failed plugin (NSString)
+extern NSString *const kHGSModuleLoaderPluginPathKey;
+// Reason for failure (NSString)
+extern NSString *const kHGSModuleLoaderPluginFailureKey;
+// Failed because it wasn't certified
+extern NSString *const kHGSModuleLoaderPluginFailedCertification;
+// Failed because it's API version was incorrect
+extern NSString *const kHGSModuleLoaderPluginFailedAPICheck;
+// Failed because unable to instantiate
+extern NSString *const kHGSModuleLoaderPluginFailedInstantiation;
+// Failed because we don't recognize the type of the plugin
+extern NSString *const kHGSModuleLoaderPluginFailedUnknownPluginType;

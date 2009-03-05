@@ -42,15 +42,15 @@
 
 - (void)testInit {
   STAssertNil([[[HGSQuery alloc] initWithString:nil
-                                    pivotObject:nil
+                                        results:nil
                                      queryFlags:0] autorelease],
               nil);
   STAssertNotNil([[[HGSQuery alloc] initWithString:@""
-                                       pivotObject:nil
+                                           results:nil
                                         queryFlags:0] autorelease],
                  nil);
   STAssertNotNil([[[HGSQuery alloc] initWithString:@"a"
-                                       pivotObject:nil
+                                           results:nil
                                         queryFlags:0] autorelease],
                  nil);
 }
@@ -65,7 +65,7 @@
   
   // empty
   query = [[[HGSQuery alloc] initWithString:@""
-                                pivotObject:nil
+                                    results:nil
                                  queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"", nil);
@@ -75,7 +75,7 @@
   
   // white space
   query = [[[HGSQuery alloc] initWithString:@"  "
-                                pivotObject:nil
+                                    results:nil
                                  queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"  ", nil);
@@ -85,7 +85,7 @@
   
   // one word
   query = [[[HGSQuery alloc] initWithString:@"a"
-                                pivotObject:nil
+                                    results:nil
                                  queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a", nil);
@@ -95,7 +95,7 @@
   
   // word repeated
   query = [[[HGSQuery alloc] initWithString:@"a A"
-                                pivotObject:nil
+                                    results:nil
                                  queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a A", nil);
@@ -104,7 +104,7 @@
   STAssertEqualObjects([query uniqueWords], expectedWords, nil);
   
   query = [[[HGSQuery alloc] initWithString:@"a B"
-                                pivotObject:nil
+                                    results:nil
                                  queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a B", nil);
@@ -114,7 +114,7 @@
   
   // word repeated and another word
   query = [[[HGSQuery alloc] initWithString:@"a a b"
-                                pivotObject:nil
+                                    results:nil
                                  queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a a b", nil);
@@ -124,7 +124,7 @@
   
   // two words and a phrase
   query = [[[HGSQuery alloc] initWithString:@"a \"b c\" d"
-                                pivotObject:nil
+                                    results:nil
                                  queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a \"b c\" d", nil);
@@ -134,7 +134,7 @@
   
   // two words and a phrase that isn't closed
   query = [[[HGSQuery alloc] initWithString:@"a d \"b c"
-                                pivotObject:nil
+                                    results:nil
                                  queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a d \"b c", nil);
@@ -144,7 +144,7 @@
   
   // an empty phrase, unclosed
   query = [[[HGSQuery alloc] initWithString:@"\""
-                                pivotObject:nil
+                                    results:nil
                                  queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"\"", nil);
@@ -154,7 +154,7 @@
   
   // an empty phrase
   query = [[[HGSQuery alloc] initWithString:@"\" \""
-                                pivotObject:nil
+                                    results:nil
                                  queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"\" \"", nil);
@@ -164,7 +164,7 @@
   
   // some words, phrase and some random punct and numbers
   query = [[[HGSQuery alloc] initWithString:@"a1 23 a-d% \"b$c"
-                                pivotObject:nil
+                                    results:nil
                                  queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query rawQueryString], @"a1 23 a-d% \"b$c", nil);
@@ -180,11 +180,11 @@
   HGSQuery *query2;
   
   query1 = [[[HGSQuery alloc] initWithString:@"abc"
-                                 pivotObject:nil
+                                     results:nil
                                   queryFlags:0] autorelease];
   STAssertNotNil(query1, nil);
   query2 = [[[HGSQuery alloc] initWithString:@"xyz"
-                                 pivotObject:nil
+                                     results:nil
                                   queryFlags:0] autorelease];
   STAssertNotNil(query2, nil);
   

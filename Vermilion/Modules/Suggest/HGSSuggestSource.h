@@ -51,7 +51,7 @@
   NSString *suggestBaseUrl_;
   // Stores the last full result returned by the source. Does not get set
   // for partial results such as those derived from a previous query.
-  NSArray *lastResult_;  // Array of HGSObject's
+  NSArray *lastResult_;  // Array of HGSResult's
   // Operation queue
   BOOL isReady_;
   BOOL continueRunning_;

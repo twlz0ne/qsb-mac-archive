@@ -31,27 +31,29 @@
 
 #import "HGSSimpleAccount.h"
 #import "HGSAccountsExtensionPoint.h"
+#import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
+#import "HGSBundle.h"
 #import "KeychainItem.h"
 
 
-@interface HGSSimpleAccount (HGSSimpleAccountPrivateMethods)
+@interface HGSSimpleAccount ()
 
 // Retrieve the keychain item for our keychain service name, if any.
 - (KeychainItem *)keychainItem;
-
-// Sets our edit controller.
-- (void)setAccountEditController:(HGSSimpleAccountEditController *)controller;
 
 // Finalize the account editing.
 - (void)accountSheetDidEnd:(NSWindow *)sheet
                 returnCode:(int)returnCode
                contextInfo:(void *)contextInfo;
 
+@property (nonatomic, retain, readwrite)
+  HGSSimpleAccountEditController *accountEditController;
+
 @end
 
 
-@interface HGSSetUpSimpleAccountViewController (HGSSetUpSimpleAccountViewControllerPrivateMethods)
+@interface HGSSetUpSimpleAccountViewController ()
 
 - (void)presentMessageOffWindow:(NSWindow *)parentWindow
                     withSummary:(NSString *)summary
@@ -64,60 +66,17 @@
 @implementation HGSSimpleAccount
 
 @synthesize accountEditController = accountEditController_;
-
-- (id)initWithName:(NSString *)accountName
-          password:(NSString *)password
-              type:(NSString *)type {
-  // Perform any adjustments on the account name required.
-  accountName = [self adjustAccountName:accountName];
-  
-  if ((self = [super initWithName:accountName
-                         password:password
-                             type:type])) {
-    NSString *keychainServiceName = [self identifier];
-    
-    // See if we already have a keychain item from which we can pull
-    // the password, ignoring any password that's being passed in because
-    // this will only be the case for prior existing accounts.
-    // TODO(mrossetti): Is it possible to be passed a password if there
-    // already is a keychain item?  Make sure it's not.
-    KeychainItem *keychainItem = [self keychainItem];
-    NSString *keychainPassword = [keychainItem password];
-    if ([keychainPassword length]) {
-      password = keychainPassword;
-    }
-    
-    // Test this account to see if we can connect.
-    BOOL authenticated = [self authenticateWithPassword:password];
-    if (authenticated) {
-      if (!keychainItem) {
-        // If necessary, create the keychain entry now.
-        [KeychainItem addKeychainItemForService:keychainServiceName
-                                   withUsername:accountName
-                                       password:password]; 
-      }
-      [self setIsAuthenticated:YES];
-    } else {
-      [self setIsAuthenticated:NO];
-    }
-  }
-  return self;
-}
+@synthesize connection = connection_;
 
 - (id)initWithDictionary:(NSDictionary *)prefDict {
   if ((self = [super initWithDictionary:prefDict])) {
-    NSString *keychainServiceName = [self identifier];
     if ([self keychainItem]) {
-      NSString *desiredAccountType = [self accountType];
-      if (![[self accountType] isEqualToString:desiredAccountType]) {
-        HGSLogDebug(@"Expected account type '%@' for account '%@' "
-                    @"but got '%@' instead", 
-                    desiredAccountType, [self accountName],
-                    [self accountType]);
-        [self release];
-        self = nil;
-      }
+      // We assume the account is still available but will soon be
+      // authenticated (for sources that index) or as soon as an action
+      // using the account is attempted.
+      [self setAuthenticated:YES];
     } else {
+      NSString *keychainServiceName = [self identifier];
       HGSLogDebug(@"No keychain item found for service name '%@'", 
                   keychainServiceName);
       [self release];
@@ -128,6 +87,7 @@
 }
 
 - (void)dealloc {
+  [self setConnection:nil];
   [accountEditController_ release];
   [super dealloc];
 }
@@ -150,33 +110,42 @@
 }
 
 - (void)remove {
-  NSString *keychainServiceName = [self identifier];
-  KeychainItem *item = [KeychainItem keychainItemForService:keychainServiceName 
-                                                   username:nil];
-  [item removeFromKeychain];
+  KeychainItem *keychainItem = [self keychainItem];
+  [keychainItem removeFromKeychain];
   [super remove];
 }
 
-- (NSString *)accountPassword {
+- (NSString *)password {
   // Retrieve the account's password from the keychain.
   KeychainItem *keychainItem = [self keychainItem];
   NSString *password = [keychainItem password];
   return password;
 }
 
-+ (NSView *)accountSetupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
++ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
   HGSLogDebug(@"Class '%@', deriving from HGSSimpleAccount, should override "
               @"accountSetupViewToInstallWithParentWindow.", [self class]);
   return nil;
 }
 
-- (void)setAccountPassword:(NSString *)password {
-  KeychainItem *keychainItem = [self keychainItem];
-  if (keychainItem) {
-    [keychainItem setUsername:[self accountName]
-                     password:password];
+- (BOOL)setPassword:(NSString *)password {
+  // Don't update the keychain unless we have a good password.
+  BOOL passwordSet = NO;
+  if ([self authenticateWithPassword:password]) {
+    KeychainItem *keychainItem = [self keychainItem];
+    if (keychainItem) {
+      [keychainItem setUsername:[self userName]
+                       password:password];
+    } else {
+      NSString *keychainServiceName = [self identifier];
+      [KeychainItem addKeychainItemForService:keychainServiceName
+                                 withUsername:[self userName]
+                                     password:password]; 
+    }
+    [super setPassword:password];
+    passwordSet = YES;
   }
-  [self authenticateWithPassword:password];
+  return passwordSet;
 }
 
 - (void)editWithParentWindow:(NSWindow *)parentWindow {
@@ -196,8 +165,8 @@
   }
 }
 
-- (NSString *) adjustAccountName:(NSString *)accountName {
-  return accountName;
+- (NSString *)adjustUserName:(NSString *)userName {
+  return userName;
 }
 
 - (NSString *)editNibName {
@@ -206,28 +175,50 @@
   return nil;
 }
 
-- (BOOL)authenticateWithPassword:(NSString *)password {
-  // Test this account to see if we can connect.
-  BOOL authenticated = YES;
-  [self setIsAuthenticated:authenticated];
-  return authenticated;
+- (void)authenticate {
+  NSURLRequest *accountRequest = [self accountURLRequest];
+  if (accountRequest) {
+    NSURLConnection *connection
+      = [NSURLConnection connectionWithRequest:accountRequest delegate:self];
+    [self setConnection:connection];
+  }
 }
 
-@end
+- (BOOL)authenticateWithPassword:(NSString *)password {
+  return YES;
+}
 
+- (NSURLRequest *)accountURLRequest {
+  KeychainItem* keychainItem 
+  = [KeychainItem keychainItemForService:[self identifier] 
+                                username:nil];
+  NSString *userName = [keychainItem username];
+  NSString *password = [keychainItem password];
+  NSURLRequest *accountRequest = [self accountURLRequestForUserName:userName
+                                                           password:password];
+  return accountRequest;
+}
 
-@implementation HGSSimpleAccount (HGSSimpleAccountPrivateMethods)
+- (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
+                                      password:(NSString *)password {
+  HGSLog(@"Class '%@' should override accountURLRequestForUserName:"
+         @"password:.", [self className]);
+  return nil;
+}
+
+- (void)setConnection:(NSURLConnection *)connection {
+  [connection_ cancel];
+  [connection_ release];
+  connection_ = [connection retain];
+}
+
+#pragma mark HGSSimpleAccount Private Methods
 
 - (KeychainItem *)keychainItem {
   NSString *keychainServiceName = [self identifier];
   KeychainItem *item = [KeychainItem keychainItemForService:keychainServiceName 
                                                    username:nil];
   return item;
-}
-
-- (void)setAccountEditController:(HGSSimpleAccountEditController *)controller {
-  [accountEditController_ autorelease];
-  accountEditController_ = [controller retain];
 }
 
 - (void)accountSheetDidEnd:(NSWindow *)sheet
@@ -237,22 +228,47 @@
   [self setAccountEditController:nil];
 }
 
+#pragma mark NSURLConnection Delegate Methods
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+  HGSAssert(connection == connection_, nil);
+  [self setConnection:nil];
+  [self setAuthenticated:YES];
+}
+
+- (void)connection:(NSURLConnection *)connection 
+didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+  HGSAssert(connection == connection_, nil);
+  [self setAuthenticated:NO];
+}
+
+- (void)connection:(NSURLConnection *)connection
+  didFailWithError:(NSError *)error {
+  HGSAssert(connection == connection_, nil);
+  [self setConnection:nil];
+  [self setAuthenticated:NO];
+}
+
 @end
 
 
 @implementation HGSSimpleAccountEditController
 
-@synthesize accountPassword = accountPassword_;
+@synthesize password = password_;
 
 - (void)dealloc {
-  [accountPassword_ release];
+  [password_ release];
   [super dealloc];
 }
 
 - (void)awakeFromNib {
   [account_ setAccountEditController:self];
-  NSString *password = [account_ accountPassword];
-  [self setAccountPassword:password];
+  NSString *password = [account_ password];
+  [self setPassword:password];
+}
+
+- (HGSSimpleAccount *)account {
+  return [[account_ retain] autorelease];
 }
 
 - (NSWindow *)editAccountSheet {
@@ -260,28 +276,24 @@
 }
 
 - (IBAction)acceptEditAccountSheet:(id)sender {
-  NSWindow *sheet = [sender window];
-  // The password field (NSSecureTextField) fails to stop editing regardless
-  // of xib setting, validateImmediately, so we must force it to validate
-  // and refresh the bound instance variable to prevent stale data when
-  // authenticating.
-  [editPasswordField_ selectText:self];  // Force password to freshen.
-  [account_ setAccountPassword:[self accountPassword]];
+  NSWindow *sheet = [self window];
+  BOOL passwordWasSet = [account_ setPassword:[self password]];
   // See if the new password authenticates.
-  if ([account_ isAuthenticated]) {
+  if (passwordWasSet) {
     [NSApp endSheet:sheet];
-  } else {
-    NSString *summaryFormat = NSLocalizedString(@"Could not set up that %@ "
+    [account_ setAuthenticated:YES];
+  } else if (![self canGiveUserAnotherTry]) {
+    NSString *summaryFormat = HGSLocalizedString(@"Could not set up that %@ "
                                                 @"account.", nil);
     NSString *summary = [NSString stringWithFormat:summaryFormat,
-                         [account_ accountType]];
+                         [account_ type]];
     NSString *explanationFormat
-      = NSLocalizedString(@"The %@ account ‘%@’ could not be set up for "
-                          @"use.  Please insure that you have used the "
-                          @"correct password.", nil);
+      = HGSLocalizedString(@"The %@ account ‚Äò%@‚Äô could not be set up for "
+                          @"use.  Please check your password and try "
+                          @"again.", nil);
     NSString *explanation = [NSString stringWithFormat:explanationFormat,
-                             [account_ accountType],
-                             [account_ accountName]];
+                             [account_ type],
+                             [account_ userName]];
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
     [alert setAlertStyle:NSWarningAlertStyle];
     [alert setMessageText:summary];
@@ -298,11 +310,16 @@
   [NSApp endSheet:sheet returnCode:NSAlertSecondButtonReturn];
 }
 
+- (BOOL)canGiveUserAnotherTry {
+  return NO;
+}
+
 @end
 
 
 @implementation HGSSetUpSimpleAccountViewController
 
+@synthesize account = account_;
 @synthesize accountName = accountName_;
 @synthesize accountPassword = accountPassword_;
 
@@ -328,50 +345,62 @@
   return self;
 }
 
+- (void)dealloc {
+  [account_ release];
+  [accountName_ release];
+  [accountPassword_ release];
+  [super dealloc];
+}
+
+
 - (NSWindow *)parentWindow {
   return parentWindow_;
 }
 
 - (void)setParentWindow:(NSWindow *)parentWindow {
   parentWindow_ = parentWindow;
+  // This call also gives us an opportunity to flush some old settings
+  // from the previous use.
+  [self setAccount:nil];
+  [self setAccountName:nil];
+  [self setAccountPassword:nil];
 }
 
 - (IBAction)acceptSetupAccountSheet:(id)sender {
   NSWindow *sheet = [sender window];
-  NSString *accountName = [self accountName];
-  if ([accountName length] > 0) {
-    // The password field (NSSecureTextField) fails to stop editing regardless
-    // of xib setting, validateImmediately, so we must force it to validate
-    // and refresh the bound instance variable to prevent stale data when
-    // authenticating.
-    [setupPasswordField_ selectText:self];  // Force password to freshen.
-    // Create the new account entry.
-    NSString *accountType = [accountTypeClass_ accountType];
-    
-    HGSSimpleAccount *newAccount
-      = [[[accountTypeClass_ alloc] initWithName:accountName
-                                        password:[self accountPassword]
-                                            type:accountType]
-         autorelease];
-    
-    // Update the account name in case initWithName: adjusted it.
-    NSString *revisedAccountName = [newAccount accountName];
-    if ([revisedAccountName length]) {
-      accountName = revisedAccountName;
-      [self setAccountName:accountName];
+  NSString *userName = [self accountName];
+  if ([userName length] > 0) {
+    NSString *password = [self accountPassword];
+    HGSSimpleAccount *newAccount = [self account];
+    if (newAccount) {
+      [newAccount setUserName:userName];
+    } else {
+      // Create the new account entry.
+      NSString *accountType = [accountTypeClass_ accountType];
+      newAccount = [[[accountTypeClass_ alloc] initWithName:userName
+                                                       type:accountType]
+                    autorelease];
+      [self setAccount:newAccount];
+
+      // Update the account name in case initWithName: adjusted it.
+      NSString *revisedAccountName = [newAccount userName];
+      if ([revisedAccountName length]) {
+        userName = revisedAccountName;
+        [self setAccountName:userName];
+      }
     }
+    
     BOOL isGood = YES;
     
     // Make sure we don't already have this account registered.
     NSString *accountIdentifier = [newAccount identifier];
-    HGSAccountsExtensionPoint *accountsExtensionPoint
-      = [HGSAccountsExtensionPoint accountsExtensionPoint];
-    if ([accountsExtensionPoint extensionWithIdentifier:accountIdentifier]) {
+    HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
+    if ([accountsPoint extensionWithIdentifier:accountIdentifier]) {
       isGood = NO;
-      NSString *summary = NSLocalizedString(@"Account already set up.",
+      NSString *summary = HGSLocalizedString(@"Account already set up.",
                                             nil);
       NSString *format
-        = NSLocalizedString(@"The account ‘%@’ has already been set up for "
+        = HGSLocalizedString(@"The account ‚Äò%@‚Äô has already been set up for "
                             @"use in Quick Search Box.", nil);
       [self presentMessageOffWindow:sheet
                         withSummary:summary
@@ -381,62 +410,77 @@
     
     // Authenticate the account.
     if (isGood) {
-      isGood = [newAccount isAuthenticated];
-      if (!isGood) {
-        NSString *summary = NSLocalizedString(@"Could not authenticate that "
+      isGood = [newAccount authenticateWithPassword:password];
+      [newAccount setAuthenticated:isGood];
+      if (isGood) {
+        // If there is not already a keychain item create one.  If there is
+        // then update the password.
+        KeychainItem *keychainItem = [newAccount keychainItem];
+        if (keychainItem) {
+          [keychainItem setUsername:userName
+                           password:password];
+        } else {
+          NSString *keychainServiceName = [newAccount identifier];
+          [KeychainItem addKeychainItemForService:keychainServiceName
+                                     withUsername:userName
+                                         password:password]; 
+        }
+
+        // Install the account.
+        isGood = [accountsPoint extendWithObject:newAccount];
+        if (isGood) {
+          [NSApp endSheet:sheet];
+          NSString *summary
+            = HGSLocalizedString(@"Enable searchable items for this account.",
+                                                nil);
+          NSString *format
+            = HGSLocalizedString(@"One or more search sources may have been "
+                                @"added for the account '%@'. It may be "
+                                @"necessary to manually enable each search "
+                                @"source that uses this account.  Do so via "
+                                @"the 'Searchable Items' tab in Preferences.",
+                                nil);
+          [self presentMessageOffWindow:[self parentWindow]
+                            withSummary:summary
+                      explanationFormat:format
+                             alertStyle:NSInformationalAlertStyle];
+          
+          [self setAccountName:nil];
+          [self setAccountPassword:nil];
+        } else {
+          HGSLogDebug(@"Failed to install account extension for account '%@'.",
+                      userName);
+        }
+      } else if (![self canGiveUserAnotherTryOffWindow:sheet]) {
+        // If we can't help the user fix things, tell them they've got
+        // something wrong.
+        NSString *summary = HGSLocalizedString(@"Could not authenticate that "
                                               @"account.", nil);
         NSString *format
-          = NSLocalizedString(@"The account ‘%@’ could not be authenticated.  "
-                              @"Please insure that you have used the correct "
-                              @"account name and password.", nil);
+          = HGSLocalizedString(@"The account ‚Äò%@‚Äô could not be authenticated. "
+                              @"Please check the account name and password "
+                              @"and try again.", nil);
         [self presentMessageOffWindow:sheet
                           withSummary:summary
                     explanationFormat:format
                            alertStyle:NSWarningAlertStyle];
       }
     }
-    
-    if (isGood) {
-      isGood = [accountsExtensionPoint extendWithObject:newAccount];
-      if (!isGood) {
-        HGSLogDebug(@"Failed to install account extension for account '%@'.",
-                    accountName);
-      }
-    }
-    
-    if (isGood) {
-      [NSApp endSheet:sheet];
-      NSString *summary = NSLocalizedString(@"Enable searchable items for this account.",
-                                            nil);
-      NSString *format
-        = NSLocalizedString(@"One or more search sources may have been added "
-                            @"for the account '%@'. It may be necessary to "
-                            @"manually enable each search source that uses "
-                            @"this account.  Do so via the 'Searchable Items' "
-                            @"tab in Preferences.", nil);
-      [self presentMessageOffWindow:[self parentWindow]
-                        withSummary:summary
-                  explanationFormat:format
-                         alertStyle:NSInformationalAlertStyle];
-      
-      [self setAccountName:nil];
-      [self setAccountPassword:nil];
-    }
   }
 }
 
 - (IBAction)cancelSetupAccountSheet:(id)sender {
   [self setAccountName:nil];
-  [setupPasswordField_ selectText:self];  // Force password to freshen.
   [self setAccountPassword:nil];
   NSWindow *sheet = [sender window];
   [NSApp endSheet:sheet];
 }
 
-@end
+- (BOOL)canGiveUserAnotherTryOffWindow:(NSWindow *)window {
+  return NO;
+}
 
-
-@implementation HGSSetUpSimpleAccountViewController (HGSSetUpSimpleAccountViewControllerPrivateMethods)
+#pragma mark HGSSetUpSimpleAccountViewController Private Methods
 
 - (void)presentMessageOffWindow:(NSWindow *)parentWindow
                     withSummary:(NSString *)summary

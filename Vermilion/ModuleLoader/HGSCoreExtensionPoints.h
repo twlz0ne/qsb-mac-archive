@@ -34,15 +34,21 @@
 
 #import "HGSExtensionPoint.h"
 
+@class HGSAccountsExtensionPoint;
+
 extern NSString* const kHGSActionsExtensionPoint;
 extern NSString* const kHGSSourcesExtensionPoint;
 extern NSString* const kHGSServicesExtensionPoint;
+extern NSString* const kHGSAccountsExtensionPoint;
+extern NSString* const kHGSPluginsExtensionPoint;
 
 @interface HGSExtensionPoint (HGSCoreExtensionPoints)
 
 // Some commonly used points
-+ (HGSExtensionPoint*)actionsPoint;
-+ (HGSExtensionPoint*)sourcesPoint;
-+ (HGSExtensionPoint*)servicesPoint;
++ (HGSExtensionPoint *)actionsPoint;
++ (HGSExtensionPoint *)sourcesPoint;
++ (HGSExtensionPoint *)servicesPoint;
++ (HGSExtensionPoint *)pluginsPoint;
++ (HGSAccountsExtensionPoint *)accountsPoint;
 
 @end

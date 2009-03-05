@@ -53,6 +53,11 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
   }
 }
 
+- (void)resetCompletion {
+  [self deleteCompletion];
+  lastCompletionRange_ = NSMakeRange(0,0);
+}
+
 - (BOOL)shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString {
   [self deleteCompletion];
   return [super shouldChangeTextInRange:affectedCharRange replacementString:replacementString];
@@ -71,8 +76,13 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
   NSArray *completions = [self completionsForPartialWordRange:range 
                                           indexOfSelectedItem:&idx];
   if ([completions count]) {
-    [self insertCompletion:[completions objectAtIndex:0]
-       forPartialWordRange:range movement:0 isFinal:YES];
+    NSString *completion = [completions objectAtIndex:0];
+    if ([completion length]) {
+      [self insertCompletion:completion
+         forPartialWordRange:range
+                    movement:0
+                     isFinal:YES];
+    }
   }
 }
 
@@ -127,7 +137,8 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
       wordCompletion = [completion substringWithRange:wordRange];
     }
   
-    if ([completion hasCaseInsensitivePrefix:[storage string]]) {
+    NSString *textFieldString = [storage string];
+    if ([completion hasCaseInsensitivePrefix:textFieldString]) {
       [storage replaceCharactersInRange:charRange withString:completion];
       lastCompletionRange_ = NSMakeRange(NSMaxRange(stringRange), 
                                          [completion length] - charRange.length);
@@ -144,6 +155,21 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
     [storage addAttribute:NSForegroundColorAttributeName 
                     value:[NSColor lightGrayColor] 
                     range:lastCompletionRange_];
+    // Allow ligatures but then beat them into submission over 
+    // the auto-completion.
+    if (lastCompletionRange_.location > 0 && lastCompletionRange_.length > 0) {
+      NSUInteger fullLength
+        = lastCompletionRange_.location + lastCompletionRange_.length;
+      NSRange ligatureRange = NSMakeRange(0, fullLength);
+      [storage addAttribute:NSLigatureAttributeName 
+                      value:[NSNumber numberWithInt:1] 
+                      range:ligatureRange];
+      // De-ligature over the typed/autocompleted transition.
+      ligatureRange = NSMakeRange(lastCompletionRange_.location - 1,2);
+      [storage addAttribute:NSLigatureAttributeName 
+                      value:[NSNumber numberWithInt:0] 
+                      range:ligatureRange];
+    }
     [storage endEditing];
     [self setSelectedRanges:selection];
   }
@@ -155,16 +181,16 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
 }
 
 - (BOOL)isAtEnd {
+  BOOL isatEnd = NO;
   NSRange range = [self selectedRange];
   if (range.length == 0) {
     if (lastCompletionRange_.location > 0) {
-      
-      return range.location == lastCompletionRange_.location; 
+      isatEnd = range.location >= lastCompletionRange_.location; 
     } else {
-      return range.location == [[self string] length]; 
+      isatEnd = range.location == [[self string] length]; 
     }
   }
-  return NO;
+  return isatEnd;
 }
 
 - (NSRange)removeCompletionIfNecessaryFromSelection:(NSRange)selection {

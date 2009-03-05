@@ -46,14 +46,16 @@ static NSString *const kHGSPicasawebFetchOperationAlbum
 static NSString *const kHGSPicasawebFetchOperationPhoto
   = @"HGSPicasawebFetchOperationPhoto";
 
-static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
+static const NSTimeInterval kRefreshSeconds = 3600.0;  // 60 minutes.
+static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 @interface PicasawebSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
   GDataServiceGooglePhotos *picasawebService_;
   NSMutableSet *activeTickets_;
   NSTimer *updateTimer_;
-  NSString *accountIdentifier_;
+  id <HGSAccount> account_;
+  NSTimeInterval previousErrorReportingTime_;
 }
 
 - (void)setUpPeriodicRefresh;
@@ -65,6 +67,10 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
 - (void)indexPhoto:(GDataEntryPhoto *)photo
          withAlbum:(GDataEntryPhotoAlbum *)album;
 
+// Utility function for reporting fetch errors.
+- (void)reportErrorForFetchType:(NSString *)fetchType
+                      errorCode:(NSInteger)errorCode;
+
 + (void)setBestFitThumbnailFromMediaGroup:(GDataMediaGroup *)mediaGroup
                              inAttributes:(NSMutableDictionary *)attributes;
 
@@ -74,7 +80,7 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
 @interface GDataMediaGroup (VermillionAdditions)
 
 // Choose the best fitting thumbnail for this media item for the given
-// |size|.
+// |bestSize|.
 - (GDataMediaThumbnail *)getBestFitThumbnailForSize:(CGSize)bestSize;
 
 @end
@@ -87,11 +93,9 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
     // Keep track of active tickets so we can cancel them if necessary.
     activeTickets_ = [[NSMutableSet set] retain];
     
-    id<HGSAccount> account
-      = [configuration objectForKey:kHGSExtensionAccountIdentifier];
-    accountIdentifier_ = [[account identifier] retain];
+    account_ = [[configuration objectForKey:kHGSExtensionAccount] retain];
 
-    if (accountIdentifier_) {
+    if (account_) {
       // Get album and photo metadata now, and schedule a timer to check
       // every so often to see if it needs to be updated.
       [self startAlbumInfoFetch];
@@ -101,8 +105,8 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
       NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
       [nc addObserver:self
              selector:@selector(loginCredentialsChanged:)
-                 name:kHGSDidChangeAccountNotification
-               object:nil];
+                 name:kHGSAccountDidChangeNotification
+               object:account_];
     } else {
       HGSLogDebug(@"Missing account identifier for HGSGoogleDocsSource '%@'",
                   [self identifier]);
@@ -122,8 +126,7 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
     [updateTimer_ invalidate];
   }
   [updateTimer_ release];
-  [accountIdentifier_ release];
-
+  [account_ release];
   [super dealloc];
 }
 
@@ -138,74 +141,75 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
 #pragma mark Album Fetching
 
 - (void)startAlbumInfoFetch {
-  if (!picasawebService_) {
-    KeychainItem* keychainItem
-      = [KeychainItem keychainItemForService:accountIdentifier_
+  if ([activeTickets_ count] == 0) {
+    KeychainItem* keychainItem 
+      = [KeychainItem keychainItemForService:[account_ identifier]
                                     username:nil];
-    if (!keychainItem ||
-        [[keychainItem username] length] == 0 ||
-        [[keychainItem password] length] == 0) {
-      // Can't do much without a login; invalidate so we stop trying (until
-      // we get a notification that the credentials have changed) and bail.
+    NSString *username = [keychainItem username];
+    NSString *password = [keychainItem password];
+    if (!picasawebService_ && username && password) {
+      picasawebService_ = [[GDataServiceGooglePhotos alloc] init];
+      [picasawebService_ setUserAgent:@"PicasawebSource"];
+      [picasawebService_ setUserCredentialsWithUsername:username
+                                               password:password];
+      [picasawebService_ setServiceShouldFollowNextLinks:YES];
+      [picasawebService_ setIsServiceRetryEnabled:YES];
+    } else {
       [updateTimer_ invalidate];
-      return;
     }
-    picasawebService_ = [[GDataServiceGooglePhotos alloc] init];
-    [picasawebService_ setUserAgent:@"PicasawebSource"];
-    [picasawebService_ setUserCredentialsWithUsername:[keychainItem username]
-                                       password:[keychainItem password]];
-    [picasawebService_ setServiceShouldFollowNextLinks:YES];
-    [picasawebService_ setIsServiceRetryEnabled:YES];
-  }
 
-  // Mark us as in the middle of a fetch so that if credentials change during
-  // a fetch we don't destroy the service out from under ourselves.
-  NSURL* albumFeedURL
-    = [GDataServiceGooglePhotos photoFeedURLForUserID:[picasawebService_ username]
-                                              albumID:nil
-                                            albumName:nil
-                                              photoID:nil
-                                                 kind:nil
-                                               access:nil];
-  GDataServiceTicket *albumFetchTicket
-    = [picasawebService_ fetchPhotoFeedWithURL:albumFeedURL
-                                      delegate:self
-                             didFinishSelector:@selector(albumInfoFetcher:finishedWithAlbum:)
-                               didFailSelector:@selector(albumInfoFetcher:failedWithError:)];
-  [activeTickets_ addObject:albumFetchTicket];
+    // Mark us as in the middle of a fetch so that if credentials change during
+    // a fetch we don't destroy the service out from under ourselves.
+    NSString *userName = [picasawebService_ username];
+    NSURL* albumFeedURL
+      = [GDataServiceGooglePhotos photoFeedURLForUserID:userName
+                                                albumID:nil
+                                              albumName:nil
+                                                photoID:nil
+                                                   kind:nil
+                                                 access:nil];
+    GDataServiceTicket *albumFetchTicket
+      = [picasawebService_ fetchPhotoFeedWithURL:albumFeedURL
+                                        delegate:self
+                               didFinishSelector:@selector(albumInfoFetcher:
+                                                           finishedWithAlbum:)
+                                 didFailSelector:@selector(albumInfoFetcher:
+                                                           failedWithError:)];
+    [activeTickets_ addObject:albumFetchTicket];
+  }
 }
 
 - (void)setUpPeriodicRefresh {
-  // if we are already running the scheduled check, we are done.
-  if ([updateTimer_ isValid])
-    return;
-  [updateTimer_ release];
-  // Refresh every so many minutes.
-  updateTimer_ = [[NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds
-                                                   target:self
-                                                 selector:@selector(refreshAlbums:)
-                                                 userInfo:nil
-                                                  repeats:YES] retain];
+  // Kick off a timer if one is not already running.
+  if (![updateTimer_ isValid]) {
+    [updateTimer_ release];
+    updateTimer_
+      = [[NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds
+                                          target:self
+                                        selector:@selector(refreshAlbums:)
+                                        userInfo:nil
+                                         repeats:YES] retain];
+  }
 }
 
 - (void)refreshAlbums:(NSTimer*)timer {
   [self startAlbumInfoFetch];
 }
 
-- (void)loginCredentialsChanged:(id)object {
-  if ([accountIdentifier_ isEqualToString:object]) {
-    // If we're in the middle of a fetch then cancel it first.
-    [self cancelAllTickets];
-    
-    // Clear the service so that we make a new one with the correct credentials.
-    [picasawebService_ release];
-    picasawebService_ = nil;
-    // If the login changes, we should update immediately, and make sure the
-    // periodic refresh is enabled (it would have been shut down if the previous
-    // credentials were incorrect).
-    [self startAlbumInfoFetch];
-    [self setUpPeriodicRefresh];
-  }
+- (void)loginCredentialsChanged:(NSNotification *)notification {
+  id <HGSAccount> account = [notification object];
+  HGSAssert(account == account_, @"Notification from bad account!");
+  // If we're in the middle of a fetch then cancel it first.
+  [self cancelAllTickets];
+  
+  // Clear the service so that we make a new one with the correct credentials.
+  [picasawebService_ release];
+  picasawebService_ = nil;
+  // If the login changes, we should update immediately, and make sure the
+  // periodic refresh is enabled (it would have been shut down if the previous
+  // credentials were incorrect).
+  [self startAlbumInfoFetch];
+  [self setUpPeriodicRefresh];
 }
 
 #pragma mark -
@@ -270,11 +274,11 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
     albumDetail = [NSString stringWithFormat:albumDetail, photoCount],
     [attributes setObject:albumDetail forKey:kHGSObjectAttributeSnippetKey];
     
-    HGSObject* result = [HGSObject objectWithIdentifier:albumURL
-                                                   name:albumTitle
-                                                   type:kHGSTypeWebPhotoAlbum
-                                                 source:self
-                                             attributes:attributes];
+    HGSResult* result = [HGSResult resultWithURL:albumURL
+                                            name:albumTitle
+                                            type:kHGSTypeWebPhotoAlbum
+                                          source:self
+                                      attributes:attributes];
     [self indexResult:result
            nameString:albumTitle
           otherString:albumDescription];
@@ -285,8 +289,10 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
       GDataServiceTicket *photoInfoTicket
         = [picasawebService_ fetchPhotoFeedWithURL:photoInfoFeedURL
                                           delegate:self
-                                 didFinishSelector:@selector(photoInfoFetcher:finishedWithPhoto:)
-                                   didFailSelector:@selector(photoInfoFetcher:failedWithError:)];
+                                 didFinishSelector:@selector(photoInfoFetcher:
+                                                             finishedWithPhoto:)
+                                   didFailSelector:@selector(photoInfoFetcher:
+                                                             failedWithError:)];
       [photoInfoTicket setProperty:album forKey:kPhotosAlbumKey];
       [activeTickets_ addObject:photoInfoTicket];
     }
@@ -304,7 +310,7 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
 }
 
 - (void)albumInfoFetcher:(GDataServiceTicket *)ticket
-     failedWithError:(NSError *)error {
+         failedWithError:(NSError *)error {
   [activeTickets_ removeObject:ticket];
 
   // If nothing has changed since we last checked then don't have a cow.
@@ -314,23 +320,8 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
       // If the login credentials are bad, don't keep trying.
       [updateTimer_ invalidate];
     }
-    KeychainItem* keychainItem
-      = [KeychainItem keychainItemForService:accountIdentifier_
-                                    username:nil];
-    NSString *username = [keychainItem username];
-    HGSLogDebug(@"PicasawebSource albumInfoFetcher failed: error=%d, "
-                @"username=%@.",
-                errorCode, username);       
-    NSDictionary *noteDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                              kHGSExtensionIdentifierKey, [self identifier],
-                              kHGSAccountUsernameKey, username,
-                              kHGSAccountConnectionErrorKey, error,
-                              kHGSPicasawebFetchTypeKey,
-                              kHGSPicasawebFetchOperationAlbum,
-                              nil];
-    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
-    [defaultCenter postNotificationName:kHGSAccountConnectionFailureNotification 
-                                 object:noteDict];
+    NSString *fetchType = HGSLocalizedString(@"album", nil);
+    [self reportErrorForFetchType:fetchType errorCode:errorCode];
   }
 }
 
@@ -361,11 +352,11 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
          baseURL, kHGSPathCellURLKey,
          nil];
     [cellArray addObject:picasawebCell];
-    
-    NSURL *userURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/%@/",
-                                           [photoURL scheme],
-                                           [photoURL host],
-                                           [picasawebService_ username]]];
+    NSString *urlString = [NSString stringWithFormat:@"%@://%@/%@/",
+                           [photoURL scheme],
+                           [photoURL host],
+                           [picasawebService_ username]];
+    NSURL *userURL  = [NSURL URLWithString:urlString];
     NSDictionary *userCell 
       = [NSMutableDictionary dictionaryWithObjectsAndKeys:
          [picasawebService_ username], kHGSPathCellDisplayTitleKey,
@@ -411,21 +402,23 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
     GDataPhotoTimestamp *photoTimestamp = [photo timestamp];
     if (photoTimestamp) {
       NSDate *timestamp = [photoTimestamp dateValue];
-      NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init]  autorelease];
+      NSDateFormatter *dateFormatter
+        = [[[NSDateFormatter alloc] init]  autorelease];
       [dateFormatter setFormatterBehavior:NSDateFormatterBehavior10_4];
       [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
       NSString *timestampString = [dateFormatter stringFromDate:timestamp];
-      photoSnippet = [timestampString stringByAppendingFormat:@" (%@)", photoSnippet];
+      photoSnippet
+        = [timestampString stringByAppendingFormat:@" (%@)", photoSnippet];
     }
     
     
     photoSnippet = [photoSnippet stringByAppendingFormat:@"\r%@", photoTitle];
     [attributes setObject:photoSnippet forKey:kHGSObjectAttributeSnippetKey];
-    HGSObject* result = [HGSObject objectWithIdentifier:photoURL
-                                                   name:photoDescription
-                                                   type:kHGSTypeWebImage
-                                                 source:self
-                                             attributes:attributes];
+    HGSResult* result = [HGSResult resultWithURL:photoURL
+                                            name:photoDescription
+                                            type:kHGSTypeWebImage
+                                          source:self
+                                      attributes:attributes];
     
     [self indexResult:result
            nameString:photoTitle
@@ -454,26 +447,61 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
     if (errorCode == kGDataBadAuthentication) {
       // If the login credentials are bad, don't keep trying.
       [updateTimer_ invalidate];
+      // Tickle the account so that if the user happens to have the preference
+      // window open showing either the account or the search source they
+      // will immediately see that the account status has changed.
+      [account_ authenticate];
     }
-    KeychainItem* keychainItem
-      = [KeychainItem keychainItemForService:accountIdentifier_
-                                    username:nil];
-    NSString *username = [keychainItem username];
-    HGSLogDebug(@"PicasawebSource photoInfoFetcher failed: error=%d, "
-                @"username=%@.",
-                errorCode, username);       
-    NSDictionary *noteDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                              kHGSExtensionIdentifierKey, [self identifier],
-                              kHGSAccountUsernameKey, username,
-                              kHGSAccountConnectionErrorKey, error,
-                              kHGSPicasawebFetchTypeKey,
-                                kHGSPicasawebFetchOperationPhoto,
-                              nil];
-    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
-    [defaultCenter postNotificationName:kHGSAccountConnectionFailureNotification 
-                                 object:noteDict];
+    NSString *fetchType = HGSLocalizedString(@"photo", nil);
+    [self reportErrorForFetchType:fetchType errorCode:errorCode];
   }
 }
+
+- (void)reportErrorForFetchType:(NSString *)fetchType
+                      errorCode:(NSInteger)errorCode {
+  KeychainItem* keychainItem 
+    = [KeychainItem keychainItemForService:[account_ identifier]
+                                  username:nil];
+  NSString *username = [keychainItem username];
+  NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
+  NSTimeInterval timeSinceLastErrorReport
+    = currentTime - previousErrorReportingTime_;
+  if (timeSinceLastErrorReport > kErrorReportingInterval) {
+    previousErrorReportingTime_ = currentTime;
+    NSString *errorSummary
+      = HGSLocalizedString(@"Picasaweb fetch problem.", nil);
+    NSString *errorString = nil;
+    // A 404 from Picasa usually means that Picasa has not been enabled for
+    // this account.  For additional information see:
+    // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5
+    if (errorCode == 404) {
+      NSString *errorFormat
+        = HGSLocalizedString(@"Have you enabled Picasa for your '%@' account? "
+                             @"(%d)", nil);
+      errorString = [NSString stringWithFormat:errorFormat,
+                     username, errorCode];
+    } else {
+      NSString *errorFormat
+        = HGSLocalizedString(@"Picasaweb %@ fetch for %@ failed. (%d)", nil);
+      errorString = [NSString stringWithFormat:errorFormat,
+                     fetchType, username, errorCode];
+    }
+    NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    NSDictionary *messageDict
+      = [NSDictionary dictionaryWithObjectsAndKeys:
+         errorSummary, kHGSSummaryMessageKey,
+         errorString, kHGSDescriptionMessageKey,
+         successCode, kHGSSuccessCodeMessageKey,
+         nil];
+    [nc postNotificationName:kHGSUserMessageNotification 
+                      object:self
+                    userInfo:messageDict];
+  }
+  HGSLogDebug(@"PicasawebSource %@InfoFetcher failed: error=%d, username=%@.",
+              fetchType, errorCode, username);       
+}
+
 
 #pragma mark -
 #pragma mark Thumbnails
@@ -501,22 +529,19 @@ static const NSTimeInterval kRefreshSeconds = 600.0;  // 10 minutes.
 #pragma mark HGSAccountClientProtocol Methods
 
 - (BOOL)accountWillBeRemoved:(id<HGSAccount>)account {
-  BOOL removeMe = NO;
-  NSString *accountIdentifier = [account identifier];
-  if ([accountIdentifier_ isEqualToString:accountIdentifier]) {
-    // Cancel any outstanding fetches.
-    [self cancelAllTickets];
+  HGSAssert(account == account_, @"Notification from bad account!");
+  
+  // Cancel any outstanding fetches.
+  [self cancelAllTickets];
     
-    // And get rid of the service.
-    [picasawebService_ release];
-    picasawebService_ = nil;
-    removeMe = YES;
-  }
-  return removeMe;
+  // And get rid of the service.
+  [picasawebService_ release];
+  picasawebService_ = nil;
+
+  return YES;
 }
 
 @end
-
 
 #pragma mark -
 

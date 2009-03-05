@@ -40,7 +40,7 @@
   @"HGSValidateSearchSourceBehaviors"
 
 
-@class HGSObject;
+@class HGSResult;
 @class HGSQuery;
 @class HGSSearchOperation;
 
@@ -78,7 +78,7 @@
 // results in this source, but the full result as presented here may carry with 
 // it enough info to allows this source to find a match and annotate it with 
 // extra data.
-- (void)annotateObject:(HGSObject *)object withQuery:(HGSQuery *)query;
+- (void)annotateResult:(HGSResult *)result withQuery:(HGSQuery *)query;
 
 // allows a Search Sources to claim a set of file UTIs that should be ignored
 // by any sources that walk file systems because this source is returning them
@@ -94,19 +94,19 @@
 
 // Fetch the actual value. This returns value. In some cases you will get a
 // temp value that will be updated in the future via KVO.
-- (id)provideValueForKey:(NSString*)key result:(HGSObject*)result;
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result;
 
 // Supports archiving something for the source to allow the result to be
 // remembered in shortcuts.  Return nil to avoid your objects being archivable.
 // Simply store the key/value pars in the dict you need to recreate your object.
-- (NSMutableDictionary *)archiveRepresentationForObject:(HGSObject*)object;
-- (HGSObject *)objectWithArchivedRepresentation:(NSDictionary *)representation;
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult *)result;
+- (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation;
 
 // Return a default icon for the source that applies to this object.
 // This is meant to be ultra fast, and should NOT require hitting the disk 
 // or network. It is meant to return a precached icon to display while the
 // "real" icon is being loaded.
-- (NSImage *)defaultIconForObject:(HGSObject *)object;
+- (NSImage *)defaultIconForResult:(HGSResult *)result;
 @end
 
 // The HGSSearchSource class is provided as a convenience class for people doing

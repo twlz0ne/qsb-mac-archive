@@ -33,7 +33,7 @@
 #import "HGSSQLiteBackedCache.h"
 #import "HGSLog.h"
 
-#import "GTMSQLiteDatabase.h"
+#import "GTMSQLite.h"
 
 static NSTimeInterval const kCacheDefaultFlushInterval = 60.0; // once a minute
 static NSTimeInterval const kCacheDefaultMaximumAge = 3600 * 24 * 7 * 2; // 2 weeks

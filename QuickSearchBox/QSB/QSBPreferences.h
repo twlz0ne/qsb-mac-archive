@@ -73,3 +73,5 @@
 #define kQSBIconInMenubarDefault              NO
 #define kQSBIconInDockKey                     @"QSBIconInDock"
 #define kQSBIconInDockDefault                 YES
+#define kQSBUseGrowlKey                       @"QSBUseGrowl"
+#define kQSBUseGrowlDefault                   YES

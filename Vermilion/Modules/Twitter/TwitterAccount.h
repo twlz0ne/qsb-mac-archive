@@ -32,6 +32,11 @@
 
 #import <Vermilion/Vermilion.h>
 
+// A class which manages a Twitter account.
+//
+@interface TwitterAccount : HGSSimpleAccount
+@end
+
 // A controller which manages a window used to edit the passowrd
 // for a Twitter account.  Exposed publicly so that Interface
 // Builder can see the action.

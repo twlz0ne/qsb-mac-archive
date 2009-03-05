@@ -33,6 +33,22 @@
 #import <Cocoa/Cocoa.h>
 #import "GTMDefines.h"
 
+enum {
+  GTMColorationBaseHighlight,
+  GTMColorationBaseMidtone,
+  GTMColorationBaseShadow,
+  GTMColorationBasePenumbra,
+  GTMColorationLightHighlight,
+  GTMColorationLightMidtone,
+  GTMColorationLightShadow,
+  GTMColorationLightPenumbra,
+  GTMColorationDarkHighlight,
+  GTMColorationDarkMidtone,
+  GTMColorationDarkShadow,
+  GTMColorationDarkPenumbra
+};
+typedef NSUInteger GTMColorationUse;
+
 @interface NSColor (ColorAndLighting)
 
 // Create a color modified by lightening or darkening it (-1.0 to 1.0)
@@ -41,6 +57,13 @@
 // As above, but you can increase plasticity to make it
 // desaturate as it gets darker or lighter
 -(NSColor *)colorWithLighting:(CGFloat)light plasticity:(CGFloat)plastic;
+
+// Returns a color adjusted for a specific usage
+- (NSColor *)adjustedFor:(GTMColorationUse)use;
+- (NSColor *)adjustedFor:(GTMColorationUse)use faded:(BOOL)fade;
+
+// Returns whether the color is in the dark half of the spectrum
+- (BOOL)isDarkColor;
 
 // Returns a color that is legible on this color
 -(NSColor *)legibleTextColor;

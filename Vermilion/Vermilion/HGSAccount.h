@@ -43,8 +43,7 @@
 @protocol HGSAccount <HGSExtension>
 
 // Initialize a new account entry.
-- (id)initWithName:(NSString *)accountName
-          password:(NSString *)password
+- (id)initWithName:(NSString *)userName
               type:(NSString *)type;
 
 // Reconstitute an account entry from a dictionary.
@@ -58,21 +57,21 @@
 - (NSString *)displayName;
 
 // Return the type (google/facebook/etc.) of the account.
-- (NSString *)accountType;
+- (NSString *)type;
 
 // Return the account name.
-- (NSString *)accountName;
+- (NSString *)userName;
 
 // Get the password for the account.
-- (NSString *)accountPassword;
+- (NSString *)password;
 
 // Set the account password.  Derived classes should always call this base
 // function in order to insure notifications are sent.
-- (void)setAccountPassword:(NSString *)password;
+- (void)setPassword:(NSString *)password;
 
 // Provide a view that will be installed in an account setup window.
 // |parentWindow| is provided as a place off which to hang alerts. 
-+ (NSView *)accountSetupViewToInstallWithParentWindow:(NSWindow *)parentWindow;
++ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow;
 
 // Do whatever is appropriate in order to edit the account.  |parentWindow|
 // is provided as a place off which to hang an edit sheet, if desired.
@@ -86,12 +85,16 @@
 // Determine if the account is editable.
 - (BOOL)isEditable;
 
+// Perform an asynchronous authentication for the account using its existing
+// credentials.
+- (void)authenticate;
+
 // Return YES if the account is valid (i.e. has been authenticated).
 - (BOOL)isAuthenticated;
-- (void)setIsAuthenticated:(BOOL)isAuthenticated;
+- (void)setAuthenticated:(BOOL)isAuthenticated;
 
-// Convenience function for testing account type and availability.
-- (BOOL)isAccountTypeAndActive:(NSString *)type;
+// Convenience function for testing account type.
+- (BOOL)isAccountType:(NSString *)type;
 
 @end
 
@@ -111,18 +114,17 @@
 //
 @interface HGSAccount : HGSExtension <HGSAccount> {
  @private
-  NSString *accountName_;
-  NSString *accountType_;
-  BOOL isAuthenticated_;
+  NSString *userName_;
+  NSString *type_;
+  BOOL authenticated_;
 }
 
-@property (nonatomic, copy) NSString *accountName;
-@property (nonatomic, copy) NSString *accountType;
-@property (nonatomic) BOOL isAuthenticated;
+@property (nonatomic, copy) NSString *userName;
+@property (nonatomic, copy) NSString *type;
+@property (nonatomic, getter=isAuthenticated) BOOL authenticated;
 
 // Initialize a new account entry.
-- (id)initWithName:(NSString *)accountName
-          password:(NSString *)password
+- (id)initWithName:(NSString *)userName
               type:(NSString *)accountType;
 
 // Return a dictionary describing the account appropriate for archiving
@@ -133,17 +135,19 @@
 - (NSString *)displayName;
 
 // Return the type (google/facebook/etc.) of the account.
-- (NSString *)accountType;
+- (NSString *)type;
 
 // Return the account name.
-- (NSString *)accountName;
+- (NSString *)userName;
 
-// Get/set the password for the account.  The default does nothing.
-- (NSString *)accountPassword;
-- (void)setAccountPassword:(NSString *)password;
+// Get the password for the account.  The default returns nil.
+- (NSString *)password;
+
+// If the password authenticates then set it and return YES.
+- (BOOL)setPassword:(NSString *)password;
 
 // The default view provider returns nil.
-+ (NSView *)accountSetupViewToInstallWithParentWindow:(NSWindow *)parentWindow;
++ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow;
 
 // The default account edit function does nothing.
 - (void)editWithParentWindow:(NSWindow *)parentWindow;
@@ -156,26 +160,26 @@
 // Determine if the account is editable.  The default returns YES.
 - (BOOL)isEditable;
 
+// Perform an asynchronous authentication for the account using its existing
+// credentials.  The default does nothing.
+- (void)authenticate;
+
 @end
 
 
-// Notification sent whenever an account has been changed.  The |object|
+// Notification sent whenever an account has been changed. The |object|
 // sent with the notification is the HGSAccount instance that has been changed.
-extern NSString *const kHGSDidChangeAccountNotification;
+extern NSString *const kHGSAccountDidChangeNotification;
 
-// Notification sent by a search souce whenever a connection failure is
-// experienced.  The |object| sent with the notification is a dictionary
-// containing, at a minimum, items for kHGSExtensionIdentifierKey,
-// kHGSAccountUsernameKey and kHGSAccountConnectionErrorKey.
-extern NSString *const kHGSAccountConnectionFailureNotification;
+// Notification sent when an account is going to be removed. The |object|
+// sent with the notification is the HGSAccount instance that will be removed.
+extern NSString *const kHGSAccountWillBeRemovedNotification;
 
 // Keys used in describing an account connection error.
-extern NSString *const kHGSAccountUsernameKey;
+extern NSString *const kHGSAccountUserNameKey;
 extern NSString *const kHGSAccountConnectionErrorKey;
 
 // Keys used in the dictionary describing an account as stored in prefs.
 //
 // String specifying the type of the account.
 extern NSString *const kHGSAccountTypeKey;
-// String specifying the name of the account.
-extern NSString *const kHGSAccountNameKey;

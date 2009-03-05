@@ -40,11 +40,12 @@
 #define kHGSValidateActionBehaviorsPrefKey @"HGSValidateActionBehaviors"
 
 
-@class HGSObject;
+@class HGSResult;
+@class HGSResultArray;
 
 // keys to |-performActionWithInfo:|, see below for more details
-extern NSString* const kHGSActionPrimaryObjectKey;
-extern NSString* const kHGSActionIndirectObjectKey;
+extern NSString* const kHGSActionDirectObjectsKey;
+extern NSString* const kHGSActionIndirectObjectsKey;
 
 //
 // HGSAction
@@ -68,27 +69,34 @@ extern NSString* const kHGSActionIndirectObjectKey;
 - (NSSet*)indirectObjectTypes;
 - (BOOL)isIndirectObjectOptional;
 
-// Does the action apply to the result.  The calling code will check that the
-// result is of one of the types listed in directObjectTypes before calling
-// this.
-- (BOOL)doesActionApplyTo:(HGSObject*)result;
+// Does the action apply to an individual result. The calling code will 
+// check that the results are all one of the types listed in directObjectTypes 
+// before calling this. Do not call this to check if an action is valid
+// for a given result. Always turn the result into a result array and call
+// appliesToResults:. This is only for subclassers to override.
+- (BOOL)appliesToResult:(HGSResult *)result;
+
+// Does the action apply to the array of results. Normally you want
+// to override appliesToResult:, which appliesToResults:
+// will call. 
+- (BOOL)appliesToResults:(HGSResultArray *)results;
 
 // Should this action appear in global search results list (ie-no pivot).
 // HGSAction implementation returns NO.
-- (BOOL)showActionInGlobalSearchResults;
+- (BOOL)showInGlobalSearchResults;
 
 // Does the action cause a UI Context change? In the case
 // of QSB, should we hide the QSB before performing the action.
 // HGSAction implementation returns YES.
-- (BOOL)doesActionCauseUIContextChange;
+- (BOOL)causesUIContextChange;
 
 // returns the name to display in the UI for this action. May change based
 // on the contents of |result|, but the base class ignores it.
-- (NSString*)displayNameForResult:(HGSObject*)result;
+- (NSString*)displayNameForResults:(HGSResultArray*)results;
 
 // returns the icon to display in the UI for this action. May change based
 // on the contents of |result|, but the base class ignores it.
-- (id)displayIconForResult:(HGSObject*)result;
+- (id)displayIconForResults:(HGSResultArray*)results;
 
 // Conformers override to perform the action. Actions can have either one or two
 // objects. If only one is present, it should act as "noun verb" such as "file
@@ -101,14 +109,14 @@ extern NSString* const kHGSActionIndirectObjectKey;
 // HGSActionOperation and use that instead.
 //
 // |info| keys:
-//   kHGSActionPrimaryObjectKey 
-//     - HGSObject* - the direct object (reqd)
-//   kHGSActionIndirectObjectKey 
-//     - HGSObject* - the indirect object, there can be only one. (opt)
+//   kHGSActionDirectObjectsKey 
+//     - HGSResultArray* - the direct objects (reqd)
+//   kHGSActionIndirectObjectsKey 
+//     - HGSResultArray* - the indirect objects (opt)
 //
 // Return YES on success.
 //
-- (BOOL)performActionWithInfo:(NSDictionary*)info;
+- (BOOL)performWithInfo:(NSDictionary*)info;
 @end
 
 // The HGSAction class is provided as a convenience class for people doing
@@ -120,8 +128,8 @@ extern NSString* const kHGSActionIndirectObjectKey;
   NSSet *directObjectTypes_;
   NSSet *indirectObjectTypes_;
   BOOL indirectObjectOptional_;
-  BOOL showActionInGlobalSearchResults_;
-  BOOL doesActionCauseUIContextChange_;
+  BOOL showInGlobalSearchResults_;
+  BOOL causesUIContextChange_;
 }
 
 // The defaults for the apis in the protocol are as follow:
@@ -132,12 +140,15 @@ extern NSString* const kHGSActionIndirectObjectKey;
 //      nil or the value of "HGSActionIndirectObjectTypes" from config dict.
 //   -isIndirectObjectOptional
 //      NO or the value of "HGSActionIndirectObjectOptional" from config dict.
-//   -doesActionApplyTo:
+//   -appliesToResult:
 //      YES
-//   -showActionInGlobalSearchResults
+//   -appliesToResults:
+//      YES if all the results in the array conform to 
+//      directObjectTypes and they each pass appliesToResult:
+//   -showInGlobalSearchResults
 //      NO or the value of "HGSActionShowActionInGlobalSearchResults" from
 //      config dict.
-//   -doesActionCauseUIContextChange
+//   -causesUIContextChange
 //      YES or the value of "HGSActionDoesActionCauseUIContextChange" from
 //      config dict.
 //   -displayNameForResult:

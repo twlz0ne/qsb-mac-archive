@@ -31,48 +31,74 @@
 //
 
 #import <Vermilion/Vermilion.h>
-#import <Vermilion/KeychainItem.h>
+#import "GTMMethodCheck.h"
+#import "GTMNSString+URLArguments.h"
+#import "KeychainItem.h"
 
-// For now, use our own password so that we aren't trying to get bookmarks for
-// hosted or non-bookmark-user accounts.
-static NSString *const kBookmarksServiceName 
-  = @"Vermilion Google Bookmarks Login";
+static NSString *const kBookmarkRequestFormat
+  = @"https://%@:%@@www.google.com/bookmarks/lookup?output=rss";
 
-static NSString *const kBookmarkFeedURL 
-  = @"https://www.google.com/bookmarks/lookup?output=rss";
+static const NSTimeInterval kRefreshSeconds = 3600.0;  // 60 minutes.
 
-@interface GoogleBookmarksSource : HGSMemorySearchSource {
+// Only report errors to user once an hour.
+static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
+
+@interface GoogleBookmarksSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
+ @private
   NSTimer *updateTimer_;
   NSMutableData *bookmarkData_;
+  HGSSimpleAccount *account_;
+  NSURLConnection *connection_;
+  BOOL currentlyFetching_;
+  NSTimeInterval previousErrorReportingTime_;
+  NSUInteger previousFailureCount_;
 }
+
+@property (nonatomic, retain) NSURLConnection *connection;
+
+- (void)setUpPeriodicRefresh;
 - (void)startAsynchronousBookmarkFetch;
 - (void)indexBookmarksFromData:(NSData*)data;
 - (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode;
+
+// Post user notification about a connection failure.
+- (void)reportConnectionFailure:(NSString *)explanation
+                    successCode:(NSInteger)successCode;
+
 @end
 
 @implementation GoogleBookmarksSource
 
+GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
+
+@synthesize connection = connection_;
+
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    // Fetch, and schedule a timer to update every hour.
-    [self startAsynchronousBookmarkFetch];
-    updateTimer_ 
-      = [[NSTimer scheduledTimerWithTimeInterval:(60 * 60)
-                                          target:self
-                                        selector:@selector(refreshBookmarks:)
-                                        userInfo:nil
-                                         repeats:YES] retain];
+    account_ = [[configuration objectForKey:kHGSExtensionAccount] retain];
+    if (account_) {
+      // Fetch, and schedule a timer to update every hour.
+      [self startAsynchronousBookmarkFetch];
+      [self setUpPeriodicRefresh];
+      // Watch for credential changes.
+      NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+      [nc addObserver:self
+             selector:@selector(loginCredentialsChanged:)
+                 name:kHGSAccountDidChangeNotification
+               object:account_];
+    }
   }
   return self;
 }
 
 - (void)dealloc {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   if ([updateTimer_ isValid]) {
     [updateTimer_ invalidate];
   }
   [updateTimer_ release];
   [bookmarkData_ release];
-
+  [account_ release];
   [super dealloc];
 }
 
@@ -81,16 +107,37 @@ static NSString *const kBookmarkFeedURL
 #pragma mark Bookmarks Fetching
 
 - (void)startAsynchronousBookmarkFetch {
-  NSURL *bookmarkFeedURL = [NSURL URLWithString:kBookmarkFeedURL];
-  NSURLRequest* request = [NSURLRequest requestWithURL:bookmarkFeedURL];
-  [NSURLConnection connectionWithRequest:request delegate:self];
+  KeychainItem* keychainItem 
+    = [KeychainItem keychainItemForService:[account_ identifier]
+                                  username:nil];
+  NSString *userName = [keychainItem username];
+  NSString *password = [keychainItem password];
+  if (!currentlyFetching_ && userName && password) {
+    NSString *encodedUserName = [userName gtm_stringByEscapingForURLArgument];
+    NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
+    NSString *bookmarkRequestString
+      = [NSString stringWithFormat:kBookmarkRequestFormat,
+         encodedUserName, encodedPassword];
+    NSURL *bookmarkRequestURL = [NSURL URLWithString:bookmarkRequestString];
+    
+    // Construct an NSMutableURLRequest for the URL and set appropriate
+    // request method.
+    NSMutableURLRequest *bookmarkRequest
+      = [NSMutableURLRequest requestWithURL:bookmarkRequestURL 
+                                cachePolicy:NSURLRequestReloadIgnoringCacheData 
+                            timeoutInterval:15.0];
+    [bookmarkRequest setHTTPMethod:@"POST"];
+    [bookmarkRequest setHTTPShouldHandleCookies:NO];
+    currentlyFetching_ = YES;
+    NSURLConnection *connection
+      = [NSURLConnection connectionWithRequest:bookmarkRequest delegate:self];
+    [self setConnection:connection];
+  }
 }
 
 - (void)refreshBookmarks:(NSTimer *)timer {
   [self startAsynchronousBookmarkFetch];
 }
-
-#pragma mark -
 
 - (void)indexBookmarksFromData:(NSData *)data {
   NSXMLDocument* bookmarksXML 
@@ -110,17 +157,18 @@ static NSString *const kBookmarkFeedURL
   NSString *title = nil;
   NSString *url = nil;
   NSMutableArray *otherTermStrings = [NSMutableArray array];
-  NSEnumerator *infoNodeEnumerator = [[bookmarkNode children] objectEnumerator];
-  NSXMLNode *infoNode;
-  while ((infoNode = [infoNodeEnumerator nextObject])) {
-    if ([[infoNode name] isEqualToString:@"title"]) {
+  NSArray *nodeChildren = [bookmarkNode children];
+  for (NSXMLNode *infoNode in nodeChildren) {
+    NSString *infoNodeName = [infoNode name];
+    if ([infoNodeName isEqualToString:@"title"]) {
       title = [infoNode stringValue];
-    } else if ([[infoNode name] isEqualToString:@"link"]) {
+    } else if ([infoNodeName isEqualToString:@"link"]) {
       url = [infoNode stringValue];
       // TODO(stuartmorgan): break the URI, and make those into title terms as well
-    } else if ([[infoNode name] isEqualToString:@"smh:bkmk_label"] ||
-               [[infoNode name] isEqualToString:@"smh:bkmk_annotation"]) {
-      [otherTermStrings addObject:[infoNode stringValue]];
+    } else if ([infoNodeName isEqualToString:@"smh:bkmk_label"] ||
+               [infoNodeName isEqualToString:@"smh:bkmk_annotation"]) {
+      NSString *infoNodeString = [infoNode stringValue];
+      [otherTermStrings addObject:infoNodeString];
     }
   }
 
@@ -133,48 +181,83 @@ static NSString *const kBookmarkFeedURL
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        url, kHGSObjectAttributeSourceURLKey,
        nil];
-  HGSObject* result 
-    = [HGSObject objectWithIdentifier:[NSURL URLWithString:url]
-                                 name:([title length] > 0 ? title : url)
-                                 type:HGS_SUBTYPE(kHGSTypeWebBookmark, @"googlebookmarks")
-                               source:self
-                           attributes:attributes];
+  HGSResult* result 
+    = [HGSResult resultWithURL:[NSURL URLWithString:url]
+                          name:([title length] > 0 ? title : url)
+                          type:HGS_SUBTYPE(kHGSTypeWebBookmark,
+                                           @"googlebookmarks")
+                        source:self
+                    attributes:attributes];
   [self indexResult:result
          nameString:title
   otherStringsArray:otherTermStrings];
 }
 
+- (void)setConnection:(NSURLConnection *)connection {
+  if (connection_ != connection) {
+    [connection_ cancel];
+    [connection_ release];
+    connection_ = [connection retain];
+  }
+}
+
 #pragma mark -
+#pragma mark NSURLConnection Delegate Methods
 
 - (void)connection:(NSURLConnection *)connection 
 didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-  KeychainItem *loginCredentials 
-    = [KeychainItem keychainItemForService:kBookmarksServiceName
+  HGSAssert(connection == connection_, nil);
+  KeychainItem* keychainItem 
+    = [KeychainItem keychainItemForService:[account_ identifier]
                                   username:nil];
-  id<NSURLAuthenticationChallengeSender> sender = [challenge sender];
-  if (loginCredentials && [challenge previousFailureCount] < 3) {
-    NSURLCredential *creds 
-      = [NSURLCredential credentialWithUser:[loginCredentials username]
-                                   password:[loginCredentials password]
-                                persistence:NSURLCredentialPersistenceForSession];
-    [sender useCredential:creds forAuthenticationChallenge:challenge];
-  } else {
-    [sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+  NSString *userName = [keychainItem username];
+  NSString *password = [keychainItem password];
+  // See if the account still validates.
+  BOOL accountAuthenticates = [account_ authenticateWithPassword:password];
+  if (accountAuthenticates) {
+    previousFailureCount_ = 0;
+    id<NSURLAuthenticationChallengeSender> sender = [challenge sender];
+    NSInteger previousFailureCount = [challenge previousFailureCount];
+    if (userName && password && previousFailureCount < 3) {
+      NSURLCredential *creds 
+        = [NSURLCredential credentialWithUser:userName
+                                     password:password
+                                  persistence:NSURLCredentialPersistenceNone];
+      [sender useCredential:creds forAuthenticationChallenge:challenge];
+    } else {
+      [sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+    }
+  } else if (++previousFailureCount_ > 3) {
+    // Don't keep trying.
+    [updateTimer_ invalidate];
+    NSString *errorFormat
+      = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
+                           @"password.", nil);
+    NSString *errorString = [NSString stringWithFormat:errorFormat,
+                             userName];
+    [self reportConnectionFailure:errorString successCode:kHGSSuccessCodeError];
+    HGSLogDebug(@"GoogleBookmarkSource authentication failure for account '%@'.",
+                userName);
   }
 }
 
 - (void)connection:(NSURLConnection *)connection 
 didReceiveResponse:(NSURLResponse *)response {
+  HGSAssert(connection == connection_, nil);
   [bookmarkData_ release];
   bookmarkData_ = [[NSMutableData alloc] init];
 }
 
 - (void)connection:(NSURLConnection *)connection 
     didReceiveData:(NSData *)data {
+  HGSAssert(connection == connection_, nil);
   [bookmarkData_ appendData:data];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+  HGSAssert(connection == connection_, nil);
+  [self setConnection:nil];
+  currentlyFetching_ = NO;
   [self indexBookmarksFromData:bookmarkData_];
   [bookmarkData_ release];
   bookmarkData_ = nil;
@@ -182,8 +265,85 @@ didReceiveResponse:(NSURLResponse *)response {
 
 - (void)connection:(NSURLConnection *)connection 
   didFailWithError:(NSError *)error {
+  HGSAssert(connection == connection_, nil);
+  [self setConnection:nil];
+  currentlyFetching_ = NO;
   [bookmarkData_ release];
   bookmarkData_ = nil;
+  KeychainItem* keychainItem 
+    = [KeychainItem keychainItemForService:[account_ identifier]
+                                  username:nil];
+  NSString *userName = [keychainItem username];
+  NSString *errorFormat
+    = HGSLocalizedString(@"Fetch for '%@' failed. (%d)", nil);
+  NSString *errorString = [NSString stringWithFormat:errorFormat,
+                           userName, [error code]];
+  [self reportConnectionFailure:errorString successCode:kHGSSuccessCodeBadError];
+  HGSLogDebug(@"GoogleBookmarkSource connection failure (%d) '%@'.",
+              [error code], [error localizedDescription]);
+}
+
+#pragma mark Authentication & Refresh
+
+- (void)loginCredentialsChanged:(NSNotification *)notification {
+  id <HGSAccount> account = [notification object];
+  HGSAssert(account == account_, @"Notification from bad account!");
+  // Make sure we aren't in the middle of waiting for results; if we are, try
+  // again later instead of changing things in the middle of the fetch.
+  if (currentlyFetching_) {
+    [self performSelector:@selector(loginCredentialsChanged:)
+               withObject:notification
+               afterDelay:60.0];
+    return;
+  }
+  // If the login changes, we should update immediately, and make sure the
+  // periodic refresh is enabled (it would have been shut down if the previous
+  // credentials were incorrect).
+  [self startAsynchronousBookmarkFetch];
+  [self setUpPeriodicRefresh];
+}
+
+- (void)reportConnectionFailure:(NSString *)explanation
+                    successCode:(NSInteger)successCode {
+  NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
+  NSTimeInterval timeSinceLastErrorReport
+    = currentTime - previousErrorReportingTime_;
+  if (timeSinceLastErrorReport > kErrorReportingInterval) {
+    previousErrorReportingTime_ = currentTime;
+    NSString *errorSummary = HGSLocalizedString(@"Google Bookmarks", nil);
+    NSNumber *successNumber = [NSNumber numberWithInt:successCode];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    NSDictionary *messageDict
+      = [NSDictionary dictionaryWithObjectsAndKeys:
+         errorSummary, kHGSSummaryMessageKey,
+         explanation, kHGSDescriptionMessageKey,
+         successNumber, kHGSSuccessCodeMessageKey,
+         nil];
+    [nc postNotificationName:kHGSUserMessageNotification 
+                      object:self
+                    userInfo:messageDict];
+  }
+}
+
+- (void)setUpPeriodicRefresh {
+  // Kick off a timer if one is not already running.
+  if (![updateTimer_ isValid]) {
+    [updateTimer_ release];
+    updateTimer_ 
+      = [[NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds
+                                          target:self
+                                        selector:@selector(refreshBookmarks:)
+                                        userInfo:nil
+                                         repeats:YES] retain];
+  }
+}
+
+#pragma mark -
+#pragma mark HGSAccountClientProtocol Methods
+
+- (BOOL)accountWillBeRemoved:(id<HGSAccount>)account {
+  HGSAssert(account == account_, @"Notification from bad account!");
+  return YES;
 }
 
 @end

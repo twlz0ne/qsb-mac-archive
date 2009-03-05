@@ -76,19 +76,22 @@
 #pragma mark -
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
+  BOOL isValid = NO;
   NSString *rawQuery = [query rawQueryString];
-
+  
   // It takes atleast 3 chars to make an expression ie- 1+1
-  if ([rawQuery length] < 3) {
-    return NO;
+  if ([rawQuery length] > 2) {
+    // As long as any of the math characters are in the string, let it through
+    NSRange range = [rawQuery rangeOfCharacterFromSet:mathSet_];
+    if (range.location != NSNotFound) {
+      // Also require at least one math character that isn't alphanumeric
+      range = [rawQuery rangeOfCharacterFromSet:nonAlphanumericSet_];
+      if (range.location != NSNotFound) {
+        isValid = [super isValidSourceForQuery:query];
+      }
+    }
   }
-
-  // As long as any of the math characters are in the string, let it through
-  NSRange range = [rawQuery rangeOfCharacterFromSet:mathSet_];
-  if (range.location == NSNotFound) return NO;
-  // Also require at least one math character that isn't alphanumeric
-  range = [rawQuery rangeOfCharacterFromSet:nonAlphanumericSet_];
-  return (range.location != NSNotFound);
+  return isValid;
 }
 
 - (BOOL)isSearchConcurrent {
@@ -114,12 +117,12 @@
     NSDictionary *attributes
      = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSNumber numberWithFloat:2.0f], kHGSObjectAttributeRankKey, nil];
-    HGSObject *hgsObject
-      = [HGSObject objectWithIdentifier:calculatorAppURL_
-                                   name:resultString
-                                   type:HGS_SUBTYPE(kHGSTypeOnebox, @"calculator")
-                                 source:self
-                             attributes:attributes];
+    HGSResult *hgsObject
+      = [HGSResult resultWithURL:calculatorAppURL_
+                            name:resultString
+                            type:HGS_SUBTYPE(kHGSTypeOnebox, @"calculator")
+                          source:self
+                      attributes:attributes];
     resultsArray = [NSArray arrayWithObject:hgsObject];
     [operation setResults:resultsArray];
   }

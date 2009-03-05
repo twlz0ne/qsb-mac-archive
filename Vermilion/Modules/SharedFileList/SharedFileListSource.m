@@ -38,36 +38,97 @@
 static NSString* const kObjectAttributeSharedFileListItem = 
   @"ObjectAttributeSharedFileListItem";
 
+@interface SharedFileListStorage : NSObject {
+ @private
+  LSSharedFileListRef list_;
+  UInt32 seed_;
+  NSArray *results_;
+}
+
+@property(readonly) LSSharedFileListRef list;
+@property(readwrite, nonatomic, assign) UInt32 seed;
+@property(readwrite, nonatomic, retain) NSArray *results;
+
+- (id)initWithList:(LSSharedFileListRef)list;
+@end
+
+// Private API that we are using as a workaround to 
+// rdar://6602133
+// LSSharedFileListItemResolve can trigger a LSShared file list change 
+// notification
+// Basically this would get us into an infinite loop if someone opened a file
+// off of a server. (http://code.google.com/p/qsb-mac/issues/detail?id=186)
+// This was on 10.5.6.
+extern CFDataRef LSSharedFileListItemCopyAliasData(LSSharedFileListItemRef item);
+
+@implementation SharedFileListStorage
+
+@synthesize seed = seed_;
+@synthesize results = results_;
+
+- (id)init {
+  HGSLog(@"Bad init of %@ use initWithList:", [self class]);
+  return [self initWithList:nil];
+}
+
+- (id)initWithList:(LSSharedFileListRef)list {
+  if ((self = [super init])) {
+    if (!list) {
+      [self release];
+      self = nil;
+    } else {
+      list_ = list;
+      CFRetain(list_);
+    }
+  }
+  return self;
+}
+
+- (void)dealloc {
+  if (list_) {
+    CFRelease(list_);
+  }
+  [results_ release];
+  [super dealloc];
+}
+
+- (LSSharedFileListRef)list {
+  return list_;
+}
+@end
+
 @interface SharedFileListSource : HGSMemorySearchSource {
 @private
-  NSArray *fileLists_;
+  NSMutableArray *storage_;  // SharedFileListStorage
 }
 - (void)loadFileLists;
 - (void)observeFileLists:(BOOL)doObserve;
 - (void)listChanged:(LSSharedFileListRef)list;
 - (void)indexObjectsForList:(LSSharedFileListRef)list;
+- (SharedFileListStorage *)storageForList:(LSSharedFileListRef)list;
 @end
 
 static void ListChanged(LSSharedFileListRef inList, void *context);
 
 @implementation SharedFileListSource
+
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    CFStringRef ourLists[] = {
-      kLSSharedFileListFavoriteVolumes,
+    CFStringRef lists[] = {
+      kLSSharedFileListRecentServerItems,
       kLSSharedFileListFavoriteItems,
+      kLSSharedFileListFavoriteVolumes,
       kLSSharedFileListRecentApplicationItems,
-      kLSSharedFileListRecentDocumentItems
+      kLSSharedFileListRecentDocumentItems,
     };
-    NSMutableArray *monitoredLists = [NSMutableArray array];
-    for (size_t i = 0; i < sizeof(ourLists) / sizeof(ourLists[0]); ++i) {
-      LSSharedFileListRef list = LSSharedFileListCreate(NULL, 
-                                                        ourLists[i], 
-                                                        NULL);
+    size_t listsSize = sizeof(lists) / sizeof(lists[0]);
+    storage_ = [[NSMutableArray alloc] initWithCapacity:listsSize];
+    for (size_t i = 0; i < listsSize; ++i) {
+      LSSharedFileListRef list = LSSharedFileListCreate(NULL, lists[i], NULL);
       if (!list) continue;
-      [monitoredLists addObject:GTMCFAutorelease(list)];
+      [self indexObjectsForList:list];
+      CFRelease(list);
     }
-    fileLists_ = [monitoredLists retain];
     [self loadFileLists];
     [self observeFileLists:YES];
   }
@@ -76,14 +137,14 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
 
 - (void)dealloc {
   [self observeFileLists:NO];
-  [fileLists_ release];
+  [storage_ release];
   [super dealloc];
 }
 
 - (void)observeFileLists:(BOOL)doObserve {
   CFRunLoopRef mainLoop = CFRunLoopGetMain();
-  for (id list in fileLists_) {
-    LSSharedFileListRef listRef = (LSSharedFileListRef)list;
+  for (SharedFileListStorage *storage in storage_) {
+    LSSharedFileListRef listRef = [storage list];
     if (doObserve) {
       LSSharedFileListAddObserver(listRef,
                                   mainLoop,
@@ -104,37 +165,62 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
   UInt32 seed;
   NSArray *items =
     (NSArray *)GTMCFAutorelease(LSSharedFileListCopySnapshot(list, &seed));
-  
+  NSMutableArray *results = [NSMutableArray arrayWithCapacity:[items count]];
   for (id item in items) {
     LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef)item;
     OSStatus err = noErr;
-    CFURLRef cfURL = NULL;
-    err = LSSharedFileListItemResolve(itemRef, 
+    // This next chunk of code is to work around rdar://6602133
+    // See comment at top of file. Commented out code below is what
+    // we really should have if it wasn't for the bug in 
+    // LSSharedFileListItemResolve causing us to infinite loop.
+    // I have left the commented code in case things get fixed
+    // for us in the future.
+    NSData *aliasData 
+      = GTMCFAutorelease(LSSharedFileListItemCopyAliasData(itemRef));
+    if (!aliasData) continue;
+    AliasRecord *aliasRecord = (AliasRecord*)[aliasData bytes];
+    AliasHandle alias = NULL;
+    err = PtrToHand(aliasRecord, (Handle *)&alias, [aliasData length]);
+    if (err) continue;
+    NSString *path = nil;
+    err = FSCopyAliasInfo (alias, NULL, NULL, (CFStringRef *)&path, NULL, NULL);
+    [path autorelease];
+    DisposeHandle((Handle)alias);
+    if (err) continue;
+    NSURL *url = [NSURL fileURLWithPath:path];
+    
+    /*
+     CFURLRef cfURL = NULL;
+     err = LSSharedFileListItemResolve(itemRef, 
                                       kLSSharedFileListNoUserInteraction
                                       | kLSSharedFileListDoNotMountVolumes, 
                                       &cfURL, NULL);
     
-    if (err) continue;
-    NSURL *url = GTMCFAutorelease(cfURL);
-
     
-    NSString *name = 
-      (NSString *)GTMCFAutorelease(LSSharedFileListItemCopyDisplayName(itemRef));
+    if (err) continue;
+    NSURL *url = GTMCFAutorelease(cfURL);*/
+    
     
     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                 item, kObjectAttributeSharedFileListItem,
                                 nil];
     
-    HGSObject *object = [HGSObject objectWithFilePath:[url path]
+    HGSResult *result = [HGSResult resultWithFilePath:[url path]
                                                source:self
                                            attributes:attributes];
-    [self indexResult:object
-           nameString:name
-          otherString:nil];
+    [results addObject:result];
   }
+  SharedFileListStorage *storage = [self storageForList:list];
+  // If we have storage, update it, otherwise create a new one.
+  if (!storage) {
+    storage = [[[SharedFileListStorage alloc] initWithList:list] autorelease];
+    [storage_ addObject:storage];
+  }
+  [storage setResults:results];
+  [storage setSeed:seed];
 }
 
-- (id)provideValueForKey:(NSString *)key result:(HGSObject *)result {
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   id value = nil;
   if ([key isEqualToString:kHGSObjectAttributeIconKey] 
       || [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
@@ -148,21 +234,63 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
       }
     }
   }
+  if (!value) {
+    value = [super provideValueForKey:key result:result];
+  }
+  
   return value;
 }
     
+- (void)processMatchingResults:(NSMutableArray*)results
+                      forQuery:(HGSQuery *)query {
+  // Filter out any documents that are no longer named or located where
+  // we remembered them being.
+  NSMutableArray *goodFiles = [NSMutableArray arrayWithCapacity:[results count]];
+  NSFileManager *fm = [NSFileManager defaultManager];
+  for (HGSResult *fileResult in results) {
+    NSURL *url = [fileResult url];
+    if ([url isFileURL] && [fm fileExistsAtPath:[url path] isDirectory:NULL]) {
+      [goodFiles addObject:fileResult];
+    }
+  }
+
+  [results setArray:goodFiles];
+}
+
+// Reset our HGSMemorySource index with all of our values.
 - (void)loadFileLists {  
   [self clearResultIndex];
-  for (id list in fileLists_) {
-    LSSharedFileListRef listRef = (LSSharedFileListRef)list;
-    [self indexObjectsForList:listRef];
+  for (SharedFileListStorage* storage in storage_) {
+    for (HGSResult *result in [storage results]) {
+      [self indexResult:result
+             nameString:[result displayName]
+            otherString:nil];   
+    }
   }
 }
 
+// The list has changed, so we reindex it and then update our master
+// index for all of our entries. Only update if the seed has changed.
 - (void)listChanged:(LSSharedFileListRef)list {
-  [self loadFileLists];
+  SharedFileListStorage *storage = [self storageForList:list];
+  UInt32 oldSeed = [storage seed];
+  if (oldSeed != LSSharedFileListGetSeedValue(list)) {
+    [self indexObjectsForList:list];
+    [self loadFileLists];
+  }
 }
 
+// Given a list, return our SharedFileListStorage record if we have
+// one.
+- (SharedFileListStorage *)storageForList:(LSSharedFileListRef)list {
+  SharedFileListStorage *storage = nil;
+  for (storage in storage_) {
+    if ([storage list] == list) break;
+  }
+  return storage;
+}
+
+// Trampoline to get us back into Objective-C from our C callback.
 static void ListChanged(LSSharedFileListRef inList, void *context) {
   SharedFileListSource *object = (SharedFileListSource *)context;
   [object listChanged:inList];

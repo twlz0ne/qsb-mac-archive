@@ -35,7 +35,7 @@
 #import "QSBViewTableViewDelegateProtocol.h"
 
 
-@class QSBQueryController;
+@class QSBSearchViewController;
 @class QSBResultsViewTableView;
 @class QSBTableResult;
 
@@ -44,7 +44,7 @@
 //
 @interface QSBResultsViewBaseController : NSViewController <QSBViewTableViewDelegateProtocol> {
  @private
-  IBOutlet QSBQueryController *queryController_;
+  IBOutlet QSBSearchViewController *searchViewController_;
   IBOutlet NSView *resultsView_;
   IBOutlet NSView *resultsScrollView_;
   IBOutlet QSBResultsViewTableView *resultsTableView_;
@@ -61,7 +61,7 @@
 }
 
 // Returns the query controller.
-- (QSBQueryController *)queryController;
+- (QSBSearchViewController *)searchViewController;
 
 // Returns the results array controller.
 - (NSArrayController *)arrayController;
@@ -94,10 +94,10 @@
 - (NSString *)queryString;
 
 // Return the last selected table item.
-- (QSBTableResult *)selectedObject;
+- (QSBTableResult *)selectedTableResult;
 
 // For a given row in the table, return the associated QSBTableResult
-- (QSBTableResult *)objectForRow:(NSInteger)row;
+- (QSBTableResult *)tableResultForRow:(NSInteger)row;
 
 // Reset due to a query restart.  The default implementation selects the
 // first row of the results table.

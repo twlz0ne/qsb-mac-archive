@@ -51,7 +51,7 @@ NSString *const kHGSAppleScriptSwitchContextsKey = @"HGSAppleScriptSwitchContext
 - (id)as_performSelectorOnMainThread:(SEL)selector withObject:(id)object;
 @end
 
-@interface AppleScriptPluginsAction (AppleScriptPluginsActionPrivate)
+@interface AppleScriptPluginsAction ()
 - (BOOL)requiredAppRunning;
 @end
 
@@ -66,23 +66,15 @@ NSString *const kHGSAppleScriptSwitchContextsKey = @"HGSAppleScriptSwitchContext
   if (!displayName) {
     displayName = name;
   }
+  NSBundle *bundle = [NSBundle bundleWithPath:path];
   NSString *iconPath = [attributes objectForKey:kHGSAppleScriptIconKey];
-  NSImage *icon = nil;
   if (iconPath) {
     if (![iconPath isAbsolutePath]) {
-      NSBundle *iconBundle = [NSBundle bundleWithPath:path];
-      NSString *bundlePath = [iconBundle resourcePath];
+      NSString *bundlePath = [bundle resourcePath];
       if (bundlePath) {
         iconPath = [bundlePath stringByAppendingPathComponent:iconPath];
       }
     }
-    if (iconPath) {
-      icon = [[[NSImage alloc] initByReferencingFile:iconPath] autorelease];
-    }
-  }
-  if (!icon) {
-    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-    icon = [ws iconForFile:path];
   }
   NSString *description 
     = [attributes objectForKey:kHGSAppleScriptDescriptionKey];
@@ -107,15 +99,19 @@ NSString *const kHGSAppleScriptSwitchContextsKey = @"HGSAppleScriptSwitchContext
   NSString *identifier 
     = [NSString stringWithFormat:@"com.google.qsb.applescript.action.%d", 
        count++];
-  NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 identifier, kHGSExtensionIdentifierKey,
-                                 name, kHGSExtensionUserVisibleNameKey,
-                                 icon, kHGSExtensionIconImageKey,
-                                 nil];
+  NSMutableDictionary *configuration 
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       identifier, kHGSExtensionIdentifierKey,
+       displayName, kHGSExtensionUserVisibleNameKey,
+       bundle, kHGSExtensionBundleKey,
+       nil];
+  if (iconPath) {
+    [configuration setObject:iconPath forKey:kHGSExtensionIconImagePathKey];
+  }
+  
   if ((self = [super initWithConfiguration:configuration])) {
     if (script) {
       script_ = [script retain];
-      displayName_ = [displayName retain];
       description_ = [description retain];
       handler_ = [handlerName retain];
       requiredRunningAppBundleID_ = [requiredAppID retain];
@@ -134,7 +130,6 @@ NSString *const kHGSAppleScriptSwitchContextsKey = @"HGSAppleScriptSwitchContext
 
 - (void)dealloc {
   [script_ release];
-  [displayName_ release];
   [description_ release];
   [handler_ release];
   [requiredRunningAppBundleID_ release];
@@ -142,7 +137,7 @@ NSString *const kHGSAppleScriptSwitchContextsKey = @"HGSAppleScriptSwitchContext
   [super dealloc];
 }
 
-- (NSNumber*)performActionWithInfoInternal:(NSDictionary*)info {
+- (NSNumber*)performWithInfoInternal:(NSDictionary*)info {
   // If we have a handler we call it
   // if not and it supports open, we call that
   // otherwise we just run the script.
@@ -155,10 +150,10 @@ NSString *const kHGSAppleScriptSwitchContextsKey = @"HGSAppleScriptSwitchContext
   }
   NSDictionary *error = nil;
   if (handler) {
-    HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
-    NSURL *uri = [object identifier];
-    NSString *uriString = [uri isFileURL] ? [uri path] : [uri absoluteString];
-    NSArray *params = [NSArray arrayWithObjects:uriString, nil];
+    HGSResultArray *directObjects 
+      = [info objectForKey:kHGSActionDirectObjectsKey];
+    NSArray *urls = [directObjects urls];
+    NSArray *params = [NSArray arrayWithObjects:urls, nil];
     
     [script_ gtm_executePositionalHandler:handler 
                                parameters:params 
@@ -175,32 +170,30 @@ NSString *const kHGSAppleScriptSwitchContextsKey = @"HGSAppleScriptSwitchContext
   return [NSNumber numberWithBool:wasGood];
 }
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary*)info {
   NSNumber *val 
-    = [self as_performSelectorOnMainThread:@selector(performActionWithInfoInternal:) 
+    = [self as_performSelectorOnMainThread:@selector(performWithInfoInternal:) 
                                 withObject:info];
   return [val boolValue];
 }  
-
-- (NSString*)displayNameForResult:(HGSObject*)result {
-  NSString *resultName = [result displayName]; 
-  return [NSString stringWithFormat:displayName_, resultName];
-}
 
 - (NSSet*)directObjectTypes {
   return supportedTypes_;
 }
 
-- (BOOL)doesActionApplyTo:(HGSObject*)object {
-  BOOL applies = [self requiredAppRunning];
-  return applies;
+- (BOOL)appliesToResults:(HGSResultArray *)results {
+  BOOL doesApply = [self requiredAppRunning];
+  if (doesApply) {
+    doesApply = [super appliesToResults:results];
+  }
+  return doesApply;
 }
  
-- (BOOL)doesActionCauseUIContextChange {
+- (BOOL)causesUIContextChange {
   return switchContexts_;
 }
 
-- (BOOL)showActionInGlobalSearchResults {
+- (BOOL)showInGlobalSearchResults {
   return displayInGlobalResults_ && [self requiredAppRunning];
 }
 
@@ -221,9 +214,7 @@ NSString *const kHGSAppleScriptSwitchContextsKey = @"HGSAppleScriptSwitchContext
   }
   return running;
 }
-@end
 
-@implementation NSObject (HGSApplescriptPluginsActionPrivate)
 - (void)as_selectorPerformer:(NSMutableDictionary *)dict {
   SEL selector = NSSelectorFromString([dict objectForKey:@"Selector"]);
   id ret = [self performSelector:selector 

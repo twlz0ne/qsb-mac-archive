@@ -31,18 +31,18 @@
 //
 
 #import "HGSAction.h"
-#import "HGSObject.h"
+#import "HGSResult.h"
 #import "HGSLog.h"
 
-NSString* const kHGSActionPrimaryObjectKey = @"HGSActionPrimaryObject";
-NSString* const kHGSActionIndirectObjectKey = @"HGSActionIndirectObject";
+NSString* const kHGSActionDirectObjectsKey = @"HGSActionDirectObjects";
+NSString* const kHGSActionIndirectObjectsKey = @"HGSActionIndirectObjects";
 
 // The result is already retained for you
-static NSSet *CopyStringSetFromId(id value) {
-  if (!value) return nil;
-  
+static NSSet *CopyStringSetFromId(id value) {  
   NSSet *result = nil;
-  if ([value isKindOfClass:[NSString class]]) {
+  if (!value) {
+    result = nil;
+  } else if ([value isKindOfClass:[NSString class]]) {
     result = [[NSSet alloc] initWithObjects:value, nil];
   } else if ([value isKindOfClass:[NSArray class]]) {
     result = [[NSSet alloc] initWithArray:value];
@@ -82,16 +82,18 @@ static NSSet *CopyStringSetFromId(id value) {
     // Default is NO, so just call boolValue on nil
     indirectObjectOptional_ = [value boolValue];
     
-    value = [configuration objectForKey:@"HGSActionShowActionInGlobalSearchResults"];
+    value 
+      = [configuration objectForKey:@"HGSActionShowActionInGlobalSearchResults"];
     // Default is NO, so just call boolValue on nil
-    showActionInGlobalSearchResults_ = [value boolValue];
+    showInGlobalSearchResults_ = [value boolValue];
     
-    value = [configuration objectForKey:@"HGSActionDoesActionCauseUIContextChange"];
+    value 
+      = [configuration objectForKey:@"HGSActionDoesActionCauseUIContextChange"];
     // Default is YES, so only call boolValue if it's non nil.
     if (value) {
-      doesActionCauseUIContextChange_ = [value boolValue];
+      causesUIContextChange_ = [value boolValue];
     } else {
-      doesActionCauseUIContextChange_ = YES;
+      causesUIContextChange_ = YES;
     }
   }
   return self;
@@ -116,28 +118,52 @@ static NSSet *CopyStringSetFromId(id value) {
   return indirectObjectOptional_;
 }
 
-- (BOOL)doesActionApplyTo:(HGSObject*)result {
+- (BOOL)appliesToResults:(HGSResultArray *)results {
+  BOOL doesApply = YES;
+  NSSet *directObjectTypes = [self directObjectTypes];
+  
+  if (!directObjectTypes) {
+    // must be global only action
+    doesApply = NO;
+  } else {
+    NSSet *allTypes = [NSSet setWithObject:@"*"];
+    if (![directObjectTypes isEqual:allTypes] &&
+        ![results conformsToTypeSet:directObjectTypes]) {
+      // not a valid type for this action
+      doesApply = NO;
+    }
+  }
+  if (doesApply) {
+    for (HGSResult *result in results) {
+      doesApply = [self appliesToResult:result];
+      if (!doesApply) break;
+    }
+  }
+  return doesApply;
+}
+
+- (BOOL)appliesToResult:(HGSResult *)result {
   return YES;
 }
 
-- (BOOL)showActionInGlobalSearchResults {
-  return showActionInGlobalSearchResults_;
+- (BOOL)showInGlobalSearchResults {
+  return showInGlobalSearchResults_;
 }
 
-- (BOOL)doesActionCauseUIContextChange {
-  return doesActionCauseUIContextChange_;
+- (BOOL)causesUIContextChange {
+  return causesUIContextChange_;
 }
 
-- (NSString*)displayNameForResult:(HGSObject*)result {
+- (NSString*)displayNameForResults:(HGSResultArray *)result {
   // defaults to just our name
-  return [self name];
+  return [self displayName];
 }
 
 - (NSString *)defaultIconName {
   return @"red-gear";
 }
 
-- (id)displayIconForResult:(HGSObject*)result {
+- (id)displayIconForResults:(HGSResultArray *)result {
   // default to our init icon
   return [self icon];
 }
@@ -146,7 +172,7 @@ static NSSet *CopyStringSetFromId(id value) {
 // or two objects. If only one is present, it should act as "noun verb" such as
 // "file open". If there are two it should behave as "noun verb noun" such as
 // "file 'email to' hasselhoff" with the 2nd being the indirect object.
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary*)info {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   if ([defaults boolForKey:kHGSValidateActionBehaviorsPrefKey]) {
     HGSLog(@"ERROR: Action %@ forgot to override performActionWithInfo:.",
@@ -158,6 +184,6 @@ static NSSet *CopyStringSetFromId(id value) {
 
 - (NSString*)description {
   return [NSString stringWithFormat:@"%@<%p> name:%@", 
-          [self class], self, [self name]];
+          [self class], self, [self displayName]];
 }
 @end

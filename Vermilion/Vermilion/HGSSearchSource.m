@@ -31,7 +31,7 @@
 //
 
 #import "HGSSearchSource.h"
-#import "HGSObject.h"
+#import "HGSResult.h"
 #import "HGSQuery.h"
 #import "HGSLog.h"
 #import "HGSBundle.h"
@@ -98,8 +98,25 @@ static NSSet *CopyStringSetFromId(id value) {
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   // Must have a pivot or something we parse as a word
-  BOOL isValid = (([query pivotObject] != nil) ||
-                  ([[query uniqueWords] count] > 0));
+  BOOL isValid = YES;
+  HGSResult *pivotObject = [query pivotObject];
+  if (pivotObject) {
+    NSSet *allPivots = [NSSet setWithObject:@"*"];
+    NSSet *pivotTypes = [self pivotableTypes];
+    if ([pivotTypes isEqual:allPivots]) {
+      isValid = YES;
+    } else {
+      isValid = NO;
+      for (NSString *pivotType in pivotTypes) {
+        if ([pivotObject conformsToType:pivotType]) {
+          isValid = YES;
+          break;
+        }
+      }
+    }
+  } else {
+    isValid = [[query uniqueWords] count] > 0;
+  }
   return isValid;
 }
 
@@ -119,7 +136,7 @@ static NSSet *CopyStringSetFromId(id value) {
 // that the query that generated |result| in another source may not have any results in
 // this source, but the full result as presented here may carry with it enough info
 // to allows this source to find a match and annotate it with extra data.
-- (void)annotateObject:(HGSObject*)result withQuery:(HGSQuery*)query{
+- (void)annotateResult:(HGSResult *)result withQuery:(HGSQuery *)query{
   // default does nothing, subclasses do not have to override. 
 }
 
@@ -127,11 +144,11 @@ static NSSet *CopyStringSetFromId(id value) {
   return [[utiToExcludeFromDiskSources_ retain] autorelease];
 }
 
-- (id)provideValueForKey:(NSString*)key result:(HGSObject*)result {
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   return nil;
 }
 
-- (NSMutableDictionary *)archiveRepresentationForObject:(HGSObject*)result {
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult *)result {
   // Do we allow archiving?
   if (cannotArchive_) return nil;
   
@@ -157,15 +174,16 @@ static NSSet *CopyStringSetFromId(id value) {
   return dict;
 }
 
-- (HGSObject *)objectWithArchivedRepresentation:(NSDictionary *)representation {
+- (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
   // Do we allow archiving?
   if (cannotArchive_) return nil;
 
-  return [HGSObject objectWithDictionary:representation source:self];
+  return [HGSResult resultWithDictionary:representation source:self];
 }
 
-- (NSImage *)defaultIconForObject:(HGSObject *)object {
-  return [[HGSIconProvider sharedIconProvider] placeHolderIcon];
+- (NSImage *)defaultIconForResult:(HGSResult *)result {
+  HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
+  NSImage *icon = [provider placeHolderIcon];
+  return icon;
 }
-
 @end

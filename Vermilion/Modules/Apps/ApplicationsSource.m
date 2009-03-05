@@ -201,13 +201,13 @@ static NSString *const kApplicationSourcePredicateString
     
     [attributes setObject:date forKey:kHGSObjectAttributeLastUsedDateKey];
 
-    // create a HGSObject to talk to the rest of the application
-    HGSObject *hgsResult 
-      = [HGSObject objectWithIdentifier:[NSURL fileURLWithPath:path]
-                                   name:name
-                                   type:kHGSTypeFileApplication
-                                 source:self
-                             attributes:attributes];
+    // create a HGSResult to talk to the rest of the application
+    HGSResult *hgsResult 
+      = [HGSResult resultWithURL:[NSURL fileURLWithPath:path]
+                            name:name
+                            type:kHGSTypeFileApplication
+                          source:self
+                      attributes:attributes];
     
     // add it to the result array for searching
     [self indexResult:hgsResult
@@ -229,12 +229,12 @@ static NSString *const kApplicationSourcePredicateString
     // Unfortunately last used date is hidden from us.
     [attributes removeObjectForKey:kHGSObjectAttributeLastUsedDateKey];
 
-    HGSObject *hgsResult 
-      = [HGSObject objectWithIdentifier:networkURL
-                                   name:name
-                                   type:kHGSTypeFileApplication
-                                 source:self
-                             attributes:attributes];
+    HGSResult *hgsResult 
+      = [HGSResult resultWithURL:networkURL
+                            name:name
+                            type:kHGSTypeFileApplication
+                          source:self
+                      attributes:attributes];
 
     [self indexResult:hgsResult
            nameString:name
@@ -268,17 +268,16 @@ static NSString *const kApplicationSourcePredicateString
 #pragma mark -
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  BOOL isGood = YES;
-  HGSObject *pivotObject = [query pivotObject];
-  if (pivotObject) {
-    isGood = NO;
-    NSURL *url = [pivotObject identifier];
-    NSString *appName = [[url absoluteString] lastPathComponent];
-    if ([appName isEqualToString:@"System%20Preferences.app"]) {
-      isGood = YES;
+  BOOL isValid = [super isValidSourceForQuery:query];
+  if (isValid) {
+    HGSResult *pivotObject = [query pivotObject];
+    if (pivotObject) {
+      NSURL *url = [pivotObject url];
+      NSString *appName = [[url absoluteString] lastPathComponent];
+      isValid = [appName isEqualToString:@"System%20Preferences.app"];
     }
   }
-  return isGood;
+  return isValid;
 }
 
 - (void)performSearchOperation:(HGSSearchOperation *)operation {
@@ -294,23 +293,21 @@ static NSString *const kApplicationSourcePredicateString
 
 - (void)processMatchingResults:(NSMutableArray*)results
                       forQuery:(HGSQuery *)query {
-  HGSObject *pivotObject = [query pivotObject];
+  HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
-    if ([self isValidSourceForQuery:query]) {
-      // Remove things that aren't preference panes
-      NSMutableIndexSet *itemsToRemove = [NSMutableIndexSet indexSet];
-      NSUInteger indexToRemove = 0;
-      for (HGSObject *result in results) {
-        NSURL *url = [result identifier];
-        NSString *absolutePath = [url absoluteString];
+    // Remove things that aren't preference panes
+    NSMutableIndexSet *itemsToRemove = [NSMutableIndexSet indexSet];
+    NSUInteger indexToRemove = 0;
+    for (HGSResult *result in results) {
+      NSURL *url = [result url];
+      NSString *absolutePath = [url absoluteString];
         // TODO(alcor): ignore invalid preference panes
-        if (![self pathIsPrefPane:absolutePath]) {
-          [itemsToRemove addIndex:indexToRemove];
-        }
-        ++indexToRemove;
+      if (![self pathIsPrefPane:absolutePath]) {
+        [itemsToRemove addIndex:indexToRemove];
       }
-      [results removeObjectsAtIndexes:itemsToRemove];
+      ++indexToRemove;
     }
+    [results removeObjectsAtIndexes:itemsToRemove];
   }
 }
   

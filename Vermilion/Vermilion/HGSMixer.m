@@ -32,11 +32,11 @@
 
 #import "HGSMixer.h"
 #import "HGSQuery.h"
-#import "HGSObject.h"
+#import "HGSResult.h"
 
 static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
 
-@interface HGSMixer(PrivateMethods)
+@interface HGSMixer()
 // these methods can be overridden to customize the behavior of the ranking
 // and de-duping.
 - (void)sortObjectsInSitu:(NSMutableArray*)objects;
@@ -93,20 +93,18 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
 - (void)mergeDuplicatesInSitu:(NSMutableArray*)results {
   NSMutableIndexSet* duplicateIndexes = [NSMutableIndexSet indexSet];
   NSUInteger currentResultIndex = 0;
-  for (HGSObject *currentResult in results) {
+  for (HGSResult *currentResult in results) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     // Check to see if it's a duplicate of any of the confirmed results
-    BOOL isDuplicate = NO;
     for (NSUInteger i = 0; i < currentResultIndex; ++i) {
       if ([duplicateIndexes containsIndex:i])
         continue;
-      HGSObject* goodResult = [results objectAtIndex:i];
+      HGSResult* goodResult = [results objectAtIndex:i];
       if ([currentResult isDuplicate:goodResult]) {
         // We've got a match; merge this into the existing result and
         // mark it for deletion.
         [goodResult mergeWith:currentResult];
         [duplicateIndexes addIndex:currentResultIndex];
-        isDuplicate = YES;
         break;
       }
     }
@@ -178,8 +176,8 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context) {
   if (!(ptr1 && ptr2)) return kCFCompareEqualTo;  // Nothing sane to do
   
   // Save some typing and cast
-  HGSObject *item1 = (HGSObject *)ptr1;
-  HGSObject *item2 = (HGSObject *)ptr2;
+  HGSResult *item1 = (HGSResult *)ptr1;
+  HGSResult *item2 = (HGSResult *)ptr2;
   NSDate *dateOne = nil;
   NSDate *dateTwo = nil;
   

@@ -40,10 +40,6 @@ static NSString *const kApplicationUIActionFormat
 
 static NSString *const kApplicationUIAXActionKey = @"ApplicationUIAXAction";
 
-@interface ApplicationUIAction (ApplicationUIActionPrivate)
-- (id)initWithAccessibilityAction:(NSString*)action;
-@end
-
 @implementation ApplicationUIAction
 + (HGSAction *)defaultActionForElement:(GTMAXUIElement*)element {
   HGSAction *action = nil;
@@ -98,31 +94,36 @@ static NSString *const kApplicationUIAXActionKey = @"ApplicationUIAXAction";
   [super dealloc];
 }
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  BOOL wasGood = NO;
-  HGSObject *directObject = [info valueForKey:kHGSActionPrimaryObjectKey];
-  GTMAXUIElement *element 
-    = [directObject valueForKey:kAppUISourceAttributeElementKey];
-  pid_t processID = [element processIdentifier];
-  ProcessSerialNumber psn;
-  OSStatus status = GetProcessForPID(processID, &psn);
-  if (status == noErr) {
-    SetFrontProcessWithOptions(&psn, kSetFrontProcessFrontWindowOnly);
-    wasGood = [element performAccessibilityAction:accessibilityAction_];
-  } else {
-    HGSLogDebug(@"Unable to get PSN for PID: %d", processID);
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  BOOL wasGood = YES;
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  for (HGSResult *result in directObjects) {
+    GTMAXUIElement *element 
+      = [result valueForKey:kAppUISourceAttributeElementKey];
+    pid_t processID = [element processIdentifier];
+    ProcessSerialNumber psn;
+    OSStatus status = GetProcessForPID(processID, &psn);
+    if (status == noErr) {
+      SetFrontProcessWithOptions(&psn, kSetFrontProcessFrontWindowOnly);
+      wasGood &= [element performAccessibilityAction:accessibilityAction_];
+    } else {
+      HGSLogDebug(@"Unable to get PSN for PID: %d", processID);
+      wasGood = NO;
+    }
   }
   return wasGood;
 }
 
-- (BOOL)doesActionApplyTo:(HGSObject*)result {
+- (BOOL)appliesToResult:(HGSResult *)result {
+  BOOL doesApply = NO;
   GTMAXUIElement *element 
     = [result valueForKey:kAppUISourceAttributeElementKey];
-  BOOL isGood = NO;
+  
   if (element) {
-    isGood = [element supportsAction:accessibilityAction_];
+    doesApply = [element supportsAction:accessibilityAction_];
   }
-  return isGood;
+  return doesApply;
 }
 
 @end

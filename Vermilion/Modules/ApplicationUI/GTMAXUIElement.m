@@ -28,11 +28,9 @@
 - (NSString*)stringValueForCFType:(CFTypeRef)cfValue;
 - (NSString*)stringValueForCFArray:(CFArrayRef)cfArray;
 - (NSString*)stringValueForAXValue:(AXValueRef)axValueRef;
-- (CFTypeRef)createCFTypeOfSameTypeAs:(CFTypeRef)valueType 
-                           withString:(NSString*)string;
-- (AXValueRef)createAXValueOfType:(AXValueType)type
-                       withString:(NSString*)stringValue;
-- (CFTypeRef)stringToBool:(NSString*)string;
+- (id)valueOfSameTypeAs:(CFTypeRef)previousValue withString:(NSString*)string;
+- (AXValueRef)axValueOfType:(AXValueType)type withString:(NSString*)string;
+- (BOOL)stringToBool:(NSString*)string;
 @end
 
 @implementation GTMAXUIElement
@@ -215,11 +213,11 @@
   return settable;
 }
 
-- (BOOL)setAccessibilityValue:(CFTypeRef)value 
+- (BOOL)setAccessibilityValue:(id)value 
                  forAttribute:(NSString*)attribute {
   AXError axerror = AXUIElementSetAttributeValue(element_, 
                                                  (CFStringRef)attribute, 
-                                                 value);
+                                                 (CFTypeRef)value);
   return axerror == kAXErrorSuccess;
 }
 
@@ -323,13 +321,9 @@
 - (BOOL)setStringValue:(NSString*)string forAttribute:(NSString*)attribute {
   CFTypeRef cfPreviousValue = [self accessibilityCopyAttributeCFValue:attribute];
   if (!cfPreviousValue || cfPreviousValue == kCFNull) return NO;
-  CFTypeRef cfValue = [self createCFTypeOfSameTypeAs:cfPreviousValue 
-                                          withString:string];
+  id value = [self valueOfSameTypeAs:cfPreviousValue withString:string];
   CFRelease(cfPreviousValue);
-  BOOL isGood = [self setAccessibilityValue:cfValue forAttribute:attribute];
-  if (cfValue) {
-    CFRelease(cfValue);
-  }
+  BOOL isGood = [self setAccessibilityValue:value forAttribute:attribute];
   return isGood;
 }
 
@@ -337,22 +331,21 @@
 
 @implementation GTMAXUIElement (GTMAXUIElementTypeConversion)
 
-- (CFTypeRef)stringToBool:(NSString*)string {
-  CFTypeRef value = kCFBooleanFalse;
+- (BOOL)stringToBool:(NSString*)string {
+  BOOL value = NO;
   if (string && [string length] > 0) {
     unichar uchar = [string characterAtIndex:0];
     if ((uchar == 'T') || (uchar == 't') 
         || (uchar == 'Y') || (uchar == 'y')) {
-      value = kCFBooleanTrue;
+      value = YES;
     } else {
-      value = [string intValue] != 0 ? kCFBooleanTrue : kCFBooleanFalse;
+      value = [string intValue] != 0 ? YES : NO;
     }
   }
   return value;
 }
 
-- (AXValueRef)createAXValueOfType:(AXValueType)type 
-                       withString:(NSString*)stringValue {
+- (AXValueRef)axValueOfType:(AXValueType)type withString:(NSString*)string {
   union {
     CGPoint point;
     CGSize size;
@@ -363,31 +356,31 @@
   
   switch (type) {
     case kAXValueCGPointType: {
-      NSPoint nsValue = NSPointFromString(stringValue);
+      NSPoint nsValue = NSPointFromString(string);
       axValue.point = *(CGPoint*)&nsValue;
       break;
     }
       
     case kAXValueCGSizeType: {
-      NSSize nsValue = NSSizeFromString(stringValue);
+      NSSize nsValue = NSSizeFromString(string);
       axValue.size = *(CGSize*)&nsValue;
       break;
     }
       
     case kAXValueCGRectType: {
-      NSRect nsValue = NSRectFromString(stringValue);
+      NSRect nsValue = NSRectFromString(string);
       axValue.rect = *(CGRect*)&nsValue;
       break;
     }
       
     case kAXValueCFRangeType: {
-      NSRange nsValue = NSRangeFromString(stringValue);
+      NSRange nsValue = NSRangeFromString(string);
       axValue.range = *(CFRange*)&nsValue;
       break;
     }
       
     case kAXValueAXErrorType:
-      axValue.error = [stringValue intValue];
+      axValue.error = [string intValue];
       break;
       
     default:
@@ -396,7 +389,7 @@
       break;
   }
 
-  return AXValueCreate(type, &axValue);
+  return (AXValueRef)GTMCFAutorelease(AXValueCreate(type, &axValue));
 }
 
 - (NSString*)stringValueForAXValue:(AXValueRef)axValueRef {
@@ -487,24 +480,24 @@
 }
 
   
-- (CFTypeRef)createCFTypeOfSameTypeAs:(CFTypeRef)previousValue
-                           withString:(NSString*)string {
-  CFTypeRef value = NULL;
+- (id)valueOfSameTypeAs:(CFTypeRef)previousValue withString:(NSString*)string {
+  id value = nil;
   CFTypeID valueType = CFGetTypeID(previousValue);
   if (valueType == CFStringGetTypeID()) {
-    value = CFStringCreateCopy(NULL, (CFStringRef)string);
+    value = [NSString stringWithString:string];
   } else if (valueType == CFURLGetTypeID()) {
-    value = CFURLCreateWithString(NULL, (CFStringRef)string, NULL);
+    value = [NSURL URLWithString:string];
   } else if (valueType == CFNumberGetTypeID()) {
     double dValue = [string doubleValue];
-    value = CFNumberCreate(NULL, kCFNumberDoubleType, &dValue);
+    value = [NSNumber numberWithDouble:dValue];
   } else if (valueType == CFNullGetTypeID()) {
-    value = kCFNull;
+    value = [NSNull null];
   } else if (valueType == AXValueGetTypeID()) {
-    value = [self createAXValueOfType:AXValueGetType(previousValue) 
-                           withString:string];
+    value = (id)[self axValueOfType:AXValueGetType(previousValue) 
+                         withString:string];
   } else if (valueType == CFBooleanGetTypeID()) {
-    value = [self stringToBool:string];
+    BOOL bValue = [self stringToBool:string];
+    value = [NSNumber numberWithBool:bValue];
   } 
   return value;
 }

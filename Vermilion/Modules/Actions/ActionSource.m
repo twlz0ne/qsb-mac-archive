@@ -72,7 +72,11 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     HGSExtensionPoint *actionsPoint = [HGSExtensionPoint actionsPoint];
     [dc addObserver:self
            selector:@selector(extensionPointActionsChanged:)
-               name:kHGSExtensionPointDidChangeNotification
+               name:kHGSExtensionPointDidAddExtensionNotification
+             object:actionsPoint];
+    [dc addObserver:self
+           selector:@selector(extensionPointActionsChanged:)
+               name:kHGSExtensionPointDidRemoveExtensionNotification
              object:actionsPoint];
   }
   return self;
@@ -92,8 +96,8 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   rebuildCache_ = YES;
 }
 
-- (HGSObject *)objectFromAction:(id<HGSAction>)action 
-                         result:(HGSObject *)result {
+- (HGSResult *)objectFromAction:(id<HGSAction>)action 
+                    resultArray:(HGSResultArray *)array {
   // Set some of the flags to bump them up in the result's ranks
   NSNumber *rankFlags 
     = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag 
@@ -105,20 +109,20 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        action, kHGSObjectAttributeDefaultActionKey,
        nil];
-  NSImage *icon = [action displayIconForResult:result];
+  NSImage *icon = [action displayIconForResults:array];
   if (icon) {
     [attributes setObject:icon forKey:kHGSObjectAttributeIconKey];
   }
-  NSString *name = [action displayNameForResult:nil];
+  NSString *name = [action displayNameForResults:nil];
   NSString *extensionIdentifier = [action identifier];
   NSString *urlStr = [NSString stringWithFormat:@"action:%@", extensionIdentifier];
   
-  HGSObject *actionObject
-    = [HGSObject objectWithIdentifier:[NSURL URLWithString:urlStr]
-                                 name:name
-                                 type:kHGSTypeAction
-                               source:self
-                           attributes:attributes];
+  HGSResult *actionObject
+    = [HGSResult resultWithURL:[NSURL URLWithString:urlStr]
+                          name:name
+                          type:kHGSTypeAction
+                        source:self
+                    attributes:attributes];
 
   return actionObject;
 }
@@ -130,7 +134,8 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   HGSExtensionPoint* actionPoint = [HGSExtensionPoint actionsPoint];
   for (id<HGSAction> action in [actionPoint extensions]) {
     // Create a result object that wraps our action
-    HGSObject *actionObject = [self objectFromAction:action result:nil];
+    HGSResult *actionObject = [self objectFromAction:action
+                                         resultArray:nil];
     // Index our result
     [self indexResult:actionObject
            nameString:[actionObject displayName]
@@ -140,7 +145,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 
 #pragma mark -
 
-- (NSMutableDictionary *)archiveRepresentationForObject:(HGSObject*)result {
+- (NSMutableDictionary *)archiveRepresentationForObject:(HGSResult*)result {
   // For action results, we pull out the action, and save off it's extension
   // identifier.
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -152,8 +157,8 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   return dict;
 }
 
-- (HGSObject *)objectWithArchivedRepresentation:(NSDictionary *)representation {
-  HGSObject *result = nil;
+- (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
+  HGSResult *result = nil;
   NSString *extensionIdentifier
     = [representation objectForKey:kActionIdentifierArchiveKey];
   if (extensionIdentifier) {
@@ -162,7 +167,8 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
       = [actionPoint extensionWithIdentifier:extensionIdentifier];
     if (action) {
       // We create a new result, but it should fold based out the url
-      result = [self objectFromAction:action result:nil];
+      result = [self objectFromAction:action
+                          resultArray:nil];
     }
   }
   
@@ -185,46 +191,29 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     = [NSMutableArray arrayWithCapacity:[results count]];
 
   
-  HGSObject *pivotObject = [query pivotObject];
-  if (pivotObject) {
+  HGSResultArray *queryResults = [query results];
+  if (queryResults) {
     BOOL emptyQuery = [[query rawQueryString] length] == 0;
     
     // Pivot: filter to actions that support this object as the target of the
     // action.
-
-    NSSet *allTypes = [NSSet setWithObject:@"*"];
-
-    for (HGSObject *actionObject in results) {
+    for (HGSResult *actionObject in results) {
       id<HGSAction> action
         = [actionObject valueForKey:kHGSObjectAttributeDefaultActionKey];
-      NSSet *directObjectTypes = [action directObjectTypes];
-
-      if (!directObjectTypes) {
-        // must be global only action
-        continue;
-      }
-
-      if (![directObjectTypes isEqual:allTypes] &&
-          ![pivotObject conformsToTypeSet:directObjectTypes]) {
-        // not a valid type for this action
-        continue;
-      }
-
-      // give the final doesActionApplyTo a crack at it.
-      if ([action doesActionApplyTo:pivotObject]) {
+      if ([action appliesToResults:queryResults]) {
         // Now that it is all set up, let's wrap it up in our proxy action.
         // We do this so that we can sub in the query's pivot object
         // when our action is called.
         ActionPivotObjectProxy *proxy 
           = [[[ActionPivotObjectProxy alloc] initWithAction:action
-                                                    query:query]
+                                                      query:query]
              autorelease];
         
         actionObject = [self objectFromAction:(id<HGSAction>)proxy
-                                       result:pivotObject];
+                                  resultArray:queryResults];
         
         if (emptyQuery) {
-          HGSMutableObject *mutable = [[actionObject mutableCopy] autorelease];
+          HGSMutableResult *mutable = [[actionObject mutableCopy] autorelease];
           [mutable addRankFlags:eHGSBelowFoldRankFlag];
           actionObject = mutable;
         }
@@ -237,10 +226,10 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 
     // No pivot: so just include the actions that are valid for a top level
     // query.
-    for (HGSObject *actionObject in results) {
+    for (HGSResult *actionObject in results) {
       id<HGSAction> action
         = [actionObject valueForKey:kHGSObjectAttributeDefaultActionKey];
-      if ([action showActionInGlobalSearchResults]) {
+      if ([action showInGlobalSearchResults]) {
         [filteredResults addObject:actionObject];
       }
     }
@@ -273,14 +262,14 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   return [action_ methodSignatureForSelector:sel];
 }
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary*)info {
   // We sub in the pivot object as the primary object, ignoring whatever
   // info we got from above.
-  id directObject = [query_ pivotObject];
+  HGSResultArray *directObjects = [query_ results];
   NSDictionary *newInfo 
-    = [NSDictionary dictionaryWithObject:directObject
-                                  forKey:kHGSActionPrimaryObjectKey];
-  return [action_ performActionWithInfo:newInfo];
+    = [NSDictionary dictionaryWithObject:directObjects
+                                  forKey:kHGSActionDirectObjectsKey];
+  return [action_ performWithInfo:newInfo];
 }
 
 

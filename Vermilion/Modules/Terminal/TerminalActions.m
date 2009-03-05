@@ -73,19 +73,20 @@ static NSString *const kTerminalBundleID = @"com.apple.Terminal";
                                    inDirectory:@"Scripts"];
       NSURL *url = [NSURL fileURLWithPath:path];
       script_ = [[NSAppleScript alloc] initWithContentsOfURL:url
-                 
                                                        error:nil];
     }
   }
   return script_;
 }
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *directObject = [info objectForKey:kHGSActionPrimaryObjectKey];
-  NSString *path = [[directObject identifier] path];
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  NSArray *paths = [directObjects filePaths];
+  NSArray *parameters = [NSArray arrayWithObject:paths];
   NSDictionary *errorDictionary = nil;
   [[self appleScript] gtm_executePositionalHandler:@"openDirectory"
-                                        parameters:[NSArray arrayWithObject:path]
+                                        parameters:parameters
                                              error:&errorDictionary];
   
   if (errorDictionary) return NO;

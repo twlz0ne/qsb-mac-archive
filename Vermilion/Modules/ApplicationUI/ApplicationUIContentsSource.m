@@ -110,13 +110,13 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
                  window, kAppUISourceAttributeElementKey, 
                  windowIcon_, kHGSObjectAttributeIconKey,
                  nil];
-            HGSObject *object 
-              = [HGSObject objectWithIdentifier:uri
-                                           name:name
-                                           type:kHGSTypeAppUIItem
-                                         source:self
-                                     attributes:attributes];
-            [results addObject:object];
+            HGSResult *result 
+              = [HGSResult resultWithURL:uri
+                                    name:name
+                                    type:kHGSTypeAppUIItem
+                                  source:self
+                              attributes:attributes];
+            [results addObject:result];
             addedElement = YES;
             break;
           }
@@ -209,7 +209,7 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
   }
 }
    
-- (id)provideValueForKey:(NSString*)key result:(HGSObject*)result {
+- (id)provideValueForKey:(NSString*)key result:(HGSResult*)result {
   id value = nil;
   GTMAXUIElement *element 
     = [result valueForKey:kAppUISourceAttributeElementKey];
@@ -219,6 +219,9 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
     } else if ([key isEqualToString:kHGSObjectAttributePathCellsKey]) {
       // TODO(dmaclach): Build up the path cells for the element
     }
+  }
+  if (!value) {
+    value = [super provideValueForKey:key result:result];
   }
   return value;
 }

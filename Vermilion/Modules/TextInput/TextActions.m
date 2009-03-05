@@ -38,12 +38,14 @@
 
 @implementation TextLargeTypeAction
 
-- (BOOL)performActionWithInfo:(NSDictionary*)info {
-  HGSObject *object = [info objectForKey:kHGSActionPrimaryObjectKey];
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];
   BOOL success = NO;
-  if (object) {
+  if (directObjects) {
+    NSString *name = [directObjects displayName];
     GTMLargeTypeWindow *largeTypeWindow
-      = [[GTMLargeTypeWindow alloc] initWithString:[object displayName]];
+      = [[GTMLargeTypeWindow alloc] initWithString:name];
     [largeTypeWindow setReleasedWhenClosed:YES];
     [largeTypeWindow makeKeyAndOrderFront:self];
     success = YES;

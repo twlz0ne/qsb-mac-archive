@@ -37,23 +37,31 @@
 // adjusted based on how much text is shown in the description.
 //
 @interface QSBTopStandardRowViewController : QSBDetailedRowViewController
-- (id)initWithController:(QSBQueryController *)controller;
+- (id)initWithController:(QSBSearchViewController *)controller;
 // return the detail string for a given result.
 - (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result;
 @end
 
 @interface QSBTopSeparatorRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBQueryController *)controller;
+- (id)initWithController:(QSBSearchViewController *)controller;
+@end
+
+@interface QSBTopSearchForRowViewController : QSBResultRowViewController
+- (id)initWithController:(QSBSearchViewController *)controller;
+@end
+
+@interface QSBTopSearchIconViewController : QSBResultRowViewController
+- (id)initWithController:(QSBSearchViewController *)controller;
 @end
 
 @interface QSBTopFoldRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBQueryController *)controller;
+- (id)initWithController:(QSBSearchViewController *)controller;
 @end
 
 @interface QSBTopSearchStatusRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBQueryController *)controller;
+- (id)initWithController:(QSBSearchViewController *)controller;
 @end
 
 @interface QSBTopMessageRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBQueryController *)controller;
+- (id)initWithController:(QSBSearchViewController *)controller;
 @end

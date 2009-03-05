@@ -44,11 +44,10 @@ static NSString *const kSetUpTwitterAccountViewNibName
 static NSString *const kTwitterVerifyAccountURLString
   = @"https://twitter.com/account/verify_credentials.xml";
 static NSString *const kTwitterURLString = @"http://twitter.com/";
-static NSString *const kTwitterAccountTypeName = @"Twitter";;
+static NSString *const kTwitterAccountTypeName = @"Twitter";
 
-// A class which manages a Twitter account.
-//
-@interface TwitterAccount : HGSSimpleAccount
+
+@interface TwitterAccount ()
 
 // Open twitter.com in the user's preferred browser.
 + (BOOL)openTwitterHomePage;
@@ -63,7 +62,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return kTwitterAccountTypeName;
 }
 
-+ (NSView *)accountSetupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
++ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
   static HGSSetUpSimpleAccountViewController *sSetUpTwitterAccountViewController = nil;
   if (!sSetUpTwitterAccountViewController) {
     NSBundle *ourBundle = HGSGetPluginBundle();
@@ -87,34 +86,50 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (BOOL)authenticateWithPassword:(NSString *)password {
-  // Test this account to see if we can connect.
   BOOL authenticated = NO;
-  NSString *accountName = [self accountName];
+  // Test this account to see if we can connect.
+  NSString *userName = [self userName];
+  NSURLRequest *accountRequest = [self accountURLRequestForUserName:userName
+                                                           password:password];
+  if (accountRequest) {
+    NSURLResponse *accountResponse = nil;
+    NSError *error = nil;
+    [NSURLConnection sendSynchronousRequest:accountRequest
+                          returningResponse:&accountResponse
+                                      error:&error];
+    authenticated = (error == nil);
+  }
+  return authenticated;
+}
+
+- (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
+                                      password:(NSString *)password {
   NSURL *accountTestURL = [NSURL URLWithString:kTwitterVerifyAccountURLString];
   NSMutableURLRequest *accountRequest
     = [NSMutableURLRequest requestWithURL:accountTestURL
                               cachePolicy:NSURLRequestUseProtocolCachePolicy
                           timeoutInterval:15.0];
   NSString *authStr = [NSString stringWithFormat:@"%@:%@",
-                       accountName, password];
+                       userName, password];
   NSData *authData = [authStr dataUsingEncoding:NSASCIIStringEncoding];
   NSString *authBase64 = [GTMBase64 stringByEncodingData:authData];
   NSString *authValue = [NSString stringWithFormat:@"Basic %@", authBase64];
   [accountRequest setValue:authValue forHTTPHeaderField:@"Authorization"];
-  NSURLResponse *accountResponse = nil;
-  NSError *error = nil;
-  [NSURLConnection sendSynchronousRequest:accountRequest
-                        returningResponse:&accountResponse
-                                    error:&error];
-  authenticated = (error == nil);
-  [self setIsAuthenticated:authenticated];
-  return authenticated;  // Return as convenience.
+  return accountRequest;
 }
 
 + (BOOL)openTwitterHomePage {
   NSURL *twitterURL = [NSURL URLWithString:kTwitterURLString];
   BOOL success = [[NSWorkspace sharedWorkspace] openURL:twitterURL];
   return success;
+}
+
+#pragma mark NSURLConnection Delegate Methods
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+  HGSAssert(connection == [self connection], nil);
+  [self setConnection:nil];
+  [self setAuthenticated:YES];
 }
 
 @end

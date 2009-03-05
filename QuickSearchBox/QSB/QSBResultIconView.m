@@ -81,9 +81,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)viewWillDraw {
   [super viewWillDraw];
   if (iconNeedsUpdating_) {
-    QSBSourceTableResult *result = [controller_ representedObject];
-    HGSObject *object = [result representedObject];
-    NSImage *icon = [object valueForKey:kHGSObjectAttributeIconKey];
+    QSBSourceTableResult *tableResult = [controller_ representedObject];
+    HGSResult *result = [tableResult representedResult];
+    NSImage *icon = [result valueForKey:kHGSObjectAttributeIconKey];
     [self setImage:icon];
     iconNeedsUpdating_ = NO;
   }

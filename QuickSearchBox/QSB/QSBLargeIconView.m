@@ -55,8 +55,11 @@ CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
   size_t minAvgY = height;
   size_t maxAvgY = 0;
   
-  unsigned char* pixels = CGBitmapContextGetData(c);
-  if (!pixels) return CGRectZero;
+   unsigned char* pixels = CGBitmapContextGetData(c);
+  
+  if (!width || !height || !pixels) {
+    return CGRectZero;
+  }
   
   for (size_t j = 0; j < height; j++) {
     NSInteger rowAverage = 0;
@@ -79,7 +82,8 @@ CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
     }
   }
   
-  CGRect rect = CGRectMake(minX, minAvgY, maxX - minX + 1, maxAvgY - minAvgY + 1);
+  CGRect rect = CGRectMake(minX, minAvgY, maxX - minX + 1, 
+                           maxAvgY - minAvgY + 1);
   return rect;
 }
 
@@ -97,7 +101,10 @@ CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
   if (!cspace) return;
   
   void *bitmapData = malloc(4 * canvasSize.width * canvasSize.height);
-  if (!bitmapData) return;
+  if (!bitmapData) {
+    CGColorSpaceRelease(cspace);
+    return;
+  }
   
   CGContextRef context = 
     CGBitmapContextCreate(bitmapData,
@@ -107,7 +114,7 @@ CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
                           canvasSize.width * 4, // bytes per pixel
                           cspace,
                           kCGImageAlphaPremultipliedFirst);
-  CFRelease(cspace);
+  CGColorSpaceRelease(cspace);
   if (context) {
     [NSGraphicsContext saveGraphicsState];
     NSGraphicsContext *nsGraphicsContext = 

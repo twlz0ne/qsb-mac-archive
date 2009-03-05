@@ -47,24 +47,26 @@
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   // We use the raw query to see if it's url like
-  BOOL isValid = YES;
-  
-  // No spaces (can't use [query uniqueWords] because that would split on
-  // punct in addition to spaces).
-  NSString *urlString = [query rawQueryString];
-  if ([urlString rangeOfString:@" "].location != NSNotFound) {
-    isValid = NO;
-  } else {
-    // Does it appear to have a scheme?
-    if ([urlString rangeOfString:@":"].location != NSNotFound) {
-      // nothing to do, already set to yes
-      // isValid = YES;
+  BOOL isValid = [super isValidSourceForQuery:query];
+  if (isValid) {
+
+    // No spaces (can't use [query uniqueWords] because that would split on
+    // punct in addition to spaces).
+    NSString *urlString = [query rawQueryString];
+    if ([urlString rangeOfString:@" "].location != NSNotFound) {
+      isValid = NO;
     } else {
-      // If it doesn't have a '.' or '/', give up.  (covers "internalsite/bar"
-      // and "google.com")
-      if ([urlString rangeOfString:@"."].location == NSNotFound
-          && [urlString rangeOfString:@"/"].location == NSNotFound) {
-        isValid = NO;
+      // Does it appear to have a scheme?
+      if ([urlString rangeOfString:@":"].location != NSNotFound) {
+        // nothing to do, already set to yes
+        // isValid = YES;
+      } else {
+        // If it doesn't have a '.' or '/', give up.  (covers "internalsite/bar"
+        // and "google.com")
+        if ([urlString rangeOfString:@"."].location == NSNotFound
+            && [urlString rangeOfString:@"/"].location == NSNotFound) {
+          isValid = NO;
+        }
       }
     }
   }
@@ -120,11 +122,11 @@
          [NSNumber numberWithFloat:1.0f], kHGSObjectAttributeRankKey,
          nil];
          
-    HGSObject *result = [HGSObject objectWithIdentifier:url
-                                                   name:queryString
-                                                   type:kHGSTypeWebpage
-                                                 source:self
-                                             attributes:attributes];
+    HGSResult *result = [HGSResult resultWithURL:url
+                                            name:queryString
+                                            type:kHGSTypeWebpage
+                                          source:self
+                                      attributes:attributes];
     [operation setResults:[NSArray arrayWithObject:result]];
   }
 }

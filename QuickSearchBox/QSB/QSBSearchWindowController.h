@@ -31,13 +31,14 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <Vermilion/Vermilion.h>
 #import "GTMDefines.h"
 
 @class QSBTextFieldEditor;
 @class QSBLargeIconView;
 @class QSBMenuButton;
 @class QSBCustomPanel;
-@class QSBQueryController;
+@class QSBSearchViewController;
 @class CAAnimation;
 
 const NSTimeInterval kQSBAppearDelay;
@@ -55,7 +56,7 @@ const NSTimeInterval kQSBAppearDelay;
   IBOutlet NSWindow *shieldWindow_;
   IBOutlet NSView *resultsOffsetterView_;
 
-  QSBQueryController *activeQueryController_;  // Currently active query.
+  QSBSearchViewController *activeSearchViewController_;  // Currently active query.
 
   BOOL needToUpdatePositionOnActivation_;  // Do we need to reposition
   // (STRONG) Resets our query to "" after kQSBResetQueryTimeoutPrefKey seconds
@@ -71,15 +72,15 @@ const NSTimeInterval kQSBAppearDelay;
   // Our list of corpora for the searchMenu
   NSArray *corpora_;
 }
-@property(nonatomic, retain) QSBQueryController *activeQueryController;
+@property(nonatomic, retain) QSBSearchViewController *activeSearchViewController;
 
 // Designated initializer
 - (id)init;
 
 - (NSImageView *)previewImageView;
 
-// Return the current query controller.
-- (QSBQueryController *)activeQueryController;
+// Return the current search view controller.
+- (QSBSearchViewController *)activeSearchViewController;
 
 // Offset of all results views from top of window.
 - (float)resultsViewOffsetFromTop;
@@ -119,6 +120,18 @@ const NSTimeInterval kQSBAppearDelay;
 - (void)setResultsWindowHeight:(float)height
                      animating:(bool)animating;
 
+// Grab the selection from the Finder
+- (IBAction)grabSelection:(id)sender;
+
+// Drop the selection from the Finder on the current selection
+- (IBAction)dropSelection:(id)sender;
+
+// Search for a string in the UI
+- (void)searchForString:(NSString *)string;
+
+// Select an object in the UI
+- (IBAction)selectResults:(HGSResultArray *)results;
+
 @end
 
 // Notifications for showing and hiding the search window
@@ -141,11 +154,11 @@ const NSTimeInterval kQSBAppearDelay;
 #define kQSBDidPivotNotification @"QSBDidPivotNotification"
 
 // Some keys for QSB Notifications
-// kQSBNotificationQueryKey type is QSBQuery *
-#define kQSBNotificationQueryKey @"QSBNotificationQueryKey"
-// kQSBNotificationDirectObjectKey is HGSObject *
-#define kQSBNotificationDirectObjectKey @"QSBNotificationDirectObjectKey" 
-// kQSBNotificationIndirectObjectKey is HGSObject *
-#define kQSBNotificationIndirectObjectKey @"QSBNotificationIndirectObjectKey"
+// kQSBNotificationSearchControllerKey type is QSBSearchController *
+#define kQSBNotificationSearchControllerKey @"QSBNotificationSearchControllerKey"
+// kQSBNotificationDirectObjectsKey is HGSResultArray *
+#define kQSBNotificationDirectObjectsKey @"QSBNotificationDirectObjectsKey" 
+// kQSBNotificationIndirectObjectsKey is HGSResultArray *
+#define kQSBNotificationIndirectObjectsKey @"QSBNotificationIndirectObjectsKey"
 // kQSBNotificationSuccessKey type is NSNumber * representing a bool
 #define kQSBNotificationSuccessKey @"QSBNotificationSuccessKey"

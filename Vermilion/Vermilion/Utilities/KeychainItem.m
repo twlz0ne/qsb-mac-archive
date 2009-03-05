@@ -33,11 +33,9 @@
 #import "KeychainItem.h"
 #import "HGSLog.h"
 
-@interface KeychainItem(Private)
+@interface KeychainItem()
 - (KeychainItem*)initWithRef:(SecKeychainItemRef)ref;
 - (void)loadKeychainData;
-- (BOOL)setAttributeType:(SecKeychainAttrType)type toString:(NSString*)value;
-- (BOOL)setAttributeType:(SecKeychainAttrType)type toValue:(void*)valuePtr withLength:(UInt32)length;
 @end
 
 @implementation KeychainItem

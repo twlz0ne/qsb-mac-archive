@@ -31,13 +31,17 @@
 --  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --
 
-on doScript(theScript)
-	tell application "Terminal" to do script theScript
+on doScript(theScripts)
+	repeat with theScript in theScripts
+		tell application "Terminal" to do script theScript
+	end repeat
 end doScript
 
-on openDirectory(thePath)
+on openDirectory(thePaths)
 	tell application "Terminal"
-		do script "cd " & "\"" & thePath & "\""
-		activate
+		repeat with thePath in thePaths
+			do script "cd " & "\"" & thePath & "\""
+			activate
+		end repeat
 	end tell
 end openDirectory

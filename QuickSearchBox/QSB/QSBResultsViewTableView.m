@@ -480,7 +480,10 @@ sortDescriptorsDidChange:(NSArray *)oldDescriptors {
 - (void)setDelegate:(id)delegate {
   id superDelegate = [super delegate];
   if (![superDelegate isKindOfClass:[QSBViewTableViewDelegateProxy class]]) {
-    [super setDelegate:[[QSBViewTableViewDelegateProxy alloc] initWithViewTableView:self delegate:delegate]];
+    delegateProxy_ 
+      = [[QSBViewTableViewDelegateProxy alloc] initWithViewTableView:self 
+                                                            delegate:delegate];
+    [super setDelegate:delegateProxy_];
   } else {
     // We go through this "set to nil, set back to value" dance because
     // NSTableView caches information about the what methods the delegate
@@ -494,16 +497,8 @@ sortDescriptorsDidChange:(NSArray *)oldDescriptors {
 
 - (void)dealloc {
   // Clean up the delegate and datasources we may have set up
-  id superDelegate = [super delegate];
-  if ([superDelegate isKindOfClass:[QSBViewTableViewDelegateProxy class]]) {
-    [super setDelegate:nil];
-    [superDelegate release];
-  }
-  id superDataSource = [super dataSource];
-  if ([superDataSource isKindOfClass:[QSBViewTableViewDataSourceProxy class]]) {
-    [super setDataSource:nil];
-    [superDataSource release];
-  }
+  [delegateProxy_ release];
+  [dataSourceProxy_ release];
   [super dealloc];
 }
 
@@ -519,8 +514,12 @@ sortDescriptorsDidChange:(NSArray *)oldDescriptors {
 // our super setDataSource which will call through to our proxy setDataSource.
 - (void)setDataSource:(id)dataSource {
   id superDataSource = [super dataSource];
-  if (![superDataSource isKindOfClass:[QSBViewTableViewDataSourceProxy class]]) {
-    [super setDataSource:[[QSBViewTableViewDataSourceProxy alloc] initWithViewTableView:self dataSource:dataSource]];
+  Class dsProxyClass = [QSBViewTableViewDataSourceProxy class];
+  if (![superDataSource isKindOfClass:dsProxyClass]) {
+    dataSourceProxy_ 
+      = [[QSBViewTableViewDataSourceProxy alloc] initWithViewTableView:self 
+                                                            dataSource:dataSource];
+    [super setDataSource:dataSourceProxy_];
   } else {
     // We go through this "set to nil, set back to value" dance because
     // NSTableView caches information about the what methods the dataSource
