@@ -424,7 +424,7 @@ void ResultsDictionaryReleaseCallBack(CFAllocatorRef allocator,
 }
 
 CFStringRef ResultsDictionaryCopyDescriptionCallBack(const void *value) {
-  return (CFStringRef)[(id)value description];
+  return (CFStringRef)[[(id)value description] copy];
 }
 
 Boolean ResultsDictionaryEqualCallBack(const void *value1, 
