@@ -410,7 +410,6 @@
 		7FE961B20F5E66E100CBBA8D /* action-audiochat-icon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7FE2537B0F5CDA23004FE5A6 /* action-audiochat-icon.pdf */; };
 		7FE961B30F5E66E100CBBA8D /* action-chat-icon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7FE2537A0F5CDA23004FE5A6 /* action-chat-icon.pdf */; };
 		7FE961B40F5E66E100CBBA8D /* action-videochat-icon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7FE253790F5CDA23004FE5A6 /* action-videochat-icon.pdf */; };
-		7FE9628E0F5F06D800CBBA8D /* action-audiochat-icon.pdf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7FE2537B0F5CDA23004FE5A6 /* action-audiochat-icon.pdf */; };
 		7FF019B30EB089CB001A2C7B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
 		7FF019B40EB089CB001A2C7B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		7FF019B50EB089CB001A2C7B /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -876,7 +875,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 5AF0EB620F60744E0041E0B9 /* Dictionary */;
+			remoteGlobalIDString = 5AF0EB620F60744E0041E0B9;
 			remoteInfo = Dictionary;
 		};
 		5AF2C47A0E5E19A400F4D546 /* PBXContainerItemProxy */ = {
@@ -1489,7 +1488,6 @@
 				F4EF90DE0ECB4529008DD6DA /* Networking.scptd in CopyFiles */,
 				F4EF90DF0ECB4529008DD6DA /* Images.scptd in CopyFiles */,
 				5AF0EC900F6076000041E0B9 /* Dictionary.hgs in CopyFiles */,
-				7FE9628E0F5F06D800CBBA8D /* action-audiochat-icon.pdf in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
