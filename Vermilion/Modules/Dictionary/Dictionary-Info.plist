@@ -31,6 +31,8 @@
 			<string>Dictionary</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
+			<key>HGSSearchSourceCannotArchive</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>

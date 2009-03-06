@@ -41,6 +41,7 @@ NSString *kDictionaryRangeLengthKey = @"DictionaryRangeLength";
 NSString *kDictionaryTermKey = @"DictionaryTerm";
 static NSString *kShowInDictionaryAction
   = @"com.google.qsb.dictionary.action.open";
+static const int kMinQueryLength = 3;
 
 @interface DictionarySearchSource : HGSCallbackSearchSource {
  @private
@@ -64,6 +65,14 @@ static NSString *kShowInDictionaryAction
 - (void) dealloc {
   [dictionaryIcon_ release];
   [super dealloc];
+}
+
+- (BOOL)isValidSourceForQuery:(HGSQuery *)query {
+  BOOL isValid = [super isValidSourceForQuery:query];
+  if (isValid) {
+    isValid = ([[query rawQueryString] length] >= kMinQueryLength);
+  }
+  return isValid;
 }
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
