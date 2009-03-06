@@ -482,12 +482,17 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (NSArray *)parseAndCacheResponseData:(NSData *)responseData
                              withQuery:(HGSQuery *)query {
+  NSArray *cachedResponse = nil;
   NSArray *response = [self responseWithJSONData:responseData];
-  // Add parse response to the cache.
-  if ([response count] > 0) {
-    [self cacheValue:response forKey:[query rawQueryString]];
+  if ([response isKindOfClass:[NSArray class]]) {
+    // Add parse response to the cache.
+    if ([response count] > 0) {
+      [self cacheValue:response forKey:[query rawQueryString]];
+    }
+    cachedResponse = [self filteredSuggestionsWithResponse:response 
+                                                 withQuery:query];
   }
-  return [self filteredSuggestionsWithResponse:response withQuery:query];
+  return cachedResponse;
 }
 
 - (NSArray *)filteredSuggestionsWithResponse:(NSArray *)response
@@ -534,92 +539,117 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (NSMutableArray *)suggestionsWithResponse:(NSArray *)response
                                   withQuery:(HGSQuery *)query {
-  if (!response || [response count] < 2) {
+  // This is all documented here:
+  // http://wiki.corp.google.com/twiki/bin/view/Main/GoogleSuggestServerAPI#_Horizontal_JSON
+  if ([response count] < 2) {
     return [NSMutableArray array];
   }
+  // Arg 0 is the query string
+  // Arg 1 is the suggestions
+  NSArray *suggestions = [response objectAtIndex:1];
+  NSMutableArray *suggestionResults 
+    = [NSMutableArray arrayWithCapacity:[suggestions count]];
+  for (NSArray *suggestionItem in suggestions) {
+    // We request the type, so we should always have at least 3 args.
+    if (!([suggestionItem isKindOfClass:[NSArray class]] &&
+          [suggestionItem count] > 2)) {
+      HGSLog(@"Unexpected suggestion %@ from response: %@ for query: %@", 
+             suggestionItem, response, query);
+      continue;
+    }
+    
+    // For suggest arg 0 will be the suggestion
+    // For NavSuggest arg 0 will be the URL
+    NSString *suggestionString = [suggestionItem objectAtIndex:0];
+    if ([suggestionString respondsToSelector:@selector(stringValue)]) {
+      suggestionString = [(id)suggestionString stringValue];
+    } else if (![suggestionString isKindOfClass:[NSString class]]) {
+      HGSLog(@"Unexpected suggestionString %@ from suggestion: %@ from "
+             @"response: %@ for query: %@", 
+             suggestionString, suggestionItem, response, query);
+      continue;
+    }
+    
+    // For both suggest and navsuggest arg 2 is the type.
+    NSNumber *nsType = [suggestionItem objectAtIndex:2];
+    if (![nsType isKindOfClass:[NSNumber class]]) {
+      HGSLog(@"Unexpected type %@ from suggestion: %@ from "
+             @"response: %@ for query: %@", 
+             nsType, suggestionItem, response, query);
+      continue;
+    }
+    
+    NSInteger suggestionType = [nsType intValue];
+    NSDictionary *attributes = nil;
+    NSString *urlString = nil;
+    NSString *name = nil;
+    NSString *type = nil;
+    if (suggestionType == kHGSSuggestTypeSuggest) {
+      NSString *escapedSuggestion 
+        = [suggestionString gtm_stringByEscapingForURLArgument];
+      urlString = [NSString stringWithFormat:@"googlesuggest://%@", 
+                   escapedSuggestion]; 
+      // TODO(altse): JSON response includes the type of the suggestion, we
+      //              should import the enums.
+      //              if (row[2] == 'calc') HGSCompletionTypeCalc;
+      //              if (row[2] is integer) HGSCompletionTypeSuggest;
 
-  NSMutableArray *suggestions = [[[NSMutableArray alloc] initWithCapacity:[[response objectAtIndex:1] count]] autorelease];
-  NSEnumerator *suggestionsEnum = [[response objectAtIndex:1] objectEnumerator];
-  NSArray *suggestionItem = nil;
-
-  while ((suggestionItem = [suggestionsEnum nextObject])) {
-    if ([suggestionItem isKindOfClass:[NSArray class]] &&
-        [suggestionItem count] > 0 &&
-        [suggestionItem objectAtIndex:0]) {
-
-      // expects > Google Suggest: suggestion NavSuggest: URL
-      id suggestionString = [suggestionItem objectAtIndex:0];
-      // expects > Google Suggest: 1,600,000 results, NavSuggest: Website Title.
-      id suggestionLabel = [suggestionItem objectAtIndex:1];
-      // expects > Google Suggest: 0 NavSuggest: 5
-      NSInteger suggestionType = [[suggestionItem objectAtIndex:2] intValue];
-
-      if ([suggestionString respondsToSelector:@selector(stringValue)]) {
-        suggestionString = [suggestionString stringValue];
-      } else if (![suggestionString isKindOfClass:[NSString class]]) {
+      attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                    suggestionString, kHGSObjectAttributeStringValueKey,
+                    [self navIcon], kHGSObjectAttributeIconKey,
+                    nil];
+      name = suggestionString;
+      type = kHGSTypeGoogleSuggest;
+    } else if (suggestionType == kHGSSuggestTypeNavSuggest) {
+      // For Nav Suggest arg 1 is the name,
+      name = [suggestionItem objectAtIndex:1];
+      if ([name respondsToSelector:@selector(stringValue)]) {
+        name = [(id)name stringValue];
+      } 
+      if (!([name isKindOfClass:[NSString class]] && [name length] > 1)) {
+        HGSLog(@"Unexpected name %@ for navsuggestion: %@ from response: %@ "
+               @"for query: %@", 
+               name, suggestionItem, response, query);
         continue;
       }
 
-      if (suggestionType == kHGSSuggestTypeSuggest) {
-        NSString *escapedSuggestion = [suggestionString gtm_stringByEscapingForURLArgument];
-        NSURL *completionId = [NSURL URLWithString:[NSString stringWithFormat:@"googlesuggest://%@", escapedSuggestion]];
-        // TODO(altse): JSON response includes the type of the suggestion, we
-        //              should import the enums.
-        //              if (row[2] == 'calc') HGSCompletionTypeCalc;
-        //              if (row[2] is integer) HGSCompletionTypeSuggest;
-        NSMutableDictionary *attributes
-          = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-             suggestionString, kHGSObjectAttributeStringValueKey,
-             [self navIcon], kHGSObjectAttributeIconKey,
-             nil];
-        if ([suggestionItem count] > 3) {
-          id isDidYouMean = [suggestionItem objectAtIndex:3];
-          if ([isDidYouMean isKindOfClass:[NSString class]] &&
-              [isDidYouMean isEqualToString:@"dym"]) {  // Did you mean?
-            [attributes setObject:[NSNumber numberWithBool:YES]
-                           forKey:kHGSObjectAttributeIsCorrectionKey];
-          }
-        }
-        
-        HGSResult* suggestion = [HGSResult resultWithURL:completionId
-                                                    name:suggestionString
-                                                    type:kHGSTypeGoogleSuggest
-                                                  source:self
-                                              attributes:attributes];
-        [suggestions addObject:suggestion];
-      } else if (suggestionType == kHGSSuggestTypeNavSuggest) {
-        NSString *title = @"";
-        if ([suggestionLabel respondsToSelector:@selector(stringValue)]) {
-          title = [suggestionLabel stringValue];
-        } else if ([suggestionLabel isKindOfClass:[NSString class]]) {
-          title = suggestionLabel;
-        }
-
-        // Only create a navsuggest if it looks and smells like a URL.
-        if ([title length] > 1 &&
-            [suggestionString isKindOfClass:[NSString class]] &&
-            [suggestionString hasPrefix:@"http://"]) {
-
-          NSURL *url = [NSURL URLWithString:suggestionString];
-          NSDictionary *attributes 
-            = [NSDictionary dictionaryWithObjectsAndKeys:
-               url, kHGSObjectAttributeURIKey,
-               [NSNumber numberWithBool:YES], kHGSObjectAttributeAllowSiteSearchKey,
-               [NSNumber numberWithBool:YES], kHGSObjectAttributeIsSyntheticKey,
-               [url absoluteString], kHGSObjectAttributeSourceURLKey,
-               nil];
-          HGSResult *navsuggestion = [HGSResult resultWithURL:url
-                                                         name:title
-                                                         type:kHGSTypeGoogleNavSuggest
-                                                       source:self
-                                                   attributes:attributes];
-          [suggestions addObject:navsuggestion];
-        }
+      if (!([suggestionString hasPrefix:@"http://"])) {
+        HGSLog(@"Unexpected url %@ for navsuggestion: %@ from response: %@ "
+               @"for query: %@", 
+               suggestionString, suggestionItem, response, query);
+        continue;
+      }
+      urlString = suggestionString;
+      NSNumber *yesValue = [NSNumber numberWithBool:YES];
+      attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                    yesValue, kHGSObjectAttributeAllowSiteSearchKey,
+                    yesValue, kHGSObjectAttributeIsSyntheticKey,
+                    urlString, kHGSObjectAttributeSourceURLKey,
+                    nil];
+      type = kHGSTypeGoogleNavSuggest;
+    }
+    if (urlString) {
+      NSURL *url = [NSURL URLWithString:urlString];
+      if (!url) {
+        HGSLog(@"Bad suggestion %@ for suggestion: %@ from response: %@ "
+               @"for query: %@", urlString, suggestionItem, response, query);
+        continue;
+      }
+      HGSResult *navsuggestion = [HGSResult resultWithURL:url
+                                                     name:name
+                                                     type:type
+                                                   source:self
+                                               attributes:attributes];
+      if (navsuggestion) {
+        [suggestionResults addObject:navsuggestion];
+      } else {
+        HGSLog(@"Unable to create result with url: %@ name: %@ attributes: %@",
+               url, name, attributes);
       }
     }
   }
 
-  return suggestions;
+  return suggestionResults;
 }
 
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
@@ -685,7 +715,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   HGSResult *result;
   for (NSUInteger i = 0; (result = [enumerator nextObject]); ++i) {
     if ([result isOfType:kHGSTypeGoogleSuggest] &&
-        ![result valueForKey:kHGSObjectAttributeIsCorrectionKey] &&
         [[result valueForKey:kHGSObjectAttributeStringValueKey] length] < queryLength + lengthThreshold) {
       [toRemove addIndex:i];
     }

@@ -60,7 +60,6 @@ extern NSString* const kHGSObjectAttributeImmediateIconKey;  // NSImage
 extern NSString* const kHGSObjectAttributeIconPreviewFileKey;  // NSURL
 extern NSString *const kHGSObjectAttributeCompoundIconPreviewFileKey;  // NSURL
 extern NSString* const kHGSObjectAttributeIsSyntheticKey;  // NSNumber (BOOL)
-extern NSString* const kHGSObjectAttributeIsCorrectionKey;  // NSNumber (BOOL)
 extern NSString* const kHGSObjectAttributeIsContainerKey;  // NSNumber (BOOL)
 extern NSString* const kHGSObjectAttributeDefaultActionKey;  // id<HGSAction>
 // Path cell-related keys
