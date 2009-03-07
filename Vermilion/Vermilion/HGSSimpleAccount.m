@@ -288,7 +288,7 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
     NSString *summary = [NSString stringWithFormat:summaryFormat,
                          [account_ type]];
     NSString *explanationFormat
-      = HGSLocalizedString(@"The %@ account ‚Äò%@‚Äô could not be set up for "
+      = HGSLocalizedString(@"The %@ account '%@' could not be set up for "
                           @"use.  Please check your password and try "
                           @"again.", nil);
     NSString *explanation = [NSString stringWithFormat:explanationFormat,
@@ -400,7 +400,7 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
       NSString *summary = HGSLocalizedString(@"Account already set up.",
                                             nil);
       NSString *format
-        = HGSLocalizedString(@"The account ‚Äò%@‚Äô has already been set up for "
+        = HGSLocalizedString(@"The account '%@' has already been set up for "
                             @"use in Quick Search Box.", nil);
       [self presentMessageOffWindow:sheet
                         withSummary:summary
@@ -457,7 +457,7 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
         NSString *summary = HGSLocalizedString(@"Could not authenticate that "
                                               @"account.", nil);
         NSString *format
-          = HGSLocalizedString(@"The account ‚Äò%@‚Äô could not be authenticated. "
+          = HGSLocalizedString(@"The account '%@' could not be authenticated. "
                               @"Please check the account name and password "
                               @"and try again.", nil);
         [self presentMessageOffWindow:sheet
