@@ -764,7 +764,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   NSURL *url = [result url];
   if ([url isFileURL]) {
     mdItem = MDItemCreate(kCFAllocatorDefault, (CFStringRef)[url path]);
-    GTMCFAutorelease(result);
+    GTMCFAutorelease(mdItem);
   }
   return mdItem;
 }
