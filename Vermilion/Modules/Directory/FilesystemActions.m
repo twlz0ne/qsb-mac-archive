@@ -126,6 +126,10 @@
   return icon;
 }
 
+- (BOOL)appliesToResults:(HGSResultArray *)results {
+  // If we have an icon, then we probably apply.
+  return [self displayIconForResults:results] != nil;
+}
 @end
 
 @implementation FileSystemScriptAction
@@ -162,7 +166,7 @@
   NSString *handlerName = [self handlerName];
   NSAppleEventDescriptor *answer
     = [script gtm_executePositionalHandler:handlerName
-                                parameters:args
+                                parameters:[NSArray arrayWithObject:args]
                                      error:&error];
   BOOL isGood = YES;
   if (!answer || error) {

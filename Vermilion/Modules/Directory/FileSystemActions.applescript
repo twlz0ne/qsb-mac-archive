@@ -32,22 +32,18 @@
 
 -- Script for FileSystemShowInFinderAction
 on showInFinder(x)
-	tell application "Finder"
-		activate
-		repeat with y in x
-			set macpath to POSIX file y as text
-			reveal macpath
-		end repeat
-	end tell
+	repeat with y in x
+		set macpath to POSIX file y as text
+		tell application "Finder" to reveal macpath
+	end repeat
+	tell application "Finder" to activate
 end showInFinder
 
 -- Script for FileSystemGetInfoAction
 on getInfo(x)
-	tell application "Finder"
-		activate
-		repeat with y in x
-			set macpath to POSIX file y as text
-			open information window of item macpath
-		end repeat
-	end tell
+	repeat with y in x
+		set macpath to POSIX file y as text
+		tell application "Finder" to open information window of item macpath
+	end repeat
+	tell application "Finder" to activate
 end getInfo
