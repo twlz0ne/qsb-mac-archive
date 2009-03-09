@@ -711,7 +711,7 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
   return handled;
 }
 
-- (BOOL)moveWorldLeftQSB {
+- (BOOL)moveWordLeftQSB {
   return [self moveLeftQSB];
 }
 
