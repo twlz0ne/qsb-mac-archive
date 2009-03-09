@@ -57,3 +57,4 @@
 #import <Vermilion/HGSAccount.h>
 #import <Vermilion/HGSAccountsExtensionPoint.h>
 #import <Vermilion/HGSSimpleAccount.h>
+#import <Vermilion/HGSStringUtil.h>

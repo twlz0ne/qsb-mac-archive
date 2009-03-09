@@ -106,7 +106,8 @@ NSString *const kAppUISourceAttributeElementKey
 }
 
 - (void)addResultsFromElement:(GTMAXUIElement*)element 
-                      toArray:(NSMutableArray*)array {
+                      toArray:(NSMutableArray*)array
+                     matching:(NSString *)rawString {
   if (element) {
     NSArray *children 
       = [element accessibilityAttributeValue:NSAccessibilityChildrenAttribute];
@@ -118,7 +119,7 @@ NSString *const kAppUISourceAttributeElementKey
       NSString *role 
         = [child stringValueForAttribute:NSAccessibilityRoleAttribute];
       if ([placeHolderRoles containsObject:role]) {
-        [self addResultsFromElement:child toArray:array];
+        [self addResultsFromElement:child toArray:array matching:rawString];
       } else {
         NSNumber *enabled 
           = [child accessibilityAttributeValue:NSAccessibilityEnabledAttribute];
@@ -128,9 +129,18 @@ NSString *const kAppUISourceAttributeElementKey
         if (!name) {
           name = [child stringValueForAttribute:NSAccessibilityRoleDescriptionAttribute];
         }
+        if ([name length] == 0) continue;
+        
+        // Filter out the ones we don't want.
+        NSString *compareName 
+          = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:name];
+        
+        if ([rawString length] && ![compareName hasPrefix:rawString]) {
+          continue;
+        }
         // TODO(dmaclach): deal with lower level UI elements such as 
         // buttons, splitters etc.
-        if ([name length] == 0) continue;
+        
         NSString *nameString 
           = [name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         NSString *uriString 
@@ -155,7 +165,7 @@ NSString *const kAppUISourceAttributeElementKey
              icon, kHGSObjectAttributeIconKey,
              nil];
         HGSAction *defaultAction 
-          = [ApplicationUIAction defaultActionForElement:element];
+          = [ApplicationUIAction defaultActionForElement:child];
         if (defaultAction) {
           [attributes setObject:defaultAction 
                          forKey:kHGSObjectAttributeDefaultActionKey];
@@ -178,24 +188,22 @@ NSString *const kAppUISourceAttributeElementKey
     HGSResult *pivotObject = [[operation query] pivotObject];
     GTMAXUIElement *element 
       = [pivotObject valueForKey:kAppUISourceAttributeElementKey];
+    if (!element) {
+      NSDictionary *appData = [self getAppInfoFromResult:pivotObject];
+      if (appData) {
+        NSNumber *pid 
+          = [appData objectForKey:@"NSApplicationProcessIdentifier"];
+        element = [GTMAXUIElement elementWithProcessIdentifier:[pid intValue]];
+      }     
+    }
     if (element) {
       NSMutableArray *results = [NSMutableArray array];
-      [self addResultsFromElement:element toArray:results];
+      HGSQuery* query = [operation query];
+      NSString *rawString = [query rawQueryString];
+      rawString 
+        = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:rawString];
+      [self addResultsFromElement:element toArray:results matching:rawString];
       [operation setResults:results];
-    }
-  }
-}
-   
-// TODO(dmaclach):fix up annotateObject so that it works properly with immutable
-// objects.
-- (void)annotateObject:(HGSResult *)result withQuery:(HGSQuery *)query {
-  NSDictionary *appData = [self getAppInfoFromResult:result];
-  if (appData) {
-    NSNumber *pid = [appData objectForKey:@"NSApplicationProcessIdentifier"];
-    GTMAXUIElement *element 
-      = [GTMAXUIElement elementWithProcessIdentifier:[pid intValue]];
-    if (element) {
-      [result setValue:element forKey:kAppUISourceAttributeElementKey];
     }
   }
 }
