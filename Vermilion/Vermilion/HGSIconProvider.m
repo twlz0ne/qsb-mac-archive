@@ -447,6 +447,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 
 // Return an image that has a round rectangle frame and a drop shadow
 + (NSImage *)imageWithRoundRectAndDropShadow:(NSImage *)image {
+  if (!image) return nil;
   NSImage *formattedImage = [[[NSImage alloc] init] autorelease];
   
   NSSize preferredSize = [self preferredIconSize];
