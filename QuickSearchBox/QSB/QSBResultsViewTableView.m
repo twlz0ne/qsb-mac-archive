@@ -473,32 +473,14 @@ sortDescriptorsDidChange:(NSArray *)oldDescriptors {
 
 @implementation QSBResultsViewTableView
 
-// Set our delegate up properly. If our super delegate isn't of type
-// QSBViewTableViewDelegateProxy create a QSBViewTableViewDelegateProxy and
-// install it in there with it's delegate set to |delegate|. Otherwise call our
-// super setDelegate which will call through to our proxy setDelegate.
-- (void)setDelegate:(id)delegate {
-  id superDelegate = [super delegate];
-  if (![superDelegate isKindOfClass:[QSBViewTableViewDelegateProxy class]]) {
-    delegateProxy_ 
-      = [[QSBViewTableViewDelegateProxy alloc] initWithViewTableView:self 
-                                                            delegate:delegate];
-    [super setDelegate:delegateProxy_];
-  } else {
-    // We go through this "set to nil, set back to value" dance because
-    // NSTableView caches information about the what methods the delegate
-    // responds to. Setting things to nil and then resetting them "clears" the
-    // cache.
-    [super setDelegate:nil];
-    [superDelegate setDelegate:delegate];
-    [super setDelegate:superDelegate];
-  }
-}
-
 - (void)dealloc {
   // Clean up the delegate and datasources we may have set up
+  // Must set them to nil because [super dealloc] calls setDelegate:nil
+  // which will attempt to re-release these.
   [delegateProxy_ release];
+  delegateProxy_ = nil;
   [dataSourceProxy_ release];
+  dataSourceProxy_ = nil;
   [super dealloc];
 }
 
@@ -507,27 +489,60 @@ sortDescriptorsDidChange:(NSArray *)oldDescriptors {
   return [[super delegate] delegate];
 }
 
+// Set our delegate up properly. If our super delegate isn't of type
+// QSBViewTableViewDelegateProxy create a QSBViewTableViewDelegateProxy and
+// install it in there with it's delegate set to |delegate|. Otherwise call our
+// super setDelegate which will call through to our proxy setDelegate.
+- (void)setDelegate:(id)delegate {
+  if (delegate) {
+    id superDelegate = [super delegate];
+    if (![superDelegate isKindOfClass:[QSBViewTableViewDelegateProxy class]]) {
+      delegateProxy_ 
+        = [[QSBViewTableViewDelegateProxy alloc] initWithViewTableView:self 
+                                                              delegate:delegate];
+      [super setDelegate:delegateProxy_];
+    } else {
+      // We go through this "set to nil, set back to value" dance because
+      // NSTableView caches information about the what methods the delegate
+      // responds to. Setting things to nil and then resetting them "clears" the
+      // cache.
+      [super setDelegate:nil];
+      [superDelegate setDelegate:delegate];
+      [super setDelegate:superDelegate];
+    }
+  } else {
+    [super setDelegate:nil];
+    [delegateProxy_ release];
+    delegateProxy_ = nil;
+  }
+}
 
 // Set our dataSource up properly. If our super dataSource isn't of type
 // QSBViewTableViewDataSourceProxy create a QSBViewTableViewDataSourceProxy and
 // install it in there with it's dataSource set to |dataSource|. Otherwise call 
 // our super setDataSource which will call through to our proxy setDataSource.
 - (void)setDataSource:(id)dataSource {
-  id superDataSource = [super dataSource];
-  Class dsProxyClass = [QSBViewTableViewDataSourceProxy class];
-  if (![superDataSource isKindOfClass:dsProxyClass]) {
-    dataSourceProxy_ 
-      = [[QSBViewTableViewDataSourceProxy alloc] initWithViewTableView:self 
-                                                            dataSource:dataSource];
-    [super setDataSource:dataSourceProxy_];
+  if (dataSource) {
+    id superDataSource = [super dataSource];
+    Class dsProxyClass = [QSBViewTableViewDataSourceProxy class];
+    if (![superDataSource isKindOfClass:dsProxyClass]) {
+      dataSourceProxy_ 
+        = [[QSBViewTableViewDataSourceProxy alloc] initWithViewTableView:self 
+                                                              dataSource:dataSource];
+      [super setDataSource:dataSourceProxy_];
+    } else {
+      // We go through this "set to nil, set back to value" dance because
+      // NSTableView caches information about the what methods the dataSource
+      // responds to. Setting things to nil and then resetting them "clears" the
+      // cache.
+      [super setDataSource:nil];
+      [superDataSource setDataSource:dataSource];
+      [super setDataSource:superDataSource];
+    }
   } else {
-    // We go through this "set to nil, set back to value" dance because
-    // NSTableView caches information about the what methods the dataSource
-    // responds to. Setting things to nil and then resetting them "clears" the
-    // cache.
     [super setDataSource:nil];
-    [superDataSource setDataSource:dataSource];
-    [super setDataSource:superDataSource];
+    [dataSourceProxy_ release];
+    dataSourceProxy_ = nil;
   }
 }
 
