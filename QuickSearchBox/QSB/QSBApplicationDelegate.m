@@ -612,7 +612,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     }
   }
   if ([allErrors count]) {
-    HGSLog(@"%@", allErrors);
+    HGSLogDebug(@"%@", allErrors);
   }
   HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
   NSArray *factorablePlugins = [pluginsPoint extensions];
