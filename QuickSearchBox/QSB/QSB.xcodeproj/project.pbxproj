@@ -70,6 +70,7 @@
 				622911BD0F2E8034005D34CE /* PBXTargetDependency */,
 				62A4AD580F2FCFC50007CD99 /* PBXTargetDependency */,
 				5AF0EC1C0F6075420041E0B9 /* PBXTargetDependency */,
+				5AF0EF3F0F61D33F0041E0B9 /* PBXTargetDependency */,
 				8B77DF400F284A5A00FA2A3C /* PBXTargetDependency */,
 			);
 			name = "Build All";
@@ -228,6 +229,14 @@
 		5AF0EC680F6075B80041E0B9 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796A438C0976F3B5000659B6 /* CoreServices.framework */; };
 		5AF0EC6A0F6075C70041E0B9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
 		5AF0EC900F6076000041E0B9 /* Dictionary.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5AF0EB630F60744E0041E0B9 /* Dictionary.hgs */; };
+		5AF0EEDD0F61D1520041E0B9 /* MoveToTrash.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5AF0EED90F61D1520041E0B9 /* MoveToTrash.icns */; };
+		5AF0EEDF0F61D1520041E0B9 /* TrashActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0EEDB0F61D1520041E0B9 /* TrashActions.m */; };
+		5AF0EEE00F61D1520041E0B9 /* TrashSearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0EEDC0F61D1520041E0B9 /* TrashSearchSource.m */; };
+		5AF0EEE80F61D2200041E0B9 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		5AF0EEEB0F61D22D0041E0B9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
+		5AF0EEEC0F61D22D0041E0B9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
+		5AF0EEEF0F61D2EA0041E0B9 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
+		5AF0EF330F61D32E0041E0B9 /* Trash.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5AF0EE220F61D0850041E0B9 /* Trash.hgs */; };
 		5AF2C4800E5E19A400F4D546 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
 		5AF2C4810E5E19A400F4D546 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		5AF2C4820E5E19A400F4D546 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -878,6 +887,13 @@
 			remoteGlobalIDString = 5AF0EB620F60744E0041E0B9;
 			remoteInfo = Dictionary;
 		};
+		5AF0EF3E0F61D33F0041E0B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5AF0EE210F61D0850041E0B9;
+			remoteInfo = Trash;
+		};
 		5AF2C47A0E5E19A400F4D546 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1488,6 +1504,7 @@
 				F4EF90DE0ECB4529008DD6DA /* Networking.scptd in CopyFiles */,
 				F4EF90DF0ECB4529008DD6DA /* Images.scptd in CopyFiles */,
 				5AF0EC900F6076000041E0B9 /* Dictionary.hgs in CopyFiles */,
+				5AF0EF330F61D32E0041E0B9 /* Trash.hgs in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1563,6 +1580,11 @@
 		5AF0EB6B0F6074A00041E0B9 /* Dictionary-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Dictionary-Info.plist"; sourceTree = "<group>"; };
 		5AF0EB6C0F6074A00041E0B9 /* DictionaryActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DictionaryActions.m; sourceTree = "<group>"; };
 		5AF0EB6D0F6074A00041E0B9 /* DictionarySearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DictionarySearchSource.m; sourceTree = "<group>"; };
+		5AF0EE220F61D0850041E0B9 /* Trash.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Trash.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AF0EED90F61D1520041E0B9 /* MoveToTrash.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = MoveToTrash.icns; sourceTree = "<group>"; };
+		5AF0EEDA0F61D1520041E0B9 /* Trash-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Trash-Info.plist"; sourceTree = "<group>"; };
+		5AF0EEDB0F61D1520041E0B9 /* TrashActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrashActions.m; sourceTree = "<group>"; };
+		5AF0EEDC0F61D1520041E0B9 /* TrashSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrashSearchSource.m; sourceTree = "<group>"; };
 		5AF2C4860E5E19A400F4D546 /* iTunes.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iTunes.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AF2C5A70E5E1C5700F4D546 /* iTunesAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iTunesAction.m; sourceTree = "<group>"; };
 		5AF2C5AA0E5E1C5700F4D546 /* iTunesSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunesSource.h; sourceTree = "<group>"; };
@@ -2177,6 +2199,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AF0EE200F61D0850041E0B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AF0EEE80F61D2200041E0B9 /* Vermilion.framework in Frameworks */,
+				5AF0EEEB0F61D22D0041E0B9 /* AppKit.framework in Frameworks */,
+				5AF0EEEC0F61D22D0041E0B9 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AF2C47F0E5E19A400F4D546 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2545,6 +2577,7 @@
 				8BCCD2DD0EC8F8C200688D64 /* Volume.scptd */,
 				F4E3B70B0EB66AA900CB713D /* Weather.hgs */,
 				5AF0EB630F60744E0041E0B9 /* Dictionary.hgs */,
+				5AF0EE220F61D0850041E0B9 /* Trash.hgs */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2678,6 +2711,17 @@
 				5AF0EB6D0F6074A00041E0B9 /* DictionarySearchSource.m */,
 			);
 			path = Dictionary;
+			sourceTree = "<group>";
+		};
+		5AF0EED80F61D1520041E0B9 /* Trash */ = {
+			isa = PBXGroup;
+			children = (
+				5AF0EED90F61D1520041E0B9 /* MoveToTrash.icns */,
+				5AF0EEDA0F61D1520041E0B9 /* Trash-Info.plist */,
+				5AF0EEDB0F61D1520041E0B9 /* TrashActions.m */,
+				5AF0EEDC0F61D1520041E0B9 /* TrashSearchSource.m */,
+			);
+			path = Trash;
 			sourceTree = "<group>";
 		};
 		5AF274610F155D3700C087B2 /* GData */ = {
@@ -3327,6 +3371,7 @@
 				62EA8C190F2E7E5E00C92E0B /* GoogleAccounts */,
 				62A4AD0C0F2FCE0E0007CD99 /* Twitter */,
 				5AF0EB6A0F6074A00041E0B9 /* Dictionary */,
+				5AF0EED80F61D1520041E0B9 /* Trash */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -4010,6 +4055,23 @@
 			name = Dictionary;
 			productName = Dictionary;
 			productReference = 5AF0EB630F60744E0041E0B9 /* Dictionary.hgs */;
+			productType = "com.apple.product-type.bundle";
+		};
+		5AF0EE210F61D0850041E0B9 /* Trash */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AF0EE310F61D0880041E0B9 /* Build configuration list for PBXNativeTarget "Trash" */;
+			buildPhases = (
+				5AF0EE1E0F61D0850041E0B9 /* Resources */,
+				5AF0EE1F0F61D0850041E0B9 /* Sources */,
+				5AF0EE200F61D0850041E0B9 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Trash;
+			productName = Trash;
+			productReference = 5AF0EE220F61D0850041E0B9 /* Trash.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
 		5AF2C4780E5E19A400F4D546 /* iTunes */ = {
@@ -4738,6 +4800,7 @@
 				62EA8BBD0F2E7DE200C92E0B /* GoogleAccounts */,
 				62A4AC790F2FCD950007CD99 /* Twitter */,
 				5AF0EB620F60744E0041E0B9 /* Dictionary */,
+				5AF0EE210F61D0850041E0B9 /* Trash */,
 			);
 		};
 /* End PBXProject section */
@@ -4837,6 +4900,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AF0EE1E0F61D0850041E0B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AF0EEDD0F61D1520041E0B9 /* MoveToTrash.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5869,6 +5940,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AF0EE1F0F61D0850041E0B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AF0EEDF0F61D1520041E0B9 /* TrashActions.m in Sources */,
+				5AF0EEE00F61D1520041E0B9 /* TrashSearchSource.m in Sources */,
+				5AF0EEEF0F61D2EA0041E0B9 /* HGSBundle.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AF2C47C0E5E19A400F4D546 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -6293,6 +6374,11 @@
 			isa = PBXTargetDependency;
 			target = 5AF0EB620F60744E0041E0B9 /* Dictionary */;
 			targetProxy = 5AF0EC1B0F6075420041E0B9 /* PBXContainerItemProxy */;
+		};
+		5AF0EF3F0F61D33F0041E0B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5AF0EE210F61D0850041E0B9 /* Trash */;
+			targetProxy = 5AF0EF3E0F61D33F0041E0B9 /* PBXContainerItemProxy */;
 		};
 		5AF2C4790E5E19A400F4D546 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -6967,6 +7053,26 @@
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Dictionary/Dictionary-Info.plist";
 				PRODUCT_NAME = Dictionary;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Release;
+		};
+		5AF0EE2F0F61D0870041E0B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Trash/Trash-Info.plist";
+				PRODUCT_NAME = Trash;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Debug;
+		};
+		5AF0EE300F61D0870041E0B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Trash/Trash-Info.plist";
+				PRODUCT_NAME = Trash;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = Release;
@@ -7831,6 +7937,15 @@
 			buildConfigurations = (
 				5AF0EB650F60744F0041E0B9 /* Debug */,
 				5AF0EB660F60744F0041E0B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AF0EE310F61D0880041E0B9 /* Build configuration list for PBXNativeTarget "Trash" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AF0EE2F0F61D0870041E0B9 /* Debug */,
+				5AF0EE300F61D0870041E0B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
