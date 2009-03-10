@@ -63,22 +63,19 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 + (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
-  static HGSSetUpSimpleAccountViewController *sSetUpTwitterAccountViewController = nil;
-  if (!sSetUpTwitterAccountViewController) {
-    NSBundle *ourBundle = HGSGetPluginBundle();
-    HGSSetUpSimpleAccountViewController *loadedViewController
-      = [[[SetUpTwitterAccountViewController alloc]
-          initWithNibName:kSetUpTwitterAccountViewNibName bundle:ourBundle]
-         autorelease];
-    if (loadedViewController) {
-      [loadedViewController loadView];
-      sSetUpTwitterAccountViewController = [loadedViewController retain];
-    } else {
-      HGSLog(@"Failed to load nib '%@'.", kSetUpTwitterAccountViewNibName);
-    }
+  NSBundle *ourBundle = HGSGetPluginBundle();
+  SetUpTwitterAccountViewController *loadedViewController
+    = [[[SetUpTwitterAccountViewController alloc]
+        initWithNibName:kSetUpTwitterAccountViewNibName bundle:ourBundle]
+       autorelease];
+  if (loadedViewController) {
+    [loadedViewController loadView];
+    [loadedViewController setParentWindow:parentWindow];
+  } else {
+    loadedViewController = nil;
+    HGSLog(@"Failed to load nib '%@'.", kSetUpTwitterAccountViewNibName);
   }
-  [sSetUpTwitterAccountViewController setParentWindow:parentWindow];
-  return [sSetUpTwitterAccountViewController view];
+  return [loadedViewController view];
 }
 
 - (NSString *)editNibName {

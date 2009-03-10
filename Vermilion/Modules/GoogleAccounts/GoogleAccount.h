@@ -61,6 +61,7 @@
  @private
   IBOutlet NSView *captchaContainerView_;
   IBOutlet NSTextField *captchaTextField_;
+  IBOutlet NSTextField *passwordField_;
   
   NSImage *captchaImage_;  // The captcha image presented to the user.
   NSString *captchaText_;  // The captcha text typed by the user.
@@ -81,6 +82,7 @@
  @private
   IBOutlet NSView *captchaContainerView_;
   IBOutlet NSTextField *captchaTextField_;
+  IBOutlet NSTextField *userNameField_;
   
   NSImage *captchaImage_;  // The captcha image presented to the user.
   NSString *captchaText_;  // The captcha text typed by the user.

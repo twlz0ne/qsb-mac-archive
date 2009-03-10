@@ -88,23 +88,20 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 + (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
-  static SetUpGoogleAccountViewController *sSetUpGoogleAccountViewController = nil;
-  if (!sSetUpGoogleAccountViewController) {
-    NSBundle *ourBundle = HGSGetPluginBundle();
-    HGSSetUpSimpleAccountViewController *loadedViewController
-      = [[[SetUpGoogleAccountViewController alloc]
-          initWithNibName:kSetUpGoogleAccountViewNibName bundle:ourBundle]
-         autorelease];
-    if (loadedViewController) {
-      [loadedViewController loadView];
-      sSetUpGoogleAccountViewController = [loadedViewController retain];
-    } else {
-      HGSLog(@"Failed to load nib '%@'.", kSetUpGoogleAccountViewNibName);
-    }
+  NSBundle *ourBundle = HGSGetPluginBundle();
+  SetUpGoogleAccountViewController *loadedViewController
+    = [[[SetUpGoogleAccountViewController alloc]
+        initWithNibName:kSetUpGoogleAccountViewNibName bundle:ourBundle]
+       autorelease];
+  if (loadedViewController) {
+    [loadedViewController loadView];
+    [loadedViewController resetCaptchaPresentation];
+    [loadedViewController setParentWindow:parentWindow];
+  } else {
+    loadedViewController = nil;
+    HGSLog(@"Failed to load nib '%@'.", kSetUpGoogleAccountViewNibName);
   }
-  [sSetUpGoogleAccountViewController resetCaptchaPresentation];
-  [sSetUpGoogleAccountViewController setParentWindow:parentWindow];
-  return [sSetUpGoogleAccountViewController view];
+  return [loadedViewController view];
 }
 
 - (NSString *)adjustUserName:(NSString *)userName {
@@ -296,6 +293,7 @@ didReceiveResponse:(NSURLResponse *)response {
   GoogleAccount *account = (GoogleAccount *)[self account];
   NSImage *captchaImage = [account captchaImage];
   BOOL resizeNeeded = ([self captchaImage] == nil);  // leftover captcha?
+  NSWindow *window = [self window];
   if (captchaImage) {
     // Install the captcha image, enable the captcha text field,
     // expand the window to show the captcha.
@@ -304,16 +302,18 @@ didReceiveResponse:(NSURLResponse *)response {
     
     if (resizeNeeded) {
       CGFloat containerHeight = NSHeight([captchaContainerView_ frame]);
-      NSWindow *window = [self window];
       NSRect windowFrame = [window frame];
       windowFrame.origin.y -= containerHeight;
       windowFrame.size.height += containerHeight;
-      [window setFrame:windowFrame display:YES];
+      [[window animator] setFrame:windowFrame display:YES];
     }
     
-    [captchaContainerView_ setHidden:NO];
+    [[captchaContainerView_ animator] setHidden:NO];
+    [window makeFirstResponder:captchaTextField_];
     canGiveUserAnotherTry = YES;
     [account setCaptchaImage:nil];  // We've used it all up.
+  } else {
+    [window makeFirstResponder:passwordField_];
   }
   return canGiveUserAnotherTry;
 }
@@ -376,12 +376,15 @@ didReceiveResponse:(NSURLResponse *)response {
       NSRect windowFrame = [window frame];
       windowFrame.origin.y -= containerHeight;
       windowFrame.size.height += containerHeight;
-      [window setFrame:windowFrame display:YES];
+      [[window animator] setFrame:windowFrame display:YES];
     }
     
-    [captchaContainerView_ setHidden:NO];
+    [[captchaContainerView_ animator] setHidden:NO];
+    [window makeFirstResponder:captchaTextField_];
     canGiveUserAnotherTry = YES;
     [account setCaptchaImage:nil];  // We've used it all up.
+  } else {
+    [self resetCaptchaPresentation];
   }
   return canGiveUserAnotherTry;
 }
@@ -392,13 +395,22 @@ didReceiveResponse:(NSURLResponse *)response {
   // If we previously presented a captcha, resize our view, disable the captcha
   // text field, and clear our memory of the captcha.
   if (![captchaContainerView_ isHidden]) {
-    NSView *view = [self view];  // Resize
-    NSSize frameSize = [view frame].size;
+    [[captchaContainerView_ animator] setHidden:YES];
     CGFloat containerHeight = NSHeight([captchaContainerView_ frame]);
-    frameSize.height -= containerHeight;
-    [view setFrameSize:frameSize];
+    NSWindow *window = [captchaContainerView_ window];
+    if (window) {
+      NSRect windowFrame = [window frame];
+      windowFrame.origin.y += containerHeight;
+      windowFrame.size.height -= containerHeight;
+      [[window animator] setFrame:windowFrame display:YES];
+      [window makeFirstResponder:userNameField_];
+    } else {
+      NSView *view = [self view];  // Resize
+      NSSize frameSize = [view frame].size;
+      frameSize.height -= containerHeight;
+      [view setFrameSize:frameSize];
+    }
     
-    [captchaContainerView_ setHidden:YES];
     [captchaTextField_ setEnabled:NO];
     [self setCaptchaText:@""];
     [self setCaptchaImage:nil];
