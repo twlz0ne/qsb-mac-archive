@@ -77,7 +77,6 @@ static NSString *const kApplicationSourcePredicateString
     condition_ = [[NSCondition alloc] init];
     if (![resultsArray_ count]) {
       // Cache didn't exist, hold queries until the first indexing run completes
-      indexing_ = YES;
       [self startQuery:nil];
     } else {
       // TODO(alcor): this retains us even if everyone else releases. 
