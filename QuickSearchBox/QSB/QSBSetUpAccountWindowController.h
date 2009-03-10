@@ -48,6 +48,10 @@
   NSView *installedSetupView_;  // The currently inserted account view.
   NSArray *accountTypes_;  // List of account type names for popup.
   NSString *selectedAccountType_;
+  __weak NSWindow *parentWindow_;
 }
+
+// Preferred initializer.
+- (id)initWithParentWindow:(NSWindow *)parentWindow;
 
 @end

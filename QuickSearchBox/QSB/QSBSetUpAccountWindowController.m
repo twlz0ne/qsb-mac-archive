@@ -45,6 +45,12 @@
 @synthesize installedSetupView = installedSetupView_;
 @synthesize accountTypes = accountTypes_;
 
+- (id)initWithParentWindow:(NSWindow *)parentWindow {
+  parentWindow_ = parentWindow;
+  self = [self init];
+  return self;
+}
+
 - (id)init {
   if ((self = [super initWithWindowNibName:@"SetUpAccount"])) {
     HGSAccountsExtensionPoint *accountsPoint 
@@ -76,9 +82,8 @@
     = [HGSExtensionPoint accountsPoint];
 
   Class accountClass = [accountsPoint classForAccountType:accountType];
-  NSWindow *parentWindow = [[self window] parentWindow];
   NSView *viewToInstall
-    = [accountClass setupViewToInstallWithParentWindow:parentWindow];
+    = [accountClass setupViewToInstallWithParentWindow:parentWindow_];
   if (viewToInstall) {
     [self setInstalledSetupView:viewToInstall];
   } else {

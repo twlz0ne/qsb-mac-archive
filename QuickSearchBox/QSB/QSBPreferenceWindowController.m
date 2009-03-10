@@ -321,11 +321,13 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 #pragma mark Account Management
 
 - (IBAction)setupAccount:(id)sender {
+  NSWindow *preferenceWindow = [self window];
   QSBSetUpAccountWindowController *controller 
-    = [[[QSBSetUpAccountWindowController alloc] init] autorelease];
+    = [[[QSBSetUpAccountWindowController alloc]
+        initWithParentWindow:preferenceWindow] autorelease];
   NSWindow *setUpWindow = [controller window];
   [NSApp beginSheet:setUpWindow
-     modalForWindow:[self window]
+     modalForWindow:preferenceWindow
       modalDelegate:self 
      didEndSelector:@selector(setupSheetDidEnd:returnCode:contextInfo:)
         contextInfo:nil];
