@@ -71,6 +71,7 @@
 				62A4AD580F2FCFC50007CD99 /* PBXTargetDependency */,
 				5AF0EC1C0F6075420041E0B9 /* PBXTargetDependency */,
 				5AF0EF3F0F61D33F0041E0B9 /* PBXTargetDependency */,
+				5AF0F53C0F671E750041E0B9 /* PBXTargetDependency */,
 				8B77DF400F284A5A00FA2A3C /* PBXTargetDependency */,
 			);
 			name = "Build All";
@@ -237,6 +238,12 @@
 		5AF0EEEC0F61D22D0041E0B9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		5AF0EEEF0F61D2EA0041E0B9 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		5AF0EF330F61D32E0041E0B9 /* Trash.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5AF0EE220F61D0850041E0B9 /* Trash.hgs */; };
+		5AF0F4F40F671E440041E0B9 /* MountSearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0F4F20F671E440041E0B9 /* MountSearchSource.m */; };
+		5AF0F4F50F671E5C0041E0B9 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		5AF0F4F80F671E6A0041E0B9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
+		5AF0F4F90F671E6A0041E0B9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
+		5AF0F5890F671F100041E0B9 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
+		5AF0F5B90F6720B10041E0B9 /* Mount.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5AF0F4880F671D9C0041E0B9 /* Mount.hgs */; };
 		5AF2C4800E5E19A400F4D546 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
 		5AF2C4810E5E19A400F4D546 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		5AF2C4820E5E19A400F4D546 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -894,6 +901,13 @@
 			remoteGlobalIDString = 5AF0EE210F61D0850041E0B9;
 			remoteInfo = Trash;
 		};
+		5AF0F53B0F671E750041E0B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5AF0F4870F671D9C0041E0B9;
+			remoteInfo = Mount;
+		};
 		5AF2C47A0E5E19A400F4D546 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1505,6 +1519,7 @@
 				F4EF90DF0ECB4529008DD6DA /* Images.scptd in CopyFiles */,
 				5AF0EC900F6076000041E0B9 /* Dictionary.hgs in CopyFiles */,
 				5AF0EF330F61D32E0041E0B9 /* Trash.hgs in CopyFiles */,
+				5AF0F5B90F6720B10041E0B9 /* Mount.hgs in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1585,6 +1600,10 @@
 		5AF0EEDA0F61D1520041E0B9 /* Trash-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Trash-Info.plist"; sourceTree = "<group>"; };
 		5AF0EEDB0F61D1520041E0B9 /* TrashActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrashActions.m; sourceTree = "<group>"; };
 		5AF0EEDC0F61D1520041E0B9 /* TrashSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrashSearchSource.m; sourceTree = "<group>"; };
+		5AF0F4880F671D9C0041E0B9 /* Mount.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Mount.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AF0F4890F671D9C0041E0B9 /* Mount-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Mount-Info.plist"; sourceTree = "<group>"; };
+		5AF0F4F10F671E440041E0B9 /* Mount-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Mount-Info.plist"; sourceTree = "<group>"; };
+		5AF0F4F20F671E440041E0B9 /* MountSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MountSearchSource.m; sourceTree = "<group>"; };
 		5AF2C4860E5E19A400F4D546 /* iTunes.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iTunes.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AF2C5A70E5E1C5700F4D546 /* iTunesAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iTunesAction.m; sourceTree = "<group>"; };
 		5AF2C5AA0E5E1C5700F4D546 /* iTunesSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunesSource.h; sourceTree = "<group>"; };
@@ -2209,6 +2228,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AF0F4860F671D9C0041E0B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AF0F4F50F671E5C0041E0B9 /* Vermilion.framework in Frameworks */,
+				5AF0F4F80F671E6A0041E0B9 /* AppKit.framework in Frameworks */,
+				5AF0F4F90F671E6A0041E0B9 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AF2C47F0E5E19A400F4D546 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2578,6 +2607,7 @@
 				F4E3B70B0EB66AA900CB713D /* Weather.hgs */,
 				5AF0EB630F60744E0041E0B9 /* Dictionary.hgs */,
 				5AF0EE220F61D0850041E0B9 /* Trash.hgs */,
+				5AF0F4880F671D9C0041E0B9 /* Mount.hgs */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2595,6 +2625,7 @@
 				D45B92550A3F6E68003A5A05 /* Libraries */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				5A4D237B0F462D2000F5C05B /* libcrypto.dylib */,
+				5AF0F4890F671D9C0041E0B9 /* Mount-Info.plist */,
 			);
 			name = GoogleDesktop;
 			sourceTree = "<group>";
@@ -2722,6 +2753,15 @@
 				5AF0EEDC0F61D1520041E0B9 /* TrashSearchSource.m */,
 			);
 			path = Trash;
+			sourceTree = "<group>";
+		};
+		5AF0F4F00F671E440041E0B9 /* Mount */ = {
+			isa = PBXGroup;
+			children = (
+				5AF0F4F10F671E440041E0B9 /* Mount-Info.plist */,
+				5AF0F4F20F671E440041E0B9 /* MountSearchSource.m */,
+			);
+			path = Mount;
 			sourceTree = "<group>";
 		};
 		5AF274610F155D3700C087B2 /* GData */ = {
@@ -3372,6 +3412,7 @@
 				62A4AD0C0F2FCE0E0007CD99 /* Twitter */,
 				5AF0EB6A0F6074A00041E0B9 /* Dictionary */,
 				5AF0EED80F61D1520041E0B9 /* Trash */,
+				5AF0F4F00F671E440041E0B9 /* Mount */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -4072,6 +4113,23 @@
 			name = Trash;
 			productName = Trash;
 			productReference = 5AF0EE220F61D0850041E0B9 /* Trash.hgs */;
+			productType = "com.apple.product-type.bundle";
+		};
+		5AF0F4870F671D9C0041E0B9 /* Mount */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AF0F4970F671D9E0041E0B9 /* Build configuration list for PBXNativeTarget "Mount" */;
+			buildPhases = (
+				5AF0F4840F671D9C0041E0B9 /* Resources */,
+				5AF0F4850F671D9C0041E0B9 /* Sources */,
+				5AF0F4860F671D9C0041E0B9 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Mount;
+			productName = Mount;
+			productReference = 5AF0F4880F671D9C0041E0B9 /* Mount.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
 		5AF2C4780E5E19A400F4D546 /* iTunes */ = {
@@ -4801,6 +4859,7 @@
 				62A4AC790F2FCD950007CD99 /* Twitter */,
 				5AF0EB620F60744E0041E0B9 /* Dictionary */,
 				5AF0EE210F61D0850041E0B9 /* Trash */,
+				5AF0F4870F671D9C0041E0B9 /* Mount */,
 			);
 		};
 /* End PBXProject section */
@@ -4908,6 +4967,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AF0EEDD0F61D1520041E0B9 /* MoveToTrash.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AF0F4840F671D9C0041E0B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5950,6 +6016,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AF0F4850F671D9C0041E0B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AF0F4F40F671E440041E0B9 /* MountSearchSource.m in Sources */,
+				5AF0F5890F671F100041E0B9 /* HGSBundle.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AF2C47C0E5E19A400F4D546 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -6379,6 +6454,11 @@
 			isa = PBXTargetDependency;
 			target = 5AF0EE210F61D0850041E0B9 /* Trash */;
 			targetProxy = 5AF0EF3E0F61D33F0041E0B9 /* PBXContainerItemProxy */;
+		};
+		5AF0F53C0F671E750041E0B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5AF0F4870F671D9C0041E0B9 /* Mount */;
+			targetProxy = 5AF0F53B0F671E750041E0B9 /* PBXContainerItemProxy */;
 		};
 		5AF2C4790E5E19A400F4D546 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7073,6 +7153,26 @@
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Trash/Trash-Info.plist";
 				PRODUCT_NAME = Trash;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Release;
+		};
+		5AF0F4950F671D9D0041E0B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Mount/Mount-Info.plist";
+				PRODUCT_NAME = Mount;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Debug;
+		};
+		5AF0F4960F671D9D0041E0B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Mount/Mount-Info.plist";
+				PRODUCT_NAME = Mount;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = Release;
@@ -7946,6 +8046,15 @@
 			buildConfigurations = (
 				5AF0EE2F0F61D0870041E0B9 /* Debug */,
 				5AF0EE300F61D0870041E0B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AF0F4970F671D9E0041E0B9 /* Build configuration list for PBXNativeTarget "Mount" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AF0F4950F671D9D0041E0B9 /* Debug */,
+				5AF0F4960F671D9D0041E0B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
