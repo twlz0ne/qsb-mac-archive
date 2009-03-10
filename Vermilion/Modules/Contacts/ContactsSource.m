@@ -601,7 +601,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   return isValidSource;
 }
 
-- (NSMutableDictionary *)archiveRepresentationForObject:(HGSResult*)result {
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
   // For address book contacts, we only need to store the Person's unique id
   // to be able to rebuild the result.
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];

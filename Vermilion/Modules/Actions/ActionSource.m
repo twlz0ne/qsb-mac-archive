@@ -145,7 +145,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 
 #pragma mark -
 
-- (NSMutableDictionary *)archiveRepresentationForObject:(HGSResult*)result {
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
   // For action results, we pull out the action, and save off it's extension
   // identifier.
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];

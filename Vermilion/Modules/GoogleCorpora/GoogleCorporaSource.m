@@ -237,7 +237,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   return YES;
 }
 
-- (NSMutableDictionary *)archiveRepresentationForObject:(HGSResult*)result {
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
   return [NSMutableDictionary
             dictionaryWithObject:[result url]
                           forKey:kHGSObjectAttributeURIKey];
