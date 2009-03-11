@@ -100,18 +100,12 @@ CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
   CGColorSpaceRef cspace = CGColorSpaceCreateDeviceRGB();   
   if (!cspace) return;
   
-  void *bitmapData = malloc(4 * canvasSize.width * canvasSize.height);
-  if (!bitmapData) {
-    CGColorSpaceRelease(cspace);
-    return;
-  }
-  
   CGContextRef context = 
-    CGBitmapContextCreate(bitmapData,
+    CGBitmapContextCreate(NULL,
                           canvasSize.width,
                           canvasSize.height,
                           8,            // bits per component
-                          canvasSize.width * 4, // bytes per pixel
+                          canvasSize.width * sizeof(UInt32), // bytes per pixel
                           cspace,
                           kCGImageAlphaPremultipliedFirst);
   CGColorSpaceRelease(cspace);
@@ -164,9 +158,7 @@ CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
       CGImageRelease(cgimage);
     }
     CGContextRelease(context);
-  }
-  free(bitmapData);
-  
+  }  
 }
 
 @end
