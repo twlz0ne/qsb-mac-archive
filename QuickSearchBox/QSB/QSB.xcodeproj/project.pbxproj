@@ -1602,7 +1602,6 @@
 		5AF0EEDB0F61D1520041E0B9 /* TrashActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrashActions.m; sourceTree = "<group>"; };
 		5AF0EEDC0F61D1520041E0B9 /* TrashSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrashSearchSource.m; sourceTree = "<group>"; };
 		5AF0F4880F671D9C0041E0B9 /* Mount.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Mount.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
-		5AF0F4890F671D9C0041E0B9 /* Mount-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Mount-Info.plist"; sourceTree = "<group>"; };
 		5AF0F4F10F671E440041E0B9 /* Mount-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Mount-Info.plist"; sourceTree = "<group>"; };
 		5AF0F4F20F671E440041E0B9 /* MountSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MountSearchSource.m; sourceTree = "<group>"; };
 		5AF0F7D70F68489A0041E0B9 /* HGSCodeSignatureTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCodeSignatureTest.m; sourceTree = "<group>"; };
@@ -2627,7 +2626,6 @@
 				D45B92550A3F6E68003A5A05 /* Libraries */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				5A4D237B0F462D2000F5C05B /* libcrypto.dylib */,
-				5AF0F4890F671D9C0041E0B9 /* Mount-Info.plist */,
 			);
 			name = GoogleDesktop;
 			sourceTree = "<group>";
