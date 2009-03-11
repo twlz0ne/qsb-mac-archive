@@ -66,4 +66,14 @@ typedef struct __SecCode const *SecStaticCodeRef;
 - (BOOL)signerCertificateIsEqual:(SecCertificateRef)cert;
 - (NSData *)generateExternalAdHocSignature;
 - (HGSSignatureStatus)verifyExternalAdHocSignature:(NSData *)signatureData;
+- (HGSSignatureStatus)verifySignature:(NSData *)signature
+                            forBundle:(NSBundle *)bundle
+                     usingCertificate:(SecCertificateRef)certificateRef;
+- (HGSSignatureStatus)verifySignature:(NSData *)signature
+                            forBundle:(NSBundle *)bundle
+                             usingKey:(NSData *)key;
+- (NSData *)generateSignatureForBundle:(NSBundle *)bundle
+                         usingIdentity:(SecIdentityRef)identity;
+- (NSData *)generateSignatureForBundle:(NSBundle *)bundle
+                              usingKey:(NSData *)key;
 @end

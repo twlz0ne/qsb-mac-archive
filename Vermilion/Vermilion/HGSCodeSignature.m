@@ -31,6 +31,8 @@
 //
 
 #import <uuid/uuid.h>
+#import <openssl/hmac.h>
+#import <openssl/sha.h>
 #import <Vermilion/Vermilion.h>
 #import "HGSCodeSignature.h"
 
@@ -39,7 +41,8 @@ typedef struct __SecRequirementRef *SecRequirementRef;
 typedef struct __SecCodeSigner *SecCodeSignerRef;
 enum {
   kSecCSSigningInformation = 2,
-  errSecCSUnsigned = -67062
+  errSecCSUnsigned = -67062,
+  kCodeSignatureDigestLength = 20 // 160 bits
 };
 extern const NSString *kSecCodeInfoCertificates;
 extern const NSString *kSecCodeSignerDetached;
@@ -63,6 +66,12 @@ OSStatus SecCodeSetDetachedSignature(SecStaticCodeRef codeRef,
 
 @interface HGSCodeSignature()
 - (void)verifySignature:(BOOL)adHocOK;
+- (BOOL)digest:(unsigned char *)digest
+     forBundle:(NSBundle *)bundle
+      usingKey:(NSData *)key;
+- (BOOL)digestDirectory:(NSString *)path
+             shaContext:(SHA_CTX *)shaCtx
+            hmacContext:(HMAC_CTX *)hmacCtx;
 @end
 
 @implementation HGSCodeSignature
@@ -234,5 +243,225 @@ OSStatus SecCodeSetDetachedSignature(SecStaticCodeRef codeRef,
   }
   return status_;
 }
+
+
+- (HGSSignatureStatus)verifySignature:(NSData *)signature
+                            forBundle:(NSBundle *)bundle
+                     usingCertificate:(SecCertificateRef)certificateRef {
+  HGSSignatureStatus result = eSignatureStatusInvalid;
+  
+  if (![signature length]) {
+    return eSignatureStatusUnsigned;
+  }
+  
+  if (!certificateRef || !bundle) {
+    return eSignatureStatusInvalid;
+  }
+  
+  unsigned char digest[kCodeSignatureDigestLength];
+  if (![self digest:digest forBundle:bundle usingKey:nil]) {
+    return eSignatureStatusInvalid;
+  }
+  
+  SecKeyRef publicKey;
+  if (SecCertificateCopyPublicKey(certificateRef, &publicKey) == noErr) {
+    CSSM_CSP_HANDLE csp;
+    if (SecKeyGetCSPHandle(publicKey, &csp) == noErr) {
+      const CSSM_KEY *cssmKey;
+      if (SecKeyGetCSSMKey(publicKey, &cssmKey) == noErr) {
+        CSSM_CC_HANDLE sigCtx;
+        if (CSSM_CSP_CreateSignatureContext(csp, CSSM_ALGID_SHA1WithRSA, NULL,
+                                            cssmKey, &sigCtx) == noErr) {
+            CSSM_DATA digestData, signatureData;
+            digestData.Length = kCodeSignatureDigestLength;
+            digestData.Data = digest;
+            signatureData.Length = [signature length];
+            signatureData.Data = (void *)[signature bytes];
+          if (CSSM_VerifyData(sigCtx, &digestData, 1, CSSM_ALGID_SHA1,
+                              &signatureData) == noErr) {
+            result = eSignatureStatusOK;
+          }
+          CSSM_DeleteContext(sigCtx);
+        }
+      }
+    }
+    CFRelease(publicKey);
+  }
+  
+  return result;
+}
+
+- (HGSSignatureStatus)verifySignature:(NSData *)signature
+                            forBundle:(NSBundle *)bundle
+                             usingKey:(NSData *)key {
+  HGSSignatureStatus result = eSignatureStatusInvalid;
+  
+  if (![signature length] || ![key length]) {
+    return eSignatureStatusUnsigned;
+  }
+  
+  if ([signature length] != kCodeSignatureDigestLength) {
+    return eSignatureStatusInvalid;
+  }
+  
+  unsigned char digest[kCodeSignatureDigestLength];
+  if ([self digest:digest forBundle:bundle usingKey:key]) {
+    if (memcmp(digest, [signature bytes], kCodeSignatureDigestLength) == 0) {
+      result = eSignatureStatusOK;
+    }
+  }
+  
+  return result;
+}
+
+- (NSData *)generateSignatureForBundle:(NSBundle *)bundle
+                         usingIdentity:(SecIdentityRef)identity {
+  NSData *result = nil;
+  
+  unsigned char digest[kCodeSignatureDigestLength];
+  if (![self digest:digest forBundle:bundle usingKey:nil]) {
+    return nil;
+  }
+  
+  SecKeyRef privateKey;
+  if (SecIdentityCopyPrivateKey(identity, &privateKey) == noErr) {
+    CSSM_CSP_HANDLE csp;
+    if (SecKeyGetCSPHandle(privateKey, &csp) == noErr) {
+      const CSSM_KEY *cssmKey;
+      if (SecKeyGetCSSMKey(privateKey, &cssmKey) == noErr) {
+        const CSSM_ACCESS_CREDENTIALS *cred;
+        if (SecKeyGetCredentials(privateKey, CSSM_ACL_AUTHORIZATION_SIGN,
+                                 kSecCredentialTypeDefault, &cred) == noErr) {
+          CSSM_CC_HANDLE sigCtx;
+          if (CSSM_CSP_CreateSignatureContext(csp, CSSM_ALGID_SHA1WithRSA, cred,
+                                              cssmKey, &sigCtx) == noErr) {
+            CSSM_DATA input, output;
+            input.Length = kCodeSignatureDigestLength;
+            input.Data = digest;
+            if (CSSM_SignData(sigCtx, &input, 1, CSSM_ALGID_SHA1,
+                              &output) == noErr) {
+              result = [NSData dataWithBytes:output.Data length:output.Length];
+            }
+            CSSM_DeleteContext(sigCtx);
+          }
+        }
+      }
+    }
+    CFRelease(privateKey);
+  }
+
+  return result;
+}
+
+- (NSData *)generateSignatureForBundle:(NSBundle *)bundle
+                              usingKey:(NSData *)key {
+  NSData *result = nil;
+  if ([key length]) {
+    unsigned char digest[kCodeSignatureDigestLength];
+    if ([self digest:digest forBundle:bundle usingKey:key]) {
+      result = [NSData dataWithBytes:digest length:kCodeSignatureDigestLength];
+    }
+  }
+  
+  return result;
+}
+
+- (BOOL)digest:(unsigned char *)digest
+     forBundle:(NSBundle *)bundle
+      usingKey:(NSData *)key {
+  BOOL result = NO;
+  
+  // Hash the Info.plist
+  NSString *plistPath
+    = [[[bundle bundlePath] stringByAppendingPathComponent:@"Contents"]
+       stringByAppendingPathComponent:@"Info.plist"];
+  NSData *contents = [NSData dataWithContentsOfFile:plistPath];
+  if ([contents length]) {
+    if (![key length]) {
+      SHA_CTX ctx;
+      if (SHA1_Init(&ctx)) {
+        if (SHA1_Update(&ctx, [contents bytes], [contents length])) {
+          if ([self digestDirectory:[bundle resourcePath]
+                         shaContext:&ctx
+                        hmacContext:nil]) {
+            if (SHA1_Final(digest, &ctx)) {
+              result = YES;
+            }
+          }
+        }
+      }
+    } else {
+      HMAC_CTX ctx;
+      HMAC_Init(&ctx, [key bytes], [key length], EVP_sha1());
+      if ([self digestDirectory:[bundle resourcePath]
+                     shaContext:nil
+                    hmacContext:&ctx]) {
+        unsigned int length = kCodeSignatureDigestLength;
+        HMAC_Final(&ctx, digest, &length);
+        result = YES;
+      }
+    }
+  }
+  
+  return result;
+}
+
+- (BOOL)digestDirectory:(NSString *)path
+             shaContext:(SHA_CTX *)shaCtx
+            hmacContext:(HMAC_CTX *)hmacCtx {
+  BOOL result = YES;
+  
+  NSFileManager *fm = [NSFileManager defaultManager];
+  NSDirectoryEnumerator *dirEnum = [fm enumeratorAtPath:path];
+  if (!dirEnum) {
+    return NO;
+  }
+  NSString *filePath;
+  while (result && (filePath = [dirEnum nextObject])) {
+    filePath = [path stringByAppendingPathComponent:filePath];
+    BOOL isDirectory, succeeded = NO;
+    // Should always return YES
+    if ([fm fileExistsAtPath:filePath isDirectory:&isDirectory]) {
+      if (!isDirectory) {
+        // Must be digestable
+        if ([fm isReadableFileAtPath:filePath]) {
+          // Must be able to get file attributes
+          NSDictionary *attrs = [fm fileAttributesAtPath:path traverseLink:YES];
+          if (attrs) {
+            NSNumber *size = [attrs objectForKey:NSFileSize];
+            if (size && [size unsignedLongLongValue] <= 0xFFFFFFFFLL) {
+              // SHA1_Update() takes the length as an unsigned long
+              if (result && [size unsignedLongLongValue] > 0) {
+                NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+                NSData *contents = [NSData dataWithContentsOfFile:filePath];
+                if (contents) {
+                  if (shaCtx) {
+                    if (SHA1_Update(shaCtx, [contents bytes],
+                                    [contents length])) {
+                      succeeded = YES;
+                    }
+                  } else if (hmacCtx) {
+                    HMAC_Update(hmacCtx, [contents bytes], [contents length]);
+                    succeeded = YES;
+                  }
+                }
+                [pool release];
+              }
+            }
+          }
+        }
+      } else {
+        // Recurse into the directory
+        succeeded = [self digestDirectory:filePath
+                               shaContext:shaCtx
+                              hmacContext:hmacCtx];
+      }
+    }
+    result = succeeded;
+  }
+  
+  return result;
+}
+
 
 @end

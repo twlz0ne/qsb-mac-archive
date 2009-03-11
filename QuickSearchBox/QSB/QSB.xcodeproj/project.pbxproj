@@ -203,7 +203,7 @@
 		5A2710BF0ECA52F200C72257 /* HGSPythonSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5A2710B80ECA52F200C72257 /* HGSPythonSource.mm */; };
 		5A2711030ECA567B00C72257 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A2711020ECA567B00C72257 /* Python.framework */; };
 		5A4D237C0F462D2000F5C05B /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A4D237B0F462D2000F5C05B /* libcrypto.dylib */; };
-		5A4D23FC0F4CD22B00F5C05B /* HGSCodeSignature.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */; };
+		5A4D23FC0F4CD22B00F5C05B /* HGSCodeSignature.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A4D23FD0F4CD22B00F5C05B /* HGSCodeSignature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */; };
 		5A8A3B120E71BCBB00A0DB4F /* iTunesAlbumBrowserIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B090E71BCBB00A0DB4F /* iTunesAlbumBrowserIcon.png */; };
 		5A8A3B130E71BCBB00A0DB4F /* iTunesArtistBrowserIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B0A0E71BCBB00A0DB4F /* iTunesArtistBrowserIcon.png */; };
@@ -244,6 +244,7 @@
 		5AF0F4F90F671E6A0041E0B9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		5AF0F5890F671F100041E0B9 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		5AF0F5B90F6720B10041E0B9 /* Mount.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5AF0F4880F671D9C0041E0B9 /* Mount.hgs */; };
+		5AF0F7D80F68489A0041E0B9 /* HGSCodeSignatureTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0F7D70F68489A0041E0B9 /* HGSCodeSignatureTest.m */; };
 		5AF2C4800E5E19A400F4D546 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
 		5AF2C4810E5E19A400F4D546 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		5AF2C4820E5E19A400F4D546 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -1604,6 +1605,7 @@
 		5AF0F4890F671D9C0041E0B9 /* Mount-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Mount-Info.plist"; sourceTree = "<group>"; };
 		5AF0F4F10F671E440041E0B9 /* Mount-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Mount-Info.plist"; sourceTree = "<group>"; };
 		5AF0F4F20F671E440041E0B9 /* MountSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MountSearchSource.m; sourceTree = "<group>"; };
+		5AF0F7D70F68489A0041E0B9 /* HGSCodeSignatureTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCodeSignatureTest.m; sourceTree = "<group>"; };
 		5AF2C4860E5E19A400F4D546 /* iTunes.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iTunes.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AF2C5A70E5E1C5700F4D546 /* iTunesAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iTunesAction.m; sourceTree = "<group>"; };
 		5AF2C5AA0E5E1C5700F4D546 /* iTunesSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunesSource.h; sourceTree = "<group>"; };
@@ -3465,6 +3467,7 @@
 				F4E3C8300EBFA78700CB713D /* HGSCallbackSearchSource.m */,
 				5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */,
 				5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */,
+				5AF0F7D70F68489A0041E0B9 /* HGSCodeSignatureTest.m */,
 				F4D14F110E9BE9A200C0EAA9 /* HGSDelegate.h */,
 				8B02FB060EC9D46B00A6EB85 /* HGSExtension.h */,
 				8B02FB0C0EC9D50C00A6EB85 /* HGSExtension.m */,
@@ -6383,6 +6386,7 @@
 				F4D1535E0E9F9E3000C0EAA9 /* HGSTokenizerTest.m in Sources */,
 				F4D153670E9FA04400C0EAA9 /* HGSQueryTest.m in Sources */,
 				5AED32BD0EAFDF2C004C7187 /* HGSOperationTest.m in Sources */,
+				5AF0F7D80F68489A0041E0B9 /* HGSCodeSignatureTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
