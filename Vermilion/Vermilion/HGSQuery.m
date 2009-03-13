@@ -33,31 +33,40 @@
 #import "HGSQuery.h"
 #import "HGSTokenizer.h"
 #import "HGSStringUtil.h"
-#import "HGSLog.h"
-
-@interface HGSQuery ()
-- (BOOL)parseQuery;
-@end
-
-static NSString * const kEmptyQuery = @"";
 
 @implementation HGSQuery
+
+@synthesize uniqueWords = uniqueWords_;
+@synthesize rawQueryString = rawQueryString_;
+@synthesize results = results_;
+@synthesize parent = parent_;
+@synthesize maxDesiredResults = maxDesiredResults_;
+@synthesize flags = flags_;
+@dynamic pivotObject;
 
 - (id)initWithString:(NSString*)query 
              results:(HGSResultArray *)results
           queryFlags:(HGSQueryFlags)flags {
   if ((self = [super init])) {
-    rawQuery_ = [query copy];
+    rawQueryString_ = [query copy];
     results_ = [results retain];
     maxDesiredResults_ = -1;
     flags_ = flags;
 
     // If we got nil for a query, but had a pivot, turn it into an empty query.
-    if (!rawQuery_ && results_) {
-      rawQuery_ = [kEmptyQuery copy];
+    if (!rawQueryString_ && results_) {
+      rawQueryString_ = @"";
     }
-
-    if (!rawQuery_ || ![self parseQuery]) {
+    NSString *prepedQuery
+      = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:rawQueryString_];
+    
+    // first, just collect all the words
+    NSArray *wordsArray = [HGSTokenizer tokenizeString:prepedQuery wordsOnly:YES];
+    if (wordsArray) {
+      // now unique them
+      uniqueWords_ = [[NSSet alloc] initWithArray:wordsArray];
+    }
+    if (!uniqueWords_) {
       [self release];
       self = nil;
     }
@@ -66,84 +75,26 @@ static NSString * const kEmptyQuery = @"";
 }
 
 - (void)dealloc {
-  [rawQuery_ release];
+  [rawQueryString_ release];
   [uniqueWords_ release];
   [results_ release];
   [parent_ release];
   [super dealloc];
 }
 
-- (NSSet *)uniqueWords {
-  // make sure it ends up in any local pool so the caller is safe threading wise
-  return [[uniqueWords_ retain] autorelease];
-}
-
-- (NSString *)rawQueryString {
-  // make sure it ends up in any local pool so the caller is safe threading wise
-  return [[rawQuery_ retain] autorelease];
-}
-
 - (HGSResult *)pivotObject {
-  HGSResult *result = [results_ lastObject];
-  // make sure it ends up in any local pool so the caller is safe threading wise
-  return [[result retain] autorelease];
-}
-
-- (HGSResultArray *)results {
-  // make sure it ends up in any local pool so the caller is safe threading wise
-  return [[results_ retain] autorelease];
-}
-
-- (HGSQuery *)parent {
-  // make sure it ends up in any local pool so the caller is safe threading wise
-  return [[parent_ retain] autorelease];
-}
-
-- (void)setParent:(HGSQuery *)parent {
-  HGSAssert(parent != self, @"um, we can't be our own parent");
-  [parent_ autorelease];
-  parent_ = [parent retain];
-}
-
-- (NSInteger)maxDesiredResults {
-  return maxDesiredResults_;
-}
-
-- (void)setMaxDesiredResults:(NSInteger)maxResults {
-  maxDesiredResults_ = maxResults;
+  HGSResult *result = nil;
+  @synchronized(self) {
+    result = [[self results] lastObject];
+    // make sure it ends up in any local pool so the caller is safe threading wise
+    [[result retain] autorelease];
+  }
+  return result;
 }
 
 - (NSString*)description {
   return [NSString stringWithFormat:@"[%@ - Q='%@' Rs=%@ P=<%@>]",
-          [self class], rawQuery_, results_, parent_];
-}
-
-- (HGSQueryFlags)flags {
-  return flags_;
-}
-
-- (BOOL)parseQuery {
-  // start out by lowercasing and folding diacriticals
-  NSString *prepedQuery
-    = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:rawQuery_];
-  
-  // first, just collect all the words
-  NSArray *wordsArray
-    = [[HGSTokenizer wordEnumeratorForString:prepedQuery] allObjects];
-  if (!wordsArray) {
-    return NO; // COV_NF_LINE
-  }
-  
-  // now unique them
-  uniqueWords_ = [[NSSet alloc] initWithArray:wordsArray];
-  if (!uniqueWords_) {
-    return NO; // COV_NF_LINE
-  }
-  
-  // If we want phrases, etc. there is more work to do here, see
-  // googlemac/Vermilion/Query for that version.
-  
-  return YES;
+          [self class], rawQueryString_, results_, parent_];
 }
 
 @end

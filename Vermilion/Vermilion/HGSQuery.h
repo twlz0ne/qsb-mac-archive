@@ -31,36 +31,33 @@
 //
 //
 
+/*!
+ @header
+ @discussion
+*/
+
 #import <Foundation/Foundation.h>
 
 @class HGSResult;
 @class HGSResultArray;
-@class HGSAction;
 
-//
-// HGSQuery
-//
-// Represents a fully-parsed query string in a format that's easily digestable
-// by those that need to perform searches.
-//
-
-//
-// The query syntax is pretty simple, all terms are looked for (ie-logical AND),
-// there is no phrase support at this time (the version of this in
-// googlemac/Vermilion/Query supports phrases).  All terms are matched on word
-// prefix, ie: "S P" matches "System Preferences".  TODO: does this open the
-// door to invisible quotes for CJK to get good results?
-//
-
-enum {
+typedef enum {
   eHGSQueryShowAlternatesFlag = 1 << 0,
-};
+} HGSQueryFlags;
 
-typedef NSUInteger HGSQueryFlags;
-
+/*!
+ Represents a fully-parsed query string in a format that's easily digestable
+ by those that need to perform searches.
+ 
+ The query syntax is pretty simple, all terms are looked for (ie-logical AND),
+ there is no phrase support at this time.  All terms are matched on word
+ prefix, ie: "S P" matches "System Preferences".
+ 
+ TODO: does this open the door to invisible quotes for CJK to get good results?
+ */
 @interface HGSQuery : NSObject {
  @private
-  NSString *rawQuery_;
+  NSString *rawQueryString_;
   NSSet *uniqueWords_;
   HGSResultArray *results_;
   HGSQuery *parent_;
@@ -68,41 +65,53 @@ typedef NSUInteger HGSQueryFlags;
   HGSQueryFlags flags_;
 }
 
+/*!
+  The query string un-processed.  Most things doing matches should really be
+  using the uniqueWords api so they get consistent breaking of the query string.
+*/
+@property (readonly, copy) NSString *rawQueryString;
+
+/*! 
+  Results is the current set of results that we have accumulated. 
+*/
+@property (readonly, retain) HGSResultArray *results;
+
+/*!
+  Returns a set of unique words found in the query string ie: query ::  "Foo
+  Bar" baz "mumble foo" returns a set w/ ::   ( "baz", "bar", "foo", "mumble" )
+  
+  NOTE: the strings are all forced to lower case, and diacriticals will have
+  been removed.
+*/
+@property (readonly, retain) NSSet *uniqueWords;
+
+/*!
+  A "parent" is a query that has asked for this one to be created.  Usually to
+  pick up an indirect object for an action.  This allows a SearchSource to walk
+  to the parent and fetch it's direct object to return results specific to that
+  object.
+*/
+@property (readwrite, retain) HGSQuery *parent;
+
+/*!
+  Maximum number of results that we are interested in receiving. -1 indicates
+  no limit.
+*/
+@property (readwrite, assign) NSInteger maxDesiredResults;
+
+/*!
+  A pivot object in the context is any result currently set to filter search
+  this could  a directory (filtering to its contents) or a website (searching
+  data there) or many other types of searchable items.
+*/
+@property (readonly, retain) HGSResult *pivotObject;
+
+/*! 
+  Various flags that modify some queries.
+*/
+@property (readonly, assign) HGSQueryFlags flags;
+
 - (id)initWithString:(NSString*)query 
              results:(HGSResultArray *)results
           queryFlags:(HGSQueryFlags)flags;
-
-// Returns a set of unique words found in the query string
-// ie: query ::  "Foo Bar" baz "mumble foo"
-//     returns a set w/ ::   ( "baz", "bar", "foo", "mumble" )
-// NOTE: the strings are all forced to lower case, and diacriticals will have
-// been removed.
-- (NSSet *)uniqueWords;
-
-// The query string un-processed.  Most things doing matches should really be
-// using the uniqueWords api so they get consistent.
-- (NSString *)rawQueryString;
-
-// A pivot object in the context is any result currently set to filter search
-// this could  a directory (filtering to its contents) or a website (searching
-// data there) or many other types of searchable items.
-- (HGSResult *)pivotObject;
-
-// Results is the current set of results that we have accumulated
-- (HGSResultArray *)results;
-
-// A "parent" is a query that has asked for this one to be created.  Usually
-// to pick up an indirect object for an action.  This allows a SearchSource to
-// walk to the parent and fetch it's direct object to return results specific to
-// that object.
-- (HGSQuery *)parent;
-- (void)setParent:(HGSQuery *)parent;
-
-// Maximum number of results that we are interested in receiving. -1 indicates
-// no limit.
-- (NSInteger)maxDesiredResults;
-- (void)setMaxDesiredResults:(NSInteger)maxResults;
-
-// Various flags that modify some queries
-- (HGSQueryFlags)flags;
 @end
