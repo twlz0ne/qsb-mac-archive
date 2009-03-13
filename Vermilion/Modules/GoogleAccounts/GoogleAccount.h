@@ -38,6 +38,9 @@
 //
 @interface GoogleAccount : HGSSimpleAccount {
  @private
+  BOOL googleAppsAccount_;  // YES if this is a hosted account.
+  BOOL accountTypeKnown_;  // YES if we've determined the kind of account.
+  // Temporary container for account authentication exchange.
   NSMutableData *responseData_;
   // The presence of a captchaImage_ indicates that one such should be shown
   // to the user and the resulting captchaText be included in the
@@ -48,11 +51,20 @@
   NSString *captchaToken_;  // Captcha token.
 }
 
+@property (nonatomic, getter=isGoogleAppsAccount) BOOL googleAppsAccount;
+@property (nonatomic, getter=isAccountTypeKnown) BOOL accountTypeKnown;
 @property (nonatomic, retain) NSImage *captchaImage;
 @property (nonatomic, copy) NSString *captchaText;
 @property (nonatomic, copy) NSString *captchaToken;
 
 @end
+
+
+// A class which manages a Google Apps account.
+//
+@interface GoogleAppsAccount : GoogleAccount
+@end
+  
 
 // A controller which manages a window used to edit the password
 // for a Google account.
@@ -62,6 +74,7 @@
   IBOutlet NSView *captchaContainerView_;
   IBOutlet NSTextField *captchaTextField_;
   IBOutlet NSTextField *passwordField_;
+  IBOutlet NSTextField *googleAppsTextField_;
   
   NSImage *captchaImage_;  // The captcha image presented to the user.
   NSString *captchaText_;  // The captcha text typed by the user.
@@ -93,5 +106,26 @@
 
 // Open google.com in the user's preferred browser.
 - (IBAction)goToGoogle:(id)sender;
+
+@end
+
+// A private window controller that helps the user decide between a hosted
+// account and a non-hosted account during setup.
+@interface GoogleAccountTypeSheetController : NSWindowController {
+ @private
+  NSString *userName_;
+  NSString *googleAppsUserName_;
+  NSInteger selectedAccountIndex_;
+}
+
+@property (nonatomic, copy) NSString *userName;
+@property (nonatomic, copy) NSString *googleAppsUserName;
+@property (nonatomic) NSInteger selectedAccountIndex;
+
+// Designated initializer.
+- (id)initWithUserName:(NSString *)userName;
+
+- (IBAction)chooseNeither:(id)sender;
+- (IBAction)chooseSelected:(id)sender;
 
 @end

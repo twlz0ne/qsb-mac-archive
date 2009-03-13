@@ -227,10 +227,6 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     // the user will see the proper account status.
     [account_ authenticate];
   }
-  KeychainItem* keychainItem 
-    = [KeychainItem keychainItemForService:[account_ identifier]
-                                  username:nil];
-  NSString *userName = [keychainItem username];
   NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
   NSTimeInterval timeSinceLastErrorReport
     = currentTime - previousErrorReportingTime_;
@@ -244,13 +240,13 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
         = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
                              @"password.", nil);
       errorString = [NSString stringWithFormat:errorFormat,
-                               userName];
+                     [account_ displayName]];
       
     } else {
       NSString *errorFormat = HGSLocalizedString(@"Fetch for '%@' failed. (%d)",
                                                  nil);
       errorString = [NSString stringWithFormat:errorFormat,
-                     userName, [error code]];
+                     [account_ displayName], [error code]];
     }
     NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -266,7 +262,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   }
   HGSLogDebug(@"HGSGoogleDocSource doc fetcher failed: error=%d, "
               @"userName=%@.",
-              [error code], userName);
+              [error code], [account_ displayName]);
 }
 
 #pragma mark -

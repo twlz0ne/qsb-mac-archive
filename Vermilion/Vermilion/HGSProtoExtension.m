@@ -52,6 +52,9 @@
 // extension, if any, and removing ourself from the list of sources.
 - (void)willRemoveAccount:(NSNotification *)notification;
 
+// Provide an array of the account types in which this extension is interested.
+- (NSArray *)desiredAccountTypes;
+
 @property (nonatomic, retain, readwrite) HGSExtension *extension;
 @property (nonatomic, readonly) NSString *className;
 
@@ -149,9 +152,8 @@
   //       an N x N expansion based on multiple factor types.
   NSMutableArray *factoredExtensions = [NSMutableArray array];
   // Create a copy of self for each account that's available.
-  NSString *desiredAccountType
-    = [configuration_ objectForKey:kHGSExtensionDesiredAccountType];
-  if (desiredAccountType) {
+  NSArray *desiredAccountTypes = [self desiredAccountTypes];
+  for (NSString *desiredAccountType in desiredAccountTypes) {
     HGSAccountsExtensionPoint *aep = [HGSExtensionPoint accountsPoint];
     NSArray *accounts = [aep accountsForType:desiredAccountType];
     for (id<HGSAccount> account in accounts) {
@@ -167,9 +169,8 @@
 - (HGSProtoExtension *)factorForAccount:(id<HGSAccount>)account {
   HGSProtoExtension *factoredExtension = nil;
   NSString *accountType = [account type];
-  NSString *desiredAccountType
-    = [configuration_ objectForKey:kHGSExtensionDesiredAccountType];
-  if ([accountType isEqualToString:desiredAccountType]) {
+  NSArray *desiredAccountTypes = [self desiredAccountTypes];
+  if ([desiredAccountTypes containsObject:accountType]) {
     factoredExtension = [[self copyWithFactor:account
                                        forKey:kHGSExtensionAccount]
                          autorelease];
@@ -370,7 +371,7 @@
   // TODO(mrossetti): This will get fancier and allow clicking on account
   // name in order to go to the account in the account list.
   NSString *newDisplayName = [[self displayName] stringByAppendingFormat:@" (%@)",
-                              [factor userName]];
+                              [factor displayName]];
   [newConfiguration setObject:newDisplayName 
                        forKey:kHGSExtensionUserVisibleNameKey];
   
@@ -396,7 +397,15 @@
   return [configuration_ objectForKey:kHGSExtensionUserVisibleNameKey];
 }
 
-
+- (NSArray *)desiredAccountTypes {
+  NSArray *desiredAccountTypes
+    = [configuration_ objectForKey:kHGSExtensionDesiredAccountType];
+  if ([desiredAccountTypes isKindOfClass:[NSString class]]) {
+    desiredAccountTypes = [NSArray arrayWithObject:desiredAccountTypes];
+  }
+  return desiredAccountTypes;
+}
+  
 #pragma mark Notification Handling
 
 - (void)willRemoveAccount:(NSNotification *)notification {

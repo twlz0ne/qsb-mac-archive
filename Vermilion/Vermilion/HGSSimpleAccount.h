@@ -33,6 +33,7 @@
 #import "HGSAccount.h"
 
 @class HGSSimpleAccountEditController;
+@class KeychainItem;
 
 // An abstract base class which manages an account with an account name
 // and password (stored in the user's keychain) and with which a search 
@@ -98,6 +99,9 @@
 // Provide the name of the edit nib.  Your implementation should
 // return a valid nib name.
 - (NSString *)editNibName;
+
+// Retrieve the keychain item for our keychain service name, if any.
+- (KeychainItem *)keychainItem;
 
 // Test the account and password to see if they authenticate.
 // The default implementation assumes the account is valid.  You
@@ -191,4 +195,9 @@
 // for an explanation.
 - (BOOL)canGiveUserAnotherTryOffWindow:(NSWindow *)window;
 
+// Used to present an alert message to the user.
+- (void)presentMessageOffWindow:(NSWindow *)parentWindow
+                    withSummary:(NSString *)summary
+              explanationFormat:(NSString *)format
+                     alertStyle:(NSAlertStyle)style;
 @end

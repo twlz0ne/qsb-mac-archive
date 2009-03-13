@@ -32,6 +32,18 @@
 			<key>HGSExtensionOfferedAccountType</key>
 			<string>Google</string>
 		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>GoogleAppsAccount</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.googleapps.account</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>Google Apps Accounts</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSAccountsExtensionPoint</string>
+			<key>HGSExtensionOfferedAccountType</key>
+			<string>GoogleApps</string>
+		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>
 	<string>${VERMILLION_PLUGIN_API_VERSION}</string>

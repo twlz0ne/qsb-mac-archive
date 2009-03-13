@@ -234,10 +234,10 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
       = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
                            @"password.", nil);
     NSString *errorString = [NSString stringWithFormat:errorFormat,
-                             userName];
+                             [account_ displayName]];
     [self reportConnectionFailure:errorString successCode:kHGSSuccessCodeError];
     HGSLogDebug(@"GoogleBookmarkSource authentication failure for account '%@'.",
-                userName);
+                [account_ displayName]);
   }
 }
 
@@ -270,14 +270,10 @@ didReceiveResponse:(NSURLResponse *)response {
   currentlyFetching_ = NO;
   [bookmarkData_ release];
   bookmarkData_ = nil;
-  KeychainItem* keychainItem 
-    = [KeychainItem keychainItemForService:[account_ identifier]
-                                  username:nil];
-  NSString *userName = [keychainItem username];
   NSString *errorFormat
     = HGSLocalizedString(@"Fetch for '%@' failed. (%d)", nil);
   NSString *errorString = [NSString stringWithFormat:errorFormat,
-                           userName, [error code]];
+                           [account_ displayName], [error code]];
   [self reportConnectionFailure:errorString successCode:kHGSSuccessCodeBadError];
   HGSLogDebug(@"GoogleBookmarkSource connection failure (%d) '%@'.",
               [error code], [error localizedDescription]);

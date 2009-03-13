@@ -28,7 +28,10 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionDesiredAccountType</key>
-			<string>Google</string>
+			<array>
+				<string>Google</string>
+				<string>GoogleApps</string>
+			</array>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Google Docs</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>

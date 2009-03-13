@@ -39,9 +39,6 @@
 
 @interface HGSSimpleAccount ()
 
-// Retrieve the keychain item for our keychain service name, if any.
-- (KeychainItem *)keychainItem;
-
 // Finalize the account editing.
 - (void)accountSheetDidEnd:(NSWindow *)sheet
                 returnCode:(int)returnCode
@@ -53,20 +50,18 @@
 @end
 
 
-@interface HGSSetUpSimpleAccountViewController ()
-
-- (void)presentMessageOffWindow:(NSWindow *)parentWindow
-                    withSummary:(NSString *)summary
-              explanationFormat:(NSString *)format
-                     alertStyle:(NSAlertStyle)style;
-
-@end
-
-
 @implementation HGSSimpleAccount
 
 @synthesize accountEditController = accountEditController_;
 @synthesize connection = connection_;
+
+- (id)initWithName:(NSString *)userName
+              type:(NSString *)type {
+  // Perform any adjustments on the account name required.
+  userName = [self adjustUserName:userName];
+  self = [super initWithName:userName type:type];
+  return self;
+}
 
 - (id)initWithDictionary:(NSDictionary *)prefDict {
   if ((self = [super initWithDictionary:prefDict])) {
@@ -479,8 +474,6 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 - (BOOL)canGiveUserAnotherTryOffWindow:(NSWindow *)window {
   return NO;
 }
-
-#pragma mark HGSSetUpSimpleAccountViewController Private Methods
 
 - (void)presentMessageOffWindow:(NSWindow *)parentWindow
                     withSummary:(NSString *)summary
