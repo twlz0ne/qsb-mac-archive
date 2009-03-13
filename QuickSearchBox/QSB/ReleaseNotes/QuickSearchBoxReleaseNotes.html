@@ -42,6 +42,11 @@ Nothing of importance yet.
         a list of nearby file shares, or type in the name of a specific
         share. Select the share and hit Return to mount the share.
     </li>
+    <li>
+        Fixed an exception thrown by the ChatBuddiesSource where an IMBuddy 
+        result contains an NSNull for the first and/or last name fields
+        by only using those names if they are actually NSStrings.
+    </li>
  </ul>
 </body>
 </html>

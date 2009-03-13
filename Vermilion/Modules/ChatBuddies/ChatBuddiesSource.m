@@ -508,12 +508,14 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSURL *url = [NSURL URLWithString:identifier];
   NSMutableString *displayName = [NSMutableString string];
   
+  // NOTE: It's possible that the IMBuddy will provide an NSNull for the
+  // first and/or last name so we must insure that we detect such case.
   NSString *firstName = [imBuddy objectForKey:IMPersonFirstNameKey];
-  if ([firstName length]) {
+  if ([firstName isKindOfClass:[NSString class]] && [firstName length]) {
     [displayName appendString:firstName];
   }
   NSString *lastName = [imBuddy objectForKey:IMPersonLastNameKey];
-  if ([lastName length]) {
+  if ([lastName isKindOfClass:[NSString class]] && [lastName length]) {
     if ([displayName length]) {
       [displayName appendString:@" "];
     }
