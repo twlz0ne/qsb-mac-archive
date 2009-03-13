@@ -53,8 +53,11 @@ extern NSString *kDictionaryTermKey;
     range.length = [[result valueForKey:kDictionaryRangeLengthKey] intValue];
     NSString *term = [result valueForKey:kDictionaryTermKey];
     CGPoint origin = { 0, 0 };
-    HIDictionaryWindowShow(NULL, (CFTypeRef)term, range, NULL,
-                           origin, NO,  NULL);
+    if (range.location != kCFNotFound && range.length != kCFNotFound &&
+        [term isKindOfClass:[NSString class]]) {
+      HIDictionaryWindowShow(NULL, (CFTypeRef)term, range, NULL,
+                             origin, NO,  NULL);
+    }
   }
 
   return YES;
