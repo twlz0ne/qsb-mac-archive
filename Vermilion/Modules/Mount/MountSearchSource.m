@@ -33,16 +33,13 @@
 #import <Vermilion/Vermilion.h>
 #import <arpa/inet.h>
 
-#define kResultTypeShare @"share"
-static NSString *kResultTypeAfpShare = HGS_SUBTYPE(kResultTypeShare, @"afp");
-static NSString *kResultTypeSmbShare = HGS_SUBTYPE(kResultTypeShare, @"smb");
 static const NSTimeInterval kServiceResolutionTimeout = 5.0;
 
 @interface MountSearchSource : HGSMemorySearchSource {
  @private
-  NSNetServiceBrowser *afpServiceBrowser_;
-  NSNetServiceBrowser *smbServiceBrowser_;
   NSMutableArray *services_;
+  NSMutableDictionary *browsers_;
+  NSDictionary *configuration_;
 }
 - (void)updateResultsIndex;
 @end
@@ -51,22 +48,28 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
+    configuration_ = [configuration objectForKey:@"MountSearchSourceServices"]; 
+    browsers_ = [[NSMutableDictionary alloc] init];
     services_ = [[NSMutableArray alloc] init];
-    afpServiceBrowser_ = [[NSNetServiceBrowser alloc] init];
-    [afpServiceBrowser_ setDelegate:self];
-    [afpServiceBrowser_ searchForServicesOfType:@"_afpovertcp._tcp" inDomain:@""];
-    smbServiceBrowser_ = [[NSNetServiceBrowser alloc] init];
-    [smbServiceBrowser_ setDelegate:self];
-    [smbServiceBrowser_ searchForServicesOfType:@"_smb._tcp" inDomain:@""];
+    
+    for (NSString *key in configuration_) {
+      NSNetServiceBrowser *browser
+        = [[[NSNetServiceBrowser alloc] init] autorelease];
+      [browser setDelegate:self];
+      [browser searchForServicesOfType:key inDomain:@""];
+      [browsers_ setObject:browser forKey:key];
+    }
   }
   return self;
 }
 
 - (void) dealloc {
-  [afpServiceBrowser_ stop];
-  [afpServiceBrowser_ release];
-  [smbServiceBrowser_ stop];
-  [smbServiceBrowser_ release];
+  for (NSString *key in browsers_) {
+    NSNetServiceBrowser *browser = [browsers_ objectForKey:key];
+    [browser stop];
+  }
+  [browsers_ release];
+  [configuration_ release];
   [services_ release];
   [super dealloc];
 }
@@ -115,17 +118,20 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
     }
   }
   if (inetAddress) {
-    const char *ipString = NULL;
+    const char *ipCString = NULL;
     char ipStringBuffer[INET6_ADDRSTRLEN] = { 0 };
+    NSString *ipString = nil;
     switch (inetAddress->sin_family) {
       case AF_INET:
-        ipString = inet_ntop(inetAddress->sin_family, &inetAddress->sin_addr,
+        ipCString = inet_ntop(inetAddress->sin_family, &inetAddress->sin_addr,
                              ipStringBuffer, sizeof(ipStringBuffer));
+        ipString = [NSString stringWithUTF8String:ipCString];
         break;
       case AF_INET6:
-        ipString = inet_ntop(inetAddress->sin_family,
+        ipCString = inet_ntop(inetAddress->sin_family,
                              &((struct sockaddr_in6 *)inetAddress)->sin6_addr,
                             ipStringBuffer, sizeof(ipStringBuffer));
+        ipString = [NSString stringWithFormat:@"[%s]", ipCString];
         break;
     }
     if (ipString) {
@@ -137,23 +143,27 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
                                   [NSImage imageNamed:NSImageNameBonjour],
                                   kHGSObjectAttributeIconKey,
                                   nil];
-      NSString *url = nil, *type = nil;
-      if ([[service type] hasPrefix:@"_afpovertcp._tcp"]) {
-        url = [NSString stringWithFormat:@"afp://%s/", ipString];
-        type = kResultTypeAfpShare;
-        [otherTerms addObject:@"afp"];
-      } else if ([[service type] hasPrefix:@"_smb._tcp"]) {
-        url = [NSString stringWithFormat:@"smb://%s/", ipString];
-        type = kResultTypeSmbShare;
-        [otherTerms addObject:@"smb"];
+      NSString *url = nil, *type = nil, *scheme = nil;
+      
+      for (NSString *key in configuration_) {
+        if ([[service type] hasPrefix:key]) {
+          NSDictionary *dict = [configuration_ objectForKey:key];
+          scheme = [dict objectForKey:@"scheme"];
+          url = [NSString stringWithFormat:@"%@://%@/", scheme, ipString];
+          type = [dict objectForKey:@"type"];
+          [otherTerms addObject:scheme];
+        } 
       }
+      
       if (url && type) {
         HGSResult *hgsResult 
-          = [HGSResult resultWithURL:[NSURL URLWithString:url]
-                                name:[service name]
-                                type:type
-                              source:self
-                          attributes:attributes];
+        = [HGSResult resultWithURL:[NSURL URLWithString:url]
+                              name:[NSString stringWithFormat:@"%@ (%@)", 
+                                     [service name],
+                                     scheme]
+                              type:type
+                            source:self
+                        attributes:attributes];
         [self indexResult:hgsResult
                nameString:[service name]
         otherStringsArray:otherTerms];

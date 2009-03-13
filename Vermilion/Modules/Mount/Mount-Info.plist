@@ -27,6 +27,51 @@
 			<string>MountSearchSource</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.mount.source</string>
+			<key>MountSearchSourceServices</key>
+			<dict>
+				<key>_rfb._tcp</key>
+				<dict>
+					<key>scheme</key>
+					<string>vnc</string>
+					<key>type</key>
+					<string>share.vnc</string>
+				</dict>
+				<key>_sftp-ssh._tcp</key>
+				<dict>
+					<key>scheme</key>
+					<string>sftp</string>
+					<key>type</key>
+					<string>share.sftp</string>
+				</dict>
+				<key>_ssh._tcp</key>
+				<dict>
+					<key>scheme</key>
+					<string>ssh</string>
+					<key>type</key>
+					<string>share.ssh</string>
+				</dict>
+				<key>_http._tcp</key>
+				<dict>
+					<key>scheme</key>
+					<string>http</string>
+					<key>type</key>
+					<string>share.http</string>
+				</dict>
+				<key>_smb._tcp</key>
+				<dict>
+					<key>scheme</key>
+					<string>smb</string>
+					<key>type</key>
+					<string>share.smb</string>
+				</dict>
+				<key>_afpovertcp._tcp</key>
+				<dict>
+					<key>scheme</key>
+					<string>afp</string>
+					<key>type</key>
+					<string>share.afp</string>
+				</dict>
+			</dict>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Mount</string>
 			<key>HGSExtensionPoint</key>
