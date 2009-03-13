@@ -4482,6 +4482,7 @@
 				8B6F2CDE0DA2B7F50052CA40 /* Sources */,
 				8B6F2CDF0DA2B7F50052CA40 /* Frameworks */,
 				8B4888110F15D37D00786C1E /* ShellScript */,
+				8B95C8C40F6AB302003BDBDD /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -5503,6 +5504,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHEROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/GData.build/${CONFIGURATION}/GDataFramework.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
+		};
+		8B95C8C40F6AB302003BDBDD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(CONFIGURATION_BUILD_DIR)/$(FULL_PRODUCT_NAME)",
+				"$(SRCROOT)/../../Vermilion/Documentation/vermilion.hdoc",
+				"$(SRCROOT)/../../Vermilion/Documentation/headerdoc2html.config",
+				"$(SRCROOT)/../../Vermilion/Documentation/toctemplate.html",
+			);
+			outputPaths = (
+				"$(CONFIGURATION_BUILD_DIR)/Documentation/Vermilion",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "DOC_FOLDER=\"${CONFIGURATION_BUILD_DIR}/Documentation/Vermilion\"\ncd \"${SRCROOT}/../../Vermilion/Documentation\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"./vermilion.hdoc\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"${CONFIGURATION_BUILD_DIR}/${PUBLIC_HEADERS_FOLDER_PATH}\"\n/usr/bin/gatherheaderdoc $DOC_FOLDER";
 		};
 		8BA016650F13CF6800926923 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
