@@ -172,23 +172,11 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
   return result;
 }
 
-- (NSArray *)allExtensionIdentifiers {
-  NSArray *result;
-  @synchronized(extensions_) {
-    // This yields a temp array safe to iterate if our data gets changed.
-    result = [extensions_ allKeys];
-  }
-  return result;
-}
-
 #pragma mark Removal
 
-- (void)removeExtensionWithIdentifier:(NSString *)identifier {
-  id extension = [self extensionWithIdentifier:identifier];
-  if (!extension) {
-    HGSLogDebug(@"No such extension with id: %@", identifier);
-    return;
-  }
+- (void)removeExtension:(id<HGSExtension>)extension {
+  NSString *identifier = [extension identifier];
+  if (!identifier) return;
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   NSDictionary *userInfo = [NSDictionary dictionaryWithObject:extension
                                                        forKey:kHGSExtensionKey];
@@ -201,10 +189,6 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
   [nc postNotificationName:kHGSExtensionPointDidRemoveExtensionNotification 
                     object:self 
                   userInfo:userInfo];
-}
-
-- (void)removeExtension:(id<HGSExtension>)extension {
-  [self removeExtensionWithIdentifier:[extension identifier]];
 }
 
 @end

@@ -30,70 +30,91 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion
+*/
+
 #import <Foundation/Foundation.h>
-
-// HGSExtensionPoint objects are a place that plugins can register new
-// functionality. Each extension point contains a list of all registered
-// extensions as well as a protocol to verify their interface.
-// Extensions can be registered at any time, and the way they are used depends
-// only on the requestor.
-
-// This class is threadsafe.
 
 @protocol HGSExtension;
 
+/*!
+  HGSExtensionPoint objects are a place that plugins can register new
+  functionality. Each extension point contains a list of all registered
+  extensions as well as a protocol to verify their interface.  Extensions can
+  be registered at any time, and the way they are used depends only on the
+  requestor.
+  
+  This class is threadsafe.
+*/
 @interface HGSExtensionPoint : NSObject {
  @private
   NSMutableDictionary* extensions_;
   Protocol* protocol_;
 }
 
-// Returns the global extension point with a given identifier
+/*!
+  All extensions registered with this point.
+*/
+@property (readonly) NSArray *extensions;
+
+/*!
+  Returns the global extension point with a given identifier.
+*/
 + (HGSExtensionPoint*)pointWithIdentifier:(NSString*)identifer;
 
-// Sets a protocol for all extensions to conform to. Extensions are verified on
-// add. If extensions have already been registered with this point, they will be
-// verified immediately. If they fail, an error will be logged to the console
-// and they will be removed/ignored
-
+/*!
+  Sets a protocol for all extensions to conform to. Extensions are verified on
+  add. If extensions have already been registered with this point, they will be
+  verified immediately. If they fail, an error will be logged to the console
+  and they will be removed/ignored.
+*/
 - (void)setProtocol:(Protocol*)protocol;
 
-// Add an extension to this point.
-// Returns NO if the extension could not be registered or if the object does
-// not conform to the protocol
+/*!
+  Add an extension to this point.  Returns NO if the extension could not be
+  registered or if the object does not conform to the protocol.
+*/
 - (BOOL)extendWithObject:(id<HGSExtension>)extension;
 
 #pragma mark Access
 
-// Returns the extension with the given identifier.
+/*!
+  Returns the extension with the given identifier.
+*/
 - (id)extensionWithIdentifier:(NSString *)identifier;
-
-// Returns all the extensions
-- (NSArray *)extensions;
-
-// Returns an array of identifiers for all registered extensions (unordered)
-- (NSArray *)allExtensionIdentifiers;
 
 #pragma mark Removal
 
-// Remove an extension with an identifier.
-- (void)removeExtensionWithIdentifier:(NSString *)identifier;
-
-// Remove a given extension
+/*!
+  Remove a given extension.
+*/
 - (void)removeExtension:(id<HGSExtension>)extension;
 
 @end
 
 
-// This notification is sent by an extension point when extensions are added.
-// Object is the extension point being modified
-// Dictionary contains kHGSExtensionKey.
+/*!
+  This notification is sent by an extension point when extensions are added.
+  Object is the extension point being modified Dictionary contains
+  kHGSExtensionKey.
+*/
 extern NSString* const kHGSExtensionPointDidAddExtensionNotification;
 
-// These notifications are sent by an extension point when extensions are removed.
+/*!
+  Notifications sent by an extension point when an extension is about to be
+  removed.
+*/
 extern NSString* const kHGSExtensionPointWillRemoveExtensionNotification;
+/*!
+  Notifications sent by an extension point when an extension is has been
+  removed.
+*/
 extern NSString* const kHGSExtensionPointDidRemoveExtensionNotification;
 
-// Key for the notification dictionary. Represents the extension being added
-// or removed.
+/*!
+  Key for the notification dictionary. Represents the extension being added or
+  removed.
+*/
 extern NSString *const kHGSExtensionKey;

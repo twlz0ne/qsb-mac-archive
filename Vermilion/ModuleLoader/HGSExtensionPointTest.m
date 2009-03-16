@@ -196,9 +196,6 @@
   extensionList = [newPoint extensions];
   STAssertEquals([extensionList count], (NSUInteger)6,
                  @"not all extensions present");
-  NSArray *extensionIDList = [newPoint allExtensionIdentifiers];
-  STAssertEquals([extensionIDList count], (NSUInteger)6,
-                 @"not all extensions present");
   
   // check that adding the same id does not add a new item
   MyTestExtension* extension7 
@@ -223,7 +220,7 @@
   // check searching for identifiers
   MyTestExtension* result = [newPoint extensionWithIdentifier:@"test1"];
   STAssertEqualObjects(result, extension1, @"didn't find last object with id");
-  [newPoint removeExtensionWithIdentifier:@"test1"];
+  [newPoint removeExtension:result];
   STAssertNil([newPoint extensionWithIdentifier:@"test1"], @"didn't remove");
   result = [newPoint extensionWithIdentifier:@"not found"];
   STAssertNil(result, @"found something with an identifier we didn't expect");
@@ -300,11 +297,4 @@
   [nc removeObserver:self];
 }
 
-- (void)testRemoveExtension {
-  // Test the failure case where the extension does now exist
-  HGSExtensionPoint* newPoint
-    = [HGSExtensionPoint pointWithIdentifier:@"testFailure"];
-  STAssertNotNil(newPoint, @"extension point creation failed");
-  [newPoint removeExtensionWithIdentifier:@"foo.bar.blatz"];
-}
 @end
