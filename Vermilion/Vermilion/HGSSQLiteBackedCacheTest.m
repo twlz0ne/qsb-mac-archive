@@ -30,17 +30,21 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSSQLiteBackedCacheTest.h"
-
+#import "GTMSenTestCase.h"
 #import "HGSSQLiteBackedCache.h"
+
+@class HGSSQLiteBackendCache;
+
+@interface HGSSQLiteBackedCacheTest : GTMTestCase {
+  HGSSQLiteBackendCache* cache_;
+}
+
+- (NSString*)tempDbPath;
+@end
 
 @interface HGSSQLiteBackedCache ()
 
 - (void)invalidateEntriesNotAccessedAfter:(NSDate *)date;
-@end
-
-@interface HGSSQLiteBackedCacheTest ()
-- (NSString*)tempDbPath;
 @end
 
 @implementation HGSSQLiteBackedCacheTest
@@ -53,8 +57,9 @@
 
 - (void)setUp {
   NSError* error = nil;
-  if ([[NSFileManager defaultManager] fileExistsAtPath:[self tempDbPath]]) {
-    [[NSFileManager defaultManager] removeItemAtPath:[self tempDbPath] error:&error];
+  NSFileManager *fm = [NSFileManager defaultManager];
+  if ([fm fileExistsAtPath:[self tempDbPath]]) {
+    [fm removeItemAtPath:[self tempDbPath] error:&error];
     STAssertNil(error,
                 @"Unable to delete file: %@: %@",
                 [self tempDbPath],
@@ -139,7 +144,8 @@
   cache_ = nil;
 
   NSError* error = nil;
-  [[NSFileManager defaultManager] removeItemAtPath:[self tempDbPath] error:&error];
+  NSString *path = [self tempDbPath];
+  [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
   STAssertNil(error,
               @"Unable to clean up after test: %@: %@",
               [self tempDbPath],

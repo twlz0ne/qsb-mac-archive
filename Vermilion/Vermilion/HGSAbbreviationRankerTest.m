@@ -1,9 +1,7 @@
 //
 //  HGSAbbreviationRankerTest.m
-//  GoogleMobile
 //
-//  Created by Alastair Tse on 2008/05/27.
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2008-2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -32,8 +30,12 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSAbbreviationRankerTest.h"
 #import "HGSAbbreviationRanker.h"
+
+#import "GTMSenTestCase.h"
+
+@interface HGSAbbreviationRankerTest : GTMTestCase 
+@end
 
 @implementation HGSAbbreviationRankerTest
 

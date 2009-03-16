@@ -1,9 +1,7 @@
 //
-//  HGSSearchSourceTest.h
-//  GoogleMobile
+//  HGSIconProviderTest.m
 //
-//  Created by Alastair Tse on 2008/05/17.
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -32,27 +30,12 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+
 #import "GTMSenTestCase.h"
+#import "HGSIconProvider.h"
 
-@class HGSPredicate;
-@class HGSSearchSource;
+@interface HGSIconProviderTest : GTMTestCase 
+@end
 
-@interface HGSSearchSourceTest : SenTestCase {
-  HGSSearchSource* source_;
-  BOOL testFirstTier_;
-  BOOL testEnabled_;
-  BOOL testPerformSearchOperation_;
-}
-
-- (void)testPerformSearchOperation;
-- (void)testSearchOperationForQueryWithObserver;
-
-// Executes a single query by setting up the observers and performing any
-// checks declared by the test* instance variables.
-//
-// Returns the actual results returned from the search so the caller can
-// do any additional asserts.
-- (NSArray *)_testSingleQuery:(HGSPredicate*)predicate
-             expectingResults:(NSArray*)expectedResults
-                   comparator:(NSInvocation*)comparator;
+@implementation HGSIconProviderTest
 @end

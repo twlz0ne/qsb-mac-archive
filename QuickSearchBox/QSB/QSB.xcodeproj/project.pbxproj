@@ -364,7 +364,6 @@
 		7F3EB48F0E5F02B500A7A75E /* MenuArrowBlack.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F3EB48D0E5F02B500A7A75E /* MenuArrowBlack.png */; };
 		7F3F758C0E152A57001AF34E /* QSBScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F758B0E152A57001AF34E /* QSBScrollView.m */; };
 		7F3F75950E152BA5001AF34E /* QSBSmallScroller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F75940E152BA5001AF34E /* QSBSmallScroller.m */; };
-		7F3F75DF0E152E7D001AF34E /* HGSSQLiteBackedCacheTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */; };
 		7F3F7EC50F39FCE70054680A /* QSBHGSResult+NSPasteboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F7EC40F39FCE70054680A /* QSBHGSResult+NSPasteboard.m */; };
 		7F4497F20F6895EB00330B67 /* GTMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = F435DAAE0DBE4BBE0069CDE8 /* GTMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7F495C1D0F24E65E0012A1B9 /* TextActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F495C1C0F24E65E0012A1B9 /* TextActions.m */; };
@@ -566,7 +565,6 @@
 		8B6C17300F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6C172E0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h */; };
 		8B6C17310F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C172F0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m */; };
 		8B6F2D740DA2B8AF0052CA40 /* HGSAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D600DA2B88E0052CA40 /* HGSAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8B6F2D760DA2B8AF0052CA40 /* HGSModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D630DA2B88E0052CA40 /* HGSModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6F2D770DA2B8AF0052CA40 /* HGSModuleLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D0E0DA2B83F0052CA40 /* HGSModuleLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6F2D780DA2B8AF0052CA40 /* HGSResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D640DA2B88E0052CA40 /* HGSResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6F2D7B0DA2B8AF0052CA40 /* HGSQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D680DA2B88E0052CA40 /* HGSQuery.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -641,6 +639,35 @@
 		8B9250DF0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B9250DC0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m */; };
 		8B92527B0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B92527A0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m */; };
 		8B9257170EE9CCF300F3DF32 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
+		8B95CAA40F6B09FE003BDBDD /* HGSAccountTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA910F6B09FE003BDBDD /* HGSAccountTest.m */; };
+		8B95CAA50F6B09FE003BDBDD /* HGSQueryControllerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA920F6B09FE003BDBDD /* HGSQueryControllerTest.m */; };
+		8B95CAA60F6B09FE003BDBDD /* HGSIconProviderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA930F6B09FE003BDBDD /* HGSIconProviderTest.m */; };
+		8B95CAA70F6B09FE003BDBDD /* HGSPythonActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA940F6B09FE003BDBDD /* HGSPythonActionTest.m */; };
+		8B95CAA80F6B09FE003BDBDD /* HGSExtensionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA950F6B09FE003BDBDD /* HGSExtensionTest.m */; };
+		8B95CAA90F6B09FE003BDBDD /* HGSPythonSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA960F6B09FE003BDBDD /* HGSPythonSourceTest.m */; };
+		8B95CAAA0F6B09FE003BDBDD /* HGSPluginTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA970F6B09FE003BDBDD /* HGSPluginTest.m */; };
+		8B95CAAB0F6B09FE003BDBDD /* HGSMemorySearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA980F6B09FE003BDBDD /* HGSMemorySearchSourceTest.m */; };
+		8B95CAAC0F6B09FE003BDBDD /* HGSLRUCacheTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA990F6B09FE003BDBDD /* HGSLRUCacheTest.m */; };
+		8B95CAAD0F6B09FE003BDBDD /* HGSBundleTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9A0F6B09FE003BDBDD /* HGSBundleTest.m */; };
+		8B95CAAE0F6B09FE003BDBDD /* HGSActionOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9B0F6B09FE003BDBDD /* HGSActionOperationTest.m */; };
+		8B95CAAF0F6B09FE003BDBDD /* HGSSearchOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9C0F6B09FE003BDBDD /* HGSSearchOperationTest.m */; };
+		8B95CAB00F6B09FE003BDBDD /* HGSSimpleAccountTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9D0F6B09FE003BDBDD /* HGSSimpleAccountTest.m */; };
+		8B95CAB10F6B09FE003BDBDD /* HGSAccountsExtensionPointTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9E0F6B09FE003BDBDD /* HGSAccountsExtensionPointTest.m */; };
+		8B95CAB30F6B09FE003BDBDD /* HGSMixerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA00F6B09FE003BDBDD /* HGSMixerTest.m */; };
+		8B95CAB40F6B09FE003BDBDD /* HGSPythonTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA10F6B09FE003BDBDD /* HGSPythonTest.m */; };
+		8B95CAB50F6B09FE003BDBDD /* HGSProtoExtensionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA20F6B09FE003BDBDD /* HGSProtoExtensionTest.m */; };
+		8B95CAB60F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA30F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m */; };
+		8B95CABB0F6B0A4A003BDBDD /* HGSSearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CABA0F6B0A4A003BDBDD /* HGSSearchSourceTest.m */; };
+		8B95CB4C0F6B1CA9003BDBDD /* HGSSQLiteBackedCacheTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */; };
+		8B95CC5E0F6EC558003BDBDD /* HGSCoreExtensionPointsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CC5D0F6EC558003BDBDD /* HGSCoreExtensionPointsTest.m */; };
+		8B95CC720F6EC66E003BDBDD /* HGSModuleLoaderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CC710F6EC66E003BDBDD /* HGSModuleLoaderTest.m */; };
+		8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
+		8B95CCB60F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
+		8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */; };
+		8B95CD210F6EDF9D003BDBDD /* GTMRegex.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */; };
+		8B95CD730F6EE20E003BDBDD /* HGSBundle.m in Headers */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
+		8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
+		8B95CE200F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CE1F0F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m */; };
 		8BA019C40F14303400926923 /* GTMSQLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BA019C20F14303400926923 /* GTMSQLite.m */; };
 		8BA019C50F14303400926923 /* GTMSQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BA019C30F14303400926923 /* GTMSQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BA01A860F1431DD00926923 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BB275AB0D6F81EA008DC1CA /* libsqlite3.dylib */; };
@@ -792,7 +819,7 @@
 		E4D1B0DD0DD0B253004BFB52 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E429DF760AC1907A00E747D8 /* Security.framework */; };
 		E4D28A920DF9971600FC6C31 /* HGSActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4D28A4C0DF98DFF00FC6C31 /* HGSActionTest.m */; };
 		E4D28B330DF9AA0C00FC6C31 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
-		E4D28DDE0DF9C11300FC6C31 /* HGSObjectTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4D28DDD0DF9C11300FC6C31 /* HGSObjectTest.m */; };
+		E4D28DDE0DF9C11300FC6C31 /* HGSResultTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4D28DDD0DF9C11300FC6C31 /* HGSResultTest.m */; };
 		E4F551380DF73082008A846E /* HGSExtensionPointTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4F551020DF72691008A846E /* HGSExtensionPointTest.m */; };
 		E4F551550DF730D7008A846E /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		F40FEB390EC4C81700B32381 /* FilesystemDirectorySearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F10EF650DCF6F63002FCB08 /* FilesystemDirectorySearchSource.m */; };
@@ -1755,7 +1782,6 @@
 		7F3F75940E152BA5001AF34E /* QSBSmallScroller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSmallScroller.m; sourceTree = "<group>"; };
 		7F3F75D80E152E6D001AF34E /* HGSSQLiteBackedCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSQLiteBackedCache.h; sourceTree = "<group>"; };
 		7F3F75D90E152E6D001AF34E /* HGSSQLiteBackedCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSQLiteBackedCache.m; sourceTree = "<group>"; };
-		7F3F75DA0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSQLiteBackedCacheTest.h; sourceTree = "<group>"; };
 		7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSQLiteBackedCacheTest.m; sourceTree = "<group>"; };
 		7F3F7EC30F39FCE70054680A /* QSBHGSResult+NSPasteboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "QSBHGSResult+NSPasteboard.h"; sourceTree = "<group>"; };
 		7F3F7EC40F39FCE70054680A /* QSBHGSResult+NSPasteboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "QSBHGSResult+NSPasteboard.m"; sourceTree = "<group>"; };
@@ -1945,7 +1971,6 @@
 		8B6F2D5F0DA2B88E0052CA40 /* Vermilion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vermilion.h; sourceTree = "<group>"; };
 		8B6F2D600DA2B88E0052CA40 /* HGSAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAction.h; sourceTree = "<group>"; };
 		8B6F2D610DA2B88E0052CA40 /* HGSAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAction.m; sourceTree = "<group>"; };
-		8B6F2D630DA2B88E0052CA40 /* HGSModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSModule.h; sourceTree = "<group>"; };
 		8B6F2D640DA2B88E0052CA40 /* HGSResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSResult.h; sourceTree = "<group>"; };
 		8B6F2D650DA2B88E0052CA40 /* HGSResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSResult.m; sourceTree = "<group>"; };
 		8B6F2D680DA2B88E0052CA40 /* HGSQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSQuery.h; sourceTree = "<group>"; };
@@ -1989,6 +2014,32 @@
 		8B9250DB0EE861E000F3DF32 /* QSBOpenProductHomepageCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBOpenProductHomepageCommand.m; sourceTree = "<group>"; };
 		8B9250DC0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBOpenPreferencesCommand.m; sourceTree = "<group>"; };
 		8B92527A0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBHGSObjectSpecifiers.m; sourceTree = "<group>"; };
+		8B95CA910F6B09FE003BDBDD /* HGSAccountTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccountTest.m; sourceTree = "<group>"; };
+		8B95CA920F6B09FE003BDBDD /* HGSQueryControllerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSQueryControllerTest.m; sourceTree = "<group>"; };
+		8B95CA930F6B09FE003BDBDD /* HGSIconProviderTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSIconProviderTest.m; sourceTree = "<group>"; };
+		8B95CA940F6B09FE003BDBDD /* HGSPythonActionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPythonActionTest.m; sourceTree = "<group>"; };
+		8B95CA950F6B09FE003BDBDD /* HGSExtensionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSExtensionTest.m; sourceTree = "<group>"; };
+		8B95CA960F6B09FE003BDBDD /* HGSPythonSourceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPythonSourceTest.m; sourceTree = "<group>"; };
+		8B95CA970F6B09FE003BDBDD /* HGSPluginTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPluginTest.m; sourceTree = "<group>"; };
+		8B95CA980F6B09FE003BDBDD /* HGSMemorySearchSourceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSMemorySearchSourceTest.m; sourceTree = "<group>"; };
+		8B95CA990F6B09FE003BDBDD /* HGSLRUCacheTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSLRUCacheTest.m; sourceTree = "<group>"; };
+		8B95CA9A0F6B09FE003BDBDD /* HGSBundleTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSBundleTest.m; sourceTree = "<group>"; };
+		8B95CA9B0F6B09FE003BDBDD /* HGSActionOperationTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSActionOperationTest.m; sourceTree = "<group>"; };
+		8B95CA9C0F6B09FE003BDBDD /* HGSSearchOperationTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSearchOperationTest.m; sourceTree = "<group>"; };
+		8B95CA9D0F6B09FE003BDBDD /* HGSSimpleAccountTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleAccountTest.m; sourceTree = "<group>"; };
+		8B95CA9E0F6B09FE003BDBDD /* HGSAccountsExtensionPointTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccountsExtensionPointTest.m; sourceTree = "<group>"; };
+		8B95CAA00F6B09FE003BDBDD /* HGSMixerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSMixerTest.m; sourceTree = "<group>"; };
+		8B95CAA10F6B09FE003BDBDD /* HGSPythonTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPythonTest.m; sourceTree = "<group>"; };
+		8B95CAA20F6B09FE003BDBDD /* HGSProtoExtensionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSProtoExtensionTest.m; sourceTree = "<group>"; };
+		8B95CAA30F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCallbackSearchSourceTest.m; sourceTree = "<group>"; };
+		8B95CABA0F6B0A4A003BDBDD /* HGSSearchSourceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSearchSourceTest.m; sourceTree = "<group>"; };
+		8B95CC5D0F6EC558003BDBDD /* HGSCoreExtensionPointsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCoreExtensionPointsTest.m; sourceTree = "<group>"; };
+		8B95CC710F6EC66E003BDBDD /* HGSModuleLoaderTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HGSModuleLoaderTest.m; path = ../../Vermilion/HGSModuleLoaderTest.m; sourceTree = SOURCE_ROOT; };
+		8B95CCB30F6EDD8C003BDBDD /* GTMUnitTestDevLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMUnitTestDevLog.h; sourceTree = "<group>"; };
+		8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMUnitTestDevLog.m; sourceTree = "<group>"; };
+		8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMRegex.h; sourceTree = "<group>"; };
+		8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMRegex.m; sourceTree = "<group>"; };
+		8B95CE1F0F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAbbreviationRankerTest.m; sourceTree = "<group>"; };
 		8BA019C20F14303400926923 /* GTMSQLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMSQLite.m; sourceTree = "<group>"; };
 		8BA019C30F14303400926923 /* GTMSQLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMSQLite.h; sourceTree = "<group>"; };
 		8BA01C000F147DB000926923 /* GTMNSWorkspace+Running.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSWorkspace+Running.h"; sourceTree = "<group>"; };
@@ -2135,7 +2186,7 @@
 		E46932F10DDB79DA00C5A64A /* ActionSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActionSource.m; sourceTree = "<group>"; };
 		E46933050DDB7A0200C5A64A /* Actions.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Actions.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4D28A4C0DF98DFF00FC6C31 /* HGSActionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSActionTest.m; sourceTree = "<group>"; };
-		E4D28DDD0DF9C11300FC6C31 /* HGSObjectTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSObjectTest.m; sourceTree = "<group>"; };
+		E4D28DDD0DF9C11300FC6C31 /* HGSResultTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSResultTest.m; sourceTree = "<group>"; };
 		E4F551020DF72691008A846E /* HGSExtensionPointTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSExtensionPointTest.m; sourceTree = "<group>"; };
 		E4F551330DF73059008A846E /* VermilionTest.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VermilionTest.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F435DAAE0DBE4BBE0069CDE8 /* GTMDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMDefines.h; sourceTree = "<group>"; };
@@ -2978,11 +3029,13 @@
 			children = (
 				8B6F2D0E0DA2B83F0052CA40 /* HGSModuleLoader.h */,
 				8B6F2D0F0DA2B83F0052CA40 /* HGSModuleLoader.m */,
+				8B95CC710F6EC66E003BDBDD /* HGSModuleLoaderTest.m */,
 				7F915C740DB50FC100B34DA2 /* HGSExtensionPoint.h */,
 				7F915C750DB50FC100B34DA2 /* HGSExtensionPoint.m */,
 				E4F551020DF72691008A846E /* HGSExtensionPointTest.m */,
 				7F915C880DB512CC00B34DA2 /* HGSCoreExtensionPoints.h */,
 				7F915C890DB512CC00B34DA2 /* HGSCoreExtensionPoints.m */,
+				8B95CC5D0F6EC558003BDBDD /* HGSCoreExtensionPointsTest.m */,
 			);
 			path = ModuleLoader;
 			sourceTree = "<group>";
@@ -3126,6 +3179,8 @@
 				8B55DAE30E78829300D39CB0 /* GTMNSObject+UnitTesting.h */,
 				8B55D9100E786B5D00D39CB0 /* GTMSenTestCase.h */,
 				8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */,
+				8B95CCB30F6EDD8C003BDBDD /* GTMUnitTestDevLog.h */,
+				8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */,
 				8B55D9250E786B5D00D39CB0 /* RunMacOSUnitTests.sh */,
 			);
 			path = UnitTesting;
@@ -3446,65 +3501,83 @@
 			children = (
 				7FE098910DC77AEB00D0FB6C /* HGSAbbreviationRanker.h */,
 				7FE098900DC77AEB00D0FB6C /* HGSAbbreviationRanker.m */,
+				8B95CE1F0F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m */,
 				62D0E9640EF058950028522C /* HGSAccount.h */,
 				62D0E96A0EF059B40028522C /* HGSAccount.m */,
+				8B95CA910F6B09FE003BDBDD /* HGSAccountTest.m */,
 				62D0E96D0EF05D0E0028522C /* HGSAccountsExtensionPoint.h */,
 				62D0E96E0EF05D0E0028522C /* HGSAccountsExtensionPoint.m */,
+				8B95CA9E0F6B09FE003BDBDD /* HGSAccountsExtensionPointTest.m */,
 				8B6F2D600DA2B88E0052CA40 /* HGSAction.h */,
 				8B6F2D610DA2B88E0052CA40 /* HGSAction.m */,
+				E4D28A4C0DF98DFF00FC6C31 /* HGSActionTest.m */,
 				7FEA74A90DA416B60052F620 /* HGSActionOperation.h */,
 				7FEA74AA0DA416B60052F620 /* HGSActionOperation.m */,
-				E4D28A4C0DF98DFF00FC6C31 /* HGSActionTest.m */,
+				8B95CA9B0F6B09FE003BDBDD /* HGSActionOperationTest.m */,
 				8B8B13040EEBADE400E543D0 /* HGSBundle.h */,
 				8B8B13050EEBADE400E543D0 /* HGSBundle.m */,
+				8B95CA9A0F6B09FE003BDBDD /* HGSBundleTest.m */,
 				F4E3C82F0EBFA78700CB713D /* HGSCallbackSearchSource.h */,
 				F4E3C8300EBFA78700CB713D /* HGSCallbackSearchSource.m */,
+				8B95CAA30F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m */,
 				5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */,
 				5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */,
 				5AF0F7D70F68489A0041E0B9 /* HGSCodeSignatureTest.m */,
 				F4D14F110E9BE9A200C0EAA9 /* HGSDelegate.h */,
 				8B02FB060EC9D46B00A6EB85 /* HGSExtension.h */,
 				8B02FB0C0EC9D50C00A6EB85 /* HGSExtension.m */,
+				8B95CA950F6B09FE003BDBDD /* HGSExtensionTest.m */,
 				5AED35E50EB7D978004C7187 /* HGSIconProvider.h */,
 				5AED35E60EB7D978004C7187 /* HGSIconProvider.m */,
+				8B95CA930F6B09FE003BDBDD /* HGSIconProviderTest.m */,
 				F4E3C0BD0EBB51EA00CB713D /* HGSLog.h */,
 				5AF4E0AE0EB91BC200B26194 /* HGSLRUCache.h */,
 				5AF4E0AF0EB91BC200B26194 /* HGSLRUCache.m */,
+				8B95CA990F6B09FE003BDBDD /* HGSLRUCacheTest.m */,
 				33D2CBAB0DD2573100C1FBDC /* HGSMemorySearchSource.h */,
 				33D2CBAC0DD2573100C1FBDC /* HGSMemorySearchSource.m */,
+				8B95CA980F6B09FE003BDBDD /* HGSMemorySearchSourceTest.m */,
 				E4617A8E0DC23BE300CE7C0F /* HGSMixer.h */,
 				E4617A8F0DC23BE300CE7C0F /* HGSMixer.m */,
-				8B6F2D630DA2B88E0052CA40 /* HGSModule.h */,
-				8B6F2D640DA2B88E0052CA40 /* HGSResult.h */,
-				8B6F2D650DA2B88E0052CA40 /* HGSResult.m */,
-				E4D28DDD0DF9C11300FC6C31 /* HGSObjectTest.m */,
+				8B95CAA00F6B09FE003BDBDD /* HGSMixerTest.m */,
 				5AED32B80EAFDF1F004C7187 /* HGSOperation.h */,
 				5AED32B90EAFDF1F004C7187 /* HGSOperation.m */,
 				5AED32BC0EAFDF2C004C7187 /* HGSOperationTest.m */,
 				62A16A8D0ED484DF0074F41B /* HGSPlugin.h */,
 				62A16A8E0ED484DF0074F41B /* HGSPlugin.m */,
+				8B95CA970F6B09FE003BDBDD /* HGSPluginTest.m */,
 				62A16A930ED485A60074F41B /* HGSProtoExtension.h */,
 				62A16A960ED485C50074F41B /* HGSProtoExtension.m */,
+				8B95CAA20F6B09FE003BDBDD /* HGSProtoExtensionTest.m */,
 				5A2710B30ECA52F200C72257 /* HGSPython.h */,
 				5A2710B40ECA52F200C72257 /* HGSPython.mm */,
+				8B95CAA10F6B09FE003BDBDD /* HGSPythonTest.m */,
 				5A2710B50ECA52F200C72257 /* HGSPythonAction.h */,
 				5A2710B60ECA52F200C72257 /* HGSPythonAction.mm */,
+				8B95CA940F6B09FE003BDBDD /* HGSPythonActionTest.m */,
 				5A2710B70ECA52F200C72257 /* HGSPythonSource.h */,
 				5A2710B80ECA52F200C72257 /* HGSPythonSource.mm */,
+				8B95CA960F6B09FE003BDBDD /* HGSPythonSourceTest.m */,
 				8B6F2D680DA2B88E0052CA40 /* HGSQuery.h */,
 				8B6F2D690DA2B88E0052CA40 /* HGSQuery.m */,
+				F4D153660E9FA04400C0EAA9 /* HGSQueryTest.m */,
 				8B6F2D6A0DA2B88E0052CA40 /* HGSQueryController.h */,
 				8B6F2D6B0DA2B88E0052CA40 /* HGSQueryController.m */,
-				F4D153660E9FA04400C0EAA9 /* HGSQueryTest.m */,
+				8B95CA920F6B09FE003BDBDD /* HGSQueryControllerTest.m */,
+				8B6F2D640DA2B88E0052CA40 /* HGSResult.h */,
+				8B6F2D650DA2B88E0052CA40 /* HGSResult.m */,
+				E4D28DDD0DF9C11300FC6C31 /* HGSResultTest.m */,
 				8B6F2D6C0DA2B88E0052CA40 /* HGSSearchOperation.h */,
 				8B6F2D6D0DA2B88E0052CA40 /* HGSSearchOperation.m */,
+				8B95CA9C0F6B09FE003BDBDD /* HGSSearchOperationTest.m */,
 				8B6F2D6F0DA2B88E0052CA40 /* HGSSearchSource.h */,
 				8B6F2D700DA2B88E0052CA40 /* HGSSearchSource.m */,
+				8B95CABA0F6B0A4A003BDBDD /* HGSSearchSourceTest.m */,
 				6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */,
 				6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */,
+				8B95CA9D0F6B09FE003BDBDD /* HGSSimpleAccountTest.m */,
 				7F3F75D80E152E6D001AF34E /* HGSSQLiteBackedCache.h */,
 				7F3F75D90E152E6D001AF34E /* HGSSQLiteBackedCache.m */,
-				7F3F75DA0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.h */,
 				7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */,
 				F4D153350E9F9C5400C0EAA9 /* HGSStringUtil.h */,
 				F4D153360E9F9C5400C0EAA9 /* HGSStringUtil.m */,
@@ -3875,6 +3948,8 @@
 				7F220C520DDB4B3200737C26 /* GTMNSString+URLArguments.m */,
 				64C385BB0DBFDCF9005EBA69 /* GTMObjC2Runtime.h */,
 				64C385BC0DBFDCF9005EBA69 /* GTMObjC2Runtime.m */,
+				8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */,
+				8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */,
 				332AD7380DC910A20009A7E9 /* GTMSystemVersion.h */,
 				332AD7390DC910A20009A7E9 /* GTMSystemVersion.m */,
 			);
@@ -3918,7 +3993,6 @@
 				7F4497F20F6895EB00330B67 /* GTMDefines.h in Headers */,
 				8B6F30DF0DA2FB520052CA40 /* Vermilion.h in Headers */,
 				8B6F2D740DA2B8AF0052CA40 /* HGSAction.h in Headers */,
-				8B6F2D760DA2B8AF0052CA40 /* HGSModule.h in Headers */,
 				8B6F2D770DA2B8AF0052CA40 /* HGSModuleLoader.h in Headers */,
 				8B6F2D780DA2B8AF0052CA40 /* HGSResult.h in Headers */,
 				8B6F2D7B0DA2B8AF0052CA40 /* HGSQuery.h in Headers */,
@@ -3951,6 +4025,7 @@
 				62D56E240EF317A900D3EB5F /* HGSAccount.h in Headers */,
 				62C051BA0F31307100DFBB1B /* HGSSimpleAccount.h in Headers */,
 				5A4D23FC0F4CD22B00F5C05B /* HGSCodeSignature.h in Headers */,
+				8B95CD730F6EE20E003BDBDD /* HGSBundle.m in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3996,6 +4071,7 @@
 				8B637A430F27706A00997738 /* GTMSystemVersion.h in Headers */,
 				8B637A440F27706A00997738 /* GTMTestTimer.h in Headers */,
 				8B6C17300F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h in Headers */,
+				8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4483,8 +4559,8 @@
 				8B6F2CDD0DA2B7F50052CA40 /* Resources */,
 				8B6F2CDE0DA2B7F50052CA40 /* Sources */,
 				8B6F2CDF0DA2B7F50052CA40 /* Frameworks */,
-				8B4888110F15D37D00786C1E /* ShellScript */,
-				8B95C8C40F6AB302003BDBDD /* ShellScript */,
+				8B4888110F15D37D00786C1E /* Breakpad */,
+				8B95C8C40F6AB302003BDBDD /* HeaderDoc */,
 			);
 			buildRules = (
 			);
@@ -5413,13 +5489,14 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"\n\"${SRCROOT}/BuildScripts/StripHeaders.sh\"";
 		};
-		8B4888110F15D37D00786C1E /* ShellScript */ = {
+		8B4888110F15D37D00786C1E /* Breakpad */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = Breakpad;
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5505,9 +5582,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHEROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/GData.build/${CONFIGURATION}/GDataFramework.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
+			shellScript = "# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHEROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/GData.build/${CONFIGURATION}/GDataFramework.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
 		};
-		8B95C8C40F6AB302003BDBDD /* ShellScript */ = {
+		8B95C8C40F6AB302003BDBDD /* HeaderDoc */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -5518,6 +5595,7 @@
 				"$(SRCROOT)/../../Vermilion/Documentation/headerdoc2html.config",
 				"$(SRCROOT)/../../Vermilion/Documentation/toctemplate.html",
 			);
+			name = HeaderDoc;
 			outputPaths = (
 				"$(CONFIGURATION_BUILD_DIR)/Documentation/Vermilion",
 			);
@@ -6263,11 +6341,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				33A015BC0DD38E1900578DE5 /* GTMMethodCheck.m in Sources */,
-				7F3F75DF0E152E7D001AF34E /* HGSSQLiteBackedCacheTest.m in Sources */,
 				8B55D9570E786B5D00D39CB0 /* GTMSenTestCase.m in Sources */,
 				8B55DAE60E78829300D39CB0 /* GTMNSObject+UnitTesting.m in Sources */,
 				8B55DAE70E78829300D39CB0 /* GTMAppKit+UnitTesting.m in Sources */,
 				8BE848B40E94313A00C611B0 /* QSBKeyMapTest.m in Sources */,
+				8B95CCB60F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6303,12 +6381,12 @@
 				8BF52D900EDFD52D00D981A0 /* HGSActionOperation.m in Sources */,
 				62A16A900ED484DF0074F41B /* HGSPlugin.m in Sources */,
 				62A16A970ED485C50074F41B /* HGSProtoExtension.m in Sources */,
-				8B8B19B00EEF0DF000E543D0 /* HGSBundle.m in Sources */,
 				8B8B19E30EEF0EE600E543D0 /* HGSSQLiteBackedCache.m in Sources */,
 				62D0E96B0EF059B40028522C /* HGSAccount.m in Sources */,
 				62D0E9700EF05D0E0028522C /* HGSAccountsExtensionPoint.m in Sources */,
 				6211C51D0F312E7E003A5122 /* HGSSimpleAccount.m in Sources */,
 				5A4D23FD0F4CD22B00F5C05B /* HGSCodeSignature.m in Sources */,
+				8B8B19B00EEF0DF000E543D0 /* HGSBundle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6375,6 +6453,7 @@
 				8BA019C40F14303400926923 /* GTMSQLite.m in Sources */,
 				8BA01C030F147DB000926923 /* GTMNSWorkspace+Running.m in Sources */,
 				8B6C17310F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m in Sources */,
+				8B95CD210F6EDF9D003BDBDD /* GTMRegex.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6394,7 +6473,7 @@
 			files = (
 				E4F551380DF73082008A846E /* HGSExtensionPointTest.m in Sources */,
 				E4D28A920DF9971600FC6C31 /* HGSActionTest.m in Sources */,
-				E4D28DDE0DF9C11300FC6C31 /* HGSObjectTest.m in Sources */,
+				E4D28DDE0DF9C11300FC6C31 /* HGSResultTest.m in Sources */,
 				8B55D9380E786B5D00D39CB0 /* GTMSenTestCase.m in Sources */,
 				F4D1491C0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m in Sources */,
 				F4D1533B0E9F9C5B00C0EAA9 /* HGSStringUtilTest.m in Sources */,
@@ -6402,6 +6481,31 @@
 				F4D153670E9FA04400C0EAA9 /* HGSQueryTest.m in Sources */,
 				5AED32BD0EAFDF2C004C7187 /* HGSOperationTest.m in Sources */,
 				5AF0F7D80F68489A0041E0B9 /* HGSCodeSignatureTest.m in Sources */,
+				8B95CAA40F6B09FE003BDBDD /* HGSAccountTest.m in Sources */,
+				8B95CAA50F6B09FE003BDBDD /* HGSQueryControllerTest.m in Sources */,
+				8B95CAA60F6B09FE003BDBDD /* HGSIconProviderTest.m in Sources */,
+				8B95CAA70F6B09FE003BDBDD /* HGSPythonActionTest.m in Sources */,
+				8B95CAA80F6B09FE003BDBDD /* HGSExtensionTest.m in Sources */,
+				8B95CAA90F6B09FE003BDBDD /* HGSPythonSourceTest.m in Sources */,
+				8B95CAAA0F6B09FE003BDBDD /* HGSPluginTest.m in Sources */,
+				8B95CAAB0F6B09FE003BDBDD /* HGSMemorySearchSourceTest.m in Sources */,
+				8B95CAAC0F6B09FE003BDBDD /* HGSLRUCacheTest.m in Sources */,
+				8B95CAAD0F6B09FE003BDBDD /* HGSBundleTest.m in Sources */,
+				8B95CAAE0F6B09FE003BDBDD /* HGSActionOperationTest.m in Sources */,
+				8B95CAAF0F6B09FE003BDBDD /* HGSSearchOperationTest.m in Sources */,
+				8B95CAB00F6B09FE003BDBDD /* HGSSimpleAccountTest.m in Sources */,
+				8B95CAB10F6B09FE003BDBDD /* HGSAccountsExtensionPointTest.m in Sources */,
+				8B95CAB30F6B09FE003BDBDD /* HGSMixerTest.m in Sources */,
+				8B95CAB40F6B09FE003BDBDD /* HGSPythonTest.m in Sources */,
+				8B95CAB50F6B09FE003BDBDD /* HGSProtoExtensionTest.m in Sources */,
+				8B95CAB60F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m in Sources */,
+				8B95CABB0F6B0A4A003BDBDD /* HGSSearchSourceTest.m in Sources */,
+				8B95CB4C0F6B1CA9003BDBDD /* HGSSQLiteBackedCacheTest.m in Sources */,
+				8B95CC5E0F6EC558003BDBDD /* HGSCoreExtensionPointsTest.m in Sources */,
+				8B95CC720F6EC66E003BDBDD /* HGSModuleLoaderTest.m in Sources */,
+				8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */,
+				8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */,
+				8B95CE200F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7752,6 +7856,487 @@
 			};
 			name = Release;
 		};
+		8B95CBB10F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624C00F12C79E008182B5 /* QSBDebug.xcconfig */;
+			buildSettings = {
+				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
+				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"$(GTM_GENERAL_GCC_PREPROCESSOR_DEFINITIONS)",
+					"$(GTM_PLATFORM_GCC_PREPROCESSOR_DEFINITIONS)",
+					"$(GTM_CONFIGURATION_GCC_PREPROCESSOR_DEFINITIONS)",
+					"VERMILLION_PLUGIN_API_VERSION=$(VERMILLION_PLUGIN_API_VERSION)",
+				);
+				OTHER_LDFLAGS = "-lgcov";
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBB20F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "Add Plugins To QSB";
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBB30F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "Test All";
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBB40F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "Release Notes";
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBB50F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BD0F12C79E008182B5 /* BreakpadExecutable.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+					"\"$(SRCROOT)/../externals/GoogleBreakpad\"",
+					"\"$(SRCROOT)/../externals/Keystone\"",
+					"\"$(SRCROOT)/../externals/Growl\"",
+				);
+				INFOPLIST_FILE = Resources/Info.plist;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					QuickLookUI,
+				);
+				PRODUCT_NAME = "Quick Search Box";
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBB60F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				GCC_PREFIX_HEADER = GTMForQSB.pch;
+				INFOPLIST_FILE = "$(SRCROOT)/../externals/google-toolbox-for-mac/GTM-Info.plist";
+				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
+				PRODUCT_NAME = GTM;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBB70F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/Vermilion-Info.plist";
+				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
+				PRODUCT_NAME = Vermilion;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBB80F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
+			buildSettings = {
+				PRODUCT_NAME = GData;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBB90F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
+			buildSettings = {
+				PRODUCT_NAME = JSON;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBBA0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(CONFIGURATION_BUILD_DIR)/Quick Search Box.app/Contents/MacOS/Quick Search Box";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
+				PRODUCT_NAME = QSBTest;
+				TEST_HOST = "$(CONFIGURATION_BUILD_DIR)/Quick Search Box.app/Contents/MacOS/Quick Search Box";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBBB0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				PRODUCT_NAME = VermilionTest;
+				WRAPPER_EXTENSION = octest;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBBC0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Actions/Actions-Info.plist";
+				PRODUCT_NAME = Actions;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBBD0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/AppleScriptPlugins-Info.plist";
+				PRODUCT_NAME = AppleScriptPlugins;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBBE0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Apps/Applications-Info.plist";
+				PRODUCT_NAME = Applications;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBBF0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/$(PRODUCT_NAME)/$(PRODUCT_NAME)-Info.plist";
+				PRODUCT_NAME = ApplicationUI;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBC00F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Calculator/Calculator-Info.plist";
+				PRODUCT_NAME = Calculator;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBC10F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/CaminoBookmarks/CaminoBookmarks-Info.plist";
+				PRODUCT_NAME = CaminoBookmarks;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBC20F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/ChatBuddies/ChatBuddies-Info.plist";
+				PRODUCT_NAME = ChatBuddies;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBC30F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Contacts/Contacts-Info.plist";
+				PRODUCT_NAME = Contacts;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBC40F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Core/CorePlugin-Info.plist";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					QuickLookUI,
+				);
+				PRODUCT_NAME = CorePlugin;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBC50F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/DeveloperDocumentation/DeveloperDocumentation-Info.plist";
+				PRODUCT_NAME = DeveloperDocumentation;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBC60F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/DirectoryScanner/DirectoryScanner-Info.plist";
+				PRODUCT_NAME = DirectoryScanner;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBC70F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/EmailActions/EmailActions-Info.plist";
+				PRODUCT_NAME = EmailURLAction;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBC80F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleBookmarks/GoogleBookmarks-Info.plist";
+				PRODUCT_NAME = GoogleBookmarks;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBC90F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "${SRCROOT}/../../Vermilion/Modules/GoogleCorpora/GoogleCorpora-Info.plist";
+				PRODUCT_NAME = GoogleCorpora;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBCA0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleDocs/GoogleDocs-Info.plist";
+				PRODUCT_NAME = GoogleDocs;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBCB0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/Info.plist";
+				PRODUCT_NAME = Images;
+				WRAPPER_EXTENSION = scptd;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBCC0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/iTunes/iTunes-Info.plist";
+				PRODUCT_NAME = iTunes;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBCD0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/Info.plist";
+				PRODUCT_NAME = iTunes;
+				WRAPPER_EXTENSION = scptd;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBCE0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/Info.plist";
+				PRODUCT_NAME = Networking;
+				WRAPPER_EXTENSION = scptd;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBCF0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Picasaweb/Picasaweb-Info.plist";
+				PRODUCT_NAME = Picasaweb;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBD00F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/RecentDocuments/RecentDocuments-Info.plist";
+				PRODUCT_NAME = RecentDocuments;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBD10F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/SafariBookmarks/SafariBookmarks-Info.plist";
+				PRODUCT_NAME = SafariBookmarks;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBD20F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/SharedFileList/SharedFileList-Info.plist";
+				PRODUCT_NAME = SharedFileList;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBD30F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "${BUILT_PRODUCTS_DIR}/Quick Search Box.app/Contents/MacOS/Quick Search Box";
+				INFOPLIST_FILE = "${SRCROOT}/../../Vermilion/Modules/Shortcuts/Shortcuts-Info.plist";
+				PRODUCT_NAME = Shortcuts;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBD40F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/SpotlightFiles/SLFiles-Info.plist";
+				PRODUCT_NAME = SpotlightFiles;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBD50F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/Info.plist";
+				PRODUCT_NAME = System;
+				WRAPPER_EXTENSION = scptd;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBD60F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Terminal/Terminal-Info.plist";
+				PRODUCT_NAME = Terminal;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBD70F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/Info.plist";
+				PRODUCT_NAME = Volume;
+				WRAPPER_EXTENSION = scptd;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBD80F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Weather/Weather-Info.plist";
+				PRODUCT_NAME = Weather;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBD90F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\\\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\\\"",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleAccounts/GoogleAccounts-Info.plist";
+				PRODUCT_NAME = GoogleAccounts;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBDA0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Twitter/Twitter-Info.plist";
+				PRODUCT_NAME = Twitter;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBDB0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Dictionary/Dictionary-Info.plist";
+				PRODUCT_NAME = Dictionary;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBDC0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Trash/Trash-Info.plist";
+				PRODUCT_NAME = Trash;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B95CBDD0F6B1DEE003BDBDD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Mount/Mount-Info.plist";
+				PRODUCT_NAME = Mount;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
 		8BCCD1AE0EC8D86B00688D64 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -8027,6 +8612,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33D2C40F0DD0E6C600C1FBDC /* Debug */,
+				8B95CBD10F6B1DEE003BDBDD /* Debug-gcov */,
 				33D2C4100DD0E6C600C1FBDC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8036,6 +8622,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33D2C5F50DD1068100C1FBDC /* Debug */,
+				8B95CBCA0F6B1DEE003BDBDD /* Debug-gcov */,
 				33D2C5F60DD1068100C1FBDC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8045,6 +8632,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33D2CAE20DD24C2600C1FBDC /* Debug */,
+				8B95CBC80F6B1DEE003BDBDD /* Debug-gcov */,
 				33D2CAE30DD24C2600C1FBDC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8054,6 +8642,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33EEA68D0DD0D9C1005766AB /* Debug */,
+				8B95CBC10F6B1DEE003BDBDD /* Debug-gcov */,
 				33EEA68E0DD0D9C1005766AB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8063,6 +8652,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5AF0EB650F60744F0041E0B9 /* Debug */,
+				8B95CBDB0F6B1DEE003BDBDD /* Debug-gcov */,
 				5AF0EB660F60744F0041E0B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8072,6 +8662,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5AF0EE2F0F61D0870041E0B9 /* Debug */,
+				8B95CBDC0F6B1DEE003BDBDD /* Debug-gcov */,
 				5AF0EE300F61D0870041E0B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8081,6 +8672,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5AF0F4950F671D9D0041E0B9 /* Debug */,
+				8B95CBDD0F6B1DEE003BDBDD /* Debug-gcov */,
 				5AF0F4960F671D9D0041E0B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8090,6 +8682,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5AF2C4840E5E19A400F4D546 /* Debug */,
+				8B95CBCC0F6B1DEE003BDBDD /* Debug-gcov */,
 				5AF2C4850E5E19A400F4D546 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8099,6 +8692,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				623ADD430EC0CC17001651D1 /* Debug */,
+				8B95CBC70F6B1DEE003BDBDD /* Debug-gcov */,
 				623ADD440EC0CC17001651D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8108,6 +8702,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				623FA3610E5C8D98003630C1 /* Debug */,
+				8B95CBC20F6B1DEE003BDBDD /* Debug-gcov */,
 				623FA3620E5C8D98003630C1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8117,6 +8712,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6263CAF90EB79F3600FF03A1 /* Debug */,
+				8B95CBCF0F6B1DEE003BDBDD /* Debug-gcov */,
 				6263CAFA0EB79F3600FF03A1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8126,6 +8722,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				627FAEC80DF9D73500E3E765 /* Debug */,
+				8B95CBD00F6B1DEE003BDBDD /* Debug-gcov */,
 				627FAEC90DF9D73500E3E765 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8135,6 +8732,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				62A4AC880F2FCD950007CD99 /* Debug */,
+				8B95CBDA0F6B1DEE003BDBDD /* Debug-gcov */,
 				62A4AC890F2FCD950007CD99 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8144,6 +8742,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				62EA8BCB0F2E7DE200C92E0B /* Debug */,
+				8B95CBD90F6B1DEE003BDBDD /* Debug-gcov */,
 				62EA8BCC0F2E7DE200C92E0B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8153,6 +8752,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				795F072709870248004C6BFE /* Debug */,
+				8B95CBB30F6B1DEE003BDBDD /* Debug-gcov */,
 				795F072809870248004C6BFE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8162,6 +8762,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7F9415CA0EEF52930049AE06 /* Debug */,
+				8B95CBD20F6B1DEE003BDBDD /* Debug-gcov */,
 				7F9415CB0EEF52930049AE06 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8171,6 +8772,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7F9415D40EEF52970049AE06 /* Debug */,
+				8B95CBC60F6B1DEE003BDBDD /* Debug-gcov */,
 				7F9415D50EEF52970049AE06 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8180,6 +8782,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7FF019BB0EB089CB001A2C7B /* Debug */,
+				8B95CBD60F6B1DEE003BDBDD /* Debug-gcov */,
 				7FF019BC0EB089CB001A2C7B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8189,6 +8792,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B20E4490DB432BA001E429B /* Debug */,
+				8B95CBBD0F6B1DEE003BDBDD /* Debug-gcov */,
 				8B20E44A0DB432BA001E429B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8198,6 +8802,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B3D267C0EAE8E7A004EA504 /* Debug */,
+				8B95CBC50F6B1DEE003BDBDD /* Debug-gcov */,
 				8B3D267D0EAE8E7A004EA504 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8207,6 +8812,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B3D2A360EAFDA66004EA504 /* Debug */,
+				8B95CBBF0F6B1DEE003BDBDD /* Debug-gcov */,
 				8B3D2A370EAFDA66004EA504 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8216,6 +8822,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B3EED7A0CEA86A100D933C0 /* Debug */,
+				8B95CBB50F6B1DEE003BDBDD /* Debug-gcov */,
 				8B3EED7B0CEA86A100D933C0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8225,6 +8832,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B3EF77B0EF2C8000036FFBD /* Debug */,
+				8B95CBC90F6B1DEE003BDBDD /* Debug-gcov */,
 				8B3EF77C0EF2C8000036FFBD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8234,6 +8842,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B3EF88C0EF2C8A80036FFBD /* Debug */,
+				8B95CBD30F6B1DEE003BDBDD /* Debug-gcov */,
 				8B3EF88D0EF2C8A80036FFBD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8243,6 +8852,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B6128A10F4641BF00E29B40 /* Debug */,
+				8B95CBB90F6B1DEE003BDBDD /* Debug-gcov */,
 				8B6128A20F4641BF00E29B40 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8252,6 +8862,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B63DD9D0D9458E500395A2B /* Debug */,
+				8B95CBBA0F6B1DEE003BDBDD /* Debug-gcov */,
 				8B63DD9E0D9458E500395A2B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8261,6 +8872,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B6F2EFF0DA2BA270052CA40 /* Debug */,
+				8B95CBD40F6B1DEE003BDBDD /* Debug-gcov */,
 				8B6F2F000DA2BA270052CA40 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8270,6 +8882,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B6F2F2C0DA2BB660052CA40 /* Debug */,
+				8B95CBC30F6B1DEE003BDBDD /* Debug-gcov */,
 				8B6F2F2D0DA2BB660052CA40 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8279,6 +8892,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B6F2F4C0DA2C37C0052CA40 /* Debug */,
+				8B95CBBE0F6B1DEE003BDBDD /* Debug-gcov */,
 				8B6F2F4D0DA2C37C0052CA40 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8288,6 +8902,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B6F2CE30DA2B7F50052CA40 /* Debug */,
+				8B95CBB70F6B1DEE003BDBDD /* Debug-gcov */,
 				8B6F2CE40DA2B7F50052CA40 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8297,6 +8912,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B735FA60EC905E900E74421 /* Debug */,
+				8B95CBCB0F6B1DEE003BDBDD /* Debug-gcov */,
 				8B735FA70EC905E900E74421 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8306,6 +8922,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B77DF3D0F284A4D00FA2A3C /* Debug */,
+				8B95CBB40F6B1DEE003BDBDD /* Debug-gcov */,
 				8B77DF3E0F284A4D00FA2A3C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8315,6 +8932,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B77E0DE0F28FC3D00FA2A3C /* Debug */,
+				8B95CBB80F6B1DEE003BDBDD /* Debug-gcov */,
 				8B77E0DF0F28FC3D00FA2A3C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8324,6 +8942,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8BCCD1AE0EC8D86B00688D64 /* Debug */,
+				8B95CBCD0F6B1DEE003BDBDD /* Debug-gcov */,
 				8BCCD1AF0EC8D86B00688D64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8333,6 +8952,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8BCCD26B0EC8E5EC00688D64 /* Debug */,
+				8B95CBD50F6B1DEE003BDBDD /* Debug-gcov */,
 				8BCCD26C0EC8E5EC00688D64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8342,6 +8962,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8BCCD2DB0EC8F8C200688D64 /* Debug */,
+				8B95CBD70F6B1DEE003BDBDD /* Debug-gcov */,
 				8BCCD2DC0EC8F8C200688D64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8351,6 +8972,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8BCCD3720EC8F93C00688D64 /* Debug */,
+				8B95CBCE0F6B1DEE003BDBDD /* Debug-gcov */,
 				8BCCD3730EC8F93C00688D64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8360,6 +8982,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8BD97D0C0E636D8D00F5C83B /* Debug */,
+				8B95CBB60F6B1DEE003BDBDD /* Debug-gcov */,
 				8BD97D0D0E636D8D00F5C83B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8369,6 +8992,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
+				8B95CBB10F6B1DEE003BDBDD /* Debug-gcov */,
 				C01FCF5008A954540054247B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8378,6 +9002,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E46933030DDB7A0200C5A64A /* Debug */,
+				8B95CBBC0F6B1DEE003BDBDD /* Debug-gcov */,
 				E46933040DDB7A0200C5A64A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8387,6 +9012,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E4F551350DF7305A008A846E /* Debug */,
+				8B95CBBB0F6B1DEE003BDBDD /* Debug-gcov */,
 				E4F551360DF7305A008A846E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8396,6 +9022,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F4E3B5870EB6573300CB713D /* Debug */,
+				8B95CBC00F6B1DEE003BDBDD /* Debug-gcov */,
 				F4E3B5880EB6573300CB713D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8405,6 +9032,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F4E3B7090EB66AA900CB713D /* Debug */,
+				8B95CBD80F6B1DEE003BDBDD /* Debug-gcov */,
 				F4E3B70A0EB66AA900CB713D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8414,6 +9042,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F4EF8F750ECB3F01008DD6DA /* Debug */,
+				8B95CBB20F6B1DEE003BDBDD /* Debug-gcov */,
 				F4EF8F760ECB3F01008DD6DA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -8423,6 +9052,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F4FEECD80EC4BF99000758EC /* Debug */,
+				8B95CBC40F6B1DEE003BDBDD /* Debug-gcov */,
 				F4FEECD90EC4BF99000758EC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;

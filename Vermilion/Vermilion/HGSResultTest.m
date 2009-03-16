@@ -1,5 +1,5 @@
 //
-//  HGSObjectTest.m
+//  HGSResultTest.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -35,22 +35,22 @@
 #import "HGSResult.h"
 #import "HGSSearchSource.h"
 
-@interface HGSObjectTest : GTMTestCase <HGSSearchSource>
+@interface HGSResultTest : GTMTestCase <HGSSearchSource>
 @end
 
-@implementation HGSObjectTest
+@implementation HGSResultTest
 
 - (void)testStaticInit {
   NSURL* path = [NSURL URLWithString:@"file://url/to/path"];
   // create an object with the full gamut and check the values
-  HGSResult* obj1 = [HGSResult resultWithIdentifier:path 
-                                               name:@"everything"
-                                               type:@"text"
-                                             source:nil
-                                         attributes:nil];
+  HGSResult* obj1 = [HGSResult resultWithURL:path 
+                                        name:@"everything"
+                                        type:@"text"
+                                      source:nil
+                                  attributes:nil];
   STAssertNotNil(obj1, @"can't create object");
   STAssertEqualObjects(path, 
-                       [obj1 identifier], 
+                       [obj1 url], 
                        @"invalid uri");
   STAssertEqualStrings(@"everything", 
                        [obj1 valueForKey:kHGSObjectAttributeNameKey], 
@@ -61,19 +61,19 @@
   
   // create an object with missing values and make sure they go through our
   // source, which will mirror the value as the provided key.
-  HGSResult* obj2 = [HGSResult resultWithIdentifier:nil 
-                                               name:nil
-                                               type:NULL
-                                             source:self
-                                         attributes:nil];
+  HGSResult* obj2 = [HGSResult resultWithURL:nil 
+                                        name:nil
+                                        type:NULL
+                                      source:self
+                                  attributes:nil];
   STAssertNil(obj2, @"created object");
 
   // create an object with everything nil
-  HGSResult* obj3 = [HGSResult resultWithIdentifier:nil 
-                                               name:nil
-                                               type:NULL
-                                             source:nil
-                                         attributes:nil];
+  HGSResult* obj3 = [HGSResult resultWithURL:nil 
+                                        name:nil
+                                        type:NULL
+                                      source:nil
+                                  attributes:nil];
   STAssertNil(obj3, @"created object");
 }
 
@@ -89,7 +89,7 @@
   HGSResult* infoObject = [HGSResult resultWithDictionary:info source:self];
   STAssertNotNil(infoObject, @"can't create object from dict");
   STAssertEqualObjects([NSURL URLWithString:path], 
-                       [infoObject identifier], 
+                       [infoObject url], 
                        @"didn't find uri");
   STAssertEqualStrings(kHGSPathCellDisplayTitleKey, 
                        [infoObject valueForKey:kHGSPathCellDisplayTitleKey], 
@@ -138,11 +138,11 @@
   for (size_t i = 0; i < sizeof(data) / sizeof(TestData); i++) {
 
     // Create an object
-    HGSResult* obj = [HGSResult resultWithIdentifier:url 
-                                                name:@"name"
-                                                type:data[i].theType
-                                              source:nil
-                                          attributes:nil];
+    HGSResult* obj = [HGSResult resultWithURL:url 
+                                         name:@"name"
+                                         type:data[i].theType
+                                       source:nil
+                                   attributes:nil];
     STAssertNotNil(obj, @"type %@", data[i].theType);
     STAssertEqualObjects(data[i].theType, 
                          [obj type], @"type %@", 
@@ -202,11 +202,15 @@
   return [super init];
 }
 
+- (NSBundle *)bundle {
+  return [NSBundle bundleForClass:[self class]];
+}
+
 - (NSImage *)icon {
   return nil;
 }
 
-- (NSString *)name {
+- (NSString *)displayName {
   return @"fakeSource";
 }
 

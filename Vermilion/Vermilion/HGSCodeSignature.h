@@ -30,8 +30,14 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion
+*/
+
 #import <Cocoa/Cocoa.h>
 
+/*! @enum HGSSignatureStatus */
 typedef enum {
   /*!
     Code has a signature that did not validate

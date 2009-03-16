@@ -1,7 +1,7 @@
 //
-//  HGSModule.h
+//  HGSQueryControllerTest.m
 //
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,20 +30,12 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-@class HGSModuleLoader;
 
-//
-// HGSModule
-//
-// 
-// A module combines Search Sources and Actions together into a bundle that can
-// be loaded dynamically. Modules may contain zero or more Sources and zero or
-// more Actions registered when the module loads. Modules are loaded when the
-// application is launched, though we may provide a mechanism for adding new
-// modules on-the-fly by watching the contents of a well-known directory for
-// changes.
-//
+#import "GTMSenTestCase.h"
+#import "HGSQueryController.h"
 
-@protocol HGSModule
-- (void)registerModuleWithLoader:(HGSModuleLoader *)loader;
+@interface HGSQueryControllerTest : GTMTestCase 
+@end
+
+@implementation HGSQueryControllerTest
 @end

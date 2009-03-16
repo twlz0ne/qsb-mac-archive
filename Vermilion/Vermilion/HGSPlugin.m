@@ -35,7 +35,6 @@
 #import "HGSAccountsExtensionPoint.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
-#import "HGSModule.h"
 #import "HGSModuleLoader.h"
 #import "HGSProtoExtension.h"
 

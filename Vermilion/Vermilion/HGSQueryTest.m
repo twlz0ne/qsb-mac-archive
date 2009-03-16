@@ -41,10 +41,10 @@
 @implementation HGSQueryTest
 
 - (void)testInit {
-  STAssertNil([[[HGSQuery alloc] initWithString:nil
-                                        results:nil
-                                     queryFlags:0] autorelease],
-              nil);
+  STAssertNotNil([[[HGSQuery alloc] initWithString:nil
+                                           results:nil
+                                        queryFlags:0] autorelease],
+                 nil);
   STAssertNotNil([[[HGSQuery alloc] initWithString:@""
                                            results:nil
                                         queryFlags:0] autorelease],

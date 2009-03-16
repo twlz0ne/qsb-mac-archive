@@ -36,7 +36,9 @@
 #import "HGSCoreExtensionPoints.h"
 
 @interface HGSExtensionPointTest : GTMTestCase {
-  BOOL gotNotification_;
+  BOOL gotPointDidAddNotification_;
+  BOOL gotPointWillRemoveNotification_;
+  BOOL gotPointDidRemoveNotification_;
 }
 @end
 
@@ -85,17 +87,6 @@
 
 
 @implementation HGSExtensionPointTest
-
-- (void)testCorePoints {
-  HGSExtensionPoint* actionPoint = [HGSExtensionPoint actionsPoint];
-  STAssertNotNil(actionPoint, @"action point not created correctly");
-  HGSExtensionPoint* sourcesPoint = [HGSExtensionPoint sourcesPoint];
-  STAssertNotNil(sourcesPoint, @"sources point not created correctly");
-
-  // make sure they're not the same
-  STAssertNotEqualObjects(actionPoint, sourcesPoint,
-                          @"action and sources point are the same");
-}
 
 - (void)testProtocolChanging {
   // create a new extension point, given it a protocol
@@ -244,8 +235,28 @@
                @"Bad Description: %@", description);
 }
 
-- (void)pointNotification:(NSNotification *)notification {
-  gotNotification_ = YES;
+- (void)pointDidAddNotification:(NSNotification *)notification {
+  STAssertEquals([[notification object] class], [HGSExtensionPoint class], nil);
+  NSDictionary *userInfo = [notification userInfo];
+  MyTestExtension *extension = [userInfo objectForKey:kHGSExtensionKey];
+  STAssertEquals([extension identifier], @"test1", nil);
+  gotPointDidAddNotification_ = YES;
+}
+
+- (void)pointDidRemoveNotification:(NSNotification *)notification {
+  STAssertEquals([[notification object] class], [HGSExtensionPoint class], nil);
+  NSDictionary *userInfo = [notification userInfo];
+  MyTestExtension *extension = [userInfo objectForKey:kHGSExtensionKey];
+  STAssertEquals([extension identifier], @"test1", nil);
+  gotPointDidRemoveNotification_ = YES;
+}
+
+- (void)pointWillRemoveNotification:(NSNotification *)notification {
+  STAssertEquals([[notification object] class], [HGSExtensionPoint class], nil);
+  NSDictionary *userInfo = [notification userInfo];
+  MyTestExtension *extension = [userInfo objectForKey:kHGSExtensionKey];
+  STAssertEquals([extension identifier], @"test1", nil);
+  gotPointWillRemoveNotification_ = YES;
 }
 
 - (void)addExtensionToPoint:(HGSExtensionPoint *)point {
@@ -261,31 +272,39 @@
     = [HGSExtensionPoint pointWithIdentifier:@"testNotification"];
   STAssertNotNil(newPoint, @"extension point creation failed");
 
+  NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+  [nc addObserver:self selector:@selector(pointDidAddNotification:)
+             name:kHGSExtensionPointDidAddExtensionNotification
+           object:newPoint];
+  [nc addObserver:self selector:@selector(pointDidRemoveNotification:)
+             name:kHGSExtensionPointDidRemoveExtensionNotification
+           object:newPoint];
+  [nc addObserver:self selector:@selector(pointWillRemoveNotification:)
+             name:kHGSExtensionPointWillRemoveExtensionNotification
+           object:newPoint];
+  
   MyTestExtension* extension1 
     = [[[MyTestExtension alloc] initWithIdentifier:@"test1"] autorelease];
   STAssertTrue([newPoint extendWithObject:extension1],
                @"extend failed");
 
-  // let notifications clear
-  NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-  [runLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.2]];
+  STAssertTrue(gotPointDidAddNotification_, 
+               @"failed to get notification for add");
 
-  NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self selector:@selector(pointNotification:)
-             name:kHGSExtensionPointDidAddExtensionNotification
-           object:newPoint];
-
-  // add on a thread, and make sure we get the notification
-  STAssertFalse(gotNotification_, nil);
-  [NSThread detachNewThreadSelector:@selector(addExtensionToPoint:)
-                           toTarget:self
-                         withObject:newPoint];
-  [runLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.2]];
-  STAssertTrue(gotNotification_, @"failed to get notification for add");
-
-  [nc removeObserver:self
-                name:kHGSExtensionPointDidAddExtensionNotification
-              object:newPoint];
+  [newPoint removeExtension:extension1];
+  STAssertTrue(gotPointDidRemoveNotification_, 
+               @"failed to get notification for remove");
+  STAssertTrue(gotPointWillRemoveNotification_, 
+               @"failed to get notification for remove");
+  
+  [nc removeObserver:self];
 }
 
+- (void)testRemoveExtension {
+  // Test the failure case where the extension does now exist
+  HGSExtensionPoint* newPoint
+    = [HGSExtensionPoint pointWithIdentifier:@"testFailure"];
+  STAssertNotNil(newPoint, @"extension point creation failed");
+  [newPoint removeExtensionWithIdentifier:@"foo.bar.blatz"];
+}
 @end

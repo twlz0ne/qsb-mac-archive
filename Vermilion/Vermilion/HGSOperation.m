@@ -137,6 +137,8 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
   return self;
 }
 
+// COV_NF_START
+// As a singleton, this is never called.
 - (void)dealloc {
   [fetches_ release];
   [fetchesLock_ release];
@@ -147,7 +149,8 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
     CFRelease(rlSource_);
   }
   [super dealloc];
-}
+}// COV_NF_END
+
 
 - (void)enqueue:(HGSNetworkOperation *)op {
   [fetchesLock_ lock];

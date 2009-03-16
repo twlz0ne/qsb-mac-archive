@@ -1,9 +1,7 @@
 //
-//  HGSSearchSourceBlockingObserver.h
-//  GoogleMobile
+//  HGSPythonSourceTest.m
 //
-//  Created by Alastair Tse on 2008/05/17.
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -32,30 +30,12 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Foundation/Foundation.h>
-#import "HGSSearchSourceObserver.h"
 
-@class HGSSearchOperation;
+#import "GTMSenTestCase.h"
+#import "HGSPythonSource.h"
 
-// An empty search source observer which can simply records whether a
-// search operation is finished and/or results returned.
-//
-// It can also block until searchOperationFinish: or
-// searchOperationUpdated: is called.
-@interface HGSSearchSourceBlockingObserver : NSObject <HGSSearchSourceObserver> {
-  NSUInteger updateCount_;
-  BOOL finished_;
-}
+@interface HGSPythonSourceTest : GTMTestCase 
+@end
 
-// Blocks while waiting for searchOperationFinished: is called. Gives up
-// after |timeout| seconds.
-- (void)runUntilSearchOperationFinishedCalled:(NSTimeInterval)timeout;
-// Blocks while waiting for searchOperationUpdated: is called. Gives up after
-// |timeout| seconds.
-- (void)runUntilSearchOperationUpdatedCalled:(NSTimeInterval)timeout;
-
-// Is the operation finished?
-- (BOOL)finished;
-// How many times did searchOperationUpdated: get called?
-- (NSUInteger)updateCount;
+@implementation HGSPythonSourceTest
 @end
