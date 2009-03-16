@@ -33,47 +33,79 @@
 #import <Cocoa/Cocoa.h>
 
 typedef enum {
-  eSignatureStatusInvalid,  // Code has a signature that did not validate
-  eSignatureStatusOK,       // Code has a valid signature
-  eSignatureStatusUnsigned  // No signature present
+  /*!
+    Code has a signature that did not validate
+  */
+  eSignatureStatusInvalid,
+
+  /*!
+    Code has a valid signature
+  */
+  eSignatureStatusOK,
+
+  /*!
+    No signature present
+  */
+  eSignatureStatusUnsigned
 } HGSSignatureStatus;
 
-#ifndef _H_CSCOMMON
-typedef struct __SecCode const *SecStaticCodeRef;
-#endif
-
-//
-// HGSCodeSignature
-//
-// Encapsulates information about the signature (or lack thereof) on a
-// bundle. This class is used by HGSModuleLoader to track which plugins
-// are trusted by the user. The purpose of this class is to keep all
-// usage of the codesigning SPIs relegated to a single file. If Apple
-// changes the SPIs or makes them public APIs, there is only one place
-// we will need to make our own changes.
-
+/*!
+  Encapsulates information about the signature (or lack thereof) on a
+  bundle. This class is used by HGSModuleLoader to track which plugins
+  are trusted by the user. The purpose of this class is to keep all
+  usage of the codesigning SPIs relegated to a single file. If Apple
+  changes the SPIs or makes them public APIs, there is only one place
+  we will need to make our own changes.
+*/
 @interface HGSCodeSignature : NSObject {
  @private
-  HGSSignatureStatus status_;
-  SecStaticCodeRef staticCodeRef_;
-  SecCertificateRef signerCertificate_;
-  CFDictionaryRef signingInfo_;
+  NSBundle *bundle_;
 }
 + (HGSCodeSignature *)codeSignatureForBundle:(NSBundle *)bundle;
+
+/*! 
+  Evaluates two SecCertificateRef objects for equality. Certificates are
+  considered equal if they have the same DER encoding.
+*/
++ (BOOL)certificate:(SecCertificateRef)cert1
+            isEqual:(SecCertificateRef)cert2;
+
 - (id)initWithBundle:(NSBundle *)bundle;
-- (HGSSignatureStatus)signatureStatus;
-- (SecCertificateRef)signerCertificate;
-- (BOOL)signerCertificateIsEqual:(SecCertificateRef)cert;
-- (NSData *)generateExternalAdHocSignature;
-- (HGSSignatureStatus)verifyExternalAdHocSignature:(NSData *)signatureData;
-- (HGSSignatureStatus)verifySignature:(NSData *)signature
-                            forBundle:(NSBundle *)bundle
-                     usingCertificate:(SecCertificateRef)certificateRef;
-- (HGSSignatureStatus)verifySignature:(NSData *)signature
-                            forBundle:(NSBundle *)bundle
-                             usingKey:(NSData *)key;
-- (NSData *)generateSignatureForBundle:(NSBundle *)bundle
-                         usingIdentity:(SecIdentityRef)identity;
-- (NSData *)generateSignatureForBundle:(NSBundle *)bundle
-                              usingKey:(NSData *)key;
+
+/*! 
+  Returns a copy of the certificate used to sign the bundle if the bundle
+  has a valid embedded signature. Otherwise, returns NULL.
+*/
+- (SecCertificateRef)copySignerCertificate;
+
+/*! 
+  Embeds a code signature in the bundle. If the bundle contains a Mach
+  executable, then standard Mac OS X code signing is used. Otherwise,
+  a proprietary signature is generated. Returns whether or not the
+  signature was sucessfully generated and embedded. Any existing signature
+  will be overwritten.
+*/
+- (BOOL)generateSignatureUsingIdentity:(SecIdentityRef)identity;
+
+/*! 
+  Verifies an embedded code signature. If the bundle contains a Mac executable,
+  the bundle must be signed using a standard Mac OS X code signature (which
+  may have been generated using generateSignatureUsingIdentity or the
+  Mac OS X codesign tool); otherwise, the proprietary signature generated
+  by generateSignatureUsingIdentity is checked.
+*/
+- (HGSSignatureStatus)verifySignature;
+
+/*
+  Generates a code signature for the bundle. The resulting signature must
+  be stored securely by the caller.
+*/
+- (NSData *)generateDetachedSignature;
+
+/*! 
+  Verifies a detached code signature created be generateDetachedSignature
+  using the same rules as verifySignature.
+*/
+- (HGSSignatureStatus)verifyDetachedSignature:(NSData *)signature;
+
 @end

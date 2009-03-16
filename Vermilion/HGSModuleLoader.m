@@ -90,6 +90,12 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
     executableSignature_
       = [[HGSCodeSignature codeSignatureForBundle:[NSBundle mainBundle]]
          retain];
+    if ([executableSignature_ verifySignature] == eSignatureStatusOK) {
+      executableCertificate_ = [executableSignature_ copySignerCertificate];
+    } else {
+      [executableSignature_ release];
+      executableSignature_ = nil;
+    }
   }
   return self;
 }
@@ -98,6 +104,9 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
   [extensionMap_ release];
   [executableSignature_ release];
   [pluginSignatureInfo_ release];
+  if (executableCertificate_) {
+    CFRelease(executableCertificate_);
+  }
   [super dealloc];
 }
 
@@ -177,11 +186,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
 }
 
 - (BOOL)isPluginAtPathCertified:(NSString *)path {
-  if ([executableSignature_ signatureStatus] != eSignatureStatusOK) {
+  if (!executableSignature_) {
     // If the host application is not signed, do not perform validation.
-    // TODO(hawk): Come up with a different policy. An attacker who has
-    // code running on the host machine but not in the QSB context could
-    // strip off our signature and drop in a plugin
     return YES;
   }
   
@@ -194,9 +200,20 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
     return YES;
   }
   
-  BOOL shouldLoad = ([signature signatureStatus] == eSignatureStatusOK &&
-                     [signature signerCertificateIsEqual:
-                      [executableSignature_ signerCertificate]]);
+  // Plugin must have a valid signature
+  BOOL shouldLoad = ([signature verifySignature] == eSignatureStatusOK);
+  // Plugin must have been signed by the same identity that signed
+  // the application
+  if (shouldLoad) {
+    SecCertificateRef pluginCertificate = [signature copySignerCertificate];
+    if (pluginCertificate) {
+      shouldLoad = [HGSCodeSignature certificate:executableCertificate_
+                                         isEqual:pluginCertificate];
+      CFRelease(pluginCertificate);
+    } else {
+      shouldLoad = NO;
+    }
+  }
   
   // Plugin is either not signed, or signed with an unknown
   // certificate. Ask the user to approve the plugin.
@@ -235,7 +252,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
     if ([[whitelisted objectForKey:kPluginPathKey] isEqual:path]) {
       NSData *signatureData = [whitelisted objectForKey:kPluginSignatureKey];
       if (signatureData &&
-          [pluginCodeSignature verifyExternalAdHocSignature:signatureData]) {
+          [pluginCodeSignature verifyDetachedSignature:signatureData]) {
         isWhitelisted = YES;
       }
     }
@@ -251,7 +268,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
     return;
   }
   
-  NSData *signatureData = [pluginCodeSignature generateExternalAdHocSignature];
+  NSData *signatureData = [pluginCodeSignature generateDetachedSignature];
   if (signatureData) {
     NSDictionary *entry = [NSDictionary dictionaryWithObjectsAndKeys:
                            [pluginBundle bundlePath], kPluginPathKey,

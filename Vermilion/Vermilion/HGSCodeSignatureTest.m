@@ -39,9 +39,6 @@
 @interface HGSCodeSignatureTest : GTMTestCase
 @end
 
-static const unsigned char kAppSigningKey[16] = {
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
-};
 static NSString *kAppPath = @"/Applications/System Preferences.app";
 
 @implementation HGSCodeSignatureTest
@@ -54,21 +51,13 @@ static NSString *kAppPath = @"/Applications/System Preferences.app";
   HGSCodeSignature *sig = [HGSCodeSignature codeSignatureForBundle:appBundle];
   STAssertNotNil(sig, @"failed to create code signature object");
   
-  NSData *key = [NSData dataWithBytes:kAppSigningKey length:16];
-  STAssertNotNil(key, @"failed to encode key data");
-  
-  HGSSignatureStatus status = [sig verifySignature:key
-                                         forBundle:appBundle
-                                          usingKey:key];
+  HGSSignatureStatus status = [sig verifyDetachedSignature:[NSData data]];
   STAssertEquals(status, eSignatureStatusInvalid, @"invalid signature accepted");
   
-  NSData *sigData = [sig generateSignatureForBundle:appBundle
-                                           usingKey:key];
+  NSData *sigData = [sig generateDetachedSignature];
   STAssertNotNil(sigData, @"failed to create signature");
-                         
-  status = [sig verifySignature:sigData
-                      forBundle:appBundle
-                       usingKey:key];
+
+  status = [sig verifyDetachedSignature:sigData];
   STAssertEquals(status, eSignatureStatusOK, @"failed to validate signature");
 }
 
@@ -80,8 +69,8 @@ static NSString *kAppPath = @"/Applications/System Preferences.app";
   HGSCodeSignature *sig = [HGSCodeSignature codeSignatureForBundle:appBundle];
   STAssertNotNil(sig, @"failed to create code signature object");
   
-  HGSSignatureStatus status = [sig signatureStatus];
-  STAssertEquals(status, eSignatureStatusOK, @"invalid signature accepted");
+  HGSSignatureStatus status = [sig verifySignature];
+  STAssertEquals(status, eSignatureStatusOK, @"OK signature declared invalid");
 }
 
 - (void)testCertificates {
@@ -92,10 +81,12 @@ static NSString *kAppPath = @"/Applications/System Preferences.app";
   HGSCodeSignature *sig = [HGSCodeSignature codeSignatureForBundle:appBundle];
   STAssertNotNil(sig, @"failed to create code signature object");
   
-  SecCertificateRef cert = [sig signerCertificate];
+  SecCertificateRef cert = [sig copySignerCertificate];
   STAssertTrue(cert != NULL, @"failed to extract certificate");
   
-  STAssertTrue([sig signerCertificateIsEqual:cert], @"certificates incorrect");
+  STAssertTrue([HGSCodeSignature certificate:cert
+                                     isEqual:cert], @"certificates incorrect");
+  CFRelease(cert);
 }
 
 @end
