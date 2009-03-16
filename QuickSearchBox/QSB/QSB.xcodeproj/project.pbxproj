@@ -366,6 +366,7 @@
 		7F3F75950E152BA5001AF34E /* QSBSmallScroller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F75940E152BA5001AF34E /* QSBSmallScroller.m */; };
 		7F3F75DF0E152E7D001AF34E /* HGSSQLiteBackedCacheTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */; };
 		7F3F7EC50F39FCE70054680A /* QSBHGSResult+NSPasteboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F7EC40F39FCE70054680A /* QSBHGSResult+NSPasteboard.m */; };
+		7F4497F20F6895EB00330B67 /* GTMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = F435DAAE0DBE4BBE0069CDE8 /* GTMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7F495C1D0F24E65E0012A1B9 /* TextActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F495C1C0F24E65E0012A1B9 /* TextActions.m */; };
 		7F495D650F24F56D0012A1B9 /* red-gear.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7F495D640F24F56D0012A1B9 /* red-gear.icns */; };
 		7F4BE5350EA7A9CC0025D57D /* NSColor+Naming.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4BE5330EA7A9CC0025D57D /* NSColor+Naming.m */; };
@@ -3914,6 +3915,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F4497F20F6895EB00330B67 /* GTMDefines.h in Headers */,
 				8B6F30DF0DA2FB520052CA40 /* Vermilion.h in Headers */,
 				8B6F2D740DA2B8AF0052CA40 /* HGSAction.h in Headers */,
 				8B6F2D760DA2B8AF0052CA40 /* HGSModule.h in Headers */,
