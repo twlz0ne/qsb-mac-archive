@@ -39,9 +39,9 @@
 
 /*! 
   @enum HGSSignatureStatus 
-  @field eSignatureStatusInvalid Code has a signature that did not validate.
-  @field eSignatureStatusOK Code has a valid signature.
-  @field eSignatureStatusUnsigned No signature present.
+  @constant eSignatureStatusInvalid Code has a signature that did not validate.
+  @constant eSignatureStatusOK Code has a valid signature.
+  @constant eSignatureStatusUnsigned No signature present.
 */
 typedef enum {
   eSignatureStatusInvalid,
