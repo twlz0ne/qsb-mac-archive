@@ -116,6 +116,3 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
 // Notification sent when we are reopened (finder icon clicked while we
 // are running, or the dock icon clicked).
 #define kQSBApplicationDidReopenNotification @"QSBApplicationDidReopenNotification"
-
-// Notification sent when the hotkey has been hit
-#define kQSBApplicationDidHitHotKeyNotification @"QSBApplicationDidHitHotKeyNotification"

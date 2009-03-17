@@ -71,6 +71,8 @@ const NSTimeInterval kQSBAppearDelay;
   CAAnimation *searchWindowSetAlphaAnimation_;
   // Our list of corpora for the searchMenu
   NSArray *corpora_;
+  // Our last visibility change userinfo dictionary for notifications
+  NSDictionary *visibilityChangedUserInfo_;
 }
 @property(nonatomic, retain) QSBSearchViewController *activeSearchViewController;
 
@@ -85,12 +87,13 @@ const NSTimeInterval kQSBAppearDelay;
 // Offset of all results views from top of window.
 - (float)resultsViewOffsetFromTop;
 
-// Back up over any text or a the latest pivot, whichever comes first.
-- (void)clearTextOrLastPivot:(id)sender;
-
 // Change search window visibility
-- (IBAction)hideSearchWindow:(id)sender;
 - (IBAction)showSearchWindow:(id)sender;
+- (IBAction)hideSearchWindow:(id)sender;
+
+// Show the search window. Toggle is what caused the window to show.
+// See kQSB*ChangeVisiblityToggle below.
+- (void)showSearchWindowBecause:(NSString *)toggle;
 
 // Take a corpus from a menu item
 - (IBAction)selectCorpus:(id)sender;
@@ -132,6 +135,8 @@ const NSTimeInterval kQSBAppearDelay;
 // Select an object in the UI
 - (IBAction)selectResults:(HGSResultArray *)results;
 
+// The hot key was hit.
+- (void)hitHotKey:(id)sender;
 @end
 
 // Notifications for showing and hiding the search window
@@ -147,6 +152,16 @@ const NSTimeInterval kQSBAppearDelay;
 #define kQSBSearchWindowDidShowNotification @"QSBSearchWindowDidShowNotification"
 #define kQSBSearchWindowWillHideNotification @"QSBSearchWindowWillHideNotification"
 #define kQSBSearchWindowDidHideNotification @"QSBSearchWindowDidHideNotification"
+#define kQSBSearchWindowChangeVisibilityToggleKey @"QSBSearchWindowChangeVisibilityToggleKey"
+#define kQSBUnknownChangeVisibilityToggle @"QSBUnknownChangeVisiblityToggle"
+#define kQSBReopenChangeVisiblityToggle @"QSBReopenChangeVisiblityToggle"
+#define kQSBHotKeyChangeVisiblityToggle @"QSBHotKeyChangeVisiblityToggle"
+#define kQSBActivationChangeVisiblityToggle @"QSBActivationChangeVisiblityToggle"
+#define kQSBDockMenuItemChangeVisiblityToggle @"QSBDockMenuChangeVisiblityToggle"
+#define kQSBStatusMenuItemChangeVisiblityToggle @"QSBStatusMenuItemChangeVisiblityToggle"
+#define kQSBFilesFromFinderChangeVisiblityToggle @"QSBFilesFromFinderChangeVisiblityToggle"
+#define kQSBServicesMenuChangeVisiblityToggle @"QSBServicesMenuChangeVisiblityToggle"
+#define kQSBAppLaunchedChangeVisiblityToggle @"QSBAppLaunchedChangeVisiblityToggle"
 
 // Notifications for pivoting
 // Object is the QSBTableResult that is being pivoted on
@@ -162,3 +177,5 @@ const NSTimeInterval kQSBAppearDelay;
 #define kQSBNotificationIndirectObjectsKey @"QSBNotificationIndirectObjectsKey"
 // kQSBNotificationSuccessKey type is NSNumber * representing a bool
 #define kQSBNotificationSuccessKey @"QSBNotificationSuccessKey"
+
+

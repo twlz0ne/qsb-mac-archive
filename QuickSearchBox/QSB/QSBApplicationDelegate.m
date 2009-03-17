@@ -527,9 +527,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     return;
   }
   
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc postNotificationName:kQSBApplicationDidHitHotKeyNotification 
-                    object:NSApp];
+  [searchWindowController_ hitHotKey:sender];
 }
 
 - (BOOL)isScreenSaverActive {
@@ -904,7 +902,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   } else {
     HGSResultArray *results = [HGSResultArray arrayWithFilePaths:fileList];
     [searchWindowController_ selectResults:results];
-    [searchWindowController_ showSearchWindow:nil];    
+    [searchWindowController_ showSearchWindowBecause:kQSBFilesFromFinderChangeVisiblityToggle];    
     [app replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
   }
 }
@@ -919,7 +917,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     NSString *userText = [pasteboard stringForType:NSStringPboardType];
     [searchWindowController_ searchForString:userText];
   }
-  [searchWindowController_ showSearchWindow:nil];    
+  [searchWindowController_ showSearchWindowBecause:kQSBServicesMenuChangeVisiblityToggle];    
 }
 
 #pragma mark Notifications

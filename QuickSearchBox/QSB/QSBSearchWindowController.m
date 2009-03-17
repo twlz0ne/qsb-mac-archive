@@ -85,7 +85,7 @@ static const unichar kZeroWidthNoBreakSpace = 0xFEFF;
 
 // This is a tag value for corpora in the corpora menu.
 static const NSInteger kBaseCorporaTagValue = 10000;
-
+  
 @interface QSBSearchWindowController ()
 - (void)updateLogoView;
 - (void)updateImageView;
@@ -165,6 +165,7 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 // Update token in text field
 - (void)updatePivotToken;
 
+- (void)hideSearchWindowBecause:(NSString *)toggle;
 @end
 
 
@@ -261,11 +262,6 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
              name:kQSBApplicationDidReopenNotification
            object:NSApp];
   
-  [nc addObserver:self 
-         selector:@selector(applicationHotKeyHit:)
-             name:kQSBApplicationDidHitHotKeyNotification
-           object:NSApp];
-  
   // named aWindowDidBecomeKey instead of windowDidBecomeKey because if we
   // used windowDidBecomeKey we would be called twice for our window (once
   // for the notification, and once because we are the search window's delegate)
@@ -350,6 +346,7 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [activeSearchViewController_ release];
   [corpora_ release];
+  [visibilityChangedUserInfo_ release];
   [super dealloc];
 }
 
@@ -600,6 +597,7 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
   // Note that this subverts the parent's idea of what the pivot object is.
   [activeSearchViewController_ setResults:results];
   [self updatePivotToken];
+  [self showResultsWindow];
   
 }
 
@@ -731,7 +729,22 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
   }
   return handled;
 }
-  
+
+- (void)hitHotKey:(id)sender {
+  if ([[self window] isVisible]) {
+    [self hideSearchWindowBecause:kQSBHotKeyChangeVisiblityToggle];
+  } else {
+    // Check to see if the display is captured, and if so beep and don't
+    // activate. 
+    // For http://buganizer/issue?id=652067
+    if ([self isOurScreenCaptured]) {
+      NSBeep();
+      return;
+    }
+    [self showSearchWindowBecause:kQSBHotKeyChangeVisiblityToggle];
+  }
+}
+
 - (BOOL)control:(NSControl *)control 
        textView:(NSTextView *)textView
 doCommandBySelector:(SEL)commandSelector {
@@ -848,15 +861,46 @@ doCommandBySelector:(SEL)commandSelector {
   
 }
 
+- (NSString *)searchWindowVisibilityToggleBasedOnSender:(id)sender {
+  NSString *toggle = kQSBUnknownChangeVisibilityToggle;
+  if ([sender isKindOfClass:[NSMenuItem class]]) {
+    NSMenu *senderMenu = [sender menu];
+    id appDelegate = [NSApp delegate];
+    if ([senderMenu isEqual:[appDelegate applicationDockMenu:NSApp]]) {
+      toggle = kQSBDockMenuItemChangeVisiblityToggle;
+    } else if ([senderMenu isEqual:[appDelegate statusItemMenu]]) {
+      toggle = kQSBStatusMenuItemChangeVisiblityToggle;
+    }
+  }
+  return toggle;
+}
+      
+      
 - (IBAction)showSearchWindow:(id)sender {
+  NSString *toggle = [self searchWindowVisibilityToggleBasedOnSender:sender];
+  [self showSearchWindowBecause:toggle];
+}
+
+- (IBAction)hideSearchWindow:(id)sender {
+  NSString *toggle = [self searchWindowVisibilityToggleBasedOnSender:sender];
+  [self hideSearchWindowBecause:toggle];
+}
+
+- (void)showSearchWindowBecause:(NSString *)toggle {
   // a window must be "visible" for it to be key. This makes it "visible"
   // but invisible to the user so we can accept keystrokes while we are
   // busy opening the window. We order it front as a invisible window, and then
   // slowly fade it in.
   NSWindow *searchWindow = [self window];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [visibilityChangedUserInfo_ autorelease];
+  visibilityChangedUserInfo_
+    = [[NSDictionary alloc] initWithObjectsAndKeys:
+       toggle, kQSBSearchWindowChangeVisibilityToggleKey,
+       nil];
   [nc postNotificationName:kQSBSearchWindowWillShowNotification
-                    object:searchWindow];
+                    object:searchWindow
+                  userInfo:visibilityChangedUserInfo_];
   
   // TODO(alcor): reenable this with a user default or optimize enough for
   // general use
@@ -874,7 +918,7 @@ doCommandBySelector:(SEL)commandSelector {
   [NSAnimationContext endGrouping];
 #endif
   
-  [searchWindow makeKeyAndOrderFront:sender];
+  [searchWindow makeKeyAndOrderFront:self];
   [searchWindow setIgnoresMouseEvents:NO];
 
   [NSAnimationContext beginGrouping];
@@ -888,14 +932,20 @@ doCommandBySelector:(SEL)commandSelector {
   }
 }
 
-- (IBAction)hideSearchWindow:(id)sender {
+- (void)hideSearchWindowBecause:(NSString *)toggle {
+  NSWindow *searchWindow = [self window];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [visibilityChangedUserInfo_ autorelease];
+  visibilityChangedUserInfo_
+    = [[NSDictionary alloc] initWithObjectsAndKeys:
+       toggle, kQSBSearchWindowChangeVisibilityToggleKey,
+       nil];
   [nc postNotificationName:kQSBSearchWindowWillHideNotification
-                    object:[self window]];
+                    object:searchWindow
+                  userInfo:visibilityChangedUserInfo_];
   [NSObject cancelPreviousPerformRequestsWithTarget:self
                                            selector:@selector(displayResults:)
                                              object:nil];
-  NSWindow *searchWindow = [self window];
   [searchWindow setIgnoresMouseEvents:YES];
   [self hideResultsWindow];
   
@@ -1084,13 +1134,13 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
   if ([NSApp keyWindow] == nil) {
-    [self showSearchWindow:self];
+    [self showSearchWindowBecause:kQSBActivationChangeVisiblityToggle];
   }
 }
 
 - (void)applicationWillResignActive:(NSNotification *)notification {
   if ([[self window] isVisible]) {
-    [self hideSearchWindow:self];
+    [self hideSearchWindowBecause:kQSBActivationChangeVisiblityToggle];
   }
 }
 
@@ -1109,7 +1159,7 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (void)applicationDidReopen:(NSNotification *)notification {
   if (![NSApp keyWindow]) {
-    [self showSearchWindow:self];
+    [self showSearchWindowBecause:kQSBReopenChangeVisiblityToggle];
   }
 }
 
@@ -1123,25 +1173,9 @@ doCommandBySelector:(SEL)commandSelector {
   if (![doNotActivateOnStartup boolValue]) {
     // UI elements don't get activated by default, so if the user launches
     // us from the finder, and we are a UI element, force ourselves active.
-    [self showSearchWindow:self];
+    [self showSearchWindowBecause:kQSBAppLaunchedChangeVisiblityToggle];
   }
 }
-
-- (void)applicationHotKeyHit:(NSNotification *)notification {
-  if ([[self window] isVisible]) {
-    [self hideSearchWindow:self];
-  } else {
-    // Check to see if the display is captured, and if so beep and don't
-    // activate. 
-    // For http://buganizer/issue?id=652067
-    if ([self isOurScreenCaptured]) {
-      NSBeep();
-      return;
-    }
-    [self showSearchWindow:self];
-  }
-}
-
 
 #pragma mark NSControl Delegate Methods (for QSBTextField)
 
@@ -1193,7 +1227,10 @@ doCommandBySelector:(SEL)commandSelector {
   }
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:notification
-                    object:[self window]];
+                    object:[self window]
+                  userInfo:visibilityChangedUserInfo_];
+  [visibilityChangedUserInfo_ autorelease];
+  visibilityChangedUserInfo_ = nil;
 }
 
 - (void)updateShadows {
