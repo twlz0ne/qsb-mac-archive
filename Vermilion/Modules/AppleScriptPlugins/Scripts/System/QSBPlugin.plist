@@ -80,7 +80,7 @@
 		</dict>
 		<dict>
 			<key>HGSAppleScriptDisplayNameKey</key>
-			<string>Quit Visible Applcations</string>
+			<string>Quit Visible Applications</string>
 			<key>HGSAppleScriptIconKey</key>
 			<string>quitVisibleApps.icns</string>
 			<key>HGSAppleScriptHandlerKey</key>
