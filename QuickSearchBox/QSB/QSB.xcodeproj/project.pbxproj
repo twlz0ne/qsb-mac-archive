@@ -19,6 +19,17 @@
 			name = "Test All";
 			productName = "Test All";
 		};
+		8B148D860F705F35002E05FA /* QSB SDK */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 8B148D9D0F705F4F002E05FA /* Build configuration list for PBXAggregateTarget "QSB SDK" */;
+			buildPhases = (
+				8B148D850F705F35002E05FA /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "QSB SDK";
+			productName = "QSB SDK";
+		};
 		8B77DEFE0F284A4C00FA2A3C /* Release Notes */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 8B77E00A0F28C9AA00FA2A3C /* Build configuration list for PBXAggregateTarget "Release Notes" */;
@@ -37,6 +48,7 @@
 				F4EF8F730ECB3EFF008DD6DA /* CopyFiles */,
 			);
 			dependencies = (
+				8B148D8B0F705F41002E05FA /* PBXTargetDependency */,
 				F4EF8F790ECB3F85008DD6DA /* PBXTargetDependency */,
 				F4EF8F7B0ECB3F85008DD6DA /* PBXTargetDependency */,
 				F4EF8F7D0ECB3F85008DD6DA /* PBXTargetDependency */,
@@ -439,6 +451,7 @@
 		8B0207C40ECBC40300A6EB85 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B02FB070EC9D46B00A6EB85 /* HGSExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B02FB060EC9D46B00A6EB85 /* HGSExtension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B02FB0D0EC9D50C00A6EB85 /* HGSExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B02FB0C0EC9D50C00A6EB85 /* HGSExtension.m */; };
+		8B1490A80F715781002E05FA /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
 		8B20E4450DB432BA001E429B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
 		8B20E4460DB432BA001E429B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
 		8B20E4470DB432BA001E429B /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -1035,6 +1048,34 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
+		};
+		8B148D8A0F705F41002E05FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B148D860F705F35002E05FA /* QSB SDK */;
+			remoteInfo = "QSB SDK";
+		};
+		8B148F900F715697002E05FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216 /* OCMock.framework */;
+			remoteInfo = OCMock;
+		};
+		8B148F920F715697002E05FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 03BF2D3708F1C69500978C59 /* OCMockTests.octest */;
+			remoteInfo = OCMockTests;
+		};
+		8B1490640F71576B002E05FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B148F940F7156B6002E05FA /* OCMock */;
+			remoteInfo = OCMock;
 		};
 		8B20E43E0DB432BA001E429B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1863,6 +1904,8 @@
 		8B07C41D0B69234900827344 /* StripHeaders.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = StripHeaders.sh; sourceTree = "<group>"; };
 		8B0CA2B20E48A6580004BFB2 /* GTMFourCharCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMFourCharCode.m; sourceTree = "<group>"; };
 		8B0CA2B30E48A6580004BFB2 /* GTMFourCharCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMFourCharCode.h; sourceTree = "<group>"; };
+		8B148F720F715697002E05FA /* OCMock.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = OCMock.xcodeproj; path = ../../../externals/OCMock/Source/OCMock.xcodeproj; sourceTree = QSBROOT; };
+		8B148F9A0F7156B6002E05FA /* OCMock.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OCMock.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B1B49330E5F994800A08972 /* GTMExceptionalInlines.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMExceptionalInlines.m; sourceTree = "<group>"; };
 		8B1B49340E5F994800A08972 /* GTMExceptionalInlines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMExceptionalInlines.h; sourceTree = "<group>"; };
 		8B20E44B0DB432BA001E429B /* AppleScriptPlugins.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppleScriptPlugins.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2570,6 +2613,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B1490A80F715781002E05FA /* OCMock.framework in Frameworks */,
 				8B77DCDD0F27A31000FA2A3C /* GTM.framework in Frameworks */,
 				E4D28B330DF9AA0C00FC6C31 /* AppKit.framework in Frameworks */,
 				E4F551550DF730D7008A846E /* Vermilion.framework in Frameworks */,
@@ -2627,6 +2671,7 @@
 				8BD97D0A0E636D8C00F5C83B /* GTM.framework */,
 				8B77E0DC0F28FC3B00FA2A3C /* GData.framework */,
 				8B6128A30F4641BF00E29B40 /* JSON.framework */,
+				8B148F9A0F7156B6002E05FA /* OCMock.framework */,
 				8B63DD9F0D9458E500395A2B /* QSBTest.octest */,
 				E4F551330DF73059008A846E /* VermilionTest.octest */,
 				E46933050DDB7A0200C5A64A /* Actions.hgs */,
@@ -3092,6 +3137,33 @@
 				8B07C41D0B69234900827344 /* StripHeaders.sh */,
 			);
 			path = BuildScripts;
+			sourceTree = "<group>";
+		};
+		8B148F5D0F715696002E05FA /* OCMock */ = {
+			isa = PBXGroup;
+			children = (
+				8B148F5E0F715696002E05FA /* Source */,
+			);
+			name = OCMock;
+			path = ../../../externals/OCMock;
+			sourceTree = QSBROOT;
+		};
+		8B148F5E0F715696002E05FA /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				8B148F720F715697002E05FA /* OCMock.xcodeproj */,
+			);
+			name = Source;
+			path = ../../../externals/OCMock/Source;
+			sourceTree = QSBROOT;
+		};
+		8B148F8C0F715697002E05FA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8B148F910F715697002E05FA /* OCMock.framework */,
+				8B148F930F715697002E05FA /* OCMockTests.octest */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		8B20E4A50DB43340001E429B /* AppleScriptPlugins */ = {
@@ -3671,6 +3743,7 @@
 				8BDCCA800F18645800CDDA78 /* GoogleBreakpad */,
 				F435DAAD0DBE4B900069CDE8 /* google-toolbox-for-mac */,
 				62E729390F4F1C9400A68815 /* Growl */,
+				8B148F5D0F715696002E05FA /* OCMock */,
 			);
 			name = externals;
 			path = ../externals;
@@ -4397,6 +4470,21 @@
 			productReference = 7FF019BD0EB089CB001A2C7B /* Terminal.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
+		8B148F940F7156B6002E05FA /* OCMock */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8B148F960F7156B6002E05FA /* Build configuration list for PBXNativeTarget "OCMock" */;
+			buildPhases = (
+				8B148F950F7156B6002E05FA /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OCMock;
+			productName = test;
+			productReference = 8B148F9A0F7156B6002E05FA /* OCMock.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		8B20E43C0DB432BA001E429B /* AppleScript Plugins */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8B20E4480DB432BA001E429B /* Build configuration list for PBXNativeTarget "AppleScript Plugins" */;
@@ -4780,6 +4868,7 @@
 			dependencies = (
 				8BC674520F58B0B4003B5C6A /* PBXTargetDependency */,
 				E4F5513B0DF730A0008A846E /* PBXTargetDependency */,
+				8B1490650F71576B002E05FA /* PBXTargetDependency */,
 			);
 			name = "Vermilion Test";
 			productName = VermilionTest;
@@ -4888,17 +4977,23 @@
 					ProductGroup = 8B61282A0F46347B00E29B40 /* Products */;
 					ProjectRef = 8B6128290F46347B00E29B40 /* JSON.xcodeproj */;
 				},
+				{
+					ProductGroup = 8B148F8C0F715697002E05FA /* Products */;
+					ProjectRef = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
 				F4EF8F740ECB3EFF008DD6DA /* Build All */,
 				795F071909870215004C6BFE /* Test All */,
 				8B77DEFE0F284A4C00FA2A3C /* Release Notes */,
+				8B148D860F705F35002E05FA /* QSB SDK */,
 				8B3EECE20CEA86A100D933C0 /* QSB Core */,
 				8BD97D090E636D8C00F5C83B /* GTM */,
 				8B6F2CE00DA2B7F50052CA40 /* Vermilion */,
 				8B77E0DB0F28FC3B00FA2A3C /* GData */,
 				8B61289E0F4641BF00E29B40 /* JSON */,
+				8B148F940F7156B6002E05FA /* OCMock */,
 				8B63DD670D9458E500395A2B /* QSB Core Test */,
 				E4F551320DF73059008A846E /* Vermilion Test */,
 				E46932F50DDB7A0200C5A64A /* Actions */,
@@ -4940,6 +5035,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		8B148F910F715697002E05FA /* OCMock.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = OCMock.framework;
+			remoteRef = 8B148F900F715697002E05FA /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8B148F930F715697002E05FA /* OCMockTests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = OCMockTests.octest;
+			remoteRef = 8B148F920F715697002E05FA /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		8B6128370F46347B00E29B40 /* JSON.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -5472,6 +5581,33 @@
 			shellPath = /bin/sh;
 			shellScript = "codesign -f -s \"$CODE_SIGN_IDENTITY\" \"$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME\"\ncodesign -v \"$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME\";\nexit 0";
 		};
+		8B148D850F705F35002E05FA /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"Building SDK Package\"\n\n\"${SYSTEM_DEVELOPER_UTILITIES_DIR}/PackageMaker.app/Contents/MacOS/PackageMaker\" --doc \"${SRCROOT}/SDK/QSB SDK.pmdoc\" --out \"${CONFIGURATION_BUILD_DIR}/Google Quick Search Box SDK.pkg\"";
+		};
+		8B148F950F7156B6002E05FA /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/GData.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/OCMock/Source\"\n/usr/bin/xcodebuild -project OCMock.xcodeproj -target OCMock -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHEROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"OCMock\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/OCMock.build/${CONFIGURATION}/OCMock.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
+		};
 		8B3EED760CEA86A100D933C0 /* Post Build Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -5479,15 +5615,18 @@
 			);
 			inputPaths = (
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
+				"$(SRCROOT)/../../Vermilion/Vermilion/HGSBundle.m",
 			);
 			name = "Post Build Script";
 			outputPaths = (
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
+				"$(BUILT_PRODUCTS_DIR)/xcconfig",
+				"$(BUILT_PRODUCTS_DIR)/pluginsrc/HGSBundle.m",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"\n\"${SRCROOT}/BuildScripts/StripHeaders.sh\"";
+			shellScript = "\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"\n\"${SRCROOT}/BuildScripts/StripHeaders.sh\"\n\n# Copy our xcconfigs into our QSB build area so that plugins building using our SDK and QSBROOT will be able to find them\ncp -R \"${SRCROOT}/xcconfig\" \"${BUILT_PRODUCTS_DIR}/xcconfig\"\nchmod -R 766 \"${BUILT_PRODUCTS_DIR}/xcconfig\"\n\ncp \"${SRCROOT}/../../Vermilion/Vermilion/HGSBundle.m\" \"${BUILT_PRODUCTS_DIR}/pluginsrc/\"\nchmod -R 766 \"${BUILT_PRODUCTS_DIR}/pluginsrc\"";
 		};
 		8B4888110F15D37D00786C1E /* Breakpad */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -5515,7 +5654,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Build JSON the way we want into our build folder\ncd \"${SRCROOT}/../externals/json-framework\"\n/usr/bin/xcodebuild -project JSON.xcodeproj -target JSON -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHEROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" SDKROOT=\"${SDKROOT}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"JSON\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/JSON.build/${CONFIGURATION}/JSON.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
+			shellScript = "# Build JSON the way we want into our build folder\ncd \"${SRCROOT}/../externals/json-framework\"\n/usr/bin/xcodebuild -project JSON.xcodeproj -target JSON -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHEROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" SDKROOT=\"${SDKROOT}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"JSON\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/JSON.build/${CONFIGURATION}/JSON.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
 		};
 		8B637BA20F27783A00997738 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6653,6 +6792,16 @@
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 7FF019AC0EB089CB001A2C7B /* PBXContainerItemProxy */;
 		};
+		8B148D8B0F705F41002E05FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B148D860F705F35002E05FA /* QSB SDK */;
+			targetProxy = 8B148D8A0F705F41002E05FA /* PBXContainerItemProxy */;
+		};
+		8B1490650F71576B002E05FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B148F940F7156B6002E05FA /* OCMock */;
+			targetProxy = 8B1490640F71576B002E05FA /* PBXContainerItemProxy */;
+		};
 		8B20E43D0DB432BA001E429B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
@@ -7527,6 +7676,58 @@
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Terminal/Terminal-Info.plist";
 				PRODUCT_NAME = Terminal;
 				WRAPPER_EXTENSION = hgs;
+			};
+			name = Release;
+		};
+		8B148D870F705F36002E05FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "QSB SDK";
+			};
+			name = Debug;
+		};
+		8B148D880F705F36002E05FA /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "QSB SDK";
+			};
+			name = "Debug-gcov";
+		};
+		8B148D890F705F36002E05FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "QSB SDK";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		8B148F970F7156B6002E05FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
+			buildSettings = {
+				PRODUCT_NAME = OCMock;
+			};
+			name = Debug;
+		};
+		8B148F980F7156B6002E05FA /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
+			buildSettings = {
+				PRODUCT_NAME = OCMock;
+			};
+			name = "Debug-gcov";
+		};
+		8B148F990F7156B6002E05FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
+			buildSettings = {
+				PRODUCT_NAME = OCMock;
 			};
 			name = Release;
 		};
@@ -8784,6 +8985,26 @@
 				7FF019BB0EB089CB001A2C7B /* Debug */,
 				8B95CBD60F6B1DEE003BDBDD /* Debug-gcov */,
 				7FF019BC0EB089CB001A2C7B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8B148D9D0F705F4F002E05FA /* Build configuration list for PBXAggregateTarget "QSB SDK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B148D870F705F36002E05FA /* Debug */,
+				8B148D880F705F36002E05FA /* Debug-gcov */,
+				8B148D890F705F36002E05FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8B148F960F7156B6002E05FA /* Build configuration list for PBXNativeTarget "OCMock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B148F970F7156B6002E05FA /* Debug */,
+				8B148F980F7156B6002E05FA /* Debug-gcov */,
+				8B148F990F7156B6002E05FA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

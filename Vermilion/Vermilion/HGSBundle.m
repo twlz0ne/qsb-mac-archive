@@ -30,9 +30,11 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSBundle.h"
+// The following two paths are intentionally like <Vermilion/...> to support
+// third party plugin development using our QSBPlugin template.
+#import <Vermilion/HGSBundle.h>
+#import <Vermilion/HGSLog.h>
 #import <dlfcn.h>
-#import "HGSLog.h"
 
 static NSBundle *sPluginBundle = nil;
 
