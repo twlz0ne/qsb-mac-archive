@@ -44,8 +44,8 @@ NSString *const kHGSExtensionIconImageKey = @"HGSExtensionIconImage";
 NSString *const kHGSExtensionIconImagePathKey = @"HGSExtensionIconImagePath";
 NSString *const kHGSExtensionEnabledKey = @"HGSExtensionEnabled";
 NSString *const kHGSExtensionBundleKey = @"HGSExtensionBundle";
-NSString *const kHGSExtensionDesiredAccountType
-  = @"HGSExtensionDesiredAccountType";
+NSString *const kHGSExtensionDesiredAccountTypes
+  = @"HGSExtensionDesiredAccountTypes";
 NSString *const kHGSExtensionOfferedAccountType
   = @"HGSExtensionOfferedAccountType";
 NSString *const kHGSExtensionIsUserVisible = @"HGSExtensionIsUserVisible";

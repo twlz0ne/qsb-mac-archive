@@ -31,6 +31,7 @@
 //
 
 #import "HGSAccount.h"
+#import "HGSBundle.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSAccountsExtensionPoint.h"
 #import "HGSLog.h"
@@ -39,15 +40,22 @@
 NSString *const kHGSAccountDisplayNameFormat = @"%@ (%@)";
 NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 
+@interface HGSAccount ()
+
+@property (nonatomic, copy) NSString *userName;
+
+@end
+
 
 @implementation HGSAccount
 
 @synthesize userName = userName_;
-@synthesize type = type_;
 @synthesize authenticated = authenticated_;
 
-- (id)initWithName:(NSString *)userName
-              type:(NSString *)accountType {
+- (id)initWithName:(NSString *)userName {
+  // NOTE: The following call to -[type] resolves to a constant string
+  // defined per-class.
+  NSString *accountType = [self type];
   NSBundle *bundle = [NSBundle bundleForClass:[self class]];
   NSString *name = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
                     userName, accountType];
@@ -61,7 +69,6 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
        nil];
   if ((self = [super initWithConfiguration:configuration])) {
     [self setUserName:userName];
-    [self setType:accountType];
     if (![self userName] || ![self type]) {
       [self release];
       self = nil;
@@ -72,9 +79,7 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 
 - (id)initWithDictionary:(NSDictionary *)prefDict {
   NSString *userName = [prefDict objectForKey:kHGSAccountUserNameKey];
-  NSString *accountType = [prefDict objectForKey:kHGSAccountTypeKey];
-  self = [self initWithName:userName
-                       type:accountType];
+  self = [self initWithName:userName];
   return self;
 }
 
@@ -89,15 +94,20 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 
 - (void) dealloc {
   [userName_ release];
-  [type_ release]; 
   [super dealloc];
 }
 
 - (NSString *)displayName {
+  NSString *localizedTypeName = HGSLocalizedString([self type], nil);
   NSString *displayName
     = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
-       [self userName], [self type]];
+       [self userName], localizedTypeName];
   return displayName;
+}
+
+- (NSString *)type {
+  HGSAssert(@"Must be overridden by subclass", nil);
+  return @"UNINITIALIZED";
 }
 
 - (NSString *)password {
@@ -111,10 +121,11 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
   return YES;
 }
 
-+ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
++ (NSViewController *)
+    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow {
   HGSLogDebug(@"Class '%@', deriving from HGSAccount, should override "
-              @"accountSetupViewToInstallWithParentWindow: if it has an "
-              @"interface for setting up new accounts.", [self class]);
+              @"accountSetupViewControllerToInstallWithParentWindow: if it "
+              @"has an interface for setting up new accounts.", [self class]);
   return nil;
 }
 
@@ -141,7 +152,7 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 
 - (NSString *)description {
   return [NSString stringWithFormat:@"<%@:%p account='%@', type='%@'>",
-          [self class], self, [self userName], type_];
+          [self class], self, [self userName], [self type]];
 }
 
 @end

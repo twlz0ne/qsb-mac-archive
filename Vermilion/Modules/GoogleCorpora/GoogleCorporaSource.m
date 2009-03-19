@@ -80,16 +80,14 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
 - (NSArray *)dasherDomains {
   HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
-  NSArray *googleAccounts = [accountsPoint accountsForType:@"Google"];
+  NSArray *googleAccounts = [accountsPoint accountsForType:@"GoogleApps"];
   NSMutableArray *domains = [NSMutableArray array];
   for (id<HGSAccount> account in googleAccounts) {
     NSString *name = [account userName];
     NSInteger location = [name rangeOfString:@"@"].location;
     if (location != NSNotFound) {
       NSString *domain = [name substringFromIndex:location + 1]; 
-      if (![domain isEqualToString:@"gmail.com"]) {
-        [domains addObject:domain];
-      }
+      [domains addObject:domain];
     }
   }
   return domains;

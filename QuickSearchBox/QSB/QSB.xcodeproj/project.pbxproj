@@ -348,7 +348,6 @@
 		62D5B51E0E648FF400C66E15 /* InstantMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629A95630E5F244D005AE855 /* InstantMessage.framework */; };
 		62D5B58D0E6491B500C66E15 /* InstantMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629A95630E5F244D005AE855 /* InstantMessage.framework */; };
 		62D5B6A00E64D0DC00C66E15 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
-		62DF29B30F68AB660033A580 /* GoogleAccountTypeSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 62DF29B10F68AB660033A580 /* GoogleAccountTypeSheet.xib */; };
 		62E190960EBA4A570002241B /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62E72A7B0F4F4ADE00A68815 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62E72A7A0F4F4ADE00A68815 /* Growl.framework */; };
 		62E72AB80F4F6E6700A68815 /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 62E72A7A0F4F4ADE00A68815 /* Growl.framework */; };
@@ -1053,28 +1052,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B148D860F705F35002E05FA /* QSB SDK */;
+			remoteGlobalIDString = 8B148D860F705F35002E05FA;
 			remoteInfo = "QSB SDK";
 		};
 		8B148F900F715697002E05FA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8DC2EF5B0486A6940098B216 /* OCMock.framework */;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
 			remoteInfo = OCMock;
 		};
 		8B148F920F715697002E05FA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 03BF2D3708F1C69500978C59 /* OCMockTests.octest */;
+			remoteGlobalIDString = 03BF2D3708F1C69500978C59;
 			remoteInfo = OCMockTests;
 		};
 		8B1490640F71576B002E05FA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B148F940F7156B6002E05FA /* OCMock */;
+			remoteGlobalIDString = 8B148F940F7156B6002E05FA;
 			remoteInfo = OCMock;
 		};
 		8B20E43E0DB432BA001E429B /* PBXContainerItemProxy */ = {
@@ -1771,7 +1770,6 @@
 		62D0E96E0EF05D0E0028522C /* HGSAccountsExtensionPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccountsExtensionPoint.m; sourceTree = "<group>"; };
 		62D14DFA0F15651B0053B99F /* QSBBooleanToColorTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBBooleanToColorTransformer.m; sourceTree = "<group>"; };
 		62D2A9290E256FCA00D42E81 /* DoubleDownChevrons.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DoubleDownChevrons.png; sourceTree = "<group>"; };
-		62DF29B20F68AB660033A580 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/GoogleAccountTypeSheet.xib; sourceTree = "<group>"; };
 		62E72A7A0F4F4ADE00A68815 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
 		62E72ABE0F4F6EB900A68815 /* growl-bsd-license.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "growl-bsd-license.html"; sourceTree = "<group>"; };
 		62EA8BCD0F2E7DE200C92E0B /* GoogleAccounts.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleAccounts.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2970,7 +2968,6 @@
 				622912110F2E81E7005D34CE /* GoogleAccount.m */,
 				622912130F2E81F6005D34CE /* SetUpGoogleAccountView.xib */,
 				62A4AEF70F30E1CD0007CD99 /* EditGoogleAccount.xib */,
-				62DF29B10F68AB660033A580 /* GoogleAccountTypeSheet.xib */,
 				62EA8C1A0F2E7E5E00C92E0B /* GoogleAccounts-Info.plist */,
 				62AD99140F33AB190063579F /* google_products.png */,
 			);
@@ -5226,7 +5223,6 @@
 				622912150F2E81F6005D34CE /* SetUpGoogleAccountView.xib in Resources */,
 				62A4AEF90F30E1CD0007CD99 /* EditGoogleAccount.xib in Resources */,
 				62AD99150F33AB190063579F /* google_products.png in Resources */,
-				62DF29B30F68AB660033A580 /* GoogleAccountTypeSheet.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7232,14 +7228,6 @@
 				62A4AEFB0F30E22E0007CD99 /* English */,
 			);
 			name = EditTwitterAccount.xib;
-			sourceTree = "<group>";
-		};
-		62DF29B10F68AB660033A580 /* GoogleAccountTypeSheet.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				62DF29B20F68AB660033A580 /* English */,
-			);
-			name = GoogleAccountTypeSheet.xib;
 			sourceTree = "<group>";
 		};
 		62F150020DD4EE3C00BCAE1A /* ResultsWindow.xib */ = {

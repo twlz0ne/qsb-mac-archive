@@ -58,11 +58,8 @@ static NSString *const kTwitterAccountTypeName = @"Twitter";
 
 GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
-+ (NSString *)accountType {
-  return kTwitterAccountTypeName;
-}
-
-+ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
++ (NSViewController *)
+    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow {
   NSBundle *ourBundle = HGSGetPluginBundle();
   SetUpTwitterAccountViewController *loadedViewController
     = [[[SetUpTwitterAccountViewController alloc]
@@ -75,7 +72,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     loadedViewController = nil;
     HGSLog(@"Failed to load nib '%@'.", kSetUpTwitterAccountViewNibName);
   }
-  return [loadedViewController view];
+  return loadedViewController;
+}
+
+- (NSString *)type {
+  return kTwitterAccountTypeName;
 }
 
 - (NSString *)editNibName {

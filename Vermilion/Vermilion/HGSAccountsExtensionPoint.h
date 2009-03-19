@@ -59,7 +59,7 @@
 - (Class)classForAccountType:(NSString *)accountType;
 
 // Convenience method that returns an array of all account type names.
-- (NSArray *)accountTypeNames;
+- (NSArray *)visibleAccountTypeDisplayNames;
 
 // Convenience method to retrieve all acccount with a given type.
 - (NSArray *)accountsForType:(NSString *)type;

@@ -59,7 +59,7 @@
   of available sources (usually presented to the user in a table).
   
   To specify an extension's interest in being factored by whatever
-  HGSGoogleAccounts are available|, provide the HGSExtensionDesiredAccountType|
+  HGSGoogleAccounts are available, provide the HGSExtensionDesiredAccountTypes
   key in your bundle's plist with a value of |Google|.
   
   It is likely that this implementation will change somewhat as new types of

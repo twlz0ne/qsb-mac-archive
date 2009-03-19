@@ -71,9 +71,16 @@ typedef enum {
 
 @interface SetUpGoogleAccountViewController ()
 
-// Make sure the captcha portion of the setup view has been obscured.
-- (void)resetCaptchaPresentation;
+@property (nonatomic, getter=isGoogleAppsCheckboxShowing)
+  BOOL googleAppsCheckboxShowing;
+@property (nonatomic, getter=isWindowSizesDetermined) BOOL windowSizesDetermined;
 
+// Pre-determine the various window heights.
+- (void)determineWindowSizes;
+
+// Determine height of window based on checkbox and captcha presentation.
+- (CGFloat)windowHeightWithCheckboxShowing:(BOOL)googleAppsCheckboxShowing
+                            captchaShowing:(BOOL)captchaShowing;
 @end
 
 
@@ -81,19 +88,9 @@ typedef enum {
 
 GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
-@synthesize googleAppsAccount = googleAppsAccount_;
-@synthesize accountTypeKnown = accountTypeKnown_;
 @synthesize captchaImage = captchaImage_;
 @synthesize captchaText = captchaText_;
 @synthesize captchaToken = captchaToken_;
-
-- (id)initWithName:(NSString *)userName
-              type:(NSString *)type {
-  self = [super initWithName:userName type:type];
-  BOOL isAppsAccount = [type isEqualToString:kGoogleAppsAccountTypeName];
-  [self setGoogleAppsAccount:isAppsAccount];
-  return self;
-}
 
 - (void)dealloc {
   [responseData_ release];
@@ -103,11 +100,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   [super dealloc];
 }
 
-+ (NSString *)accountType {
+- (NSString *)type {
   return kGoogleAccountTypeName;
 }
 
-+ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
++ (NSViewController *)
+    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow {
   NSBundle *ourBundle = HGSGetPluginBundle();
   SetUpGoogleAccountViewController *loadedViewController
     = [[[SetUpGoogleAccountViewController alloc]
@@ -115,13 +113,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
        autorelease];
   if (loadedViewController) {
     [loadedViewController loadView];
-    [loadedViewController resetCaptchaPresentation];
     [loadedViewController setParentWindow:parentWindow];
   } else {
     loadedViewController = nil;
     HGSLog(@"Failed to load nib '%@'.", kSetUpGoogleAccountViewNibName);
   }
-  return [loadedViewController view];
+  return loadedViewController;
 }
 
 - (NSString *)adjustUserName:(NSString *)userName {
@@ -157,7 +154,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                                       password:(NSString *)password {
   NSString *encodedAccountName = [userName gtm_stringByEscapingForURLArgument];
   NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
-  BOOL hosted = [self isGoogleAppsAccount];
+  BOOL hosted = [self isKindOfClass:[GoogleAppsAccount class]];
   NSString *accountType = (hosted) ? kHostedAccountType : kGoogleAccountType;
   NSString *accountTestString = [NSString stringWithFormat:kAccountTestFormat,
                                  encodedAccountName, encodedPassword,
@@ -272,6 +269,10 @@ didReceiveResponse:(NSURLResponse *)response {
 
 @implementation GoogleAppsAccount
 
+- (NSString *)type {
+  return kGoogleAppsAccountTypeName;
+}
+
 @end
 
 
@@ -296,7 +297,7 @@ didReceiveResponse:(NSURLResponse *)response {
   BOOL adjustWindow = NO;
   
   // Show the "Is a Google Apps account" text field.
-  if ([account isGoogleAppsAccount]) {
+  if ([account isKindOfClass:[GoogleAppsAccount class]]) {
     deltaHeight = NSHeight([googleAppsTextField_ frame]) + 8.0;
     [googleAppsTextField_ setHidden:NO];
     adjustWindow = YES;
@@ -374,6 +375,9 @@ didReceiveResponse:(NSURLResponse *)response {
 
 @synthesize captchaImage = captchaImage_;
 @synthesize captchaText = captchaText_;
+@synthesize googleAppsAccount = googleAppsAccount_;
+@synthesize googleAppsCheckboxShowing = googleAppsCheckboxShowing_;
+@synthesize windowSizesDetermined = windowSizesDetermined_;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil
                bundle:(NSBundle *)nibBundleOrNil {
@@ -390,172 +394,14 @@ didReceiveResponse:(NSURLResponse *)response {
 }
 
 - (IBAction)acceptSetupAccountSheet:(id)sender {
-  // |newAccount| may be nil (first time through).
-  GoogleAccount *newAccount = (GoogleAccount *)[self account];
   // If we're showing a captcha then we need to pass along the captcha text
-  // to the account for authentication.  |newAccount| won't be nil since
-  // a captcha will never be required on the first pass through.
+  // to the account for authentication.
   if ([self captchaImage]) {
     NSString *captchaText = [self captchaText];
-    [newAccount setCaptchaText:captchaText];
+    GoogleAccount *account = (GoogleAccount *)[self account];
+    [account setCaptchaText:captchaText];
   }
-  // The rest of this is very similar to the implementation of
-  // acceptSetupAccountSheet: found in HGSSimpleAccount, with changes
-  // to support determining if this is a hosted or non-hosted account.
-  NSWindow *sheet = [sender window];
-  NSString *userName = [self accountName];
-  if ([userName length] > 0) {
-    NSString *password = [self accountPassword];
-    if (newAccount) {
-      [newAccount setUserName:userName];
-    } else {
-      // Create the new account entry.
-      newAccount = [[[GoogleAccount alloc] initWithName:userName
-                                                   type:kGoogleAccountTypeName]
-                    autorelease];
-      [self setAccount:newAccount];
-      
-      // Update the account name in case initWithName: adjusted it.
-      NSString *revisedAccountName = [newAccount userName];
-      if ([revisedAccountName length]) {
-        userName = revisedAccountName;
-        [self setAccountName:userName];
-      }
-    }
-    
-    // Authenticate the account for both hosted and non-hosted.
-    BOOL hostedAuthenticated = NO;
-    [newAccount setGoogleAppsAccount:YES];
-    NSURLRequest *hostedRequest
-      = [newAccount accountURLRequestForUserName:userName password:password];
-    if (hostedRequest) {
-      NSURLResponse *hostedResponse = nil;
-      NSError *error = nil;
-      NSData *result = [NSURLConnection sendSynchronousRequest:hostedRequest
-                                             returningResponse:&hostedResponse
-                                                         error:&error];
-      hostedAuthenticated = [newAccount validateResult:result];
-    }
-    
-    BOOL nonHostedAuthenticated = NO;
-    [newAccount setGoogleAppsAccount:NO];
-    NSURLRequest *nonHostedRequest
-      = [newAccount accountURLRequestForUserName:userName password:password];
-    if (nonHostedRequest) {
-      NSURLResponse *nonHostedResponse = nil;
-      NSError *error = nil;
-      NSData *result = [NSURLConnection sendSynchronousRequest:nonHostedRequest
-                                             returningResponse:&nonHostedResponse
-                                                         error:&error];
-      nonHostedAuthenticated = [newAccount validateResult:result];
-    }
-    
-    BOOL isGood = NO;
-    
-    if (hostedAuthenticated && nonHostedAuthenticated) {
-      // Both authenticated -- pathological case.  Let the user decide.
-      GoogleAccountTypeSheetController *controller 
-        = [[[GoogleAccountTypeSheetController alloc]
-            initWithUserName:userName] autorelease];
-      NSWindow *typeWindow = [controller window];
-      NSInteger result = [NSApp runModalForWindow:typeWindow];
-      [typeWindow orderOut:self];
-      if (result == eGoogleAccountTypeChooseSelected) {
-        BOOL useHosted = ([controller selectedAccountIndex] == 0);
-        [newAccount setGoogleAppsAccount:useHosted];
-        [newAccount setAccountTypeKnown:YES];
-        isGood = YES;
-      }
-    } else if (hostedAuthenticated || nonHostedAuthenticated) {
-      [newAccount setGoogleAppsAccount:hostedAuthenticated];
-      [newAccount setAccountTypeKnown:YES];
-      isGood = YES;
-    } else if (![self canGiveUserAnotherTryOffWindow:sheet]) {
-      // Neither authenticated so tell the abuser.
-      // If we can't help the user fix things, tell them they've got
-      // something wrong.
-      NSString *summary = HGSLocalizedString(@"Could not authenticate that "
-                                             @"account.", nil);
-      NSString *format
-        = HGSLocalizedString(@"The account '%@' could not be authenticated. "
-                             @"Please check the account name and password "
-                             @"and try again.", nil);
-      [self presentMessageOffWindow:sheet
-                        withSummary:summary
-                  explanationFormat:format
-                         alertStyle:NSWarningAlertStyle];
-    }
-    
-    if (isGood) {
-      // Adjust the type and identifier of the account if hosted.
-      if ([newAccount isGoogleAppsAccount]) {
-        // Adjusting requires that we create a new account instance
-        // with the proper type.
-        newAccount
-          = [[[GoogleAppsAccount alloc] initWithName:userName
-                                                type:kGoogleAppsAccountTypeName]
-             autorelease];
-        [self setAccount:newAccount];
-      }
-      // Make sure we don't already have this account registered.
-      NSString *accountIdentifier = [newAccount identifier];
-      HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
-      if ([accountsPoint extensionWithIdentifier:accountIdentifier]) {
-        isGood = NO;
-        NSString *summary = HGSLocalizedString(@"Account already set up.",
-                                               nil);
-        NSString *format
-          = HGSLocalizedString(@"The account '%@' has already been set up for "
-                               @"use in Quick Search Box.", nil);
-        [self presentMessageOffWindow:sheet
-                          withSummary:summary
-                    explanationFormat:format
-                           alertStyle:NSWarningAlertStyle];
-      }
-      
-      [newAccount setAuthenticated:isGood];
-      if (isGood) {
-        // Install the account.
-        isGood = [accountsPoint extendWithObject:newAccount];
-        if (isGood) {
-          // If there is not already a keychain item create one.  If there is
-          // then update the password.
-          KeychainItem *keychainItem = [newAccount keychainItem];
-          if (keychainItem) {
-            [keychainItem setUsername:userName
-                             password:password];
-          } else {
-            NSString *keychainServiceName = [newAccount identifier];
-            [KeychainItem addKeychainItemForService:keychainServiceName
-                                       withUsername:userName
-                                           password:password]; 
-          }
-          
-          [NSApp endSheet:sheet];
-          NSString *summary
-            = HGSLocalizedString(@"Enable searchable items for this account.",
-                                 nil);
-          NSString *format
-            = HGSLocalizedString(@"One or more search sources may have been "
-                                 @"added for the account '%@'. It may be "
-                                 @"necessary to manually enable each search "
-                                 @"source that uses this account.  Do so via "
-                                 @"the 'Searchable Items' tab in Preferences.",
-                                 nil);
-          [self presentMessageOffWindow:[self parentWindow]
-                            withSummary:summary
-                      explanationFormat:format
-                             alertStyle:NSInformationalAlertStyle];
-          
-          [self setAccountName:nil];
-          [self setAccountPassword:nil];
-        } else {
-          HGSLogDebug(@"Failed to install account extension for account '%@'.",
-                      userName);
-        }
-      }
-    }
-  }
+  [super acceptSetupAccountSheet:sender];
 }
 
 - (IBAction)goToGoogle:(id)sender {
@@ -576,10 +422,14 @@ didReceiveResponse:(NSURLResponse *)response {
     [self setCaptchaImage:captchaImage];
 
     if (resizeNeeded) {
-      CGFloat containerHeight = NSHeight([captchaContainerView_ frame]);
+      BOOL googleAppsCheckboxShowing = [self isGoogleAppsCheckboxShowing];
+      CGFloat newHeight
+        = [self windowHeightWithCheckboxShowing:googleAppsCheckboxShowing
+                                 captchaShowing:YES];
       NSRect windowFrame = [window frame];
-      windowFrame.origin.y -= containerHeight;
-      windowFrame.size.height += containerHeight;
+      CGFloat deltaHeight = newHeight - NSHeight(windowFrame);
+      windowFrame.size.height = newHeight;
+      windowFrame.origin.y -= deltaHeight;
       [[window animator] setFrame:windowFrame display:YES];
     }
     
@@ -587,68 +437,175 @@ didReceiveResponse:(NSURLResponse *)response {
     [window makeFirstResponder:captchaTextField_];
     canGiveUserAnotherTry = YES;
     [account setCaptchaImage:nil];  // We've used it all up.
-  } else {
-    [self resetCaptchaPresentation];
+  } else if (resizeNeeded) {
+    BOOL googleAppsCheckboxShowing = [self isGoogleAppsCheckboxShowing];
+    CGFloat newHeight
+      = [self windowHeightWithCheckboxShowing:googleAppsCheckboxShowing
+                               captchaShowing:NO];
+    NSRect windowFrame = [window frame];
+    CGFloat deltaHeight = newHeight - NSHeight(windowFrame);
+    windowFrame.size.height = newHeight;
+    windowFrame.origin.y -= deltaHeight;
+    [[window animator] setFrame:windowFrame display:YES];
   }
   return canGiveUserAnotherTry;
 }
 
+- (void)setGoogleAppsAccount:(BOOL)googleAppsAccount {
+  if (googleAppsAccount != googleAppsAccount_) {
+    googleAppsAccount_ = googleAppsAccount;
+    // Create an account of the appropriate type, hosted or non-hosted.
+    NSString *userName = [self accountName];
+    Class accountClass
+      = (googleAppsAccount) ? [GoogleAppsAccount class] : [GoogleAccount class];
+    HGSSimpleAccount *account
+      = [[[accountClass alloc] initWithName:userName] autorelease];
+    
+    [self setAccount:account];
+  }
+}
+
+- (void)setAccount:(HGSSimpleAccount *)account {
+  [super setAccount:account];
+  [self setCaptchaImage:nil];
+}
+
+- (void)setAccountName:(NSString *)userName {
+  [super setAccountName:userName];
+  
+  BOOL showCheckbox = NO;
+  if (userName) {
+    NSString *gmailDomain = HGSLocalizedString(@"@gmail.com", nil);
+    NSRange atRange = [userName rangeOfString:@"@"];
+    if (atRange.location != NSNotFound) {
+      NSString *domainString = [userName substringFromIndex:atRange.location];
+      NSUInteger gmailDomainLength = [gmailDomain length];
+      NSUInteger domainLength = [domainString length];
+      if (domainLength) {
+        if (domainLength <= gmailDomainLength) {
+          NSRange domainRange = NSMakeRange(0, domainLength);
+          NSComparisonResult result
+            = [gmailDomain compare:domainString
+                           options:NSCaseInsensitiveSearch
+                             range:domainRange];
+          showCheckbox = (result != NSOrderedSame);
+        } else {
+          showCheckbox = YES;
+        }
+      }
+    }
+  }
+  if (showCheckbox != [self isGoogleAppsCheckboxShowing]) {
+    [self setGoogleAppsCheckboxShowing:showCheckbox];
+    [googleAppsCheckbox_ setEnabled:showCheckbox];
+    if (showCheckbox) {
+      [[googleAppsCheckbox_ animator] setHidden:NO];
+    } else {
+      [googleAppsCheckbox_ setHidden:YES];
+    }
+
+    BOOL captchaShowing = [self captchaImage] != nil;
+    CGFloat newHeight = [self windowHeightWithCheckboxShowing:showCheckbox
+                                               captchaShowing:captchaShowing];
+    NSWindow *window = [captchaContainerView_ window];
+    NSRect windowFrame = [window frame];
+    CGFloat deltaHeight = newHeight - NSHeight(windowFrame);
+    windowFrame.size.height = newHeight;
+    windowFrame.origin.y -= deltaHeight;
+    [[window animator] setFrame:windowFrame display:YES];
+  }
+}
+
 #pragma mark SetUpGoogleAccountViewController Private Methods
 
-- (void)resetCaptchaPresentation {
-  // If we previously presented a captcha, resize our view, disable the captcha
-  // text field, and clear our memory of the captcha.
-  if (![captchaContainerView_ isHidden]) {
-    [[captchaContainerView_ animator] setHidden:YES];
-    CGFloat containerHeight = NSHeight([captchaContainerView_ frame]);
-    NSWindow *window = [captchaContainerView_ window];
-    if (window) {
+- (void)loadView {
+  [super loadView];
+  
+  // Hide the captcha section.
+  [captchaContainerView_ setHidden:YES];
+  CGFloat containerHeight = NSHeight([captchaContainerView_ frame]);
+  NSView *view = [self view];  // Resize
+  NSSize frameSize = [view frame].size;
+  frameSize.height -= containerHeight;
+  
+  // Hide the Google Apps checkbox.
+  CGFloat checkboxHeight = NSHeight([googleAppsCheckbox_ frame]) + 4.0;
+  [self setGoogleAppsCheckboxShowing:NO];
+  [googleAppsCheckbox_ setHidden:YES];
+  [googleAppsCheckbox_ setEnabled:NO];
+  frameSize.height -= checkboxHeight;
+  
+  [view setFrameSize:frameSize];
+  
+  [captchaTextField_ setEnabled:NO];
+  [self setCaptchaText:@""];
+  [self setCaptchaImage:nil];
+}
+
+- (void)determineWindowSizes {
+  // This assumes that the window has been resized to fit the view and the
+  // view is not showing the checkbox of captcha.
+  NSWindow *parentWindow = [captchaContainerView_ window];
+  CGFloat checkboxHeight = NSHeight([googleAppsCheckbox_ frame]) + 4.0;;
+  CGFloat captchaHeight = NSHeight([captchaContainerView_ frame]);
+  
+  windowHeightNoCheckboxNoCaptcha_ = NSHeight([parentWindow frame]);
+  windowHeightNoCheckboxCaptcha_
+    = windowHeightNoCheckboxNoCaptcha_ + captchaHeight;
+  windowHeightCheckboxNoCaptcha_
+    = windowHeightNoCheckboxNoCaptcha_ + checkboxHeight;
+  windowHeightCheckboxCaptcha_
+    = windowHeightNoCheckboxCaptcha_ + checkboxHeight;
+  [self setWindowSizesDetermined:YES];
+}
+
+- (CGFloat)windowHeightWithCheckboxShowing:(BOOL)googleAppsCheckboxShowing
+                            captchaShowing:(BOOL)captchaShowing {
+  if (![self isWindowSizesDetermined]) {
+    [self determineWindowSizes];
+  }
+  CGFloat newHeight = 0.0;
+  if (googleAppsCheckboxShowing) {
+    newHeight = (captchaShowing)
+                ? windowHeightCheckboxCaptcha_
+                : windowHeightCheckboxNoCaptcha_;
+  } else {
+    newHeight = (captchaShowing)
+                ? windowHeightNoCheckboxCaptcha_
+                : windowHeightNoCheckboxNoCaptcha_;
+  }
+  return newHeight;
+}
+
+- (void)setCaptchaImage:(NSImage *)captcha {
+  if (captcha != captchaImage_) {
+    BOOL didShow = (captchaImage_ != nil);
+    BOOL willShow =  (captcha != nil);
+    [captchaImage_ release];
+    captchaImage_ = [captcha retain];
+    // Show/hide the captcha image area.
+    if (didShow != willShow) {
+      BOOL googleAppsCheckboxShowing = [self isGoogleAppsCheckboxShowing];
+      CGFloat newHeight
+        = [self windowHeightWithCheckboxShowing:googleAppsCheckboxShowing
+                                 captchaShowing:willShow];
+      NSWindow *window = [captchaContainerView_ window];
       NSRect windowFrame = [window frame];
-      windowFrame.origin.y += containerHeight;
-      windowFrame.size.height -= containerHeight;
+      CGFloat deltaHeight = newHeight - NSHeight(windowFrame);
+      windowFrame.size.height = newHeight;
+      windowFrame.origin.y -= deltaHeight;
+      
+      [captchaTextField_ setEnabled:willShow];
+      [self setCaptchaText:nil];
       [[window animator] setFrame:windowFrame display:YES];
-      [window makeFirstResponder:userNameField_];
-    } else {
-      NSView *view = [self view];  // Resize
-      NSSize frameSize = [view frame].size;
-      frameSize.height -= containerHeight;
-      [view setFrameSize:frameSize];
+      if (willShow) {
+        [[captchaContainerView_ animator] setHidden:NO];
+      } else {
+        [window makeFirstResponder:userNameField_];
+        [captchaContainerView_ setHidden:YES];
+      }
     }
-    
-    [captchaTextField_ setEnabled:NO];
-    [self setCaptchaText:@""];
-    [self setCaptchaImage:nil];
-    GoogleAccount *account = (GoogleAccount *)[self account];
-    [account setCaptchaImage:nil];
   }
-}
-
-@end
-
-
-@implementation GoogleAccountTypeSheetController
-
-@synthesize userName = userName_;
-@synthesize googleAppsUserName = googleAppsUserName_;
-@synthesize selectedAccountIndex = selectedAccountIndex_;
-
-- (id)initWithUserName:(NSString *)userName {
-  self = [super initWithWindowNibName:@"GoogleAccountTypeSheet"];
-  if (self) {
-    [self setUserName:userName];
-    NSString *format = HGSLocalizedString(@"%@ — Google Apps", nil);
-    NSString *appsName = [NSString stringWithFormat:format, userName];
-    [self setGoogleAppsUserName:appsName];
-  }
-  return self;
-}
-
-- (IBAction)chooseNeither:(id)sender {
-  [NSApp stopModalWithCode:(NSInteger)eGoogleAccountTypeChooseNeither];
-}
-
-- (IBAction)chooseSelected:(id)sender {
-  [NSApp stopModalWithCode:(NSInteger)eGoogleAccountTypeChooseSelected];
 }
 
 @end

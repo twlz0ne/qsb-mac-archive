@@ -29,7 +29,7 @@
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Google Bookmarks</string>
-			<key>HGSExtensionDesiredAccountType</key>
+			<key>HGSExtensionDesiredAccountTypes</key>
 			<array>
 				<string>Google</string>
 				<string>GoogleApps</string>

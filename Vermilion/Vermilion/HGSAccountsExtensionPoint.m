@@ -76,8 +76,8 @@ GTM_METHOD_CHECK(NSEnumerator,
 }
 
 - (void)addAccountType:(NSString *)accountType withClass:(Class)accountClass {
-  static NSString * const sAccountTypeNamesKey = @"accountTypeNames";
-  [self willChangeValueForKey:sAccountTypeNamesKey];
+  static NSString * const sVisibleAccountTypeNamesKey = @"visibleAccountTypeDisplayNames";
+  [self willChangeValueForKey:sVisibleAccountTypeNamesKey];
   if (!accountTypes_) {
     accountTypes_ = [[NSMutableDictionary dictionaryWithObject:accountClass
                                                        forKey:accountType]
@@ -85,7 +85,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   } else {
     [accountTypes_ setObject:accountClass forKey:accountType];
   }
-  [self didChangeValueForKey:sAccountTypeNamesKey];
+  [self didChangeValueForKey:sVisibleAccountTypeNamesKey];
 }
 
 - (Class)classForAccountType:(NSString *)accountType {
@@ -93,9 +93,17 @@ GTM_METHOD_CHECK(NSEnumerator,
   return accountClass;
 }
 
-- (NSArray *)accountTypeNames {
-  NSArray *accountTypeNames = [accountTypes_ allKeys];
-  return accountTypeNames;
+- (NSArray *)visibleAccountTypeDisplayNames {
+  NSMutableArray *visibleAccountTypeDisplayNames
+    = [NSMutableArray arrayWithCapacity:[accountTypes_ count]];
+  for (NSString *accountTypeName in accountTypes_) {
+    // TODO(mrossetti): The following will not be required once we refactor
+    // accounts and account types.  This is a temporary work-around.
+    if (![accountTypeName isEqualToString:@"GoogleApps"]) {
+      [visibleAccountTypeDisplayNames addObject:accountTypeName];
+    }
+  }
+  return visibleAccountTypeDisplayNames;
 }
 
 - (NSArray *)accountsForType:(NSString *)type {

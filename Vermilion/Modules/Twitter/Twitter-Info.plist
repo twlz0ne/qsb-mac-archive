@@ -43,7 +43,7 @@
 			<string>text</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.text.action.sendtwittermessage</string>
-			<key>HGSExtensionDesiredAccountType</key>
+			<key>HGSExtensionDesiredAccountTypes</key>
 			<string>Twitter</string>
 			<key>HGSExtensionIsEnabledByDefault</key>
 			<true/>

@@ -388,7 +388,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 - (void)setupSheetDidEnd:(NSWindow *)sheet 
               returnCode:(NSInteger)returnCode 
              contextInfo:(void *)contextInfo {
-  [sheet orderOut:self];
+  [sheet close];
 }
 
 - (void)updateColorPopup {

@@ -245,15 +245,21 @@ static NSString *const kHGSPluginAPIVersionKey
   // added account and, if so, add them to our sources.
   NSDictionary *userInfo = [notification userInfo];
   id<HGSAccount> account = [userInfo objectForKey:kHGSExtensionKey];
-  NSMutableArray *newExtensions = [NSMutableArray array];
-  for (HGSProtoExtension *factorableExtension in factorableProtoExtensions_) {
-    HGSProtoExtension *newProtoExtension
-      = [factorableExtension factorForAccount:account];
-    if (newProtoExtension) {
-      [newExtensions addObject:newProtoExtension];
+  // Only factor for accounts with a userName.
+  NSString *userName = [account userName];
+  // TODO(mrossetti): The following will not be required once we refactor
+  // accounts and account types.  This is a temporary work-around.
+  if ([userName length]) {
+    NSMutableArray *newExtensions = [NSMutableArray array];
+    for (HGSProtoExtension *factorableExtension in factorableProtoExtensions_) {
+      HGSProtoExtension *newProtoExtension
+        = [factorableExtension factorForAccount:account];
+      if (newProtoExtension) {
+        [newExtensions addObject:newProtoExtension];
+      }
     }
+    [self addProtoExtensions:newExtensions install:YES];
   }
-  [self addProtoExtensions:newExtensions install:YES];
 }
 
 - (void)addProtoExtensions:(NSArray *)protoExtensions

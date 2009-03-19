@@ -43,10 +43,11 @@
 //
 @interface QSBSetUpAccountWindowController : NSWindowController {
  @private
-  IBOutlet NSArrayController *accountTypesController_;
+  IBOutlet NSArrayController *accountTypeDisplayNamesController_;
   IBOutlet NSView *setupContainerView_;  // Account view inserts here.
-  NSView *installedSetupView_;  // The currently inserted account view.
-  NSArray *accountTypes_;  // List of account type names for popup.
+  // The currently installed account setup view controller.
+  NSViewController *installedSetupViewController_;
+  NSArray *accountTypeDisplayNames_;  // List of account type names for popup.
   NSString *selectedAccountType_;
   __weak NSWindow *parentWindow_;
 }

@@ -38,8 +38,6 @@
 //
 @interface GoogleAccount : HGSSimpleAccount {
  @private
-  BOOL googleAppsAccount_;  // YES if this is a hosted account.
-  BOOL accountTypeKnown_;  // YES if we've determined the kind of account.
   // Temporary container for account authentication exchange.
   NSMutableData *responseData_;
   // The presence of a captchaImage_ indicates that one such should be shown
@@ -51,8 +49,6 @@
   NSString *captchaToken_;  // Captcha token.
 }
 
-@property (nonatomic, getter=isGoogleAppsAccount) BOOL googleAppsAccount;
-@property (nonatomic, getter=isAccountTypeKnown) BOOL accountTypeKnown;
 @property (nonatomic, retain) NSImage *captchaImage;
 @property (nonatomic, copy) NSString *captchaText;
 @property (nonatomic, copy) NSString *captchaToken;
@@ -96,36 +92,30 @@
   IBOutlet NSView *captchaContainerView_;
   IBOutlet NSTextField *captchaTextField_;
   IBOutlet NSTextField *userNameField_;
+  IBOutlet NSButton *googleAppsCheckbox_;
   
   NSImage *captchaImage_;  // The captcha image presented to the user.
   NSString *captchaText_;  // The captcha text typed by the user.
+  BOOL googleAppsAccount_;  // YES for a Google Apps account.
+  // Have to use |checkboxShowing_| because we animate showing of the checkbox 
+  // and the 'hidden' atttribute of the checkbox field is not reliable 
+  // until the animation has completed.
+  BOOL googleAppsCheckboxShowing_;
+  BOOL windowSizesDetermined_;  // NO until we've calculated window sizes.
+  // Precalculated window heights to accommodate animations.  A delta cannot
+  // be calculated as needed because the window might be in the middle of
+  // an animation and thus its height not yet finalized.
+  CGFloat windowHeightNoCheckboxNoCaptcha_;
+  CGFloat windowHeightCheckboxNoCaptcha_;
+  CGFloat windowHeightNoCheckboxCaptcha_;
+  CGFloat windowHeightCheckboxCaptcha_;
 }
 
 @property (nonatomic, retain) NSImage *captchaImage;
 @property (nonatomic, copy) NSString *captchaText;
+@property (nonatomic, getter=isGoogleAppsAccount) BOOL googleAppsAccount;
 
 // Open google.com in the user's preferred browser.
 - (IBAction)goToGoogle:(id)sender;
-
-@end
-
-// A private window controller that helps the user decide between a hosted
-// account and a non-hosted account during setup.
-@interface GoogleAccountTypeSheetController : NSWindowController {
- @private
-  NSString *userName_;
-  NSString *googleAppsUserName_;
-  NSInteger selectedAccountIndex_;
-}
-
-@property (nonatomic, copy) NSString *userName;
-@property (nonatomic, copy) NSString *googleAppsUserName;
-@property (nonatomic) NSInteger selectedAccountIndex;
-
-// Designated initializer.
-- (id)initWithUserName:(NSString *)userName;
-
-- (IBAction)chooseNeither:(id)sender;
-- (IBAction)chooseSelected:(id)sender;
 
 @end

@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1" id="9"/>
+			<integer value="55"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -33,7 +33,7 @@
 					<object class="NSTextField" id="222078252">
 						<reference key="NSNextResponder" ref="1005"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 258}, {149, 17}}</string>
+						<string key="NSFrame">{{17, 278}, {149, 17}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="257252732">
@@ -69,7 +69,7 @@
 					<object class="NSTextField" id="278445815">
 						<reference key="NSNextResponder" ref="1005"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{98, 229}, {68, 17}}</string>
+						<string key="NSFrame">{{98, 249}, {68, 17}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="1066625535">
@@ -85,7 +85,7 @@
 					<object class="NSTextField" id="573982667">
 						<reference key="NSNextResponder" ref="1005"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{171, 256}, {226, 22}}</string>
+						<string key="NSFrame">{{171, 276}, {226, 22}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="462839794">
@@ -115,7 +115,7 @@
 					<object class="NSSecureTextField" id="669544908">
 						<reference key="NSNextResponder" ref="1005"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{171, 224}, {226, 22}}</string>
+						<string key="NSFrame">{{171, 244}, {226, 22}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSecureTextFieldCell" key="NSCell" id="262889025">
@@ -176,7 +176,7 @@
 					<object class="NSButton" id="553429500">
 						<reference key="NSNextResponder" ref="1005"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{18, 284}, {50, 50}}</string>
+						<string key="NSFrame">{{18, 304}, {50, 50}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="579508659">
@@ -204,7 +204,7 @@
 					<object class="NSTextField" id="678688732">
 						<reference key="NSNextResponder" ref="1005"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{71, 297}, {253, 26}}</string>
+						<string key="NSFrame">{{71, 317}, {253, 26}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="560681006">
@@ -277,7 +277,7 @@
 							<object class="NSTextField" id="477901243">
 								<reference key="NSNextResponder" ref="129662236"/>
 								<int key="NSvFlags">268</int>
-								<string key="NSFrame">{{-3, 17}, {195, 17}}</string>
+								<string key="NSFrame">{{-3, 13}, {195, 17}}</string>
 								<reference key="NSSuperview" ref="129662236"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSTextFieldCell" key="NSCell" id="476970945">
@@ -293,7 +293,7 @@
 							<object class="NSTextField" id="949214813">
 								<reference key="NSNextResponder" ref="129662236"/>
 								<int key="NSvFlags">268</int>
-								<string key="NSFrame">{{0, 38}, {226, 22}}</string>
+								<string key="NSFrame">{{0, 34}, {226, 22}}</string>
 								<reference key="NSSuperview" ref="129662236"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSTextFieldCell" key="NSCell" id="701313248">
@@ -312,8 +312,35 @@
 						<reference key="NSSuperview" ref="1005"/>
 						<string key="NSClassName">NSView</string>
 					</object>
+					<object class="NSButton" id="625805093">
+						<reference key="NSNextResponder" ref="1005"/>
+						<int key="NSvFlags">-2147483380</int>
+						<string key="NSFrame">{{169, 220}, {217, 18}}</string>
+						<reference key="NSSuperview" ref="1005"/>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSButtonCell" key="NSCell" id="723007339">
+							<int key="NSCellFlags">-2080244224</int>
+							<int key="NSCellFlags2">0</int>
+							<string key="NSContents">This is a Google Apps account.</string>
+							<reference key="NSSupport" ref="877674271"/>
+							<reference key="NSControlView" ref="625805093"/>
+							<int key="NSButtonFlags">1211912703</int>
+							<int key="NSButtonFlags2">130</int>
+							<object class="NSCustomResource" key="NSNormalImage">
+								<string key="NSClassName">NSImage</string>
+								<string key="NSResourceName">NSSwitch</string>
+							</object>
+							<object class="NSButtonImageSource" key="NSAlternateImage">
+								<string key="NSImageName">NSSwitch</string>
+							</object>
+							<string key="NSAlternateContents"/>
+							<string key="NSKeyEquivalent"/>
+							<int key="NSPeriodicDelay">200</int>
+							<int key="NSPeriodicInterval">25</int>
+						</object>
+					</object>
 				</object>
-				<string key="NSFrameSize">{417, 333}</string>
+				<string key="NSFrameSize">{417, 353}</string>
 				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 			</object>
@@ -425,7 +452,7 @@
 							<string key="NSKeyPath">accountName</string>
 							<object class="NSDictionary" key="NSOptions">
 								<string key="NS.key.0">NSContinuouslyUpdatesValue</string>
-								<reference key="NS.object.0" ref="9"/>
+								<integer value="1" key="NS.object.0" id="9"/>
 							</object>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
@@ -520,6 +547,30 @@
 					</object>
 					<int key="connectionID">87</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">googleAppsCheckbox_</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="625805093"/>
+					</object>
+					<int key="connectionID">90</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: googleAppsAccount</string>
+						<reference key="source" ref="625805093"/>
+						<reference key="destination" ref="1001"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="625805093"/>
+							<reference key="NSDestination" ref="1001"/>
+							<string key="NSLabel">value: googleAppsAccount</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">googleAppsAccount</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">91</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -564,6 +615,7 @@
 							<reference ref="922667850"/>
 							<reference ref="222078252"/>
 							<reference ref="278445815"/>
+							<reference ref="625805093"/>
 						</object>
 						<reference key="parent" ref="1002"/>
 						<string key="objectName">Google Account Setup</string>
@@ -753,6 +805,20 @@
 						<reference key="object" ref="701313248"/>
 						<reference key="parent" ref="949214813"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">88</int>
+						<reference key="object" ref="625805093"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="723007339"/>
+						</object>
+						<reference key="parent" ref="1005"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">89</int>
+						<reference key="object" ref="723007339"/>
+						<reference key="parent" ref="625805093"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -791,6 +857,8 @@
 					<string>7.IBPluginDependency</string>
 					<string>70.IBPluginDependency</string>
 					<string>8.IBPluginDependency</string>
+					<string>88.IBPluginDependency</string>
+					<string>89.IBPluginDependency</string>
 					<string>9.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
@@ -798,11 +866,13 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{80, 127}, {417, 333}}</string>
+					<string>{{631, 719}, {417, 353}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="9"/>
+					<integer value="0"/>
 					<string>{628, 654}</string>
 					<string>{{357, 416}, {480, 272}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -850,7 +920,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">87</int>
+			<int key="maxID">91</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -958,12 +1028,14 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>captchaContainerView_</string>
 							<string>captchaTextField_</string>
+							<string>googleAppsCheckbox_</string>
 							<string>userNameField_</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSView</string>
 							<string>NSTextField</string>
+							<string>NSButton</string>
 							<string>NSTextField</string>
 						</object>
 					</object>

@@ -139,7 +139,7 @@
   // We are factorable if we are looking for accounts.  
   // TODO(mrossetti): Additional types of factors may be added in the future.
   NSString *desiredAccountType
-    = [configuration_ objectForKey:kHGSExtensionDesiredAccountType];
+    = [configuration_ objectForKey:kHGSExtensionDesiredAccountTypes];
   BOOL factorsByAccount = (desiredAccountType != nil);
   return factorsByAccount;
 }
@@ -399,7 +399,7 @@
 
 - (NSArray *)desiredAccountTypes {
   NSArray *desiredAccountTypes
-    = [configuration_ objectForKey:kHGSExtensionDesiredAccountType];
+    = [configuration_ objectForKey:kHGSExtensionDesiredAccountTypes];
   if ([desiredAccountTypes isKindOfClass:[NSString class]]) {
     desiredAccountTypes = [NSArray arrayWithObject:desiredAccountTypes];
   }

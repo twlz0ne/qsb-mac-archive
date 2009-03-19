@@ -55,11 +55,10 @@
 @synthesize accountEditController = accountEditController_;
 @synthesize connection = connection_;
 
-- (id)initWithName:(NSString *)userName
-              type:(NSString *)type {
+- (id)initWithName:(NSString *)userName {
   // Perform any adjustments on the account name required.
   userName = [self adjustUserName:userName];
-  self = [super initWithName:userName type:type];
+  self = [super initWithName:userName];
   return self;
 }
 
@@ -117,7 +116,8 @@
   return password;
 }
 
-+ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow {
++ (NSViewController *)
+    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow {
   HGSLogDebug(@"Class '%@', deriving from HGSSimpleAccount, should override "
               @"accountSetupViewToInstallWithParentWindow.", [self class]);
   return nil;
@@ -366,23 +366,17 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
   NSString *userName = [self accountName];
   if ([userName length] > 0) {
     NSString *password = [self accountPassword];
-    HGSSimpleAccount *newAccount = [self account];
-    if (newAccount) {
-      [newAccount setUserName:userName];
-    } else {
-      // Create the new account entry.
-      NSString *accountType = [accountTypeClass_ accountType];
-      newAccount = [[[accountTypeClass_ alloc] initWithName:userName
-                                                       type:accountType]
-                    autorelease];
-      [self setAccount:newAccount];
 
-      // Update the account name in case initWithName: adjusted it.
-      NSString *revisedAccountName = [newAccount userName];
-      if ([revisedAccountName length]) {
-        userName = revisedAccountName;
-        [self setAccountName:userName];
-      }
+    // Create a new account entry.
+    HGSSimpleAccount *newAccount
+      = [[[accountTypeClass_ alloc] initWithName:userName] autorelease];
+    [self setAccount:newAccount];
+    
+    // Update the account name in case initWithName: adjusted it.
+    NSString *revisedAccountName = [newAccount userName];
+    if ([revisedAccountName length]) {
+      userName = revisedAccountName;
+      [self setAccountName:userName];
     }
     
     BOOL isGood = YES;
@@ -393,10 +387,10 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
     if ([accountsPoint extensionWithIdentifier:accountIdentifier]) {
       isGood = NO;
       NSString *summary = HGSLocalizedString(@"Account already set up.",
-                                            nil);
+                                             nil);
       NSString *format
-        = HGSLocalizedString(@"The account '%@' has already been set up for "
-                            @"use in Quick Search Box.", nil);
+      = HGSLocalizedString(@"The account '%@' has already been set up for "
+                           @"use in Quick Search Box.", nil);
       [self presentMessageOffWindow:sheet
                         withSummary:summary
                   explanationFormat:format
@@ -420,21 +414,21 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
                                      withUsername:userName
                                          password:password]; 
         }
-
+        
         // Install the account.
         isGood = [accountsPoint extendWithObject:newAccount];
         if (isGood) {
           [NSApp endSheet:sheet];
           NSString *summary
-            = HGSLocalizedString(@"Enable searchable items for this account.",
-                                                nil);
+          = HGSLocalizedString(@"Enable searchable items for this account.",
+                               nil);
           NSString *format
-            = HGSLocalizedString(@"One or more search sources may have been "
-                                @"added for the account '%@'. It may be "
-                                @"necessary to manually enable each search "
-                                @"source that uses this account.  Do so via "
-                                @"the 'Searchable Items' tab in Preferences.",
-                                nil);
+          = HGSLocalizedString(@"One or more search sources may have been "
+                               @"added for the account '%@'. It may be "
+                               @"necessary to manually enable each search "
+                               @"source that uses this account.  Do so via "
+                               @"the 'Searchable Items' tab in Preferences.",
+                               nil);
           [self presentMessageOffWindow:[self parentWindow]
                             withSummary:summary
                       explanationFormat:format
@@ -450,11 +444,11 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
         // If we can't help the user fix things, tell them they've got
         // something wrong.
         NSString *summary = HGSLocalizedString(@"Could not authenticate that "
-                                              @"account.", nil);
+                                               @"account.", nil);
         NSString *format
-          = HGSLocalizedString(@"The account '%@' could not be authenticated. "
-                              @"Please check the account name and password "
-                              @"and try again.", nil);
+        = HGSLocalizedString(@"The account '%@' could not be authenticated. "
+                             @"Please check the account name and password "
+                             @"and try again.", nil);
         [self presentMessageOffWindow:sheet
                           withSummary:summary
                     explanationFormat:format

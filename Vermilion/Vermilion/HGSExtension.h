@@ -131,8 +131,9 @@ extern NSString *const kHGSExtensionIconImagePathKey;
 extern NSString *const kHGSExtensionEnabledKey;
 // NSBundle bundle associated with the extension
 extern NSString *const kHGSExtensionBundleKey;
-// Type of accounts in which the extension is interested.
-extern NSString *const kHGSExtensionDesiredAccountType;
+// Types of accounts in which the extension is interested.  This may be a
+// single NSString specifying the account type, or an array of NSStrings.
+extern NSString *const kHGSExtensionDesiredAccountTypes;
 // Type of accounts in which the extension is offering.
 extern NSString *const kHGSExtensionOfferedAccountType;
 // YES if the extension presented to the user in the preferences panel.

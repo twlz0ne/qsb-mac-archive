@@ -43,8 +43,7 @@
 @protocol HGSAccount <HGSExtension>
 
 // Initialize a new account entry.
-- (id)initWithName:(NSString *)userName
-              type:(NSString *)type;
+- (id)initWithName:(NSString *)userName;
 
 // Reconstitute an account entry from a dictionary.
 - (id)initWithDictionary:(NSDictionary *)prefDict;
@@ -69,9 +68,10 @@
 // function in order to insure notifications are sent.
 - (void)setPassword:(NSString *)password;
 
-// Provide a view that will be installed in an account setup window.
-// |parentWindow| is provided as a place off which to hang alerts. 
-+ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow;
+// Provide a view controller whose view will be installed in an account setup
+// window.  |parentWindow| is provided as a place off which to hang alerts. 
++ (NSViewController *)
+    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow;
 
 // Do whatever is appropriate in order to edit the account.  |parentWindow|
 // is provided as a place off which to hang an edit sheet, if desired.
@@ -111,18 +111,16 @@
 //
 @interface HGSAccount : HGSExtension <HGSAccount> {
  @private
-  NSString *userName_;
-  NSString *type_;
+  NSString *userName_; // AKA the account name.
   BOOL authenticated_;
 }
 
-@property (nonatomic, copy) NSString *userName;
-@property (nonatomic, copy) NSString *type;
+@property (nonatomic, copy, readonly) NSString *userName;
+@property (nonatomic, copy, readonly) NSString *type;
 @property (nonatomic, getter=isAuthenticated) BOOL authenticated;
 
-// Initialize a new account entry.
-- (id)initWithName:(NSString *)userName
-              type:(NSString *)accountType;
+// Initialize a new account entry 
+- (id)initWithName:(NSString *)userName;
 
 // Return a dictionary describing the account appropriate for archiving
 // to preferences.
@@ -131,20 +129,15 @@
 // Return a display name for the account.
 - (NSString *)displayName;
 
-// Return the type (google/facebook/etc.) of the account.
-- (NSString *)type;
-
-// Return the account name.
-- (NSString *)userName;
-
 // Get the password for the account.  The default returns nil.
 - (NSString *)password;
 
 // If the password authenticates then set it and return YES.
 - (BOOL)setPassword:(NSString *)password;
 
-// The default view provider returns nil.
-+ (NSView *)setupViewToInstallWithParentWindow:(NSWindow *)parentWindow;
+// The default view controller provider returns nil.
++ (NSViewController *)
+    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow;
 
 // The default account edit function does nothing.
 - (void)editWithParentWindow:(NSWindow *)parentWindow;
