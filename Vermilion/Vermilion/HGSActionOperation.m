@@ -39,14 +39,14 @@ NSString *const kHGSActionDidPerformNotification = @"HSGActionDidPerformNotifica
 NSString* const kHGSActionCompletedSuccessfully = @"HGSActionCompletedSuccessfully";
 
 @implementation HGSActionOperation
-- (id)initWithAction:(id<HGSAction>)action 
+- (id)initWithAction:(HGSAction *)action 
        directObjects:(HGSResultArray *)directObjects {
   return [self initWithAction:action
                 directObjects:directObjects
               indirectObjects:nil];
 }
 
-- (id)initWithAction:(id<HGSAction>)action 
+- (id)initWithAction:(HGSAction *)action 
        directObjects:(HGSResultArray *)directObjects
      indirectObjects:(HGSResultArray *)indirectObjects {
   if ((self = [super init])) {
@@ -72,11 +72,9 @@ NSString* const kHGSActionCompletedSuccessfully = @"HGSActionCompletedSuccessful
 
 - (NSDictionary*)performAction {
   NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-  NSNotification *notification
-    = [NSNotification notificationWithName:kHGSActionWillPerformNotification
-                                    object:action_
-                                  userInfo:args_];
-  [center postNotification:notification];
+  [center postNotificationName:kHGSActionWillPerformNotification
+                        object:action_
+                      userInfo:args_];
   // TODO(dmaclach): when we want to revisit results on actions, no only do we
   // need a result vs. success, we also need to figure out how we want to manage
   // actions that take a while.  this currently works synchronous to the main
@@ -95,11 +93,9 @@ NSString* const kHGSActionCompletedSuccessfully = @"HGSActionCompletedSuccessful
   }
   NSNumber *success = [NSNumber numberWithBool:result ? YES : NO];
   [args_ setObject:success forKey:kHGSActionCompletedSuccessfully];
-  notification 
-    = [NSNotification notificationWithName:kHGSActionDidPerformNotification
-                                    object:action_
-                                  userInfo:args_];
-  [center postNotification:notification];
+  [center postNotificationName:kHGSActionDidPerformNotification
+                        object:action_
+                      userInfo:args_];
   return args_;
 }
 
