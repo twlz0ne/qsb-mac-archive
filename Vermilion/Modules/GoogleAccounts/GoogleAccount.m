@@ -47,6 +47,7 @@ static NSString *const kAccountTestFormat
   = @"https://www.google.com/accounts/ClientLogin?Email=%@&Passwd=%@"
     @"&source=GoogleQuickSearch&accountType=%@";
 static NSString *const kGoogleAccountType = @"GOOGLE";
+static NSString *const kGoogleCorpAccountType = @"HOSTED_OR_GOOGLE";
 static NSString *const kHostedAccountType = @"HOSTED";
 static NSString *const accountCaptchaFormat = @"&logintoken=%@&logincaptcha=%@";
 static NSString *const kCaptchaImageURLPrefix
@@ -155,7 +156,20 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSString *encodedAccountName = [userName gtm_stringByEscapingForURLArgument];
   NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
   BOOL hosted = [self isKindOfClass:[GoogleAppsAccount class]];
-  NSString *accountType = (hosted) ? kHostedAccountType : kGoogleAccountType;
+  NSString *accountType = kHostedAccountType;
+  if (!hosted) {
+    accountType = kGoogleAccountType;
+    NSString *googleDomain = @"@google.com"; // Not localized.
+    NSRange atRange = [userName rangeOfString:@"@"];
+    if (atRange.location != NSNotFound) {
+      NSString *domainString = [userName substringFromIndex:atRange.location];
+      NSComparisonResult result
+        = [googleDomain compare:domainString options:NSCaseInsensitiveSearch];
+      if (result == NSOrderedSame) {
+        accountType = kGoogleCorpAccountType;
+      }
+    }
+  }
   NSString *accountTestString = [NSString stringWithFormat:kAccountTestFormat,
                                  encodedAccountName, encodedPassword,
                                  accountType];
@@ -482,15 +496,24 @@ didReceiveResponse:(NSURLResponse *)response {
       NSUInteger gmailDomainLength = [gmailDomain length];
       NSUInteger domainLength = [domainString length];
       if (domainLength) {
+        showCheckbox = YES;
         if (domainLength <= gmailDomainLength) {
           NSRange domainRange = NSMakeRange(0, domainLength);
-          NSComparisonResult result
+          NSComparisonResult gmailResult
             = [gmailDomain compare:domainString
                            options:NSCaseInsensitiveSearch
                              range:domainRange];
-          showCheckbox = (result != NSOrderedSame);
-        } else {
-          showCheckbox = YES;
+          showCheckbox = (gmailResult != NSOrderedSame);
+        }
+        NSString *googleDomain = @"@google.com"; // Not localized.
+        NSUInteger googleDomainLength = [googleDomain length];
+        if (showCheckbox && domainLength <= googleDomainLength) {
+          NSRange domainRange = NSMakeRange(0, domainLength);
+          NSComparisonResult googleResult
+            = [googleDomain compare:domainString
+                            options:NSCaseInsensitiveSearch
+                              range:domainRange];
+          showCheckbox = (googleResult != NSOrderedSame);
         }
       }
     }
