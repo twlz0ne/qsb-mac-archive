@@ -83,7 +83,7 @@
                      plugin:(HGSPlugin *)plugin {
   if ((self = [super init])) {
     configuration_ 
-      = [[NSMutableDictionary alloc] initWithConfiguration:configuration];
+      = [[NSMutableDictionary alloc] initWithDictionary:configuration];
     
     plugin_ = plugin;
     
