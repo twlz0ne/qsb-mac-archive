@@ -49,7 +49,7 @@ static NSString *const kAccountTestFormat
 static NSString *const kGoogleAccountType = @"GOOGLE";
 static NSString *const kGoogleCorpAccountType = @"HOSTED_OR_GOOGLE";
 static NSString *const kHostedAccountType = @"HOSTED";
-static NSString *const accountCaptchaFormat = @"&logintoken=%@&logincaptcha=%@";
+static NSString *const kAccountCaptchaFormat = @"&logintoken=%@&logincaptcha=%@";
 static NSString *const kCaptchaImageURLPrefix
   = @"http://www.google.com/accounts/";
 
@@ -177,7 +177,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   if ([captchaText length]) {
     NSString *captchaToken = [self captchaToken];
     accountTestString = [accountTestString stringByAppendingFormat:
-                         accountCaptchaFormat, captchaToken, captchaText];
+                         kAccountCaptchaFormat, captchaToken, captchaText];
     // Clear for next time.
     [self setCaptchaImage:nil];
     [self setCaptchaText:nil];
@@ -407,6 +407,7 @@ didReceiveResponse:(NSURLResponse *)response {
   [super dealloc];
 }
 
+#if 0
 - (IBAction)acceptSetupAccountSheet:(id)sender {
   // If we're showing a captcha then we need to pass along the captcha text
   // to the account for authentication.
@@ -417,6 +418,7 @@ didReceiveResponse:(NSURLResponse *)response {
   }
   [super acceptSetupAccountSheet:sender];
 }
+#endif
 
 - (IBAction)goToGoogle:(id)sender {
   [GoogleAccount openGoogleHomePage];
@@ -480,7 +482,19 @@ didReceiveResponse:(NSURLResponse *)response {
 }
 
 - (void)setAccount:(HGSSimpleAccount *)account {
+  // Remember the old captchaToken.
+  GoogleAccount *oldAccount = (GoogleAccount *)[self account];
+  NSString *captchaToken
+    = (oldAccount) ? [NSString stringWithString:[oldAccount captchaToken]] : nil;
   [super setAccount:account];
+  // If we're showing a captcha then we need to pass along the captcha text
+  // to the account for authentication.
+  if (captchaToken) {
+    GoogleAccount *newAccount = (GoogleAccount *)account;
+    NSString *captchaText = [self captchaText];
+    [newAccount setCaptchaText:captchaText];
+    [newAccount setCaptchaToken:captchaToken];
+  }
   [self setCaptchaImage:nil];
 }
 
