@@ -37,7 +37,7 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include "../externals/google-toolbox-for-mac/XcodeConfig/Target/LoadableBundle.xcconfig"
+#include "../../externals/google-toolbox-for-mac/XcodeConfig/Target/LoadableBundle.xcconfig"
 
 // For both Release and Debug we need debug symbols so that line numbers
 // appear in the crash output.

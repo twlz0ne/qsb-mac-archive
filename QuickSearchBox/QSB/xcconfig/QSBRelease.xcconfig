@@ -33,7 +33,7 @@
 //
 
 // Pull in our general Google settings
-#include "../externals/google-toolbox-for-mac/XcodeConfig/Project/ReleaseLeopardOrLater.xcconfig"
+#include "../../externals/google-toolbox-for-mac/XcodeConfig/Project/ReleaseLeopardOrLater.xcconfig"
 
 // Pull in our QSB Settings
 #include "QSB.xcconfig"
