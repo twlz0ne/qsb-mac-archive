@@ -39,7 +39,7 @@
 
 @class HGSPlugin;
 @class HGSExtension;
-@protocol HGSAccount;
+@class HGSAccount;
 
 /*!
   An HGSProtoExtension manages an HGSExtension.  Typically, a list of these
@@ -143,7 +143,7 @@
   protoExtension is not factorable on account then return nil.
   TODO(mrossetti): Generalize this when additional factor types are introduced.
 */
-- (HGSProtoExtension *)factorForAccount:(id<HGSAccount>)account;
+- (HGSProtoExtension *)factorForAccount:(HGSAccount *)account;
 
 /*!
   Install the extension represented by this protoextension. This will add

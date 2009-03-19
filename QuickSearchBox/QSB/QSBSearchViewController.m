@@ -168,7 +168,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   return [searchController_ results];
 }
 
-- (void)performAction:(id<HGSAction>)action
+- (void)performAction:(HGSAction *)action
           withResults:(HGSResultArray *)results {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   NSMutableDictionary *userInfo 

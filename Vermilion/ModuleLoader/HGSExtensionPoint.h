@@ -37,8 +37,6 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol HGSExtension;
-
 /*!
   HGSExtensionPoint objects are a place that plugins can register new
   functionality. Each extension point contains a list of all registered
@@ -51,7 +49,7 @@
 @interface HGSExtensionPoint : NSObject {
  @private
   NSMutableDictionary* extensions_;
-  Protocol* protocol_;
+  Class class_;
 }
 
 /*!
@@ -65,18 +63,19 @@
 + (HGSExtensionPoint*)pointWithIdentifier:(NSString*)identifer;
 
 /*!
-  Sets a protocol for all extensions to conform to. Extensions are verified on
-  add. If extensions have already been registered with this point, they will be
-  verified immediately. If they fail, an error will be logged to the console
-  and they will be removed/ignored.
+    Sets a class that all extensions on this point must have a "kindOf"
+    relationship. Extensions are verified on add. If extensions have already
+    been registered with this point, they will be verified immediately. If they
+    fail, an error will be logged to the console and they will be
+    removed/ignored.
 */
-- (void)setProtocol:(Protocol*)protocol;
+- (void)setKindOfClass:(Class)kindOfClass;
 
 /*!
   Add an extension to this point.  Returns NO if the extension could not be
   registered or if the object does not conform to the protocol.
 */
-- (BOOL)extendWithObject:(id<HGSExtension>)extension;
+- (BOOL)extendWithObject:(id)extension;
 
 #pragma mark Access
 
@@ -90,7 +89,7 @@
 /*!
   Remove a given extension.
 */
-- (void)removeExtension:(id<HGSExtension>)extension;
+- (void)removeExtension:(id)extension;
 
 @end
 

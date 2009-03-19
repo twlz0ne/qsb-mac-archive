@@ -30,9 +30,14 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+  @header
+  @discussion
+*/
+
 #import <Foundation/Foundation.h>
 
-@protocol HGSSearchSource;
+@class HGSSearchSource;
 
 // Support the icon property: the phone needs to treat this as a different class
 #if TARGET_OS_IPHONE
@@ -73,10 +78,6 @@ extern NSString* const kHGSPathCellHiddenKey;  // NSNumber (BOOL)
 extern NSString* const kHGSObjectAttributeContactEmailKey; // NSString - Primary email address
 extern NSString* const kHGSObjectAttributeEmailAddressesKey; // NSArray of NSString - Related email addresses
 extern NSString* const kHGSObjectAttributeContactsKey; // NSArray of NSString - Names of related people
-
-// Chat buddy-related keys
-extern NSString* const kHGSObjectAttributeBuddyMatchingStringKey; // NSString
-extern NSString* const kHGSIMBuddyInformationKey; // NSDictionary
 
 extern NSString* const kHGSObjectAttributeAlternateActionURIKey; // NSURL - url to be opened for accessory cell in mobile
 
@@ -142,20 +143,6 @@ extern NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey;  // NS
 #define kHGSTypeTextEmailAddress HGS_SUBTYPE(kHGSTypeText, @"emailaddress")
 #define kHGSTypeTextInstantMessage HGS_SUBTYPE(kHGSTypeText, @"instantmessage")
 
-//
-// HGSResult
-//
-// Encapsulates a search result. May not directly contain all information about
-// the result, but can use |source| to provide it lazily when needed for
-// display or comparison purposes.
-//
-// The source may provide results lazily and will send notifications to anyone
-// registered with KVO.  Consumers of the attributes shouldn't need to concern
-// themselves with the details of pending loads or caching of results, but
-// should call |-cancelAllPendingAttributeUpdates| when details of an object are
-// no longer required (eg, the user has selected a different result or cleared
-// the search).
-
 enum {
   eHGSNameMatchRankFlag = 1 << 0,
   eHGSUserPersistentPathRankFlag = 1 << 1,
@@ -168,12 +155,108 @@ enum {
   eHGSHomeChildRankFlag = 1 << 8,
   eHGSBelowFoldRankFlag = 1 << 9,
 };
-
 typedef NSUInteger HGSRankFlags;
 
-@protocol HGSResult 
-// The name by which this result shall be known.
-- (NSString*)displayName;
+/*!
+  Encapsulates a search result. May not directly contain all information about
+  the result, but can use |source| to provide it lazily when needed for display
+  or comparison purposes.
+  
+  The source may provide results lazily and will send notifications to anyone
+  registered with KVO.  Consumers of the attributes shouldn't need to concern
+  themselves with the details of pending loads or caching of results, but
+  should call |-cancelAllPendingAttributeUpdates| when details of an object are
+  no longer required (eg, the user has selected a different result or cleared
+  the search).
+*/
+@interface HGSResult : NSObject <NSCopying, NSMutableCopying> {
+ @protected
+  // Used for global ranking, set by the Search Source that creates it.
+  HGSRankFlags rankFlags_;
+  CGFloat rank_;
+  NSURL *url_;
+  NSUInteger idHash_;
+  NSString *displayName_;
+  NSString *type_;
+  HGSSearchSource *source_;
+  NSMutableDictionary* values_;  // All accesses to values_ must be synchronized
+  BOOL conformsToContact_;
+  NSString *normalizedIdentifier_; // Only webpages have normalizedIdentifiers
+  NSDate *lastUsedDate_;
+}
+
+/*!
+ The display name for the result.
+ */
+@property (readonly) NSString *displayName;
+/*!
+  URL for the result.
+*/
+@property (readonly) NSURL *url;
+/*!
+  Type of the result. See kHGSType constants.
+*/
+@property (readonly) NSString *type;
+/*!
+  Last time this result was used (if known)
+*/
+@property (readonly) NSDate *lastUsedDate;
+/*!
+  The relative rank of an item (from 0.0 to 1.0)
+*/
+@property (readonly) CGFloat rank;
+/*!
+  Information about the item that may change it's overall ranking
+*/
+@property (readonly) HGSRankFlags rankFlags;
+/*!
+  The source which supplied this result.
+*/
+@property (readonly) HGSSearchSource *source;
+
+// Convenience methods 
++ (id)resultWithURL:(NSURL *)url
+               name:(NSString *)name
+               type:(NSString *)typeStr
+             source:(HGSSearchSource *)source
+         attributes:(NSDictionary *)attributes;
+
++ (id)resultWithFilePath:(NSString *)path 
+                  source:(HGSSearchSource *)source 
+              attributes:(NSDictionary *)attributes;
+
+// Create an result based on a dictionary of keys. Note that even though
+// kHGSObjectAttributeURIKey is documented as being a NSURL, it needs to be
+// an NSString and will be converted internally.
++ (id)resultWithDictionary:(NSDictionary *)dictionary 
+                    source:(HGSSearchSource *)source;
+
+- (id)initWithURL:(NSURL *)url
+             name:(NSString *)name
+             type:(NSString *)typeStr
+           source:(HGSSearchSource *)source
+       attributes:(NSDictionary *)attributes;
+
+- (id)initWithDictionary:(NSDictionary*)dict
+                  source:(HGSSearchSource *)source;
+
+// get and set attributes. |-valueForKey:| may return a placeholder value
+// that is to be updated later via KVO.
+// TODO(dmaclach)get rid of setValue:forKey: support
+- (void)setValue:(id)obj forKey:(NSString*)key;
+- (id)valueForKey:(NSString*)key;
+
+// An array of NSDictionaries describing the path to the result.
+- (NSArray*)displayPath;
+
+// merge the attributes of |result| into this one. Single values that overlap
+// are lost, arrays and dictionaries are merged together to form the union.
+// TODO(dmaclach): get rid of mergewith
+- (void)mergeWith:(HGSResult*)result;
+
+// this is result a "duplicate" of |compareTo|? Not using |-isEqual:| because 
+// that impacts how the object gets put into collections.
+- (BOOL)isDuplicate:(HGSResult*)compareTo;
 
 // Get an icon for this result
 - (NSImage*)displayIconWithLazyLoad:(BOOL)lazyLoad;
@@ -186,89 +269,6 @@ typedef NSUInteger HGSRankFlags;
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet;
 @end
 
-@interface HGSResult : NSObject <NSCopying, NSMutableCopying, HGSResult> {
- @protected
-  // Used for global ranking, set by the Search Source that creates it.
-  HGSRankFlags rankFlags_;
-  CGFloat rank_;
-  NSURL *url_;
-  NSUInteger idHash_;
-  NSString *name_;
-  NSString *type_;
-  id <HGSSearchSource> source_;
-  // TODO(pink) - Cole had the idea that some of the values should be marked
-  //    as purgable or cacheable (eg, preview) so that they can be tossed if we
-  //    determine we're taking up too much memory, or if they're really expensive
-  //    to generate, they can be cached. However, the cacheable nature doesn't
-  //    seem like something anyone outside of the providing SearchSource should
-  //    have to care about.
-  NSMutableDictionary* values_;  // All accesses to values_ must be synchronized
-  BOOL conformsToContact_;
-  NSString *normalizedIdentifier_; // Only webpages have normalizedIdentifiers
-  NSDate *lastUsedDate_;
-};
-
-// Convenience methods 
-+ (id)resultWithURL:(NSURL *)url
-               name:(NSString *)name
-               type:(NSString *)typeStr
-             source:(id<HGSSearchSource>)source
-         attributes:(NSDictionary *)attributes;
-
-+ (id)resultWithFilePath:(NSString *)path 
-                  source:(id<HGSSearchSource>)source 
-              attributes:(NSDictionary *)attributes;
-
-// Create an result based on a dictionary of keys. Note that even though
-// kHGSObjectAttributeURIKey is documented as being a NSURL, it needs to be
-// an NSString and will be converted internally.
-+ (id)resultWithDictionary:(NSDictionary *)dictionary 
-                    source:(id<HGSSearchSource>)source;
-
-- (id)initWithURL:(NSURL *)url
-             name:(NSString *)name
-             type:(NSString *)typeStr
-           source:(id<HGSSearchSource>)source
-       attributes:(NSDictionary *)attributes;
-
-- (id)initWithDictionary:(NSDictionary*)dict
-                  source:(id<HGSSearchSource>)source;
-
-// get and set attributes. |-valueForKey:| may return a placeholder value
-// that is to be updated later via KVO.
-// TODO(dmaclach)get rid of setValue:forKey: support
-- (void)setValue:(id)obj forKey:(NSString*)key;
-- (id)valueForKey:(NSString*)key;
-
-// URI for result
-- (NSURL *)url;
-
-// The type, of this result.
-- (NSString*)type;
-
-// The source which will handle this result.
-- (id<HGSSearchSource>)source;
-
-// An array of NSDictionaries describing the path to the result.
-- (NSArray*)displayPath;
-
-- (CGFloat)rank;
-
-- (HGSRankFlags)rankFlags;
-
-- (NSDate *)lastUsedDate;
-
-// merge the attributes of |result| into this one. Single values that overlap
-// are lost, arrays and dictionaries are merged together to form the union.
-// TODO(dmaclach): get rid of mergewith
-- (void)mergeWith:(HGSResult*)result;
-
-// this is result a "duplicate" of |compareTo|? Not using |-isEqual:| because 
-// that impacts how the object gets put into collections.
-- (BOOL)isDuplicate:(HGSResult*)compareTo;
-
-@end
-
 @interface HGSMutableResult : HGSResult
 - (void)setRankFlags:(HGSRankFlags)flags;
 - (void)addRankFlags:(HGSRankFlags)flags;
@@ -276,14 +276,14 @@ typedef NSUInteger HGSRankFlags;
 - (void)setRank:(CGFloat)rank;
 @end
 
-// Each subclass defines its own set of public value keys for both display
-// and dupe-detection purposes.
-
-extern NSString* const kHGSObjectAttributeVisitedCountKey;  // NSValue (NSInteger)
-
-@interface HGSResultArray : NSObject <HGSResult, NSFastEnumeration> {
+@interface HGSResultArray : NSObject <NSFastEnumeration> {
   NSArray *results_;
 }
+/*!
+ The display name for the results combined.
+ */
+@property (readonly) NSString *displayName;
+
 + (id)arrayWithResult:(HGSResult *)result;
 + (id)arrayWithResults:(NSArray *)results;
 + (id)arrayWithFilePaths:(NSArray *)filePaths;
@@ -295,4 +295,14 @@ extern NSString* const kHGSObjectAttributeVisitedCountKey;  // NSValue (NSIntege
 - (HGSResult *)lastObject;
 // Will return nil if any of the results does not have a valid file path
 - (NSArray *)filePaths;
+
+// Some helpers to check if this result is of a given type.  |isOfType| checks
+// for an exact match of the type.  |conformsToType{Set}| checks to see if this
+// object is of the specific type{s} or a refinement of it/them.
+- (BOOL)isOfType:(NSString *)typeStr;
+- (BOOL)conformsToType:(NSString *)typeStr;
+- (BOOL)conformsToTypeSet:(NSSet *)typeSet;
+
+// Get an icon for these results
+- (NSImage*)displayIconWithLazyLoad:(BOOL)lazyLoad;
 @end

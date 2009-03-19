@@ -41,8 +41,7 @@
 @class QSBTableResult;
 @class HGSResult;
 @class HGSResultArray;
-
-@protocol HGSAction;
+@class HGSAction;
 
 // The controller associated with a particular query responsible for
 // managing the relationship between this query and any previous query
@@ -119,7 +118,7 @@
 - (HGSResultArray *)results;
 
 // Perform an action on results
-- (void)performAction:(id<HGSAction>)action 
+- (void)performAction:(HGSAction *)action 
           withResults:(HGSResultArray *)results;
 
 // Perform the default action on the selected object in the active results controller.

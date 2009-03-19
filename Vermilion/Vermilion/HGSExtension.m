@@ -32,6 +32,7 @@
 
 #import "HGSExtension.h"
 #import "HGSLog.h"
+#import "HGSBundle.h"
 
 // Extension keys
 
@@ -64,6 +65,14 @@ NSString *const kHGSImageMessageKey = @"HGSImageMessageKey";
 NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
 
 @implementation HGSExtension
+
+@synthesize displayName = displayName_;
+@synthesize identifier = identifier_;
+@synthesize bundle = bundle_;
+
+- (id)init {
+  return [self initWithConfiguration:nil];
+}
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super init])) {
@@ -108,7 +117,8 @@ NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
             name = [self objectForInfoDictionaryKey:@"CFBundleExecutable"];
             if (![name length]) {
               HGSLogDebug(@"Unable to get a name for %@", self);
-              name = @"Unknown Name";
+              name = HGSLocalizedString(@"Unknown Name", 
+                                        @"Unknown plugin name");
             }
           }
         }
@@ -174,20 +184,6 @@ NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
   return [[icon_ retain] autorelease];
 }
 
-// Return a display name for the extension.
-- (NSString *)displayName {
-  return [[displayName_ retain] autorelease];
-}
-
-- (NSBundle *)bundle {
-  return [[bundle_ retain] autorelease];
-}
-
-// Return a display name for the extension.
-- (NSString *)identifier {
-  return [[identifier_ retain] autorelease];
-}
-
 // Return a copyright string for the extension.
 - (NSString *)copyright {
   return [self objectForInfoDictionaryKey:@"NSHumanReadableCopyright"];
@@ -222,7 +218,26 @@ NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
 }
 
 - (id)objectForInfoDictionaryKey:(NSString *)key {
-  return [bundle_ objectForInfoDictionaryKey:key];
+  id value = [bundle_ objectForInfoDictionaryKey:key];
+  if (!value) {
+    // We support storing strings in QSBInfo.plist files in cases where
+    // using the standard Info.plist file is difficult (AppleScript).
+    // We also do localization in QSBInfoPlist.strings.
+    NSString *qsbPlistPath = [bundle_ pathForResource:@"QSBInfo" 
+                                               ofType:@"plist"];
+    if (qsbPlistPath) {
+      NSDictionary *qsbPlist 
+        = [NSDictionary dictionaryWithContentsOfFile:qsbPlistPath];
+      value = [qsbPlist objectForKey:key];
+      if ([value isKindOfClass:[NSString class]]) {
+        // Attempt to localize
+        value = [bundle_ localizedStringForKey:key
+                                         value:value 
+                                         table:@"QSBInfoPlist"];
+      }
+    }
+  }
+  return value;
 }
 
 - (id)defaultObjectForKey:(NSString *)key {

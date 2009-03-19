@@ -40,7 +40,7 @@
 #import <openssl/x509v3.h>
 
 @interface HGSModuleLoader()
-- (BOOL)isPluginAtPathCertified:(NSString *)path;
+- (BOOL)isPluginBundleCertified:(NSBundle *)pluginBundle;
 - (BOOL)pluginIsWhitelisted:(NSBundle *)pluginBundle
           withCodeSignature:(HGSCodeSignature *)pluginCodeSignature;
 - (void)addPluginToWhitelist:(NSBundle *)pluginBundle
@@ -81,12 +81,6 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
 - (id)init {
   if ((self = [super init])) {
     extensionMap_ = [[NSMutableDictionary alloc] init];
-    if (!extensionMap_) {
-      HGSLog(@"Unable to create extensionMap_");
-      [self release];
-      self = nil;
-    }
-    
     executableSignature_
       = [[HGSCodeSignature codeSignatureForBundle:[NSBundle mainBundle]]
          retain];
@@ -100,6 +94,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
   return self;
 }
 
+// COV_NF_START
+// Singleton, so never called.
 - (void)dealloc {
   [extensionMap_ release];
   [executableSignature_ release];
@@ -109,6 +105,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
   }
   [super dealloc];
 }
+// COV_NF_END
 
 - (void)loadPluginsAtPath:(NSString*)pluginPath errors:(NSArray **)errors {
   if (pluginPath) {
@@ -123,10 +120,11 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
       NSString *extension = [fullPath pathExtension];
       Class pluginClass = [extensionMap_ objectForKey:extension];
       if (pluginClass) {
-        if ([self isPluginAtPathCertified:fullPath]) {
-          if ([pluginClass isPluginAtPathValidAPI:fullPath]) {
-            HGSPlugin *plugin = [[[pluginClass alloc] initWithPath:fullPath]
-                                 autorelease];
+        NSBundle *pluginBundle = [NSBundle bundleWithPath:fullPath];
+        if ([self isPluginBundleCertified:pluginBundle]) {
+          if ([pluginClass isPluginBundleValidAPI:pluginBundle]) {
+            HGSPlugin *plugin 
+              = [[[pluginClass alloc] initWithBundle:pluginBundle] autorelease];
             if (plugin) {
               [pluginsPoint extendWithObject:plugin];
             } else {
@@ -171,12 +169,6 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
 
 #pragma mark -
 
-- (BOOL)extendPoint:(NSString *)extensionPointID
-         withObject:(id<HGSExtension>)extension {
-  HGSExtensionPoint *point = [HGSExtensionPoint pointWithIdentifier:extensionPointID];
-  return [point extendWithObject:extension];
-}
-
 - (id<HGSDelegate>)delegate {
   return delegate_;
 }
@@ -185,13 +177,12 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
   delegate_ = delegate;
 }
 
-- (BOOL)isPluginAtPathCertified:(NSString *)path {
+- (BOOL)isPluginBundleCertified:(NSBundle *)pluginBundle {
   if (!executableSignature_) {
     // If the host application is not signed, do not perform validation.
     return YES;
   }
   
-  NSBundle *pluginBundle = [NSBundle bundleWithPath:path];
   HGSCodeSignature *signature
     = [HGSCodeSignature codeSignatureForBundle:pluginBundle];
   
@@ -218,7 +209,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
   // Plugin is either not signed, or signed with an unknown
   // certificate. Ask the user to approve the plugin.
   if (!shouldLoad) {
-    switch ([delegate_ shouldLoadPluginAtPath:path
+    switch ([delegate_ shouldLoadPluginAtPath:[pluginBundle bundlePath]
                                 withSignature:signature]) {
       case eHGSAllowAlways:
         [self addPluginToWhitelist:pluginBundle

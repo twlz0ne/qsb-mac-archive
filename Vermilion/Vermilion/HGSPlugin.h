@@ -45,7 +45,6 @@
   extension point.
 */
 @protocol HGSPlugin
-+ (BOOL)isPluginAtPathValidAPI:(NSString *)path;
 @end
 
 /*!
@@ -87,7 +86,7 @@
   until the user enables one of the 'Searchable Items' in Preferences.  (See
   HGSProtoExtension for more on this topic.)
 */
-@interface HGSPlugin : HGSExtension <HGSPlugin> {
+@interface HGSPlugin : HGSExtension {
  @private
   NSArray *protoExtensions_;
   NSMutableArray *factorableProtoExtensions_;
@@ -104,10 +103,19 @@
 */
 @property (nonatomic, getter=isEnabled) BOOL enabled;
 
-/*! 
-  Reconstitute a plugin at a path. 
+/*!
+  Checks to see that the plugin bundle has a valid API version.
+  @param bundle to check
+  @result YES if API is valid
 */
-- (id)initWithPath:(NSString *)path;
++ (BOOL)isPluginBundleValidAPI:(NSBundle *)pluginBundle;
+
+/*!
+  Reconstitue a plugin from a bundle.
+ 
+  Designated initializer.
+*/
+- (id)initWithBundle:(NSBundle *)bundle;
 
 /*! 
   Factor our protoextensions, if appropriate. 

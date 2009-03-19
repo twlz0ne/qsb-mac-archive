@@ -33,9 +33,63 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSPlugin.h"
+#import <OCMock/OCMock.h>
 
 @interface HGSPluginTest : GTMTestCase 
 @end
 
 @implementation HGSPluginTest
+- (void)testInit {
+  HGSPlugin *plugin = [[HGSPlugin alloc] init];
+  STAssertNil(plugin, nil);
+  
+  // Test with no extensions
+  id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  [[[bundleMock stub] 
+    andReturn:@"plugin.identifier"] 
+   objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  [[[bundleMock stub] 
+    andReturn:@"pluginName"] 
+   objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+  [[[bundleMock stub] 
+    andReturn:nil] 
+   objectForInfoDictionaryKey:@"HGSExtensions"];
+  [[[bundleMock stub] 
+    andReturn:nil] 
+   pathForResource:@"QSBInfo" ofType:@"plist"];
+  [[[bundleMock stub] 
+    andReturn:@"bundlePath"] 
+   bundlePath];  
+  plugin = [[[HGSPlugin alloc] initWithBundle:bundleMock] autorelease];
+  STAssertNil(plugin, nil);
+  [bundleMock verify];
+  
+  // Test with extensions
+  bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  [[[bundleMock stub] 
+    andReturn:@"plugin.identifier"] 
+   objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  [[[bundleMock stub] 
+    andReturn:@"pluginName"] 
+   objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+  NSDictionary *extensionDict 
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       @"HGSPluginTestExtensionClass", kHGSExtensionClassKey,
+       @"HGSPluginExtensionPoint", kHGSExtensionPointKey,
+       @"HGSPluginExtensionID", kHGSExtensionIdentifierKey,
+       nil];
+  NSArray *array = [NSArray arrayWithObject:extensionDict];
+  [[[bundleMock stub] 
+    andReturn:array] 
+   objectForInfoDictionaryKey:@"HGSExtensions"];
+  [[[bundleMock stub] 
+    andReturn:nil] 
+   pathForResource:@"QSBInfo" ofType:@"plist"];
+  [[[bundleMock stub] 
+    andReturn:@"bundlePath"] 
+   bundlePath];  
+  plugin = [[[HGSPlugin alloc] initWithBundle:bundleMock] autorelease];
+  STAssertNotNil(plugin, nil);
+  [bundleMock verify];
+}
 @end

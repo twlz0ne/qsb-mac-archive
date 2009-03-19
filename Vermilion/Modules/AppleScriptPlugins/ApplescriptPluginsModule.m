@@ -59,8 +59,8 @@
                                                      path:path
                                                attributes:scriptDefn]
        autorelease];
-    [loader extendPoint:kHGSActionsExtensionPoint
-             withObject:actionObj];
+    HGSExtensionPoint *actionPoint = [HGSExtensionPoint actionsPoint];
+    [actionPoint extendWithObject:actionObj];
   }
 }
 

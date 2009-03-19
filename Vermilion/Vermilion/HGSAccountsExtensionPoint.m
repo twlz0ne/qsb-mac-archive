@@ -53,9 +53,9 @@ GTM_METHOD_CHECK(NSEnumerator,
     NSString *accountType = [accountDict objectForKey:kHGSAccountTypeKey];
     if (accountType) {
       Class accountClass = [self classForAccountType:accountType];
-      id<HGSAccount> account = [[[accountClass alloc]
-                                 initWithDictionary:accountDict]
-                                autorelease];
+      HGSAccount *account = [[[accountClass alloc]
+                              initWithConfiguration:accountDict]
+                             autorelease];
       if (account) {
         [self extendWithObject:account];
       }
@@ -69,7 +69,7 @@ GTM_METHOD_CHECK(NSEnumerator,
 - (NSArray *)accountsAsArray {
   NSEnumerator *archiveAccountEnum
     = [[[self extensions] objectEnumerator]
-       gtm_enumeratorByMakingEachObjectPerformSelector:@selector(dictionaryValue)
+       gtm_enumeratorByMakingEachObjectPerformSelector:@selector(configuration)
                                             withObject:nil];
   NSArray *archivableAccounts = [archiveAccountEnum allObjects];
   return archivableAccounts;

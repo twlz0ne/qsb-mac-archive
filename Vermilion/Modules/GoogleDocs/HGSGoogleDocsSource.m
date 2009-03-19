@@ -51,7 +51,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   NSTimer *updateTimer_;
   NSDictionary *docIcons_;
   BOOL currentlyFetching_;
-  id <HGSAccount> account_;
+  HGSAccount *account_;
   NSString *userName_;
   NSTimeInterval previousErrorReportingTime_;
 }
@@ -181,7 +181,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 }
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
-  id <HGSAccount> account = [notification object];
+  HGSAccount *account = [notification object];
   HGSAssert(account == account_, @"Notification from bad account!");
   
   // Make sure we aren't in the middle of waiting for results; if we are, try
@@ -388,7 +388,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 #pragma mark -
 #pragma mark HGSAccountClientProtocol Methods
 
-- (BOOL)accountWillBeRemoved:(id<HGSAccount>)account {
+- (BOOL)accountWillBeRemoved:(HGSAccount *)account {
   HGSAssert(account == account_, @"Notification from bad account!");
   if (currentlyFetching_) {
     [serviceTicket_ cancelTicket];

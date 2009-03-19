@@ -77,13 +77,13 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
   return self;
 }
 
-- (id)initWithDictionary:(NSDictionary *)prefDict {
+- (id)initWithConfiguration:(NSDictionary *)prefDict {
   NSString *userName = [prefDict objectForKey:kHGSAccountUserNameKey];
   self = [self initWithName:userName];
   return self;
 }
 
-- (NSDictionary *)dictionaryValue {
+- (NSDictionary *)configuration {
   NSDictionary *accountDict
     = [NSDictionary dictionaryWithObjectsAndKeys:
        [self userName], kHGSAccountUserNameKey,
@@ -114,11 +114,10 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
   return nil;
 }
 
-- (BOOL)setPassword:(NSString *)password {
+- (void)setPassword:(NSString *)password {
   NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
   [defaultCenter postNotificationName:kHGSAccountDidChangeNotification 
                                object:self];
-  return YES;
 }
 
 + (NSViewController *)
@@ -163,5 +162,4 @@ NSString *const kHGSAccountWillBeRemovedNotification
   = @"HGSAccountWillBeRemovedNotification";
 
 NSString *const kHGSAccountUserNameKey = @"HGSAccountUserNameKey";
-NSString *const kHGSAccountConnectionErrorKey = @"HGSAccountConnectionErrorKey";
 NSString *const kHGSAccountTypeKey = @"HGSAccountTypeKey";

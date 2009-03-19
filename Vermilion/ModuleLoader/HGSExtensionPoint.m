@@ -46,7 +46,7 @@ NSString *const kHGSExtensionKey = @"HGSExtension";
 static NSMutableDictionary *sHGSExtensionPoints = nil;
 
 @interface HGSExtensionPoint ()
-- (BOOL)verifyExtension:(id<HGSExtension>)extension;
+- (BOOL)verifyExtension:(id)extension;
 @end
 
 @implementation HGSExtensionPoint
@@ -87,12 +87,12 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
 // COV_NF_END
 
 
-- (BOOL)verifyExtension:(id<HGSExtension>)extension {
-  return extension && (!protocol_ || [extension conformsToProtocol:protocol_]);
+- (BOOL)verifyExtension:(id)extension {
+  return extension && (!class_ || [extension isKindOfClass:class_]);
 }
 
-- (void)setProtocol:(Protocol *)protocol {
-  protocol_ = protocol;
+- (void)setKindOfClass:(Class)kindOfClass {
+  class_ = kindOfClass;
 
   NSMutableArray *extensionsToRemove = [NSMutableArray array];
   NSArray *allValues = nil;
@@ -105,11 +105,13 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
     }
   }
   for (id extension in extensionsToRemove) {
+    HGSLog(@"Removing extension %@ because it not kind of class %@", 
+           extension, kindOfClass);
     [self removeExtension:extension];
   }
 }
 
-- (BOOL)extendWithObject:(id<HGSExtension>)extension {
+- (BOOL)extendWithObject:(id)extension {
   BOOL wasGood = YES;
   NSString *identifier = [extension identifier];
   if (![identifier length]) {
@@ -148,7 +150,7 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
 
 - (NSString *)description {
   NSString *result = [NSString stringWithFormat:@"%@ <%@> - Extensions: %@",
-                      [self class], NSStringFromProtocol(protocol_), 
+                      [self class], NSStringFromClass(class_), 
                       [self extensions]];
   return result;
 }
@@ -174,7 +176,7 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
 
 #pragma mark Removal
 
-- (void)removeExtension:(id<HGSExtension>)extension {
+- (void)removeExtension:(id)extension {
   NSString *identifier = [extension identifier];
   if (!identifier) return;
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];

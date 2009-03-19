@@ -96,7 +96,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   rebuildCache_ = YES;
 }
 
-- (HGSResult *)objectFromAction:(id<HGSAction>)action 
+- (HGSResult *)objectFromAction:(HGSAction *)action 
                     resultArray:(HGSResultArray *)array {
   // Set some of the flags to bump them up in the result's ranks
   NSNumber *rankFlags 
@@ -132,7 +132,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   [self clearResultIndex];
 
   HGSExtensionPoint* actionPoint = [HGSExtensionPoint actionsPoint];
-  for (id<HGSAction> action in [actionPoint extensions]) {
+  for (HGSAction *action in [actionPoint extensions]) {
     // Create a result object that wraps our action
     HGSResult *actionObject = [self objectFromAction:action
                                          resultArray:nil];
@@ -163,7 +163,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     = [representation objectForKey:kActionIdentifierArchiveKey];
   if (extensionIdentifier) {
     HGSExtensionPoint* actionPoint = [HGSExtensionPoint actionsPoint];
-    id<HGSAction> action
+    HGSAction *action
       = [actionPoint extensionWithIdentifier:extensionIdentifier];
     if (action) {
       // We create a new result, but it should fold based out the url
@@ -198,7 +198,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     // Pivot: filter to actions that support this object as the target of the
     // action.
     for (HGSResult *actionObject in results) {
-      id<HGSAction> action
+      HGSAction *action
         = [actionObject valueForKey:kHGSObjectAttributeDefaultActionKey];
       if ([action appliesToResults:queryResults]) {
         // Now that it is all set up, let's wrap it up in our proxy action.
@@ -209,7 +209,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
                                                       query:query]
              autorelease];
         
-        actionObject = [self objectFromAction:(id<HGSAction>)proxy
+        actionObject = [self objectFromAction:(HGSAction *)proxy
                                   resultArray:queryResults];
         
         if (emptyQuery) {
@@ -227,7 +227,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     // No pivot: so just include the actions that are valid for a top level
     // query.
     for (HGSResult *actionObject in results) {
-      id<HGSAction> action
+      HGSAction *action
         = [actionObject valueForKey:kHGSObjectAttributeDefaultActionKey];
       if ([action showInGlobalSearchResults]) {
         [filteredResults addObject:actionObject];

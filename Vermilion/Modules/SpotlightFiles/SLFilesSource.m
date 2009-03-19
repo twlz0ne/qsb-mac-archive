@@ -705,7 +705,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
     // collect the utis
     NSMutableSet *utiSet = [NSMutableSet set];
     NSArray *extensions = [[HGSExtensionPoint sourcesPoint] extensions];
-    for (id<HGSSearchSource> searchSource in extensions) {
+    for (HGSSearchSource *searchSource in extensions) {
       NSSet *utis = [searchSource utisToExcludeFromDiskSources];
       if (utis) {
         [utiSet unionSet:utis];

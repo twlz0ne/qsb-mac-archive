@@ -42,14 +42,6 @@
 }
 @end
 
-@protocol TestProtocol <HGSExtension>
-- (void)doNothing;
-@end
-
-@protocol AnotherTestProtocol <HGSExtension>
-- (void)doMoreNothing;
-@end
-
 @interface BaseTestExtension : NSObject {
   NSString *identifier_;
 }
@@ -71,29 +63,27 @@
 
 @end
 
-@interface MyTestExtension : BaseTestExtension<TestProtocol>
+@interface MyTestExtension : BaseTestExtension
 @end
 
 @implementation MyTestExtension
-- (void)doNothing { }  // COV_NF_LINE
 @end
 
-@interface MyOtherTestExtension : BaseTestExtension <AnotherTestProtocol>
+@interface MyOtherTestExtension : BaseTestExtension
 @end
 
 @implementation MyOtherTestExtension
-- (void)doMoreNothing { }  // COV_NF_LINE
 @end
 
 
 @implementation HGSExtensionPointTest
 
-- (void)testProtocolChanging {
-  // create a new extension point, given it a protocol
+- (void)testKindOfClassChanging {
+  // create a new extension point, giving it a class
   HGSExtensionPoint* newPoint
     = [HGSExtensionPoint pointWithIdentifier:@"testProtocolChanging"];
   STAssertNotNil(newPoint, @"");
-  [newPoint setProtocol:@protocol(TestProtocol)];
+  [newPoint setKindOfClass:[MyTestExtension class]];
 
   // create new objects that implement the protocol and verify it's valid
   MyTestExtension* extension 
@@ -118,14 +108,14 @@
   STAssertEquals([extensionList count], (NSUInteger)5,
                  @"not all extensions present");
 
-  // now change the protocol to be empty, should have no effect
-  [newPoint setProtocol:nil];
+  // now change the class kind to be empty, should have no effect
+  [newPoint setKindOfClass:nil];
   extensionList = [newPoint extensions];
   STAssertEquals([extensionList count], (NSUInteger)5,
                  @"not all extensions present");
 
-  // change to a different protocol, should remove all elements of the list
-  [newPoint setProtocol:@protocol(AnotherTestProtocol)];
+  // change to a different class, should remove all elements of the list
+  [newPoint setKindOfClass:[MyOtherTestExtension class]];
   extensionList = [newPoint extensions];
 
   STAssertEquals([extensionList count], (NSUInteger)0,
@@ -133,24 +123,24 @@
 }
 
 - (void)testProtocol {
-  // create a new extension point, given it a protocol
+  // create a new extension point, giving it a kind of class
   HGSExtensionPoint* newPoint
     = [HGSExtensionPoint pointWithIdentifier:@"testProtocol"];
   STAssertNotNil(newPoint, @"");
-  [newPoint setProtocol:@protocol(TestProtocol)];
+  [newPoint setKindOfClass:[MyTestExtension class]];
 
-  // create a new object that implements that protocol and verify it's valid
+  // create a new object that inherits from the class and verify it's valid
   MyTestExtension* extension 
     = [[[MyTestExtension alloc] initWithIdentifier:@"test1"] autorelease];
   STAssertTrue([newPoint extendWithObject:extension],
-               @"protocol check failed");
+               @"kind of class check failed");
 
-  // create a new object that implements some other protocol and make sure
+  // create a new object that inherits from some other class and make sure
   // it fails to add correclty.
   MyOtherTestExtension* badExtension
     = [[[MyOtherTestExtension alloc] init] autorelease];
   STAssertFalse([newPoint extendWithObject:badExtension],
-                @"protocol check failed");
+                @"kind of class check failed");
 }
 
 - (void)testExtendingPoint {
@@ -228,7 +218,7 @@
   STAssertNil(result, @"found something with an identifier that was nil");
 
   NSString *description = [newPoint description];
-  STAssertTrue([description hasPrefix:@"HGSExtensionPoint <nil>"],
+  STAssertTrue([description hasPrefix:@"HGSExtensionPoint <(null)>"],
                @"Bad Description: %@", description);
 }
 

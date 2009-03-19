@@ -64,7 +64,6 @@ static Boolean ResultsDictionaryEqualCallBack(const void *value1,
 static CFHashCode ResultsDictionaryHashCallBack(const void *value);
 
 @interface HGSQueryController()
-- (void)annotateResults:(NSMutableArray*)results;
 + (NSString *)categoryForType:(NSString *)type;
 - (void)cancelPendingSearchOperations:(NSTimer*)timer;
 @end
@@ -127,7 +126,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kHGSQueryControllerWillStartNotification object:self];
-  for (id<HGSSearchSource> source in [sourcesPoint extensions]) {
+  for (HGSSearchSource *source in [sourcesPoint extensions]) {
     // Check if the source likes the query string
     if ([source isValidSourceForQuery:parsedQuery_]) {
       HGSSearchOperation* operation;
@@ -260,9 +259,6 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     NSMutableArray* results = [mixer_ mix:operationResultArrays
                                     query:parsedQuery_];
 
-  #if !TARGET_OS_IPHONE
-    [self annotateResults:results];
-  #endif
     rankedResults_ = [results retain];
   }
   return rankedResults_;
@@ -311,22 +307,6 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     [sTypeCategoryDict setObject:category forKey:type];
   }
   return category;
-}
-
-// allow each source a chance to add more information to a result that could
-// come from another source. This is O(N*M) where N = #results and M=#sources
-- (void)annotateResults:(NSMutableArray*)results {
-  NSEnumerator* resultIt = [results objectEnumerator];
-  HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
-  HGSResult* currentResult = nil;
-  NSInteger resultCount = 0;
-  NSInteger maxCount = [parsedQuery_ maxDesiredResults];
-  while ((currentResult = [resultIt nextObject])
-         && ++resultCount <= maxCount) {
-    for (id<HGSSearchSource> source in [sourcesPoint extensions]) {
-      [source annotateResult:currentResult withQuery:parsedQuery_];
-    }
-  }
 }
 
 // stops the query

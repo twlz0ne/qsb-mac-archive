@@ -77,15 +77,25 @@ static NSString *const kHGSPluginAPIVersionKey
 }
 
 
-+ (BOOL)isPluginAtPathValidAPI:(NSString *)path {
-  NSBundle *pluginBundle = [NSBundle bundleWithPath:path];
++ (BOOL)isPluginBundleValidAPI:(NSBundle *)pluginBundle {
   NSNumber *pluginAPIVersion
     = [pluginBundle objectForInfoDictionaryKey:kHGSPluginAPIVersionKey];
+  if (!pluginAPIVersion) {
+    NSString *qsbPlistPath = [pluginBundle pathForResource:@"QSBInfo" ofType:@"plist"];
+    if (qsbPlistPath) {
+      NSDictionary *qsbPlist 
+        = [NSDictionary dictionaryWithContentsOfFile:qsbPlistPath];
+      pluginAPIVersion = [qsbPlist objectForKey:kHGSPluginAPIVersionKey];
+    }
+  }
   return [pluginAPIVersion intValue] == VERMILLION_PLUGIN_API_VERSION;
 }
 
-- (id)initWithPath:(NSString *)path {
-  NSBundle *bundle = [NSBundle bundleWithPath:path];
+- (id)init {
+  return [self initWithBundle:nil];
+}
+
+- (id)initWithBundle:(NSBundle *)bundle {
   if (!bundle) {
     [self release];
     return nil;
@@ -99,7 +109,7 @@ static NSString *const kHGSPluginAPIVersionKey
     
     // Discover all plist based extensions
     NSArray *standardExtensions
-      = [bundle objectForInfoDictionaryKey:kHGSExtensionsKey];
+      = [self objectForInfoDictionaryKey:kHGSExtensionsKey];
     factorableProtoExtensions_ = [[NSMutableArray array] retain];
     for (NSDictionary *extensionConfig in standardExtensions) {
       HGSProtoExtension *extension
@@ -132,7 +142,7 @@ static NSString *const kHGSPluginAPIVersionKey
     }
     if (!hasExtensions) {
       HGSLog(@"No standard extensions or factorable extensions found "
-             @"in plugin at path %@.", path);
+             @"in plugin at path %@.", [bundle bundlePath]);
       [self release];
       return nil;
     }
@@ -244,7 +254,7 @@ static NSString *const kHGSPluginAPIVersionKey
   // See if any of our factorable extensions are interested in a newly
   // added account and, if so, add them to our sources.
   NSDictionary *userInfo = [notification userInfo];
-  id<HGSAccount> account = [userInfo objectForKey:kHGSExtensionKey];
+  HGSAccount *account = [userInfo objectForKey:kHGSExtensionKey];
   // Only factor for accounts with a userName.
   NSString *userName = [account userName];
   // TODO(mrossetti): The following will not be required once we refactor

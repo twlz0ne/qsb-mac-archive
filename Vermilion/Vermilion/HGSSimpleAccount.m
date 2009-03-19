@@ -62,8 +62,8 @@
   return self;
 }
 
-- (id)initWithDictionary:(NSDictionary *)prefDict {
-  if ((self = [super initWithDictionary:prefDict])) {
+- (id)initWithConfiguration:(NSDictionary *)prefDict {
+  if ((self = [super initWithConfiguration:prefDict])) {
     if ([self keychainItem]) {
       // We assume the account is still available but will soon be
       // authenticated (for sources that index) or as soon as an action
@@ -123,24 +123,18 @@
   return nil;
 }
 
-- (BOOL)setPassword:(NSString *)password {
-  // Don't update the keychain unless we have a good password.
-  BOOL passwordSet = NO;
-  if ([self authenticateWithPassword:password]) {
-    KeychainItem *keychainItem = [self keychainItem];
-    if (keychainItem) {
-      [keychainItem setUsername:[self userName]
-                       password:password];
-    } else {
-      NSString *keychainServiceName = [self identifier];
-      [KeychainItem addKeychainItemForService:keychainServiceName
-                                 withUsername:[self userName]
-                                     password:password]; 
-    }
-    [super setPassword:password];
-    passwordSet = YES;
+- (void)setPassword:(NSString *)password {
+  KeychainItem *keychainItem = [self keychainItem];
+  if (keychainItem) {
+    [keychainItem setUsername:[self userName]
+                     password:password];
+  } else {
+    NSString *keychainServiceName = [self identifier];
+    [KeychainItem addKeychainItemForService:keychainServiceName
+                               withUsername:[self userName]
+                                   password:password]; 
   }
-  return passwordSet;
+  [super setPassword:password];
 }
 
 - (void)editWithParentWindow:(NSWindow *)parentWindow {
@@ -272,9 +266,9 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 
 - (IBAction)acceptEditAccountSheet:(id)sender {
   NSWindow *sheet = [self window];
-  BOOL passwordWasSet = [account_ setPassword:[self password]];
-  // See if the new password authenticates.
-  if (passwordWasSet) {
+  NSString *password = [self password];
+  if ([account_ authenticateWithPassword:[self password]]) {
+    [account_ setPassword:password];
     [NSApp endSheet:sheet];
     [account_ setAuthenticated:YES];
   } else if (![self canGiveUserAnotherTry]) {

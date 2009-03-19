@@ -54,6 +54,12 @@ static NSSet *CopyStringSetFromId(id value) {
 
 @implementation HGSAction
 
+@synthesize directObjectTypes = directObjectTypes_;
+@synthesize indirectObjectTypes = indirectObjectTypes_;
+@synthesize indirectObjectOptional = indirectObjectOptional_;
+@synthesize showInGlobalSearchResults = showInGlobalSearchResults_;
+@synthesize causesUIContextChange = causesUIContextChange_;
+
 + (void)initialize {
   if (self == [HGSAction class]) {
 #if DEBUG
@@ -106,18 +112,6 @@ static NSSet *CopyStringSetFromId(id value) {
   [super dealloc];
 }
 
-- (NSSet*)directObjectTypes {
-  return [[directObjectTypes_ retain] autorelease];
-}
-
-- (NSSet*)indirectObjectTypes {
-  return [[indirectObjectTypes_ retain] autorelease];
-}
-
-- (BOOL)isIndirectObjectOptional {
-  return indirectObjectOptional_;
-}
-
 - (BOOL)appliesToResults:(HGSResultArray *)results {
   BOOL doesApply = YES;
   NSSet *directObjectTypes = [self directObjectTypes];
@@ -144,14 +138,6 @@ static NSSet *CopyStringSetFromId(id value) {
 
 - (BOOL)appliesToResult:(HGSResult *)result {
   return YES;
-}
-
-- (BOOL)showInGlobalSearchResults {
-  return showInGlobalSearchResults_;
-}
-
-- (BOOL)causesUIContextChange {
-  return causesUIContextChange_;
 }
 
 - (NSString*)displayNameForResults:(HGSResultArray *)result {

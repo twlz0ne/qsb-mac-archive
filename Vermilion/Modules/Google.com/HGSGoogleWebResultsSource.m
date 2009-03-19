@@ -48,7 +48,7 @@
 @interface HGSGoogleWebSearchOperation : HGSSearchOperation {
  @private
   GDataHTTPFetcher *fetcher_;
-  id<HGSSearchSource> source_;
+  HGSSearchSource *source_;
 }
 @end
 
@@ -102,7 +102,7 @@ GTM_METHOD_CHECK(NSArray, commonPrefixForStringsWithOptions:);
 GTM_METHOD_CHECK(NSString, readableURLString);
 
 - (id)initWithQuery:(HGSQuery*)query
-             source:(id<HGSSearchSource>)source {
+             source:(HGSSearchSource *)source {
   self = [super initWithQuery:query];
   if (self) {
     source_ = [source retain];

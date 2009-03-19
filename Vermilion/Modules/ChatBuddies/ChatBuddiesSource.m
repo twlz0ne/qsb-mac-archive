@@ -37,6 +37,9 @@
 #import "GTMNSString+URLArguments.h"
 #import "GTMMethodCheck.h"
 
+static NSString* const kChatBuddyAttributeInformationKey 
+  = @"ChatBuddyAttributeInformationKey";
+
 // TODO(alcor): rank buddies by frequency of use, consider "RecentChats" default
 
 // Search our buddy list and return matches against screen name, first or
@@ -59,7 +62,7 @@
 
 - (HGSResult *)contactResultFromIMBuddy:(NSDictionary *)buddy
                                 service:(IMService *)service
-                                 source:(id<HGSSearchSource>)source;
+                                 source:(HGSSearchSource *)source;
 
 // Pushes everything in our buddyResults_ down into the memory source
 - (void)updateIndex;
@@ -190,7 +193,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   if ([key isEqualToString:kHGSObjectAttributeIconKey] 
       || [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
     // Retrieve the info for this result.
-    NSDictionary *imBuddyInfo = [result valueForKey:kHGSIMBuddyInformationKey];
+    NSDictionary *imBuddyInfo 
+      = [result valueForKey:kChatBuddyAttributeInformationKey];
     if ([imBuddyInfo count]) {
       NSString *serviceName = [imBuddyInfo objectForKey:IMPersonServiceNameKey];
       if ([serviceName length]) {
@@ -212,7 +216,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   } else if ([key isEqualToString:kHGSObjectAttributeSnippetKey]) {
     // Snippet: status, "status message"
     NSMutableString *snippet = [NSMutableString string];
-    NSDictionary *imBuddyInfo = [result valueForKey:kHGSIMBuddyInformationKey];
+    NSDictionary *imBuddyInfo 
+      = [result valueForKey:kChatBuddyAttributeInformationKey];
 
     // Fetch their current status for up to date info
     NSString *serviceName = [imBuddyInfo objectForKey:IMPersonServiceNameKey];
@@ -244,7 +249,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
     if ([statusMessage length]) {
       [snippet appendString:statusMessage];
-      if ([statusString length] && ![statusString isEqualToString:statusMessage]) {
+      if ([statusString length] 
+          && ![statusString isEqualToString:statusMessage]) {
         [snippet appendFormat:@" (%@)", statusString];
       }
     } else if ([statusString length]) {
@@ -280,14 +286,16 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       CFRelease(iChatCFURL);
     }
     
-    NSDictionary *imBuddyInfo = [result valueForKey:kHGSIMBuddyInformationKey];
+    NSDictionary *imBuddyInfo 
+      = [result valueForKey:kChatBuddyAttributeInformationKey];
     NSString *serviceName = [imBuddyInfo objectForKey:IMPersonServiceNameKey];
     NSString *screenName = [imBuddyInfo objectForKey:IMPersonScreenNameKey];
     
     if ([serviceName length] && [screenName length]) {
-      NSMutableDictionary *iChatCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                        iChatName, kHGSPathCellDisplayTitleKey,
-                                        nil];
+      NSMutableDictionary *iChatCell 
+        = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+           iChatName, kHGSPathCellDisplayTitleKey,
+           nil];
       if (iChatURL) {
         [iChatCell setObject:iChatURL forKey:kHGSPathCellURLKey];
       }
@@ -353,7 +361,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (NSArray *)stringsFromBuddy:(HGSResult *)buddy 
                       forKeys:(NSArray *)keys {
   NSMutableArray *strings = [NSMutableArray array];
-  NSDictionary *imBuddyInfo = [buddy valueForKey:kHGSIMBuddyInformationKey];
+  NSDictionary *imBuddyInfo 
+    = [buddy valueForKey:kChatBuddyAttributeInformationKey];
   for (NSString *key in keys) {
     NSString *aStr = [imBuddyInfo objectForKey:key];
     if (aStr) {
@@ -416,7 +425,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         HGSResult *buddyResult = nil;
         for (buddyResult in buddyResults_) {
           NSDictionary *imBuddyInfo 
-            = [buddyResult valueForKey:kHGSIMBuddyInformationKey];
+            = [buddyResult valueForKey:kChatBuddyAttributeInformationKey];
           NSString *buddyService 
             = [imBuddyInfo objectForKey:IMPersonServiceNameKey];
           if ([buddyService isEqualToString:serviceName]) {
@@ -488,7 +497,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (HGSResult *)contactResultFromIMBuddy:(NSDictionary *)imBuddy
                                 service:(IMService *)service
-                                 source:(id<HGSSearchSource>)source {
+                                 source:(HGSSearchSource *)source {
   // Both a screen name and service name are required.
   NSString *screenName = imBuddy ? [imBuddy objectForKey:IMPersonScreenNameKey]
     : nil;
@@ -551,7 +560,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSDictionary *attributes
     = [NSDictionary dictionaryWithObjectsAndKeys:
        uniqueIdentifiers, kHGSObjectAttributeUniqueIdentifiersKey,
-       imBuddyInfo, kHGSIMBuddyInformationKey,
+       imBuddyInfo, kChatBuddyAttributeInformationKey,
        nil];
   return [HGSResult resultWithURL:url
                              name:displayName

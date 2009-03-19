@@ -33,9 +33,101 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSMemorySearchSource.h"
+#import "HGSResult.h"
+#import "HGSSearchOperation.h"
+#import "HGSQuery.h"
+#import <OCMock/OCMock.h>
 
 @interface HGSMemorySearchSourceTest : GTMTestCase 
 @end
 
 @implementation HGSMemorySearchSourceTest
+- (void)testInit {
+  HGSMemorySearchSource *memSource = nil;
+  memSource = [[HGSMemorySearchSource alloc] init];
+  STAssertNil(memSource, nil);
+  NSDictionary *config = [NSDictionary dictionary];
+  memSource = [[HGSMemorySearchSource alloc] initWithConfiguration:config];
+  STAssertNil(memSource, nil);
+  
+  id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  struct {
+    NSString *value;
+    NSString *key;
+  } stubValuesAndKeys[] = {
+    // things called to get an identifier
+    { @"test.identifier", @"CFBundleIdentifier" },
+    // things called to get a name
+    { nil, @"CFBundleDisplayName" },
+    { nil, @"CFBundleName" },
+    { nil, @"CFBundleExecutable" },
+    { @"testCopyright", @"NSHumanReadableCopyright" },
+    { @"testVersion", @"CFBundleVersion" }
+  };    
+  for (size_t i = 0; 
+       i < sizeof(stubValuesAndKeys) / sizeof(stubValuesAndKeys[0]);
+       ++i) {
+    [[[bundleMock stub] andReturn:stubValuesAndKeys[i].value] 
+     objectForInfoDictionaryKey:stubValuesAndKeys[i].key];
+    if (!stubValuesAndKeys[i].value) {
+      [[[bundleMock stub] andReturn:nil] 
+       pathForResource:@"QSBInfo" ofType:@"plist"];
+    }
+  }
+  config = [NSDictionary dictionaryWithObject:bundleMock 
+                                       forKey:kHGSExtensionBundleKey];
+  memSource 
+    = [[[HGSMemorySearchSource alloc] initWithConfiguration:config] autorelease];
+  STAssertNotNil(memSource, nil);
+}
+
+- (void)testSearch {
+  id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  struct {
+    NSString *value;
+    NSString *key;
+  } stubValuesAndKeys[] = {
+    // things called to get an identifier
+    { @"test.identifier", @"CFBundleIdentifier" },
+    // things called to get a name
+    { nil, @"CFBundleDisplayName" },
+    { nil, @"CFBundleName" },
+    { nil, @"CFBundleExecutable" },
+    { @"testCopyright", @"NSHumanReadableCopyright" },
+    { @"testVersion", @"CFBundleVersion" }
+  };    
+  for (size_t i = 0; 
+       i < sizeof(stubValuesAndKeys) / sizeof(stubValuesAndKeys[0]);
+       ++i) {
+    [[[bundleMock stub] andReturn:stubValuesAndKeys[i].value] 
+     objectForInfoDictionaryKey:stubValuesAndKeys[i].key];
+    if (!stubValuesAndKeys[i].value) {
+      [[[bundleMock stub] andReturn:nil] 
+       pathForResource:@"QSBInfo" ofType:@"plist"];
+    }
+  }
+  NSDictionary *config = [NSDictionary dictionaryWithObject:bundleMock 
+                                                     forKey:kHGSExtensionBundleKey];
+  HGSMemorySearchSource *memSource 
+    = [[[HGSMemorySearchSource alloc] initWithConfiguration:config] autorelease];
+  STAssertNotNil(memSource, nil);
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+  NSString *path
+    = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
+  STAssertNotNil(path, nil);
+  id searchSourceMock = [OCMockObject mockForClass:[HGSSearchSource class]];
+  HGSResult *result = [HGSResult resultWithFilePath:path
+                                             source:searchSourceMock
+                                         attributes:nil];
+  STAssertNotNil(result, nil);
+  [memSource indexResult:result
+              nameString:@"testName"
+       otherStringsArray:[NSArray arrayWithObjects:@"foo", @"bar", @"bam", nil]];
+  
+  id searchQueryMock = [OCMockObject mockForClass:[HGSQuery class]];
+  HGSSearchOperation *op 
+    = [[HGSSearchOperation alloc] initWithQuery:searchQueryMock];
+  [[[searchQueryMock stub] andReturn:[NSSet setWithObject:@"foo"]] uniqueWords];
+  [memSource performSearchOperation:op];
+}
 @end

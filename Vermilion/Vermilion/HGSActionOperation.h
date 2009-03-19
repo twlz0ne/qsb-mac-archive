@@ -33,18 +33,18 @@
 #import <Foundation/Foundation.h>
 
 // HGSActionOperation represents a single task performed by an action
-@protocol HGSAction;
+@class HGSAction;
 @class HGSResultArray;
 
 @interface HGSActionOperation : NSObject {
  @private
-  id<HGSAction> action_;
+  HGSAction * action_;
   NSMutableDictionary *args_;
 }
 
-- (id)initWithAction:(id<HGSAction>)action 
+- (id)initWithAction:(HGSAction *)action 
        directObjects:(HGSResultArray *)directObjects;
-- (id)initWithAction:(id<HGSAction>)action 
+- (id)initWithAction:(HGSAction *)action 
        directObjects:(HGSResultArray *)directObjects
      indirectObjects:(HGSResultArray *)indirectObjects;
 - (NSDictionary*)performAction;

@@ -49,15 +49,15 @@ static BOOL isInitialized = NO;
 static void InitializeCategory(void) {
   HGSExtensionPoint *ep;
   ep = [HGSExtensionPoint pointWithIdentifier:kHGSActionsExtensionPoint];
-  [ep setProtocol:@protocol(HGSAction)];
+  [ep setKindOfClass:[HGSAction class]];
   ep = [HGSExtensionPoint pointWithIdentifier:kHGSSourcesExtensionPoint];
-  [ep setProtocol:@protocol(HGSSearchSource)];
+  [ep setKindOfClass:[HGSSearchSource class]];
   ep = [HGSExtensionPoint pointWithIdentifier:kHGSServicesExtensionPoint];
-  [ep setProtocol:@protocol(HGSExtension)];
+  [ep setKindOfClass:[HGSExtension class]];
   ep = [HGSExtensionPoint pointWithIdentifier:kHGSPluginsExtensionPoint];
-  [ep setProtocol:@protocol(HGSPlugin)];
+  [ep setKindOfClass:[HGSPlugin class]];
   ep = [HGSAccountsExtensionPoint pointWithIdentifier:kHGSAccountsExtensionPoint];
-  [ep setProtocol:@protocol(HGSAccount)];
+  [ep setKindOfClass:[HGSAccount class]];
   isInitialized = YES;
 }
 

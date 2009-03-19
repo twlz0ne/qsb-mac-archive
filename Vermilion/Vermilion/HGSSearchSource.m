@@ -53,6 +53,8 @@ static NSSet *CopyStringSetFromId(id value) {
 }
 
 @implementation HGSSearchSource
+@synthesize pivotableTypes = pivotableTypes_;
+@synthesize utisToExcludeFromDiskSources = utisToExcludeFromDiskSources_;
 
 + (void)initialize {
   if (self == [HGSSearchSource class]) {
@@ -77,7 +79,7 @@ static NSSet *CopyStringSetFromId(id value) {
 
     value
       = [configuration objectForKey:@"HGSSearchSourceUTIsToExcludeFromDiskSources"];
-    utiToExcludeFromDiskSources_ = CopyStringSetFromId(value);
+    utisToExcludeFromDiskSources_ = CopyStringSetFromId(value);
     
     value = [configuration objectForKey:@"HGSSearchSourceCannotArchive"];
     cannotArchive_ = [value boolValue];
@@ -87,13 +89,9 @@ static NSSet *CopyStringSetFromId(id value) {
 
 - (void)dealloc {
   [pivotableTypes_ release];
-  [utiToExcludeFromDiskSources_ release];
+  [utisToExcludeFromDiskSources_ release];
 
   [super dealloc];
-}
-
-- (NSSet *)pivotableTypes {
-  return [[pivotableTypes_ retain] autorelease];
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
@@ -129,19 +127,6 @@ static NSSet *CopyStringSetFromId(id value) {
   }
   [self doesNotRecognizeSelector:_cmd];
   return nil;  // COV_NF_LINE
-}
-
-// allows a Search Source the ability to add more information to a result. This
-// is different from merging two results together because they're duplicates in
-// that the query that generated |result| in another source may not have any results in
-// this source, but the full result as presented here may carry with it enough info
-// to allows this source to find a match and annotate it with extra data.
-- (void)annotateResult:(HGSResult *)result withQuery:(HGSQuery *)query{
-  // default does nothing, subclasses do not have to override. 
-}
-
-- (NSSet *)utisToExcludeFromDiskSources {
-  return [[utiToExcludeFromDiskSources_ retain] autorelease];
 }
 
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {

@@ -33,9 +33,116 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSExtension.h"
+#import <OCMock/OCMock.h>
 
 @interface HGSExtensionTest : GTMTestCase 
 @end
 
 @implementation HGSExtensionTest
+- (void)testInit {
+  // Test bad init inputs
+  HGSExtension *extension = [[HGSExtension alloc] init];
+  STAssertNil(extension, nil);
+  extension = [[HGSExtension alloc] initWithConfiguration:nil];
+  STAssertNil(extension, nil);
+  extension = [[HGSExtension alloc] 
+               initWithConfiguration:[NSDictionary dictionary]];
+  STAssertNil(extension, nil);
+
+  // Mock up case where we don't have an identifier
+  id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  [[[bundleMock stub] andReturn:nil] 
+   objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  [[[bundleMock stub] andReturn:nil] 
+   pathForResource:@"QSBInfo" ofType:@"plist"];
+  NSDictionary *config = 
+    [NSDictionary dictionaryWithObject:bundleMock 
+                                forKey:kHGSExtensionBundleKey];
+  extension = [[HGSExtension alloc] initWithConfiguration:config];
+  STAssertNil(extension, nil);
+  [bundleMock verify];
+  
+  bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  struct {
+    NSString *value;
+    NSString *key;
+  } stubValuesAndKeys[] = {
+    // things called to get an identifier
+    { @"test.identifier", @"CFBundleIdentifier" },
+    // things called to get a name
+    { nil, @"CFBundleDisplayName" },
+    { nil, @"CFBundleName" },
+    { nil, @"CFBundleExecutable" },
+    { @"testCopyright", @"NSHumanReadableCopyright" },
+    { @"testVersion", @"CFBundleVersion" }
+  };    
+  for (size_t i = 0; 
+       i < sizeof(stubValuesAndKeys) / sizeof(stubValuesAndKeys[0]);
+       ++i) {
+    [[[bundleMock stub] andReturn:stubValuesAndKeys[i].value] 
+     objectForInfoDictionaryKey:stubValuesAndKeys[i].key];
+    if (!stubValuesAndKeys[i].value) {
+      [[[bundleMock stub] andReturn:nil] 
+       pathForResource:@"QSBInfo" ofType:@"plist"];
+    }
+  }
+  config = 
+    [NSDictionary dictionaryWithObject:bundleMock 
+                                forKey:kHGSExtensionBundleKey];
+  extension = [[[HGSExtension alloc] initWithConfiguration:config] autorelease];
+  STAssertNotNil(extension, nil);
+  STAssertEqualObjects([extension identifier], @"test.identifier", nil);
+  STAssertEqualObjects([extension displayName], @"Unknown Name", nil);
+  STAssertEqualObjects([extension bundle], bundleMock, nil);
+  STAssertNotNil([extension icon], nil);
+  
+  STAssertEqualObjects([extension copyright], @"testCopyright", nil);
+  STAssertEqualObjects([extension extensionVersion], @"testVersion", nil);
+  [bundleMock verify];
+}
+
+- (void)testIcon {
+  id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  NSDictionary *config = 
+    [NSDictionary dictionaryWithObjectsAndKeys:
+     bundleMock, kHGSExtensionBundleKey,
+     @"test.identifier", kHGSExtensionIdentifierKey,
+     @"testName", kHGSExtensionUserVisibleNameKey,
+     [[[NSImage alloc] init] autorelease], kHGSExtensionIconImageKey,
+     @"testPath", kHGSExtensionIconImagePathKey,
+     nil];
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+  NSString *finderPath 
+    = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
+  STAssertNotNil(finderPath, nil);
+  NSBundle *bundle = [NSBundle bundleWithPath:finderPath];
+  STAssertNotNil(bundle, nil);
+  NSString *imagePath = [bundle pathForImageResource:@"Finder.icns"];
+  STAssertNotNil(imagePath, nil);
+  [[[bundleMock stub] andReturn:imagePath] pathForImageResource:@"testPath"];
+  HGSExtension *extension 
+    = [[[HGSExtension alloc] initWithConfiguration:config] autorelease];
+  STAssertNotNil(extension, nil);
+  NSImage *icon = [extension icon];
+  STAssertNotNil(icon, nil);
+  [bundleMock verify];
+  
+  // Test failure cases
+  bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  config = 
+    [NSDictionary dictionaryWithObjectsAndKeys:
+     bundleMock, kHGSExtensionBundleKey,
+     @"test.identifier", kHGSExtensionIdentifierKey,
+     @"testName", kHGSExtensionUserVisibleNameKey,
+     [[[NSImage alloc] init] autorelease], kHGSExtensionIconImageKey,
+     @"testPath", kHGSExtensionIconImagePathKey,
+     nil];
+  [[[bundleMock stub] andReturn:@"imagePath"] pathForImageResource:@"testPath"];
+  extension 
+    = [[[HGSExtension alloc] initWithConfiguration:config] autorelease];
+  STAssertNotNil(extension, nil);
+  icon = [extension icon];
+  STAssertNotNil(icon, nil);
+}
+
 @end

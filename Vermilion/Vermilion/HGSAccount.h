@@ -30,146 +30,121 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+  @header
+  @discussion
+*/
+
 #import <Foundation/Foundation.h>
 #import "HGSExtension.h"
 
-// TODO(mrossetti): Refactor HGSExtension so that unessential features
-// required for sources and actions is not also required for accounts.
-// Also, move all notifications on add/remove/change into HSGExtension.
-
-// Information about accounts that a UI can display and which source or
-// actions can access.
-//
-@protocol HGSAccount <HGSExtension>
-
-// Initialize a new account entry.
-- (id)initWithName:(NSString *)userName;
-
-// Reconstitute an account entry from a dictionary.
-- (id)initWithDictionary:(NSDictionary *)prefDict;
-
-// Return a dictionary describing the account appropriate for archiving
-// to preferences.
-- (NSDictionary *)dictionaryValue;
-
-// Return a display name for the account.
-- (NSString *)displayName;
-
-// Return the type (google/facebook/etc.) of the account.
-- (NSString *)type;
-
-// Return the account name.
-- (NSString *)userName;
-
-// Get the password for the account.
-- (NSString *)password;
-
-// Set the account password.  Derived classes should always call this base
-// function in order to insure notifications are sent.
-- (void)setPassword:(NSString *)password;
-
-// Provide a view controller whose view will be installed in an account setup
-// window.  |parentWindow| is provided as a place off which to hang alerts. 
-+ (NSViewController *)
-    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow;
-
-// Do whatever is appropriate in order to edit the account.  |parentWindow|
-// is provided as a place off which to hang an edit sheet, if desired.
-- (void)editWithParentWindow:(NSWindow *)parentWindow;
-
-// Do what is appropriate in order to remove the account.  Derived classes
-// should either call this base function in order to insure notifications
-// are sent, or send both notifications itself.
-- (void)remove;
-
-// Determine if the account is editable.
-- (BOOL)isEditable;
-
-// Perform an asynchronous authentication for the account using its existing
-// credentials.
-- (void)authenticate;
-
-// Return YES if the account is valid (i.e. has been authenticated).
-- (BOOL)isAuthenticated;
-- (void)setAuthenticated:(BOOL)isAuthenticated;
-
-@end
-
-
-// A protocol to which extensions wanting access to an account must adhere.
-//
-@protocol HGSAccountClientProtocol
-
-// Inform an account clients that an account is going to be removed.  The
-// client should return YES if it should be shut down and deleted.
-- (BOOL)accountWillBeRemoved:(id<HGSAccount>)account;
-
-@end
-
-
-// A concrete representation of the HGSAccount protocol.
-//
-@interface HGSAccount : HGSExtension <HGSAccount> {
+/*!
+  Information about accounts that a UI can display and which source or actions
+  can access.
+*/
+@interface HGSAccount : HGSExtension {
  @private
   NSString *userName_; // AKA the account name.
   BOOL authenticated_;
 }
 
+/*!
+  The userName for the account
+*/
 @property (nonatomic, copy, readonly) NSString *userName;
+/*!
+  The type (google/facebook/etc.) of the account.
+*/
 @property (nonatomic, copy, readonly) NSString *type;
+/*!
+  Is the account valid? (i.e. has it been authenticated)
+*/
 @property (nonatomic, getter=isAuthenticated) BOOL authenticated;
-
-// Initialize a new account entry 
+/*!
+  Determine if the account is editable.  The default returns YES.
+*/
+@property (nonatomic, readonly, getter=isEditable) BOOL editable;
+/*!
+  Account password
+*/
+@property (nonatomic, readwrite, retain) NSString *password;
+/*!
+  Initialize a new account entry
+*/
 - (id)initWithName:(NSString *)userName;
 
-// Return a dictionary describing the account appropriate for archiving
-// to preferences.
-- (NSDictionary *)dictionaryValue;
+/*!
+  Reconstitute an account entry from a dictionary.
+*/
+- (id)initWithConfiguration:(NSDictionary *)prefDict;
 
-// Return a display name for the account.
-- (NSString *)displayName;
+/*!
+  Return a dictionary describing the account appropriate for archiving to
+  preferences.
+*/
+- (NSDictionary *)configuration;
 
-// Get the password for the account.  The default returns nil.
-- (NSString *)password;
-
-// If the password authenticates then set it and return YES.
-- (BOOL)setPassword:(NSString *)password;
-
-// The default view controller provider returns nil.
+/*!
+  Provide a view controller whose view will be installed in an account setup
+  window.  |parentWindow| is provided as a place off which to hang alerts.  The
+  default view controller provider returns nil.
+*/
 + (NSViewController *)
     setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow;
 
-// The default account edit function does nothing.
+/*!
+  Do whatever is appropriate in order to edit the account.  |parentWindow| is
+  provided as a place off which to hang an edit sheet, if desired.  The default
+  account edit function does nothing.
+*/
 - (void)editWithParentWindow:(NSWindow *)parentWindow;
 
-// Do what is appropriate in order to remove the account.  The default
-// removes the account from the accounts extensions point.  If you derive
-// a subclass then you should call super's (this) remove.
+/*!
+  Do what is appropriate in order to remove the account.  The default removes
+  the account from the accounts extensions point.  If you derive a subclass
+  then you should call super's (this) remove.
+*/
 - (void)remove;
 
-// Determine if the account is editable.  The default returns YES.
-- (BOOL)isEditable;
-
-// Perform an asynchronous authentication for the account using its existing
-// credentials.  The default does nothing.
+/*!
+  Perform an asynchronous authentication for the account using its existing
+  credentials.  The default does nothing.
+*/
 - (void)authenticate;
 
 @end
 
+/*!  
+  A protocol to which extensions wanting access to an account must adhere.
+*/
+@protocol HGSAccountClientProtocol
 
-// Notification sent whenever an account has been changed. The |object|
-// sent with the notification is the HGSAccount instance that has been changed.
+/*!
+  Inform an account clients that an account is going to be removed.  The client
+  should return YES if it should be shut down and deleted.
+*/
+- (BOOL)accountWillBeRemoved:(HGSAccount *)account;
+
+@end
+
+/*!
+  Notification sent whenever an account has been changed. The |object| sent
+  with the notification is the HGSAccount instance that has been changed.
+*/
 extern NSString *const kHGSAccountDidChangeNotification;
 
-// Notification sent when an account is going to be removed. The |object|
-// sent with the notification is the HGSAccount instance that will be removed.
+/*!
+  Notification sent when an account is going to be removed. The |object| sent
+  with the notification is the HGSAccount instance that will be removed.
+*/
 extern NSString *const kHGSAccountWillBeRemovedNotification;
 
-// Keys used in describing an account connection error.
+/*!
+  String specifying the username of the account.
+*/
 extern NSString *const kHGSAccountUserNameKey;
-extern NSString *const kHGSAccountConnectionErrorKey;
 
-// Keys used in the dictionary describing an account as stored in prefs.
-//
-// String specifying the type of the account.
+/*!
+  String specifying the type of the account.
+*/
 extern NSString *const kHGSAccountTypeKey;

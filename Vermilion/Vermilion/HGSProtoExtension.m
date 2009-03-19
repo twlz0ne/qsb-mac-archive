@@ -45,7 +45,7 @@
 // TODO(mrossetti): There will be other types of factors in the future so
 // will need to introduce an HGSFactor protocol that supports -[identifier]
 // at a minimum.
-- (id)copyWithFactor:(id<HGSAccount>)factor
+- (id)copyWithFactor:(HGSAccount *)factor
               forKey:(NSString *)key;
 
 // Respond to the pending removal of an account by shutting down our
@@ -83,7 +83,7 @@
                      plugin:(HGSPlugin *)plugin {
   if ((self = [super init])) {
     configuration_ 
-      = [[NSMutableDictionary alloc] initWithDictionary:configuration];
+      = [[NSMutableDictionary alloc] initWithConfiguration:configuration];
     
     plugin_ = plugin;
     
@@ -156,7 +156,7 @@
   for (NSString *desiredAccountType in desiredAccountTypes) {
     HGSAccountsExtensionPoint *aep = [HGSExtensionPoint accountsPoint];
     NSArray *accounts = [aep accountsForType:desiredAccountType];
-    for (id<HGSAccount> account in accounts) {
+    for (HGSAccount *account in accounts) {
       HGSProtoExtension *factoredExtension = [self factorForAccount:account];
       if (factoredExtension) {
         [factoredExtensions addObject:factoredExtension];
@@ -166,7 +166,7 @@
   return factoredExtensions;
 }
 
-- (HGSProtoExtension *)factorForAccount:(id<HGSAccount>)account {
+- (HGSProtoExtension *)factorForAccount:(HGSAccount *)account {
   HGSProtoExtension *factoredExtension = nil;
   NSString *accountType = [account type];
   NSArray *desiredAccountTypes = [self desiredAccountTypes];
@@ -207,7 +207,7 @@
 - (BOOL)canSetEnabled {
   BOOL canSet = [plugin_ isEnabled];
   if (canSet) {
-    id<HGSAccount> account = [configuration_ objectForKey:kHGSExtensionAccount];
+    HGSAccount *account = [configuration_ objectForKey:kHGSExtensionAccount];
     if (account) {
       canSet = [account isAuthenticated];
     }
@@ -222,7 +222,7 @@
   
   NSDate *startDate = [NSDate date];
   NSBundle *bundle = [configuration_ objectForKey:kHGSExtensionBundleKey];
-  id<HGSExtension> extension = nil;
+  HGSExtension *extension = nil;
   
   // Ensure the bundle is loaded
   if (![bundle isLoaded]) {
@@ -350,7 +350,7 @@
           [self class], self, [self isEnabled], plugin_, configuration_];
 }
 
-- (id)copyWithFactor:(id<HGSAccount>)factor
+- (id)copyWithFactor:(HGSAccount *)factor
               forKey:(NSString *)key {
   NSMutableDictionary *newConfiguration 
     = [NSMutableDictionary dictionaryWithDictionary:configuration_];

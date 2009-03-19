@@ -71,7 +71,6 @@
 // We prefer the former, and only support the latter for very complex extensions
 // or dynamic extensions.
 
-@protocol HGSExtension;
 @protocol HGSDelegate;
 @class HGSCodeSignature;
 
@@ -107,8 +106,6 @@
 // Given a path to a folder where modules may live, identify all modules and
 // their sources and actions, and return them as mutable plugins.
 - (void)loadPluginsAtPath:(NSString*)pluginsPath errors:(NSArray **)errors;
-- (BOOL)extendPoint:(NSString *)extensionPointID
-         withObject:(id<HGSExtension>)extension;
 
 - (id<HGSDelegate>)delegate;
 - (void)setDelegate:(id<HGSDelegate>)delegate;

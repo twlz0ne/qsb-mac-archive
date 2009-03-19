@@ -193,7 +193,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
-  id <HGSAccount> account = [notification object];
+  HGSAccount *account = [notification object];
   HGSAssert(account == account_, @"Notification from bad account!");
 }
 
@@ -263,7 +263,7 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 
 #pragma mark HGSAccountClientProtocol Methods
 
-- (BOOL)accountWillBeRemoved:(id<HGSAccount>)account {
+- (BOOL)accountWillBeRemoved:(HGSAccount *)account {
   HGSAssert(account == account_, @"Notification from bad account!");
   return YES;
 }

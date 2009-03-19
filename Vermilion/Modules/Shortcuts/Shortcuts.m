@@ -171,7 +171,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
     NSDictionary *archivedRep = [archiveDict objectForKey:sourceName];
     if ([archivedRep isKindOfClass:[NSDictionary class]]) {
       HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
-      id<HGSSearchSource> source = [sourcesPoint extensionWithIdentifier:sourceName];
+      HGSSearchSource *source = [sourcesPoint extensionWithIdentifier:sourceName];
       HGSResult *result = [source resultWithArchivedRepresentation:archivedRep];
       return result;
     } else {
@@ -226,7 +226,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
     return NO;
   }
   
-  id<HGSSearchSource> source = [result source];
+  HGSSearchSource *source = [result source];
   NSMutableDictionary *archiveDict = [source archiveRepresentationForResult:result];
   if (!archiveDict || [archiveDict count] == 0) {
     return NO;

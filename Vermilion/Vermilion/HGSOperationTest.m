@@ -35,8 +35,8 @@
 #import "HGSOperation.h"
 #import <GData/GDataHTTPFetcher.h>
 
-static const int kDiskOperationLength = 2; // seconds
-static const int kNetworkOperationLength = 2; // seconds
+static const int kDiskOperationLength = 500000; // microseconds
+static const int kNetworkOperationLength = 500000; // microseconds
 static const int kMemoryOperationCount = 10;
 static const int kNormalOperationCount = 5;
 static NSString * const kGoogleUrl = @"http://www.google.com/";
@@ -84,7 +84,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   // is, give us some confidence that our test results are accurate because
   // the class is correctly implemented, not because the operation ran so
   // quickly that the next queued-up operation didn't have time to start)
-  sleep(kDiskOperationLength);
+  usleep(kDiskOperationLength);
   
   @synchronized(self) {
     // Ensure that we are still not running simultaneously
@@ -115,7 +115,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   finishedWithDataIsRunning_ = YES;
   [condition signal];
   [condition unlock];
-  sleep(kNetworkOperationLength); // testNetworkOperations is now cancelling...
+  usleep(kNetworkOperationLength); // testNetworkOperations is now cancelling...
   STAssertTrue([[HGSInvocationOperation currentOperation] isCancelled],
                @"finishedWithData operation was not cancelled");
 }

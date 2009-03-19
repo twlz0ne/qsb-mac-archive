@@ -34,8 +34,9 @@
 #import "GTMSenTestCase.h"
 #import "HGSResult.h"
 #import "HGSSearchSource.h"
+#import <OCMock/OCMock.h>
 
-@interface HGSResultTest : GTMTestCase <HGSSearchSource>
+@interface HGSResultTest : GTMTestCase
 @end
 
 @implementation HGSResultTest
@@ -58,15 +59,6 @@
   STAssertEqualStrings(@"text",
                        [obj1 valueForKey:kHGSObjectAttributeTypeKey], 
                        @"invalid type");
-  
-  // create an object with missing values and make sure they go through our
-  // source, which will mirror the value as the provided key.
-  HGSResult* obj2 = [HGSResult resultWithURL:nil 
-                                        name:nil
-                                        type:NULL
-                                      source:self
-                                  attributes:nil];
-  STAssertNil(obj2, @"created object");
 
   // create an object with everything nil
   HGSResult* obj3 = [HGSResult resultWithURL:nil 
@@ -86,14 +78,20 @@
   [info setObject:path forKey:kHGSObjectAttributeURIKey];
   [info setObject:@"foo" forKey:kHGSObjectAttributeNameKey];
   [info setObject:@"bar" forKey:kHGSObjectAttributeTypeKey];
-  HGSResult* infoObject = [HGSResult resultWithDictionary:info source:self];
+  id searchSourceMock = [OCMockObject mockForClass:[HGSSearchSource class]];
+  HGSResult* infoObject = [HGSResult resultWithDictionary:info 
+                                                   source:searchSourceMock];
   STAssertNotNil(infoObject, @"can't create object from dict");
   STAssertEqualObjects([NSURL URLWithString:path], 
                        [infoObject url], 
                        @"didn't find uri");
+  [[[searchSourceMock stub] 
+    andReturn:kHGSPathCellDisplayTitleKey] 
+   provideValueForKey:kHGSPathCellDisplayTitleKey result:infoObject];
   STAssertEqualStrings(kHGSPathCellDisplayTitleKey, 
                        [infoObject valueForKey:kHGSPathCellDisplayTitleKey], 
                        @"didn't find title");
+  [searchSourceMock verify];
   
   // create an object from a dictionary where the source doesn't implement
   // the correct protocol. This shouldn't throw or crash.
@@ -196,76 +194,60 @@
   }
 }
 
-#pragma mark fake extension
+@end
 
-- (id)initWithConfiguration:(NSDictionary *)configuration {
-  return [super init];
-}
+@interface HGSResultArrayTest : GTMTestCase
+@end
 
-- (NSBundle *)bundle {
-  return [NSBundle bundleForClass:[self class]];
-}
-
-- (NSImage *)icon {
-  return nil;
-}
-
-- (NSString *)displayName {
-  return @"fakeSource";
-}
-
-- (NSString *)copyright {
-  return nil;
-}
-
-- (NSString *)identifier {
-  return @"fakeID";
-}
-
-- (NSAttributedString *)extensionDescription {
-  return nil;
-}
-
-- (NSString *)extensionVersion {
-  return nil;
-}
-
-#pragma mark fake search source
-
-- (NSSet *)pivotableTypes {
-  return nil;
-}
-
-- (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  return NO;
-}
-
-- (HGSSearchOperation *)searchOperationForQuery:(HGSQuery *)query {
-  return nil;
-}
-
-- (void)annotateResult:(HGSResult *)result withQuery:(HGSQuery *)query {
-}
-
-- (NSSet *)utisToExcludeFromDiskSources {
-  return nil;
-}
-
-- (NSMutableDictionary*)archiveRepresentationForResult:(HGSResult*)result {
-  return nil;
-}
-
-- (HGSResult *)resultWithArchivedRepresentation:(NSDictionary*)representation {
-  return nil;
-}
-
-// simply fills in the same value as the given |key|. Won't be called if the
-// value is already set.
-- (id)provideValueForKey:(NSString*)key result:(HGSResult*)result {
-  return key;
-}
-
-- (NSImage *)defaultIconForResult:(HGSResult *)result {
-  return nil;
+@implementation HGSResultArrayTest
+- (void)testArrayWithFilePaths {
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+  NSString *path1 
+    = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
+  STAssertNotNil(path1, nil);
+  NSString *path2 
+    = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.Xcode"];
+  STAssertNotNil(path2, nil);
+  NSArray *paths = [NSArray arrayWithObjects:path1, path2, nil];
+  HGSResultArray *results = [HGSResultArray arrayWithFilePaths:paths];
+  STAssertNotNil(results, nil);
+  STAssertEquals([results count], 2U, nil);
+  STAssertEqualObjects([results displayName], @"Multiple Items", nil);
+  HGSResult *result2 = [results objectAtIndex:1];
+  STAssertEqualObjects(result2, [results lastObject], nil);
+  NSArray *filePaths = [results filePaths];
+  STAssertEquals([filePaths count], [results count], nil);
+  NSArray *urls = [results urls];
+  STAssertEquals([urls count], [results count], nil);
+  
+  BOOL isOfType = [results isOfType:@"badType"];
+  STAssertFalse(isOfType, nil);
+  NSString *resultType = [result2 type];
+  isOfType = [results isOfType:resultType];
+  STAssertTrue(isOfType, nil);
+  isOfType = [results isOfType:nil];
+  STAssertFalse(isOfType, nil);
+  isOfType = [results isOfType:@""];
+  STAssertFalse(isOfType, nil);
+  
+  
+  BOOL conformsToType = [results conformsToType:@"badType"];
+  STAssertFalse(conformsToType, nil);
+  conformsToType = [results conformsToType:resultType];
+  STAssertTrue(conformsToType, nil);
+  conformsToType = [results conformsToType:nil];
+  STAssertFalse(conformsToType, nil);
+  conformsToType = [results conformsToType:@""];
+  STAssertFalse(conformsToType, nil);
+  
+  NSImage *icon = [results displayIconWithLazyLoad:NO];
+  STAssertNotNil(icon, nil);
+  icon = [results displayIconWithLazyLoad:YES];
+  STAssertNotNil(icon, nil);
+  
+  NSString *description = [results description];
+  STAssertTrue([description hasPrefix:@"HGSResultArray results:"], 
+               @"description is %@", description);
 }
 @end
+

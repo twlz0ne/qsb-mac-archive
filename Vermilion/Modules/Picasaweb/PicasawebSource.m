@@ -54,7 +54,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   GDataServiceGooglePhotos *picasawebService_;
   NSMutableSet *activeTickets_;
   NSTimer *updateTimer_;
-  id <HGSAccount> account_;
+  HGSAccount *account_;
   NSTimeInterval previousErrorReportingTime_;
 }
 
@@ -197,7 +197,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 }
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
-  id <HGSAccount> account = [notification object];
+  HGSAccount *account = [notification object];
   HGSAssert(account == account_, @"Notification from bad account!");
   // If we're in the middle of a fetch then cancel it first.
   [self cancelAllTickets];
@@ -528,7 +528,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 #pragma mark -
 #pragma mark HGSAccountClientProtocol Methods
 
-- (BOOL)accountWillBeRemoved:(id<HGSAccount>)account {
+- (BOOL)accountWillBeRemoved:(HGSAccount *)account {
   HGSAssert(account == account_, @"Notification from bad account!");
   
   // Cancel any outstanding fetches.

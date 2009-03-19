@@ -82,7 +82,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
   NSArray *googleAccounts = [accountsPoint accountsForType:@"GoogleApps"];
   NSMutableArray *domains = [NSMutableArray array];
-  for (id<HGSAccount> account in googleAccounts) {
+  for (HGSAccount *account in googleAccounts) {
     NSString *name = [account userName];
     NSInteger location = [name rangeOfString:@"@"].location;
     if (location != NSNotFound) {

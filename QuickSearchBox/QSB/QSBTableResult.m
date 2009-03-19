@@ -385,7 +385,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
   HGSResult *result = [self representedResult];
-  id<HGSAction> action
+  HGSAction *action
     = [result valueForKey:kHGSObjectAttributeDefaultActionKey];
   if (action) {
     HGSResultArray *results = [HGSResultArray arrayWithResult:result];

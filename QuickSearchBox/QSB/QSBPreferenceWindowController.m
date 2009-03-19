@@ -335,7 +335,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 
 - (IBAction)editAccount:(id)sender {
   NSArray *selections = [accountsListController_ selectedObjects];
-  id<HGSAccount> account = [selections objectAtIndex:0];
+  HGSAccount *account = [selections objectAtIndex:0];
   if ([account isEditable]) {
     [account editWithParentWindow:[self window]];
   }
@@ -344,7 +344,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 - (IBAction)removeAccount:(id)sender {
   NSArray *selections = [accountsListController_ selectedObjects];
   if ([selections count]) {
-    id<HGSAccount> accountToRemove = [selections objectAtIndex:0];
+    HGSAccount *accountToRemove = [selections objectAtIndex:0];
     NSString *summary = NSLocalizedString(@"About to remove an account.",
                                           nil);
     NSString *format
@@ -418,7 +418,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
                       returnCode:(int)returnCode
                      contextInfo:(void *)contextInfo {
   if (returnCode == NSAlertFirstButtonReturn) {
-    id<HGSAccount> accountToRemove = (id<HGSAccount>)contextInfo;
+    HGSAccount *accountToRemove = (HGSAccount *)contextInfo;
     NSUInteger selection = [accountsListController_ selectionIndex];
     if (selection > 0) {
       [accountsListController_ setSelectionIndex:(selection - 1)];
@@ -429,7 +429,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 
 - (void)didAddAccount:(NSNotification *)notification {
   NSDictionary *userInfo = [notification userInfo];
-  id<HGSAccount> newAccount = [userInfo objectForKey:kHGSExtensionKey];
+  HGSAccount *newAccount = [userInfo objectForKey:kHGSExtensionKey];
   if (newAccount) {
     NSArray *accounts = [NSArray arrayWithObject:newAccount];
     [accountsListController_ setSelectedObjects:accounts];

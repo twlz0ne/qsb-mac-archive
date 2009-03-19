@@ -56,7 +56,8 @@ NSString* const kHGSObjectAttributeIconPreviewFileKey = @"kHGSObjectAttributeIco
 NSString *const kHGSObjectAttributeCompoundIconPreviewFileKey = @"kHGSObjectAttributeCompoundIconPreviewFileKey";
 NSString* const kHGSObjectAttributeIsSyntheticKey = @"kHGSObjectAttributeIsSynthetic";
 NSString* const kHGSObjectAttributeIsContainerKey = @"kHGSObjectAttributeIsContainer";
-NSString* const kHGSObjectAttributeRankKey = @"kHGSObjectAttributeRank";  
+NSString* const kHGSObjectAttributeRankKey = @"kHGSObjectAttributeRank";
+NSString* const kHGSObjectAttributeRankFlagsKey = @"kHGSObjectAttributeRankFlags";
 NSString* const kHGSObjectAttributeDefaultActionKey = @"kHGSObjectAttributeDefaultActionKey";
 // Path cell-related keys
 NSString* const kHGSObjectAttributePathCellClickHandlerKey = @"kHGSObjectAttributePathCellClickHandler";
@@ -66,15 +67,11 @@ NSString* const kHGSPathCellImageKey = @"kHGSPathCellImage";
 NSString* const kHGSPathCellURLKey = @"kHGSPathCellURL";
 NSString* const kHGSPathCellHiddenKey = @"kHGSPathCellHidden";
 
-NSString* const kHGSObjectAttributeVisitedCountKey = @"kHGSObjectAttributeVisitedCount";
-
 NSString* const kHGSObjectAttributeWebSearchDisplayStringKey = @"kHGSObjectAttributeWebSearchDisplayString";
 NSString* const kHGSObjectAttributeWebSearchTemplateKey = @"kHGSObjectAttributeWebSearchTemplate";
 NSString* const kHGSObjectAttributeAllowSiteSearchKey = @"kHGSObjectAttributeAllowSiteSearch";
 NSString* const kHGSObjectAttributeWebSuggestTemplateKey = @"kHGSObjectAttributeWebSuggestTemplate";
 NSString* const kHGSObjectAttributeStringValueKey = @"kHGSObjectAttributeStringValue";
-
-NSString* const kHGSObjectAttributeRankFlagsKey = @"kHGSObjectAttributeRankFlags";
 
 // Contact related keys
 NSString* const kHGSObjectAttributeContactEmailKey = @"kHGSObjectAttributeContactEmail";  
@@ -82,10 +79,6 @@ NSString* const kHGSObjectAttributeEmailAddressesKey = @"kHGSObjectAttributeEmai
 NSString* const kHGSObjectAttributeContactsKey = @"kHGSObjectAttributeContactsKey";
 NSString* const kHGSObjectAttributeAlternateActionURIKey = @"kHGSObjectAttributeAlternateActionURI";
 NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey = @"kHGSObjectAttributeAddressBookRecordIdentifier";
-
-// Chat Buddy-related keys
-NSString* const kHGSObjectAttributeBuddyMatchingStringKey = @"kHGSObjectAttributeBuddyMatchingStringKey";
-NSString* const kHGSIMBuddyInformationKey = @"kHGSIMBuddyInformationKey";
 
 @interface HGSResult ()
 + (NSString *)hgsTypeForPath:(NSString*)path;
@@ -99,6 +92,13 @@ NSString* const kHGSIMBuddyInformationKey = @"kHGSIMBuddyInformationKey";
 @implementation HGSResult
 
 GTM_METHOD_CHECK(NSString, readableURLString);
+@synthesize displayName = displayName_;
+@synthesize type = type_;
+@synthesize url = url_;
+@synthesize lastUsedDate = lastUsedDate_;
+@synthesize rank = rank_;
+@synthesize rankFlags = rankFlags_;
+@synthesize source = source_;
 
 + (void)initialize {
   [self setKeys:[NSArray arrayWithObject:kHGSObjectAttributeIconKey]  
@@ -112,7 +112,7 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
 + (id)resultWithURL:(NSURL*)url
                name:(NSString *)name
                type:(NSString *)typeStr
-             source:(id<HGSSearchSource>)source 
+             source:(HGSSearchSource *)source 
          attributes:(NSDictionary *)attributes {
   return [[[self alloc] initWithURL:url
                                name:name
@@ -122,7 +122,7 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
 }
 
 + (id)resultWithFilePath:(NSString *)path 
-                  source:(id<HGSSearchSource>)source 
+                  source:(HGSSearchSource *)source 
               attributes:(NSDictionary *)attributes {
   NSFileManager *fm = [NSFileManager defaultManager];
   NSURL *url = [NSURL fileURLWithPath:path];
@@ -139,7 +139,7 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
 }
 
 + (id)resultWithDictionary:(NSDictionary *)dictionary 
-                    source:(id<HGSSearchSource>)source {
+                    source:(HGSSearchSource *)source {
   return [[[self alloc] initWithDictionary:dictionary 
                                     source:source] autorelease];
 }
@@ -147,7 +147,7 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
 - (id)initWithURL:(NSURL *)url
              name:(NSString *)name
              type:(NSString *)typeStr
-           source:(id<HGSSearchSource>)source 
+           source:(HGSSearchSource *)source 
        attributes:(NSDictionary *)attributes {
   if ((self = [super init])) {
     if (!url || !name || !typeStr) {
@@ -160,7 +160,7 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
     
     url_ = [url retain];
     idHash_ = [url_ hash];
-    name_ = [name retain];
+    displayName_ = [name retain];
     type_ = [typeStr retain];
     source_ = [source retain];
     conformsToContact_ = [self conformsToType:kHGSTypeContact];
@@ -192,7 +192,7 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
 }
   
 - (id)initWithDictionary:(NSDictionary*)dict 
-                  source:(id<HGSSearchSource>)source {
+                  source:(HGSSearchSource *)source {
   NSMutableDictionary *attributes 
     = [NSMutableDictionary dictionaryWithDictionary:dict];
   NSURL *url = [attributes objectForKey:kHGSObjectAttributeURIKey];
@@ -229,7 +229,7 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
   [values_ release];
   [url_ release];
   [normalizedIdentifier_ release];
-  [name_ release];
+  [displayName_ release];
   [type_ release];
   [lastUsedDate_ release];
   [super dealloc];
@@ -342,16 +342,8 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
   return [[value retain] autorelease];
 }
 
-- (NSURL *)url {
-  return [[url_ retain] autorelease];
-}
-
 - (NSString*)stringValue {
   return [self displayName];
-}
-
-- (NSString*)displayName {
-  return [[name_ retain] autorelease];
 }
 
 - (NSImage *)displayIconWithLazyLoad:(BOOL)lazyLoad {
@@ -376,10 +368,6 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
   return [self valueForKey:kHGSObjectAttributePathCellsKey];
 }
 
-- (NSString*)type {
-  return type_;
-}
-
 - (BOOL)isOfType:(NSString *)typeStr {
   // Exact match
   BOOL result = [type_ isEqualToString:typeStr];
@@ -388,13 +376,13 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
 
 static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   // Must have the exact prefix
-  BOOL result = [type1 hasPrefix:type2];
-  NSUInteger typeLen;
+  NSUInteger type2Len = [type2 length];
+  BOOL result = type2Len > 0 && [type1 hasPrefix:type2];
   if (result &&
-      ([type1 length] > (typeLen = [type2 length]))) {
+      ([type1 length] > type2Len)) {
     // If it's not an exact match, it has to have a '.' after the base type (we
     // don't count "foobar" as of type "foo", only "foo.bar" matches).
-    unichar nextChar = [type1 characterAtIndex:typeLen];
+    unichar nextChar = [type1 characterAtIndex:type2Len];
     result = (nextChar == '.');
   }
   return result;
@@ -413,18 +401,6 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
     }
   }
   return NO;
-}
-
-- (id<HGSSearchSource>)source {  
-  return source_;
-}
-
-- (CGFloat)rank {
-  return rank_;
-}
-
-- (HGSRankFlags)rankFlags {
-  return rankFlags_;
 }
 
 - (NSString*)description {
@@ -496,10 +472,6 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
     }
   }
   return intersects;
-}
-
-- (NSDate *)lastUsedDate {
-  return lastUsedDate_;
 }
 
 - (NSDictionary *)values {
@@ -773,10 +745,6 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
                                          count:len];
 }
 
-- (NSArray *)results {
-  return [[results_ retain] autorelease];
-}
-
 - (NSString*)displayName {
   NSString *displayName = nil;
   if ([results_ count] == 1) {
@@ -784,7 +752,7 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
     displayName = [result displayName];
   } else {
     // TODO(alcor): make this nicer
-    displayName = @"Multiple Items";
+    displayName = HGSLocalizedString(@"Multiple Items", nil);
   }
   return displayName;
 }
@@ -800,7 +768,6 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   }
   return displayImage;
 }
-
 
 - (BOOL)isOfType:(NSString *)typeStr {
   BOOL isOfType = YES;

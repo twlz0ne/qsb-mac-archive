@@ -30,100 +30,29 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion
+*/
+
 #import <Foundation/Foundation.h>
 #import "HGSExtension.h"
-
-// kHGSValidateActionBehaviorsPrefKey is a boolean preference that the engine
-// can use to enable extra logging about Action behaviors to help developers
-// make sure their Action is acting right.  The pref should be set before launch
-// to ensure it is all possible checks are done.
-#define kHGSValidateActionBehaviorsPrefKey @"HGSValidateActionBehaviors"
-
 
 @class HGSResult;
 @class HGSResultArray;
 
-// keys to |-performActionWithInfo:|, see below for more details
-extern NSString* const kHGSActionDirectObjectsKey;
-extern NSString* const kHGSActionIndirectObjectsKey;
-
-//
-// HGSAction
-//
-// The base class for actions. Actions can exist in two different versions.
-// The first version is "noun verb" such as "file open". The second requires two
-// objects, "noun verb noun" such as "file 'email to' hasselhoff" with the 2nd
-// being the indirect object. An action can be asked if a given result is
-// valid as an indirect object. Actions can also return a result so that they
-// can be chained together. 
-//
- 
-@protocol HGSAction <HGSExtension>
-
-// If this action can take a direct and/or indirect object, it must declare the
-// types.  If the indirect object is optional, then use
-// |isIndirectObjectOptional| to let the calling code know.  If any object type
-// is valid for either direct or indirect objects, then return a set with the
-// string "*".
-- (NSSet*)directObjectTypes;
-- (NSSet*)indirectObjectTypes;
-- (BOOL)isIndirectObjectOptional;
-
-// Does the action apply to an individual result. The calling code will 
-// check that the results are all one of the types listed in directObjectTypes 
-// before calling this. Do not call this to check if an action is valid
-// for a given result. Always turn the result into a result array and call
-// appliesToResults:. This is only for subclassers to override.
-- (BOOL)appliesToResult:(HGSResult *)result;
-
-// Does the action apply to the array of results. Normally you want
-// to override appliesToResult:, which appliesToResults:
-// will call. 
-- (BOOL)appliesToResults:(HGSResultArray *)results;
-
-// Should this action appear in global search results list (ie-no pivot).
-// HGSAction implementation returns NO.
-- (BOOL)showInGlobalSearchResults;
-
-// Does the action cause a UI Context change? In the case
-// of QSB, should we hide the QSB before performing the action.
-// HGSAction implementation returns YES.
-- (BOOL)causesUIContextChange;
-
-// returns the name to display in the UI for this action. May change based
-// on the contents of |result|, but the base class ignores it.
-- (NSString*)displayNameForResults:(HGSResultArray*)results;
-
-// returns the icon to display in the UI for this action. May change based
-// on the contents of |result|, but the base class ignores it.
-- (id)displayIconForResults:(HGSResultArray*)results;
-
-// Conformers override to perform the action. Actions can have either one or two
-// objects. If only one is present, it should act as "noun verb" such as "file
-// open". If there are two it should behave as "noun verb noun" such as "file
-// 'email to' hasselhoff" with the 2nd being the indirect object.
-// Returns NO if action not performed. YES dictionary if performed.
-// 
-// *** NB ***
-// Do not call this method directly. Wrap your action up in an
-// HGSActionOperation and use that instead.
-//
-// |info| keys:
-//   kHGSActionDirectObjectsKey 
-//     - HGSResultArray* - the direct objects (reqd)
-//   kHGSActionIndirectObjectsKey 
-//     - HGSResultArray* - the indirect objects (opt)
-//
-// Return YES on success.
-//
-- (BOOL)performWithInfo:(NSDictionary*)info;
-@end
-
-// The HGSAction class is provided as a convenience class for people doing
-// simple actions. People may want to use the protocol if they prefer to reuse
-// some exiting class without subclassing.
-
-@interface HGSAction : HGSExtension <HGSAction> {
+/*!
+  @class HGSAction
+  @coclass HGSActionOperation
+  @discussion
+  The base class for actions. Actions can exist in two different versions.  The
+  first version is "noun verb" such as "file open". The second requires two
+  objects, "noun verb noun" such as "file 'email to' hasselhoff" with the 2nd
+  being the indirect object. An action can be asked if a given result is valid
+  as an indirect object. Actions can also return a result so that they can be
+  chained together.
+*/
+@interface HGSAction : HGSExtension {
  @private
   NSSet *directObjectTypes_;
   NSSet *indirectObjectTypes_;
@@ -132,29 +61,110 @@ extern NSString* const kHGSActionIndirectObjectsKey;
   BOOL causesUIContextChange_;
 }
 
-// The defaults for the apis in the protocol are as follow:
-//
-//   -directObjectTypes
-//      nil or the value of "HGSActionDirectObjectTypes" from config dict.
-//   -indirectObjectTypes
-//      nil or the value of "HGSActionIndirectObjectTypes" from config dict.
-//   -isIndirectObjectOptional
-//      NO or the value of "HGSActionIndirectObjectOptional" from config dict.
-//   -appliesToResult:
-//      YES
-//   -appliesToResults:
-//      YES if all the results in the array conform to 
-//      directObjectTypes and they each pass appliesToResult:
-//   -showInGlobalSearchResults
-//      NO or the value of "HGSActionShowActionInGlobalSearchResults" from
-//      config dict.
-//   -causesUIContextChange
-//      YES or the value of "HGSActionDoesActionCauseUIContextChange" from
-//      config dict.
-//   -displayNameForResult:
-//      the name of the action (-[HGSExtension name])
-//   -displayIconForResult:
-//      the name of the action (-[HGSExtension icon])
-//
+/*!
+  The types of direct objects that are valid for this action
+  @result The value of "HGSActionDirectObjectTypes" from config dict.
+*/
+@property (readonly, retain) NSSet *directObjectTypes;
+/*!
+  The types of direct objects that are valid for this action
+  @result The value of "HGSActionIndirectObjectTypes" from config dict.
+*/
+@property (readonly, retain) NSSet *indirectObjectTypes;
+/*!
+  Is the indirect object optional for this action.
+  @result Defaults to NO or the value of "HGSActionIndirectObjectOptional" from 
+          config dict.
+*/ 
+@property (readonly) BOOL indirectObjectOptional;
+/*!
+  Should this action appear in global search results list (ie-no pivot).
+  @result NO or the value of "HGSActionShowActionInGlobalSearchResults" from
+          config dict.
+*/
+@property (readonly) BOOL showInGlobalSearchResults;
+/*!
+  Does the action cause a UI Context change? In the case of QSB, should we hide
+  the QSB before performing the action.
+  @result YES or the value of "HGSActionDoesActionCauseUIContextChange" from
+          config dict.
+*/
+@property (readonly) BOOL causesUIContextChange;
+
+/*!
+  Does the action apply to an individual result. The calling code will check
+  that the results are all one of the types listed in directObjectTypes before
+  calling this. Do not call this to check if an action is valid for a given
+  result. Always turn the result into a result array and call
+  appliesToResults:. This is only for subclassers to override.
+  @result Defaults to YES
+*/
+- (BOOL)appliesToResult:(HGSResult *)result;
+
+/*!
+  Does the action apply to the array of results. Normally you want to override
+  appliesToResult:, which appliesToResults: will call.
+  @result YES if all the results in the array conform to 
+          directObjectTypes and they each pass appliesToResult:
+*/
+- (BOOL)appliesToResults:(HGSResultArray *)results;
+
+/*!
+  returns the name to display in the UI for this action. May change based on
+  the contents of |result|, but the base class ignores it.
+  @result Defaults to displayName.
+
+*/
+- (NSString*)displayNameForResults:(HGSResultArray*)results;
+
+/*!
+  returns the icon to display in the UI for this action. May change based on
+  the contents of |result|, but the base class ignores it.
+  @result Defaults to generic action icon.
+*/
+- (id)displayIconForResults:(HGSResultArray*)results;
+
+/*!
+  Conformers override to perform the action. Actions can have either one or two
+  objects. If only one is present, it should act as "noun verb" such as "file
+  open". If there are two it should behave as "noun verb noun" such as "file
+  'email to' hasselhoff" with the 2nd being the indirect object.
+  
+  *** NB *** 
+  
+  Do not call this method directly. Wrap your action up in an
+  HGSActionOperation and use that instead.
+  
+  @param info keys: 
+  1 kHGSActionDirectObjectsKey (HGSResultArray *) - the direct objects (reqd)  
+  2 kHGSActionIndirectObjectsKey (HGSResultArray *) - the indirect objects (opt)
+  
+  @result YES if action performed.
+*/
+- (BOOL)performWithInfo:(NSDictionary*)info;
 
 @end
+
+/*!
+  kHGSValidateActionBehaviorsPrefKey is a boolean preference that the engine
+  can use to enable extra logging about Action behaviors to help developers
+  make sure their Action is acting right.  The pref should be set before launch
+  to ensure it is all possible checks are done.
+*/
+#define kHGSValidateActionBehaviorsPrefKey @"HGSValidateActionBehaviors"
+
+/*!
+  The key for the direct objects for to performWithInfo:. 
+ 
+  Type is HGSResultsArray.
+  @see //google_vermilion_ref/occ/instm/HGSAction/performWithInfo: performWithInfo:
+*/
+extern NSString* const kHGSActionDirectObjectsKey;
+
+/*!
+ The key for the indirect objects for to performWithInfo:.
+ 
+ Type is HGSResultsArray.
+ @see //google_vermilion_ref/occ/instm/HGSAction/performWithInfo: performWithInfo:
+*/
+extern NSString* const kHGSActionIndirectObjectsKey;
