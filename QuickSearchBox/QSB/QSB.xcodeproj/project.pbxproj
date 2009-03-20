@@ -688,6 +688,9 @@
 		8BA61B920F0ADEAD008182B5 /* QuickLook.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B6ECB620E154F08006A815D /* QuickLook.png */; };
 		8BA61DBB0F0AEF78008182B5 /* AddToPartyShuffle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BA61DBA0F0AEF78008182B5 /* AddToPartyShuffle.icns */; };
 		8BA61DBD0F0AEF7E008182B5 /* PlayInPartyShuffle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BA61DBC0F0AEF7E008182B5 /* PlayInPartyShuffle.icns */; };
+		8BB658F20F73034600E20B99 /* GTMNSObject+UnitTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55DAE20E78829300D39CB0 /* GTMNSObject+UnitTesting.m */; };
+		8BB658F40F73035000E20B99 /* GTMAppKit+UnitTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55DAE40E78829300D39CB0 /* GTMAppKit+UnitTesting.m */; };
+		8BB6594B0F73036600E20B99 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8BB912C80E1D23F30018636A /* RecentDocumentsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 627FAEB50DF9D71D00E3E765 /* RecentDocumentsSource.m */; };
 		8BC350BB0F2BD7D3001ADD5B /* QSBResultIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC350BA0F2BD7D3001ADD5B /* QSBResultIconView.m */; };
 		8BC3F4A50F17C7C000896770 /* action-share-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4410F17C7BE00896770 /* action-share-icon.png */; };
@@ -3142,8 +3145,8 @@
 				8B148F5E0F715696002E05FA /* Source */,
 			);
 			name = OCMock;
-			path = ../../../externals/OCMock;
-			sourceTree = QSBROOT;
+			path = ../externals/OCMock;
+			sourceTree = SOURCE_ROOT;
 		};
 		8B148F5E0F715696002E05FA /* Source */ = {
 			isa = PBXGroup;
@@ -6641,6 +6644,9 @@
 				8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */,
 				8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */,
 				8B95CE200F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m in Sources */,
+				8BB658F20F73034600E20B99 /* GTMNSObject+UnitTesting.m in Sources */,
+				8BB658F40F73035000E20B99 /* GTMAppKit+UnitTesting.m in Sources */,
+				8BB6594B0F73036600E20B99 /* GTMMethodCheck.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
