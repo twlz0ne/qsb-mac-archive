@@ -127,8 +127,6 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
       // Make sure it isn't in use and we don't already have this extension
       // used for a different key
       if ([extensions_ objectForKey:identifier]) {
-        HGSLog(@"Extension %@ with identifier '%@' already exists in %@",
-               extension, identifier, self);
         wasGood = NO;
       } else {
         [extensions_ setObject:extension forKey:identifier];
