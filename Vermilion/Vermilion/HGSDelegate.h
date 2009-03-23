@@ -58,9 +58,6 @@ typedef enum {
 
 - (NSString *)suggestLanguage;
 
-// Return the ID for the default action 
-- (NSString *)defaultActionID;
-
 // When a new plugin is loaded, this method is called to approve it. certRef
 // will contain the certificate that was used to code sign the plugin
 // bundle, or nil if the plugin bundle was unsigned or has an invalid
@@ -68,4 +65,7 @@ typedef enum {
 - (HGSPluginLoadResult)shouldLoadPluginAtPath:(NSString *)path
                                 withSignature:(HGSCodeSignature *)signature;
 
+// Given a result provide a value for the key. This is for keys that are
+// specific to the UI.
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result;
 @end

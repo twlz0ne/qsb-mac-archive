@@ -33,6 +33,25 @@
 #import <Cocoa/Cocoa.h>
 #import <Vermilion/Vermilion.h>
 
+// The path presentation shown in the search results window can be
+// built from one of the following (in order of preference):
+//   1. an array of cell descriptions
+//   2. a file path URL (from our |identifier|).
+//   3. a slash-delimeted string of cell titles
+// Only the first option guarantees that a cell is clickable, the
+// second option may but is not likely to support clicking, and the
+// third definitely not.  We will return a decent cell array for regular URLs 
+// and file URLs and a mediocre one for public.message results but you can 
+// compose and provide your own in your source's provideValueForKey: method.
+
+// Path cell-related keys
+#define kQSBObjectAttributePathCellClickHandlerKey @"kQSBObjectAttributePathCellClickHandler"  // selector as string
+#define kQSBObjectAttributePathCellsKey @"kQSBbjectAttributePathCells"  // NSArray of NSDictionaries
+#define kQSBPathCellDisplayTitleKey @"kQSBPathCellDisplayTitle"  // NSString
+#define kQSBPathCellImageKey @"kQSBPathCellImage"  // NSImage
+#define kQSBPathCellURLKey @"kQSBPathCellURL"  // NSURL
+#define kQSBPathCellHiddenKey @"kQSBPathCellHidden"  // NSNumber (BOOL)
+
 @class QSBPluginVerifyWindowController;
 
 // Class that acts as the delegate for the HGS framework providing some

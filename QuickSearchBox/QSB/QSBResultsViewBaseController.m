@@ -42,6 +42,7 @@
 #import "GTMGeometryUtils.h"
 #import "GTMNSObject+KeyValueObserving.h"
 #import "GTMMethodCheck.h"
+#import "QSBHGSDelegate.h"
 
 static const CGFloat kScrollViewMinusTableHeight = 7.0;
 static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
@@ -376,7 +377,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                                         objectAtIndex:0];
       SEL cellClickHandler
         = NSSelectorFromString([selectedObject
-                                valueForKey:kHGSObjectAttributePathCellClickHandlerKey]);
+                                valueForKey:kQSBObjectAttributePathCellClickHandlerKey]);
       if (cellClickHandler) {
         NSArray *pathComponentCells = [pathControl pathComponentCells];
         NSUInteger clickedCell 

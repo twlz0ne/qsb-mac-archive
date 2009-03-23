@@ -40,6 +40,7 @@
 #import "GTMGeometryUtils.h"
 #import "GTMNSImage+Scaling.h"
 #import "GTMNSBezierPath+CGPath.h"
+#import "QSBHGSDelegate.h"
 
 static NSString *const kMetaDataFilePath
   = @"~/Library/Application Support/AddressBook/Metadata/%@.abcdp";
@@ -538,7 +539,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     value = [snippetArray componentsJoinedByString:@", "];
   }
 #if !TARGET_OS_IPHONE
-  else if ([key isEqualToString:kHGSObjectAttributePathCellsKey]) {
+  else if ([key isEqualToString:kQSBObjectAttributePathCellsKey]) {
     // Build two cells, the first with Address Book or Google Contacts,
     // the second with the contact entry.
     // TODO(mrossetti): Accommodate Google Contacts when available.
@@ -563,14 +564,14 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     }
     
     NSMutableDictionary *baseCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                     serviceName, kHGSPathCellDisplayTitleKey,
+                                     serviceName, kQSBPathCellDisplayTitleKey,
                                      nil];
     if (serviceURL) {
-      [baseCell setObject:serviceURL forKey:kHGSPathCellURLKey];
+      [baseCell setObject:serviceURL forKey:kQSBPathCellURLKey];
     }
     NSDictionary *contactCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 contactName, kHGSPathCellDisplayTitleKey,
-                                 contactURL, kHGSPathCellURLKey,
+                                 contactName, kQSBPathCellDisplayTitleKey,
+                                 contactURL, kQSBPathCellURLKey,
                                  nil];
     value = [NSArray arrayWithObjects:baseCell, contactCell, nil];
   }

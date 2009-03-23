@@ -33,6 +33,7 @@
 #import <Vermilion/Vermilion.h>
 #import <GData/GData.h>
 #import "KeychainItem.h"
+#import "QSBHGSDelegate.h"
 
 static NSString *const kPhotosAlbumKey = @"kPhotosAlbumKey";
 
@@ -234,8 +235,8 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     NSMutableArray *cellArray = [NSMutableArray array];
     NSDictionary *picasawebCell 
       = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-         HGSLocalizedString(@"Picasaweb", nil), kHGSPathCellDisplayTitleKey,
-         baseURL, kHGSPathCellURLKey,
+         HGSLocalizedString(@"Picasaweb", nil), kQSBPathCellDisplayTitleKey,
+         baseURL, kQSBPathCellURLKey,
          nil];
     [cellArray addObject:picasawebCell];
     
@@ -246,17 +247,17 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                               [picasawebService_ username]]];
     NSDictionary *userCell 
       = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-         [picasawebService_ username], kHGSPathCellDisplayTitleKey,
-         userURL, kHGSPathCellURLKey,
+         [picasawebService_ username], kQSBPathCellDisplayTitleKey,
+         userURL, kQSBPathCellURLKey,
          nil];
     [cellArray addObject:userCell];
     
     NSDictionary *albumCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   albumTitle, kHGSPathCellDisplayTitleKey,
-                                   albumURL, kHGSPathCellURLKey,
+                                   albumTitle, kQSBPathCellDisplayTitleKey,
+                                   albumURL, kQSBPathCellURLKey,
                                    nil];
     [cellArray addObject:albumCell];
-    [attributes setObject:cellArray forKey:kHGSObjectAttributePathCellsKey]; 
+    [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
 
     // Remember the first photo's URL to ease on-demand fetching later.
     [PicasawebSource setBestFitThumbnailFromMediaGroup:[album mediaGroup]
@@ -348,8 +349,8 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     NSMutableArray *cellArray = [NSMutableArray array];
     NSDictionary *picasawebCell 
       = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-         HGSLocalizedString(@"Picasaweb", nil), kHGSPathCellDisplayTitleKey,
-         baseURL, kHGSPathCellURLKey,
+         HGSLocalizedString(@"Picasaweb", nil), kQSBPathCellDisplayTitleKey,
+         baseURL, kQSBPathCellURLKey,
          nil];
     [cellArray addObject:picasawebCell];
     NSString *urlString = [NSString stringWithFormat:@"%@://%@/%@/",
@@ -359,27 +360,27 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     NSURL *userURL  = [NSURL URLWithString:urlString];
     NSDictionary *userCell 
       = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-         [picasawebService_ username], kHGSPathCellDisplayTitleKey,
-         userURL, kHGSPathCellURLKey,
+         [picasawebService_ username], kQSBPathCellDisplayTitleKey,
+         userURL, kQSBPathCellURLKey,
          nil];
     [cellArray addObject:userCell];
     
     NSString* albumTitle = [[album title] stringValue];
     NSURL* albumURL = [[album HTMLLink] URL];
     NSDictionary *albumCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                               albumTitle, kHGSPathCellDisplayTitleKey,
-                               albumURL, kHGSPathCellURLKey,
+                               albumTitle, kQSBPathCellDisplayTitleKey,
+                               albumURL, kQSBPathCellURLKey,
                                nil];
     [cellArray addObject:albumCell];
-    [attributes setObject:cellArray forKey:kHGSObjectAttributePathCellsKey]; 
+    [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
     
     NSString* photoTitle = [[photo title] stringValue];
     NSDictionary *photoCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                               photoTitle, kHGSPathCellDisplayTitleKey,
-                               photoURL, kHGSPathCellURLKey,
+                               photoTitle, kQSBPathCellDisplayTitleKey,
+                               photoURL, kQSBPathCellURLKey,
                                nil];
     [cellArray addObject:photoCell];
-    [attributes setObject:cellArray forKey:kHGSObjectAttributePathCellsKey]; 
+    [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
     
     // Remember the photo's first image URL.
     [PicasawebSource setBestFitThumbnailFromMediaGroup:[photo mediaGroup]

@@ -43,6 +43,7 @@
 #import "QSBMoreResultsViewControllers.h"
 #import "GTMNSObject+KeyValueObserving.h"
 #import "GTMMethodCheck.h"
+#import "QSBHGSDelegate.h"
 
 typedef enum {
   kQSBResultDescriptionTitle = 0,
@@ -398,7 +399,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (NSArray *)displayPath {
   HGSResult *result = [self representedResult];
-  return [result displayPath];
+  return [result valueForKey:kQSBObjectAttributePathCellsKey];
 }
 
 - (NSString *)displayName {
@@ -528,8 +529,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSURL *url = [[self representedResult] url];
   
   return [NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:
-                                   string, kHGSPathCellDisplayTitleKey,
-                                   url, kHGSPathCellURLKey,
+                                   string, kQSBPathCellDisplayTitleKey,
+                                   url, kQSBPathCellURLKey,
                                    nil]];
 }
 

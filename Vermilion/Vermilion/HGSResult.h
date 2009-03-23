@@ -67,14 +67,6 @@ extern NSString *const kHGSObjectAttributeCompoundIconPreviewFileKey;  // NSURL
 extern NSString* const kHGSObjectAttributeIsSyntheticKey;  // NSNumber (BOOL)
 extern NSString* const kHGSObjectAttributeIsContainerKey;  // NSNumber (BOOL)
 extern NSString* const kHGSObjectAttributeDefaultActionKey;  // id<HGSAction>
-// Path cell-related keys
-extern NSString* const kHGSObjectAttributePathCellClickHandlerKey;  // selector as string
-extern NSString* const kHGSObjectAttributePathCellsKey;  // NSArray of NSDictionaries
-extern NSString* const kHGSPathCellDisplayTitleKey;  // NSString
-extern NSString* const kHGSPathCellImageKey;  // NSImage
-extern NSString* const kHGSPathCellURLKey;  // NSURL
-extern NSString* const kHGSPathCellHiddenKey;  // NSNumber (BOOL)
-
 extern NSString* const kHGSObjectAttributeContactEmailKey; // NSString - Primary email address
 extern NSString* const kHGSObjectAttributeEmailAddressesKey; // NSArray of NSString - Related email addresses
 extern NSString* const kHGSObjectAttributeContactsKey; // NSArray of NSString - Names of related people
@@ -245,9 +237,6 @@ typedef NSUInteger HGSRankFlags;
 // TODO(dmaclach)get rid of setValue:forKey: support
 - (void)setValue:(id)obj forKey:(NSString*)key;
 - (id)valueForKey:(NSString*)key;
-
-// An array of NSDictionaries describing the path to the result.
-- (NSArray*)displayPath;
 
 // merge the attributes of |result| into this one. Single values that overlap
 // are lost, arrays and dictionaries are merged together to form the union.

@@ -36,6 +36,7 @@
 #import "ApplicationUIAction.h"
 #import "HGSStringUtil.h"
 #import "HGSTokenizer.h"
+#import "QSBHGSDelegate.h"
 
 // Turns out the Finder has a couple of places with recursive
 // accessibility references. 10 should be deep enough for most cases.
@@ -216,7 +217,7 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
   if (element) {
     if ([key isEqualToString:kHGSObjectAttributeDefaultActionKey]) {
       value = [ApplicationUIAction defaultActionForElement:element];
-    } else if ([key isEqualToString:kHGSObjectAttributePathCellsKey]) {
+    } else if ([key isEqualToString:kQSBObjectAttributePathCellsKey]) {
       // TODO(dmaclach): Build up the path cells for the element
     }
   }

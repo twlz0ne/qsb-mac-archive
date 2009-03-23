@@ -59,13 +59,6 @@ NSString* const kHGSObjectAttributeIsContainerKey = @"kHGSObjectAttributeIsConta
 NSString* const kHGSObjectAttributeRankKey = @"kHGSObjectAttributeRank";
 NSString* const kHGSObjectAttributeRankFlagsKey = @"kHGSObjectAttributeRankFlags";
 NSString* const kHGSObjectAttributeDefaultActionKey = @"kHGSObjectAttributeDefaultActionKey";
-// Path cell-related keys
-NSString* const kHGSObjectAttributePathCellClickHandlerKey = @"kHGSObjectAttributePathCellClickHandler";
-NSString* const kHGSObjectAttributePathCellsKey = @"kHGSObjectAttributePathCells";
-NSString* const kHGSPathCellDisplayTitleKey = @"kHGSPathCellDisplayTitle";
-NSString* const kHGSPathCellImageKey = @"kHGSPathCellImage";
-NSString* const kHGSPathCellURLKey = @"kHGSPathCellURL";
-NSString* const kHGSPathCellHiddenKey = @"kHGSPathCellHidden";
 
 NSString* const kHGSObjectAttributeWebSearchDisplayStringKey = @"kHGSObjectAttributeWebSearchDisplayString";
 NSString* const kHGSObjectAttributeWebSearchTemplateKey = @"kHGSObjectAttributeWebSearchTemplate";
@@ -84,9 +77,7 @@ NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey = @"kHGSObject
 + (NSString *)hgsTypeForPath:(NSString*)path;
 - (NSDictionary *)values;
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result;
-- (NSArray *)pathCellArrayForResult:(HGSResult *)result;
-- (NSArray *)pathCellArrayForFileURL:(NSURL *)url;
-- (NSArray *)pathCellArrayForNonFileURL:(NSURL *)url;
+
 @end
 
 @implementation HGSResult
@@ -352,22 +343,6 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
   return [self valueForKey:key];
 }
 
-- (NSArray *)displayPath {
-  // The path presentation shown in the search results window can be
-  // built from one of the following (in order of preference):
-  //   1. an array of cell descriptions
-  //   2. a file path URL (from our |identifier|).
-  //   3. a slash-delimeted string of cell titles
-  // Only the first option guarantees that a cell is clickable, the
-  // second option may but is not likely to support clicking, and the
-  // third definitely not.  GDGeneralDataProvider will return a decent
-  // cell array for regular URLs and file URLs and a mediocre one for
-  // public.message results but you can compose and provide your own
-  // in 1) your source's provideValueForKey: method or 2) an override
-  // of displayPath in your custom HGSObect result class.
-  return [self valueForKey:kHGSObjectAttributePathCellsKey];
-}
-
 - (BOOL)isOfType:(NSString *)typeStr {
   // Exact match
   BOOL result = [type_ isEqualToString:typeStr];
@@ -535,137 +510,13 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
     value = [provider provideIconForResult:result
                                 loadLazily:lazily
                                   useCache:YES];
-  } else if ([key isEqualToString:kHGSObjectAttributePathCellsKey]) {
-    value = [self pathCellArrayForResult:result];
-  } else if ([key isEqualToString:kHGSObjectAttributeDefaultActionKey]) {
-    HGSExtensionPoint *actionPoint = [HGSExtensionPoint actionsPoint];
-    HGSModuleLoader *sharedLoader = [HGSModuleLoader sharedModuleLoader];
-    id<HGSDelegate> delegate = [sharedLoader delegate];
-    NSString *actionID = [delegate defaultActionID];
-    value = [actionPoint extensionWithIdentifier:actionID];
-  } 
+  }  
+  if (!value) {
+    HGSModuleLoader *loader = [HGSModuleLoader sharedModuleLoader];
+    id <HGSDelegate> delegate = [loader delegate];
+    value = [delegate provideValueForKey:key result:result];
+  }
   return value;
-}
-
-- (NSArray *)pathCellArrayForResult:(HGSResult *)result {
-  NSArray *cellArray = nil;
-  NSURL *url = [result url];
-  if ([url isFileURL]) {
-    cellArray = [self pathCellArrayForFileURL:url];
-  } else {
-    cellArray = [self pathCellArrayForNonFileURL:url];
-  }
-  return cellArray;
-}
-
-- (NSArray *)pathCellArrayForFileURL:(NSURL *)url {
-  NSMutableArray *cellArray = nil;
-  
-  // Provide a cellArray for the path control assuming that we are
-  // a file and our identifier is a file URL.
-  if (url) {
-    // Generate a list of display components and then walk backwards
-    // through it generating URLs for each component.
-    NSString *targetPath = [url path];
-    NSFileManager *fm = [NSFileManager defaultManager];
-    NSArray *displayComponents = [fm componentsToDisplayForPath:targetPath];
-    if (displayComponents) {
-      cellArray = [NSMutableArray arrayWithCapacity:[displayComponents count]];
-      NSEnumerator *reverseEnum = [displayComponents reverseObjectEnumerator];
-      NSString *component;
-      NSString *subPath = targetPath;
-      while ((component = [reverseEnum nextObject])) {
-        NSURL *subUrl = [NSURL fileURLWithPath:subPath];
-        NSDictionary *cellDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  component, kHGSPathCellDisplayTitleKey,
-                                  subUrl, kHGSPathCellURLKey,
-                                  nil];
-        [cellArray insertObject:cellDict atIndex:0];
-        subPath = [subPath stringByDeletingLastPathComponent];
-      }
-      // Determine if we can abbreviate the path presentation.
-      
-      // First, see if this is in the user's home directory structure
-      // and, if so, abbreviated it with 'Home'.  If not, then check
-      // to see if we're on the root volume and if so, don't show
-      // the volume name.
-      NSString *homeDirectory = NSHomeDirectory();
-      NSString *homeDisplay = [fm displayNameAtPath:homeDirectory];
-      NSUInteger compCount = 0;
-      NSDictionary *componentToAdd = nil;
-      NSDictionary *firstCell = [cellArray objectAtIndex:0];
-      NSString *firstCellTitle = [firstCell objectForKey:kHGSPathCellDisplayTitleKey];
-      if ([firstCellTitle isEqualToString:homeDisplay]) {
-        compCount = 1;
-        componentToAdd = [NSDictionary dictionaryWithObjectsAndKeys:
-                          HGSLocalizedString(@"Home", nil), kHGSPathCellDisplayTitleKey,
-                          [NSURL fileURLWithPath:homeDirectory], kHGSPathCellURLKey,
-                          nil];
-      } else {
-        NSString *rootDisplay = [fm displayNameAtPath:@"/"];
-        if ([firstCellTitle isEqualToString:rootDisplay]) {
-          compCount = 1;
-        }
-      }
-      if (compCount) {
-        [cellArray removeObjectsInRange:NSMakeRange(0, compCount)];
-      }
-      if (componentToAdd) {
-        [cellArray insertObject:componentToAdd atIndex:0];
-      }
-    } else {
-      HGSLogDebug(@"Unable to get path components for path '%@'.", targetPath);
-    }
-  }
-  
-  return cellArray;
-}
-
-- (NSArray *)pathCellArrayForNonFileURL:(NSURL *)url {
-  NSMutableArray *cellArray = nil;
-  
-  // See if we have a regular URL.
-  NSString *absolutePath = [url absoluteString];
-  if (absolutePath) {
-    // Build up two path cells, one with the domain, and the second
-    // with the location within the domain.  Do this by finding the
-    // first and second occurrence of the slash separator.
-    NSString *hostString = [url host];
-    if ([hostString length]) {
-      cellArray = [NSMutableArray arrayWithCapacity:2];
-      NSURL *pathURL = [NSURL URLWithString:absolutePath];
-      NSString *pathString = [url path];
-      
-      if ([pathString length] == 0 || [pathString isEqualToString:@"/"]) {
-        // We just have a host cell.
-        NSDictionary *hostCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  hostString, kHGSPathCellDisplayTitleKey,
-                                  pathURL, kHGSPathCellURLKey,
-                                  nil];
-        [cellArray addObject: hostCell];
-      } else {          
-        // NOTE: Attempts to use -[NSURL initWithScheme:host:path:] were unsuccessful
-        //       using (nil|@""|@"/") for the path.  Each fails to produce an
-        //       acceptable URL or throws an exception.
-        // NSURL *hostURL = [[[NSURL alloc] initWithScheme:[url scheme]
-        //                                            host:hostString
-        //                                            path:???] autorelease];
-        NSURL *hostURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/",
-                                               [url scheme], hostString]];
-        NSDictionary *hostCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  hostString, kHGSPathCellDisplayTitleKey,
-                                  hostURL, kHGSPathCellURLKey,
-                                  nil];
-        [cellArray addObject: hostCell];
-        NSDictionary *pathCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  pathString, kHGSPathCellDisplayTitleKey,
-                                  pathURL, kHGSPathCellURLKey,
-                                  nil];
-        [cellArray addObject: pathCell];
-      }
-    }
-  }
-  return cellArray;
 }
 
 @end

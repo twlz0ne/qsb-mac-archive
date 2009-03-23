@@ -31,6 +31,7 @@
 //
 
 #import <Vermilion/Vermilion.h>
+#import "QSBHGSDelegate.h"
 
 // Private interface that we've borrowed.
 @interface DSADocSet : NSObject
@@ -92,8 +93,8 @@ static NSString *const kiPhoneReferenceDocSetPath
   NSString *docSetName 
     = [rootDirBundle objectForInfoDictionaryKey:(NSString*)kCFBundleNameKey];
   NSDictionary *docSetCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                              docSetName, kHGSPathCellDisplayTitleKey,
-                              docsURL, kHGSPathCellURLKey,
+                              docSetName, kQSBPathCellDisplayTitleKey,
+                              docsURL, kQSBPathCellURLKey,
                               nil];
   Class dsaDocSetClass = NSClassFromString(@"DSADocSet");
   if (!dsaDocSetClass) {
@@ -133,13 +134,13 @@ static NSString *const kiPhoneReferenceDocSetPath
     }
     if (url) {
       NSDictionary *docCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                               name, kHGSPathCellDisplayTitleKey,
-                               url, kHGSPathCellURLKey,
+                               name, kQSBPathCellDisplayTitleKey,
+                               url, kQSBPathCellURLKey,
                                nil];
       NSArray *docCells = [NSArray arrayWithObjects:docSetCell, docCell, nil];
       NSDictionary *attributes
         = [NSDictionary dictionaryWithObjectsAndKeys:
-           docCells, kHGSObjectAttributePathCellsKey, 
+           docCells, kQSBObjectAttributePathCellsKey, 
            docSetIcon_, kHGSObjectAttributeIconKey,
            nil];
       HGSResult *result 

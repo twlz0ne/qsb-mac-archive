@@ -38,7 +38,7 @@
 #import "GTMLinearRGBShading.h"
 #import "GTMNSBezierPath+RoundRect.h"
 #import "GTMNSBezierPath+Shading.h"
-
+#import "QSBHGSDelegate.h"
 
 // TODO(mrossetti): Remove workaround once we get a fix from Apple.
 // This includes the declaration of _hoveredCell and _setHoveredCell
@@ -126,15 +126,15 @@
     NSFont *cellFont = [NSFont systemFontOfSize:fontSize];
     while ((cellDict = [cellEnum nextObject])) {
       QSBPathComponentCell *newCell = [[[QSBPathComponentCell alloc] init] autorelease];
-      NSURL *cellURL = [cellDict objectForKey:kHGSPathCellURLKey];
+      NSURL *cellURL = [cellDict objectForKey:kQSBPathCellURLKey];
       if (cellURL) {
         [newCell setURL:cellURL];
       }
-      NSString *cellTitle = [cellDict objectForKey:kHGSPathCellDisplayTitleKey];
+      NSString *cellTitle = [cellDict objectForKey:kQSBPathCellDisplayTitleKey];
       if (cellTitle) {
         [newCell setTitle:cellTitle];
       }
-      NSImage *cellImage = [cellDict objectForKey:kHGSPathCellImageKey];
+      NSImage *cellImage = [cellDict objectForKey:kQSBPathCellImageKey];
       if (cellImage) {
         [newCell setImage:cellImage];
       }

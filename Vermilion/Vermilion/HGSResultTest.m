@@ -86,11 +86,11 @@
                        [infoObject url], 
                        @"didn't find uri");
   [[[searchSourceMock stub] 
-    andReturn:kHGSPathCellDisplayTitleKey] 
-   provideValueForKey:kHGSPathCellDisplayTitleKey result:infoObject];
-  STAssertEqualStrings(kHGSPathCellDisplayTitleKey, 
-                       [infoObject valueForKey:kHGSPathCellDisplayTitleKey], 
-                       @"didn't find title");
+    andReturn:kHGSObjectAttributeSnippetKey] 
+   provideValueForKey:kHGSObjectAttributeSnippetKey result:infoObject];
+  STAssertEqualStrings(kHGSObjectAttributeSnippetKey, 
+                       [infoObject valueForKey:kHGSObjectAttributeSnippetKey], 
+                       @"didn't find template");
   [searchSourceMock verify];
   
   // create an object from a dictionary where the source doesn't implement
@@ -101,8 +101,8 @@
   [info2 setObject:@"bar" forKey:kHGSObjectAttributeTypeKey];
   HGSResult* infoObject2 = [HGSResult resultWithDictionary:info2 source:nil];
   STAssertNotNil(infoObject2, @"can't create object from dict");
-  STAssertNil([infoObject2 valueForKey:kHGSPathCellDisplayTitleKey], 
-              @"found a title");
+  STAssertNil([infoObject2 valueForKey:kHGSObjectAttributeSnippetKey], 
+              @"found a snippet");
  
   // create an object wil a nil dictionary
   HGSResult* nilObject = [HGSResult resultWithDictionary:nil source:nil];

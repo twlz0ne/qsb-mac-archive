@@ -33,6 +33,7 @@
 #import <Vermilion/Vermilion.h>
 #import <GData/GData.h>
 #import "KeychainItem.h"
+#import "QSBHGSDelegate.h"
 
 // Google Docs categories
 static NSString* const kDocCategoryDocument = @"document";
@@ -296,8 +297,8 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   NSMutableArray *cellArray = [NSMutableArray array];
   NSDictionary *googleDocsCell 
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-       HGSLocalizedString(@"Google Docs", nil), kHGSPathCellDisplayTitleKey,
-       baseURL, kHGSPathCellURLKey,
+       HGSLocalizedString(@"Google Docs", nil), kQSBPathCellDisplayTitleKey,
+       baseURL, kQSBPathCellURLKey,
        nil];
   [cellArray addObject:googleDocsCell];
   
@@ -314,14 +315,14 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   if (folders && [folders count]) {
     NSString *label = [[folders objectAtIndex:0] label];
     NSDictionary *folderCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                label, kHGSPathCellDisplayTitleKey,
+                                label, kQSBPathCellDisplayTitleKey,
                                 nil];
     [cellArray addObject:folderCell];
   }
   
   NSDictionary *resultDocCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                 docTitle, kHGSPathCellDisplayTitleKey,
-                                 docURL, kHGSPathCellURLKey,
+                                 docTitle, kQSBPathCellDisplayTitleKey,
+                                 docURL, kQSBPathCellURLKey,
                                  nil];
   [cellArray addObject:resultDocCell];
   
@@ -340,7 +341,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   NSDictionary *attributes
    = [NSDictionary dictionaryWithObjectsAndKeys:
       rankFlags, kHGSObjectAttributeRankFlagsKey,
-      cellArray, kHGSObjectAttributePathCellsKey,
+      cellArray, kQSBObjectAttributePathCellsKey,
       date, kHGSObjectAttributeLastUsedDateKey,
       icon, kHGSObjectAttributeIconKey,
       nil];

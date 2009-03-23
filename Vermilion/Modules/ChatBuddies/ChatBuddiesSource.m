@@ -36,6 +36,7 @@
 #import "GTMGarbageCollection.h"
 #import "GTMNSString+URLArguments.h"
 #import "GTMMethodCheck.h"
+#import "QSBHGSDelegate.h"
 
 static NSString* const kChatBuddyAttributeInformationKey 
   = @"ChatBuddyAttributeInformationKey";
@@ -258,7 +259,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     }
     value = snippet;
   }
-  else if ([key isEqualToString:kHGSObjectAttributePathCellsKey]) {
+  else if ([key isEqualToString:kQSBObjectAttributePathCellsKey]) {
     // Build three cells, the first with 'iChat', the second with the
     // service name, and the third with the screen name.  Only the
     // third cell will respond to clicks.
@@ -294,17 +295,17 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     if ([serviceName length] && [screenName length]) {
       NSMutableDictionary *iChatCell 
         = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-           iChatName, kHGSPathCellDisplayTitleKey,
+           iChatName, kQSBPathCellDisplayTitleKey,
            nil];
       if (iChatURL) {
-        [iChatCell setObject:iChatURL forKey:kHGSPathCellURLKey];
+        [iChatCell setObject:iChatURL forKey:kQSBPathCellURLKey];
       }
       NSDictionary *serviceCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                                   serviceName, kHGSPathCellDisplayTitleKey,
+                                   serviceName, kQSBPathCellDisplayTitleKey,
                                    nil];
       NSDictionary *buddyCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 screenName, kHGSPathCellDisplayTitleKey,
-                                 buddyURL, kHGSPathCellURLKey,
+                                 screenName, kQSBPathCellDisplayTitleKey,
+                                 buddyURL, kQSBPathCellURLKey,
                                  nil];
       value = [NSArray arrayWithObjects:iChatCell, serviceCell, buddyCell, nil];
     }
