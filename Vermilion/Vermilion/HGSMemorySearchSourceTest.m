@@ -126,7 +126,7 @@
   
   id searchQueryMock = [OCMockObject mockForClass:[HGSQuery class]];
   HGSSearchOperation *op 
-    = [[HGSSearchOperation alloc] initWithQuery:searchQueryMock];
+    = [[[HGSSearchOperation alloc] initWithQuery:searchQueryMock] autorelease];
   [[[searchQueryMock stub] andReturn:[NSSet setWithObject:@"foo"]] uniqueWords];
   [memSource performSearchOperation:op];
 }
