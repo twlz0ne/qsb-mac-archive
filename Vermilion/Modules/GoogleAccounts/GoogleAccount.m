@@ -407,19 +407,6 @@ didReceiveResponse:(NSURLResponse *)response {
   [super dealloc];
 }
 
-#if 0
-- (IBAction)acceptSetupAccountSheet:(id)sender {
-  // If we're showing a captcha then we need to pass along the captcha text
-  // to the account for authentication.
-  if ([self captchaImage]) {
-    NSString *captchaText = [self captchaText];
-    GoogleAccount *account = (GoogleAccount *)[self account];
-    [account setCaptchaText:captchaText];
-  }
-  [super acceptSetupAccountSheet:sender];
-}
-#endif
-
 - (IBAction)goToGoogle:(id)sender {
   [GoogleAccount openGoogleHomePage];
 }
