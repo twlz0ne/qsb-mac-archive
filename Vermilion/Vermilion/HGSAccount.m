@@ -53,33 +53,45 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 @synthesize authenticated = authenticated_;
 
 - (id)initWithName:(NSString *)userName {
-  // NOTE: The following call to -[type] resolves to a constant string
-  // defined per-class.
-  NSString *accountType = [self type];
-  NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-  NSString *name = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
-                    userName, accountType];
-  NSString *identifier = [NSString stringWithFormat:kHGSAccountIdentifierFormat, 
-                          accountType, userName];
-  NSDictionary *configuration
-    = [NSDictionary dictionaryWithObjectsAndKeys:
-       bundle, kHGSExtensionBundleKey,
-       name, kHGSExtensionUserVisibleNameKey,
-       identifier, kHGSExtensionIdentifierKey,
-       nil];
-  if ((self = [super initWithConfiguration:configuration])) {
-    [self setUserName:userName];
-    if (![self userName] || ![self type]) {
-      [self release];
-      self = nil;
+  if ([userName length]) {
+    // NOTE: The following call to -[type] resolves to a constant string
+    // defined per-class.
+    NSString *accountType = [self type];
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *name = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
+                      userName, accountType];
+    NSString *identifier = [NSString stringWithFormat:kHGSAccountIdentifierFormat, 
+                            accountType, userName];
+    NSDictionary *configuration
+      = [NSDictionary dictionaryWithObjectsAndKeys:
+         bundle, kHGSExtensionBundleKey,
+         name, kHGSExtensionUserVisibleNameKey,
+         identifier, kHGSExtensionIdentifierKey,
+         nil];
+    if ((self = [super initWithConfiguration:configuration])) {
+      [self setUserName:userName];
+      if (![self userName] || ![self type]) {
+        [self release];
+        self = nil;
+      }
     }
+  } else {
+    [self release];
+    self = nil;
   }
   return self;
 }
 
+// TODO(mrossetti): This is SO WRONG!  Refactor so that we don't lose
+// everything in the configuration when initializing from a pref dict.
 - (id)initWithConfiguration:(NSDictionary *)prefDict {
   NSString *userName = [prefDict objectForKey:kHGSAccountUserNameKey];
   self = [self initWithName:userName];
+  return self;
+}
+
+- (id)init {
+  self = [self initWithName:nil];
   return self;
 }
 
@@ -107,7 +119,7 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 
 - (NSString *)type {
   HGSAssert(@"Must be overridden by subclass", nil);
-  return @"UNINITIALIZED";
+  return nil;
 }
 
 - (NSString *)password {

@@ -960,6 +960,20 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
+		620054560F77F0FD00C806A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216 /* OCMock.framework */;
+			remoteInfo = OCMock;
+		};
+		620054580F77F0FD00C806A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 03BF2D3708F1C69500978C59 /* Test.octest */;
+			remoteInfo = Test;
+		};
 		622911BC0F2E8034005D34CE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1057,20 +1071,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B148D860F705F35002E05FA;
 			remoteInfo = "QSB SDK";
-		};
-		8B148F900F715697002E05FA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
-			remoteInfo = OCMock;
-		};
-		8B148F920F715697002E05FA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 03BF2D3708F1C69500978C59;
-			remoteInfo = OCMockTests;
 		};
 		8B1490640F71576B002E05FA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1905,7 +1905,7 @@
 		8B07C41D0B69234900827344 /* StripHeaders.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = StripHeaders.sh; sourceTree = "<group>"; };
 		8B0CA2B20E48A6580004BFB2 /* GTMFourCharCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMFourCharCode.m; sourceTree = "<group>"; };
 		8B0CA2B30E48A6580004BFB2 /* GTMFourCharCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMFourCharCode.h; sourceTree = "<group>"; };
-		8B148F720F715697002E05FA /* OCMock.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = OCMock.xcodeproj; path = ../../../externals/OCMock/Source/OCMock.xcodeproj; sourceTree = QSBROOT; };
+		8B148F720F715697002E05FA /* OCMock.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = OCMock.xcodeproj; sourceTree = "<group>"; };
 		8B148F9A0F7156B6002E05FA /* OCMock.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OCMock.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B1B49330E5F994800A08972 /* GTMExceptionalInlines.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMExceptionalInlines.m; sourceTree = "<group>"; };
 		8B1B49340E5F994800A08972 /* GTMExceptionalInlines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMExceptionalInlines.h; sourceTree = "<group>"; };
@@ -2903,6 +2903,15 @@
 			path = ITunes;
 			sourceTree = "<group>";
 		};
+		620054520F77F0FD00C806A1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				620054570F77F0FD00C806A1 /* OCMock.framework */,
+				620054590F77F0FD00C806A1 /* Test.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		623ADD740EC0CC31001651D1 /* EmailActions */ = {
 			isa = PBXGroup;
 			children = (
@@ -3153,17 +3162,7 @@
 			children = (
 				8B148F720F715697002E05FA /* OCMock.xcodeproj */,
 			);
-			name = Source;
-			path = ../../../externals/OCMock/Source;
-			sourceTree = QSBROOT;
-		};
-		8B148F8C0F715697002E05FA /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8B148F910F715697002E05FA /* OCMock.framework */,
-				8B148F930F715697002E05FA /* OCMockTests.octest */,
-			);
-			name = Products;
+			path = Source;
 			sourceTree = "<group>";
 		};
 		8B20E4A50DB43340001E429B /* AppleScriptPlugins */ = {
@@ -4978,7 +4977,7 @@
 					ProjectRef = 8B6128290F46347B00E29B40 /* JSON.xcodeproj */;
 				},
 				{
-					ProductGroup = 8B148F8C0F715697002E05FA /* Products */;
+					ProductGroup = 620054520F77F0FD00C806A1 /* Products */;
 					ProjectRef = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
 				},
 			);
@@ -5035,18 +5034,18 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		8B148F910F715697002E05FA /* OCMock.framework */ = {
+		620054570F77F0FD00C806A1 /* OCMock.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = OCMock.framework;
-			remoteRef = 8B148F900F715697002E05FA /* PBXContainerItemProxy */;
+			remoteRef = 620054560F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		8B148F930F715697002E05FA /* OCMockTests.octest */ = {
+		620054590F77F0FD00C806A1 /* Test.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = OCMockTests.octest;
-			remoteRef = 8B148F920F715697002E05FA /* PBXContainerItemProxy */;
+			path = Test.octest;
+			remoteRef = 620054580F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		8B6128370F46347B00E29B40 /* JSON.framework */ = {
