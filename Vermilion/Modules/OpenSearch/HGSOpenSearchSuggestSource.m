@@ -84,7 +84,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSEnumerator *suggestionsEnum = [jsonSuggestions objectEnumerator];
   NSString *suggestion = nil;
   HGSResult *pivotObject = [query pivotObject];
-  id image = [pivotObject displayIconWithLazyLoad:NO];
+  id image = [pivotObject valueForKey:kHGSObjectAttributeIconKey];
   NSString *urlFormat = [pivotObject valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
   urlFormat = [urlFormat stringByReplacingOccurrencesOfString:@"{searchterms}" withString:@"%@"];
 

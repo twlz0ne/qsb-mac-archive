@@ -161,14 +161,11 @@ static NSSet *CopyStringSetFromId(id value) {
 
 - (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
   // Do we allow archiving?
-  if (cannotArchive_) return nil;
-
-  return [HGSResult resultWithDictionary:representation source:self];
+  HGSResult *result = nil;
+  if (!cannotArchive_) {
+    result = [HGSResult resultWithDictionary:representation source:self];
+  }
+  return result;
 }
 
-- (NSImage *)defaultIconForResult:(HGSResult *)result {
-  HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
-  NSImage *icon = [provider placeHolderIcon];
-  return icon;
-}
 @end

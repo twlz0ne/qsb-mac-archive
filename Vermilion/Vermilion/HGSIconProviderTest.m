@@ -33,9 +33,60 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSIconProvider.h"
+#import <OCMock/OCMock.h>
+#import "HGSResult.h"
+#import "HGSSearchSource.h"
+#import "GTMNSObject+UnitTesting.h"
+#import "GTMAppKit+UnitTesting.h"
 
 @interface HGSIconProviderTest : GTMTestCase 
 @end
 
 @implementation HGSIconProviderTest
+- (void)testProvideIconForResult {  
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+  NSString *path
+    = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
+  STAssertNotNil(path, nil);
+  id searchSourceMock = [OCMockObject mockForClass:[HGSSearchSource class]];
+  HGSResult *result = [HGSResult resultWithFilePath:path
+                                             source:searchSourceMock
+                                         attributes:nil];
+  STAssertNotNil(result, nil);
+  HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
+  [[[searchSourceMock stub] 
+    andReturn:nil]
+   provideValueForKey:kHGSObjectAttributeIconPreviewFileKey result:result];
+  [[[searchSourceMock stub] 
+    andReturn:nil]
+   provideValueForKey:kHGSObjectAttributeImmediateIconKey result:result];
+  NSImage *icon = [provider provideIconForResult:result 
+                                      loadLazily:NO];
+  // Not using GTMAssertObjectImageEqualToImageNamed because it appears there
+  // is an issue with the OS returning icons to us that aren't really
+  // of generic color space. 
+  // TODO(dmaclach): dig into this and file a radar.
+  STAssertNotNil(icon, nil);
+}
+
+- (void)testRoundRectAndDropShadow {
+  HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
+  NSSize size = [provider preferredIconSize];
+  STAssertEquals(size.height, (CGFloat)96.0, nil);
+  STAssertEquals(size.width, (CGFloat)96.0, nil);
+  NSImage *image = [[[NSImage alloc] initWithSize:size] autorelease];
+  STAssertNotNil(image, nil);
+  [image lockFocus];
+  [[NSColor redColor] set];
+  NSBezierPath *path = [NSBezierPath bezierPath];
+  // Make a triangle so we can test that everything is flipped the right way
+  [path moveToPoint:NSMakePoint(16, 16)];
+  [path lineToPoint:NSMakePoint(80, 16)];
+  [path lineToPoint:NSMakePoint(48,80)];
+  [path fill];
+  [image unlockFocus];
+  image = [provider imageWithRoundRectAndDropShadow:image];
+  GTMAssertObjectImageEqualToImageNamed(image, @"RoundRectAndDropShadow", nil);
+}
+  
 @end

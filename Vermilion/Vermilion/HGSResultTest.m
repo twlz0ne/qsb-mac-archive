@@ -240,9 +240,11 @@
   conformsToType = [results conformsToType:@""];
   STAssertFalse(conformsToType, nil);
   
-  NSImage *icon = [results displayIconWithLazyLoad:NO];
-  STAssertNotNil(icon, nil);
-  icon = [results displayIconWithLazyLoad:YES];
+  NSImage *icon = [results icon];
+  // Not using GTMAssertObjectImageEqualToImageNamed because it appears there
+  // is an issue with the OS returning icons to us that aren't really
+  // of generic color space. 
+  // TODO(dmaclach): dig into this and file a radar.
   STAssertNotNil(icon, nil);
   
   NSString *description = [results description];

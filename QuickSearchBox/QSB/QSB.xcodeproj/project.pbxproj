@@ -450,6 +450,7 @@
 		8B0207C40ECBC40300A6EB85 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B02FB070EC9D46B00A6EB85 /* HGSExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B02FB060EC9D46B00A6EB85 /* HGSExtension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B02FB0D0EC9D50C00A6EB85 /* HGSExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B02FB0C0EC9D50C00A6EB85 /* HGSExtension.m */; };
+		8B0D21600F79660400FD4A12 /* RoundRectAndDropShadow.tiff in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B0D215E0F7965FE00FD4A12 /* RoundRectAndDropShadow.tiff */; };
 		8B1490A80F715781002E05FA /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
 		8B20E4450DB432BA001E429B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
 		8B20E4460DB432BA001E429B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
@@ -964,14 +965,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8DC2EF5B0486A6940098B216 /* OCMock.framework */;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
 			remoteInfo = OCMock;
 		};
 		620054580F77F0FD00C806A1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 03BF2D3708F1C69500978C59 /* Test.octest */;
+			remoteGlobalIDString = 03BF2D3708F1C69500978C59;
 			remoteInfo = Test;
 		};
 		622911BC0F2E8034005D34CE /* PBXContainerItemProxy */ = {
@@ -1537,6 +1538,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		8B0D215F0F7965FE00FD4A12 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				8B0D21600F79660400FD4A12 /* RoundRectAndDropShadow.tiff in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B3EECF90CEA86A100D933C0 /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1905,6 +1916,7 @@
 		8B07C41D0B69234900827344 /* StripHeaders.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = StripHeaders.sh; sourceTree = "<group>"; };
 		8B0CA2B20E48A6580004BFB2 /* GTMFourCharCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMFourCharCode.m; sourceTree = "<group>"; };
 		8B0CA2B30E48A6580004BFB2 /* GTMFourCharCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMFourCharCode.h; sourceTree = "<group>"; };
+		8B0D215E0F7965FE00FD4A12 /* RoundRectAndDropShadow.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RoundRectAndDropShadow.tiff; sourceTree = "<group>"; };
 		8B148F720F715697002E05FA /* OCMock.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = OCMock.xcodeproj; sourceTree = "<group>"; };
 		8B148F9A0F7156B6002E05FA /* OCMock.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OCMock.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B1B49330E5F994800A08972 /* GTMExceptionalInlines.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMExceptionalInlines.m; sourceTree = "<group>"; };
@@ -2907,7 +2919,7 @@
 			isa = PBXGroup;
 			children = (
 				620054570F77F0FD00C806A1 /* OCMock.framework */,
-				620054590F77F0FD00C806A1 /* Test.octest */,
+				620054590F77F0FD00C806A1 /* OCMockTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3146,6 +3158,14 @@
 				8B07C41D0B69234900827344 /* StripHeaders.sh */,
 			);
 			path = BuildScripts;
+			sourceTree = "<group>";
+		};
+		8B0D215D0F7965FE00FD4A12 /* TestData */ = {
+			isa = PBXGroup;
+			children = (
+				8B0D215E0F7965FE00FD4A12 /* RoundRectAndDropShadow.tiff */,
+			);
+			path = TestData;
 			sourceTree = "<group>";
 		};
 		8B148F5D0F715696002E05FA /* OCMock */ = {
@@ -3660,6 +3680,7 @@
 				8B6F2D5F0DA2B88E0052CA40 /* Vermilion.h */,
 				5A2710B20ECA52F200C72257 /* Vermilion.py */,
 				8B924DFC0EE7A57C00F3DF32 /* Resources */,
+				8B0D215D0F7965FE00FD4A12 /* TestData */,
 				331EE5120DC7BDE30091CC22 /* Utilities */,
 			);
 			path = Vermilion;
@@ -4859,6 +4880,7 @@
 			buildConfigurationList = E4F551370DF7305A008A846E /* Build configuration list for PBXNativeTarget "Vermilion Test" */;
 			buildPhases = (
 				E4F5512F0DF73059008A846E /* Sources */,
+				8B0D215F0F7965FE00FD4A12 /* CopyFiles */,
 				E4F551300DF73059008A846E /* Frameworks */,
 				E4F551310DF73059008A846E /* ShellScript */,
 			);
@@ -5041,10 +5063,10 @@
 			remoteRef = 620054560F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		620054590F77F0FD00C806A1 /* Test.octest */ = {
+		620054590F77F0FD00C806A1 /* OCMockTests.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = Test.octest;
+			path = OCMockTests.octest;
 			remoteRef = 620054580F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -5679,7 +5701,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
+			shellScript = "# Run the unit tests in this test bundle.\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\nexport GTM_REMOVE_GCOV_DATA=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
 		};
 		8B735FA40EC905E900E74421 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6187,7 +6209,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
+			shellScript = "# Run the unit tests in this test bundle.\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\nexport GTM_REMOVE_GCOV_DATA=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

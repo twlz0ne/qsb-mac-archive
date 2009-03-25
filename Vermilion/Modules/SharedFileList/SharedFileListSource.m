@@ -222,8 +222,7 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
 
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   id value = nil;
-  if ([key isEqualToString:kHGSObjectAttributeIconKey] 
-      || [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
+  if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
     id item = [result valueForKey:kObjectAttributeSharedFileListItem];
     if (item) {
       LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef)item;

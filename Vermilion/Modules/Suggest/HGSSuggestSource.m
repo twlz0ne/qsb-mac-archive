@@ -654,8 +654,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   id value = nil;
-  if ([key isEqualToString:kHGSObjectAttributeIconKey] 
-      || [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
+  if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
     value = [self navIcon];
   }
   if (!value) {

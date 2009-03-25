@@ -60,6 +60,12 @@
 // return the path as an array of dictionaries for display in the UI
 - (NSArray *)displayPath;
 
+// return an icon
+- (NSImage *)displayIcon;
+
+// return a thumbnail
+- (NSImage *)displayThumbnail;
+
 // return the rank of the result
 - (CGFloat)rank;
 

@@ -40,7 +40,7 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
 // these methods can be overridden to customize the behavior of the ranking
 // and de-duping.
 - (void)sortObjectsInSitu:(NSMutableArray*)objects;
-- (void)mergeDuplicatesInSitu:(NSMutableArray*)objects;
+- (NSMutableArray *)mergeDuplicates:(NSArray*)objects;
 @end
 
 @implementation HGSMixer
@@ -62,7 +62,7 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
   
   // merge/remove duplicates
   //
-  [self mergeDuplicatesInSitu:results];
+  results = [self mergeDuplicates:results];
   
   return results;
 }
@@ -84,36 +84,31 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
 }
 
 //
-// -mergeDuplicatesInSitu:
+// -mergeDuplicates:
 //
-// merges/removes duplicate results, but only up to |scanLimit| non-duplicates.
-// Since this is O(n^2), |scanLimit| should be as small as possible.
-// |scanLimit| can safely be > the number of items in the list.
+// merges/removes duplicate results
 //
-- (void)mergeDuplicatesInSitu:(NSMutableArray*)results {
-  NSMutableIndexSet* duplicateIndexes = [NSMutableIndexSet indexSet];
-  NSUInteger currentResultIndex = 0;
+- (NSMutableArray *)mergeDuplicates:(NSArray*)results {
+  NSMutableArray *singulars 
+    = [NSMutableArray arrayWithCapacity:[results count]];
   for (HGSResult *currentResult in results) {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     // Check to see if it's a duplicate of any of the confirmed results
-    for (NSUInteger i = 0; i < currentResultIndex; ++i) {
-      if ([duplicateIndexes containsIndex:i])
-        continue;
-      HGSResult* goodResult = [results objectAtIndex:i];
-      if ([currentResult isDuplicate:goodResult]) {
-        // We've got a match; merge this into the existing result and
-        // mark it for deletion.
-        [goodResult mergeWith:currentResult];
-        [duplicateIndexes addIndex:currentResultIndex];
+    NSUInteger count = [singulars count];
+    NSUInteger i;
+    for (i = 0; i < count; ++i) {
+      HGSResult *singular = [singulars objectAtIndex:i];
+      if ([currentResult isDuplicate:singular]) {
+        // We've got a match; merge this into the existing result and replace
+        singular = [singular mergeWith:currentResult];
+        [singulars replaceObjectAtIndex:i withObject:singular];
         break;
       }
     }
-    ++currentResultIndex;
-    [pool release];
+    if (i == count) {
+      [singulars addObject:currentResult];
+    }
   }
-  
-  // prune out the duplicates
-  [results removeObjectsAtIndexes:duplicateIndexes];
+  return singulars;
 }
 
 #pragma mark -

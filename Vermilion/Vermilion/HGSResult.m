@@ -74,9 +74,8 @@ NSString* const kHGSObjectAttributeAlternateActionURIKey = @"kHGSObjectAttribute
 NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey = @"kHGSObjectAttributeAddressBookRecordIdentifier";
 
 @interface HGSResult ()
+@property (readonly) NSDictionary *attributes;
 + (NSString *)hgsTypeForPath:(NSString*)path;
-- (NSDictionary *)values;
-- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result;
 
 @end
 
@@ -90,15 +89,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 @synthesize rank = rank_;
 @synthesize rankFlags = rankFlags_;
 @synthesize source = source_;
-
-+ (void)initialize {
-  [self setKeys:[NSArray arrayWithObject:kHGSObjectAttributeIconKey]  
-triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
-}
-
-+ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key {
-  return YES;  
-}
+@synthesize attributes = attributes_;
 
 + (id)resultWithURL:(NSURL*)url
                name:(NSString *)name
@@ -147,8 +138,13 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
       [self release];
       return nil;
     }
-    values_ = [[NSMutableDictionary alloc] initWithCapacity:4 ];
-    
+    NSMutableDictionary *abridgedAttrs 
+      = [NSMutableDictionary dictionaryWithDictionary:attributes];
+    [abridgedAttrs removeObjectsForKeys:[NSArray arrayWithObjects:
+                                         kHGSObjectAttributeURIKey, 
+                                         kHGSObjectAttributeNameKey, 
+                                         kHGSObjectAttributeTypeKey,
+                                         nil]];
     url_ = [url retain];
     idHash_ = [url_ hash];
     displayName_ = [name retain];
@@ -156,42 +152,57 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
     source_ = [source retain];
     conformsToContact_ = [self conformsToType:kHGSTypeContact];
     if ([self conformsToType:kHGSTypeWebpage]) {
-      normalizedIdentifier_ = [[[url_ absoluteString] readableURLString] retain];
+      normalizedIdentifier_ 
+        = [[[url_ absoluteString] readableURLString] retain];
     }
-    if (attributes) {
-      [values_ addEntriesFromDictionary:attributes];
-    }
-    NSNumber *rank = [values_ objectForKey:kHGSObjectAttributeRankKey];
+    NSNumber *rank 
+      = [abridgedAttrs objectForKey:kHGSObjectAttributeRankKey];
     if (rank) {
       rank_ = [rank floatValue];
-      [values_ removeObjectForKey:kHGSObjectAttributeRankKey];
+      [abridgedAttrs removeObjectForKey:kHGSObjectAttributeRankKey];
     }
-    NSNumber *rankFlags = [values_ objectForKey:kHGSObjectAttributeRankFlagsKey];
+    NSNumber *rankFlags 
+      = [abridgedAttrs objectForKey:kHGSObjectAttributeRankFlagsKey];
     if (rankFlags) {
       rankFlags_ = [rankFlags unsignedIntValue];
-      [values_ removeObjectForKey:kHGSObjectAttributeRankFlagsKey];
+      [abridgedAttrs removeObjectForKey:kHGSObjectAttributeRankFlagsKey];
     }
-    lastUsedDate_ = [values_ objectForKey:kHGSObjectAttributeLastUsedDateKey];
+    lastUsedDate_ 
+      = [abridgedAttrs objectForKey:kHGSObjectAttributeLastUsedDateKey];
     if (lastUsedDate_) {
-      [values_ removeObjectForKey:kHGSObjectAttributeLastUsedDateKey];
+      [abridgedAttrs removeObjectForKey:kHGSObjectAttributeLastUsedDateKey];
     } else {
       lastUsedDate_ = [NSDate distantPast];
     }
+    
+    // If we are supplied with an icon, apply it to both immediate
+    // and non-immediate icon attributes.
+    NSImage *image = [abridgedAttrs objectForKey:kHGSObjectAttributeIconKey];
+    if (image) {
+      if (![abridgedAttrs objectForKey:kHGSObjectAttributeImmediateIconKey]) {
+        [abridgedAttrs setObject:image forKey:kHGSObjectAttributeImmediateIconKey];
+      }
+    } else {
+      image = [abridgedAttrs objectForKey:kHGSObjectAttributeImmediateIconKey];
+      if (image) {
+        if (![abridgedAttrs objectForKey:kHGSObjectAttributeIconKey]) {
+          [abridgedAttrs setObject:image forKey:kHGSObjectAttributeIconKey];
+        }
+      }
+    }
+      
     [lastUsedDate_ retain];
+    attributes_ = [abridgedAttrs retain];
   }
   return self;
 }
   
-- (id)initWithDictionary:(NSDictionary*)dict 
+- (id)initWithDictionary:(NSDictionary*)attributes 
                   source:(HGSSearchSource *)source {
-  NSMutableDictionary *attributes 
-    = [NSMutableDictionary dictionaryWithDictionary:dict];
   NSURL *url = [attributes objectForKey:kHGSObjectAttributeURIKey];
   if ([url isKindOfClass:[NSString class]]) {
     url = [NSURL URLWithString:(NSString*)url];
   }
-  
-
   if ([url isFileURL]) {
     NSFileManager *fm = [NSFileManager defaultManager];
     if (![fm fileExistsAtPath:[url path]]) {
@@ -199,14 +210,8 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
       return nil;
     }  
   }
-  
   NSString *name = [attributes objectForKey:kHGSObjectAttributeNameKey];
   NSString *type = [attributes objectForKey:kHGSObjectAttributeTypeKey];
-  [attributes removeObjectsForKeys:[NSArray arrayWithObjects:
-                                    kHGSObjectAttributeURIKey, 
-                                    kHGSObjectAttributeNameKey, 
-                                    kHGSObjectAttributeTypeKey,
-                                    nil]];
   return [self initWithURL:url
                       name:name 
                       type:type 
@@ -217,7 +222,7 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
 - (void)dealloc {
   [[HGSIconProvider sharedIconProvider] cancelOperationsForResult:self];
   [source_ release];
-  [values_ release];
+  [attributes_ release];
   [url_ release];
   [normalizedIdentifier_ release];
   [displayName_ release];
@@ -226,29 +231,30 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
   [super dealloc];
 }
 
-- (id)copyOfClass:(Class)cls {
-  // Split the alloc and the init up to minimize time spent in
-  // synchronized block.
-  HGSResult *newResult = [cls alloc];
-  @synchronized(values_) {
-    newResult = [newResult initWithURL:[self url]
-                                  name:[self displayName]
-                                  type:[self type]
-                                source:source_
-                            attributes:values_];
+- (id)copyOfClass:(Class)cls mergingAttributes:(NSDictionary *)attributes {
+  if (attributes) {
+    NSMutableDictionary *newAttributes = [attributes mutableCopy];
+    [newAttributes addEntriesFromDictionary:[self attributes]];
+    attributes = newAttributes;
+  } else {
+    attributes = [self attributes];
   }
-  // now pull over the fields
+  HGSResult *newResult = [[cls alloc] initWithURL:[self url]
+                                             name:[self displayName]
+                                             type:[self type]
+                                           source:source_
+                                       attributes:attributes];
   newResult->rank_ = rank_;
   newResult->rankFlags_ = rankFlags_;
   return newResult;
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  return [self copyOfClass:[HGSResult class]];
+  return [self copyOfClass:[HGSResult class] mergingAttributes:nil];
 }
 
 - (id)mutableCopyWithZone:(NSZone *)zone {
-  return [self copyOfClass:[HGSMutableResult class]];
+  return [self copyOfClass:[HGSMutableResult class] mergingAttributes:nil];
 }
 
 - (NSUInteger)hash {
@@ -266,68 +272,48 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
   return equal;
 }
 
-- (void)setValue:(id)obj forKey:(NSString*)key {
-  if (key) { // This allows nil to remove value
-    @synchronized(values_) {
-      id oldValue = [values_ objectForKey:key];
-      // TODO(dmaclach): handle this better, hopefully by getting rid of
-      // setValue:forKey:
-      HGSAssert(![key isEqualToString:kHGSObjectAttributeRankFlagsKey], nil);
-      HGSAssert(![key isEqualToString:kHGSObjectAttributeURIKey], nil);
-      HGSAssert(![key isEqualToString:kHGSObjectAttributeRankKey], nil);
-      HGSAssert(![key isEqualToString:kHGSObjectAttributeNameKey], nil);
-      HGSAssert(![key isEqualToString:kHGSObjectAttributeTypeKey], nil);
-      if (oldValue != obj && ![oldValue isEqual:obj]) {
-        [self willChangeValueForKey:key];
-        if (!obj) {
-          [values_ removeObjectForKey:key];
-        } else {
-          [values_ setObject:obj forKey:key];
-        }
-        [self didChangeValueForKey:key];
-      }
-    }
-  }
-}
-
 - (id)valueForUndefinedKey:(NSString *)key {
   return nil;
 }
 
+- (void)setValue:(id)value forKey:(NSString *)key {
+  // TODO(dmaclach): remove this soon. Here right now in case I missed 
+  // some setValue:forKey: calls on HGSResult.
+  HGSAssert(NO, @"setValue:(%@) forKey:(%@)", value, key);
+  exit(-1);
+}
+
 // if the value isn't present, ask the result source to satisfy the
-// request. Also registers for notifications so that we can update the
-// value cache. 
+// request.
 - (id)valueForKey:(NSString*)key {
-  id value = nil;
-  if ([key isEqualToString:kHGSObjectAttributeURIKey]) {
-    value = [self url];
-  } else if ([key isEqualToString:kHGSObjectAttributeNameKey]) {
-    value = [self displayName];
-  } else if ([key isEqualToString:kHGSObjectAttributeTypeKey]) {
-    value = [self type];
+  id value = [attributes_ objectForKey:key];
+  if (!value) {
+    if ([key isEqualToString:kHGSObjectAttributeURIKey]) {
+      value = [self url];
+    } else if ([key isEqualToString:kHGSObjectAttributeNameKey]) {
+      value = [self displayName];
+    } else if ([key isEqualToString:kHGSObjectAttributeTypeKey]) {
+      value = [self type];
+    } else if ([key isEqualToString:kHGSObjectAttributeIconKey]
+        || [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {  
+      HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
+      BOOL lazily = ![key isEqualToString:kHGSObjectAttributeImmediateIconKey];
+      value = [provider provideIconForResult:self
+                                  loadLazily:lazily];
+    }  
+    if (!value) {
+      // If we haven't provided a value, ask our source for a value.
+      value = [[self source] provideValueForKey:key result:self];
+    } 
+    if (!value) {
+      // If neither self or source provides a value, ask our HGSDelegate.
+      HGSModuleLoader *loader = [HGSModuleLoader sharedModuleLoader];
+      id <HGSDelegate> delegate = [loader delegate];
+      value = [delegate provideValueForKey:key result:self];
+    }
   }
   if (!value) {
-    @synchronized (values_) {
-      value = [values_ objectForKey:key];
-      if (!value) {
-        if ([key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
-          value = [values_ objectForKey:kHGSObjectAttributeIconKey];
-        }
-      }
-      if (!value) {
-        // request from the source. This may kick off a pending load. 
-        value = [[self source] provideValueForKey:key result:self];
-        if (!value) {
-          value = [self provideValueForKey:key result:self];
-        }
-        if (value) {
-          [self setValue:value forKey:key];
-        }
-      }
-      if (!value) {
-        value = [super valueForKey:key];
-      }
-    }
+    value = [super valueForKey:key];
   }
   // Done for thread safety.
   return [[value retain] autorelease];
@@ -335,12 +321,6 @@ triggerChangeNotificationsForDependentKey:kHGSObjectAttributeImmediateIconKey];
 
 - (NSString*)stringValue {
   return [self displayName];
-}
-
-- (NSImage *)displayIconWithLazyLoad:(BOOL)lazyLoad {
-  NSString *key = lazyLoad ? kHGSObjectAttributeIconKey 
-  : kHGSObjectAttributeImmediateIconKey;
-  return [self valueForKey:key];
 }
 
 - (BOOL)isOfType:(NSString *)typeStr {
@@ -384,22 +364,12 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
 }
 
 // merge the attributes of |result| into this one. Single values that overlap
-// are lost, arrays and dictionaries are merged together to form the union.
-// TODO(dmaclach): currently this description is a lie. Arrays and dictionaries
-// aren't merged.
-- (void)mergeWith:(HGSResult*)result {
-  BOOL dumpQueryProgress = [[NSUserDefaults standardUserDefaults]
-                            boolForKey:@"reportQueryOperationsProgress"];
-  if (dumpQueryProgress) {
-    HGSLogDebug(@"merging %@ into %@", [result description], [self description]);
-  }
-  NSDictionary *resultValues = [result values];
-  @synchronized(values_) {
-    for (NSString *key in [resultValues allKeys]) {
-      if ([values_ objectForKey:key]) continue;
-      [values_ setValue:[result valueForKey:key] forKey:key];
-    }
-  }
+// are lost.
+- (HGSResult *)mergeWith:(HGSResult*)result {
+  Class cls = [self class];
+  NSDictionary *attributes = [result attributes];
+  HGSResult *newResult = [self copyOfClass:cls mergingAttributes:attributes];
+  return [newResult autorelease];
 }
 
 // this is result a "duplicate" of |compareTo|? The default implementation 
@@ -414,8 +384,12 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   if (self->conformsToContact_ 
       && compareTo->conformsToContact_) {
     
-    NSArray *identifiers = [self valueForKey:kHGSObjectAttributeUniqueIdentifiersKey];
-    NSArray *identifiers2 = [compareTo valueForKey:kHGSObjectAttributeUniqueIdentifiersKey];
+    // Running through the identifers ourself is faster than creating two
+    // NSSets and calling intersectsSet on them.
+    NSArray *identifiers 
+      = [self valueForKey:kHGSObjectAttributeUniqueIdentifiersKey];
+    NSArray *identifiers2 
+      = [compareTo valueForKey:kHGSObjectAttributeUniqueIdentifiersKey];
     
     for (id a in identifiers) {
       for (id b in identifiers2) {
@@ -449,15 +423,6 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   return intersects;
 }
 
-- (NSDictionary *)values {
-  NSDictionary *dict;
-  @synchronized (values_) {
-    // We make a copy and autorelease to keep safe across threads.
-    dict = [values_ copy];
-  }
-  return [dict autorelease];
-}
-
 + (NSString *)hgsTypeForPath:(NSString*)path {
   // TODO(dmaclach): probably need some way for third parties to muscle their
   // way in here and improve this map for their types.
@@ -470,7 +435,8 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
                                &isDir);
   if (err != noErr) return nil;
   CFStringRef cfUTType = NULL;
-  err = LSCopyItemAttribute(&ref, kLSRolesAll, kLSItemContentType, (CFTypeRef*)&cfUTType);
+  err = LSCopyItemAttribute(&ref, kLSRolesAll, 
+                            kLSItemContentType, (CFTypeRef*)&cfUTType);
   if (err != noErr || !cfUTType) return nil;
   NSString *outType = nil;
   // Order of the map below is important as it's most specific first.
@@ -499,24 +465,6 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   }
   CFRelease(cfUTType);
   return outType;
-}
-
-- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
-  id value = nil;
-  if ([key isEqualToString:kHGSObjectAttributeIconKey]
-      || [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {  
-    HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
-    BOOL lazily = ![key isEqualToString:kHGSObjectAttributeImmediateIconKey];
-    value = [provider provideIconForResult:result
-                                loadLazily:lazily
-                                  useCache:YES];
-  }  
-  if (!value) {
-    HGSModuleLoader *loader = [HGSModuleLoader sharedModuleLoader];
-    id <HGSDelegate> delegate = [loader delegate];
-    value = [delegate provideValueForKey:key result:result];
-  }
-  return value;
 }
 
 @end
@@ -608,18 +556,6 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   return displayName;
 }
 
-- (NSImage*)displayIconWithLazyLoad:(BOOL)lazyLoad {
-  NSImage *displayImage = nil;
-  if ([results_ count] == 1) {
-    HGSResult *result = [results_ objectAtIndex:0];
-    displayImage = [result displayIconWithLazyLoad:lazyLoad];
-  } else {
-    HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
-    displayImage = [provider compoundPlaceHolderIcon];
-  }
-  return displayImage;
-}
-
 - (BOOL)isOfType:(NSString *)typeStr {
   BOOL isOfType = YES;
   for (HGSResult *result in self) {
@@ -680,4 +616,17 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
 - (NSString *)description {
   return [NSString stringWithFormat:@"%@ results:\r%@", [self class], results_];
 }
+
+- (NSImage*)icon {
+  NSImage *displayImage = nil;
+  if ([results_ count] == 1) {
+    HGSResult *result = [results_ objectAtIndex:0];
+    displayImage = [result valueForKey:kHGSObjectAttributeIconKey];
+  } else {
+    HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
+    displayImage = [provider compoundPlaceHolderIcon];
+  }
+  return displayImage;
+}
+
 @end

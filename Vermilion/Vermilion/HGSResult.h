@@ -171,10 +171,10 @@ typedef NSUInteger HGSRankFlags;
   NSString *displayName_;
   NSString *type_;
   HGSSearchSource *source_;
-  NSMutableDictionary* values_;  // All accesses to values_ must be synchronized
-  BOOL conformsToContact_;
+  NSDictionary *attributes_;  
   NSString *normalizedIdentifier_; // Only webpages have normalizedIdentifiers
   NSDate *lastUsedDate_;
+  BOOL conformsToContact_;
 }
 
 /*!
@@ -232,23 +232,17 @@ typedef NSUInteger HGSRankFlags;
 - (id)initWithDictionary:(NSDictionary*)dict
                   source:(HGSSearchSource *)source;
 
-// get and set attributes. |-valueForKey:| may return a placeholder value
+// get an attribute by name. |-valueForKey:| may return a placeholder value
 // that is to be updated later via KVO.
-// TODO(dmaclach)get rid of setValue:forKey: support
-- (void)setValue:(id)obj forKey:(NSString*)key;
 - (id)valueForKey:(NSString*)key;
 
-// merge the attributes of |result| into this one. Single values that overlap
-// are lost, arrays and dictionaries are merged together to form the union.
-// TODO(dmaclach): get rid of mergewith
-- (void)mergeWith:(HGSResult*)result;
+// merge the attributes of |result| with this one, and return a new object. 
+// Single values that overlap are lost.
+- (HGSResult *)mergeWith:(HGSResult*)result;
 
 // this is result a "duplicate" of |compareTo|? Not using |-isEqual:| because 
 // that impacts how the object gets put into collections.
 - (BOOL)isDuplicate:(HGSResult*)compareTo;
-
-// Get an icon for this result
-- (NSImage*)displayIconWithLazyLoad:(BOOL)lazyLoad;
 
 // Some helpers to check if this result is of a given type.  |isOfType| checks
 // for an exact match of the type.  |conformsToType{Set}| checks to see if this
@@ -284,14 +278,11 @@ typedef NSUInteger HGSRankFlags;
 - (HGSResult *)lastObject;
 // Will return nil if any of the results does not have a valid file path
 - (NSArray *)filePaths;
-
+- (NSImage *)icon;
 // Some helpers to check if this result is of a given type.  |isOfType| checks
 // for an exact match of the type.  |conformsToType{Set}| checks to see if this
 // object is of the specific type{s} or a refinement of it/them.
 - (BOOL)isOfType:(NSString *)typeStr;
 - (BOOL)conformsToType:(NSString *)typeStr;
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet;
-
-// Get an icon for these results
-- (NSImage*)displayIconWithLazyLoad:(BOOL)lazyLoad;
 @end

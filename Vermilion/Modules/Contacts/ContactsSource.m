@@ -54,7 +54,6 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   BOOL indexing_;
   NSMutableDictionary *imageLoadingTags_;
   NSArray *results_;
-  NSImage *genericImage_;
 }
 - (void)loadAddressBookContactsOperation;
 - (void)addressBookChanged:(NSNotification *)notification;
@@ -106,15 +105,17 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 }
 
 - (NSImage *)genericContactImage {
-  if (!genericImage_) {
-    @synchronized(self) {
-      genericImage_ = [NSImage imageNamed:@"blue-contact"];
-      genericImage_
-        = [HGSIconProvider imageWithRoundRectAndDropShadow:genericImage_];
-      [genericImage_ retain];
+  static NSImage *sGenericImage = nil;
+  @synchronized([HGSContactsSource class]) {
+    if (!sGenericImage) {
+      sGenericImage = [NSImage imageNamed:@"blue-contact"];
+      HGSIconProvider *iconProvider = [HGSIconProvider sharedIconProvider];
+      sGenericImage
+        = [iconProvider imageWithRoundRectAndDropShadow:sGenericImage];
+      [sGenericImage retain];
     }
   }
-  return genericImage_; 
+  return sGenericImage; 
 }
 
 - (void)loadAddressBookContactsOperation {
@@ -216,8 +217,6 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 }
 
 - (void)dealloc {
-  [genericImage_ release];
-  genericImage_ = nil;
   [condition_ release];
   [imageLoadingTags_ release];
   [results_ release];
@@ -426,13 +425,13 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 
     // create an image out of the data and put it into the result
     NSImage *image = [[[NSImage alloc] initWithData:data] autorelease];
-    image = [HGSIconProvider imageWithRoundRectAndDropShadow:image];
+    HGSIconProvider *iconProvider = [HGSIconProvider sharedIconProvider];
+    image = [iconProvider imageWithRoundRectAndDropShadow:image];
     if (image) {
-      [result setValue:image forKey:kHGSObjectAttributeIconKey];
-      
-      NSString *idString = [[result url] absoluteString];
-      [[HGSIconProvider sharedIconProvider] cacheIcon:image
-                                               forKey:idString];
+      NSString *uri = [[result url] absoluteString];
+      [iconProvider setIcon:image
+                  forResult:result 
+                    withURI:uri];
     }
   }
 }
@@ -450,7 +449,8 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   return person;
 }
 
-- (NSImage *)loadImageForObject:(HGSResult *)result immediately:(BOOL)immediately {
+- (NSImage *)loadImageForObject:(HGSResult *)result 
+                    immediately:(BOOL)immediately {
   NSImage *image = [[HGSIconProvider sharedIconProvider] 
                     cachedIconForKey:[[result url] absoluteString]];
   
@@ -466,12 +466,12 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     } else {
       NSData *data = [person imageData];
       if (data) {
+        HGSIconProvider *iconProvider = [HGSIconProvider sharedIconProvider];
         image = [[[NSImage alloc] initWithData:data] autorelease];
-        image = [HGSIconProvider imageWithRoundRectAndDropShadow:image];
+        image = [iconProvider imageWithRoundRectAndDropShadow:image];
         if (image) {
           NSString *idString = [[result url] absoluteString];
-          [[HGSIconProvider sharedIconProvider] cacheIcon:image
-                                                   forKey:idString];
+          [iconProvider cacheIcon:image forKey:idString];
         }
       } else {
         image = [self genericContactImage];

@@ -60,16 +60,11 @@
 //
 // If loadLazily is YES, an asynchronous load of the icon will be started.
 //
-// If useCache is YES, this method will first attempt to obtain the icon
-// from the cache. If the icon is not in the cache, and the loadLazily
-// is YES, the icon will be added to the cache after a successful retrieval.
-//
 // The result argument is not retained; it's very important that for lazy icon
 // retrievals cancelOperationsForResult be called whenever a result is going
 // away.
-- (NSImage *)provideIconForResult:(HGSResult*)result
-                       loadLazily:(BOOL)loadLazily
-                         useCache:(BOOL)useCache;
+- (NSImage *)provideIconForResult:(HGSResult *)result
+                       loadLazily:(BOOL)loadLazily;
 
 // If provideIconForResult has been called with loadLazily:YES, then the
 // the call to provideIconForResult may be followed by a subsequent call
@@ -82,7 +77,14 @@
 - (NSImage *)cachedIconForKey:(NSString *)key;
 - (void)cacheIcon:(NSImage *)icon forKey:(NSString *)key;
 
-+ (NSImage *)imageWithRoundRectAndDropShadow:(NSImage *)image;
-+ (NSSize)preferredIconSize; // Size of the largest icon used in the UI
+// Updates the icon for a given result and caches the image for the future.
+// This can be called from any thread. The actual setting happens on the main
+// thread.
+- (void)setIcon:(NSImage *)icon
+      forResult:(HGSResult *)result 
+        withURI:(NSString *)uri;
+
+- (NSImage *)imageWithRoundRectAndDropShadow:(NSImage *)image;
+- (NSSize)preferredIconSize; // Size of the largest icon used in the UI
 
 @end

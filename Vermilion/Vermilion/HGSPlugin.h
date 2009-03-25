@@ -41,13 +41,6 @@
 @class HGSProtoExtension;
 
 /*!
-  Basic protocol that all plugins must follow to be added to the plugins
-  extension point.
-*/
-@protocol HGSPlugin
-@end
-
-/*!
   A class that manages a collection of source, action and service extensions
   along with location, type, enablement, etc.
   

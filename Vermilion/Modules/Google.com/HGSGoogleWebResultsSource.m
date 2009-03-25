@@ -212,7 +212,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   if (!googleResultArray) return;
 
   HGSResult *pivotObject = [[self query] pivotObject];
-  id image = [pivotObject displayIconWithLazyLoad:NO];
+  id image = [pivotObject valueForKey:kHGSObjectAttributeIconKey];
 
   NSArray *unescapedNames = [googleResultArray valueForKeyPath:@"titleNoFormatting.gtm_stringByUnescapingFromHTML"];
   if (!unescapedNames) return;

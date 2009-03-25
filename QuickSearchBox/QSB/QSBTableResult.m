@@ -409,7 +409,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (NSImage *)displayIcon {
   HGSResult *result = [self representedResult];
-  return [result displayIconWithLazyLoad:YES];
+  return [result valueForKey:kHGSObjectAttributeIconKey];
 }
 
 - (NSString*)displayToolTip {
@@ -422,7 +422,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (NSImage *)displayThumbnail {
   HGSResult *result = [self representedResult];
-  return [result displayIconWithLazyLoad:NO];
+  return [result valueForKey:kHGSObjectAttributeImmediateIconKey];
 }
 
 - (NSMutableAttributedString*)genericTitleLine {

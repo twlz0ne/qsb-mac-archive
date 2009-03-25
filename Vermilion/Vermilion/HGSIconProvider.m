@@ -64,6 +64,7 @@ static HGSLRUCacheCallBacks kLRUCacheCallbacks = {
 static NSString *const kHGSIconProviderResultKey = @"HGSIconProviderResultKey";
 static NSString *const kHGSIconProviderValueKey = @"HGSIconProviderValueKey";
 static NSString *const kHGSIconProviderAttrKey = @"HGSIconProviderAttrKey";
+static NSString *const kHGSIconProviderURIKey = @"HGSIconProviderURIKey";
 static NSString *const kHGSIconProviderThumbnailURLFormat = @"HGSIconProviderThumbnailURLFormat";
 
 static NSURL* IconURLForResult(HGSResult *result) {
@@ -89,10 +90,11 @@ static NSURL* IconURLForResult(HGSResult *result) {
 @class HGSIconOperation;
 
 @interface HGSIconProvider()
-- (void)beginLazyLoadForResult:(HGSResult*)result useCache:(BOOL)useCache;
+- (void)beginLazyLoadForResult:(HGSResult*)result;
 
 // Remove an operation from our list of pending icon fetch operations.
 - (void)removeOperation:(HGSIconOperation *)operation;
+- (void)setValueOnMainThread:(NSDictionary *)args;
 
 @end
 
@@ -102,30 +104,24 @@ static NSURL* IconURLForResult(HGSResult *result) {
   HGSInvocationOperation *operation_; // STRONG
   GDataHTTPFetcher *fetcher_;   // STRONG
   HGSResult *result_;    // WEAK
-  BOOL useCache_;
 }
-+ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result
-                                    useCache:(BOOL)useCache;
-- (id)initWithResult:(HGSResult*)result useCache:(BOOL)useCache;
++ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result;
+- (id)initWithResult:(HGSResult*)result;
 - (void)beginLoading;
 - (void)cancel;
-- (void)setValueOnMainThread:(NSDictionary *)args;
 @end
 
 
 @implementation HGSIconOperation
 
-+ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result
-                                    useCache:(BOOL)useCache {
-  return [[[HGSIconOperation alloc] initWithResult:result
-                                          useCache:useCache] autorelease];
++ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result {
+  return [[[HGSIconOperation alloc] initWithResult:result] autorelease];
 }
 
-- (id)initWithResult:(HGSResult*)result useCache:(BOOL)useCache {
+- (id)initWithResult:(HGSResult*)result {
   self = [super init];
   if (self) {
     result_ = result;
-    useCache_ = useCache;
   }
   return self;
 }
@@ -183,11 +179,11 @@ static NSURL* IconURLForResult(HGSResult *result) {
   }
 }
 
-- (void)performDiskLoad:(id)obj {
+- (NSImage *)performDiskLoad:(HGSResult *)result {
   NSURL *url = nil;
   @synchronized(self) {
     if (![operation_ isCancelled]) {
-      url = IconURLForResult(result_);
+      url = IconURLForResult(result);
     }
   }
   
@@ -225,33 +221,15 @@ static NSURL* IconURLForResult(HGSResult *result) {
     }
   }
   
-  if (icon && useCache_) {
-    [[HGSIconProvider sharedIconProvider] cacheIcon:icon
-                                             forKey:[url absoluteString]];
-  }
-  
-  @synchronized(self) {
-    if (icon && ![operation_ isCancelled]) {
-      NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
-                            result_, kHGSIconProviderResultKey,
-                            icon, kHGSIconProviderValueKey,
-                            kHGSObjectAttributeIconKey, kHGSIconProviderAttrKey,
-                            nil];
-      [self performSelectorOnMainThread:@selector(setValueOnMainThread:)
-                             withObject:args
-                          waitUntilDone:NO];
-    }
-  }
   HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
-  [sharedIconProvider removeOperation:self];
-}
 
-- (void)setValueOnMainThread:(NSDictionary *)args {
-  GTMAssertRunningOnMainThread();
-  HGSResult *result = [args objectForKey:kHGSIconProviderResultKey];
-  id value = [args objectForKey:kHGSIconProviderValueKey];
-  NSString *key = [args objectForKey:kHGSIconProviderAttrKey];
-  [result setValue:value forKey:key];
+  if (icon && ![operation_ isCancelled]) {
+    [sharedIconProvider setIcon:icon 
+                      forResult:result 
+                        withURI:[url absoluteString]];
+  }
+  [sharedIconProvider removeOperation:self];
+  return icon;
 }
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
@@ -260,28 +238,15 @@ static NSURL* IconURLForResult(HGSResult *result) {
   @synchronized(self) {
     cancelled = ([operation_ isCancelled]);
   }
+  HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
   if (!cancelled) {
     NSImage *icon = [[[NSImage alloc] initWithData:retrievedData] autorelease];
-    icon = [HGSIconProvider imageWithRoundRectAndDropShadow:icon];
-    if (icon && useCache_) {
-      [[HGSIconProvider sharedIconProvider] cacheIcon:icon
-                                 forKey:[[[fetcher request] URL] absoluteString]];
-    }
-    
-    @synchronized(self) {
-      if (icon && ![operation_ isCancelled]) {
-        NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
-                              result_, kHGSIconProviderResultKey,
-                              icon, kHGSIconProviderValueKey,
-                              kHGSObjectAttributeIconKey, kHGSIconProviderAttrKey,
-                              nil];
-        [self performSelectorOnMainThread:@selector(setValueOnMainThread:)
-                               withObject:args
-                            waitUntilDone:NO];
-      }
+    icon = [sharedIconProvider imageWithRoundRectAndDropShadow:icon];
+    if (icon && ![operation_ isCancelled]) {
+      NSString *uri = [[[fetcher request] URL] absoluteString];
+      [sharedIconProvider setIcon:icon forResult:result_ withURI:uri];
     }
   }
-  HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
   [sharedIconProvider removeOperation:self];
 }
 
@@ -317,6 +282,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   return self;
 }
 
+// COV_NF_START
+// Singleton, so this is never called.
 - (void)dealloc {
   @synchronized(self) {
     for (NSOperation *op in iconOperations_) {
@@ -327,6 +294,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   [placeHolderIcon_ release];
   [super dealloc];
 }
+// COV_NF_END
 
 - (NSImage *)placeHolderIcon {
   return placeHolderIcon_;
@@ -337,51 +305,56 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 }
 
 - (NSImage *)provideIconForResult:(HGSResult*)result
-                       loadLazily:(BOOL)loadLazily
-                         useCache:(BOOL)useCache {
+                       loadLazily:(BOOL)loadLazily {
   NSImage *icon = nil;
   
   NSURL *url = IconURLForResult(result);
   if (url) {
-    if (useCache) {
-      icon = [self cachedIconForKey:[url absoluteString]];
-    }
+    icon = [self cachedIconForKey:[url absoluteString]];
     if (!icon) {
       if (loadLazily) {
-        [self beginLazyLoadForResult:result useCache:useCache];
-        icon = [[result source] defaultIconForResult:result];
+        [self beginLazyLoadForResult:result];
+        icon = [[result source] provideValueForKey:kHGSObjectAttributeIconKey
+                                            result:result];
         if (!icon) {
           icon = [self placeHolderIcon];
         }
       } else {
-        if ([url isFileURL]) {
-          HGSIconOperation *op 
-            = [HGSIconOperation iconOperationForResult:result
-                                              useCache:useCache];
-          [op performDiskLoad:nil];
+        HGSSearchSource *source = [result source];
+        icon = [source provideValueForKey:kHGSObjectAttributeImmediateIconKey 
+                                   result:result];
+        if (icon) {
+          [self cacheIcon:icon forKey:[url absoluteString]];
         } else {
-          NSString *scheme = [url scheme];
-          typedef struct {
-            NSString *scheme;
-            OSType icon;
-          } SchemeMap;
-          SchemeMap map[] = {
-            { @"http", 'tSts' },
-            { @"https", 'tSts' },
-            { @"ftp", kInternetLocationFTPIcon },
-            { @"afp", kInternetLocationAppleShareIcon },
-            { @"mailto", kInternetLocationMailIcon },
-            { @"news", kInternetLocationNewsIcon }
-          };
-          OSType iconType = kInternetLocationGenericIcon;
-          for (size_t i = 0; i < sizeof(map) / sizeof(SchemeMap); ++i) {
-            if ([scheme caseInsensitiveCompare:map[i].scheme] == NSOrderedSame) {
-              iconType = map[i].icon;
-              break;
+          if ([url isFileURL]) {
+            HGSIconOperation *op 
+              = [HGSIconOperation iconOperationForResult:result];
+            icon = [op performDiskLoad:result];
+          } else {
+            NSString *scheme = [url scheme];
+            typedef struct {
+              NSString *scheme;
+              OSType icon;
+            } SchemeMap;
+            SchemeMap map[] = {
+              { @"http", 'tSts' },
+              { @"https", 'tSts' },
+              { @"ftp", kInternetLocationFTPIcon },
+              { @"afp", kInternetLocationAppleShareIcon },
+              { @"mailto", kInternetLocationMailIcon },
+              { @"news", kInternetLocationNewsIcon }
+            };
+            OSType iconType = kInternetLocationGenericIcon;
+            for (size_t i = 0; i < sizeof(map) / sizeof(SchemeMap); ++i) {
+              if ([scheme caseInsensitiveCompare:map[i].scheme] == NSOrderedSame) {
+                iconType = map[i].icon;
+                break;
+              }
             }
+            NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+            icon = [ws iconForFileType:NSFileTypeForHFSTypeCode(iconType)];
+            [self beginLazyLoadForResult:result];
           }
-          NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-          icon = [ws iconForFileType:NSFileTypeForHFSTypeCode(iconType)];
         }
       }
     }
@@ -391,8 +364,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 
 - (void)cancelOperationsForResult:(HGSResult*)result {
   HGSIconOperation *operation = 
-    [HGSIconOperation iconOperationForResult:result
-                                    useCache:NO];
+    [HGSIconOperation iconOperationForResult:result];
   @synchronized(self) {
     HGSIconOperation *original = [iconOperations_ member:operation];
     if (original) {
@@ -408,10 +380,9 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   }
 }
 
-- (void)beginLazyLoadForResult:(HGSResult*)result useCache:(BOOL)useCache {
+- (void)beginLazyLoadForResult:(HGSResult*)result {
   HGSIconOperation *operation = 
-    [HGSIconOperation iconOperationForResult:result
-                                    useCache:useCache];
+    [HGSIconOperation iconOperationForResult:result];
   @synchronized(self) {
     // Don't add if we're already doing a load for this object
     if (![iconOperations_ member:operation]) {
@@ -446,7 +417,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 }
 
 // Return an image that has a round rectangle frame and a drop shadow
-+ (NSImage *)imageWithRoundRectAndDropShadow:(NSImage *)image {
+- (NSImage *)imageWithRoundRectAndDropShadow:(NSImage *)image {
   if (!image) return nil;
   NSImage *formattedImage = [[[NSImage alloc] init] autorelease];
   
@@ -455,17 +426,14 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   NSRect borderRect = GTMNSRectOfSize(preferredSize);
   borderRect = NSInsetRect(borderRect, 8.0, 8.0);
   
-  NSBitmapImageRep *bestRep
-    = (NSBitmapImageRep *)[image gtm_bestRepresentationForSize:borderRect.size];  
+  NSImageRep *bestRep = [image gtm_bestRepresentationForSize:borderRect.size];  
   NSRect drawRect = GTMNSScaleRectToRect(GTMNSRectOfSize([bestRep size]), 
                                          borderRect,
                                          GTMScaleProportionally,
                                          GTMRectAlignCenter);
   drawRect = NSIntegralRect(drawRect);
-
-  CGImageRef imageRef = [bestRep CGImage]; // this is autoreleased
   
-  CGColorSpaceRef cspace = CGColorSpaceCreateDeviceRGB();   
+  CGColorSpaceRef cspace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);   
   if (!cspace) return image;
   
   CGSize largeSize = NSSizeToCGSize(preferredSize);
@@ -493,7 +461,13 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
     }
     CGContextSaveGState(largeContext);
     CGContextClip(largeContext);
-    CGContextDrawImage(largeContext, GTMNSRectToCGRect(drawRect), imageRef);
+    [NSGraphicsContext saveGraphicsState];
+    NSGraphicsContext *context 
+      = [NSGraphicsContext graphicsContextWithGraphicsPort:largeContext 
+                                                   flipped:YES];
+    [NSGraphicsContext setCurrentContext:context];
+    [bestRep drawInRect:drawRect];
+    [NSGraphicsContext restoreGraphicsState];
     CGContextRestoreGState(largeContext);
     CGContextSetLineWidth(largeContext, 1.0);
     if (path) {
@@ -545,7 +519,13 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
     }
     CGContextSaveGState(smallContext);
     CGContextClip(smallContext);
-    CGContextDrawImage(smallContext, GTMNSRectToCGRect(smallDrawRect), imageRef);
+    [NSGraphicsContext saveGraphicsState];
+    NSGraphicsContext *context 
+      = [NSGraphicsContext graphicsContextWithGraphicsPort:smallContext 
+                                                   flipped:YES];
+    [NSGraphicsContext setCurrentContext:context];
+    [bestRep drawInRect:drawRect];
+    [NSGraphicsContext restoreGraphicsState];
     CGContextRestoreGState(smallContext);
     
     CGContextSetLineWidth(smallContext, 1.0);
@@ -575,8 +555,34 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 }
 
 
-+ (NSSize)preferredIconSize {
+- (NSSize)preferredIconSize {
   return NSMakeSize(96.0, 96.0);
+}
+
+- (void)setValueOnMainThread:(NSDictionary *)args {
+  GTMAssertRunningOnMainThread();
+  HGSResult *result = [args objectForKey:kHGSIconProviderResultKey];
+  NSString *key = [args objectForKey:kHGSIconProviderAttrKey];
+  NSImage *icon = [args objectForKey:kHGSIconProviderValueKey];
+  NSString *uri = [args objectForKey:kHGSIconProviderURIKey];
+  HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
+  [result willChangeValueForKey:key];
+  [provider cacheIcon:icon forKey:uri];
+  [result didChangeValueForKey:key];
+}
+
+- (void)setIcon:(NSImage *)icon 
+      forResult:(HGSResult *)result 
+        withURI:(NSString *)uri {
+  NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
+                        result, kHGSIconProviderResultKey,
+                        icon, kHGSIconProviderValueKey,
+                        kHGSObjectAttributeIconKey, kHGSIconProviderAttrKey,
+                        uri, kHGSIconProviderURIKey,
+                        nil];
+  [self performSelectorOnMainThread:@selector(setValueOnMainThread:)
+                         withObject:args
+                      waitUntilDone:NO];
 }
 @end
 

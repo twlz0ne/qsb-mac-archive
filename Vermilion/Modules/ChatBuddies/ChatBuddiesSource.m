@@ -191,8 +191,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   // TODO(mrossetti): break this method up. It's too complex.
   id value = nil;
-  if ([key isEqualToString:kHGSObjectAttributeIconKey] 
-      || [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
+  if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
     // Retrieve the info for this result.
     NSDictionary *imBuddyInfo 
       = [result valueForKey:kChatBuddyAttributeInformationKey];
@@ -207,7 +206,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         if (buddyPictureData) {
           NSImage *image = [[[NSImage alloc] initWithData:buddyPictureData]
                             autorelease];
-          value = [HGSIconProvider imageWithRoundRectAndDropShadow:image];
+          HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
+          value = [provider imageWithRoundRectAndDropShadow:image];
         }
       }
     }

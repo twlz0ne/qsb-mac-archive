@@ -52,6 +52,7 @@
 #import "GTMNSObject+KeyValueObserving.h"
 #import "GTMNSAppleEventDescriptor+Foundation.h"
 #import "NSString+CaseInsensitive.h"
+#import "QSBTableResult.h"
 
 static const NSTimeInterval kQSBShowDuration = 0.1;
 static const NSTimeInterval kQSBHideDuration = 0.333;
@@ -391,11 +392,8 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
 }
 
 - (void)updateImageView {
-  NSImage *image = nil;
   id selection = [self selection];
-  if ([selection respondsToSelector:@selector(displayThumbnail)])
-    image = [selection valueForKey:@"displayThumbnail"];
-
+  NSImage *image = [selection displayThumbnail];
   [logoView_ setHidden:image != nil];
   [previewImageView_ setImage:image];
   [previewImageView_ display];
@@ -404,11 +402,10 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
 - (void)updateLogoView {
   NSImage *menuImage = nil;
   NSImage *logoImage = nil;
-  NSColor *color = [NSColor whiteColor];
   NSData *data = [[NSUserDefaults standardUserDefaults]
                   dataForKey:kQSBUserPrefBackgroundColorKey];
-  if (data) 
-    color = [NSUnarchiver unarchiveObjectWithData:data];
+  NSColor *color = data ? [NSUnarchiver unarchiveObjectWithData:data] 
+                        : [NSColor whiteColor];
   color = [color colorUsingColorSpaceName:NSDeviceRGBColorSpace];
   
   CGFloat brightness = [color brightnessComponent];
@@ -1308,7 +1305,7 @@ doCommandBySelector:(SEL)commandSelector {
   HGSResultArray *results = [activeSearchViewController_ results];
   NSString *pivotString = [results displayName];
   [searchMenu_ setTitle:pivotString];
-  NSImage *image = [results displayIconWithLazyLoad:NO];
+  NSImage *image = [results icon];
   NSRect frame;
   if (image) {
     // We go through this instead of copying the image so we don't

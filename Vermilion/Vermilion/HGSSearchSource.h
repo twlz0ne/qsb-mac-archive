@@ -63,7 +63,7 @@
 /*!
  The list of types this source can do a pivot search on. Defaults to the value 
  of "HGSSearchSourcePivotTypes" from config dict. Set
- "HGSSearchSourcePivotTypes" to @"*" to pivot on any type
+ "HGSSearchSourcePivotTypes" to \@"*" to pivot on any type
 */
 @property (readonly) NSSet *pivotableTypes;
 
@@ -129,14 +129,6 @@
   archiveRepresentationForResult:.
 */
 - (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation;
-
-/*!
-  Return a default icon for the source that applies to this object.  This is
-  meant to be ultra fast, and should NOT require hitting the disk or network.
-  It is meant to return a precached icon to display while the "real" icon is
-  being loaded.
-*/
-- (NSImage *)defaultIconForResult:(HGSResult *)result;
 
 @end
 
