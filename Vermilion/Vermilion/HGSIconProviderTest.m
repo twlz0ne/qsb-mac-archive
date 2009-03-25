@@ -38,6 +38,7 @@
 #import "HGSSearchSource.h"
 #import "GTMNSObject+UnitTesting.h"
 #import "GTMAppKit+UnitTesting.h"
+#import "GTMGarbageCollection.h"
 
 @interface HGSIconProviderTest : GTMTestCase 
 @end
@@ -74,17 +75,34 @@
   NSSize size = [provider preferredIconSize];
   STAssertEquals(size.height, (CGFloat)96.0, nil);
   STAssertEquals(size.width, (CGFloat)96.0, nil);
+  // Create up NSImage using CG calls because doing it using lockFocus and
+  // friends causes a weird mixup of calibrated and direct colorspaces.
+  CGColorSpaceRef cspace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
+  GTMCFAutorelease(cspace);
+  CGContextRef context 
+    = CGBitmapContextCreate(NULL, 
+                            size.width, 
+                            size.height, 
+                            8, 
+                            32 * size.width, 
+                            cspace, 
+                            kCGBitmapByteOrder32Host 
+                            | kCGImageAlphaPremultipliedLast);
+  GTMCFAutorelease(context);
+  STAssertNotNULL(context, nil);
+  CGColorRef color = CGColorCreateGenericRGB(0, 0, 1, 1);
+  GTMCFAutorelease(color);
+  CGContextSetFillColorWithColor(context, color);
+  CGContextMoveToPoint(context, 16, 16);
+  CGContextAddLineToPoint(context, 80, 16);
+  CGContextAddLineToPoint(context, 48, 80);
+  CGContextFillPath(context);
+  CGImageRef cgImage = CGBitmapContextCreateImage(context);
+  GTMCFAutorelease(cgImage);
+  NSBitmapImageRep *bitmap 
+    = [[[NSBitmapImageRep alloc] initWithCGImage:cgImage] autorelease];
   NSImage *image = [[[NSImage alloc] initWithSize:size] autorelease];
-  STAssertNotNil(image, nil);
-  [image lockFocus];
-  [[NSColor redColor] set];
-  NSBezierPath *path = [NSBezierPath bezierPath];
-  // Make a triangle so we can test that everything is flipped the right way
-  [path moveToPoint:NSMakePoint(16, 16)];
-  [path lineToPoint:NSMakePoint(80, 16)];
-  [path lineToPoint:NSMakePoint(48,80)];
-  [path fill];
-  [image unlockFocus];
+  [image addRepresentation:bitmap];
   image = [provider imageWithRoundRectAndDropShadow:image];
   GTMAssertObjectImageEqualToImageNamed(image, @"RoundRectAndDropShadow", nil);
 }
