@@ -46,4 +46,4 @@ then
   cp -R "$QSB_INSTALL_DIR/QSBPlugin" "$QSB_XCODE_SHARED_DIR/Project Templates/QSB/"
 fi
 
-rm -rf "$$QSB_INSTALL_DIR"
+rm -rf "$QSB_INSTALL_DIR"
