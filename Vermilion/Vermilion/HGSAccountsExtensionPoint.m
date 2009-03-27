@@ -57,7 +57,10 @@ GTM_METHOD_CHECK(NSEnumerator,
                               initWithConfiguration:accountDict]
                              autorelease];
       if (account) {
-        [self extendWithObject:account];
+        BOOL accountAdded = [self extendWithObject:account];
+        if (!accountAdded) {
+          HGSLogDebug(@"Failed to add account '%@'.", [account displayName]);
+        }
       }
     } else {
       HGSLogDebug(@"Did not find account type for account dictionary :%@",
@@ -76,16 +79,19 @@ GTM_METHOD_CHECK(NSEnumerator,
 }
 
 - (void)addAccountType:(NSString *)accountType withClass:(Class)accountClass {
-  static NSString * const sVisibleAccountTypeNamesKey = @"visibleAccountTypeDisplayNames";
-  [self willChangeValueForKey:sVisibleAccountTypeNamesKey];
-  if (!accountTypes_) {
-    accountTypes_ = [[NSMutableDictionary dictionaryWithObject:accountClass
-                                                       forKey:accountType]
-                     retain];
-  } else {
-    [accountTypes_ setObject:accountClass forKey:accountType];
+  if (accountType && accountClass) {
+    static NSString * const sVisibleAccountTypeNamesKey
+      = @"visibleAccountTypeDisplayNames";
+    [self willChangeValueForKey:sVisibleAccountTypeNamesKey];
+    if (!accountTypes_) {
+      accountTypes_ = [[NSMutableDictionary dictionaryWithObject:accountClass
+                                                          forKey:accountType]
+                       retain];
+    } else {
+      [accountTypes_ setObject:accountClass forKey:accountType];
+    }
+    [self didChangeValueForKey:sVisibleAccountTypeNamesKey];
   }
-  [self didChangeValueForKey:sVisibleAccountTypeNamesKey];
 }
 
 - (Class)classForAccountType:(NSString *)accountType {
@@ -107,8 +113,8 @@ GTM_METHOD_CHECK(NSEnumerator,
 }
 
 - (NSArray *)accountsForType:(NSString *)type {
-  NSPredicate *pred = [NSPredicate predicateWithFormat:@"type == %@", type];
   NSArray *array = [self extensions];
+  NSPredicate *pred = [NSPredicate predicateWithFormat:@"type == %@", type];
   array = [array filteredArrayUsingPredicate:pred];
   return array;
 }

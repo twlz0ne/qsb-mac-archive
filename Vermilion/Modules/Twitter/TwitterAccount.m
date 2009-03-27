@@ -134,7 +134,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 @implementation TwitterAccountEditController
 
-- (IBAction)goToTwitter:(id)sender {
+- (IBAction)openTwitterHomePage:(id)sender {
   BOOL success = [TwitterAccount openTwitterHomePage];
   if (!success) {
     NSBeep();
@@ -153,7 +153,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return self;
 }
 
-- (IBAction)goToTwitter:(id)sender {
+- (IBAction)openTwitterHomePage:(id)sender {
   BOOL success = [TwitterAccount openTwitterHomePage];
   if (!success) {
     NSBeep();

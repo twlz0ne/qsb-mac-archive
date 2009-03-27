@@ -33,9 +33,245 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSSimpleAccount.h"
+#import "KeychainItem.h"
+#import <OCMock/OCMock.h>
 
-@interface HGSSimpleAccountTest : GTMTestCase 
+static NSString *const kServiceName
+  =  @"com.google.qsb.SimpleAccountType.HGSSimpleAccount E";
+
+@interface HGSSimpleAccountTest : GTMTestCase {
+ @private
+  BOOL receivedPasswordNotification_;
+  BOOL receivedWillBeRemovedNotification_;
+  HGSAccount *account_;
+}
+
+@property BOOL receivedPasswordNotification;
+@property BOOL receivedWillBeRemovedNotification;
+@property (retain) HGSAccount *account;
+
+@end
+
+@interface SimpleAccount : HGSSimpleAccount
+@end
+
+@implementation SimpleAccount
+
+- (NSString *)type {
+  return @"SimpleAccountType";
+}
+
+@end
+
+@interface SimpleAccountWithFakeKeychain : SimpleAccount
+@end
+
+@implementation SimpleAccountWithFakeKeychain
+
+// Fake having a keychainItem.
+- (KeychainItem *)keychainItem {
+  KeychainItem *item = [[[KeychainItem alloc] init] autorelease];
+  return item;
+}
+
 @end
 
 @implementation HGSSimpleAccountTest
+
+@synthesize receivedPasswordNotification = receivedPasswordNotification_;
+@synthesize receivedWillBeRemovedNotification
+  = receivedWillBeRemovedNotification_;
+@synthesize account = account_;
+
+- (void)dealloc {
+  [self setAccount:nil];
+  [super dealloc];
+}
+
+- (void)setAccount:(HGSAccount *)account {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  if (account_) {
+    [account_ release];
+    [nc removeObserver:self];
+  }
+  if (account) {
+    account_ = [account retain];
+    [nc addObserver:self
+           selector:@selector(passwordChanged:)
+               name:kHGSAccountDidChangeNotification
+             object:account];
+    [nc addObserver:self
+           selector:@selector(willBeRemoved:)
+               name:kHGSAccountWillBeRemovedNotification
+             object:account];
+  }
+}
+
+- (void)passwordChanged:(NSNotification *)notification {
+  id notificationObject = [notification object];
+  HGSAccount *expectedAccount = [self account];
+  BOOL gotExpectedObject = (notificationObject == expectedAccount);
+  [self setReceivedPasswordNotification:gotExpectedObject];
+}
+
+- (void)willBeRemoved:(NSNotification *)notification {
+  id notificationObject = [notification object];
+  HGSAccount *expectedAccount = [self account];
+  BOOL gotExpectedObject = (notificationObject == expectedAccount);
+  [self setReceivedWillBeRemovedNotification:gotExpectedObject];
+}
+
+- (BOOL)receivedPasswordNotification {
+  BOOL result = receivedPasswordNotification_;
+  receivedPasswordNotification_ = NO;
+  return result;
+}
+
+- (BOOL)receivedWillBeRemovedNotification {
+  BOOL result = receivedWillBeRemovedNotification_;
+  receivedWillBeRemovedNotification_ = NO;
+  return result;
+}
+
+- (void)setUp {
+  // Cleanse the keychain.
+  NSArray *keychainItems
+    = [KeychainItem allKeychainItemsForService:kServiceName];
+  for (KeychainItem *keychainItem in keychainItems) {
+    [keychainItem removeFromKeychain];
+  }
+}
+
+#pragma mark Tests
+
+- (void)testInit {
+  // init: Should fail to init due to no username or type.
+  HGSSimpleAccount *account = [[[HGSSimpleAccount alloc] init] autorelease];
+  STAssertNil(account, nil);
+  // initWithName: Should fail to init since there is no type.
+  account = [[[HGSSimpleAccount alloc] initWithName:nil] autorelease];
+  STAssertNil(account, nil);
+  account = [[[HGSSimpleAccount alloc] initWithName:@""] autorelease];
+  STAssertNil(account, nil);
+  account = [[[HGSSimpleAccount alloc] initWithName:@"HGSSimpleAccount A"] autorelease];
+  STAssertNil(account, nil);
+  account = [[[SimpleAccount alloc] initWithName:@"SimpleAccount A"] autorelease];
+  STAssertNotNil(account, nil);
+  // initWithConfiguration:
+  NSDictionary *configuration = [NSDictionary dictionary];
+  account
+    = [[[HGSSimpleAccount alloc] initWithConfiguration:configuration] autorelease];
+  STAssertNil(account, nil);
+  configuration = [NSDictionary dictionaryWithObjectsAndKeys:
+                   @"HGSSimpleAccount A", kHGSAccountUserNameKey,
+                   nil];
+  account
+    = [[[HGSSimpleAccount alloc] initWithConfiguration:configuration] autorelease];
+  STAssertNil(account, nil);
+  configuration = [NSDictionary dictionaryWithObjectsAndKeys:
+                   @"HGSSimpleAccount B", kHGSAccountUserNameKey,
+                   @"SIMPLE TYPE B", kHGSAccountTypeKey,
+                   nil];
+  account
+    = [[[HGSSimpleAccount alloc] initWithConfiguration:configuration] autorelease];
+  STAssertNil(account, nil);
+  // HGSSimpleAccounts must have a keychain item so this will result in nil.
+  configuration = [NSDictionary dictionaryWithObjectsAndKeys:
+                   @"HGSSimpleAccount C", kHGSAccountUserNameKey,
+                   nil];
+  account
+    = [[[SimpleAccount alloc] initWithConfiguration:configuration] autorelease];
+  STAssertNil(account, nil);
+}
+
+- (void)testConfiguration {
+  // The SimpleAccountWithFakeKeychain class provides a fake keychain item
+  // so should result in an account.
+  id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  [[[bundleMock stub] andReturn:@"bundle.identifier"] 
+   objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 @"HGSSimpleAccount D", kHGSAccountUserNameKey,
+                                 bundleMock, kHGSExtensionBundleKey,
+                                 nil];
+  HGSAccount *account
+    = [[[SimpleAccountWithFakeKeychain alloc] initWithConfiguration:configuration]
+       autorelease];
+  NSDictionary *result = [account configuration];
+  STAssertNotNil(result, nil);
+  NSString * userName = [result objectForKey:kHGSAccountUserNameKey];
+  STAssertEqualObjects(userName, @"HGSSimpleAccount D", nil);
+  NSString * accountType = [result objectForKey:kHGSAccountTypeKey];
+  STAssertEqualObjects(accountType, @"SimpleAccountType", nil);
+}
+
+- (void)testAccessors {
+  SimpleAccount *account
+    = [[[SimpleAccount alloc] initWithName:@"HGSSimpleAccount E"]
+       autorelease];
+  NSString *identifier = [account identifier];
+  STAssertEqualObjects(identifier, kServiceName, nil);
+  NSString *userName = [account userName];
+  STAssertEqualObjects(userName, @"HGSSimpleAccount E", nil);
+  NSString *displayName = [account displayName];
+  STAssertEqualObjects(displayName, @"HGSSimpleAccount E (SimpleAccountType)",
+                       nil);
+  NSString *accountType = [account type];
+  STAssertEqualObjects(accountType, @"SimpleAccountType", nil);
+  BOOL isEditable = [account isEditable];
+  STAssertFalse(isEditable, nil);
+  NSString *description = [account description];
+  STAssertNotNil(description, nil);
+  
+  // Password
+  BOOL notified = [self receivedPasswordNotification];
+  STAssertFalse(notified, nil);
+  NSString *password = [account password];
+  STAssertNil(password, nil);
+  [self setAccount:account];
+  [account setPassword:@"PASSWORD E"];
+  notified = [self receivedPasswordNotification];
+  STAssertTrue(notified, nil);
+  // receivedPasswordNotification should have been reset -- be sure.
+  notified = [self receivedPasswordNotification];
+  STAssertFalse(notified, nil);
+  // Reset the password -- takes a different path from first setting.
+  [account setPassword:@"PASSWORD E1"];
+  notified = [self receivedPasswordNotification];
+  STAssertTrue(notified, nil);
+  
+  // Null operations.
+  [account editWithParentWindow:nil];
+  [account authenticate];
+  
+  // Class Accessors
+  NSViewController *setupController
+    = [SimpleAccount setupViewControllerToInstallWithParentWindow:nil];
+  STAssertNil(setupController, nil);
+  
+  // Other Accessors
+  NSString *editNibName = [account editNibName];
+  STAssertNil(editNibName, nil);
+  BOOL authenticated = [account authenticateWithPassword:nil];
+  STAssertTrue(authenticated, nil);
+  [account setAuthenticated:YES];
+  authenticated = [account isAuthenticated];
+  STAssertTrue(authenticated, nil);
+  [account setAuthenticated:NO];
+  authenticated = [account isAuthenticated];
+  STAssertFalse(authenticated, nil);
+  [account setAuthenticated:YES];
+  authenticated = [account isAuthenticated];
+  STAssertTrue(authenticated, nil);
+  NSURLRequest *urlRequest = [account accountURLRequestForUserName:nil
+                                                       password:nil];
+  STAssertNil(urlRequest, nil);
+  NSURLConnection *connection = [account connection];
+  STAssertNil(connection, nil);
+  
+  // Removal
+  [account remove];
+  STAssertTrue([self receivedWillBeRemovedNotification], nil);
+}
+
 @end

@@ -1,5 +1,5 @@
 //
-//  GoogleAccount.h
+//  GoogleAccountSetUpViewController.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -34,32 +34,39 @@
 
 // NOTE: This class exposed here purely to satisfy Interface Builder.
 
-// A class which manages a Google account.
+
+// A controller which manages a view used to specify a Google account
+// name and password during the setup process.
 //
-@interface GoogleAccount : HGSSimpleAccount {
+@interface GoogleAccountSetUpViewController : HGSSimpleAccountSetUpViewController {
  @private
-  // Temporary container for account authentication exchange.
-  NSMutableData *responseData_;
-  // The presence of a captchaImage_ indicates that one such should be shown
-  // to the user and the resulting captchaText be included in the
-  // authentication reply.  The consumer of this image (i.e. the UI) should
-  // clear the captcha image and text prior to the next authentication attempt.
+  IBOutlet NSView *captchaContainerView_;
+  IBOutlet NSTextField *captchaTextField_;
+  IBOutlet NSTextField *userNameField_;
+  IBOutlet NSButton *googleAppsCheckbox_;
+  
   NSImage *captchaImage_;  // The captcha image presented to the user.
-  NSString *captchaText_;  // The user's response.
-  NSString *captchaToken_;  // Captcha token.
+  NSString *captchaText_;  // The captcha text typed by the user.
+  BOOL googleAppsAccount_;  // YES for a Google Apps account.
+  // Have to use |checkboxShowing_| because we animate showing of the checkbox 
+  // and the 'hidden' atttribute of the checkbox field is not reliable 
+  // until the animation has completed.
+  BOOL googleAppsCheckboxShowing_;
+  BOOL windowSizesDetermined_;  // NO until we've calculated window sizes.
+  // Precalculated window heights to accommodate animations.  A delta cannot
+  // be calculated as needed because the window might be in the middle of
+  // an animation and thus its height not yet finalized.
+  CGFloat windowHeightNoCheckboxNoCaptcha_;
+  CGFloat windowHeightCheckboxNoCaptcha_;
+  CGFloat windowHeightNoCheckboxCaptcha_;
+  CGFloat windowHeightCheckboxCaptcha_;
 }
 
 @property (nonatomic, retain) NSImage *captchaImage;
 @property (nonatomic, copy) NSString *captchaText;
-@property (nonatomic, copy) NSString *captchaToken;
+@property (nonatomic, getter=isGoogleAppsAccount) BOOL googleAppsAccount;
 
 // Open google.com in the user's preferred browser.
-+ (BOOL)openGoogleHomePage;
+- (IBAction)openGoogleHomePage:(id)sender;
 
-@end
-
-
-// A class which manages a Google Apps account.
-//
-@interface GoogleAppsAccount : GoogleAccount
 @end

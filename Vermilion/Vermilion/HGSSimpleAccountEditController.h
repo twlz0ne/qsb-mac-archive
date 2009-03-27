@@ -1,7 +1,7 @@
 //
-//  TwitterAccount.h
+//  HGSSimpleAccountEditController.h
 //
-//  Copyright (c) 2009 Google Inc. All rights reserved.
+//  Copyright (c) 2008 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,31 +30,38 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
+#import <Cocoa/Cocoa.h>
 
-// A class which manages a Twitter account.
+@class HGSSimpleAccount;
+
+// A controller which manages a window used to update the password
+// for the account account.
 //
-@interface TwitterAccount : HGSSimpleAccount
-@end
+@interface HGSSimpleAccountEditController : NSWindowController {
+ @private
+  IBOutlet HGSSimpleAccount *account_;
+  IBOutlet NSWindow *editAccountSheet_;
+  
+  NSString *password_;
+}
 
-// A controller which manages a window used to edit the passowrd
-// for a Twitter account.  Exposed publicly so that Interface
-// Builder can see the action.
-//
-@interface TwitterAccountEditController : HGSSimpleAccountEditController
+@property (nonatomic, copy) NSString *password;
+@property (nonatomic, retain, readonly) HGSSimpleAccount *account;
 
-// Open twitter.com in the user's preferred browser.
-- (IBAction)openTwitterHomePage:(id)sender;
+// Gets the edit window associated with this controller.
+- (NSWindow *)editAccountSheet;
 
-@end
+// Called when the user presses 'OK'.
+- (IBAction)acceptEditAccountSheet:(id)sender;
 
-// A controller which manages a view used to specify a Twitter account
-// name and password during the setup process.  Exposed publicly so that 
-// Interface Builder can see the action.
-//
-@interface SetUpTwitterAccountViewController : HGSSimpleAccountSetUpViewController
+// Called when user presses 'Cancel'.
+- (IBAction)cancelEditAccountSheet:(id)sender;
 
-// Open twitter.com in the user's preferred browser.
-- (IBAction)openTwitterHomePage:(id)sender;
+// Called when authentication fails, to see if remediation is possible.
+// The default returns NO.  Override this to determine if some additional
+// action can be performed (within the setup process) to fix the
+// authentication.  One common remediation is to respond to a captcha
+// request.
+- (BOOL)canGiveUserAnotherTry;
 
 @end

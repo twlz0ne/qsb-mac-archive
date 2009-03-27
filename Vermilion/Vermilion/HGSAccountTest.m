@@ -42,10 +42,8 @@
   HGSAccount *account_;
 }
 
-@property (getter=didReceivePasswordNotification)
-  BOOL receivedPasswordNotification;
-@property (getter=didReceiveWillBeRemovedNotification)
-  BOOL receivedWillBeRemovedNotification;
+@property BOOL receivedPasswordNotification;
+@property BOOL receivedWillBeRemovedNotification;
 @property (retain) HGSAccount *account;
 
 - (void)passwordChanged:(NSNotification *)notification;
@@ -53,13 +51,13 @@
 
 @end
 
-@interface SimpleAccount : HGSAccount
+@interface BaseAccount : HGSAccount
 @end
 
-@implementation SimpleAccount
+@implementation BaseAccount
 
 - (NSString *)type {
-  return @"SimpleAccountType";
+  return @"BaseAccountType";
 }
 
 @end
@@ -122,6 +120,8 @@
   STAssertNil(account, @"|initWithName:@\"\"| should not create new HSGAccount");
   account = [[[HGSAccount alloc] initWithName:@"USERNAME"] autorelease];
   STAssertNil(account, nil);
+  account = [[[BaseAccount alloc] initWithName:@"BASENAME A"] autorelease];
+  STAssertNotNil(account, nil);
   // initWithConfiguration:
   NSDictionary *configuration = [NSDictionary dictionary];
   account
@@ -142,38 +142,52 @@
   STAssertNil(account, nil);
   // Initializations with test account type.  This is the only one that
   // should actually succeed in creating an account.
+  id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  [[[bundleMock stub] andReturn:@"bundle.identifier"] 
+   objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME C", kHGSAccountUserNameKey,
+                   bundleMock, kHGSExtensionBundleKey,
                    nil];
   account
-    = [[[SimpleAccount alloc] initWithConfiguration:configuration] autorelease];
+    = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
   STAssertNotNil(account, nil);
 }
 
 - (void)testConfiguration {
+  id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  [[[bundleMock stub] andReturn:@"bundle.identifier"] 
+   objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME D", kHGSAccountUserNameKey,
+                                 bundleMock, kHGSExtensionBundleKey,
                                  nil];
   HGSAccount *account
-    = [[[SimpleAccount alloc] initWithConfiguration:configuration] autorelease];
+    = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
   NSDictionary *result = [account configuration];
   STAssertNotNil(result, nil);
   NSString * userName = [result objectForKey:kHGSAccountUserNameKey];
   STAssertEqualObjects(userName, @"USERNAME D", nil);
   NSString * accountType = [result objectForKey:kHGSAccountTypeKey];
-  STAssertEqualObjects(accountType, @"SimpleAccountType", nil);
+  STAssertEqualObjects(accountType, @"BaseAccountType", nil);
 }
 
 - (void)testAccessors {
+  id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  [[[bundleMock stub] andReturn:@"bundle.identifier"] 
+   objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME E", kHGSAccountUserNameKey,
-                                nil];
+                                 bundleMock, kHGSExtensionBundleKey,
+                               nil];
   HGSAccount *account
-    = [[[SimpleAccount alloc] initWithConfiguration:configuration] autorelease];
+    = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
+  NSString * userName = [account userName];
+  STAssertEqualObjects(userName, @"USERNAME E", nil);
   NSString *displayName = [account displayName];
-  STAssertEqualObjects(displayName, @"USERNAME E (SimpleAccountType)", nil);
+  STAssertEqualObjects(displayName, @"USERNAME E (BaseAccountType)", nil);
   NSString *accountType = [account type];
-  STAssertEqualObjects(accountType, @"SimpleAccountType", nil);
+  STAssertEqualObjects(accountType, @"BaseAccountType", nil);
   NSString *password = [account password];
   STAssertNil(password, nil);
   BOOL isEditable = [account isEditable];
@@ -192,25 +206,33 @@
 }
 
 - (void)testSetPassword {
+  id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  [[[bundleMock stub] andReturn:@"bundle.identifier"] 
+   objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME F", kHGSAccountUserNameKey,
-                                 nil];
+                                 bundleMock, kHGSExtensionBundleKey,
+                                nil];
   HGSAccount *account
-    = [[[SimpleAccount alloc] initWithConfiguration:configuration] autorelease];
+    = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
   [self setAccount:account];
   [account setPassword:@"PASSWORD F"];
-  STAssertTrue([self didReceivePasswordNotification], nil);
+  STAssertTrue([self receivedPasswordNotification], nil);
 }
 
 - (void)testRemove {
+  id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
+  [[[bundleMock stub] andReturn:@"bundle.identifier"] 
+   objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME G", kHGSAccountUserNameKey,
-                                 nil];
+                                 bundleMock, kHGSExtensionBundleKey,
+                                nil];
   HGSAccount *account
-    = [[[SimpleAccount alloc] initWithConfiguration:configuration] autorelease];
+    = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
   [self setAccount:account];
   [account remove];
-  STAssertTrue([self didReceiveWillBeRemovedNotification], nil);
+  STAssertTrue([self receivedWillBeRemovedNotification], nil);
 }
 
 @end

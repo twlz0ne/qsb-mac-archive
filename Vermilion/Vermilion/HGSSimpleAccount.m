@@ -31,9 +31,10 @@
 
 #import "HGSSimpleAccount.h"
 #import "HGSAccountsExtensionPoint.h"
+#import "HGSBundle.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
-#import "HGSBundle.h"
+#import "HGSSimpleAccountEditController.h"
 #import "KeychainItem.h"
 
 
@@ -43,9 +44,6 @@
 - (void)accountSheetDidEnd:(NSWindow *)sheet
                 returnCode:(int)returnCode
                contextInfo:(void *)contextInfo;
-
-@property (nonatomic, retain, readwrite)
-  HGSSimpleAccountEditController *accountEditController;
 
 @end
 
@@ -86,12 +84,6 @@
   [super dealloc];
 }
 
-+ (NSString *)accountType {
-  HGSLogDebug(@"Class '%@', deriving from HGSSimpleAccount, should override "
-              @"accountType.", [self class]);
-  return nil;
-}
-
 - (BOOL)isEditable {
   BOOL isEditable = NO;
   NSString *keychainServiceName = [self identifier];
@@ -125,13 +117,14 @@
 
 - (void)setPassword:(NSString *)password {
   KeychainItem *keychainItem = [self keychainItem];
+  NSString *userName = [self userName];
   if (keychainItem) {
-    [keychainItem setUsername:[self userName]
+    [keychainItem setUsername:userName
                      password:password];
   } else {
     NSString *keychainServiceName = [self identifier];
     [KeychainItem addKeychainItemForService:keychainServiceName
-                               withUsername:[self userName]
+                               withUsername:userName
                                    password:password]; 
   }
   [super setPassword:password];
@@ -205,8 +198,9 @@
 
 - (KeychainItem *)keychainItem {
   NSString *keychainServiceName = [self identifier];
+  NSString *userName = [self userName];
   KeychainItem *item = [KeychainItem keychainItemForService:keychainServiceName 
-                                                   username:nil];
+                                                   username:userName];
   return item;
 }
 
@@ -239,245 +233,3 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 }
 
 @end
-
-
-@implementation HGSSimpleAccountEditController
-
-@synthesize password = password_;
-
-- (void)dealloc {
-  [password_ release];
-  [super dealloc];
-}
-
-- (void)awakeFromNib {
-  [account_ setAccountEditController:self];
-  NSString *password = [account_ password];
-  [self setPassword:password];
-}
-
-- (HGSSimpleAccount *)account {
-  return [[account_ retain] autorelease];
-}
-
-- (NSWindow *)editAccountSheet {
-  return editAccountSheet_;
-}
-
-- (IBAction)acceptEditAccountSheet:(id)sender {
-  NSWindow *sheet = [self window];
-  NSString *password = [self password];
-  if ([account_ authenticateWithPassword:[self password]]) {
-    [account_ setPassword:password];
-    [NSApp endSheet:sheet];
-    [account_ setAuthenticated:YES];
-  } else if (![self canGiveUserAnotherTry]) {
-    NSString *summaryFormat = HGSLocalizedString(@"Could not set up that %@ "
-                                                @"account.", nil);
-    NSString *summary = [NSString stringWithFormat:summaryFormat,
-                         [account_ type]];
-    NSString *explanationFormat
-      = HGSLocalizedString(@"The %@ account '%@' could not be set up for "
-                          @"use.  Please check your password and try "
-                          @"again.", nil);
-    NSString *explanation = [NSString stringWithFormat:explanationFormat,
-                             [account_ type],
-                             [account_ userName]];
-    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-    [alert setAlertStyle:NSWarningAlertStyle];
-    [alert setMessageText:summary];
-    [alert setInformativeText:explanation];
-    [alert beginSheetModalForWindow:sheet
-                      modalDelegate:self
-                     didEndSelector:nil
-                        contextInfo:nil];
-  }
-}
-
-- (IBAction)cancelEditAccountSheet:(id)sender {
-  NSWindow *sheet = [sender window];
-  [NSApp endSheet:sheet returnCode:NSAlertSecondButtonReturn];
-}
-
-- (BOOL)canGiveUserAnotherTry {
-  return NO;
-}
-
-@end
-
-
-@implementation HGSSetUpSimpleAccountViewController
-
-@synthesize account = account_;
-@synthesize accountName = accountName_;
-@synthesize accountPassword = accountPassword_;
-
-- (id)init {
-  self = [self initWithNibName:nil
-                        bundle:nil
-              accountTypeClass:nil];
-  return self;
-}
-
-- (id)initWithNibName:(NSString *)nibNameOrNil
-               bundle:(NSBundle *)nibBundleOrNil
-      accountTypeClass:(Class)accountTypeClass {
-  if ((self = [super initWithNibName:nibNameOrNil
-                              bundle:nibBundleOrNil])) {
-    if (accountTypeClass) {
-      accountTypeClass_ = accountTypeClass;
-    } else {
-      [self release];
-      self = nil;
-    }
-  }
-  return self;
-}
-
-- (void)dealloc {
-  [account_ release];
-  [accountName_ release];
-  [accountPassword_ release];
-  [super dealloc];
-}
-
-
-- (NSWindow *)parentWindow {
-  return parentWindow_;
-}
-
-- (void)setParentWindow:(NSWindow *)parentWindow {
-  parentWindow_ = parentWindow;
-  // This call also gives us an opportunity to flush some old settings
-  // from the previous use.
-  [self setAccount:nil];
-  [self setAccountName:nil];
-  [self setAccountPassword:nil];
-}
-
-- (IBAction)acceptSetupAccountSheet:(id)sender {
-  NSWindow *sheet = [sender window];
-  NSString *userName = [self accountName];
-  if ([userName length] > 0) {
-    NSString *password = [self accountPassword];
-
-    // Create a new account entry.
-    HGSSimpleAccount *newAccount
-      = [[[accountTypeClass_ alloc] initWithName:userName] autorelease];
-    [self setAccount:newAccount];
-    
-    // Update the account name in case initWithName: adjusted it.
-    NSString *revisedAccountName = [newAccount userName];
-    if ([revisedAccountName length]) {
-      userName = revisedAccountName;
-      [self setAccountName:userName];
-    }
-    
-    BOOL isGood = YES;
-    
-    // Make sure we don't already have this account registered.
-    NSString *accountIdentifier = [newAccount identifier];
-    HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
-    if ([accountsPoint extensionWithIdentifier:accountIdentifier]) {
-      isGood = NO;
-      NSString *summary = HGSLocalizedString(@"Account already set up.",
-                                             nil);
-      NSString *format
-      = HGSLocalizedString(@"The account '%@' has already been set up for "
-                           @"use in Quick Search Box.", nil);
-      [self presentMessageOffWindow:sheet
-                        withSummary:summary
-                  explanationFormat:format
-                         alertStyle:NSWarningAlertStyle];
-    }
-    
-    // Authenticate the account.
-    if (isGood) {
-      isGood = [newAccount authenticateWithPassword:password];
-      [newAccount setAuthenticated:isGood];
-      if (isGood) {
-        // If there is not already a keychain item create one.  If there is
-        // then update the password.
-        KeychainItem *keychainItem = [newAccount keychainItem];
-        if (keychainItem) {
-          [keychainItem setUsername:userName
-                           password:password];
-        } else {
-          NSString *keychainServiceName = [newAccount identifier];
-          [KeychainItem addKeychainItemForService:keychainServiceName
-                                     withUsername:userName
-                                         password:password]; 
-        }
-        
-        // Install the account.
-        isGood = [accountsPoint extendWithObject:newAccount];
-        if (isGood) {
-          [NSApp endSheet:sheet];
-          NSString *summary
-          = HGSLocalizedString(@"Enable searchable items for this account.",
-                               nil);
-          NSString *format
-          = HGSLocalizedString(@"One or more search sources may have been "
-                               @"added for the account '%@'. It may be "
-                               @"necessary to manually enable each search "
-                               @"source that uses this account.  Do so via "
-                               @"the 'Searchable Items' tab in Preferences.",
-                               nil);
-          [self presentMessageOffWindow:[self parentWindow]
-                            withSummary:summary
-                      explanationFormat:format
-                             alertStyle:NSInformationalAlertStyle];
-          
-          [self setAccountName:nil];
-          [self setAccountPassword:nil];
-        } else {
-          HGSLogDebug(@"Failed to install account extension for account '%@'.",
-                      userName);
-        }
-      } else if (![self canGiveUserAnotherTryOffWindow:sheet]) {
-        // If we can't help the user fix things, tell them they've got
-        // something wrong.
-        NSString *summary = HGSLocalizedString(@"Could not authenticate that "
-                                               @"account.", nil);
-        NSString *format
-        = HGSLocalizedString(@"The account '%@' could not be authenticated. "
-                             @"Please check the account name and password "
-                             @"and try again.", nil);
-        [self presentMessageOffWindow:sheet
-                          withSummary:summary
-                    explanationFormat:format
-                           alertStyle:NSWarningAlertStyle];
-      }
-    }
-  }
-}
-
-- (IBAction)cancelSetupAccountSheet:(id)sender {
-  [self setAccountName:nil];
-  [self setAccountPassword:nil];
-  NSWindow *sheet = [sender window];
-  [NSApp endSheet:sheet];
-}
-
-- (BOOL)canGiveUserAnotherTryOffWindow:(NSWindow *)window {
-  return NO;
-}
-
-- (void)presentMessageOffWindow:(NSWindow *)parentWindow
-                    withSummary:(NSString *)summary
-              explanationFormat:(NSString *)format
-                     alertStyle:(NSAlertStyle)style {
-  NSString *accountName = [self accountName];
-  NSString *explanation = [NSString stringWithFormat:format, accountName];
-  NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-  [alert setAlertStyle:style];
-  [alert setMessageText:summary];
-  [alert setInformativeText:explanation];
-  [alert beginSheetModalForWindow:parentWindow
-                    modalDelegate:self
-                   didEndSelector:nil
-                      contextInfo:nil];
-}
-
-@end
-

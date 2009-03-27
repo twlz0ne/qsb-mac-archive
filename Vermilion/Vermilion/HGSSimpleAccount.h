@@ -67,17 +67,17 @@
 //      -[accountURLRequestForUserName:password:].)
 //    - an -[authenticate] method that performs an asynchronous authentication
 //      of the account and sets |authenticated|.
-//  - A controller class deriving from HGSSetUpSimpleAccountViewController
+//  - A controller class deriving from HGSSimpleAccountSetUpViewController
 //    that provides:
 //    - an -[initWithNibName:bundle:] method that calls through to the
-//      HGSSetUpSimpleAccountViewController
+//      HGSSimpleAccountSetUpViewController
 //      -[initWithNibName:bundle:accountTypeClass:] method while supplying
 //      the class of the account being created.
 //  - Your account extension's plist entry must include an entry
 //    for HGSExtensionOfferedAccountType giving the accountType.
 //
 // Optionally, other functionality can be added to the 
-// HGSSetUpSimpleAccountViewController and a specialization of the
+// HGSSimpleAccountSetUpViewController and a specialization of the
 // HGSSimpleAccountEditController can be supplied, if desired.
 //
 // See Vermilion/Modules/GoogleAccount/ for an example.
@@ -88,7 +88,7 @@
   NSURLConnection *connection_; // Used by async authentication.
 }
 
-@property (nonatomic, retain, readonly)
+@property (nonatomic, retain)
   HGSSimpleAccountEditController *accountEditController;
 @property (nonatomic, retain) NSURLConnection *connection;
 
@@ -120,84 +120,3 @@
 
 @end
 
-
-// A controller which manages a window used to update the password
-// for the account account.
-//
-@interface HGSSimpleAccountEditController : NSWindowController {
- @private
-  IBOutlet HGSSimpleAccount *account_;
-  IBOutlet NSWindow *editAccountSheet_;
-  
-  NSString *password_;
-}
-
-@property (nonatomic, copy) NSString *password;
-
-// Returns the account associated with this edit controller.
-- (HGSSimpleAccount *)account;
-
-// Gets the edit window associated with this controller.
-- (NSWindow *)editAccountSheet;
-
-// Called when the user presses 'OK'.
-- (IBAction)acceptEditAccountSheet:(id)sender;
-
-// Called when user presses 'Cancel'.
-- (IBAction)cancelEditAccountSheet:(id)sender;
-
-// Called when authentication fails, to see if remediation is possible.
-// The default returns NO.  Override this to determine if some additional
-// action can be performed (within the setup process) to fix the
-// authentication.  One common remediation is to respond to a captcha
-// request.
-- (BOOL)canGiveUserAnotherTry;
-
-@end
-
-
-// A controller which manages a view used to specify a new account's
-// name and password during the setup process.  The view associated with
-// this controller gets injected into a window provided by the user
-// interface of the client.
-//
-@interface HGSSetUpSimpleAccountViewController : NSViewController {
- @private
-  HGSSimpleAccount *account_;  // The account, once created.
-  NSString *accountName_;
-  NSString *accountPassword_;
-  NSWindow *parentWindow_;  // WEAK
-  Class accountTypeClass_;
-}
-
-@property (nonatomic, retain) HGSSimpleAccount *account;
-@property (nonatomic, copy) NSString *accountName;
-@property (nonatomic, copy) NSString *accountPassword;
-
-// Designated initializer.
-- (id)initWithNibName:(NSString *)nibNameOrNil
-               bundle:(NSBundle *)nibBundleOrNil
-     accountTypeClass:(Class)accountTypeClass;
-  
-// Get/set the window off which to hang any alerts.
-- (NSWindow *)parentWindow;
-- (void)setParentWindow:(NSWindow *)parentWindow;
-
-// Called when the user presses 'OK'.
-- (IBAction)acceptSetupAccountSheet:(id)sender;
-
-// Called when user presses 'Cancel'.
-- (IBAction)cancelSetupAccountSheet:(id)sender;
-
-// Called when authentication fails to, see if remediation is possible.  Pass 
-// along the window off of which we can hang an alert, if so desired.
-// See description of -[HGSSimpleAccountEditController canGiveUserAnotherTry]
-// for an explanation.
-- (BOOL)canGiveUserAnotherTryOffWindow:(NSWindow *)window;
-
-// Used to present an alert message to the user.
-- (void)presentMessageOffWindow:(NSWindow *)parentWindow
-                    withSummary:(NSString *)summary
-              explanationFormat:(NSString *)format
-                     alertStyle:(NSAlertStyle)style;
-@end

@@ -267,6 +267,13 @@
 		5AF4E0400EB7DB5C00B26194 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
 		5AF4E0B00EB91BC200B26194 /* HGSLRUCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AF4E0AE0EB91BC200B26194 /* HGSLRUCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5AF4E0B10EB91BC200B26194 /* HGSLRUCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4E0AF0EB91BC200B26194 /* HGSLRUCache.m */; };
+		620055160F78564300C806A1 /* HGSSimpleAccountEditController.h in Headers */ = {isa = PBXBuildFile; fileRef = 620055140F78564300C806A1 /* HGSSimpleAccountEditController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		620055170F78564300C806A1 /* HGSSimpleAccountEditController.m in Sources */ = {isa = PBXBuildFile; fileRef = 620055150F78564300C806A1 /* HGSSimpleAccountEditController.m */; };
+		6200551A0F78567300C806A1 /* HGSSimpleAccountSetUpViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 620055180F78567300C806A1 /* HGSSimpleAccountSetUpViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6200551B0F78567300C806A1 /* HGSSimpleAccountSetUpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 620055190F78567300C806A1 /* HGSSimpleAccountSetUpViewController.m */; };
+		620055690F78595F00C806A1 /* GoogleAccountEditController.m in Sources */ = {isa = PBXBuildFile; fileRef = 620055660F78595F00C806A1 /* GoogleAccountEditController.m */; };
+		6200556A0F78595F00C806A1 /* GoogleAccountSetUpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 620055680F78595F00C806A1 /* GoogleAccountSetUpViewController.m */; };
+		6200571F0F7A909E00C806A1 /* KeychainItemTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6200571E0F7A909E00C806A1 /* KeychainItemTest.m */; };
 		6200F9750E785F4400F046EC /* MoreSeparator.png in Resources */ = {isa = PBXBuildFile; fileRef = 6200F9740E785F4400F046EC /* MoreSeparator.png */; };
 		6200F99D0E785FE700F046EC /* MoreShowAllTableResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200F99B0E785FE700F046EC /* MoreShowAllTableResultView.xib */; };
 		6200F9E00E78623500F046EC /* MoreFoldResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200F9DE0E78623500F046EC /* MoreFoldResultView.xib */; };
@@ -1695,6 +1702,15 @@
 		5AF2C5AC0E5E1C5700F4D546 /* ITunes-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ITunes-Info.plist"; sourceTree = "<group>"; };
 		5AF4E0AE0EB91BC200B26194 /* HGSLRUCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSLRUCache.h; sourceTree = "<group>"; };
 		5AF4E0AF0EB91BC200B26194 /* HGSLRUCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSLRUCache.m; sourceTree = "<group>"; };
+		620055140F78564300C806A1 /* HGSSimpleAccountEditController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSimpleAccountEditController.h; sourceTree = "<group>"; };
+		620055150F78564300C806A1 /* HGSSimpleAccountEditController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleAccountEditController.m; sourceTree = "<group>"; };
+		620055180F78567300C806A1 /* HGSSimpleAccountSetUpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSimpleAccountSetUpViewController.h; sourceTree = "<group>"; };
+		620055190F78567300C806A1 /* HGSSimpleAccountSetUpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleAccountSetUpViewController.m; sourceTree = "<group>"; };
+		620055650F78595F00C806A1 /* GoogleAccountEditController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleAccountEditController.h; sourceTree = "<group>"; };
+		620055660F78595F00C806A1 /* GoogleAccountEditController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountEditController.m; sourceTree = "<group>"; };
+		620055670F78595F00C806A1 /* GoogleAccountSetUpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleAccountSetUpViewController.h; sourceTree = "<group>"; };
+		620055680F78595F00C806A1 /* GoogleAccountSetUpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountSetUpViewController.m; sourceTree = "<group>"; };
+		6200571E0F7A909E00C806A1 /* KeychainItemTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeychainItemTest.m; sourceTree = "<group>"; };
 		6200F9740E785F4400F046EC /* MoreSeparator.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MoreSeparator.png; sourceTree = "<group>"; };
 		6200F99C0E785FE700F046EC /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MoreShowAllTableResultView.xib; sourceTree = "<group>"; };
 		6200F9DF0E78623500F046EC /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MoreFoldResultView.xib; sourceTree = "<group>"; };
@@ -2773,6 +2789,7 @@
 			children = (
 				337C2C860DCFDA9B00897EB3 /* KeychainItem.h */,
 				337C2C870DCFDA9B00897EB3 /* KeychainItem.m */,
+				6200571E0F7A909E00C806A1 /* KeychainItemTest.m */,
 				644161ED0DE362CC00AC646D /* NSString+ReadableURL.h */,
 				644161EE0DE362CC00AC646D /* NSString+ReadableURL.m */,
 				F4D1491B0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m */,
@@ -2919,7 +2936,7 @@
 			isa = PBXGroup;
 			children = (
 				620054570F77F0FD00C806A1 /* OCMock.framework */,
-				620054590F77F0FD00C806A1 /* OCMockTests.octest */,
+				620054590F77F0FD00C806A1 /* Test.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2990,6 +3007,10 @@
 			children = (
 				622912100F2E81E7005D34CE /* GoogleAccount.h */,
 				622912110F2E81E7005D34CE /* GoogleAccount.m */,
+				620055650F78595F00C806A1 /* GoogleAccountEditController.h */,
+				620055660F78595F00C806A1 /* GoogleAccountEditController.m */,
+				620055670F78595F00C806A1 /* GoogleAccountSetUpViewController.h */,
+				620055680F78595F00C806A1 /* GoogleAccountSetUpViewController.m */,
 				622912130F2E81F6005D34CE /* SetUpGoogleAccountView.xib */,
 				62A4AEF70F30E1CD0007CD99 /* EditGoogleAccount.xib */,
 				62EA8C1A0F2E7E5E00C92E0B /* GoogleAccounts-Info.plist */,
@@ -3667,6 +3688,10 @@
 				6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */,
 				6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */,
 				8B95CA9D0F6B09FE003BDBDD /* HGSSimpleAccountTest.m */,
+				620055140F78564300C806A1 /* HGSSimpleAccountEditController.h */,
+				620055150F78564300C806A1 /* HGSSimpleAccountEditController.m */,
+				620055180F78567300C806A1 /* HGSSimpleAccountSetUpViewController.h */,
+				620055190F78567300C806A1 /* HGSSimpleAccountSetUpViewController.m */,
 				7F3F75D80E152E6D001AF34E /* HGSSQLiteBackedCache.h */,
 				7F3F75D90E152E6D001AF34E /* HGSSQLiteBackedCache.m */,
 				7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */,
@@ -4119,6 +4144,8 @@
 				62C051BA0F31307100DFBB1B /* HGSSimpleAccount.h in Headers */,
 				5A4D23FC0F4CD22B00F5C05B /* HGSCodeSignature.h in Headers */,
 				8B95CD730F6EE20E003BDBDD /* HGSBundle.m in Headers */,
+				620055160F78564300C806A1 /* HGSSimpleAccountEditController.h in Headers */,
+				6200551A0F78567300C806A1 /* HGSSimpleAccountSetUpViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5063,10 +5090,10 @@
 			remoteRef = 620054560F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		620054590F77F0FD00C806A1 /* OCMockTests.octest */ = {
+		620054590F77F0FD00C806A1 /* Test.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = OCMockTests.octest;
+			path = Test.octest;
 			remoteRef = 620054580F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -6349,6 +6376,8 @@
 				62EA8BC30F2E7DE200C92E0B /* HGSBundle.m in Sources */,
 				622912120F2E81E7005D34CE /* GoogleAccount.m in Sources */,
 				622912F40F2EAF80005D34CE /* GTMMethodCheck.m in Sources */,
+				620055690F78595F00C806A1 /* GoogleAccountEditController.m in Sources */,
+				6200556A0F78595F00C806A1 /* GoogleAccountSetUpViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6546,6 +6575,8 @@
 				6211C51D0F312E7E003A5122 /* HGSSimpleAccount.m in Sources */,
 				5A4D23FD0F4CD22B00F5C05B /* HGSCodeSignature.m in Sources */,
 				8B8B19B00EEF0DF000E543D0 /* HGSBundle.m in Sources */,
+				620055170F78564300C806A1 /* HGSSimpleAccountEditController.m in Sources */,
+				6200551B0F78567300C806A1 /* HGSSimpleAccountSetUpViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6668,6 +6699,7 @@
 				8BB658F20F73034600E20B99 /* GTMNSObject+UnitTesting.m in Sources */,
 				8BB658F40F73035000E20B99 /* GTMAppKit+UnitTesting.m in Sources */,
 				8BB6594B0F73036600E20B99 /* GTMMethodCheck.m in Sources */,
+				6200571F0F7A909E00C806A1 /* KeychainItemTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

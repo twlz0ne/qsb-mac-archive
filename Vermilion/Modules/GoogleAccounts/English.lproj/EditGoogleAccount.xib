@@ -370,14 +370,6 @@
 					<int key="connectionID">24</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">goToGoogle:</string>
-						<reference key="source" ref="186018340"/>
-						<reference key="destination" ref="987902970"/>
-					</object>
-					<int key="connectionID">34</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">captchaContainerView_</string>
 						<reference key="source" ref="186018340"/>
@@ -544,6 +536,14 @@
 						<reference key="destination" ref="500637644"/>
 					</object>
 					<int key="connectionID">72</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">openGoogleHomePage:</string>
+						<reference key="source" ref="186018340"/>
+						<reference key="destination" ref="987902970"/>
+					</object>
+					<int key="connectionID">73</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -917,7 +917,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">72</int>
+			<int key="maxID">73</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -925,7 +925,7 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">GoogleAccount</string>
 					<string key="superclassName">HGSSimpleAccount</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="992335589">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">../../Vermilion/Modules/GoogleAccounts/GoogleAccount.h</string>
 					</object>
@@ -934,7 +934,7 @@
 					<string key="className">GoogleAccountEditController</string>
 					<string key="superclassName">HGSSimpleAccountEditController</string>
 					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">goToGoogle:</string>
+						<string key="NS.key.0">openGoogleHomePage:</string>
 						<string key="NS.object.0">id</string>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
@@ -954,7 +954,10 @@
 							<string>NSTextField</string>
 						</object>
 					</object>
-					<reference key="sourceIdentifier" ref="992335589"/>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../../Vermilion/Modules/GoogleAccounts/GoogleAccountEditController.h</string>
+					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">HGSAccount</string>
@@ -975,7 +978,7 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">HGSSimpleAccount</string>
 					<string key="superclassName">HGSAccount</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="811935653">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">../../Vermilion/Vermilion/HGSSimpleAccount.h</string>
 					</object>
@@ -1009,7 +1012,10 @@
 							<string>NSWindow</string>
 						</object>
 					</object>
-					<reference key="sourceIdentifier" ref="811935653"/>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../../Vermilion/Vermilion/HGSSimpleAccountEditController.h</string>
+					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSApplication</string>

@@ -1,7 +1,7 @@
 //
-//  TwitterAccount.h
+//  GoogleAccountEditController.h
 //
-//  Copyright (c) 2009 Google Inc. All rights reserved.
+//  Copyright (c) 2008 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -32,29 +32,26 @@
 
 #import <Vermilion/Vermilion.h>
 
-// A class which manages a Twitter account.
+// NOTE: This class exposed here purely to satisfy Interface Builder.
+
+// A controller which manages a window used to edit the password
+// for a Google account.
 //
-@interface TwitterAccount : HGSSimpleAccount
-@end
+@interface GoogleAccountEditController : HGSSimpleAccountEditController {
+ @private
+  IBOutlet NSView *captchaContainerView_;
+  IBOutlet NSTextField *captchaTextField_;
+  IBOutlet NSTextField *passwordField_;
+  IBOutlet NSTextField *googleAppsTextField_;
+  
+  NSImage *captchaImage_;  // The captcha image presented to the user.
+  NSString *captchaText_;  // The captcha text typed by the user.
+}
 
-// A controller which manages a window used to edit the passowrd
-// for a Twitter account.  Exposed publicly so that Interface
-// Builder can see the action.
-//
-@interface TwitterAccountEditController : HGSSimpleAccountEditController
+@property (nonatomic, retain) NSImage *captchaImage;
+@property (nonatomic, copy) NSString *captchaText;
 
-// Open twitter.com in the user's preferred browser.
-- (IBAction)openTwitterHomePage:(id)sender;
-
-@end
-
-// A controller which manages a view used to specify a Twitter account
-// name and password during the setup process.  Exposed publicly so that 
-// Interface Builder can see the action.
-//
-@interface SetUpTwitterAccountViewController : HGSSimpleAccountSetUpViewController
-
-// Open twitter.com in the user's preferred browser.
-- (IBAction)openTwitterHomePage:(id)sender;
+// Open google.com in the user's preferred browser.
+- (IBAction)openGoogleHomePage:(id)sender;
 
 @end

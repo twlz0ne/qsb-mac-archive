@@ -57,20 +57,21 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
     // NOTE: The following call to -[type] resolves to a constant string
     // defined per-class.
     NSString *accountType = [self type];
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     NSString *name = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
                       userName, accountType];
     NSString *identifier = [NSString stringWithFormat:kHGSAccountIdentifierFormat, 
                             accountType, userName];
+    NSBundle *bundle = HGSGetPluginBundle();
     NSDictionary *configuration
       = [NSDictionary dictionaryWithObjectsAndKeys:
-         bundle, kHGSExtensionBundleKey,
          name, kHGSExtensionUserVisibleNameKey,
          identifier, kHGSExtensionIdentifierKey,
+         bundle, kHGSExtensionBundleKey,
          nil];
     if ((self = [super initWithConfiguration:configuration])) {
       [self setUserName:userName];
       if (![self userName] || ![self type]) {
+        HGSLog(@"HGSAccounts require a userName and type.");
         [self release];
         self = nil;
       }
@@ -82,11 +83,53 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
   return self;
 }
 
-// TODO(mrossetti): This is SO WRONG!  Refactor so that we don't lose
-// everything in the configuration when initializing from a pref dict.
 - (id)initWithConfiguration:(NSDictionary *)prefDict {
   NSString *userName = [prefDict objectForKey:kHGSAccountUserNameKey];
-  self = [self initWithName:userName];
+  if ([userName length]) {
+    // NOTE: The following call to -[type] resolves to a constant string
+    // defined per-class.
+    NSString *accountType = [self type];
+    NSString *name = [prefDict objectForKey:kHGSExtensionUserVisibleNameKey];
+    NSString *identifier = [prefDict objectForKey:kHGSExtensionIdentifierKey];
+    NSBundle *bundle = [prefDict objectForKey:kHGSExtensionBundleKey];
+    if (!name || !identifier || !bundle) {
+      NSMutableDictionary *configuration
+        = [NSMutableDictionary dictionaryWithDictionary:prefDict];
+      if (!name) {
+        name = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
+                userName, accountType];
+        [configuration setObject:name forKey:kHGSExtensionUserVisibleNameKey];
+      }
+      if (!identifier) {
+        identifier = [NSString stringWithFormat:kHGSAccountIdentifierFormat, 
+                      accountType, userName];
+        [configuration setObject:identifier forKey:kHGSExtensionIdentifierKey];
+      }
+      if (!bundle) {
+        bundle = HGSGetPluginBundle();
+        if (!bundle) {
+          HGSLog(@"HGSAccounts require bundle.");
+          [self release];
+          self = nil;
+          return self;
+        }
+        [configuration setObject:bundle forKey:kHGSExtensionBundleKey];
+      }
+      prefDict = configuration;
+    }
+    if ((self = [super initWithConfiguration:prefDict])) {
+      [self setUserName:userName];
+      if (![self type]) {
+        HGSLog(@"HGSAccounts require an account type.");
+        [self release];
+        self = nil;
+      }
+    }
+  } else {
+    HGSLog(@"HGSAccounts require a userName and type.");
+    [self release];
+    self = nil;
+  }
   return self;
 }
 
