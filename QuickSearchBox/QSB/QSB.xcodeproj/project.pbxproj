@@ -11,10 +11,9 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 795F072609870248004C6BFE /* Build configuration list for PBXAggregateTarget "Test All" */;
 			buildPhases = (
+				8BAAA38C0F7D459D00DF4F12 /* ShellScript */,
 			);
 			dependencies = (
-				8B55D8AE0E7859D000D39CB0 /* PBXTargetDependency */,
-				8B55DABE0E78817B00D39CB0 /* PBXTargetDependency */,
 			);
 			name = "Test All";
 			productName = "Test All";
@@ -1142,20 +1141,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 7FF019AA0EB089CB001A2C7B;
 			remoteInfo = Terminal;
-		};
-		8B55D8AD0E7859D000D39CB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E4F551320DF73059008A846E;
-			remoteInfo = VermilionTest;
-		};
-		8B55DABD0E78817B00D39CB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B63DD670D9458E500395A2B;
-			remoteInfo = QSB2Test;
 		};
 		8B6128360F46347B00E29B40 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2936,7 +2921,7 @@
 			isa = PBXGroup;
 			children = (
 				620054570F77F0FD00C806A1 /* OCMock.framework */,
-				620054590F77F0FD00C806A1 /* Test.octest */,
+				620054590F77F0FD00C806A1 /* OCMockTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -5090,10 +5075,10 @@
 			remoteRef = 620054560F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		620054590F77F0FD00C806A1 /* Test.octest */ = {
+		620054590F77F0FD00C806A1 /* OCMockTests.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = Test.octest;
+			path = OCMockTests.octest;
 			remoteRef = 620054580F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -5728,7 +5713,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\nexport GTM_REMOVE_GCOV_DATA=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
+			shellScript = "# Run the unit tests in this test bundle.\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
 		};
 		8B735FA40EC905E900E74421 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6173,6 +6158,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
 		};
+		8BAAA38C0F7D459D00DF4F12 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Build all of our unit tests\n# We do it this way instead of using dependencies in the standard xcode model, \n# so we can pass the GTM_DO_NOT_REMOVE_GCOV_DATA flag in and we can unify our\n# code coverage numbers.\n\necho \"Test All:${LINENO}: note: Removing gcov data files from ${CONFIGURATION_TEMP_DIR}\"\n( cd \"${CONFIGURATION_TEMP_DIR}\" &&  find . -type f -name \"*.gcda\" -print0 | xargs -0 rm -f )\n\nxcodebuild -project \"QSB.xcodeproj\" -target \"Vermilion Test\" -configuration \"${CONFIGURATION}\" GTM_DO_NOT_REMOVE_GCOV_DATA=1\nxcodebuild -project \"QSB.xcodeproj\" -target \"QSB Core Test\" -configuration \"${CONFIGURATION}\" GTM_DO_NOT_REMOVE_GCOV_DATA=1\n";
+		};
 		8BCCD1DB0EC8DB0500688D64 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -6236,7 +6234,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\nexport GTM_REMOVE_GCOV_DATA=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
+			shellScript = "# Run the unit tests in this test bundle.\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -6896,16 +6894,6 @@
 			isa = PBXTargetDependency;
 			target = 7FF019AA0EB089CB001A2C7B /* Terminal */;
 			targetProxy = 8B4A422B0ED3329D006BFDD8 /* PBXContainerItemProxy */;
-		};
-		8B55D8AE0E7859D000D39CB0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E4F551320DF73059008A846E /* Vermilion Test */;
-			targetProxy = 8B55D8AD0E7859D000D39CB0 /* PBXContainerItemProxy */;
-		};
-		8B55DABE0E78817B00D39CB0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B63DD670D9458E500395A2B /* QSB Core Test */;
-			targetProxy = 8B55DABD0E78817B00D39CB0 /* PBXContainerItemProxy */;
 		};
 		8B6128E90F46427800E29B40 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
