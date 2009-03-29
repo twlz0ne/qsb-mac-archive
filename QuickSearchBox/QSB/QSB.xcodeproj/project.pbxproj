@@ -5624,7 +5624,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"Building SDK Package\"\n\n\"${SYSTEM_DEVELOPER_UTILITIES_DIR}/PackageMaker.app/Contents/MacOS/PackageMaker\" --doc \"${SRCROOT}/SDK/QSB SDK.pmdoc\" --out \"${CONFIGURATION_BUILD_DIR}/Google Quick Search Box SDK.pkg\"";
+			shellScript = "echo \"Building SDK Package\"\n\n\"${SYSTEM_DEVELOPER_UTILITIES_DIR}/PackageMaker.app/Contents/MacOS/PackageMaker\" --doc \"${SRCROOT}/SDK/QSB_SDK.pmdoc\" --out \"${CONFIGURATION_BUILD_DIR}/Google Quick Search Box SDK.pkg\"";
 		};
 		8B148F950F7156B6002E05FA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
