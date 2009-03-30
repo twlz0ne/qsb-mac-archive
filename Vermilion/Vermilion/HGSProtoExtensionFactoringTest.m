@@ -129,8 +129,8 @@ static NSString *const kFactorableAccountType = @"FactorableAccountType";
   // Remove the account.
   expectedExtensionRemoved_ = factoredExtension;
   id constraint
-    = [OCMockArgConstraint constrainTo:@selector(expectedExtensionConstraint:)
-                                    of:self];
+    = [OCMConstraint constraintWithSelector:@selector(expectedExtensionConstraint:)
+                                   onObject:self];
   [[pluginMock expect] removeProtoExtension:constraint];
   [account remove];
   expectedExtensionRemoved_ = nil;
