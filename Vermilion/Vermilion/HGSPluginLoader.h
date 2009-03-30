@@ -1,5 +1,5 @@
 //
-//  HGSModuleLoader.h
+//  HGSPluginLoader.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -33,7 +33,7 @@
 #import <Foundation/Foundation.h>
 
 //
-// HGSModuleLoader
+// HGSPluginLoader
 //
 // Takes care of loading and registering modules that extend extensions points
 // Fields requests for iterators and actions for a given type via 
@@ -74,7 +74,7 @@
 @protocol HGSDelegate;
 @class HGSCodeSignature;
 
-@interface HGSModuleLoader : NSObject {
+@interface HGSPluginLoader : NSObject {
  @private
   __weak id<HGSDelegate> delegate_;
   
@@ -97,8 +97,8 @@
   NSMutableDictionary *pluginSignatureInfo_;
 }
 
-// Return the shared module Loader.
-+ (HGSModuleLoader*)sharedModuleLoader;
+// Return the shared plugin Loader.
++ (HGSPluginLoader*)sharedPluginLoader;
 
 // Registers a plugin class for a given set of extensions.
 - (void)registerClass:(Class)cls forExtensions:(NSArray *)extensions;
@@ -114,14 +114,14 @@
 
 // Keys for the error dictionaries for the loadPluginsAtPath:errors: method
 // Path of the failed plugin (NSString)
-extern NSString *const kHGSModuleLoaderPluginPathKey;
+extern NSString *const kHGSPluginLoaderPluginPathKey;
 // Reason for failure (NSString)
-extern NSString *const kHGSModuleLoaderPluginFailureKey;
+extern NSString *const kHGSPluginLoaderPluginFailureKey;
 // Failed because it wasn't certified
-extern NSString *const kHGSModuleLoaderPluginFailedCertification;
+extern NSString *const kHGSPluginLoaderPluginFailedCertification;
 // Failed because it's API version was incorrect
-extern NSString *const kHGSModuleLoaderPluginFailedAPICheck;
+extern NSString *const kHGSPluginLoaderPluginFailedAPICheck;
 // Failed because unable to instantiate
-extern NSString *const kHGSModuleLoaderPluginFailedInstantiation;
+extern NSString *const kHGSPluginLoaderPluginFailedInstantiation;
 // Failed because we don't recognize the type of the plugin
-extern NSString *const kHGSModuleLoaderPluginFailedUnknownPluginType;
+extern NSString *const kHGSPluginLoaderPluginFailedUnknownPluginType;

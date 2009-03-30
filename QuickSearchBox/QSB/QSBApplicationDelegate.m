@@ -172,7 +172,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (id)init {
   if ((self = [super init])) {
     hgsDelegate_ = [[QSBHGSDelegate alloc] init];
-    [[HGSModuleLoader sharedModuleLoader] setDelegate:hgsDelegate_];
+    [[HGSPluginLoader sharedPluginLoader] setDelegate:hgsDelegate_];
     NSNotificationCenter *workSpaceNC 
       = [[NSWorkspace sharedWorkspace] notificationCenter];
     [workSpaceNC addObserver:self
@@ -600,7 +600,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // TODO(dmaclach): alert user that their prefs have been ignored.
   // Rediscover plug-ins by scanning all plugin folders.
   NSArray *pluginPaths = [hgsDelegate_ pluginFolders];
-  HGSModuleLoader *moduleLoader = [HGSModuleLoader sharedModuleLoader];
+  HGSPluginLoader *moduleLoader = [HGSPluginLoader sharedPluginLoader];
   NSMutableArray *allErrors = [NSMutableArray array];
   for (NSString *pluginPath in pluginPaths) {
     NSArray *errors = nil;

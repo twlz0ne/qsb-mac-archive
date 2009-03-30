@@ -182,7 +182,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   NSString *suggestHost
-    = [[[HGSModuleLoader sharedModuleLoader] delegate] suggestHost];
+    = [[[HGSPluginLoader sharedPluginLoader] delegate] suggestHost];
   NSString *baseURL = [NSString stringWithFormat:kHGSGoogleSuggestBase, suggestHost];
   self = [self initWithConfiguration:configuration
                             baseURL:baseURL];
@@ -816,7 +816,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (NSString *)suggestLanguage {
   NSString *suggestedLanguage = nil;
-  suggestedLanguage = [[[HGSModuleLoader sharedModuleLoader] delegate] suggestLanguage];
+  suggestedLanguage = [[[HGSPluginLoader sharedPluginLoader] delegate] suggestLanguage];
   if (!suggestedLanguage) {
     // TODO(altse): Should this be "en" or "en_US" ? Right now it is just "en"
     suggestedLanguage = @"en";  // Default, just in case.

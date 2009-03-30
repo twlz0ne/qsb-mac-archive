@@ -112,7 +112,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
     GMOSourceConfigProvider *provider = [GMOSourceConfigProvider defaultConfig];
     NSString* cachePath = [provider shortcutsCacheDbPath];
 #else
-    id<HGSDelegate> delegate = [[HGSModuleLoader sharedModuleLoader] delegate];
+    id<HGSDelegate> delegate = [[HGSPluginLoader sharedPluginLoader] delegate];
     NSString *appSupportPath = [delegate userApplicationSupportFolderForApp];
     NSString* cachePath
       = [appSupportPath stringByAppendingPathComponent:@"shortcuts.db"];

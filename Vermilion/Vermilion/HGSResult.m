@@ -38,7 +38,7 @@
 #import "HGSSearchSource.h"
 #import "NSString+ReadableURL.h"
 #import "GTMMethodCheck.h"
-#import "HGSModuleLoader.h"
+#import "HGSPluginLoader.h"
 #import "HGSDelegate.h"
 #import "HGSBundle.h"
 
@@ -307,7 +307,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     } 
     if (!value) {
       // If neither self or source provides a value, ask our HGSDelegate.
-      HGSModuleLoader *loader = [HGSModuleLoader sharedModuleLoader];
+      HGSPluginLoader *loader = [HGSPluginLoader sharedPluginLoader];
       id <HGSDelegate> delegate = [loader delegate];
       value = [delegate provideValueForKey:key result:self];
     }

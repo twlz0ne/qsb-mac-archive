@@ -1,5 +1,5 @@
 //
-//  HGSModuleLoaderTest.m
+//  HGSPluginLoaderTest.m
 //
 //  Copyright (c) 2009 Google Inc. All rights reserved.
 //
@@ -32,10 +32,10 @@
 
 
 #import "GTMSenTestCase.h"
-#import "HGSModuleLoader.h"
+#import "HGSPluginLoader.h"
 
-@interface HGSModuleLoaderTest : GTMTestCase 
+@interface HGSPluginLoaderTest : GTMTestCase 
 @end
 
-@implementation HGSModuleLoaderTest
+@implementation HGSPluginLoaderTest
 @end

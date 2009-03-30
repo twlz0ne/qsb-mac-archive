@@ -46,7 +46,7 @@
 #import <Vermilion/HGSCallbackSearchSource.h>
 #import <Vermilion/HGSDelegate.h>
 #import <Vermilion/HGSIconProvider.h>
-#import <Vermilion/HGSModuleLoader.h>
+#import <Vermilion/HGSPluginLoader.h>
 #import <Vermilion/HGSSearchOperation.h>
 #import <Vermilion/HGSOperation.h>
 #import <Vermilion/HGSActionOperation.h>

@@ -36,7 +36,7 @@
 #import "HGSTokenizer.h"
 #import "HGSSearchOperation.h"
 #import "HGSDelegate.h"
-#import "HGSModuleLoader.h"
+#import "HGSPluginLoader.h"
 #import "HGSLog.h"
 
 static NSString* const kHGSMemorySourceResultKey = @"HGSMSResultObject";
@@ -109,7 +109,7 @@ static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *t
       [self release];
       self = nil;
     }
-    id<HGSDelegate> delegate = [[HGSModuleLoader sharedModuleLoader] delegate];
+    id<HGSDelegate> delegate = [[HGSPluginLoader sharedPluginLoader] delegate];
     NSString *appSupportPath = [delegate userCacheFolderForApp];
     NSString *filename =
       [NSString stringWithFormat:@"%@.cache.db", [self identifier]];

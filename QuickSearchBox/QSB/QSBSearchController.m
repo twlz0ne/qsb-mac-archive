@@ -598,7 +598,7 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
           object:nil]
          autorelease];
     NSOperationQueue *sharedQueue
-      = [[[HGSModuleLoader sharedModuleLoader] delegate] sharedOperationQueue];
+      = [[[HGSPluginLoader sharedPluginLoader] delegate] sharedOperationQueue];
     [sharedQueue addOperation:updateMoreOp];
 #else
     NSDictionary *resultsByCategory = [queryController_ rankedResultsByCategory];

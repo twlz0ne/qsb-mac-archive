@@ -51,7 +51,7 @@ typedef enum {
 
 /*!
   Encapsulates information about the signature (or lack thereof) on a
-  bundle. This class is used by HGSModuleLoader to track which plugins
+  bundle. This class is used by HGSPluginLoader to track which plugins
   are trusted by the user. The purpose of this class is to keep all
   usage of the codesigning SPIs relegated to a single file. If Apple
   changes the SPIs or makes them public APIs, there is only one place

@@ -1,5 +1,5 @@
 //
-//  HGSModuleLoader.m
+//  HGSPluginLoader.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -39,7 +39,7 @@
 #import <openssl/x509.h>
 #import <openssl/x509v3.h>
 
-@interface HGSModuleLoader()
+@interface HGSPluginLoader()
 - (BOOL)isPluginBundleCertified:(NSBundle *)pluginBundle;
 - (BOOL)pluginIsWhitelisted:(NSBundle *)pluginBundle
           withCodeSignature:(HGSCodeSignature *)pluginCodeSignature;
@@ -61,22 +61,22 @@ static const UInt32 kEncryptionKeyLength = 16; // bytes, i.e., 128 bits
 static const UInt32 kEncryptionIvLength = 16;
 static const long kTenYearsInSeconds = 60 * 60 * 24 * 365 * 10;
 
-NSString *const kHGSModuleLoaderPluginPathKey
-  = @"HGSModuleLoaderPluginPathKey";
-NSString *const kHGSModuleLoaderPluginFailureKey
-  = @"HGSModuleLoaderPluginFailureKey";
-NSString *const kHGSModuleLoaderPluginFailedCertification
-  = @"HGSModuleLoaderPluginFailedCertification";
-NSString *const kHGSModuleLoaderPluginFailedAPICheck
-  = @"HGSModuleLoaderPluginFailedAPICheck";
-NSString *const kHGSModuleLoaderPluginFailedInstantiation
-  = @"HGSModuleLoaderPluginFailedInstantiation";
-NSString *const kHGSModuleLoaderPluginFailedUnknownPluginType 
-  = @"HGSModuleLoaderPluginFailedUnknownPluginType";
+NSString *const kHGSPluginLoaderPluginPathKey
+  = @"HGSPluginLoaderPluginPathKey";
+NSString *const kHGSPluginLoaderPluginFailureKey
+  = @"HGSPluginLoaderPluginFailureKey";
+NSString *const kHGSPluginLoaderPluginFailedCertification
+  = @"HGSPluginLoaderPluginFailedCertification";
+NSString *const kHGSPluginLoaderPluginFailedAPICheck
+  = @"HGSPluginLoaderPluginFailedAPICheck";
+NSString *const kHGSPluginLoaderPluginFailedInstantiation
+  = @"HGSPluginLoaderPluginFailedInstantiation";
+NSString *const kHGSPluginLoaderPluginFailedUnknownPluginType 
+  = @"HGSPluginLoaderPluginFailedUnknownPluginType";
 
-@implementation HGSModuleLoader
+@implementation HGSPluginLoader
 
-GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
+GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 
 - (id)init {
   if ((self = [super init])) {
@@ -128,22 +128,22 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSModuleLoader, sharedModuleLoader);
             if (plugin) {
               [pluginsPoint extendWithObject:plugin];
             } else {
-              errorType = kHGSModuleLoaderPluginFailedInstantiation;
+              errorType = kHGSPluginLoaderPluginFailedInstantiation;
             }
           } else {
-            errorType = kHGSModuleLoaderPluginFailedAPICheck;
+            errorType = kHGSPluginLoaderPluginFailedAPICheck;
           }
         } else {
-          errorType = kHGSModuleLoaderPluginFailedCertification;
+          errorType = kHGSPluginLoaderPluginFailedCertification;
         }
       } else {
-        errorType = kHGSModuleLoaderPluginFailedUnknownPluginType;
+        errorType = kHGSPluginLoaderPluginFailedUnknownPluginType;
       }
       if (errorType) {
         NSDictionary *errorDictionary
           = [NSDictionary dictionaryWithObjectsAndKeys:
-             errorType, kHGSModuleLoaderPluginFailureKey,
-             fullPath, kHGSModuleLoaderPluginPathKey,
+             errorType, kHGSPluginLoaderPluginFailureKey,
+             fullPath, kHGSPluginLoaderPluginPathKey,
              nil];
         [ourErrors addObject:errorDictionary];
       }

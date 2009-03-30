@@ -410,10 +410,6 @@
 		7F7F90930F32570F00B39433 /* TopSearchIconResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F7F908F0F32570F00B39433 /* TopSearchIconResultView.xib */; };
 		7F7F90940F32570F00B39433 /* TopSearchForResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F7F90910F32570F00B39433 /* TopSearchForResultView.xib */; };
 		7F838BF70DB79DB200530EAE /* NewButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F838BF60DB79DB200530EAE /* NewButton.png */; };
-		7F915CA90DB5151E00B34DA2 /* HGSExtensionPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F915C750DB50FC100B34DA2 /* HGSExtensionPoint.m */; };
-		7F915CAA0DB5151F00B34DA2 /* HGSExtensionPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F915C740DB50FC100B34DA2 /* HGSExtensionPoint.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7F915CBF0DB516B300B34DA2 /* HGSCoreExtensionPoints.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F915C880DB512CC00B34DA2 /* HGSCoreExtensionPoints.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7F915CC00DB516B400B34DA2 /* HGSCoreExtensionPoints.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F915C890DB512CC00B34DA2 /* HGSCoreExtensionPoints.m */; };
 		7F9238C00D9424BD00D6510F /* MagnifyingGlassTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9238BF0D9424BD00D6510F /* MagnifyingGlassTemplate.png */; };
 		7F9416BC0EEF53050049AE06 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		7F9416BD0EEF53050049AE06 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -584,7 +580,6 @@
 		8B6C17300F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6C172E0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h */; };
 		8B6C17310F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C172F0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m */; };
 		8B6F2D740DA2B8AF0052CA40 /* HGSAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D600DA2B88E0052CA40 /* HGSAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8B6F2D770DA2B8AF0052CA40 /* HGSModuleLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D0E0DA2B83F0052CA40 /* HGSModuleLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6F2D780DA2B8AF0052CA40 /* HGSResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D640DA2B88E0052CA40 /* HGSResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6F2D7B0DA2B8AF0052CA40 /* HGSQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D680DA2B88E0052CA40 /* HGSQuery.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6F2D7C0DA2B8AF0052CA40 /* HGSQueryController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D6A0DA2B88E0052CA40 /* HGSQueryController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -678,13 +673,10 @@
 		8B95CAB60F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA30F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m */; };
 		8B95CABB0F6B0A4A003BDBDD /* HGSSearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CABA0F6B0A4A003BDBDD /* HGSSearchSourceTest.m */; };
 		8B95CB4C0F6B1CA9003BDBDD /* HGSSQLiteBackedCacheTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */; };
-		8B95CC5E0F6EC558003BDBDD /* HGSCoreExtensionPointsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CC5D0F6EC558003BDBDD /* HGSCoreExtensionPointsTest.m */; };
-		8B95CC720F6EC66E003BDBDD /* HGSModuleLoaderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CC710F6EC66E003BDBDD /* HGSModuleLoaderTest.m */; };
 		8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B95CCB60F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */; };
 		8B95CD210F6EDF9D003BDBDD /* GTMRegex.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */; };
-		8B95CD730F6EE20E003BDBDD /* HGSBundle.m in Headers */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B95CE200F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CE1F0F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m */; };
 		8BA019C40F14303400926923 /* GTMSQLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BA019C20F14303400926923 /* GTMSQLite.m */; };
@@ -695,6 +687,15 @@
 		8BA61B920F0ADEAD008182B5 /* QuickLook.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B6ECB620E154F08006A815D /* QuickLook.png */; };
 		8BA61DBB0F0AEF78008182B5 /* AddToPartyShuffle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BA61DBA0F0AEF78008182B5 /* AddToPartyShuffle.icns */; };
 		8BA61DBD0F0AEF7E008182B5 /* PlayInPartyShuffle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BA61DBC0F0AEF7E008182B5 /* PlayInPartyShuffle.icns */; };
+		8BAAA8640F813E2A00DF4F12 /* HGSExtensionPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BAAA85B0F813E2A00DF4F12 /* HGSExtensionPoint.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8BAAA8650F813E2A00DF4F12 /* HGSPluginLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85C0F813E2A00DF4F12 /* HGSPluginLoader.m */; };
+		8BAAA8660F813E2A00DF4F12 /* HGSCoreExtensionPoints.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85D0F813E2A00DF4F12 /* HGSCoreExtensionPoints.m */; };
+		8BAAA8670F813E2A00DF4F12 /* HGSExtensionPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85E0F813E2A00DF4F12 /* HGSExtensionPoint.m */; };
+		8BAAA8680F813E2A00DF4F12 /* HGSPluginLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BAAA85F0F813E2A00DF4F12 /* HGSPluginLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8BAAA86B0F813E2A00DF4F12 /* HGSCoreExtensionPoints.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BAAA8620F813E2A00DF4F12 /* HGSCoreExtensionPoints.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8BAAA8770F813E3800DF4F12 /* HGSPluginLoaderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85A0F813E2A00DF4F12 /* HGSPluginLoaderTest.m */; };
+		8BAAA8780F813E3800DF4F12 /* HGSExtensionPointTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA8600F813E2A00DF4F12 /* HGSExtensionPointTest.m */; };
+		8BAAA8790F813E3800DF4F12 /* HGSCoreExtensionPointsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA8610F813E2A00DF4F12 /* HGSCoreExtensionPointsTest.m */; };
 		8BB658F20F73034600E20B99 /* GTMNSObject+UnitTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55DAE20E78829300D39CB0 /* GTMNSObject+UnitTesting.m */; };
 		8BB658F40F73035000E20B99 /* GTMAppKit+UnitTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55DAE40E78829300D39CB0 /* GTMAppKit+UnitTesting.m */; };
 		8BB6594B0F73036600E20B99 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
@@ -842,7 +843,6 @@
 		E4D28A920DF9971600FC6C31 /* HGSActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4D28A4C0DF98DFF00FC6C31 /* HGSActionTest.m */; };
 		E4D28B330DF9AA0C00FC6C31 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
 		E4D28DDE0DF9C11300FC6C31 /* HGSResultTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4D28DDD0DF9C11300FC6C31 /* HGSResultTest.m */; };
-		E4F551380DF73082008A846E /* HGSExtensionPointTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4F551020DF72691008A846E /* HGSExtensionPointTest.m */; };
 		E4F551550DF730D7008A846E /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		F40FEB390EC4C81700B32381 /* FilesystemDirectorySearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F10EF650DCF6F63002FCB08 /* FilesystemDirectorySearchSource.m */; };
 		F40FEC2A0EC4DBBA00B32381 /* HGSWebSearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F7357290DC92B53003DB5C6 /* HGSWebSearchSource.m */; };
@@ -859,7 +859,6 @@
 		F4D1491C0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D1491B0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m */; };
 		F4D1494B0E9A438B00C0EAA9 /* NSString+ReadableURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 644161EE0DE362CC00AC646D /* NSString+ReadableURL.m */; };
 		F4D14F120E9BE9A200C0EAA9 /* HGSDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = F4D14F110E9BE9A200C0EAA9 /* HGSDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F4D1503C0E9C03DC00C0EAA9 /* HGSModuleLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B6F2D0F0DA2B83F0052CA40 /* HGSModuleLoader.m */; };
 		F4D153380E9F9C5400C0EAA9 /* HGSStringUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = F4D153350E9F9C5400C0EAA9 /* HGSStringUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F4D153390E9F9C5400C0EAA9 /* HGSStringUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153360E9F9C5400C0EAA9 /* HGSStringUtil.m */; };
 		F4D1533B0E9F9C5B00C0EAA9 /* HGSStringUtilTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153370E9F9C5400C0EAA9 /* HGSStringUtilTest.m */; };
@@ -1872,10 +1871,6 @@
 		7F7F90900F32570F00B39433 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TopSearchIconResultView.xib; sourceTree = "<group>"; };
 		7F7F90920F32570F00B39433 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TopSearchForResultView.xib; sourceTree = "<group>"; };
 		7F838BF60DB79DB200530EAE /* NewButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NewButton.png; sourceTree = "<group>"; };
-		7F915C740DB50FC100B34DA2 /* HGSExtensionPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSExtensionPoint.h; sourceTree = "<group>"; };
-		7F915C750DB50FC100B34DA2 /* HGSExtensionPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSExtensionPoint.m; sourceTree = "<group>"; };
-		7F915C880DB512CC00B34DA2 /* HGSCoreExtensionPoints.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSCoreExtensionPoints.h; sourceTree = "<group>"; };
-		7F915C890DB512CC00B34DA2 /* HGSCoreExtensionPoints.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCoreExtensionPoints.m; sourceTree = "<group>"; };
 		7F9238BF0D9424BD00D6510F /* MagnifyingGlassTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MagnifyingGlassTemplate.png; sourceTree = "<group>"; };
 		7F9415CC0EEF52930049AE06 /* SharedFileList.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SharedFileList.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F9415D60EEF52970049AE06 /* DirectoryScanner.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DirectoryScanner.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2016,8 +2011,6 @@
 		8B6C172F0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSObject+KeyValueObserving.m"; sourceTree = "<group>"; };
 		8B6ECB620E154F08006A815D /* QuickLook.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = QuickLook.png; sourceTree = "<group>"; };
 		8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Vermilion.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8B6F2D0E0DA2B83F0052CA40 /* HGSModuleLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HGSModuleLoader.h; path = ../HGSModuleLoader.h; sourceTree = "<group>"; };
-		8B6F2D0F0DA2B83F0052CA40 /* HGSModuleLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HGSModuleLoader.m; path = ../HGSModuleLoader.m; sourceTree = "<group>"; };
 		8B6F2D120DA2B83F0052CA40 /* Applications-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Applications-Info.plist"; sourceTree = "<group>"; };
 		8B6F2D160DA2B83F0052CA40 /* ApplicationsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationsSource.m; sourceTree = "<group>"; };
 		8B6F2D180DA2B83F0052CA40 /* Contacts-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Contacts-Info.plist"; sourceTree = "<group>"; };
@@ -2090,8 +2083,6 @@
 		8B95CAA20F6B09FE003BDBDD /* HGSProtoExtensionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSProtoExtensionTest.m; sourceTree = "<group>"; };
 		8B95CAA30F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCallbackSearchSourceTest.m; sourceTree = "<group>"; };
 		8B95CABA0F6B0A4A003BDBDD /* HGSSearchSourceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSearchSourceTest.m; sourceTree = "<group>"; };
-		8B95CC5D0F6EC558003BDBDD /* HGSCoreExtensionPointsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCoreExtensionPointsTest.m; sourceTree = "<group>"; };
-		8B95CC710F6EC66E003BDBDD /* HGSModuleLoaderTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HGSModuleLoaderTest.m; path = ../../Vermilion/HGSModuleLoaderTest.m; sourceTree = SOURCE_ROOT; };
 		8B95CCB30F6EDD8C003BDBDD /* GTMUnitTestDevLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMUnitTestDevLog.h; sourceTree = "<group>"; };
 		8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMUnitTestDevLog.m; sourceTree = "<group>"; };
 		8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMRegex.h; sourceTree = "<group>"; };
@@ -2115,6 +2106,15 @@
 		8BA624BF0F12C79E008182B5 /* PackageVersion.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = PackageVersion.xcconfig; sourceTree = "<group>"; };
 		8BA624C00F12C79E008182B5 /* QSBDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = QSBDebug.xcconfig; sourceTree = "<group>"; };
 		8BA624C10F12C79E008182B5 /* QSBRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = QSBRelease.xcconfig; sourceTree = "<group>"; };
+		8BAAA85A0F813E2A00DF4F12 /* HGSPluginLoaderTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPluginLoaderTest.m; sourceTree = "<group>"; };
+		8BAAA85B0F813E2A00DF4F12 /* HGSExtensionPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSExtensionPoint.h; sourceTree = "<group>"; };
+		8BAAA85C0F813E2A00DF4F12 /* HGSPluginLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPluginLoader.m; sourceTree = "<group>"; };
+		8BAAA85D0F813E2A00DF4F12 /* HGSCoreExtensionPoints.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCoreExtensionPoints.m; sourceTree = "<group>"; };
+		8BAAA85E0F813E2A00DF4F12 /* HGSExtensionPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSExtensionPoint.m; sourceTree = "<group>"; };
+		8BAAA85F0F813E2A00DF4F12 /* HGSPluginLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSPluginLoader.h; sourceTree = "<group>"; };
+		8BAAA8600F813E2A00DF4F12 /* HGSExtensionPointTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSExtensionPointTest.m; sourceTree = "<group>"; };
+		8BAAA8610F813E2A00DF4F12 /* HGSCoreExtensionPointsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCoreExtensionPointsTest.m; sourceTree = "<group>"; };
+		8BAAA8620F813E2A00DF4F12 /* HGSCoreExtensionPoints.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSCoreExtensionPoints.h; sourceTree = "<group>"; };
 		8BB275AB0D6F81EA008DC1CA /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
 		8BC350B90F2BD7D3001ADD5B /* QSBResultIconView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBResultIconView.h; sourceTree = "<group>"; };
 		8BC350BA0F2BD7D3001ADD5B /* QSBResultIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBResultIconView.m; sourceTree = "<group>"; };
@@ -2244,7 +2244,6 @@
 		E46933050DDB7A0200C5A64A /* Actions.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Actions.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4D28A4C0DF98DFF00FC6C31 /* HGSActionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSActionTest.m; sourceTree = "<group>"; };
 		E4D28DDD0DF9C11300FC6C31 /* HGSResultTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSResultTest.m; sourceTree = "<group>"; };
-		E4F551020DF72691008A846E /* HGSExtensionPointTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSExtensionPointTest.m; sourceTree = "<group>"; };
 		E4F551330DF73059008A846E /* VermilionTest.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VermilionTest.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F435DAAE0DBE4BBE0069CDE8 /* GTMDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMDefines.h; sourceTree = "<group>"; };
 		F43C9B100AF0EFEC009E5549 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -3096,22 +3095,6 @@
 			name = Core;
 			sourceTree = "<group>";
 		};
-		7F915C730DB50FC100B34DA2 /* ModuleLoader */ = {
-			isa = PBXGroup;
-			children = (
-				8B6F2D0E0DA2B83F0052CA40 /* HGSModuleLoader.h */,
-				8B6F2D0F0DA2B83F0052CA40 /* HGSModuleLoader.m */,
-				8B95CC710F6EC66E003BDBDD /* HGSModuleLoaderTest.m */,
-				7F915C740DB50FC100B34DA2 /* HGSExtensionPoint.h */,
-				7F915C750DB50FC100B34DA2 /* HGSExtensionPoint.m */,
-				E4F551020DF72691008A846E /* HGSExtensionPointTest.m */,
-				7F915C880DB512CC00B34DA2 /* HGSCoreExtensionPoints.h */,
-				7F915C890DB512CC00B34DA2 /* HGSCoreExtensionPoints.m */,
-				8B95CC5D0F6EC558003BDBDD /* HGSCoreExtensionPointsTest.m */,
-			);
-			path = ModuleLoader;
-			sourceTree = "<group>";
-		};
 		7F9417310EEF533B0049AE06 /* DirectoryScanner */ = {
 			isa = PBXGroup;
 			children = (
@@ -3515,7 +3498,6 @@
 			children = (
 				8BC3F43D0F17C7BE00896770 /* Resources */,
 				8B6F2D5D0DA2B88E0052CA40 /* Vermilion */,
-				7F915C730DB50FC100B34DA2 /* ModuleLoader */,
 				8B6F2D100DA2B83F0052CA40 /* Modules */,
 			);
 			name = Vermilion;
@@ -3607,10 +3589,10 @@
 				8B95CA9E0F6B09FE003BDBDD /* HGSAccountsExtensionPointTest.m */,
 				8B6F2D600DA2B88E0052CA40 /* HGSAction.h */,
 				8B6F2D610DA2B88E0052CA40 /* HGSAction.m */,
-				E4D28A4C0DF98DFF00FC6C31 /* HGSActionTest.m */,
 				7FEA74A90DA416B60052F620 /* HGSActionOperation.h */,
 				7FEA74AA0DA416B60052F620 /* HGSActionOperation.m */,
 				8B95CA9B0F6B09FE003BDBDD /* HGSActionOperationTest.m */,
+				E4D28A4C0DF98DFF00FC6C31 /* HGSActionTest.m */,
 				8B8B13040EEBADE400E543D0 /* HGSBundle.h */,
 				8B8B13050EEBADE400E543D0 /* HGSBundle.m */,
 				8B95CA9A0F6B09FE003BDBDD /* HGSBundleTest.m */,
@@ -3620,10 +3602,16 @@
 				5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */,
 				5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */,
 				5AF0F7D70F68489A0041E0B9 /* HGSCodeSignatureTest.m */,
+				8BAAA8620F813E2A00DF4F12 /* HGSCoreExtensionPoints.h */,
+				8BAAA85D0F813E2A00DF4F12 /* HGSCoreExtensionPoints.m */,
+				8BAAA8610F813E2A00DF4F12 /* HGSCoreExtensionPointsTest.m */,
 				F4D14F110E9BE9A200C0EAA9 /* HGSDelegate.h */,
 				8B02FB060EC9D46B00A6EB85 /* HGSExtension.h */,
 				8B02FB0C0EC9D50C00A6EB85 /* HGSExtension.m */,
 				8B95CA950F6B09FE003BDBDD /* HGSExtensionTest.m */,
+				8BAAA85B0F813E2A00DF4F12 /* HGSExtensionPoint.h */,
+				8BAAA85E0F813E2A00DF4F12 /* HGSExtensionPoint.m */,
+				8BAAA8600F813E2A00DF4F12 /* HGSExtensionPointTest.m */,
 				5AED35E50EB7D978004C7187 /* HGSIconProvider.h */,
 				5AED35E60EB7D978004C7187 /* HGSIconProvider.m */,
 				8B95CA930F6B09FE003BDBDD /* HGSIconProviderTest.m */,
@@ -3643,6 +3631,9 @@
 				62A16A8D0ED484DF0074F41B /* HGSPlugin.h */,
 				62A16A8E0ED484DF0074F41B /* HGSPlugin.m */,
 				8B95CA970F6B09FE003BDBDD /* HGSPluginTest.m */,
+				8BAAA85F0F813E2A00DF4F12 /* HGSPluginLoader.h */,
+				8BAAA85C0F813E2A00DF4F12 /* HGSPluginLoader.m */,
+				8BAAA85A0F813E2A00DF4F12 /* HGSPluginLoaderTest.m */,
 				62A16A930ED485A60074F41B /* HGSProtoExtension.h */,
 				62A16A960ED485C50074F41B /* HGSProtoExtension.m */,
 				8B95CAA20F6B09FE003BDBDD /* HGSProtoExtensionTest.m */,
@@ -4096,14 +4087,11 @@
 				7F4497F20F6895EB00330B67 /* GTMDefines.h in Headers */,
 				8B6F30DF0DA2FB520052CA40 /* Vermilion.h in Headers */,
 				8B6F2D740DA2B8AF0052CA40 /* HGSAction.h in Headers */,
-				8B6F2D770DA2B8AF0052CA40 /* HGSModuleLoader.h in Headers */,
 				8B6F2D780DA2B8AF0052CA40 /* HGSResult.h in Headers */,
 				8B6F2D7B0DA2B8AF0052CA40 /* HGSQuery.h in Headers */,
 				8B6F2D7C0DA2B8AF0052CA40 /* HGSQueryController.h in Headers */,
 				8B6F2D7D0DA2B8AF0052CA40 /* HGSSearchOperation.h in Headers */,
 				8B6F2D7F0DA2B8AF0052CA40 /* HGSSearchSource.h in Headers */,
-				7F915CAA0DB5151F00B34DA2 /* HGSExtensionPoint.h in Headers */,
-				7F915CBF0DB516B300B34DA2 /* HGSCoreExtensionPoints.h in Headers */,
 				E4617A900DC23BE300CE7C0F /* HGSMixer.h in Headers */,
 				7FE098930DC77AEB00D0FB6C /* HGSAbbreviationRanker.h in Headers */,
 				33D2CBAD0DD2573100C1FBDC /* HGSMemorySearchSource.h in Headers */,
@@ -4128,9 +4116,11 @@
 				62D56E240EF317A900D3EB5F /* HGSAccount.h in Headers */,
 				62C051BA0F31307100DFBB1B /* HGSSimpleAccount.h in Headers */,
 				5A4D23FC0F4CD22B00F5C05B /* HGSCodeSignature.h in Headers */,
-				8B95CD730F6EE20E003BDBDD /* HGSBundle.m in Headers */,
 				620055160F78564300C806A1 /* HGSSimpleAccountEditController.h in Headers */,
 				6200551A0F78567300C806A1 /* HGSSimpleAccountSetUpViewController.h in Headers */,
+				8BAAA8640F813E2A00DF4F12 /* HGSExtensionPoint.h in Headers */,
+				8BAAA8680F813E2A00DF4F12 /* HGSPluginLoader.h in Headers */,
+				8BAAA86B0F813E2A00DF4F12 /* HGSCoreExtensionPoints.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5647,18 +5637,15 @@
 			);
 			inputPaths = (
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
-				"$(SRCROOT)/../../Vermilion/Vermilion/HGSBundle.m",
 			);
 			name = "Post Build Script";
 			outputPaths = (
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/xcconfig",
-				"$(BUILT_PRODUCTS_DIR)/pluginsrc/HGSBundle.m",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"\n\"${SRCROOT}/BuildScripts/StripHeaders.sh\"\n\n# Copy our xcconfigs into our QSB build area so that plugins building using our SDK and QSBROOT will be able to find them\ncp -R \"${SRCROOT}/xcconfig\" \"${BUILT_PRODUCTS_DIR}/xcconfig\"\nchmod -R 766 \"${BUILT_PRODUCTS_DIR}/xcconfig\"\n\ncp \"${SRCROOT}/../../Vermilion/Vermilion/HGSBundle.m\" \"${BUILT_PRODUCTS_DIR}/pluginsrc/\"\nchmod -R 766 \"${BUILT_PRODUCTS_DIR}/pluginsrc\"";
+			shellScript = "\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"\n\"${SRCROOT}/BuildScripts/StripHeaders.sh\"\n\n";
 		};
 		8B4888110F15D37D00786C1E /* Breakpad */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6545,15 +6532,12 @@
 				8B6F2E150DA2B9290052CA40 /* HGSQueryController.m in Sources */,
 				8B6F2E160DA2B9290052CA40 /* HGSSearchOperation.m in Sources */,
 				8B6F2E170DA2B9290052CA40 /* HGSSearchSource.m in Sources */,
-				7F915CA90DB5151E00B34DA2 /* HGSExtensionPoint.m in Sources */,
-				7F915CC00DB516B400B34DA2 /* HGSCoreExtensionPoints.m in Sources */,
 				64C385C60DBFDCF9005EBA69 /* GTMMethodCheck.m in Sources */,
 				E4617A910DC23BE300CE7C0F /* HGSMixer.m in Sources */,
 				7FE098920DC77AEB00D0FB6C /* HGSAbbreviationRanker.m in Sources */,
 				337C2C890DCFDA9B00897EB3 /* KeychainItem.m in Sources */,
 				33D2CBAE0DD2573100C1FBDC /* HGSMemorySearchSource.m in Sources */,
 				F4D1494B0E9A438B00C0EAA9 /* NSString+ReadableURL.m in Sources */,
-				F4D1503C0E9C03DC00C0EAA9 /* HGSModuleLoader.m in Sources */,
 				F4D153390E9F9C5400C0EAA9 /* HGSStringUtil.m in Sources */,
 				F4D1535C0E9F9E2900C0EAA9 /* HGSTokenizer.m in Sources */,
 				5AED32BB0EAFDF1F004C7187 /* HGSOperation.m in Sources */,
@@ -6575,6 +6559,9 @@
 				8B8B19B00EEF0DF000E543D0 /* HGSBundle.m in Sources */,
 				620055170F78564300C806A1 /* HGSSimpleAccountEditController.m in Sources */,
 				6200551B0F78567300C806A1 /* HGSSimpleAccountSetUpViewController.m in Sources */,
+				8BAAA8650F813E2A00DF4F12 /* HGSPluginLoader.m in Sources */,
+				8BAAA8660F813E2A00DF4F12 /* HGSCoreExtensionPoints.m in Sources */,
+				8BAAA8670F813E2A00DF4F12 /* HGSExtensionPoint.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6659,7 +6646,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4F551380DF73082008A846E /* HGSExtensionPointTest.m in Sources */,
 				E4D28A920DF9971600FC6C31 /* HGSActionTest.m in Sources */,
 				E4D28DDE0DF9C11300FC6C31 /* HGSResultTest.m in Sources */,
 				8B55D9380E786B5D00D39CB0 /* GTMSenTestCase.m in Sources */,
@@ -6689,8 +6675,6 @@
 				8B95CAB60F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m in Sources */,
 				8B95CABB0F6B0A4A003BDBDD /* HGSSearchSourceTest.m in Sources */,
 				8B95CB4C0F6B1CA9003BDBDD /* HGSSQLiteBackedCacheTest.m in Sources */,
-				8B95CC5E0F6EC558003BDBDD /* HGSCoreExtensionPointsTest.m in Sources */,
-				8B95CC720F6EC66E003BDBDD /* HGSModuleLoaderTest.m in Sources */,
 				8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */,
 				8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */,
 				8B95CE200F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m in Sources */,
@@ -6698,6 +6682,9 @@
 				8BB658F40F73035000E20B99 /* GTMAppKit+UnitTesting.m in Sources */,
 				8BB6594B0F73036600E20B99 /* GTMMethodCheck.m in Sources */,
 				6200571F0F7A909E00C806A1 /* KeychainItemTest.m in Sources */,
+				8BAAA8770F813E3800DF4F12 /* HGSPluginLoaderTest.m in Sources */,
+				8BAAA8780F813E3800DF4F12 /* HGSExtensionPointTest.m in Sources */,
+				8BAAA8790F813E3800DF4F12 /* HGSCoreExtensionPointsTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

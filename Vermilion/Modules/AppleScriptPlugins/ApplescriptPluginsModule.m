@@ -38,7 +38,7 @@
 
 @implementation AppleScriptPluginsModule
 - (void)registerAppleScript:(NSAppleScript*)script
-                 withLoader:(HGSModuleLoader *)loader
+                 withLoader:(HGSPluginLoader *)loader
                        path:(NSString*)path {  
   NSArray *scripts = nil;
   if ([[path pathExtension] caseInsensitiveCompare:@"scptd"] == NSOrderedSame) {
@@ -65,7 +65,7 @@
 }
 
 - (void)registerAppleScript:(NSString*)scriptPath
-                 withLoader:(HGSModuleLoader *)loader {
+                 withLoader:(HGSPluginLoader *)loader {
   NSURL *url = [NSURL fileURLWithPath:scriptPath];
   NSDictionary *error = nil;
   NSAppleScript *script = [[[NSAppleScript alloc] initWithContentsOfURL:url
@@ -81,7 +81,7 @@
 }
 
 - (void)registerAppleScripts:(NSArray*)scripts 
-                  withLoader:(HGSModuleLoader *)loader {
+                  withLoader:(HGSPluginLoader *)loader {
   NSEnumerator *enumerator = [scripts objectEnumerator];
   NSString *path;
   while ((path = [enumerator nextObject])) {
@@ -91,7 +91,7 @@
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    HGSModuleLoader *loader = [HGSModuleLoader sharedModuleLoader];
+    HGSPluginLoader *loader = [HGSPluginLoader sharedPluginLoader];
     id<HGSDelegate> delegate = [loader delegate];
     NSArray *pluginFolders = [delegate pluginFolders];
     for (NSString *path in pluginFolders) {

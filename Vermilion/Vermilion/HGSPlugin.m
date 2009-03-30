@@ -35,7 +35,7 @@
 #import "HGSAccountsExtensionPoint.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
-#import "HGSModuleLoader.h"
+#import "HGSPluginLoader.h"
 #import "HGSProtoExtension.h"
 
 // Array of Cocoa extension descriptions.
@@ -71,7 +71,7 @@ static NSString *const kHGSPluginAPIVersionKey
 
 + (void)load {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  HGSModuleLoader *loader = [HGSModuleLoader sharedModuleLoader];
+  HGSPluginLoader *loader = [HGSPluginLoader sharedPluginLoader];
   [loader registerClass:self forExtensions:[NSArray arrayWithObject:@"hgs"]];
   [pool release];
 }
@@ -81,7 +81,8 @@ static NSString *const kHGSPluginAPIVersionKey
   NSNumber *pluginAPIVersion
     = [pluginBundle objectForInfoDictionaryKey:kHGSPluginAPIVersionKey];
   if (!pluginAPIVersion) {
-    NSString *qsbPlistPath = [pluginBundle pathForResource:@"QSBInfo" ofType:@"plist"];
+    NSString *qsbPlistPath = [pluginBundle pathForResource:@"QSBInfo" 
+                                                    ofType:@"plist"];
     if (qsbPlistPath) {
       NSDictionary *qsbPlist 
         = [NSDictionary dictionaryWithContentsOfFile:qsbPlistPath];
