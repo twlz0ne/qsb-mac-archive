@@ -30,38 +30,52 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header Accounts Extension Point
+ 
+ The accounts extension point manages all known account types, prototypical
+ account extensions and active accounts.
+ */
+
 #import <Foundation/Foundation.h>
 
 #import "HGSExtensionPoint.h"
 
-// An extension point that maintains an inventory of all accounts
-// available to sources and actions as well as a list of all
-// registered account types.
-// NOTE: Not thread-safe.
-//
+/*!
+  An extension point that maintains an inventory of all accounts
+  available to sources and actions as well as a list of all
+  registered account types.
+ 
+  NOTE: Not thread-safe.
+*/
 @interface HGSAccountsExtensionPoint : HGSExtensionPoint {
  @private
   NSMutableDictionary *accountTypes_;  // NSString
 }
 
-// Register all accounts contained in the array of dictionaries as while
-// restoring from preferences.  This method will not send notification of
-// newly added accounts.
+/*!
+  Register all accounts contained in the array of dictionaries as while
+  restoring from preferences.  This method will not send notification of
+  newly added accounts.
+*/
 - (void)addAccountsFromArray:(NSArray *)accountsArray;
 
-// Return a dictionary describing all registered accounts.
+/*! Returns a dictionary describing all registered accounts. */
 - (NSArray *)accountsAsArray;
 
-// Register an account type.
+/*! Registers an account type. */
 - (void)addAccountType:(NSString *)accountType withClass:(Class)accountClass;
 
-// Return the class for an account type
+/*! Returns the class for an account type */
 - (Class)classForAccountType:(NSString *)accountType;
 
-// Convenience method that returns an array of all account type names.
+/*! A convenience method that returns an array of all account type names. */
 - (NSArray *)visibleAccountTypeDisplayNames;
 
-// Convenience method to retrieve all acccount with a given type.
+/*!
+  A convenience method that returns an array of all acccounts
+  with a given type.
+*/
 - (NSArray *)accountsForType:(NSString *)type;
 
 @end
