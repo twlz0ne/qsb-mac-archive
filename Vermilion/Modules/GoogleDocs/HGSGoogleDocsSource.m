@@ -72,13 +72,13 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     NSBundle* sourceBundle = HGSGetPluginBundle();
     NSString *docPath = [sourceBundle pathForImageResource:@"gdocdocument"];
     HGSAssert(docPath, @"Icons for 'gdocdocument' are missing from the "
-              @"HGSGoogleDocsSource module bundle.");
+              @"HGSGoogleDocsSource bundle.");
     NSString *ssPath = [sourceBundle pathForImageResource:@"gdocspreadsheet"];
     HGSAssert(ssPath, @"Icons for 'gdocspreadsheet' are missing from the "
-              @"HGSGoogleDocsSource module bundle.");
+              @"HGSGoogleDocsSource bundle.");
     NSString *presPath = [sourceBundle pathForImageResource:@"gdocpresentation"];
     HGSAssert(presPath, @"Icons for 'gdocpresentation' are missing from the "
-              @"HGSGoogleDocsSource module bundle.");
+              @"HGSGoogleDocsSource bundle.");
     NSImage *docImage 
       = [[[NSImage alloc] initByReferencingFile:docPath] autorelease];
     NSImage *ssImage

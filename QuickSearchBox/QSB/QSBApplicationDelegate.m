@@ -600,11 +600,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // TODO(dmaclach): alert user that their prefs have been ignored.
   // Rediscover plug-ins by scanning all plugin folders.
   NSArray *pluginPaths = [hgsDelegate_ pluginFolders];
-  HGSPluginLoader *moduleLoader = [HGSPluginLoader sharedPluginLoader];
+  HGSPluginLoader *pluginLoader = [HGSPluginLoader sharedPluginLoader];
   NSMutableArray *allErrors = [NSMutableArray array];
   for (NSString *pluginPath in pluginPaths) {
     NSArray *errors = nil;
-    [moduleLoader loadPluginsAtPath:pluginPath errors:&errors];
+    [pluginLoader loadPluginsAtPath:pluginPath errors:&errors];
     if (errors) {
       [allErrors addObjectsFromArray:errors];
     }

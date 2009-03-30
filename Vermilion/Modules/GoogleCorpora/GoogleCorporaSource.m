@@ -167,8 +167,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 - (BOOL)loadCorpora {
   // TODO(dmaclach): mumble
   // TODO(mrossetti): mumble
-  //  -- If/When we get support for config info in the module registration, it
-  // might make sense for the DefaultCorp info to go into the normal module
+  //  -- If/When we get support for config info in the plugin registration, it
+  // might make sense for the DefaultCorp info to go into the normal plugin
   // registation make config it's own source instead of having this one source
   // cycle through them.  That would also allow those individual configs to be
   // enabled/disabled.

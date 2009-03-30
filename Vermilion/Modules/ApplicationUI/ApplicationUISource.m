@@ -54,19 +54,19 @@ NSString *const kAppUISourceAttributeElementKey
     NSBundle *bundle = HGSGetPluginBundle();
     NSString *path = [bundle pathForResource:@"window" ofType:@"icns"];
     HGSAssert(path, @"Icons for 'window' are missing from the "
-              @"ApplicationUISource module bundle.");
+              @"ApplicationUISource bundle.");
     windowIcon_ = [[NSImage alloc] initByReferencingFile:path];
     path = [bundle pathForResource:@"menu" ofType:@"icns"];
     HGSAssert(path, @"Icons for 'menu' are missing from the "
-              @"ApplicationUISource module bundle.");
+              @"ApplicationUISource bundle.");
     menuIcon_ = [[NSImage alloc] initByReferencingFile:path];
     path = [bundle pathForResource:@"menuitem" ofType:@"icns"];
     HGSAssert(path, @"Icons for 'menuitem' are missing from the "
-              @"ApplicationUISource module bundle.");
+              @"ApplicationUISource bundle.");
     menuItemIcon_ = [[NSImage alloc] initByReferencingFile:path];
     path = [bundle pathForResource:@"view" ofType:@"icns"];
     HGSAssert(path, @"Icons for 'view' are missing from the "
-              @"ApplicationUISource module bundle.");
+              @"ApplicationUISource bundle.");
     viewIcon_ = [[NSImage alloc] initByReferencingFile:path];
     if (!(windowIcon_ && menuIcon_ && menuItemIcon_ && viewIcon_)) {
       HGSLogDebug(@"Unable to get icons for %@", [self class]);

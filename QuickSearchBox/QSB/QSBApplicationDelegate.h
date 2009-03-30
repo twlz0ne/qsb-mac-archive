@@ -60,7 +60,7 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
   pid_t otherQSBPid_;  // The pid of any other qsb that is running
   QSBPreferenceWindowController *prefsWindowController_;
   QSBHGSDelegate *hgsDelegate_;
-  NSArray *plugins_;  // All available plug-in modules, enabled or not.
+  NSArray *plugins_;  // All available plugins, enabled or not.
   QSBUserMessenger *userMessenger_;
 }
 
@@ -90,7 +90,7 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
 
 - (NSMenu*)statusItemMenu;
 
-// A list of all modules which have been identified in the various
+// A list of all plugins which have been identified in the various
 // plugin locations.
 - (NSArray *)plugins;
 

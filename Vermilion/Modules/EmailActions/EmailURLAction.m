@@ -66,7 +66,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       icon = [[[NSImage alloc] initByReferencingFile:path] autorelease]; 
       if (!icon) {
         HGSLogDebug(@"Icon for EmailURL is missing from the EmailActions "
-                    @"module bundle.");
+                    @"bundle.");
       }
     }
     defaultObject = icon;

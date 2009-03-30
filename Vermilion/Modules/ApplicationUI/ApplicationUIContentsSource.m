@@ -55,7 +55,7 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
     NSBundle *bundle = HGSGetPluginBundle();
     NSString *path = [bundle pathForResource:@"window" ofType:@"icns"];
     HGSAssert(path, @"Icons for 'window' are missing from the "
-              @"ApplicationUIContentsSource module bundle.");
+              @"ApplicationUIContentsSource bundle.");
     windowIcon_ = [[NSImage alloc] initByReferencingFile:path];
   }
   return self;

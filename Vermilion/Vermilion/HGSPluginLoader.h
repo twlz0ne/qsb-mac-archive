@@ -35,7 +35,7 @@
 //
 // HGSPluginLoader
 //
-// Takes care of loading and registering modules that extend extensions points
+// Takes care of loading and registering plugins that extend extensions points
 // Fields requests for iterators and actions for a given type via 
 // the associated protocols.
 
@@ -59,17 +59,6 @@
 //   </dict>
 // </array>
 //
-// OR
-// 
-// Create a class that conforms to the HGSModule Protocol and set it as
-// the principal class for your bundle.
-//
-// Example:
-// <key>NSPrincipalClass</key>
-// <string>HGSApplicationsModule</string>
-//
-// We prefer the former, and only support the latter for very complex extensions
-// or dynamic extensions.
 
 @protocol HGSDelegate;
 @class HGSCodeSignature;
@@ -103,8 +92,8 @@
 // Registers a plugin class for a given set of extensions.
 - (void)registerClass:(Class)cls forExtensions:(NSArray *)extensions;
 
-// Given a path to a folder where modules may live, identify all modules and
-// their sources and actions, and return them as mutable plugins.
+// Given a path to a folder where plugins may live, identify all plugins and
+// their sources and actions.
 - (void)loadPluginsAtPath:(NSString*)pluginsPath errors:(NSArray **)errors;
 
 - (id<HGSDelegate>)delegate;
