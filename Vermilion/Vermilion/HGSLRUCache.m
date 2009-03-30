@@ -31,7 +31,7 @@
 //
 
 #import "HGSLRUCache.h"
-
+#import "HGSLog.h"
 
 // Although the cache looks like a dictionary to the caller, internally
 // it is actually one (or more for future implementations like LRU-SP)
@@ -119,8 +119,10 @@ static CFDictionaryValueCallBacks gHGSLRUCacheEntryDictionaryValueCallBacks = {
                                      &dictKeyCallBacks_,
                                      &gHGSLRUCacheEntryDictionaryValueCallBacks);
   if (!cache_) {
+    // COV_NF_START
     [self release];
     return nil;
+    // COV_NF_END
   }
 
   return self;
@@ -168,7 +170,8 @@ static CFDictionaryValueCallBacks gHGSLRUCacheEntryDictionaryValueCallBacks = {
 
 - (void)removeValueForKey:(const void *)key {
 
-  HGSLRUCacheEntry *cacheEntry = (HGSLRUCacheEntry *)CFDictionaryGetValue(cache_, key);
+  HGSLRUCacheEntry *cacheEntry 
+    = (HGSLRUCacheEntry *)CFDictionaryGetValue(cache_, key);
   if (!cacheEntry) return;  // No bookkeeping
 
   // Remove from head
@@ -211,16 +214,12 @@ static CFDictionaryValueCallBacks gHGSLRUCacheEntryDictionaryValueCallBacks = {
   // Remove from tail till there is space
   while (currentSize_ > (cacheSize_ - size)) {
     assert(lruTail_);
-    if (!lruTail_) {
-      NSLog(@"HGSLRUCache out of tail while new insertion still doesn't fit!");
-      return NO;
-    }
     // Evict
     if (callBacks_->evict) {
       if (!callBacks_->evict(((HGSLRUCacheEntry *)lruTail_)->key,
                              ((HGSLRUCacheEntry *)lruTail_)->value,
                              evictContext_)) {
-        NSLog(@"HGSLRUCache eviction failure.");
+        HGSLog(@"HGSLRUCache eviction failure.");
         return NO;
       }
     }
@@ -229,7 +228,8 @@ static CFDictionaryValueCallBacks gHGSLRUCacheEntryDictionaryValueCallBacks = {
   }
 
   // Create a new cache entry
-  HGSLRUCacheEntry *newEntry = CFAllocatorAllocate(kCFAllocatorDefault, sizeof(HGSLRUCacheEntry), 0);
+  HGSLRUCacheEntry *newEntry = CFAllocatorAllocate(kCFAllocatorDefault, 
+                                                   sizeof(HGSLRUCacheEntry), 0);
   if (!newEntry) return NO;
   newEntry->retainCount = 1;  // Creation just to be proper about it.
   newEntry->callbacks = callBacks_;
@@ -267,30 +267,20 @@ static CFDictionaryValueCallBacks gHGSLRUCacheEntryDictionaryValueCallBacks = {
 } // count
 
 - (void)getKeys:(const void **)keys values:(const void **)values {
-
-  HGSLRUCacheEntry *current = (HGSLRUCacheEntry *)lruHead_;
-  if (keys && values) {
+  if (keys || values) {
+    HGSLRUCacheEntry *current = (HGSLRUCacheEntry *)lruHead_;
     while (current) {
-      *keys = current->key;
-      keys++;
-      *values = current->value;
-      values++;
+      if (keys) {
+        *keys = current->key;
+        keys++;
+      }
+      if (values) {
+        *values = current->value;
+        values++;
+      }
       current = current->next;
     }
-  } else if (keys) {
-    while (current) {
-      *keys = current->key;
-      keys++;
-      current = current->next;
-    }
-  } else if (values) {
-    while (current) {
-      *values = current->value;
-      values++;
-      current = current->next;
-    }
-  }
-
+  } 
 } // getKeys:values:
 
 @end
