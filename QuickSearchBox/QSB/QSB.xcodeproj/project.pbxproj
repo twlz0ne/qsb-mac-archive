@@ -283,6 +283,7 @@
 		6211C51D0F312E7E003A5122 /* HGSSimpleAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */; };
 		6219B5340E8C1DB3008643F4 /* BaseResultsViews.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */; };
 		621B1E3B0E4CD7B800EEF553 /* PreferencesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 621B1E390E4CD7B800EEF553 /* PreferencesWindow.xib */; };
+		621BCE960F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 621BCE950F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m */; };
 		621D21BB0E438F2000D739F2 /* QSBCategoryTextAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 621D21BA0E438F2000D739F2 /* QSBCategoryTextAttachment.m */; };
 		6223C9AD0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.m */; };
 		6223CBB30E761AEB00F61030 /* QSBResultsViewBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223CBB10E761AEB00F61030 /* QSBResultsViewBaseController.m */; };
@@ -1707,6 +1708,7 @@
 		6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleAccount.m; sourceTree = "<group>"; };
 		6219B5330E8C1DB3008643F4 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/BaseResultsViews.xib; sourceTree = "<group>"; };
 		621B1E3A0E4CD7B800EEF553 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/PreferencesWindow.xib; sourceTree = "<group>"; };
+		621BCE950F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSProtoExtensionFactoringTest.m; sourceTree = "<group>"; };
 		621D21B90E438F2000D739F2 /* QSBCategoryTextAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBCategoryTextAttachment.h; sourceTree = "<group>"; };
 		621D21BA0E438F2000D739F2 /* QSBCategoryTextAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCategoryTextAttachment.m; sourceTree = "<group>"; };
 		6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMoreResultsViewDelegate.m; sourceTree = "<group>"; };
@@ -2925,7 +2927,7 @@
 			isa = PBXGroup;
 			children = (
 				620054570F77F0FD00C806A1 /* OCMock.framework */,
-				620054590F77F0FD00C806A1 /* OCMockTests.octest */,
+				620054590F77F0FD00C806A1 /* Test.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3643,6 +3645,7 @@
 				62A16A930ED485A60074F41B /* HGSProtoExtension.h */,
 				62A16A960ED485C50074F41B /* HGSProtoExtension.m */,
 				8B95CAA20F6B09FE003BDBDD /* HGSProtoExtensionTest.m */,
+				621BCE950F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m */,
 				5A2710B30ECA52F200C72257 /* HGSPython.h */,
 				5A2710B40ECA52F200C72257 /* HGSPython.mm */,
 				8B95CAA10F6B09FE003BDBDD /* HGSPythonTest.m */,
@@ -5071,10 +5074,10 @@
 			remoteRef = 620054560F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		620054590F77F0FD00C806A1 /* OCMockTests.octest */ = {
+		620054590F77F0FD00C806A1 /* Test.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = OCMockTests.octest;
+			path = Test.octest;
 			remoteRef = 620054580F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -6688,6 +6691,7 @@
 				8BB658F40F73035000E20B99 /* GTMAppKit+UnitTesting.m in Sources */,
 				8BB6594B0F73036600E20B99 /* GTMMethodCheck.m in Sources */,
 				6200571F0F7A909E00C806A1 /* KeychainItemTest.m in Sources */,
+				621BCE960F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m in Sources */,
 				8BAAA8770F813E3800DF4F12 /* HGSPluginLoaderTest.m in Sources */,
 				8BAAA8780F813E3800DF4F12 /* HGSExtensionPointTest.m in Sources */,
 				8BAAA8790F813E3800DF4F12 /* HGSCoreExtensionPointsTest.m in Sources */,

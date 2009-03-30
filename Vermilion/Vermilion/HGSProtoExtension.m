@@ -79,48 +79,64 @@
   return affectingKeys;
 }
 
+- (id)init {
+  self = [self initWithConfiguration:nil plugin:nil];
+  return self;
+}
+
 - (id)initWithConfiguration:(NSDictionary *)configuration
                      plugin:(HGSPlugin *)plugin {
   if ((self = [super init])) {
-    configuration_ 
-      = [[NSMutableDictionary alloc] initWithDictionary:configuration];
-    
-    plugin_ = plugin;
-    
-    NSString *displayName = [self displayName];
-    if (!displayName) {
-      displayName = [plugin displayName];
-      [configuration_ setObject:displayName 
-                         forKey:kHGSExtensionUserVisibleNameKey];
-    }
-    
-    NSString *className = [self className];
-    NSString *identifier = [self identifier];
-    NSString *extensionPointKey = [self extensionPointKey];
-    
-    if (!plugin_ || !className || !identifier || !extensionPointKey) {
-      HGSLog(@"Unable to create proto extension %@ (%@)", 
-             [self displayName], [self class]);
-      [self release];
-      return nil;
-    }
-    
-    [configuration_ setObject:[plugin bundle] forKey:kHGSExtensionBundleKey];
-
-    // TODO(mrossetti): Review this policy in light of accounts and net access.
-    // Always enable new extensions.
-    // TODO(mrossetti): Eliminate this once we switch to actually removing
-    // and installing extensions.
-    // Do not use mutator since we do not want the side-effects.
-    enabled_ = YES;
-    NSNumber *enabled = [configuration objectForKey:kHGSExtensionEnabledKey];
-    if (enabled) {
-      enabled_ = [enabled boolValue]; 
-    } else {
-      enabled = [configuration objectForKey:kHGSExtensionIsEnabledByDefault];
-      if (enabled) {
-        enabled_ = [enabled boolValue];
+    if (plugin) {
+      configuration_ 
+        = [[NSMutableDictionary alloc] initWithDictionary:configuration];
+      
+      plugin_ = plugin;
+      
+      NSString *displayName = [self displayName];
+      if (!displayName) {
+        displayName = [plugin displayName];
+        [configuration_ setObject:displayName 
+                           forKey:kHGSExtensionUserVisibleNameKey];
       }
+      
+      NSString *className = [self className];
+      NSString *identifier = [self identifier];
+      NSString *extensionPointKey = [self extensionPointKey];
+      
+      if (!className || !identifier || !extensionPointKey) {
+        HGSLog(@"Unable to create proto extension %@ (%@)", 
+               [self displayName], [self class]);
+        [self release];
+        return nil;
+      }
+      
+      NSBundle *pluginBundle = [plugin bundle];
+      if (pluginBundle) {
+        [configuration_ setObject:pluginBundle forKey:kHGSExtensionBundleKey];
+
+        // TODO(mrossetti): Review this policy in light of accounts and net access.
+        // Always enable new extensions.
+        // Do not use mutator since we do not want the side-effects.
+        enabled_ = YES;
+        NSNumber *enabled = [configuration objectForKey:kHGSExtensionEnabledKey];
+        if (enabled) {
+          enabled_ = [enabled boolValue]; 
+        } else {
+          enabled = [configuration objectForKey:kHGSExtensionIsEnabledByDefault];
+          if (enabled) {
+            enabled_ = [enabled boolValue];
+          }
+        }
+      } else {
+        HGSLogDebug(@"Plugin must have a bundle.");
+        [self release];
+        self = nil;
+      }
+    } else {
+      HGSLogDebug(@"Plugin required.");
+      [self release];
+      self = nil;
     }
   }
   return self;
@@ -409,8 +425,8 @@
 #pragma mark Notification Handling
 
 - (void)willRemoveAccount:(NSNotification *)notification {
-  BOOL alsoRemoveClient = YES;  // Remove ourself unless our installed
-  // extension tells us otherwise.
+  // Remove ourself unless our installed extension tells us otherwise.
+  BOOL alsoRemoveClient = YES;
   if ([self isInstalled]) {
     // Inform our extension that the account is going away.
     HGSExtension *extension = [self extension];
@@ -439,4 +455,4 @@
 
 // Notification sent when extension has been enabled/disabled.
 NSString *const kHGSExtensionDidChangeEnabledNotification
-   =@ "HGSExtensionDidChangeEnabledNotification";
+   = @"HGSExtensionDidChangeEnabledNotification";
