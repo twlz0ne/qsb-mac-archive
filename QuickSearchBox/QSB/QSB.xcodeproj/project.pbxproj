@@ -225,6 +225,8 @@
 		5A8A3B180E71BCBB00A0DB4F /* Pause.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B0F0E71BCBB00A0DB4F /* Pause.icns */; };
 		5A8A3B190E71BCBB00A0DB4F /* Play.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B100E71BCBB00A0DB4F /* Play.icns */; };
 		5A8A3B1A0E71BCBB00A0DB4F /* PreviousSong.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B110E71BCBB00A0DB4F /* PreviousSong.icns */; };
+		5AC3E77A0F7C29A900F171EB /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A2711020ECA567B00C72257 /* Python.framework */; };
+		5AC3E8240F7C2F7300F171EB /* VermilionTest.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5AC3E8230F7C2F6200F171EB /* VermilionTest.py */; };
 		5ACEF2B80F40EAF5007EA38B /* QSBPluginVerifyWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACEF2B70F40EAF5007EA38B /* QSBPluginVerifyWindowController.m */; };
 		5ACEF2CB0F40EBFC007EA38B /* PluginVerifyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ACEF2C90F40EBFC007EA38B /* PluginVerifyWindow.xib */; };
 		5AED32BA0EAFDF1F004C7187 /* HGSOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AED32B80EAFDF1F004C7187 /* HGSOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1535,6 +1537,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
+				5AC3E8240F7C2F7300F171EB /* VermilionTest.py in CopyFiles */,
 				8B0D21600F79660400FD4A12 /* RoundRectAndDropShadow.tiff in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1658,6 +1661,7 @@
 		5A8A3B0F0E71BCBB00A0DB4F /* Pause.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Pause.icns; sourceTree = "<group>"; };
 		5A8A3B100E71BCBB00A0DB4F /* Play.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Play.icns; sourceTree = "<group>"; };
 		5A8A3B110E71BCBB00A0DB4F /* PreviousSong.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PreviousSong.icns; sourceTree = "<group>"; };
+		5AC3E8230F7C2F6200F171EB /* VermilionTest.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = VermilionTest.py; sourceTree = "<group>"; };
 		5ACEF2B60F40EAF5007EA38B /* QSBPluginVerifyWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPluginVerifyWindowController.h; sourceTree = "<group>"; };
 		5ACEF2B70F40EAF5007EA38B /* QSBPluginVerifyWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPluginVerifyWindowController.m; sourceTree = "<group>"; };
 		5ACEF2CA0F40EBFC007EA38B /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/PluginVerifyWindow.xib; sourceTree = "<group>"; };
@@ -2634,6 +2638,7 @@
 				8BD990060DF84ECC0068565A /* Carbon.framework in Frameworks */,
 				8B55DB030E78832300D39CB0 /* SenTestingKit.framework in Frameworks */,
 				8BC673940F58A48E003B5C6A /* GData.framework in Frameworks */,
+				5AC3E77A0F7C29A900F171EB /* Python.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3152,6 +3157,7 @@
 		8B0D215D0F7965FE00FD4A12 /* TestData */ = {
 			isa = PBXGroup;
 			children = (
+				5AC3E8230F7C2F6200F171EB /* VermilionTest.py */,
 				8B0D215E0F7965FE00FD4A12 /* RoundRectAndDropShadow.tiff */,
 			);
 			path = TestData;
