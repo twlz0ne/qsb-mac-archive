@@ -87,16 +87,16 @@ class VermilionTest(object):
   def IsValidSourceForQuery(self, query):
     return True
 
-class SetScreensaverAction(object):
+class VermilionAction(object):
 
   def __init__(self):
     pass
     
-  def DoesActionApplyTo(self, result):
+  def AppliesToResult(self, result):
     return True
 
-  def PerformAction(self, result, pivot_object=None):
-    pass
+  def Perform(self, result, pivot_object=None):
+    return True
 
 
 def main(argv=None):

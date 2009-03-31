@@ -132,7 +132,9 @@ static const char *const kHGSPythonPerform = "Perform";
   [super dealloc];
 }
 
-- (NSDictionary*)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  BOOL result = NO;
+  
   HGSResultArray *directs 
     = [info objectForKey:kHGSActionDirectObjectsKey];
   HGSResultArray *indirects 
@@ -151,6 +153,7 @@ static const char *const kHGSPythonPerform = "Perform";
                                    pyDirects,
                                    nil);
       if (pythonResult) {
+        result = (pythonResult == Py_True);
         Py_DECREF(pythonResult);
       }
       Py_DECREF(pyDirects);
@@ -160,7 +163,7 @@ static const char *const kHGSPythonPerform = "Perform";
     }
   }
   
-  return [NSDictionary dictionary];
+  return result;
 }
 
 - (NSSet*)directObjectTypes {

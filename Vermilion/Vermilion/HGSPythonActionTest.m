@@ -33,9 +33,51 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSPythonAction.h"
+#import "HGSResult.h"
 
 @interface HGSPythonActionTest : GTMTestCase 
 @end
 
 @implementation HGSPythonActionTest
+
+- (void)testAction {
+  HGSPython *sharedPython = [HGSPython sharedPython];
+  STAssertNotNil(sharedPython, nil);
+  
+  NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+  [sharedPython appendPythonPath:[bundle resourcePath]];
+  
+  NSDictionary *config = [NSDictionary dictionaryWithObjectsAndKeys:
+                          @"VermilionTest", kPythonModuleNameKey,
+                          @"VermilionAction", kPythonClassNameKey,
+                          @"python.test", kHGSExtensionIdentifierKey,
+                          bundle, kHGSExtensionBundleKey,
+                          nil];
+  STAssertNotNil(config, nil);
+
+  HGSPythonAction *action
+    = [[[HGSPythonAction alloc] initWithConfiguration:config] autorelease];
+  STAssertNotNil(action, nil);
+  
+  NSURL *url = [NSURL URLWithString:@"http://www.google.com/"];
+  HGSResult *result = [HGSResult resultWithURL:url
+                                          name:@"Google"
+                                          type:kHGSTypeWebBookmark
+                                        source:nil
+                                    attributes:nil];
+  STAssertNotNil(result, nil);
+  HGSResultArray *results = [HGSResultArray arrayWithResult:result];
+  STAssertNotNil(results, nil);
+  
+  STAssertTrue([action appliesToResults:results], nil);
+  
+  NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+                        results, kHGSActionDirectObjectsKey, nil];
+  STAssertNotNil(info, nil);
+  
+  STAssertTrue([action performWithInfo:info], nil);
+  
+  STAssertNotNil([action directObjectTypes], nil);
+}
+
 @end
