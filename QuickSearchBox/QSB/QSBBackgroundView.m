@@ -36,7 +36,6 @@
 #import "GTMNSBezierPath+Shading.h"
 #import "GTMGeometryUtils.h"
 #import "GTMMethodCheck.h"
-#import "QSBUISettings.h"
 #import "NSColor+Lighting.h"
 
 @interface QSBBackgroundView ()

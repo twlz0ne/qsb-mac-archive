@@ -36,7 +36,6 @@
 #import <unistd.h>
 #import <Vermilion/Vermilion.h>
 
-#import "QSBUISettings.h"
 #import "QSBKeyMap.h"
 #import "QSBPreferences.h"
 #import "QSBPreferenceWindowController.h"
@@ -147,6 +146,8 @@ static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 // Present a user message using Growl.
 - (void)presentUserMessageViaGrowl:(NSDictionary *)messageDict;
 
+// Return the time required to count as a double click.
+- (NSTimeInterval)doubleClickTime;
 @end
 
 
@@ -197,7 +198,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       ProcessSerialNumber psn = { 0, kCurrentProcess };
       TransformProcessType(&psn, kProcessTransformToForegroundApplication);
     }
-    hotModifierDeltaTime_ = [QSBUISettings doubleClickTime];
     searchWindowController_ = [[QSBSearchWindowController alloc] init];
     
     NSArray *supportedTypes
@@ -303,7 +303,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSTimeInterval startDate = [NSDate timeIntervalSinceReferenceDate];
   BOOL isGood = NO;
   while(([NSDate timeIntervalSinceReferenceDate] - startDate) 
-        < hotModifierDeltaTime_) {
+        < [self doubleClickTime]) {
     QSBKeyMap *currentKeyMap = [QSBKeyMap currentKeyMap];
     if ([currentKeyMap containsAnyKeyIn:invertedHotMap]) {
       return;
@@ -319,7 +319,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   isGood = NO;
   startDate = [NSDate timeIntervalSinceReferenceDate];
   while(([NSDate timeIntervalSinceReferenceDate] - startDate) 
-        < hotModifierDeltaTime_) {
+        < [self doubleClickTime]) {
     QSBKeyMap *currentKeyMap = [QSBKeyMap currentKeyMap];
     if ([currentKeyMap containsAnyKeyIn:invertedHotMap]) {
       return;
@@ -334,7 +334,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if (!isGood) return;
   startDate = [NSDate timeIntervalSinceReferenceDate];
   while(([NSDate timeIntervalSinceReferenceDate] - startDate) 
-        < hotModifierDeltaTime_) {
+        < [self doubleClickTime]) {
     QSBKeyMap *currentKeyMap = [QSBKeyMap currentKeyMap];
     if ([currentKeyMap containsAnyKeyIn:invertedHotMap]) {
       return;
@@ -357,10 +357,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if (!hotModifiers_) {
     return;
   }
-  NSTimeInterval lastTime = lastHotModifiersEventCheckedTime_;
+  NSTimeInterval timeWindowToRespond
+    = lastHotModifiersEventCheckedTime_ + [self doubleClickTime];
   lastHotModifiersEventCheckedTime_ = [event timestamp];
   if (hotModifiersState_
-      && lastHotModifiersEventCheckedTime_ > lastTime + hotModifierDeltaTime_) {
+      && lastHotModifiersEventCheckedTime_ > timeWindowToRespond) {
     // Timed out. Reset.
     hotModifiersState_ = 0;
     return;
@@ -573,6 +574,19 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
 }
 
+// Returns the amount of time between two clicks to be considered a double click
+- (NSTimeInterval)doubleClickTime {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSTimeInterval doubleClickThreshold 
+    = [defaults doubleForKey:@"com.apple.mouse.doubleClickThreshold"];
+    
+  // if we couldn't find the value in the user defaults, take a 
+  // conservative estimate
+  if (doubleClickThreshold <= 0.0) {
+    doubleClickThreshold = 1.0;
+  }
+  return doubleClickThreshold;
+}
 
 
 #pragma mark Plugins & Extensions Management

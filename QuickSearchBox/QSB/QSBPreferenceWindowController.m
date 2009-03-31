@@ -44,7 +44,6 @@
 #import "QSBPreferences.h"
 #import "QSBSearchWindowController.h"
 #import "QSBSetUpAccountWindowController.h"
-#import "QSBUISettings.h"
 
 static void OpenAtLoginItemsChanged(LSSharedFileListRef inList, void *context);
 

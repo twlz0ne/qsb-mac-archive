@@ -31,7 +31,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "QSBUISettings.h"
 #import "QSBViewTableViewDelegateProtocol.h"
 
 

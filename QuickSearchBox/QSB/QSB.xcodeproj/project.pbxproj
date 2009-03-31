@@ -528,7 +528,6 @@
 		8B5EC6C90CEE61BF00AD3BBD /* QSBApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5EC64F0CEE61BE00AD3BBD /* QSBApplication.m */; };
 		8B5EC6CA0CEE61BF00AD3BBD /* QSBApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5EC6510CEE61BE00AD3BBD /* QSBApplicationDelegate.m */; };
 		8B5EC6CE0CEE61BF00AD3BBD /* QSBTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5EC65A0CEE61BE00AD3BBD /* QSBTextField.m */; };
-		8B5EC6CF0CEE61BF00AD3BBD /* QSBUISettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5EC65C0CEE61BF00AD3BBD /* QSBUISettings.m */; };
 		8B5EC6D70CEE61BF00AD3BBD /* QSBQueryBoundingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5EC6690CEE61BF00AD3BBD /* QSBQueryBoundingView.m */; };
 		8B5EC6DB0CEE61BF00AD3BBD /* QSBResultTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5EC6710CEE61BF00AD3BBD /* QSBResultTableView.m */; };
 		8B5EC6E30CEE61BF00AD3BBD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5EC6800CEE61BF00AD3BBD /* main.m */; };
@@ -1984,8 +1983,6 @@
 		8B5EC6510CEE61BE00AD3BBD /* QSBApplicationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBApplicationDelegate.m; sourceTree = "<group>"; };
 		8B5EC6590CEE61BE00AD3BBD /* QSBTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBTextField.h; sourceTree = "<group>"; };
 		8B5EC65A0CEE61BE00AD3BBD /* QSBTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBTextField.m; sourceTree = "<group>"; };
-		8B5EC65B0CEE61BF00AD3BBD /* QSBUISettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBUISettings.h; sourceTree = "<group>"; };
-		8B5EC65C0CEE61BF00AD3BBD /* QSBUISettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBUISettings.m; sourceTree = "<group>"; };
 		8B5EC6660CEE61BF00AD3BBD /* QSBSearchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSearchController.h; sourceTree = "<group>"; };
 		8B5EC6670CEE61BF00AD3BBD /* QSBSearchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSearchController.m; sourceTree = "<group>"; };
 		8B5EC6680CEE61BF00AD3BBD /* QSBQueryBoundingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBQueryBoundingView.h; sourceTree = "<group>"; };
@@ -2927,7 +2924,7 @@
 			isa = PBXGroup;
 			children = (
 				620054570F77F0FD00C806A1 /* OCMock.framework */,
-				620054590F77F0FD00C806A1 /* Test.octest */,
+				620054590F77F0FD00C806A1 /* OCMockTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3364,8 +3361,6 @@
 				623AFDBC0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.m */,
 				624DD9F70E9EAA150029EF72 /* QSBTopResultsViewControllers.h */,
 				624DD9F80E9EAA150029EF72 /* QSBTopResultsViewControllers.m */,
-				8B5EC65B0CEE61BF00AD3BBD /* QSBUISettings.h */,
-				8B5EC65C0CEE61BF00AD3BBD /* QSBUISettings.m */,
 				626585210F43BD4C008A94B2 /* QSBUserMessenger.h */,
 				626585220F43BD4C008A94B2 /* QSBUserMessenger.m */,
 				62521AB20EFAC30000A6E647 /* QSBViewTableViewCell.h */,
@@ -5074,10 +5069,10 @@
 			remoteRef = 620054560F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		620054590F77F0FD00C806A1 /* Test.octest */ = {
+		620054590F77F0FD00C806A1 /* OCMockTests.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = Test.octest;
+			path = OCMockTests.octest;
 			remoteRef = 620054580F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -6441,7 +6436,6 @@
 				8B5EC6C90CEE61BF00AD3BBD /* QSBApplication.m in Sources */,
 				8B5EC6CA0CEE61BF00AD3BBD /* QSBApplicationDelegate.m in Sources */,
 				8B5EC6CE0CEE61BF00AD3BBD /* QSBTextField.m in Sources */,
-				8B5EC6CF0CEE61BF00AD3BBD /* QSBUISettings.m in Sources */,
 				8B5EC6D70CEE61BF00AD3BBD /* QSBQueryBoundingView.m in Sources */,
 				8B5EC6DB0CEE61BF00AD3BBD /* QSBResultTableView.m in Sources */,
 				8B5EC6E30CEE61BF00AD3BBD /* main.m in Sources */,

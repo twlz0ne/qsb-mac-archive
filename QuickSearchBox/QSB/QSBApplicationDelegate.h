@@ -52,7 +52,6 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
   
   QSBSearchWindowController *searchWindowController_;
   EventHotKeyRef hotKey_;  // the hot key we're looking for. 
-  NSTimeInterval hotModifierDeltaTime_;
   NSUInteger hotModifiers_;  // if we are getting double taps, the mods to look for.
   NSUInteger hotModifiersState_;
   NSTimeInterval lastHotModifiersEventCheckedTime_;
