@@ -212,11 +212,12 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   }
   NSString *name = [attributes objectForKey:kHGSObjectAttributeNameKey];
   NSString *type = [attributes objectForKey:kHGSObjectAttributeTypeKey];
-  return [self initWithURL:url
+  self = [self initWithURL:url
                       name:name 
                       type:type 
                     source:source
                 attributes:attributes];
+  return self;
 }
 
 - (void)dealloc {
@@ -359,8 +360,9 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
 }
 
 - (NSString*)description {
-  return [NSString stringWithFormat:@"[%@ - %@ (%@ from %@)]", 
-          [self displayName], [self type], [self class], source_];
+  return [NSString stringWithFormat:@"<%@:%p> [%@ - %@ (%@ from %@)]", 
+          [self class], self, [self displayName], [self type], [self class],
+          source_];
 }
 
 // merge the attributes of |result| into this one. Single values that overlap

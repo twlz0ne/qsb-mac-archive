@@ -132,6 +132,11 @@ static NSURL* IconURLForResult(HGSResult *result) {
   [super dealloc];
 }
 
+- (NSUInteger)hash {
+  NSUInteger hash = [result_ hash];
+  return hash;
+}
+
 - (BOOL)isEqual:(id)otherObj {
   BOOL isEqual = NO;
   // We call them equal if they reference the same two HGSObjects
@@ -141,7 +146,8 @@ static NSURL* IconURLForResult(HGSResult *result) {
     // we add an accessor for the result from the other object, then we would
     // have to push it to the callers auto release pool, which could be bad
     // since we could end up here as a result of the result being dealloced.
-    isEqual = (result_ == ((HGSIconOperation*)otherObj)->result_) ? YES : NO;
+    HGSResult *otherResult = ((HGSIconOperation*)otherObj)->result_;
+    isEqual = (result_ == otherResult) ? YES : NO;
   }
   return isEqual;
 }
@@ -363,8 +369,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 }
 
 - (void)cancelOperationsForResult:(HGSResult*)result {
-  HGSIconOperation *operation = 
-    [HGSIconOperation iconOperationForResult:result];
+  HGSIconOperation *operation
+    = [HGSIconOperation iconOperationForResult:result];
   @synchronized(self) {
     HGSIconOperation *original = [iconOperations_ member:operation];
     if (original) {
@@ -381,8 +387,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 }
 
 - (void)beginLazyLoadForResult:(HGSResult*)result {
-  HGSIconOperation *operation = 
-    [HGSIconOperation iconOperationForResult:result];
+  HGSIconOperation *operation
+    = [HGSIconOperation iconOperationForResult:result];
   @synchronized(self) {
     // Don't add if we're already doing a load for this object
     if (![iconOperations_ member:operation]) {
