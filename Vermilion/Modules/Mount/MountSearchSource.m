@@ -139,10 +139,6 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
                                     HGSLocalizedString(@"mount", @"mount"),
                                     HGSLocalizedString(@"shares", @"shares"),
                                     nil];
-      NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  [NSImage imageNamed:NSImageNameBonjour],
-                                  kHGSObjectAttributeIconKey,
-                                  nil];
       NSString *url = nil, *type = nil, *scheme = nil;
       
       for (NSString *key in configuration_) {
@@ -154,6 +150,11 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
           [otherTerms addObject:scheme];
         } 
       }
+      
+      NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  url,
+                                  kHGSObjectAttributeSourceURLKey,
+                                  nil];
       
       if (url && type) {
         HGSResult *hgsResult 
@@ -178,4 +179,20 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
               [errorDict objectForKey:NSNetServicesErrorCode]);
 }
 
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
+  id value = nil;
+  if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
+    NSURL *appURL = nil;
+    if (noErr == LSGetApplicationForURL((CFURLRef)[result url],
+                                        kLSRolesViewer,
+                                        NULL,
+                                        (CFURLRef *)&appURL)) {
+      // TODO(alcor): badge this with the bonjour icon
+      // NSImage *bonjour = [NSImage imageNamed:NSImageNameBonjour];
+      value = [[NSWorkspace sharedWorkspace] iconForFile:[appURL path]];
+    }
+  
+  }
+  return value;
+}
 @end

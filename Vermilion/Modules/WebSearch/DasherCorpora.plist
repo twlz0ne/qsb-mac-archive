@@ -10,7 +10,7 @@
 		<key>Id</key>
 		<string>gmail</string>
 		<key>kHGSObjectAttributeWebSearchTemplate</key>
-		<string>http://mail.google.com/a/%@/#search/{searchterms}</string>
+		<string>https://mail.google.com/a/%@/?view=tl&amp;q={searchterms}&amp;search=query&amp;fs=1</string>
 		<key>kHGSCorporaSourceAttributeURIString</key>
 		<string>http://mail.google.com/a/%@/</string>
 		<key>AcceptsSource</key>

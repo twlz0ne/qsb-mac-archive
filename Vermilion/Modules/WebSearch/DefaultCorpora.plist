@@ -105,6 +105,8 @@
 		<string>gmail</string>
 		<key>kHGSObjectAttributeName</key>
 		<string>Gmail</string>
+		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<string>http://mail.google.com/mail/?view=tl&amp;q={searchterms}&amp;search=query&amp;fs=1</string>
 		<key>kHGSCorporaSourceAttributeURIString</key>
 		<string>http://mail.google.com</string>
 		<key>kHGSCorporaSourceAttributeMobileURIString</key>

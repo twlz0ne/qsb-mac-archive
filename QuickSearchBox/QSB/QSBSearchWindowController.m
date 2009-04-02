@@ -65,6 +65,8 @@ static const NSTimeInterval kQSBReshowResultsDelay = 4.0;
 static const CGFloat kTextFieldPadding = 2.0;
 static const CGFloat kResultsAnimationDistance = 12.0;
 
+static NSString * const kQSBSearchWindowDimBackground
+  = @"QSBSearchWindowDimBackground";
 static NSString * const kQSBSearchWindowFrameTopPrefKey
   = @"QSBSearchWindow Top QSBSearchResultsWindow";
 static NSString * const kQSBSearchWindowFrameLeftPrefKey
@@ -899,21 +901,20 @@ doCommandBySelector:(SEL)commandSelector {
                     object:searchWindow
                   userInfo:visibilityChangedUserInfo_];
   
-  // TODO(alcor): reenable this with a user default or optimize enough for
-  // general use
-#if 0
-  NSWindow *shieldWindow = [self shieldWindow];
-  [shieldWindow setFrame:[[NSScreen mainScreen] frame] display:NO];
-  if (![shieldWindow isVisible]) {
-    [shieldWindow setAlphaValue:0.0];
-    [shieldWindow makeKeyAndOrderFront:sender];
-  } 
-  
-  [NSAnimationContext beginGrouping];
-  [[NSAnimationContext currentContext] setDuration:0.5];
-  [[shieldWindow animator] setAlphaValue:0.1];
-  [NSAnimationContext endGrouping];
-#endif
+  if ([[NSUserDefaults standardUserDefaults]
+       boolForKey:kQSBSearchWindowDimBackground]) {
+    NSWindow *shieldWindow = [self shieldWindow];
+    [shieldWindow setFrame:[[NSScreen mainScreen] frame] display:NO];
+    if (![shieldWindow isVisible]) {
+      [shieldWindow setAlphaValue:0.0];
+      [shieldWindow makeKeyAndOrderFront:nil];
+    } 
+    
+    [NSAnimationContext beginGrouping];
+    [[NSAnimationContext currentContext] setDuration:0.5];
+    [[shieldWindow animator] setAlphaValue:0.1];
+    [NSAnimationContext endGrouping];
+  }
   
   [searchWindow makeKeyAndOrderFront:self];
   [searchWindow setIgnoresMouseEvents:NO];
@@ -946,12 +947,13 @@ doCommandBySelector:(SEL)commandSelector {
   [searchWindow setIgnoresMouseEvents:YES];
   [self hideResultsWindow];
   
-#if 0
-  [NSAnimationContext beginGrouping];
-  [[NSAnimationContext currentContext] setDuration:0.5];
-  [[[self shieldWindow] animator] setAlphaValue:0.0];
-  [NSAnimationContext endGrouping];
-#endif
+  if ([[NSUserDefaults standardUserDefaults]
+      boolForKey:kQSBSearchWindowDimBackground]) {
+    [NSAnimationContext beginGrouping];
+    [[NSAnimationContext currentContext] setDuration:0.5];
+    [[[self shieldWindow] animator] setAlphaValue:0.0];
+    [NSAnimationContext endGrouping];
+  }
   
   [NSAnimationContext beginGrouping];
   [[NSAnimationContext currentContext] setDuration:kQSBHideDuration];

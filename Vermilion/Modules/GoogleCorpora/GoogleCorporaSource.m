@@ -80,7 +80,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
 - (NSArray *)dasherDomains {
   HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
-  NSArray *googleAccounts = [accountsPoint accountsForType:@"GoogleApps"];
+  NSArray *googleAccounts = [accountsPoint accountsForType:@"Google"];
   NSMutableArray *domains = [NSMutableArray array];
   for (HGSAccount *account in googleAccounts) {
     NSString *name = [account userName];
