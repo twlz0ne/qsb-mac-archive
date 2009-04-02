@@ -475,11 +475,10 @@ static const int kSignatureTypeResource = 2;
   
   int sigType = [[sigDict objectForKey:kDetachedSignatureTypeKey] intValue];
   if (sigType == kSignatureTypeStandard) {
-    OSStatus err = fnfErr;
     CFURLRef url = (CFURLRef)[NSURL fileURLWithPath:[bundle_ bundlePath]];
     if (url) {
       SecStaticCodeRef codeRef;
-      if ((err = SecStaticCodeCreateWithPath(url, 0, &codeRef)) == noErr) {
+      if (SecStaticCodeCreateWithPath(url, 0, &codeRef) == noErr) {
         if (SecCodeSetDetachedSignature(codeRef,
                                         (CFDataRef)sigData, 0) == noErr) {
           if (SecStaticCodeCheckValidityWithErrors(codeRef, 0, NULL,

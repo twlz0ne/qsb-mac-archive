@@ -234,7 +234,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
 - (id)copyOfClass:(Class)cls mergingAttributes:(NSDictionary *)attributes {
   if (attributes) {
-    NSMutableDictionary *newAttributes = [attributes mutableCopy];
+    NSMutableDictionary *newAttributes 
+      = [NSMutableArray arrayWithArray:attributes];
     [newAttributes addEntriesFromDictionary:[self attributes]];
     attributes = newAttributes;
   } else {
