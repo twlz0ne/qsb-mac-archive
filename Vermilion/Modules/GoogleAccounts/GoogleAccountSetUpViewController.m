@@ -135,8 +135,9 @@
 - (void)setAccount:(HGSSimpleAccount *)account {
   // Remember the old captchaToken.
   GoogleAccount *oldAccount = (GoogleAccount *)[self account];
+  NSString *oldToken = [oldAccount captchaToken];
   NSString *captchaToken
-    = (oldAccount) ? [NSString stringWithString:[oldAccount captchaToken]] : nil;
+    = (oldToken) ? [NSString stringWithString:oldToken] : nil;
   [super setAccount:account];
   // If we're showing a captcha then we need to pass along the captcha text
   // to the account for authentication.
