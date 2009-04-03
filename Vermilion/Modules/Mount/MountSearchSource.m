@@ -77,8 +77,12 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
 - (void)updateResultsIndex {
   [self clearResultIndex];
   for (NSNetService *service in services_) {
-    [service setDelegate:self];
-    [service resolveWithTimeout:kServiceResolutionTimeout];
+    if (![service delegate]) {
+      // If the delegate has not been set then it's new and we haven't started
+      // resolving it. So set the delegate, and start resolving.
+      [service setDelegate:self];
+      [service resolveWithTimeout:kServiceResolutionTimeout];
+    }
   }
 }
 
@@ -139,34 +143,35 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
                                     HGSLocalizedString(@"mount", @"mount"),
                                     HGSLocalizedString(@"shares", @"shares"),
                                     nil];
-      NSString *url = nil, *type = nil, *scheme = nil;
+      NSString *urlString = nil, *type = nil, *scheme = nil;
       
       for (NSString *key in configuration_) {
         if ([[service type] hasPrefix:key]) {
           NSDictionary *dict = [configuration_ objectForKey:key];
           scheme = [dict objectForKey:@"scheme"];
-          url = [NSString stringWithFormat:@"%@://%@/", scheme, ipString];
+          urlString = [NSString stringWithFormat:@"%@://%@/", scheme, ipString];
           type = [dict objectForKey:@"type"];
           [otherTerms addObject:scheme];
+          break;
         } 
       }
       
-      NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  url,
-                                  kHGSObjectAttributeSourceURLKey,
-                                  nil];
-      
-      if (url && type) {
-        HGSResult *hgsResult 
-        = [HGSResult resultWithURL:[NSURL URLWithString:url]
-                              name:[NSString stringWithFormat:@"%@ (%@)", 
-                                     [service name],
-                                     scheme]
-                              type:type
-                            source:self
-                        attributes:attributes];
-        [self indexResult:hgsResult
-               nameString:[service name]
+      if (urlString && type) {
+        NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    urlString,
+                                    kHGSObjectAttributeSourceURLKey,
+                                    nil];
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSString *name = [service name];
+        NSString *displayName = [NSString stringWithFormat:@"%@ (%@)", 
+                                 name, scheme];
+        HGSResult *hgsResult = [HGSResult resultWithURL:url
+                                                   name:displayName
+                                                   type:type
+                                                 source:self
+                                             attributes:attributes];
+        [self indexResult:hgsResult 
+               nameString:name 
         otherStringsArray:otherTerms];
       }
     }
@@ -175,7 +180,7 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
 
 - (void)netService:(NSNetService *)sender
      didNotResolve:(NSDictionary *)errorDict {
-  HGSLogDebug(@"Mount did not resolve: %@",
+  HGSLogDebug(@"Mount did not resolve: %@ (%@)", sender,
               [errorDict objectForKey:NSNetServicesErrorCode]);
 }
 
