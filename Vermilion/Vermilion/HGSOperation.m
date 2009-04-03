@@ -54,6 +54,7 @@ static const CFTimeInterval kNetworkOperationTimeout = 60; // seconds
 @interface HGSInvocationOperation()
 - (id)initWithTarget:(id)target selector:(SEL)sel object:(id)arg;
 - (id)initWithInvocation:(NSInvocation *)inv;
+- (id)init;
 - (InvocationType)invocationType;
 - (void)setInvocationType:(InvocationType)type;
 - (id)target;
@@ -208,7 +209,9 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
           forFetcher:(GDataHTTPFetcher *)fetcher
    didFinishSelector:(SEL)didFinishSel
      didFailSelector:(SEL)didFailSel {
-  self = [super init];
+  self = [super initWithTarget:self
+                      selector:@selector(main)
+                        object:nil];
   if (self) {
     fetcherTarget_ = [target retain];
     fetcher_ = [fetcher retain];
@@ -373,6 +376,13 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
     [self setInvocationType:NORMAL_INVOCATION];
   }
   return self;
+}
+
+- (id)init {
+  HGSAssert(NO, @"Do not use init; use initWithTarget: or "
+                @"initWithInvocation: instead.");
+  [self release];
+  return nil;
 }
 
 - (InvocationType)invocationType {
