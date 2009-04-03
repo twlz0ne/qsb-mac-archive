@@ -365,6 +365,7 @@
 		62EA8BC50F2E7DE200C92E0B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		62EA8BC60F2E7DE200C92E0B /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		62EA8BC80F2E7DE200C92E0B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
+		62ECB7AA0F86A17100C7B435 /* CategorySingulars.strings in Resources */ = {isa = PBXBuildFile; fileRef = 62ECB7A90F86A17100C7B435 /* CategorySingulars.strings */; };
 		62ED068B0EC261F0001A838E /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62ED06910EC265AF001A838E /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		62ED5EE50E8AADB200C9C2C3 /* QSBSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62ED5EE40E8AADB200C9C2C3 /* QSBSearchViewController.m */; };
@@ -1793,6 +1794,7 @@
 		62E72ABE0F4F6EB900A68815 /* growl-bsd-license.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "growl-bsd-license.html"; sourceTree = "<group>"; };
 		62EA8BCD0F2E7DE200C92E0B /* GoogleAccounts.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleAccounts.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		62EA8C1A0F2E7E5E00C92E0B /* GoogleAccounts-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleAccounts-Info.plist"; sourceTree = "<group>"; };
+		62ECB79C0F86A14700C7B435 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/CategorySingulars.strings; sourceTree = "<group>"; };
 		62ED5EE30E8AADA800C9C2C3 /* QSBSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSearchViewController.h; sourceTree = "<group>"; };
 		62ED5EE40E8AADB200C9C2C3 /* QSBSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSearchViewController.m; sourceTree = "<group>"; };
 		62F150030DD4EE3D00BCAE1A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ResultsWindow.xib; sourceTree = "<group>"; };
@@ -3383,6 +3385,7 @@
 			children = (
 				6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */,
 				7F95C81E0E1D72DC00CAB15D /* BlackLargeGoogle.pdf */,
+				62ECB7A90F86A17100C7B435 /* CategorySingulars.strings */,
 				7FF711EA0EF24030000C2AE7 /* ChildArrow.png */,
 				8B5EC68B0CEE61BF00AD3BBD /* ColorGoogle.ai */,
 				8B5EC68C0CEE61BF00AD3BBD /* ColorGoogle.pdf */,
@@ -5417,6 +5420,7 @@
 				62FDEA9D0F536A4A00A66631 /* Growl Registration Ticket.growlRegDict in Resources */,
 				7FE2542C0F5CE3E4004FE5A6 /* blue-nav.icns in Resources */,
 				8BC685570F5ED38C003B5C6A /* SetUpAccount.xib in Resources */,
+				62ECB7AA0F86A17100C7B435 /* CategorySingulars.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7317,6 +7321,14 @@
 				62A4AEFB0F30E22E0007CD99 /* English */,
 			);
 			name = EditTwitterAccount.xib;
+			sourceTree = "<group>";
+		};
+		62ECB7A90F86A17100C7B435 /* CategorySingulars.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				62ECB79C0F86A14700C7B435 /* English */,
+			);
+			name = CategorySingulars.strings;
 			sourceTree = "<group>";
 		};
 		62F150020DD4EE3C00BCAE1A /* ResultsWindow.xib */ = {

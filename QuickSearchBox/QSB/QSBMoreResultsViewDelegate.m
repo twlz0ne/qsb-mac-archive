@@ -382,6 +382,11 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   while ((catString = [catEnum nextObject])) {
     NSUInteger catIndex = [[catIndexEnum nextObject] unsignedIntValue];
     NSUInteger catCount = [[catCountEnum nextObject] unsignedIntValue];
+    if (catCount == 1) {
+      // Singularize the category string.
+      catString
+        = NSLocalizedStringFromTable(catString, @"CategorySingulars", nil );
+    }
     QSBCategoryTextAttachment *catAttachment
       = [QSBCategoryTextAttachment categoryTextAttachmentWithString:catString
                                                              index:catIndex];
