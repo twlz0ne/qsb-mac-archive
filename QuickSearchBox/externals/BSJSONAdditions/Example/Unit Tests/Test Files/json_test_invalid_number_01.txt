@@ -1,3 +1,0 @@
-"test"
-
--- Not an object or array at the top level.

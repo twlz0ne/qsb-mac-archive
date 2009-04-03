@@ -1,6 +1,0 @@
-//
-[ { "pi": 3.14, "e": 2.7, "sqrt2": 1.414 }, 1, 2, 3, 4, "\\quotetest\"" ]
-
--- A top-level array instead of a dictionary.
--- Contains a dictionary, numbers, and a string.
--- Has extra characters before the array, which need to be bypassed.
