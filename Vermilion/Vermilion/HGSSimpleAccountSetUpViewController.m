@@ -43,6 +43,7 @@
 @synthesize account = account_;
 @synthesize accountName = accountName_;
 @synthesize accountPassword = accountPassword_;
+@synthesize accountTypeClass = accountTypeClass_;
 
 - (id)init {
   self = [self initWithNibName:nil

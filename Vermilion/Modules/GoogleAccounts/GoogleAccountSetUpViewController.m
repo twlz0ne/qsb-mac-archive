@@ -75,6 +75,16 @@
   [GoogleAccount openGoogleHomePage];
 }
 
+- (IBAction)acceptSetupAccountSheet:(id)sender {
+  BOOL isAppsAccount = [self isGoogleAppsAccount];
+  Class accountClass = (isAppsAccount)
+                       ? [GoogleAppsAccount class]
+                       : [GoogleAccount class];
+  [self setAccountTypeClass:accountClass];
+  [super acceptSetupAccountSheet:sender];
+}
+
+
 - (BOOL)canGiveUserAnotherTryOffWindow:(NSWindow *)window {
   BOOL canGiveUserAnotherTry = NO;
   // If the last authentication attempt resulted in a captcha request then

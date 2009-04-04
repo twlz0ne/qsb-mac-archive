@@ -51,6 +51,7 @@
 @property (nonatomic, retain) HGSSimpleAccount *account;
 @property (nonatomic, copy) NSString *accountName;
 @property (nonatomic, copy) NSString *accountPassword;
+@property (nonatomic, assign) Class accountTypeClass;
 
 // Designated initializer.
 - (id)initWithNibName:(NSString *)nibNameOrNil
