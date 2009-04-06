@@ -103,7 +103,12 @@
                                     &infoRec);
     }
     if (status) {
-      HGSLogDebug(@"Unable to LSCopyItemInfoForURL (%d) for %@", paramErr, subURL);
+      // For some odd reason /dev always returns nsvErr.
+      // Radar 6759537 - Getting URL info on /dev return -35 nsvErr
+      if (![subpath isEqualToString:@"/dev"]) {
+        HGSLogDebug(@"Unable to LSCopyItemInfoForURL (%d) for %@", 
+                    status, subURL);
+      }
       continue;
     }
     if (infoRec.flags & kLSItemInfoIsInvisible) continue;
