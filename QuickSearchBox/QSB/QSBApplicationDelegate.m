@@ -623,8 +623,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       [allErrors addObjectsFromArray:errors];
     }
   }
-  if ([allErrors count]) {
-    HGSLogDebug(@"%@", allErrors);
+  for (NSDictionary *error in allErrors) {
+    NSString *type = [error objectForKey:kHGSPluginLoaderPluginFailureKey];
+    if (![type isEqualToString:kHGSPluginLoaderPluginFailedUnknownPluginType]) {
+      HGSLogDebug(@"Unable to load %@ (%@)", 
+                  [error objectForKey:kHGSPluginLoaderPluginPathKey], type);
+    }
   }
   HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
   NSArray *factorablePlugins = [pluginsPoint extensions];
