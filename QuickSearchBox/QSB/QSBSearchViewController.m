@@ -138,7 +138,6 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 }
 
 - (void)setQueryString:(NSString *)queryString {
-  [searchController_ setQueryString:queryString];
   if ([self activeResultsViewController] != topResultsController_) {
     [self showTopResults:self];
   } else {
@@ -147,6 +146,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
     // TODO(alcor): this causes the wrong size to be set. Fix
     //[self updateViewsWithAnimation:NO];
   }
+  [searchController_ setQueryString:queryString];
 }
 
 - (NSString*)queryString {
