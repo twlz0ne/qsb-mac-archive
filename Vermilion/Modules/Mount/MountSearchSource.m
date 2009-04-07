@@ -51,6 +51,12 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
     configuration_ = [configuration objectForKey:@"MountSearchSourceServices"]; 
     browsers_ = [[NSMutableDictionary alloc] init];
     services_ = [[NSMutableArray alloc] init];
+
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self
+           selector:@selector(willRemoveExtensionNotification:)
+               name:kHGSExtensionPointWillRemoveExtensionNotification
+             object:nil];
     
     for (NSString *key in configuration_) {
       NSNetServiceBrowser *browser
@@ -63,15 +69,27 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
   return self;
 }
 
-- (void) dealloc {
+- (void)dealloc {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self];
+  [browsers_ release];
+  [configuration_ release];
+  [services_ release];
+  [super dealloc];
+}
+
+- (void)willRemoveExtensionNotification:(NSNotification *)notification {
   for (NSString *key in browsers_) {
     NSNetServiceBrowser *browser = [browsers_ objectForKey:key];
     [browser stop];
   }
   [browsers_ release];
-  [configuration_ release];
+  browsers_ = nil;
+  for (NSNetService *service in services_) {
+    [service setDelegate:nil];
+  }
   [services_ release];
-  [super dealloc];
+  services_ = nil;
 }
 
 - (void)updateResultsIndex {
