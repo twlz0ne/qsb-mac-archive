@@ -79,7 +79,7 @@ static NSString *const kiPhoneReferenceDocSetPath
   
   NSBundle *rootDirBundle = [NSBundle bundleWithPath:docSetPath];
   if (!rootDirBundle) {
-    HGSLogDebug(@"Unable to get developer docs");
+    HGSLogDebug(@"Unable to get developer docs at path %@", docSetPath);
     return;
   }
   NSString *rootDirDocuments = [rootDirBundle resourcePath];

@@ -236,9 +236,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
   [db_ beginDeferredTransaction];
   {
     // TODO(altse): Needs testing.    
-    NSEnumerator *enumerator = [touches objectEnumerator];
-    NSDictionary *touch;
-    while ((touch = [enumerator nextObject])) {
+    for (NSDictionary *touch in touches) {
       NSString *pendingTouch = [touch objectForKey:kCachePendingTouchKey];
       NSNumber *timeStamp = [touch objectForKey:kCachePendingTouchTimestamp];
       [statement bindStringAtPosition:1 string:pendingTouch];  
