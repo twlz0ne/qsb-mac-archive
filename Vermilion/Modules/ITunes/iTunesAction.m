@@ -320,6 +320,7 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_isAppWithIdentifierRunning:);
 - (BOOL)appliesToResults:(HGSResultArray *)results {
   BOOL doesApply = [super appliesToResults:results];
   if (doesApply) {
+    doesApply = NO;
     if ([results count] == 1) {
       if ([[ITunesActionSupport sharedSupport] iTunesIsRunning]) {
         HGSResult *result = [results objectAtIndex:0];
