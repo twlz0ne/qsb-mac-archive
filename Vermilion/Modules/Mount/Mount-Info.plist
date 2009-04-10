@@ -71,6 +71,13 @@
 					<key>type</key>
 					<string>share.afp</string>
 				</dict>
+				<key>_ftp._tcp</key>
+				<dict>
+					<key>scheme</key>
+					<string>ftp</string>
+					<key>type</key>
+					<string>share.ftp</string>
+				</dict>
 			</dict>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Mount</string>
