@@ -57,6 +57,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   NSTimer *updateTimer_;
   HGSAccount *account_;
   NSTimeInterval previousErrorReportingTime_;
+  NSImage *placeholderIcon_;
 }
 
 - (void)setUpPeriodicRefresh;
@@ -108,6 +109,17 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
              selector:@selector(loginCredentialsChanged:)
                  name:kHGSAccountDidChangeNotification
                object:account_];
+
+      // Pick up a placeholder icon.
+      NSBundle *bundle = HGSGetPluginBundle();
+      NSString *path
+        = [bundle pathForResource:@"PicasaPlaceholder" ofType:@"icns"];
+      if (path) {
+        placeholderIcon_ = [[NSImage alloc] initByReferencingFile:path];
+      } else {
+        HGSLogDebug(@"PicasaPlaceholder.icns missing from PicasawebSource. "
+                    @"The generic placeholder will be used instead.");
+      }
     } else {
       HGSLogDebug(@"Missing account identifier for HGSGoogleDocsSource '%@'",
                   [self identifier]);
@@ -128,6 +140,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   }
   [updateTimer_ release];
   [account_ release];
+  [placeholderIcon_ release];
   [super dealloc];
 }
 
@@ -136,6 +149,17 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     [ticket cancelTicket];
   }
   [activeTickets_ removeAllObjects];
+}
+
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
+  id value = nil;
+  if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
+    value = placeholderIcon_;
+  }
+  if (!value) {
+    value = [super provideValueForKey:key result:result];
+  }
+  return value;
 }
 
 #pragma mark -
@@ -375,6 +399,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
     
     NSString* photoTitle = [[photo title] stringValue];
+    if ([photoDescription length] == 0) {
+      photoDescription = photoTitle;
+    }
     NSDictionary *photoCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                photoTitle, kQSBPathCellDisplayTitleKey,
                                photoURL, kQSBPathCellURLKey,

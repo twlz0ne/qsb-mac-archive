@@ -431,7 +431,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSString *html = [result valueForKey:kHGSObjectAttributeNameKey];
   NSMutableAttributedString *title 
     = [self mutableAttributedStringWithString:html];
-  if (!title) {
+  if ([title length] == 0) {
     // If we don't have a title, we'll just use a canned string
     NSString *titleString = NSLocalizedString(@"<No Title>", @"");
     title =  [self mutableAttributedStringWithString:titleString];

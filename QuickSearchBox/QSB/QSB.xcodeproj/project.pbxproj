@@ -348,6 +348,7 @@
 		62B7CE9F0E6375AA00299B23 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		62C051BA0F31307100DFBB1B /* HGSSimpleAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62C053D20F32081400DFBB1B /* twitter_t.png in Resources */ = {isa = PBXBuildFile; fileRef = 62C053D10F32081400DFBB1B /* twitter_t.png */; };
+		62C25E270F8BF17500DA57E7 /* PicasaPlaceholder.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */; };
 		62D0E96B0EF059B40028522C /* HGSAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D0E96A0EF059B40028522C /* HGSAccount.m */; };
 		62D0E96F0EF05D0E0028522C /* HGSAccountsExtensionPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D0E96D0EF05D0E0028522C /* HGSAccountsExtensionPoint.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62D0E9700EF05D0E0028522C /* HGSAccountsExtensionPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D0E96E0EF05D0E0028522C /* HGSAccountsExtensionPoint.m */; };
@@ -1784,6 +1785,7 @@
 		62AD18A50F16B034000D380C /* QSBPathControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPathControl.m; sourceTree = "<group>"; };
 		62AD99140F33AB190063579F /* google_products.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = google_products.png; sourceTree = "<group>"; };
 		62C053D10F32081400DFBB1B /* twitter_t.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = twitter_t.png; sourceTree = "<group>"; };
+		62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PicasaPlaceholder.icns; sourceTree = "<group>"; };
 		62D0E9640EF058950028522C /* HGSAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAccount.h; sourceTree = "<group>"; };
 		62D0E96A0EF059B40028522C /* HGSAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccount.m; sourceTree = "<group>"; };
 		62D0E96D0EF05D0E0028522C /* HGSAccountsExtensionPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAccountsExtensionPoint.h; sourceTree = "<group>"; };
@@ -2956,6 +2958,7 @@
 			children = (
 				6263CB070EB79FB300FF03A1 /* Picasaweb-Info.plist */,
 				6263CB0A0EB79FB300FF03A1 /* PicasawebSource.m */,
+				62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */,
 			);
 			path = Picasaweb;
 			sourceTree = "<group>";
@@ -5232,6 +5235,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62C25E270F8BF17500DA57E7 /* PicasaPlaceholder.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
