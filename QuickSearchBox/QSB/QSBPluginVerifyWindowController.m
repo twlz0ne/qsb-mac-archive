@@ -60,7 +60,12 @@
 
 - (HGSPluginLoadResult)runForPluginAtPath:(NSString *)path
                             withSignature:(HGSCodeSignature *)signature {
-  [self setPlugin:[[HGSPlugin alloc] initWithPath:path]];
+  NSBundle *bundle = [NSBundle bundleWithPath:path];
+  if (!bundle) {
+    HGSLog(@"Unable to load plugin %@", path);
+    return eHGSDisallow;
+  }
+  [self setPlugin:[[HGSPlugin alloc] initWithBundle:bundle]];
   if (!plugin_) {
     HGSLog(@"Unable to verify plugin %@", path);
     return eHGSDisallow;
