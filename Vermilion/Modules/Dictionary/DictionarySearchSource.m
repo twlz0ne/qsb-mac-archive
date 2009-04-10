@@ -41,6 +41,7 @@ NSString *kDictionaryRangeLengthKey = @"DictionaryRangeLength";
 NSString *kDictionaryTermKey = @"DictionaryTerm";
 static NSString *kShowInDictionaryAction
   = @"com.google.qsb.dictionary.action.open";
+static NSString *kDictionaryAppBundleId = @"com.apple.Dictionary";
 static const int kMinQueryLength = 3;
 
 @interface DictionarySearchSource : HGSCallbackSearchSource {
@@ -68,8 +69,17 @@ static const int kMinQueryLength = 3;
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  BOOL isValid = [super isValidSourceForQuery:query];
-  if (isValid) {
+  BOOL isValid = NO;
+  HGSResult *pivotObject = [query pivotObject];
+  if (pivotObject) {
+    if ([[pivotObject type] isEqual:kHGSTypeFileApplication]) {
+      NSURL *url = [pivotObject url];
+      NSBundle *bnd = [NSBundle bundleWithPath:[url path]];
+      if ([[bnd bundleIdentifier] isEqual:kDictionaryAppBundleId]) {
+        isValid = ([[query rawQueryString] length] > 0);
+      }
+    }
+  } else {
     isValid = ([[query rawQueryString] length] >= kMinQueryLength);
   }
   return isValid;
