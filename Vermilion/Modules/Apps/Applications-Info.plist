@@ -32,6 +32,18 @@
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<string>com.apple.application</string>
 		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>ApplicationsQuitAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.applications.action.quit</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file.application</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>Quit</string>
+		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>
 	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
