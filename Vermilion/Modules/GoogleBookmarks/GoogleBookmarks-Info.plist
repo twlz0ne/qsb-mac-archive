@@ -32,7 +32,6 @@
 			<key>HGSExtensionDesiredAccountTypes</key>
 			<array>
 				<string>Google</string>
-				<string>GoogleApps</string>
 			</array>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<array>
