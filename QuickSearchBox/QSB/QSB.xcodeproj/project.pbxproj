@@ -510,6 +510,9 @@
 		8B3EFA360EF2CB1D0036FFBD /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F379C740D8FFD5C00A47C98 /* QuickLook.framework */; };
 		8B3EFF6A0EF312040036FFBD /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		8B3EFFA60EF31BC70036FFBD /* Shortcuts.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EFFA40EF31BC70036FFBD /* Shortcuts.m */; };
+		8B4099FF0F93DC0100DF540E /* GTMUILocalizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B4099FD0F93DC0100DF540E /* GTMUILocalizer.h */; };
+		8B409A000F93DC0100DF540E /* GTMUILocalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4099FE0F93DC0100DF540E /* GTMUILocalizer.m */; };
+		8B409FED0F95494C00DF540E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B409FEC0F95494C00DF540E /* Localizable.strings */; };
 		8B459D890DA4417C001148C5 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		8B488A480F15DE6A00786C1E /* QSBMenuButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B488A460F15DE6A00786C1E /* QSBMenuButton.m */; };
 		8B488A490F15DE9400786C1E /* NSString+CaseInsensitive.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7C373C0D78A415009885B4 /* NSString+CaseInsensitive.m */; };
@@ -1961,6 +1964,9 @@
 		8B3EF7680EF2C7ED0036FFBD /* GoogleCorpora-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleCorpora-Info.plist"; sourceTree = "<group>"; };
 		8B3EFAD50EF2D84A0036FFBD /* ContactsActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContactsActions.m; sourceTree = "<group>"; };
 		8B3EFFA40EF31BC70036FFBD /* Shortcuts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Shortcuts.m; sourceTree = "<group>"; };
+		8B4099FD0F93DC0100DF540E /* GTMUILocalizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMUILocalizer.h; sourceTree = "<group>"; };
+		8B4099FE0F93DC0100DF540E /* GTMUILocalizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMUILocalizer.m; sourceTree = "<group>"; };
+		8B409FEA0F95494700DF540E /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8B488A460F15DE6A00786C1E /* QSBMenuButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMenuButton.m; sourceTree = "<group>"; };
 		8B488A470F15DE6A00786C1E /* QSBMenuButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBMenuButton.h; sourceTree = "<group>"; };
 		8B488EAF0F16842500786C1E /* CalculatePrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CalculatePrivate.h; sourceTree = "<group>"; };
@@ -2814,6 +2820,8 @@
 				332AD8AA0DC93E880009A7E9 /* GTMShading.h */,
 				8B9249CD0EE6DE1C00F3DF32 /* GTMHotKeyTextField.m */,
 				8B9249CE0EE6DE1C00F3DF32 /* GTMHotKeyTextField.h */,
+				8B4099FD0F93DC0100DF540E /* GTMUILocalizer.h */,
+				8B4099FE0F93DC0100DF540E /* GTMUILocalizer.m */,
 			);
 			path = AppKit;
 			sourceTree = "<group>";
@@ -3223,6 +3231,7 @@
 				8B3D2E350EB0C7D1004EA504 /* ApplicationUISource.h */,
 				8B3D2A4C0EAFDB00004EA504 /* ApplicationUISource.m */,
 				8B3D35220EB27FAA004EA504 /* ApplicationUIContentsSource.m */,
+				8B409FEC0F95494C00DF540E /* Localizable.strings */,
 			);
 			path = ApplicationUI;
 			sourceTree = "<group>";
@@ -4180,6 +4189,7 @@
 				8B637A440F27706A00997738 /* GTMTestTimer.h in Headers */,
 				8B6C17300F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h in Headers */,
 				8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */,
+				8B4099FF0F93DC0100DF540E /* GTMUILocalizer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5299,6 +5309,7 @@
 				8B3D2C200EAFF5B4004EA504 /* menuitem.icns in Resources */,
 				8B3D30A20EB1209F004EA504 /* action.icns in Resources */,
 				8B3D33D40EB23C53004EA504 /* view.icns in Resources */,
+				8B409FED0F95494C00DF540E /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6695,6 +6706,7 @@
 				8BA01C030F147DB000926923 /* GTMNSWorkspace+Running.m in Sources */,
 				8B6C17310F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m in Sources */,
 				8B95CD210F6EDF9D003BDBDD /* GTMRegex.m in Sources */,
+				8B409A000F93DC0100DF540E /* GTMUILocalizer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7377,6 +7389,14 @@
 				7FD2E82D0F33D75F00189D93 /* English */,
 			);
 			name = "ResultsWindow-Large.xib";
+			sourceTree = "<group>";
+		};
+		8B409FEC0F95494C00DF540E /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8B409FEA0F95494700DF540E /* English */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		8B5EC6990CEE61BF00AD3BBD /* Localizable.strings */ = {
