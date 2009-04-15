@@ -158,7 +158,11 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   // Compose a results dict with localized category as name then sort.
   NSMutableDictionary *localizedDict
     = [NSMutableDictionary dictionaryWithCapacity:[rawDict count]];
+  NSBundle *bundle = [NSBundle mainBundle];
   for (NSString *rawCategoryName in [rawDict allKeys]) {
+    rawCategoryName = [bundle localizedStringForKey:rawCategoryName 
+                                              value:nil 
+                                              table:nil];
     [localizedDict setObject:[rawDict objectForKey:rawCategoryName]
                       forKey:NSLocalizedString(rawCategoryName, nil)];
   }
@@ -200,7 +204,9 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
         NSString *localizedCategoryName 
           = GTMCFAutorelease(UTTypeCopyDescription((CFStringRef)categoryName));
         if (!localizedCategoryName) {
-          localizedCategoryName = NSLocalizedString(categoryName, nil);
+          localizedCategoryName = [bundle localizedStringForKey:categoryName
+                                                          value:nil 
+                                                          table:nil];
         }
         [sourceResult setCategoryName:localizedCategoryName];
         NSUInteger resultsCount = [results count];
@@ -384,8 +390,10 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
     NSUInteger catCount = [[catCountEnum nextObject] unsignedIntValue];
     if (catCount == 1) {
       // Singularize the category string.
-      catString
-        = NSLocalizedStringFromTable(catString, @"CategorySingulars", nil );
+      NSBundle *bundle = [NSBundle mainBundle];
+      catString = [bundle localizedStringForKey:catString 
+                                          value:nil 
+                                          table:@"CategorySingulars"];
     }
     QSBCategoryTextAttachment *catAttachment
       = [QSBCategoryTextAttachment categoryTextAttachmentWithString:catString
