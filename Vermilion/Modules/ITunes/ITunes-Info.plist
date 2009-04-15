@@ -56,7 +56,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>itunes.track</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Play in Party Shuffle</string>
+			<string>Play in iTunes DJ</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>PlayInPartyShuffle.icns</string>
 		</dict>
@@ -70,7 +70,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>itunes.track</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Add to Party Shuffle</string>
+			<string>Add to iTunes DJ</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>AddToPartyShuffle.icns</string>
 		</dict>
