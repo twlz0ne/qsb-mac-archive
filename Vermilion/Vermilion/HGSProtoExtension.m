@@ -267,7 +267,7 @@
            autorelease];
     }
     @catch (NSException *e) {
-      HGSLog(@"Unable to init extension %@", extension);
+      HGSLog(@"Unable to init extension %@ (%@)", extension, e);
     }
   }
   if (extension) {
