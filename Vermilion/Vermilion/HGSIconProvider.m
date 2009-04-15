@@ -530,7 +530,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
       = [NSGraphicsContext graphicsContextWithGraphicsPort:smallContext 
                                                    flipped:YES];
     [NSGraphicsContext setCurrentContext:context];
-    [bestRep drawInRect:drawRect];
+    [bestRep drawInRect:smallDrawRect];
     [NSGraphicsContext restoreGraphicsState];
     CGContextRestoreGState(smallContext);
     
