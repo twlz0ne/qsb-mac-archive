@@ -195,13 +195,14 @@
     }
   }
   if (showCheckbox != [self isGoogleAppsCheckboxShowing]) {
+    // Cautionary note: The reason we use isGoogleAppsCheckboxShowing to
+    // control the hiding and showing of the checkbox is because the
+    // -[NSControl hidden] accessor is not a reliable indicator due
+    // to our use of animations--the control's isHidden does not get
+    // updated until the animation has completed.
     [self setGoogleAppsCheckboxShowing:showCheckbox];
     [googleAppsCheckbox_ setEnabled:showCheckbox];
-    if (showCheckbox) {
-      [[googleAppsCheckbox_ animator] setHidden:NO];
-    } else {
-      [googleAppsCheckbox_ setHidden:YES];
-    }
+    [[googleAppsCheckbox_ animator] setHidden:!showCheckbox];
 
     BOOL captchaShowing = [self captchaImage] != nil;
     CGFloat newHeight = [self windowHeightWithCheckboxShowing:showCheckbox
