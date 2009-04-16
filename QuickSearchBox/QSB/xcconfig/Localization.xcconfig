@@ -1,9 +1,9 @@
+﻿//
+//  Localization.xcconfig
 //
-//  QSB.xcconfig
-//
-//  Xcode configuration file for building a Debug QSB.
-//
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Xcode configuration file that sets some specialized Google settings
+//  for the localization support tools in //depot/googlemac/Tools/l10n
+//  Copyright (c) 2006-2008 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -32,29 +32,9 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-// Package Versioning
-#include "PackageVersion.xcconfig"
-#include "Localization.xcconfig"
+// Callers can override, but generally the strings used for version info
+// are good enough for us.
+GOOGLE_L10N_PROJECT = $(GOOGLE_PRODUCT_NAME)
 
-ARCHS[sdk=macosx10.5*] = i386 ppc 
-ARCHS[sdk=macosx10.6*] = i386 ppc
-
-GCC_PREFIX_HEADER = QSB.pch
-GCC_PRECOMPILE_PREFIX_HEADER = YES
-
-GOOGLE_VERSIONINFO_FINDER = ${GOOGLE_PRODUCT_NAME} - ${QSB_CODE_NAME} ${GOOGLE_VERSIONINFO_LONG}${GOOGLE_VERSION_EXTRAINFO}${GOOGLE_VERSION_DEBUG_FLAG}, © ${GOOGLE_VERSION_COPYRIGHT} Google Inc.
-GOOGLE_VERSION_MAJOR = 2
-GOOGLE_VERSION_MINOR = 0
-GOOGLE_VERSION_FIXLEVEL = 0
-
-GOOGLE_MAC_ROOT = ${SRCROOT}/../..
-GOOGLE_MAC_TOOLS = ${GOOGLE_MAC_ROOT}/Tools
-
-QSB_CODE_NAME = Manganese
-QSB_BUNDLE_ID = com.google.qsb
-QSB_RELEASE_NOTE_PATH = ${BUILT_PRODUCTS_DIR}/QuickSearchBoxReleaseNotes_${GOOGLE_VERSIONINFO_LONG}_${QSB_CODE_NAME}.html
-VERMILLION_PLUGIN_API_VERSION = 2
-
-GCC_WARN_SHADOW = YES
-
-GTM_HOST_OTHER_CFLAGS = -fstack-protector -fstack-protector-all
+// And for a target name just use the Xcode target.
+GOOGLE_L10N_TARGET = $(TARGET_NAME)
