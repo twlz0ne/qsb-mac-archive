@@ -40,7 +40,7 @@ end doScript
 on openDirectory(thePaths)
 	tell application "Terminal"
 		repeat with thePath in thePaths
-			do script "cd " & "\"" & thePath & "\""
+			do script "cd " & quoted form of thePath
 			activate
 		end repeat
 	end tell
