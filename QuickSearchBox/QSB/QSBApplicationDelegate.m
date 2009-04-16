@@ -239,10 +239,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)awakeFromNib {
   // set up all our menu bar UI
   [self updateIconInMenubar];
-
-  [self updateMenuWithAppName:[NSApp mainMenu]];
-  [self updateMenuWithAppName:dockMenu_];
-  [self updateMenuWithAppName:statusItemMenu_];
   
   // watch for prefs changing
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -830,6 +826,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
   [self updateHotKeyRegistration];
+  
+  [self updateMenuWithAppName:[NSApp mainMenu]];
+  [self updateMenuWithAppName:dockMenu_];
+  [self updateMenuWithAppName:statusItemMenu_];
   
   // Inventory and process all plugins and extensions.
   [self inventoryPlugins];
