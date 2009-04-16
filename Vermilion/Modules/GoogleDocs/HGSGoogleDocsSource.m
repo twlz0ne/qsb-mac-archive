@@ -141,6 +141,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
         [docService_ setUserAgent:@"HGSGoogleDocSource"];
         [docService_ setUserCredentialsWithUsername: userName
                                            password: password];
+        [docService_ setIsServiceRetryEnabled:YES];
       } else {
         // Can't do much without a login; invalidate so we stop trying (until
         // we get a notification that the credentials have changed) and bail.
@@ -151,8 +152,15 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     // Mark us as in the middle of a fetch so that if credentials change 
     // during a fetch we don't destroy the service out from under ourselves.
     currentlyFetching_ = YES;
-    NSURL* docURL
-      = [NSURL URLWithString:kGDataGoogleDocsDefaultPrivateFullFeed];
+    // If the doc feed is attempting an http request then upgrade it to https.
+    NSString *docURLString = kGDataGoogleDocsDefaultPrivateFullFeed;
+    static NSString *const httpScheme = @"http:";
+    static NSString *const httpsScheme = @"https:";
+    if ([docURLString hasPrefix:httpScheme]) {
+      docURLString = [docURLString substringFromIndex:[httpScheme length]];
+      docURLString = [httpsScheme stringByAppendingString:docURLString];
+    }
+    NSURL* docURL = [NSURL URLWithString:docURLString];
     serviceTicket_
       = [[docService_ fetchDocsFeedWithURL:docURL
                                   delegate:self
