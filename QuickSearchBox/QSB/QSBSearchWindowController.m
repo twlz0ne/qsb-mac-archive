@@ -917,12 +917,9 @@ doCommandBySelector:(SEL)commandSelector {
   }
   
   [searchWindow makeKeyAndOrderFront:self];
-  [searchWindow setIgnoresMouseEvents:NO];
 
-  [NSAnimationContext beginGrouping];
-  [[NSAnimationContext currentContext] setDuration:kQSBShowDuration];
-  [[searchWindow animator] setAlphaValue:1.0];
-  [NSAnimationContext endGrouping];
+  [searchWindow setAlphaValue:1.0];
+  
   if ([[activeSearchViewController_ queryString] length]) {
     [self performSelector:@selector(displayResults:)
                withObject:nil 
@@ -944,7 +941,6 @@ doCommandBySelector:(SEL)commandSelector {
   [NSObject cancelPreviousPerformRequestsWithTarget:self
                                            selector:@selector(displayResults:)
                                              object:nil];
-  [searchWindow setIgnoresMouseEvents:YES];
   [self hideResultsWindow];
   
   if ([[NSUserDefaults standardUserDefaults]
@@ -957,7 +953,6 @@ doCommandBySelector:(SEL)commandSelector {
   
   [NSAnimationContext beginGrouping];
   [[NSAnimationContext currentContext] setDuration:kQSBHideDuration];
-  [searchWindow setIgnoresMouseEvents:YES];
   [[searchWindow animator] setAlphaValue:0.0];
   [NSAnimationContext endGrouping];
 }
