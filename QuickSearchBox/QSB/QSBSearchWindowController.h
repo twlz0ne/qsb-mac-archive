@@ -91,9 +91,10 @@ const NSTimeInterval kQSBAppearDelay;
 - (IBAction)showSearchWindow:(id)sender;
 - (IBAction)hideSearchWindow:(id)sender;
 
-// Show the search window. Toggle is what caused the window to show.
+// Hide/show the search window. Toggle is what caused the window to show.
 // See kQSB*ChangeVisiblityToggle below.
 - (void)showSearchWindowBecause:(NSString *)toggle;
+- (void)hideSearchWindowBecause:(NSString *)toggle;
 
 // Take a corpus from a menu item
 - (IBAction)selectCorpus:(id)sender;
@@ -156,6 +157,7 @@ const NSTimeInterval kQSBAppearDelay;
 #define kQSBUnknownChangeVisibilityToggle @"QSBUnknownChangeVisiblityToggle"
 #define kQSBReopenChangeVisiblityToggle @"QSBReopenChangeVisiblityToggle"
 #define kQSBHotKeyChangeVisiblityToggle @"QSBHotKeyChangeVisiblityToggle"
+#define kQSBExecutedChangeVisiblityToggle @"QSBExecutedChangeVisiblityToggle"
 #define kQSBActivationChangeVisiblityToggle @"QSBActivationChangeVisiblityToggle"
 #define kQSBDockMenuItemChangeVisiblityToggle @"QSBDockMenuChangeVisiblityToggle"
 #define kQSBStatusMenuItemChangeVisiblityToggle @"QSBStatusMenuItemChangeVisiblityToggle"

@@ -226,11 +226,11 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
         for (HGSResult *suggest in hgsSuggestions) {
           QSBTableResult *qsbSuggest = nil;
           // This switch controls icon versus text suggestions
-#if 1          
+#if 0          
           NSString *suggestString = [suggest displayName];
           qsbSuggest = [QSBGoogleTableResult tableResultForQuery:suggestString];
 #else
-          qsbSuggest = [QSBSourceTableResult resultWithObject:suggest];
+          qsbSuggest = [QSBSourceTableResult tableResultWithResult:suggest];
 #endif
           
           if (prefixSuggestions) {

@@ -42,6 +42,7 @@ NSString *kDictionaryTermKey = @"DictionaryTerm";
 static NSString *kShowInDictionaryAction
   = @"com.google.qsb.dictionary.action.open";
 static NSString *kDictionaryAppBundleId = @"com.apple.Dictionary";
+static NSString *kDictionaryPrefix = @"define";
 static const int kMinQueryLength = 3;
 
 @interface DictionarySearchSource : HGSCallbackSearchSource {
@@ -80,7 +81,9 @@ static const int kMinQueryLength = 3;
       }
     }
   } else {
-    isValid = ([[query rawQueryString] length] >= kMinQueryLength);
+    isValid = [[query rawQueryString] hasPrefix:kDictionaryPrefix];
+    // TODO(alcor): we should support definitions below the fold for all queries
+    // but this isn't working yet.
   }
   return isValid;
 }
@@ -88,6 +91,14 @@ static const int kMinQueryLength = 3;
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
   NSMutableSet *results = [NSMutableSet set];
   NSString *query = [[operation query] rawQueryString];
+  
+  BOOL highRelevance = NO;
+  if ([query hasPrefix:kDictionaryPrefix]) {
+    query = [query substringFromIndex:[kDictionaryPrefix length]];
+    NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@": "];
+    query = [query stringByTrimmingCharactersInSet:set];
+    highRelevance = YES;
+  }
   CFRange range = DCSGetTermRangeInString(NULL, (CFStringRef)query, 0);
   if (range.location != kCFNotFound && range.length != kCFNotFound) {
     CFStringRef def = DCSCopyTextDefinition(NULL, (CFStringRef)query, range);
@@ -99,10 +110,18 @@ static const int kMinQueryLength = 3;
         = [NSMutableDictionary dictionaryWithObjectsAndKeys:
            (NSString *)def, kHGSObjectAttributeSnippetKey,
            dictionaryIcon_, kHGSObjectAttributeIconKey,
+           [NSNumber numberWithInt:eHGSSpecialUIRankFlag], 
+             kHGSObjectAttributeRankFlagsKey,
            [NSNumber numberWithInt:range.location], kDictionaryRangeLocationKey,
            [NSNumber numberWithInt:range.length], kDictionaryRangeLengthKey,
            query, kDictionaryTermKey,
            nil];
+      
+      if (highRelevance) {
+        [attributes setValue:[NSNumber numberWithInt:1] 
+                      forKey:kHGSObjectAttributeRankKey]; 
+      }
+      
       HGSAction *action 
         = [[HGSExtensionPoint actionsPoint]
            extensionWithIdentifier:kShowInDictionaryAction];

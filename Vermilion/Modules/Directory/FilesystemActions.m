@@ -187,7 +187,10 @@
 - (id)defaultObjectForKey:(NSString *)key {
   id defaultObject = nil;
   if ([key isEqualToString:kHGSExtensionIconImageKey]) {
-    defaultObject = [NSImage imageNamed:NSImageNameRevealFreestandingTemplate];
+    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+    NSString *finderPath
+      = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
+    defaultObject = [ws iconForFile:finderPath];
   }
   if (!defaultObject) {
     defaultObject = [super defaultObjectForKey:key];

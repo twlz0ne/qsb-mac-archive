@@ -207,7 +207,7 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 }
 
 - (NSMutableAttributedString*)mutableAttributedStringWithString:(NSString*)string {
-  CGFloat startingSize = 12.0;
+  CGFloat startingSize = 13.0;
   const CGFloat maxLineHeight = 200;
   NSDictionary *attributes = nil;
   NSMutableAttributedString *attrString = nil;
@@ -345,9 +345,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     HGSResult *result = [self representedResult];
     if ([result conformsToType:kHGSTypeAction]) {
       [string addAttribute:NSForegroundColorAttributeName
-                     value:[NSColor colorWithCalibratedRed:0.667
+                     value:[NSColor colorWithCalibratedRed:0.0
                                                      green:0.0 
-                                                      blue:0.0 
+                                                      blue:1.0 
                                                      alpha:1.0]];
     }
   }
@@ -361,7 +361,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   Class rowViewClass = Nil;
   HGSResult *result = [self representedResult];
   if ([result conformsToType:kHGSTypeSuggest]) {
-    rowViewClass = [QSBTopSearchIconViewController class];
+    rowViewClass = [QSBTopSearchForRowViewController class];
   } else if ([result isKindOfClass:[HGSResult class]]) {
     rowViewClass = [QSBTopStandardRowViewController class];
   }
@@ -511,7 +511,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (Class)topResultsRowViewControllerClass {
+#if 1
   return [QSBTopStandardRowViewController class];
+#else
+  return [QSBTopSearchForRowViewController class];
+#endif
 }
 
 // We want to inherit the google logo, so don't return an icon

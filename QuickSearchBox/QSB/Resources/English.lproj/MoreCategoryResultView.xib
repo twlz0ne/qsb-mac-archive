@@ -71,17 +71,17 @@
 					<object class="NSTextField" id="774154779">
 						<reference key="NSNextResponder" ref="776526201"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{0, 4}, {87, 14}}</string>
+						<string key="NSFrame">{{-3, 2}, {91, 17}}</string>
 						<reference key="NSSuperview" ref="776526201"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="964499232">
 							<int key="NSCellFlags">67239488</int>
 							<int key="NSCellFlags2">71436288</int>
 							<string key="NSContents">Category</string>
-							<object class="NSFont" key="NSSupport">
+							<object class="NSFont" key="NSSupport" id="223533401">
 								<string key="NSName">LucidaGrande</string>
-								<double key="NSSize">1.100000e+01</double>
-								<int key="NSfFlags">3100</int>
+								<double key="NSSize">1.300000e+01</double>
+								<int key="NSfFlags">16</int>
 							</object>
 							<reference key="NSControlView" ref="774154779"/>
 							<object class="NSColor" key="NSBackgroundColor" id="431491621">
@@ -109,11 +109,7 @@
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">1346371584</int>
 							<string key="NSContents">Multiline Label</string>
-							<object class="NSFont" key="NSSupport">
-								<string key="NSName">LucidaGrande</string>
-								<double key="NSSize">1.300000e+01</double>
-								<int key="NSfFlags">16</int>
-							</object>
+							<reference key="NSSupport" ref="223533401"/>
 							<reference key="NSControlView" ref="57358362"/>
 							<reference key="NSBackgroundColor" ref="431491621"/>
 							<object class="NSColor" key="NSTextColor">
@@ -411,7 +407,21 @@
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../externals/google-toolbox-for-mac/Foundation/GTMNSObject+KeyValueObserving.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">../externals/google-toolbox-for-mac/UnitTesting/GTMNSObject+UnitTesting.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../externals/json-framework/Source/NSObject+SBJSON.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -444,7 +454,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">QSBMoreDetailedRowViewController</string>
-					<string key="superclassName">QSBDetailedRowViewController</string>
+					<string key="superclassName">QSBResultRowViewController</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="867023791">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">QSBMoreResultsViewControllers.h</string>
@@ -472,7 +482,7 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">QSBIconRowView.h</string>
+						<string key="minorKey">QSBResultIconView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

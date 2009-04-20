@@ -55,7 +55,8 @@
 #import "QSBTableResult.h"
 
 static const NSTimeInterval kQSBShowDuration = 0.1;
-static const NSTimeInterval kQSBHideDuration = 0.333;
+static const NSTimeInterval kQSBHideDuration = 0.3;
+static const NSTimeInterval kQSBShortHideDuration = 0.15;
 static const NSTimeInterval kQSBResizeDuration = 0.1;
 static const NSTimeInterval kQSBPushPopDuration = 0.2;
 const NSTimeInterval kQSBAppearDelay = 0.2;
@@ -917,8 +918,14 @@ doCommandBySelector:(SEL)commandSelector {
   }
   
   [searchWindow makeKeyAndOrderFront:self];
+  
+  // Start the window partially shown, and animate the rest of the way.
+  [searchWindow setAlphaValue:0.75];
 
-  [searchWindow setAlphaValue:1.0];
+  [NSAnimationContext beginGrouping];
+  [[NSAnimationContext currentContext] setDuration:kQSBShowDuration];
+  [[searchWindow animator] setAlphaValue:1.0];
+  [NSAnimationContext endGrouping];
   
   if ([[activeSearchViewController_ queryString] length]) {
     [self performSelector:@selector(displayResults:)
@@ -941,7 +948,6 @@ doCommandBySelector:(SEL)commandSelector {
   [NSObject cancelPreviousPerformRequestsWithTarget:self
                                            selector:@selector(displayResults:)
                                              object:nil];
-  [self hideResultsWindow];
   
   if ([[NSUserDefaults standardUserDefaults]
       boolForKey:kQSBSearchWindowDimBackground]) {
@@ -951,10 +957,38 @@ doCommandBySelector:(SEL)commandSelector {
     [NSAnimationContext endGrouping];
   }
   
-  [NSAnimationContext beginGrouping];
-  [[NSAnimationContext currentContext] setDuration:kQSBHideDuration];
-  [[searchWindow animator] setAlphaValue:0.0];
-  [NSAnimationContext endGrouping];
+  if ([toggle isEqualToString:kQSBExecutedChangeVisiblityToggle]) {
+    // Block when executing
+    NSDictionary *anim1 = [NSDictionary dictionaryWithObjectsAndKeys:
+                           searchWindow, NSViewAnimationTargetKey, 
+                           NSViewAnimationFadeOutEffect,
+                           NSViewAnimationEffectKey, 
+                           nil];
+    
+    NSDictionary *anim2 = [NSDictionary dictionaryWithObjectsAndKeys:
+                           resultsWindow_, NSViewAnimationTargetKey, 
+                           NSViewAnimationFadeOutEffect,
+                           NSViewAnimationEffectKey, 
+                           nil];
+    
+    NSViewAnimation *animation = [[NSViewAnimation alloc] 
+                                  initWithViewAnimations:
+                                  [NSArray arrayWithObjects:anim1, anim2, nil]];
+    [animation setDuration:0.2];
+    [animation setAnimationBlockingMode:NSAnimationBlocking];
+    [animation startAnimation];
+    [animation release];
+    [resultsWindow_ orderOut:nil];
+    [searchWindow orderOut:nil];
+    // TODO(alcor): add custom behaviors for toggle, execute, fade
+    //  } else if ([toggle isEqualToString:kQSBHotKeyChangeVisiblityToggle]) {
+  }  else {
+    [NSAnimationContext beginGrouping];
+    [self hideResultsWindow];
+    [[NSAnimationContext currentContext] setDuration:kQSBHideDuration];
+    [[searchWindow animator] setAlphaValue:0.0];
+    [NSAnimationContext endGrouping];    
+  }
 }
 
 - (NSWindow *)resultsWindow {
@@ -1243,7 +1277,7 @@ doCommandBySelector:(SEL)commandSelector {
   [[self window] removeChildWindow:resultsWindow_];
   
   [NSAnimationContext beginGrouping];
-  [[NSAnimationContext currentContext] setDuration:kQSBHideDuration];
+  [[NSAnimationContext currentContext] setDuration:kQSBShortHideDuration];
   
   [resultsWindow_ setIgnoresMouseEvents:YES];
   [[resultsWindow_ animator] setFrame:NSOffsetRect([resultsWindow_ frame], 

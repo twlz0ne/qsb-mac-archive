@@ -81,8 +81,11 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 - (NSArray *)dasherDomains {
   HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
   NSArray *googleAccounts = [accountsPoint accountsForType:@"Google"];
+  // TODO(mrossetti): update account type to 'com.google.qsb.google(apps).account'.
   NSMutableArray *domains = [NSMutableArray array];
   for (HGSAccount *account in googleAccounts) {
+    BOOL hosted = [account isKindOfClass:NSClassFromString(@"GoogleAppsAccount")];     
+    if (!hosted) continue;
     NSString *name = [account userName];
     NSInteger location = [name rangeOfString:@"@"].location;
     if (location != NSNotFound) {

@@ -943,7 +943,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)actionWillPerformNotification:(NSNotification *)notification {
   HGSAction * action = [notification object];
   if ([action causesUIContextChange]) {
-    [searchWindowController_ hideSearchWindow:nil];
+    [searchWindowController_ hideSearchWindowBecause:
+      kQSBExecutedChangeVisiblityToggle];
   }
 }
 
