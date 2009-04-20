@@ -597,7 +597,63 @@ static const void *LRURetain(CFAllocatorRef allocator, const void *value) {
 }
 
 static void LRURelease(CFAllocatorRef allocator, const void *value) {
-  [(id)value release];
+  // We want to autorelease (as opposed to release) because we want the 
+  // actual dealloc of the item to occur outside the "cache" lock.
+  // We had a bug where dealloc'ing an image caused us to deadlock
+  // because we had the NSAppKitLock in thread 1 and were waiting 
+  // on the HGSIconProvider cache_ lock, and in thread 2 we had the 
+  // HGSIconProvider cache_ lock and were waiting on NSAppKitLock.
+  // By switching the release to an autorelease, we should get out of the
+  // cache lock on thread 2, before attempting to release the image which
+  // acquires the NSAppKitLock.
+  
+  //  Thread 1...
+  //  928 -[NSTableView _drawContentsAtRow:column:withCellFrame:]
+  //    928 -[QSBViewTableViewCell drawWithFrame:inView:]
+  //      928 -[NSView addSubview:]
+  //        928 -[NSView _setWindow:]
+  //          928 CFArrayApplyFunction
+  //            928 __NSViewRecursionHelper
+  //              928 -[NSControl _setWindow:]
+  //                928 -[NSView _setWindow:]
+  //                  928 -[QSBResultIconView viewDidMoveToWindow]
+  //                    928 -[NSView displayIfNeeded]
+  //                      928 -[NSView _sendViewWillDrawInRect:]
+  //                        928 -[NSView viewWillDraw]
+  //                          928 -[NSTableView viewWillDraw]
+  //                            928 -[NSView viewWillDraw]
+  //                              928 -[NSView viewWillDraw]
+  //                                928 -[QSBResultIconView viewWillDraw]
+  //                                  928 -[HGSResult valueForKey:]
+  //                                    928 -[HGSResult provideValueForKey:result:]
+  //                                      928 -[HGSIconProvider provideIconForResult:loadLazily:useCache:]
+  //                                        928 -[HGSIconProvider cachedIconForKey:]
+  //                                          928 pthread_mutex_lock
+  //                                            928 semaphore_wait_signal_trap
+  //                                              928 semaphore_wait_signal_trap
+  //  Thread 2...
+  //  928 -[HGSInvocationOperation intermediateInvocation:]
+  //    928 -[HGSIconOperation performDiskLoad:]
+  //      928 -[HGSIconProvider cacheIcon:forKey:]
+  //        928 -[HGSLRUCache setValue:forKey:size:]
+  //          928 -[HGSLRUCache removeValueForKey:]
+  //            928 CFDictionaryRemoveValue
+  //              928 HGSLRUCacheEntryRelease
+  //                928 LRURelease
+  //                  928 -[NSImage dealloc]
+  //                    928 -[NSImage _setRepresentationListCache:]
+  //                      928 _CFRelease
+  //                        928 __CFArrayReleaseValues
+  //                          928 CFRelease
+  //                            928 -[NSIconRefBitmapImageRep dealloc]
+  //                              928 -[NSBitmapImageRep dealloc]
+  //                                928 SetCustomCGColorSpace
+  //                                  928 _NSAppKitLock
+  //                                    928 -[NSRecursiveLock lock]
+  //                                      928 pthread_mutex_lock
+  //                                        928 semaphore_wait_signal_trap
+  //                                          928 semaphore_wait_signal_trap
+  [(id)value autorelease];
 }
 
 static Boolean LRUEqual(const void *value1, const void *value2) {
