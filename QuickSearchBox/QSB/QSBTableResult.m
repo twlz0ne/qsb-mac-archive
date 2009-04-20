@@ -414,8 +414,15 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (NSString*)displayToolTip {
   // TODO(alcor): for now add in rank info to help with debugging. remove.
+  NSString *displayString = [self displayName];
+  HGSResult *result = [self representedResult];
+  NSString *snippetString = [result valueForKey:kHGSObjectAttributeSnippetKey];
+  if ([snippetString length]) {
+    displayString = [displayString stringByAppendingFormat:@" — %@",
+                     snippetString];
+  }
   return [NSString stringWithFormat:@"%@ (Rank: %.2f, %d)", 
-                                    [self displayName],
+                                    displayString,
                                     [self rank],
                                     [[self representedResult] rankFlags]];
 }

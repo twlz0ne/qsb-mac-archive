@@ -125,6 +125,23 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   [super dealloc];
 }
 
+- (BOOL)isValidSourceForQuery:(HGSQuery *)query {
+  BOOL isValid = [super isValidSourceForQuery:query];
+  // If we're pivoting on docs.google.com then we can provide
+  // a list of all of our docs.
+  if (!isValid) {
+    HGSResult *pivotObject = [query pivotObject];
+    if ([pivotObject conformsToType:kHGSTypeWebApplication]) {
+      NSURL *url = [pivotObject url];
+      NSString *host = [url host];
+      NSComparisonResult compareResult
+        = [host compare:@"docs.google.com" options:NSCaseInsensitiveSearch];
+      isValid = compareResult == NSOrderedSame;
+    }
+  }
+  return isValid;
+}
+
 #pragma mark -
 #pragma mark Docs Fetching
 
@@ -303,9 +320,10 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                          [docURL scheme],
                                          [docURL host]]];
   NSMutableArray *cellArray = [NSMutableArray array];
+  NSString *docsString = HGSLocalizedString(@"Google Docs", nil);
   NSDictionary *googleDocsCell 
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-       HGSLocalizedString(@"Google Docs", nil), kQSBPathCellDisplayTitleKey,
+       docsString, kQSBPathCellDisplayTitleKey,
        baseURL, kQSBPathCellURLKey,
        nil];
   [cellArray addObject:googleDocsCell];
@@ -351,12 +369,11 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
       rankFlags, kHGSObjectAttributeRankFlagsKey,
       cellArray, kQSBObjectAttributePathCellsKey,
       date, kHGSObjectAttributeLastUsedDateKey,
+      userName_, kHGSObjectAttributeSnippetKey,
       icon, kHGSObjectAttributeIconKey,
       nil];
-  NSString *docTitleWithAccount = [docTitle stringByAppendingFormat:@" (%@)",
-                                   userName_];
   HGSResult* result = [HGSResult resultWithURL:docURL
-                                          name:docTitleWithAccount
+                                          name:docTitle
                                           type:kHGSTypeWebpage
                                         source:self
                                     attributes:attributes];
