@@ -490,7 +490,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSString *name = nil;
   NSString *urlString = nil;
   if (![query length]) {
-    name = NSLocalizedString(@"Search Google", @"");
+    name = NSLocalizedString(@"Google Search", @"");
     urlString = @"http://www.google.com";
   } else {
     name = query;
@@ -540,7 +540,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (NSAttributedString*)sourceURLString {
   NSMutableAttributedString *sourceURLString = nil;
-  NSString *sourceURL = NSLocalizedString(@"Search Google", @""); ;
+  NSString *sourceURL = NSLocalizedString(@"Google Search", @""); ;
   if (sourceURL) {
     sourceURLString = [self mutableAttributedStringFromHTMLString:sourceURL];
     [self addAttributes:sourceURLString elementType:kQSBResultDescriptionSnippet];
