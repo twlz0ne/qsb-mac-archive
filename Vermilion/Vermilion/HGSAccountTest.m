@@ -34,6 +34,7 @@
 #import "GTMSenTestCase.h"
 #import "HGSAccount.h"
 #import "HGSAccountType.h"
+#import "HGSGoogleAccountTypes.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSExtensionPoint.h"
 #import "HGSPlugin.h"
