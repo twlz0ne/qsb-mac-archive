@@ -85,11 +85,13 @@ static NSString *const kiPhoneReferenceDocSetPath
   NSString *rootDirDocuments = [rootDirBundle resourcePath];
   rootDirDocuments 
     = [rootDirDocuments stringByAppendingPathComponent:@"Documents"];
-  NSURL *docsURL = [NSURL fileURLWithPath:docSetPath];
+
+  NSURL *docsURL = [NSURL fileURLWithPath:docSetPath isDirectory:YES];
   if (!docsURL) {
     HGSLogDebug(@"Unable to get developer docs URL");
     return;
   }
+  NSURL *rootDirURL = [NSURL fileURLWithPath:rootDirDocuments isDirectory:YES];
   NSString *docSetName 
     = [rootDirBundle objectForInfoDictionaryKey:(NSString*)kCFBundleNameKey];
   NSDictionary *docSetCell = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -129,8 +131,7 @@ static NSString *const kiPhoneReferenceDocSetPath
         url = [NSURL URLWithString:urlString];
       }
     } else {
-      path = [rootDirDocuments stringByAppendingPathComponent:path];
-      url = [NSURL fileURLWithPath:path];
+      url = [[NSURL alloc] initWithString:path relativeToURL:rootDirURL];
     }
     if (url) {
       NSDictionary *docCell = [NSDictionary dictionaryWithObjectsAndKeys:
