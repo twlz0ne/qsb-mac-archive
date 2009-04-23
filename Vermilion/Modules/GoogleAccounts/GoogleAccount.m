@@ -34,14 +34,11 @@
 #import "GoogleAccountSetUpViewController.h"
 #import "GTMMethodCheck.h"
 #import "GTMNSString+URLArguments.h"
+#import "HGSGoogleAccountTypes.h"
 #import "HGSLog.h"
 
 
 static NSString *const kGoogleURLString = @"http://www.google.com/";
-static NSString *const kGoogleAccountTypeName
-  = @"com.google.qsb.google.account";
-static NSString *const kGoogleAppsAccountTypeName
-  = @"com.google.qsb.googleapps.account";
 static NSString *const kAccountTestFormat
   = @"https://www.google.com/accounts/ClientLogin?Email=%@&Passwd=%@"
     @"&source=GoogleQuickSearch&accountType=%@";
@@ -93,7 +90,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (NSString *)type {
-  return kGoogleAccountTypeName;
+  return kHGSGoogleAccountType;
 }
 
 - (NSString *)adjustUserName:(NSString *)userName {
@@ -254,7 +251,7 @@ didReceiveResponse:(NSURLResponse *)response {
 @implementation GoogleAppsAccount
 
 - (NSString *)type {
-  return kGoogleAppsAccountTypeName;
+  return kHGSGoogleAppsAccountType;
 }
 
 @end

@@ -30,7 +30,7 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Google Bookmarks</string>
 			<key>HGSExtensionDesiredAccountTypes</key>
-			<string>com.google.qsb.google.account</string>
+			<string>kHGSGoogleAccountTypeID</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<array>
 				<string>com.googlecode.precipitate.bookmark</string>

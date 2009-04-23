@@ -33,6 +33,7 @@
 #import "GoogleCorporaSource.h"
 #import "GTMMethodCheck.h"
 #import "NSString+ReadableURL.h"
+#import "HGSGoogleAccountTypes.h"
 #import <Vermilion/Vermilion.h>
 
 static NSString *const kHGSCorporaSourceAttributeIconNameKey 
@@ -64,11 +65,23 @@ GTM_METHOD_CHECK(NSString, readableURLString);
       [self release];
       self = nil;
     }
+    HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self 
+           selector:@selector(didAddOrRemoveAccount:) 
+               name:kHGSExtensionPointDidAddExtensionNotification 
+             object:accountsPoint];
+    [nc addObserver:self 
+           selector:@selector(didAddOrRemoveAccount:) 
+               name:kHGSExtensionPointDidRemoveExtensionNotification 
+             object:accountsPoint];
   }
   return self;
 }
 
 - (void)dealloc {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self];
   [searchableCorpora_ release];
   [visibleCorpora_ release];
   [super dealloc];
@@ -80,12 +93,10 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
 - (NSArray *)dasherDomains {
   HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
-  NSArray *googleAccounts = [accountsPoint accountsForType:@"Google"];
-  // TODO(mrossetti): update account type to 'com.google.qsb.google(apps).account'.
+  NSArray *googleAppsAccounts
+    = [accountsPoint accountsForType:kHGSGoogleAppsAccountType];
   NSMutableArray *domains = [NSMutableArray array];
-  for (HGSAccount *account in googleAccounts) {
-    BOOL hosted = [account isKindOfClass:NSClassFromString(@"GoogleAppsAccount")];     
-    if (!hosted) continue;
+  for (HGSAccount *account in googleAppsAccounts) {
     NSString *name = [account userName];
     NSInteger location = [name rangeOfString:@"@"].location;
     if (location != NSNotFound) {
@@ -251,6 +262,15 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   }
   
   return nil;
+}
+
+- (void)didAddOrRemoveAccount:(NSNotification *)notification {
+  NSDictionary *userInfo = [notification userInfo];
+  HGSAccount *account = [userInfo objectForKey:kHGSExtensionKey];
+  NSString *accountType = [account type];
+  if ([accountType isEqualToString:kHGSGoogleAppsAccountType]) {
+    [self loadCorpora];
+  }
 }
 
 @end

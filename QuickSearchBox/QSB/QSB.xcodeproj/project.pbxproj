@@ -325,6 +325,7 @@
 		6263CAF60EB79F3600FF03A1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E429DF760AC1907A00E747D8 /* Security.framework */; };
 		6263CB0E0EB79FB300FF03A1 /* PicasawebSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 6263CB0A0EB79FB300FF03A1 /* PicasawebSource.m */; };
 		626585230F43BD4C008A94B2 /* QSBUserMessenger.m in Sources */ = {isa = PBXBuildFile; fileRef = 626585220F43BD4C008A94B2 /* QSBUserMessenger.m */; };
+		627B43C00FA0E3D9006BE269 /* HGSGoogleAccountTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 627B43BF0FA0E3D9006BE269 /* HGSGoogleAccountTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		627B84A20E2423DC001FB81E /* DoubleUpChevrons.png in Resources */ = {isa = PBXBuildFile; fileRef = 627B84A10E2423DC001FB81E /* DoubleUpChevrons.png */; };
 		627FAEC20DF9D73500E3E765 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
 		627FAEC30DF9D73500E3E765 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
@@ -1795,6 +1796,7 @@
 		6263CB0A0EB79FB300FF03A1 /* PicasawebSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicasawebSource.m; sourceTree = "<group>"; };
 		626585210F43BD4C008A94B2 /* QSBUserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBUserMessenger.h; sourceTree = "<group>"; };
 		626585220F43BD4C008A94B2 /* QSBUserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBUserMessenger.m; sourceTree = "<group>"; };
+		627B43BF0FA0E3D9006BE269 /* HGSGoogleAccountTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSGoogleAccountTypes.h; sourceTree = "<group>"; };
 		627B84A10E2423DC001FB81E /* DoubleUpChevrons.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DoubleUpChevrons.png; sourceTree = "<group>"; };
 		627FAEB50DF9D71D00E3E765 /* RecentDocumentsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecentDocumentsSource.m; sourceTree = "<group>"; };
 		627FAEB60DF9D71D00E3E765 /* RecentDocuments-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RecentDocuments-Info.plist"; sourceTree = "<group>"; };
@@ -3683,6 +3685,7 @@
 				8BAAA85B0F813E2A00DF4F12 /* HGSExtensionPoint.h */,
 				8BAAA85E0F813E2A00DF4F12 /* HGSExtensionPoint.m */,
 				8BAAA8600F813E2A00DF4F12 /* HGSExtensionPointTest.m */,
+				627B43BF0FA0E3D9006BE269 /* HGSGoogleAccountTypes.h */,
 				5AED35E50EB7D978004C7187 /* HGSIconProvider.h */,
 				5AED35E60EB7D978004C7187 /* HGSIconProvider.m */,
 				8B95CA930F6B09FE003BDBDD /* HGSIconProviderTest.m */,
@@ -4190,6 +4193,7 @@
 				62FF5B870F8D846F00B21B5D /* HGSAccountType.h in Headers */,
 				62F974C30F8EF33E001C55B6 /* QSBSetUpAccountViewController.h in Headers */,
 				62F974CA0F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.h in Headers */,
+				627B43C00FA0E3D9006BE269 /* HGSGoogleAccountTypes.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7516,6 +7520,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleDocs/GoogleDocs-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = GoogleDocs;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -7526,6 +7532,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleDocs/GoogleDocs-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = GoogleDocs;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -7536,6 +7544,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleBookmarks/GoogleBookmarks-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = GoogleBookmarks;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -7546,6 +7556,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleBookmarks/GoogleBookmarks-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = GoogleBookmarks;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -7696,6 +7708,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Picasaweb/Picasaweb-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = Picasaweb;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -7706,6 +7720,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Picasaweb/Picasaweb-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = Picasaweb;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -7760,6 +7776,8 @@
 					"\\\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\\\"",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleAccounts/GoogleAccounts-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = GoogleAccounts;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -7774,6 +7792,8 @@
 					"\\\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\\\"",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleAccounts/GoogleAccounts-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = GoogleAccounts;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -8525,6 +8545,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleBookmarks/GoogleBookmarks-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = GoogleBookmarks;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -8545,6 +8567,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleDocs/GoogleDocs-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = GoogleDocs;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -8592,6 +8616,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Picasaweb/Picasaweb-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = Picasaweb;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -8695,6 +8721,8 @@
 					"\\\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\\\"",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleAccounts/GoogleAccounts-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = GoogleAccounts;
 				WRAPPER_EXTENSION = hgs;
 			};

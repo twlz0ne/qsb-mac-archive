@@ -43,10 +43,6 @@
 #pragma mark Supporting Classes
 
 static NSString *const kTestAccountTypeID = @"com.google.qsb.test.account";
-static NSString *const kMockGoogleAccountTypeID
-  = @"com.google.qsb.google.account";
-static NSString *const kMockGoogleAppsAccountTypeID
-  = @"com.google.qsb.googleapps.account";
 static NSString *const kTestAccountTypeClass = @"TestAccountType";
 static NSString *const kTestAccountType = @"BaseAccount";
 static NSString *const kTestAccountClass = @"BaseAccount";
@@ -84,7 +80,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
 @implementation MockGoogleAccount
 
 - (NSString *)type {
-  return kMockGoogleAccountTypeID;
+  return kHGSGoogleAccountType;
 }
 
 @end
@@ -96,7 +92,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
 @implementation MockGoogleAppsAccount
 
 - (NSString *)type {
-  return kMockGoogleAppsAccountTypeID;
+  return kHGSGoogleAppsAccountType;
 }
 
 @end
@@ -382,7 +378,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   // Testing for nil is adequate since the -[type] accesses the member function
   // which returns a constant.  But let's just make sure.
   NSString *accountType = [account type];
-  STAssertEqualObjects(accountType, kMockGoogleAccountTypeID, nil);
+  STAssertEqualObjects(accountType, kHGSGoogleAccountType, nil);
 
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME G", kHGSAccountUserNameKey,
@@ -395,7 +391,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
        autorelease];
   STAssertNotNil(account, nil);
   accountType = [account type];
-  STAssertEqualObjects(accountType, kMockGoogleAppsAccountTypeID, nil);
+  STAssertEqualObjects(accountType, kHGSGoogleAppsAccountType, nil);
 }
 
 @end

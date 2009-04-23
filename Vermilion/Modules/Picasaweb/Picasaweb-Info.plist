@@ -30,7 +30,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionDesiredAccountTypes</key>
-			<string>com.google.qsb.google.account</string>
+			<string>kHGSGoogleAccountTypeID</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<array>
 				<string>com.googlecode.precipitate.pwa.album</string>

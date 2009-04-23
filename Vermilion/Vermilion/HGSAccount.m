@@ -34,6 +34,7 @@
 #import "HGSAccountType.h"
 #import "HGSBundle.h"
 #import "HGSCoreExtensionPoints.h"
+#import "HGSGoogleAccountTypes.h"
 #import "HGSAccountsExtensionPoint.h"
 #import "HGSLog.h"
 #import "KeychainItem.h"
@@ -228,10 +229,10 @@ NSString *const kHGSAccountIdentifierFormat = @"%@.%@";
       NSString *newAccountType = nil;
       NSString *oldKeychainPrefix = nil;
       if ([oldAccountType isEqualToString:@"GoogleAccount"]) {
-        newAccountType = @"com.google.qsb.google.account";
+        newAccountType = kHGSGoogleAccountType;
         oldKeychainPrefix = @"com.google.qsb.GoogleAccount";
       } else if ([oldAccountType isEqualToString:@"GoogleAppsAccount"]) {
-        newAccountType = @"com.google.qsb.googleapps.account";
+        newAccountType = kHGSGoogleAppsAccountType;
         oldKeychainPrefix = @"com.google.qsb.GoogleAppsAccount";
       } else if ([oldAccountType isEqualToString:@"TwitterAccount"]) {
         newAccountType = @"com.google.qsb.twitter.account";

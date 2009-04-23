@@ -30,7 +30,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSAccountTypesExtensionPoint</string>
 			<key>HGSExtensionOfferedAccountType</key>
-			<string>com.google.qsb.google.account</string>
+			<string>kHGSGoogleAccountTypeID</string>
 			<key>HGSExtensionOfferedAccountClass</key>
 			<string>GoogleAccount</string>
 			<key>QSBSetUpAccountViewNibName</key>
@@ -52,7 +52,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSAccountTypesExtensionPoint</string>
 			<key>HGSExtensionOfferedAccountType</key>
-			<string>com.google.qsb.googleapps.account</string>
+			<string>kHGSGoogleAppsAccountTypeID</string>
 			<key>HGSExtensionOfferedAccountClass</key>
 			<string>GoogleAppsAccount</string>
 			<key>HGSExtensionIsUserVisible</key>
