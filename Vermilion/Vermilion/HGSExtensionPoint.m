@@ -88,7 +88,22 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
 
 
 - (BOOL)verifyExtension:(id)extension {
-  return extension && (!class_ || [extension isKindOfClass:class_]);
+  BOOL verified = NO;
+  if (extension) {
+    if (class_) {
+      if ([extension isKindOfClass:class_]) {
+        verified = YES;
+      } else {
+        HGSLogDebug(@"Verify failed: extension point class (%@) is not kind of "
+                    @"class_ (%@).", [extension class], class_);
+      }
+    } else {
+      HGSLogDebug(@"Verify failed: extension point class_ was nil.");
+    }
+  } else {
+    HGSLogDebug(@"Verify failed: extension is nil.");
+  }
+  return verified;
 }
 
 - (void)setKindOfClass:(Class)kindOfClass {
@@ -119,7 +134,7 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
     wasGood = NO;
   }
   if (![self verifyExtension:extension]) {
-    HGSLog(@"Extension %@ does not conform to protocol", identifier);
+    HGSLog(@"Extension %@ did not verify", identifier);
     wasGood = NO;
   }
   if (wasGood) {
@@ -128,6 +143,8 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
       // used for a different key
       if ([extensions_ objectForKey:identifier]) {
         wasGood = NO;
+        HGSLogDebug(@"Extension with identifier '%@' already installed",
+                    identifier);
       } else {
         [extensions_ setObject:extension forKey:identifier];
         wasGood = YES;
@@ -147,9 +164,10 @@ static NSMutableDictionary *sHGSExtensionPoints = nil;
 }
 
 - (NSString *)description {
-  NSString *result = [NSString stringWithFormat:@"%@ <%@> - Extensions: %@",
-                      [self class], NSStringFromClass(class_), 
-                      [self extensions]];
+  NSString *result
+    = [NSString stringWithFormat:@"%@, Class: '%@', Extensions: %@",
+       [self class], NSStringFromClass(class_), 
+       [self extensions]];
   return result;
 }
 

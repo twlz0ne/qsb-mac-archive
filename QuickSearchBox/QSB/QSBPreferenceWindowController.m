@@ -40,10 +40,14 @@
 #import "HGSLog.h"
 #import "KeychainItem.h"
 #import "NSColor+Naming.h"
-#import "QSBApplicationDelegate.h"
 #import "QSBPreferences.h"
 #import "QSBSearchWindowController.h"
 #import "QSBSetUpAccountWindowController.h"
+#import "QSBEditAccountWindowController.h"
+
+NSString *const kQSBEditAccountWindowNibName = @"QSBEditAccountWindowNibName";
+NSString *const kQSBEditAccountWindowControllerClassName
+  = @"QSBEditAccountWindowControllerClassName";
 
 static void OpenAtLoginItemsChanged(LSSharedFileListRef inList, void *context);
 
@@ -328,7 +332,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   [NSApp beginSheet:setUpWindow
      modalForWindow:preferenceWindow
       modalDelegate:self 
-     didEndSelector:@selector(setupSheetDidEnd:returnCode:contextInfo:)
+     didEndSelector:@selector(setUpAccountSheetDidEnd:returnCode:contextInfo:)
         contextInfo:nil];
 }
 
@@ -336,7 +340,32 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   NSArray *selections = [accountsListController_ selectedObjects];
   HGSAccount *account = [selections objectAtIndex:0];
   if ([account isEditable]) {
-    [account editWithParentWindow:[self window]];
+    NSString *accountTypeName = [account type];
+    HGSExtensionPoint *accountTypesEP = [HGSExtensionPoint accountTypesPoint];
+    HGSAccountType *accountType
+      = [accountTypesEP extensionWithIdentifier:accountTypeName];
+    HGSProtoExtension *accountProto = [accountType protoExtension];
+    NSString *editAccountControllerClassName
+      = [accountProto objectForKey:kQSBEditAccountWindowControllerClassName];
+    Class editAccountControllerClass
+      = NSClassFromString(editAccountControllerClassName);
+    NSString *editAccountNibName
+      = [accountProto objectForKey:kQSBEditAccountWindowNibName];
+    QSBEditAccountWindowController *editWindowController
+      = [[editAccountControllerClass alloc]
+         initWithWindowNibName:editAccountNibName account:account];
+    if (editWindowController) {
+      NSWindow *preferenceWindow = [self window];
+      NSWindow *editWindow = [editWindowController window];
+      [NSApp beginSheet:editWindow
+         modalForWindow:preferenceWindow
+          modalDelegate:self 
+         didEndSelector:@selector(editAccountSheetDidEnd:returnCode:contextInfo:)
+            contextInfo:editWindowController];
+    } else {
+      HGSLog(@"Failed to load edit account nib '%@' for account '%@'.",
+             editAccountNibName, account);
+    }
   }
 }
 
@@ -347,9 +376,9 @@ GTM_METHOD_CHECK(NSColor, crayonName);
     NSString *summary = NSLocalizedString(@"About to remove an account.",
                                           nil);
     NSString *format
-    = NSLocalizedString(@"Removing the account '%@' will disable and remove "
-                        @"all search sources associated with this account.",
-                        nil);
+      = NSLocalizedString(@"Removing the account '%@' will disable and remove "
+                          @"all search sources associated with this account.",
+                          nil);
     NSString *userName = [accountToRemove userName];
     NSString *explanation = [NSString stringWithFormat:format, userName];
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
@@ -384,10 +413,18 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   }
 }
 
-- (void)setupSheetDidEnd:(NSWindow *)sheet 
-              returnCode:(NSInteger)returnCode 
-             contextInfo:(void *)contextInfo {
+- (void)setUpAccountSheetDidEnd:(NSWindow *)sheet 
+                     returnCode:(NSInteger)returnCode 
+                    contextInfo:(void *)contextInfo {
   [sheet close];
+}
+
+- (void)editAccountSheetDidEnd:(NSWindow *)sheet 
+                    returnCode:(NSInteger)returnCode 
+                   contextInfo:(void *)contextInfo {
+  QSBEditAccountWindowController *editWindowController = contextInfo;
+  [sheet close];
+  [editWindowController release];
 }
 
 - (void)updateColorPopup {

@@ -29,8 +29,8 @@
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionDesiredAccountTypes</key>
 			<array>
-				<string>Google</string>
-				<string>GoogleApps</string>
+				<string>com.google.qsb.google.account</string>
+				<string>com.google.qsb.googleapps.account</string>
 			</array>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>Google Docs</string>

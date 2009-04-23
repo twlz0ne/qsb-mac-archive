@@ -33,10 +33,48 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSAccount.h"
+#import "HGSAccountType.h"
 #import "HGSAccountsExtensionPoint.h"
 #import "HGSCoreExtensionPoints.h"
+#import "HGSExtensionPoint.h"
+#import "HGSPlugin.h"
+#import "HGSProtoExtension.h"
 #import <OCMock/OCMock.h>
 
+#pragma mark Supporting Classes
+
+static NSString *const kAccountTypeAID = @"com.google.qsb.testA.account";
+static NSString *const kAccountTypeAClass = @"AccountTypeA";
+static NSString *const kAccountTypeA = @"AccountA";
+static NSString *const kAccountAClass = @"AccountA";
+static NSString *const kAccountTypeAName = @"Account Type A";
+
+@interface AccountTypeA : HGSAccountType
+@end
+
+
+@implementation AccountTypeA
+
+- (NSString *)type {
+  return kAccountTypeAID;
+}
+
+@end
+
+
+@interface AccountA : HGSAccount
+@end
+
+
+@implementation AccountA
+
+- (NSString *)type {
+  return kAccountTypeAID;
+}
+
+@end
+
+#pragma mark Test Class
 
 @interface HGSAccountsExtensionPointTest : GTMTestCase {
  @private
@@ -53,19 +91,7 @@
 @property BOOL receivedDidRemoveAccountExtensionNotification;
 @property (retain) HGSAccount *expectedAccount;
 
-@end
-
-
-@interface TestAccount : HGSAccount
-@end
-
-static NSString *const kTestAccountType = @"TestAccountType";
-
-@implementation TestAccount
-
-- (NSString *)type {
-  return kTestAccountType;
-}
+- (void)removeAllAccountsAndTypes;
 
 @end
 
@@ -85,6 +111,19 @@ static NSString *const kTestAccountType = @"TestAccountType";
 - (void)dealloc {
   [self setExpectedAccount:nil];
   [super dealloc];
+}
+
+- (void)removeAllAccountsAndTypes {
+  HGSExtensionPoint *point = [HGSExtensionPoint accountTypesPoint];
+  NSArray *extensions = [point extensions];
+  for (HGSExtension *extension in extensions) {
+    [point removeExtension:extension];
+  }
+  point = [HGSExtensionPoint accountsPoint];
+  extensions = [point extensions];
+  for (HGSExtension *extension in extensions) {
+    [point removeExtension:extension];
+  }
 }
 
 - (void)setExpectedAccount:(HGSAccount *)expectedAccount {
@@ -186,29 +225,10 @@ static NSString *const kTestAccountType = @"TestAccountType";
   HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
   STAssertNotNil(accountsPoint, nil);
   
-  // Vain attempts to add bad account types
-  [accountsPoint addAccountType:nil withClass:nil];
-  NSUInteger typeCount = [[accountsPoint visibleAccountTypeDisplayNames] count];
-  STAssertEquals(typeCount, (NSUInteger)0, nil);
-  [accountsPoint addAccountType:nil withClass:[NSString class]];
-  typeCount = [[accountsPoint visibleAccountTypeDisplayNames] count];
-  STAssertEquals(typeCount, (NSUInteger)0, nil);
-  [accountsPoint addAccountType:@"DUMMYTYPE" withClass:nil];
-  typeCount = [[accountsPoint visibleAccountTypeDisplayNames] count];
-  STAssertEquals(typeCount, (NSUInteger)0, nil);
-  
-  // Valid attempt to add good account type
-  [accountsPoint addAccountType:kTestAccountType
-                      withClass:[TestAccount class]];
-  typeCount = [[accountsPoint visibleAccountTypeDisplayNames] count];
-  STAssertEquals(typeCount, (NSUInteger)1, nil);
-  Class class = [accountsPoint classForAccountType:kTestAccountType];
-  STAssertEquals(class, [TestAccount class], nil);
-  
   // There should be no accounts registered yet.
   NSArray *accounts = [accountsPoint accountsForType:@"DUMMYTYPE"];
   STAssertEquals([accounts count], (NSUInteger)0, nil);
-  accounts = [accountsPoint accountsForType:kTestAccountType];
+  accounts = [accountsPoint accountsForType:kAccountTypeA];
   STAssertEquals([accounts count], (NSUInteger)0, nil);
 
   // Attempt to add invalid accounts.
@@ -221,8 +241,8 @@ static NSString *const kTestAccountType = @"TestAccountType";
   STAssertFalse(notified, nil);
   
   // Add one valid account.
-  TestAccount *account1
-    = [[[TestAccount alloc] initWithName:@"account1"] autorelease];
+  AccountA *account1
+    = [[[AccountA alloc] initWithName:@"account1"] autorelease];
   STAssertNotNil(account1, nil);
   [self setExpectedAccount:account1];
   STAssertTrue([accountsPoint extendWithObject:account1], nil);
@@ -241,45 +261,96 @@ static NSString *const kTestAccountType = @"TestAccountType";
   STAssertTrue(notified, nil);
  
   [self setExpectedAccount:nil];
-  
-  // Add several accounts.
+
+  // Remove everything.
+  [self removeAllAccountsAndTypes];
+}
+
+- (void)testAddMultipleAccounts {
+  // We need a bundle.
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  BOOL yes = YES;
+  [[[bundleMock stub] andReturnValue:OCMOCK_VALUE(yes)] isLoaded];
+
+  // We need a plugin
+  id pluginMock = [OCMockObject mockForClass:[HGSPlugin class]];
+  [[[pluginMock stub] andReturn:@"PLUGIN"] displayName];
+  [[[pluginMock stub] andReturn:bundleMock] bundle];
+  
+  // We need an account type extension point.
+  HGSExtensionPoint *accountTypesPoint = [HGSExtensionPoint accountTypesPoint];
+  STAssertNotNil(accountTypesPoint, nil);
+  
+  // We need at least one account type.
+  NSDictionary *configuration
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       bundleMock, kHGSExtensionBundleKey,
+       kAccountTypeAClass, kHGSExtensionClassKey,
+       kAccountTypeAID, kHGSExtensionIdentifierKey,
+       kAccountTypeAName, kHGSExtensionUserVisibleNameKey,
+       kHGSAccountTypesExtensionPoint, kHGSExtensionPointKey,
+       kAccountTypeA, kHGSExtensionOfferedAccountType,
+       kAccountAClass, kHGSExtensionOfferedAccountClass,
+       nil];
+  HGSProtoExtension *accountTypeProto
+    = [[[HGSProtoExtension alloc] initWithConfiguration:configuration
+                                                 plugin:pluginMock]
+       autorelease];
+  STAssertNotNil(accountTypeProto, nil);
+  [accountTypeProto install];
+  HGSAccountType *accountType
+    = [accountTypesPoint extensionWithIdentifier:kAccountTypeAID];
+  STAssertNotNil(accountType, nil);
+  
+  // Add several accounts.
+  NSNumber *versionNumber
+    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
   NSDictionary *accountDict1 = [NSDictionary dictionaryWithObjectsAndKeys:
-                                kTestAccountType, kHGSAccountTypeKey,
+                                kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account1", kHGSAccountUserNameKey,
+                                versionNumber, kQSBAccountsPrefVersionKey,
                                 nil];
   NSDictionary *accountDict2 = [NSDictionary dictionaryWithObjectsAndKeys:
-                                kTestAccountType, kHGSAccountTypeKey,
+                                kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account2", kHGSAccountUserNameKey,
+                                versionNumber, kQSBAccountsPrefVersionKey,
                                 nil];
   NSDictionary *accountDict3 = [NSDictionary dictionaryWithObjectsAndKeys:
-                                kTestAccountType, kHGSAccountTypeKey,
+                                kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account3", kHGSAccountUserNameKey,
+                                versionNumber, kQSBAccountsPrefVersionKey,
                                 nil];
   NSDictionary *accountDict4 = [NSDictionary dictionaryWithObjectsAndKeys:
-                                kTestAccountType, kHGSAccountTypeKey,
+                                kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account4", kHGSAccountUserNameKey,
+                                versionNumber, kQSBAccountsPrefVersionKey,
                                 nil];
   NSDictionary *accountDict5 = [NSDictionary dictionaryWithObjectsAndKeys:
-                                kTestAccountType, kHGSAccountTypeKey,
+                                kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account5", kHGSAccountUserNameKey,
+                                versionNumber, kQSBAccountsPrefVersionKey,
                                 nil];
   NSArray *accountDicts = [NSArray arrayWithObjects:accountDict1, accountDict2,
-                       accountDict3, accountDict4, accountDict5, nil];
+                           accountDict3, accountDict4, accountDict5, nil];
+  HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
   [accountsPoint addAccountsFromArray:accountDicts];
-  accounts = [accountsPoint accountsForType:kTestAccountType];
+  NSArray *accountExtensions = [accountsPoint extensions];
+  NSUInteger extensionCount = [accountExtensions count];
+  STAssertEquals(extensionCount, (NSUInteger)5, nil);
+  NSArray *accounts = [accountsPoint accountsForType:kAccountTypeAID];
   NSUInteger accountCount = [accounts count];
   STAssertEquals(accountCount, (NSUInteger)5, nil);
   
   NSString *description = [accountsPoint description];
   STAssertNotEquals([description length], (NSUInteger)0, nil);
+  [self removeAllAccountsAndTypes];
 }
 
 @end

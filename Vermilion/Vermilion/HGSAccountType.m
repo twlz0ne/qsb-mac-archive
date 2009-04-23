@@ -1,7 +1,7 @@
 //
-//  HGSSimpleAccountEditController.h
+//  HGSAccountType.m
 //
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,38 +30,7 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Cocoa/Cocoa.h>
+#import "HGSAccountType.h"
 
-@class HGSSimpleAccount;
-
-// A controller which manages a window used to update the password
-// for the account account.
-//
-@interface HGSSimpleAccountEditController : NSWindowController {
- @private
-  IBOutlet HGSSimpleAccount *account_;
-  IBOutlet NSWindow *editAccountSheet_;
-  
-  NSString *password_;
-}
-
-@property (nonatomic, copy) NSString *password;
-@property (nonatomic, retain, readonly) HGSSimpleAccount *account;
-
-// Gets the edit window associated with this controller.
-- (NSWindow *)editAccountSheet;
-
-// Called when the user presses 'OK'.
-- (IBAction)acceptEditAccountSheet:(id)sender;
-
-// Called when user presses 'Cancel'.
-- (IBAction)cancelEditAccountSheet:(id)sender;
-
-// Called when authentication fails, to see if remediation is possible.
-// The default returns NO.  Override this to determine if some additional
-// action can be performed (within the setup process) to fix the
-// authentication.  One common remediation is to respond to a captcha
-// request.
-- (BOOL)canGiveUserAnotherTry;
-
+@implementation HGSAccountType
 @end

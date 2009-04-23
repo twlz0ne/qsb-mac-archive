@@ -74,6 +74,12 @@
 }
 
 /*!
+   Returns the concrete extension, if any, associated with this
+   proto-extension.
+*/
+@property (nonatomic, retain, readonly) HGSExtension *extension;
+
+/*!
   Returns the display name for the protoextension. This is localized.
 */
 @property (nonatomic, copy, readonly) NSString *displayName;
@@ -163,9 +169,9 @@
 - (BOOL)isUserVisibleAndExtendsExtensionPoint:(NSString *)extensionPoint;
 
 /*!
-  Install all account types that we offer.
+  Returns a configuration value.
 */
-- (void)installAccountTypes;
+- (id)objectForKey:(NSString *)configurationKey;
 
 @end
 

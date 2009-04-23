@@ -31,6 +31,7 @@
 //
 
 #import "HGSExtension.h"
+#import "HGSProtoExtension.h"
 #import "HGSLog.h"
 #import "HGSBundle.h"
 
@@ -49,6 +50,8 @@ NSString *const kHGSExtensionDesiredAccountTypes
   = @"HGSExtensionDesiredAccountTypes";
 NSString *const kHGSExtensionOfferedAccountType
   = @"HGSExtensionOfferedAccountType";
+NSString *const kHGSExtensionOfferedAccountClass
+  = @"HGSExtensionOfferedAccountClass";
 NSString *const kHGSExtensionIsUserVisible = @"HGSExtensionIsUserVisible";
 NSString *const kHGSExtensionIsEnabledByDefault 
   = @"HGSExtensionIsEnabledByDefault";
@@ -66,9 +69,11 @@ NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
 
 @implementation HGSExtension
 
+@synthesize protoExtension = protoExtension_;
 @synthesize displayName = displayName_;
 @synthesize identifier = identifier_;
 @synthesize bundle = bundle_;
+@synthesize userVisible = userVisible_;
 
 - (id)init {
   return [self initWithConfiguration:nil];
@@ -138,6 +143,18 @@ NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
       }
       iconPath_ = [iconPath copy];
     }
+    NSNumber *userVisibleValue 
+      = [configuration objectForKey:kHGSExtensionIsUserVisible];
+    BOOL userVisible = (userVisibleValue) ? [userVisibleValue boolValue] : YES;
+    [self setUserVisible:userVisible];
+  }
+  return self;
+}
+
+- (id)initWithConfiguration:(NSDictionary *)configuration
+                      owner:(HGSProtoExtension *)owner {
+  if ((self = [self initWithConfiguration:configuration])) {
+    protoExtension_ = owner;
   }
   return self;
 }
@@ -244,6 +261,13 @@ NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
   // Override if you have a different mechanism for providing the
   // requested object.
   return nil;
+}
+
+- (NSString*)description {
+  return [NSString stringWithFormat:@"%@<%p> identifier: %@, name: %@, "
+          @"userVisible: %d", 
+          [self class], self, [self identifier], [self displayName],
+          [self userVisible]];
 }
 
 @end

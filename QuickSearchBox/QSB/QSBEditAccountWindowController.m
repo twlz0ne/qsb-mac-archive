@@ -1,5 +1,5 @@
 //
-//  HGSSimpleAccountEditController.m
+//  QSBEditAccountWindowController.m
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -29,68 +29,47 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSSimpleAccountEditController.h"
-#import "HGSBundle.h"
-#import "HGSLog.h"
-#import "HGSSimpleAccount.h"
+#import "QSBEditAccountWindowController.h"
+#import <Vermilion/Vermilion.h>
 
-@implementation HGSSimpleAccountEditController
+@interface QSBEditAccountWindowController ()
 
-@synthesize password = password_;
+@property (nonatomic, retain, readwrite) HGSAccount *account;
+
+@end
+
+
+@implementation QSBEditAccountWindowController
+
 @synthesize account = account_;
 
+- (id)initWithWindowNibName:(NSString *)windowNibName
+                    account:(HGSAccount *)account {
+  if ((self = [super initWithWindowNibName:windowNibName owner:self])) {
+    if (account) {
+      account_ = [account retain];
+    } else {
+      [self release];
+      self = nil;
+    }
+  }
+  return self;
+}
+
 - (void)dealloc {
-  [password_ release];
+  [account_ release];
   [super dealloc];
-}
-
-- (void)awakeFromNib {
-  [account_ setAccountEditController:self];
-  NSString *password = [account_ password];
-  [self setPassword:password];
-}
-
-- (NSWindow *)editAccountSheet {
-  return editAccountSheet_;
 }
 
 - (IBAction)acceptEditAccountSheet:(id)sender {
   NSWindow *sheet = [self window];
-  NSString *password = [self password];
-  if ([account_ authenticateWithPassword:[self password]]) {
-    [account_ setPassword:password];
-    [NSApp endSheet:sheet];
-    [account_ setAuthenticated:YES];
-  } else if (![self canGiveUserAnotherTry]) {
-    NSString *summaryFormat = HGSLocalizedString(@"Could not set up that %@ "
-                                                 @"account.", nil);
-    NSString *summary = [NSString stringWithFormat:summaryFormat,
-                         [account_ type]];
-    NSString *explanationFormat
-      = HGSLocalizedString(@"The %@ account '%@' could not be set up for "
-                           @"use.  Please check your password and try "
-                           @"again.", nil);
-    NSString *explanation = [NSString stringWithFormat:explanationFormat,
-                             [account_ type],
-                             [account_ userName]];
-    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-    [alert setAlertStyle:NSWarningAlertStyle];
-    [alert setMessageText:summary];
-    [alert setInformativeText:explanation];
-    [alert beginSheetModalForWindow:sheet
-                      modalDelegate:self
-                     didEndSelector:nil
-                        contextInfo:nil];
-  }
+  [NSApp endSheet:sheet];
+  [account_ setAuthenticated:YES];
 }
 
 - (IBAction)cancelEditAccountSheet:(id)sender {
   NSWindow *sheet = [sender window];
   [NSApp endSheet:sheet returnCode:NSAlertSecondButtonReturn];
-}
-
-- (BOOL)canGiveUserAnotherTry {
-  return NO;
 }
 
 @end

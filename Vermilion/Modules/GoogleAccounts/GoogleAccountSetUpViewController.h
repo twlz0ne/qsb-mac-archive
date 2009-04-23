@@ -30,24 +30,29 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
+/*!
+  @header
+  @discussion
+*/
 
-// NOTE: This class exposed here purely to satisfy Interface Builder.
+#import "QSBSetUpSimpleAccountViewController.h"
 
+/*!
+ A controller which manages a view used to specify a Google account
+ name and password during the setup process.
 
-// A controller which manages a view used to specify a Google account
-// name and password during the setup process.
-//
-@interface GoogleAccountSetUpViewController : HGSSimpleAccountSetUpViewController {
+ NOTE: This class exposed here purely to satisfy Interface Builder.
+*/
+@interface GoogleAccountSetUpViewController : QSBSetUpSimpleAccountViewController {
  @private
   IBOutlet NSView *captchaContainerView_;
   IBOutlet NSTextField *captchaTextField_;
   IBOutlet NSTextField *userNameField_;
   IBOutlet NSButton *googleAppsCheckbox_;
   
-  NSImage *captchaImage_;  // The captcha image presented to the user.
-  NSString *captchaText_;  // The captcha text typed by the user.
-  BOOL googleAppsAccount_;  // YES for a Google Apps account.
+  NSImage *captchaImage_;
+  NSString *captchaText_;
+  BOOL googleAppsAccount_;
   // Have to use |checkboxShowing_| because we animate showing of the checkbox 
   // and the 'hidden' atttribute of the checkbox field is not reliable 
   // until the animation has completed.
@@ -62,11 +67,16 @@
   CGFloat windowHeightCheckboxCaptcha_;
 }
 
+/*! The captcha image presented to the user. */
 @property (nonatomic, retain) NSImage *captchaImage;
+
+/*! The captcha text typed by the user. */
 @property (nonatomic, copy) NSString *captchaText;
+
+/*! YES for a Google Apps account. */
 @property (nonatomic, getter=isGoogleAppsAccount) BOOL googleAppsAccount;
 
-// Open google.com in the user's preferred browser.
+/*! Open google.com in the user's preferred browser. */
 - (IBAction)openGoogleHomePage:(id)sender;
 
 @end

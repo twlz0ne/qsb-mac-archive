@@ -135,6 +135,35 @@
 */
 - (void)installAccountTypes;
 
+/*! 
+ Convenience function that returns only extensions of a specific type. 
+*/
+- (NSArray *)extensionsWithType:(NSString *)type;
+
+/*! 
+ Convenience function that returns only source extensions.  Used by
+ Debug panel of Preferences nib.
+*/
+- (NSArray *)sourceExtensions;
+
+/*! 
+ Convenience function that returns only action extensions.  Used by
+ Debug panel of Preferences nib.
+*/
+- (NSArray *)actionExtensions;
+
+/*! 
+ Convenience function that returns only service extensions.  Used by
+ Debug panel of Preferences nib.
+*/
+- (NSArray *)serviceExtensions;
+
+/*! 
+ Convenience function that returns only account type extensions.  Used by
+ Debug panel of Preferences nib.
+*/
+- (NSArray *)accountTypeExtensions;
+
 @end
 
 /*!

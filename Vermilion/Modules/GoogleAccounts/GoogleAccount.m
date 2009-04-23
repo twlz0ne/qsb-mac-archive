@@ -31,20 +31,17 @@
 //
 
 #import "GoogleAccount.h"
-#import "GoogleAccountEditController.h"
 #import "GoogleAccountSetUpViewController.h"
-#import "HGSAccountsExtensionPoint.h"
 #import "GTMMethodCheck.h"
 #import "GTMNSString+URLArguments.h"
-#import "HGSBundle.h"
 #import "HGSLog.h"
-#import "KeychainItem.h"
 
 
-static NSString *const kSetUpGoogleAccountViewNibName = @"SetUpGoogleAccountView";
 static NSString *const kGoogleURLString = @"http://www.google.com/";
-static NSString *const kGoogleAccountTypeName = @"Google";
-static NSString *const kGoogleAppsAccountTypeName = @"GoogleApps";
+static NSString *const kGoogleAccountTypeName
+  = @"com.google.qsb.google.account";
+static NSString *const kGoogleAppsAccountTypeName
+  = @"com.google.qsb.googleapps.account";
 static NSString *const kAccountTestFormat
   = @"https://www.google.com/accounts/ClientLogin?Email=%@&Passwd=%@"
     @"&source=GoogleQuickSearch&accountType=%@";
@@ -99,33 +96,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return kGoogleAccountTypeName;
 }
 
-+ (NSViewController *)
-    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow {
-  NSBundle *ourBundle = HGSGetPluginBundle();
-  GoogleAccountSetUpViewController *loadedViewController
-    = [[[GoogleAccountSetUpViewController alloc]
-        initWithNibName:kSetUpGoogleAccountViewNibName bundle:ourBundle]
-       autorelease];
-  if (loadedViewController) {
-    [loadedViewController loadView];
-    [loadedViewController setParentWindow:parentWindow];
-  } else {
-    loadedViewController = nil;
-    HGSLog(@"Failed to load nib '%@'.", kSetUpGoogleAccountViewNibName);
-  }
-  return loadedViewController;
-}
-
 - (NSString *)adjustUserName:(NSString *)userName {
   if ([userName rangeOfString:@"@"].location == NSNotFound) {
     NSString *countryGMailCom = HGSLocalizedString(@"@gmail.com", nil);
     userName = [userName stringByAppendingString:countryGMailCom];
   }
   return userName;
-}
-
-- (NSString *)editNibName {
-  return @"EditGoogleAccount";
 }
 
 - (BOOL)authenticateWithPassword:(NSString *)password {

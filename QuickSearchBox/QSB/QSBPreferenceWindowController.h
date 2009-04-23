@@ -30,12 +30,19 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header Manage the QSB preferences window.
+ @discussion Provide the primary interface for managing the top-level
+ elements of the preferences window.
+ */
+
 #import <Cocoa/Cocoa.h>
 
 @class QSBSetUpAccountWindowController;
 
-// Manage the Quick Search App preferences window.
-//
+/*!
+ Manage the Quick Search App preferences window.
+*/
 @interface QSBPreferenceWindowController : NSWindowController {
  @private
   IBOutlet NSPopUpButton *colorPopUp_;
@@ -53,7 +60,7 @@
 
 @property (nonatomic, retain) NSColor *selectedColor;
 
-// Designated initializer.
+/*! Designated initializer. */
 - (id)init;
 
 // Manage and report the visisbility of the preferences window.
@@ -73,3 +80,15 @@
 - (IBAction)setColorFromMenu:(id)sender;
 
 @end
+
+/*!
+ A string specifying the name of the nib to be loaded and used for
+ editing an existing account.
+ */
+extern NSString *const kQSBEditAccountWindowNibName;
+
+/*!
+ A string specifying the name of the class of the window controller used in
+ the account edit window specified by kQSBEditAccountWindowNibName.
+ */
+extern NSString *const kQSBEditAccountWindowControllerClassName;

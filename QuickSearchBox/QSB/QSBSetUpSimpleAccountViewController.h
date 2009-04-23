@@ -1,5 +1,5 @@
 //
-//  HGSSimpleAccountSetUpViewController.h
+//  QSBSimpleAccountSetUpViewController.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,51 +30,46 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Cocoa/Cocoa.h>
+/*!
+ @header A view controller useful for editing a 'simple' account.
+ @discussion Provides a base class for a view controller used
+ by account type extensions for setting the credentials for a
+ 'simple' account, that is one that has an account name and a
+ password.
+ */
 
-@class HGSSimpleAccount;
+#import "QSBSetUpAccountViewController.h"
 
-// A controller which manages a view used to specify a new account's
-// name and password during the setup process.  The view associated with
-// this controller gets injected into a window provided by the user
-// interface of the client.
-//
-@interface HGSSimpleAccountSetUpViewController : NSViewController {
+/*!
+ A controller which manages a view used to specify a new account's
+ name and password during the setup process.  
+*/
+@interface QSBSetUpSimpleAccountViewController : QSBSetUpAccountViewController {
  @private
-  HGSSimpleAccount *account_;  // The account, once created.
   NSString *accountName_;
   NSString *accountPassword_;
-  __weak NSWindow *parentWindow_;
-  Class accountTypeClass_;
 }
 
-@property (nonatomic, retain) HGSSimpleAccount *account;
+/*! The user name/account name for the account being set up. */
 @property (nonatomic, copy) NSString *accountName;
+
+/*! The password for the account being set up. */
 @property (nonatomic, copy) NSString *accountPassword;
-@property (nonatomic, assign) Class accountTypeClass;
 
-// Designated initializer.
-- (id)initWithNibName:(NSString *)nibNameOrNil
-               bundle:(NSBundle *)nibBundleOrNil
-     accountTypeClass:(Class)accountTypeClass;
-  
-// Get/set the window off which to hang any alerts.
-- (NSWindow *)parentWindow;
-- (void)setParentWindow:(NSWindow *)parentWindow;
-
-// Called when the user presses 'OK'.
+/*! Called when the user presses 'OK'. */
 - (IBAction)acceptSetupAccountSheet:(id)sender;
 
-// Called when user presses 'Cancel'.
-- (IBAction)cancelSetupAccountSheet:(id)sender;
-
-// Called when authentication fails to, see if remediation is possible.  Pass 
-// along the window off of which we can hang an alert, if so desired.
-// See description of -[HGSSimpleAccountEditController canGiveUserAnotherTry]
-// for an explanation.
+/*!
+ When authentication fails, this is called to see if remediation is possible.
+ Pass along the window off of which we can hang an alert, if so desired.
+ See description of -[HGSSimpleAccountEditController canGiveUserAnotherTry]
+ for an explanation.
+*/
 - (BOOL)canGiveUserAnotherTryOffWindow:(NSWindow *)window;
 
-// Used to present an alert message to the user.
+/*!
+ Used to present an alert message to the user mentioning the account name.
+*/
 - (void)presentMessageOffWindow:(NSWindow *)parentWindow
                     withSummary:(NSString *)summary
               explanationFormat:(NSString *)format

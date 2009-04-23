@@ -31,14 +31,24 @@
 //
 
 #import "HGSAccount.h"
+#import "HGSAccountType.h"
 #import "HGSBundle.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSAccountsExtensionPoint.h"
 #import "HGSLog.h"
+#import "KeychainItem.h"
 
+
+// The version of the preferences data stored in the dictionary (NSNumber).
+NSString *const kQSBAccountsPrefVersionKey 
+  = @"QSBAccountsPrefVersionKey";
+
+// Account versions
+NSInteger const kQSBAccountsPrefVersion0 = 0;
+NSInteger const kQSBAccountsPrefCurrentVersion = 1;
 
 NSString *const kHGSAccountDisplayNameFormat = @"%@ (%@)";
-NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
+NSString *const kHGSAccountIdentifierFormat = @"%@.%@";
 
 @interface HGSAccount ()
 
@@ -69,8 +79,8 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
          bundle, kHGSExtensionBundleKey,
          nil];
     if ((self = [super initWithConfiguration:configuration])) {
-      [self setUserName:userName];
-      if (![self userName] || ![self type]) {
+      userName_ = [userName copy];
+      if (!userName_ || ![self type]) {
         HGSLog(@"HGSAccounts require a userName and type.");
         [self release];
         self = nil;
@@ -84,49 +94,65 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 }
 
 - (id)initWithConfiguration:(NSDictionary *)prefDict {
-  NSString *userName = [prefDict objectForKey:kHGSAccountUserNameKey];
-  if ([userName length]) {
-    // NOTE: The following call to -[type] resolves to a constant string
-    // defined per-class.
-    NSString *accountType = [self type];
-    NSString *name = [prefDict objectForKey:kHGSExtensionUserVisibleNameKey];
-    NSString *identifier = [prefDict objectForKey:kHGSExtensionIdentifierKey];
-    NSBundle *bundle = [prefDict objectForKey:kHGSExtensionBundleKey];
-    if (!name || !identifier || !bundle) {
-      NSMutableDictionary *configuration
-        = [NSMutableDictionary dictionaryWithDictionary:prefDict];
-      if (!name) {
-        name = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
-                userName, accountType];
-        [configuration setObject:name forKey:kHGSExtensionUserVisibleNameKey];
-      }
-      if (!identifier) {
-        identifier = [NSString stringWithFormat:kHGSAccountIdentifierFormat, 
-                      accountType, userName];
-        [configuration setObject:identifier forKey:kHGSExtensionIdentifierKey];
-      }
-      if (!bundle) {
-        bundle = HGSGetPluginBundle();
+  // See if this configuration is up-to-date.
+  if (prefDict) {
+    prefDict = [HGSAccount upgradeConfiguration:prefDict];
+  }
+  if (prefDict) {
+    NSString *userName = [prefDict objectForKey:kHGSAccountUserNameKey];
+    if ([userName length]) {
+      NSString *accountTypeIdentifier = [prefDict objectForKey:kHGSAccountTypeKey];
+      NSString *name = [prefDict objectForKey:kHGSExtensionUserVisibleNameKey];
+      NSString *identifier = [prefDict objectForKey:kHGSExtensionIdentifierKey];
+      NSBundle *bundle = [prefDict objectForKey:kHGSExtensionBundleKey];
+      if (!name || !identifier || !bundle) {
+        NSMutableDictionary *configuration
+          = [NSMutableDictionary dictionaryWithDictionary:prefDict];
+        if (!name) {
+          HGSExtensionPoint *accountTypesPoint
+            = [HGSExtensionPoint accountTypesPoint];
+          HGSAccountType *accountType
+            = [accountTypesPoint extensionWithIdentifier:accountTypeIdentifier];
+          HGSProtoExtension *protoAccountType = [accountType protoExtension];
+          NSString *accountTypeName
+            = [protoAccountType objectForKey:kHGSExtensionUserVisibleNameKey];
+          name = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
+                  userName, accountTypeName];
+          [configuration setObject:name forKey:kHGSExtensionUserVisibleNameKey];
+        }
+        if (!identifier) {
+          identifier = [NSString stringWithFormat:kHGSAccountIdentifierFormat, 
+                        accountTypeIdentifier, userName];
+          [configuration setObject:identifier forKey:kHGSExtensionIdentifierKey];
+        }
         if (!bundle) {
-          HGSLog(@"HGSAccounts require bundle.");
+          bundle = HGSGetPluginBundle();
+          if (!bundle) {
+            // COV_NF_START
+            HGSLog(@"HGSAccounts require bundle.");
+            [self release];
+            return nil;
+            // COV_NF_END
+          }
+          [configuration setObject:bundle forKey:kHGSExtensionBundleKey];
+        }
+        prefDict = configuration;
+      }
+      if ((self = [super initWithConfiguration:prefDict])) {
+        userName_ = [userName copy];
+        if (![self type]) {
+          HGSLog(@"HGSAccounts require an account type.");
           [self release];
           self = nil;
-          return self;
         }
-        [configuration setObject:bundle forKey:kHGSExtensionBundleKey];
       }
-      prefDict = configuration;
-    }
-    if ((self = [super initWithConfiguration:prefDict])) {
-      [self setUserName:userName];
-      if (![self type]) {
-        HGSLog(@"HGSAccounts require an account type.");
-        [self release];
-        self = nil;
-      }
+    } else {
+      HGSLog(@"HGSAccounts require a userName and type.");
+      [self release];
+      self = nil;
     }
   } else {
-    HGSLog(@"HGSAccounts require a userName and type.");
+    HGSLog(@"Bad or missing account configuration.");
     [self release];
     self = nil;
   }
@@ -139,25 +165,19 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
 }
 
 - (NSDictionary *)configuration {
-  NSDictionary *accountDict
-    = [NSDictionary dictionaryWithObjectsAndKeys:
-       [self userName], kHGSAccountUserNameKey,
-       [self type], kHGSAccountTypeKey,
-       nil];
+  NSNumber *versionNumber
+    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+  NSDictionary *accountDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                               [self userName], kHGSAccountUserNameKey,
+                               [self type], kHGSAccountTypeKey,
+                               versionNumber, kQSBAccountsPrefVersionKey,
+                               nil];
   return accountDict;
 }
 
 - (void) dealloc {
   [userName_ release];
   [super dealloc];
-}
-
-- (NSString *)displayName {
-  NSString *localizedTypeName = HGSLocalizedString([self type], nil);
-  NSString *displayName
-    = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
-       [self userName], localizedTypeName];
-  return displayName;
 }
 
 - (NSString *)type {
@@ -173,20 +193,6 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
   NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
   [defaultCenter postNotificationName:kHGSAccountDidChangeNotification 
                                object:self];
-}
-
-+ (NSViewController *)
-    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow {
-  HGSLogDebug(@"Class '%@', deriving from HGSAccount, should override "
-              @"accountSetupViewControllerToInstallWithParentWindow: if it "
-              @"has an interface for setting up new accounts.", [self class]);
-  return nil;
-}
-
-- (void)editWithParentWindow:(NSWindow *)parentWindow {
-  HGSLogDebug(@"Class '%@', deriving from HGSAccount, should override "
-              @"editWithParentWindow: if it has an interface "
-              @"for editing its account type.", [self class]);
 }
 
 - (void)remove {
@@ -209,7 +215,65 @@ NSString *const kHGSAccountIdentifierFormat = @"com.google.qsb.%@.%@";
           [self class], self, [self userName], [self type]];
 }
 
++ (NSDictionary *)upgradeConfiguration:(NSDictionary *)configuration {
+  NSNumber *versionNumber
+    = [configuration valueForKey:kQSBAccountsPrefVersionKey];
+  NSInteger version = [versionNumber integerValue];
+  if (!versionNumber || version != kQSBAccountsPrefCurrentVersion) {
+    // The configuration is NOT of the latest version.
+    NSMutableDictionary *upgradedAccount = nil;
+    if (version == 0) {
+      // For version 0: convert the account type and update the keychain.
+      NSString *oldAccountType = [configuration objectForKey:kHGSAccountTypeKey];
+      NSString *newAccountType = nil;
+      NSString *oldKeychainPrefix = nil;
+      if ([oldAccountType isEqualToString:@"GoogleAccount"]) {
+        newAccountType = @"com.google.qsb.google.account";
+        oldKeychainPrefix = @"com.google.qsb.GoogleAccount";
+      } else if ([oldAccountType isEqualToString:@"GoogleAppsAccount"]) {
+        newAccountType = @"com.google.qsb.googleapps.account";
+        oldKeychainPrefix = @"com.google.qsb.GoogleAppsAccount";
+      } else if ([oldAccountType isEqualToString:@"TwitterAccount"]) {
+        newAccountType = @"com.google.qsb.twitter.account";
+        oldKeychainPrefix = @"com.google.qsb.TwitterAccount";
+      }
+      if (newAccountType) {
+        upgradedAccount
+          = [NSMutableDictionary dictionaryWithDictionary:configuration];
+        [upgradedAccount setObject:newAccountType forKey:kHGSAccountTypeKey];
+        // Retrieve the old keychain entry.
+        NSString *userName = [configuration objectForKey:kHGSAccountUserNameKey];
+        NSString *keychainServiceName = [NSString stringWithFormat:@"%@.%@",
+                                         oldKeychainPrefix, userName];
+        KeychainItem *keychainItem
+          = [KeychainItem keychainItemForService:keychainServiceName 
+                                        username:userName];
+        if (keychainItem) {
+          NSString *password = [keychainItem password];
+          [keychainItem removeFromKeychain];
+          keychainServiceName = [NSString stringWithFormat:@"%@.%@",
+                                 newAccountType, userName];
+          [KeychainItem addKeychainItemForService:keychainServiceName
+                                     withUsername:userName
+                                         password:password]; 
+        }
+      }
+      NSNumber *updatedVersionNumber
+        = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+      [upgradedAccount setObject:updatedVersionNumber
+                          forKey:kQSBAccountsPrefVersionKey];
+
+    } else {
+      HGSLog(@"Failed to upgrade account from version %d, account description: %@",
+             version, configuration);
+    }
+    configuration = upgradedAccount;
+  }
+  return configuration;
+}
+
 @end
+
 
 NSString *const kHGSAccountDidChangeNotification
   = @"HGSAccountDidChangeNotification";

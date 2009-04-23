@@ -254,6 +254,9 @@
   // Create it now
   NSString *className = [self className];
   Class extensionPointClass = NSClassFromString(className);
+  // Note that the extension class must descend from HGSExtension and should
+  // provide its own implementation of initWithConfiguration: which will be
+  // called by -[HGSExtension initWithConfiguration:owner:].
   if (extensionPointClass 
       && [extensionPointClass
           instancesRespondToSelector:@selector(initWithConfiguration:)]) {
@@ -263,12 +266,16 @@
       // extensions. Since we are calling 3rd party code, we can't be sure
       // they will be kind to us.
       extension
-        = [[[extensionPointClass alloc] initWithConfiguration:configuration_] 
+        = [[[extensionPointClass alloc] initWithConfiguration:configuration_
+                                                        owner:self] 
            autorelease];
     }
     @catch (NSException *e) {
       HGSLog(@"Unable to init extension %@ (%@)", extension, e);
     }
+  } else {
+    HGSLogDebug(@"No className (%@) or extensionPointClass does not respond "
+                @"to -[initWithConfiguration:]", className);
   }
   if (extension) {
     NSString *extensionPointKey = [self extensionPointKey];
@@ -281,6 +288,8 @@
         HGSLog(@"Unable to extend %@ with %@ in %@",
                point, extension, bundle);
       }
+    } else {
+      HGSLogDebug(@"No extensionPointKey");
     }
   } else {
     HGSLog(@"Unable to instantiate extension %@ in %@",
@@ -288,7 +297,7 @@
   }
   NSTimeInterval loadTime = -[startDate timeIntervalSinceNow];
   if (loadTime > 0.1f) {
-    HGSLog(@"Loading %@ took %3.0fms", [self displayName], loadTime * 1000);
+    HGSLogDebug(@"Loading %@ took %3.0fms", [self displayName], loadTime * 1000);
   }
 }
 
@@ -338,26 +347,6 @@
     }
   }
   return doesExtend;
-}
-
-- (void)installAccountTypes {
-  NSString *extensionPointKey = [self extensionPointKey];
-  if ([extensionPointKey isEqualToString:kHGSAccountsExtensionPoint]) {
-    // Ensure the bundle is loaded
-    NSBundle *bundle = [configuration_ objectForKey:kHGSExtensionBundleKey];
-    if (![bundle isLoaded]) {
-      if (![bundle load]) {
-        HGSLog(@"Unable to load bundle %@", bundle);
-      }
-    }
-    NSString *accountType
-      = [configuration_ objectForKey:kHGSExtensionOfferedAccountType];
-    NSString *className = [self className];
-    Class accountClass = NSClassFromString(className);
-    HGSAccountsExtensionPoint *accountsExtensionPoint
-      = [HGSExtensionPoint accountsPoint];
-    [accountsExtensionPoint addAccountType:accountType withClass:accountClass];
-  }
 }
 
 - (NSString *)description {
@@ -420,6 +409,10 @@
     desiredAccountTypes = [NSArray arrayWithObject:desiredAccountTypes];
   }
   return desiredAccountTypes;
+}
+
+- (id)objectForKey:(NSString *)configurationKey {
+  return [configuration_ objectForKey:configurationKey];
 }
   
 #pragma mark Notification Handling

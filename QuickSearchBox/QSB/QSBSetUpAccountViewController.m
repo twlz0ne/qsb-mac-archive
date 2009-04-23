@@ -1,5 +1,5 @@
 //
-//  TwitterAccount.h
+//  QSBSetUpAccountViewController.m
 //
 //  Copyright (c) 2009 Google Inc. All rights reserved.
 //
@@ -30,41 +30,60 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-/*!
-  @header
-  @discussion
-*/
+#import "QSBSetUpAccountViewController.h"
+#import "HGSAccount.h"
 
-#import <Vermilion/Vermilion.h>
-#import "QSBEditSimpleAccountWindowController.h"
-#import "QSBSetUpSimpleAccountViewController.h"
+@implementation QSBSetUpAccountViewController
 
-@class TwitterAccountEditController;
+@synthesize account = account_;
+@synthesize accountTypeClass = accountTypeClass_;
+@synthesize parentWindow = parentWindow_;
 
-/*! A class which manages a Twitter account. */
-@interface TwitterAccount : HGSSimpleAccount
+- (id)init {
+  self = [self initWithNibName:nil
+                        bundle:nil
+              accountTypeClass:nil];
+  return self;
+}
+
+- (id)initWithNibName:(NSString *)nibNameOrNil
+               bundle:(NSBundle *)nibBundleOrNil
+     accountTypeClass:(Class)accountTypeClass {
+  if ((self = [super initWithNibName:nibNameOrNil
+                              bundle:nibBundleOrNil])) {
+    if (accountTypeClass) {
+      accountTypeClass_ = accountTypeClass;
+    } else {
+      [self release];
+      self = nil;
+    }
+  }
+  return self;
+}
+
+- (void)dealloc {
+  [account_ release];
+  [super dealloc];
+}
+
+- (IBAction)cancelSetupAccountSheet:(id)sender {
+  NSWindow *sheet = [sender window];
+  [NSApp endSheet:sheet];
+}
+
+- (void)presentMessageOffWindow:(NSWindow *)parentWindow
+                    withSummary:(NSString *)summary
+                    explanation:(NSString *)explanation
+                     alertStyle:(NSAlertStyle)style {
+  NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+  [alert setAlertStyle:style];
+  [alert setMessageText:summary];
+  [alert setInformativeText:explanation];
+  [alert beginSheetModalForWindow:parentWindow
+                    modalDelegate:self
+                   didEndSelector:nil
+                      contextInfo:nil];
+}
+
 @end
 
-/*
- A controller which manages a window used to edit the passowrd
- for a Twitter account.  Exposed publicly so that Interface
- Builder can see the action.
-*/
-@interface EditTwitterAccountWindowController : QSBEditSimpleAccountWindowController
-
-/*! Open twitter.com in the user's preferred browser. */
-- (IBAction)openTwitterHomePage:(id)sender;
-
-@end
-
-/*
- A controller which manages a view used to specify a Twitter account
- name and password during the setup process.  Exposed publicly so that 
- Interface Builder can see the action.
-*/
-@interface SetUpTwitterAccountViewController : QSBSetUpSimpleAccountViewController
-
-/*! Open twitter.com in the user's preferred browser. */
-- (IBAction)openTwitterHomePage:(id)sender;
-
-@end

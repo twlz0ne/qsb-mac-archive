@@ -229,7 +229,7 @@ static NSString *const kAccountType = @"AccountType";
     = [[[HGSProtoExtension alloc] initWithConfiguration:configurationK
                                                  plugin:pluginMockK]
        autorelease];
-  [protoExtensionK installAccountTypes];
+  STAssertNotNil(protoExtensionK, nil);
 }
 
 - (void)testIsFactorable {

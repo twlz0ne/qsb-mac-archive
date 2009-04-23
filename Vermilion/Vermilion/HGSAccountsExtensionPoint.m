@@ -34,6 +34,8 @@
 #import "GTMMethodCheck.h"
 #import "GTMNSEnumerator+Filter.h"
 #import "HGSAccount.h"
+#import "HGSAccountType.h"
+#import "HGSExtensionPoint.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
 
@@ -43,28 +45,42 @@
 GTM_METHOD_CHECK(NSEnumerator,
                  gtm_enumeratorByMakingEachObjectPerformSelector:withObject:);
 
-- (void)dealloc {
-  [accountTypes_ release];
-  [super dealloc];
-}
-
 - (void)addAccountsFromArray:(NSArray *)accountsArray {
   for (NSDictionary *accountDict in accountsArray) {
-    NSString *accountType = [accountDict objectForKey:kHGSAccountTypeKey];
-    if (accountType) {
-      Class accountClass = [self classForAccountType:accountType];
-      HGSAccount *account = [[[accountClass alloc]
-                              initWithConfiguration:accountDict]
-                             autorelease];
-      if (account) {
-        BOOL accountAdded = [self extendWithObject:account];
-        if (!accountAdded) {
-          HGSLogDebug(@"Failed to add account '%@'.", [account displayName]);
+    // Upgrade the account configuration if necessary.
+    accountDict = [HGSAccount upgradeConfiguration:accountDict];
+    NSString *accountTypeID = [accountDict objectForKey:kHGSAccountTypeKey];
+    if (accountTypeID) {
+      HGSExtensionPoint *accountTypesPoint
+        = [HGSExtensionPoint accountTypesPoint];
+      HGSAccountType *accountType
+        = [accountTypesPoint extensionWithIdentifier:accountTypeID];
+      HGSProtoExtension *protoAccountType = [accountType protoExtension];
+      if (protoAccountType) {
+        NSString *accountClassName
+          = [protoAccountType objectForKey:kHGSExtensionOfferedAccountClass];
+        Class accountClass = NSClassFromString(accountClassName);
+        HGSAccount *account = [[[accountClass alloc]
+                                initWithConfiguration:accountDict]
+                               autorelease];
+        if (account) {
+          BOOL accountAdded = [self extendWithObject:account];
+          if (!accountAdded) {
+            HGSLogDebug(@"Failed to add account '%@'.",  // COV_NF_LINE
+                        [account displayName]);
+          }
+        } else {
+          HGSLogDebug(@"Failed to create account of type '%@' "  // COV_NF_LINE
+                      @"and class '%@'",
+                      accountTypeID, accountClassName);
         }
+      } else {
+        HGSLogDebug(@"Proto extension not found for "  // COV_NF_LINE
+                    @"accountType: %@", accountType);
       }
     } else {
-      HGSLogDebug(@"Did not find account type for account dictionary :%@",
-                  accountDict);
+      HGSLogDebug(@"Did not find account type for account "  // COV_NF_LINE
+                  @"dictionary :%@", accountDict);
     }
   }
 }
@@ -78,40 +94,6 @@ GTM_METHOD_CHECK(NSEnumerator,
   return archivableAccounts;
 }
 
-- (void)addAccountType:(NSString *)accountType withClass:(Class)accountClass {
-  if (accountType && accountClass) {
-    static NSString * const sVisibleAccountTypeNamesKey
-      = @"visibleAccountTypeDisplayNames";
-    [self willChangeValueForKey:sVisibleAccountTypeNamesKey];
-    if (!accountTypes_) {
-      accountTypes_ = [[NSMutableDictionary dictionaryWithObject:accountClass
-                                                          forKey:accountType]
-                       retain];
-    } else {
-      [accountTypes_ setObject:accountClass forKey:accountType];
-    }
-    [self didChangeValueForKey:sVisibleAccountTypeNamesKey];
-  }
-}
-
-- (Class)classForAccountType:(NSString *)accountType {
-  Class accountClass = [accountTypes_ objectForKey:accountType];
-  return accountClass;
-}
-
-- (NSArray *)visibleAccountTypeDisplayNames {
-  NSMutableArray *visibleAccountTypeDisplayNames
-    = [NSMutableArray arrayWithCapacity:[accountTypes_ count]];
-  for (NSString *accountTypeName in accountTypes_) {
-    // TODO(mrossetti): The following will not be required once we refactor
-    // accounts and account types.  This is a temporary work-around.
-    if (![accountTypeName isEqualToString:@"GoogleApps"]) {
-      [visibleAccountTypeDisplayNames addObject:accountTypeName];
-    }
-  }
-  return visibleAccountTypeDisplayNames;
-}
-
 - (NSArray *)accountsForType:(NSString *)type {
   NSArray *array = [self extensions];
   NSPredicate *pred = [NSPredicate predicateWithFormat:@"type == %@", type];
@@ -119,13 +101,4 @@ GTM_METHOD_CHECK(NSEnumerator,
   return array;
 }
 
-- (NSString *)description {
-  NSString *description = [super description];
-  description = [description stringByAppendingFormat:@"\naccountTypes: %@",
-                 accountTypes_];
-  return description;
-}
-
-
 @end
-

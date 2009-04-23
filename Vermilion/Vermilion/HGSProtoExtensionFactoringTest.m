@@ -33,6 +33,7 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSAccount.h"
+#import "HGSAccountType.h"
 #import "HGSAccountsExtensionPoint.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSExtensionPoint.h"
@@ -48,16 +49,34 @@
 @end
 
 
+static NSString *const kAccountTypeID = @"com.google.qsb.factor.account";
+static NSString *const kAccountTypeClass = @"FactorableAccountType";
+static NSString *const kAccountTypeName = @"Factorable Account Type";
+static NSString *const kAccountClass = @"FactorableAccount";
+static NSString *const kAccountType = @"FactorableAccount";
+
+@interface FactorableAccountType : HGSAccountType
+@end
+
+
+@implementation FactorableAccountType
+
+- (NSString *)type {
+  return kAccountTypeID;
+}
+
+@end
+
+
 @interface FactorableAccount : HGSAccount
 @end
 
 // Account Extension Mock
-static NSString *const kFactorableAccountType = @"FactorableAccountType";
 
 @implementation FactorableAccount
 
 - (NSString *)type {
-  return kFactorableAccountType;
+  return kAccountType;
 }
 
 @end
@@ -72,43 +91,81 @@ static NSString *const kFactorableAccountType = @"FactorableAccountType";
 }
 
 - (void)testFactoring {
-  // Set up the accounts point and add an account.
+  // Debugging Note: If you plan to inspect the protoExtension (via an
+  // NSLog, for instance) then you'll need a _real_ bundle.  Subtituting
+  // the following for the OCMockObject will suffice:
+  //  NSBundle *bundleMock = [NSBundle bundleForClass:[self class]];
+
+  // We need a bundle.
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  BOOL yes = YES;
+  [[[bundleMock stub] andReturnValue:OCMOCK_VALUE(yes)] isLoaded];
+
+  // We need a plugin
+  id pluginMock = [OCMockObject mockForClass:[HGSPlugin class]];
+  [[[pluginMock stub] andReturn:@"PLUGIN"] displayName];
+  [[[pluginMock stub] andReturn:bundleMock] bundle];
+  [[[pluginMock stub] andReturnValue:OCMOCK_VALUE(yes)] isEnabled];
+  
+  // We need an account type extension point.
+  HGSExtensionPoint *accountTypesPoint = [HGSExtensionPoint accountTypesPoint];
+  STAssertNotNil(accountTypesPoint, nil);
+  
+  // We need at least one account type.
+  NSDictionary *configuration
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       bundleMock, kHGSExtensionBundleKey,
+       kAccountTypeClass, kHGSExtensionClassKey,
+       kAccountTypeID, kHGSExtensionIdentifierKey,
+       kAccountTypeName, kHGSExtensionUserVisibleNameKey,
+       kHGSAccountTypesExtensionPoint, kHGSExtensionPointKey,
+       kAccountType, kHGSExtensionOfferedAccountType,
+       kAccountClass, kHGSExtensionOfferedAccountClass,
+       nil];
+  HGSProtoExtension *accountTypeProto
+    = [[[HGSProtoExtension alloc] initWithConfiguration:configuration
+                                                 plugin:pluginMock]
+       autorelease];
+  STAssertNotNil(accountTypeProto, nil);
+  [accountTypeProto install];
+  HGSAccountType *accountType
+    = [accountTypesPoint extensionWithIdentifier:kAccountTypeID];
+  STAssertNotNil(accountType, nil);
+
+  // Add an account.
+  NSNumber *versionNumber
+    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
   NSDictionary *accountDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                               kFactorableAccountType, kHGSAccountTypeKey,
+                               kAccountTypeID, kHGSAccountTypeKey,
                                bundleMock, kHGSExtensionBundleKey,
-                               @"testAccount", kHGSAccountUserNameKey,
+                               @"testUserName", kHGSAccountUserNameKey,
+                               versionNumber, kQSBAccountsPrefVersionKey,
                                nil];
   NSArray *accountDicts = [NSArray arrayWithObject:accountDict];
 
   HGSAccountsExtensionPoint *aep = [HGSExtensionPoint accountsPoint];
-  [aep addAccountType:kFactorableAccountType
-            withClass:[FactorableAccount class]];
   [aep addAccountsFromArray:accountDicts];
   
-  NSArray *accounts = [aep accountsForType:kFactorableAccountType];
+  NSArray *accounts = [aep accountsForType:kAccountType];
   STAssertEquals([accounts count], (NSUInteger)1, nil);
   HGSAccount *account = [accounts objectAtIndex:0];
   [account setAuthenticated:YES];
 
   // Create the factorable extension.
-  NSDictionary *configuration
+  NSDictionary *factorConfiguration
     = [NSDictionary dictionaryWithObjectsAndKeys:
        @"DISPLAY NAME", kHGSExtensionUserVisibleNameKey,
        @"IDENTIFIER", kHGSExtensionIdentifierKey,
        @"CLASS NAME", kHGSExtensionClassKey,
        kHGSAccountsExtensionPoint, kHGSExtensionPointKey,
        [NSNumber numberWithBool:YES], kHGSExtensionEnabledKey,
-       kFactorableAccountType, kHGSExtensionDesiredAccountTypes,
+       kAccountType, kHGSExtensionDesiredAccountTypes,
        [NSNumber numberWithBool:YES], kHGSExtensionIsUserVisible,
        nil];
-  id pluginMock = [OCMockObject mockForClass:[HGSPlugin class]];
-  [[[pluginMock stub] andReturn:@"PLUGIN"] displayName];
-  [[[pluginMock stub] andReturn:@"BUNDLE PLACEHOLDER"] bundle];
   HGSProtoExtension *protoExtensionI
-    = [[[HGSProtoExtension alloc] initWithConfiguration:configuration
+    = [[[HGSProtoExtension alloc] initWithConfiguration:factorConfiguration
                                                  plugin:pluginMock]
        autorelease];
   NSArray *factored = [protoExtensionI factor];
@@ -120,8 +177,6 @@ static NSString *const kFactorableAccountType = @"FactorableAccountType";
     = [factoredExtension
        isUserVisibleAndExtendsExtensionPoint:kHGSAccountsExtensionPoint];
   STAssertTrue(userVisible, nil);
-  BOOL yes = YES;
-  [[[pluginMock stub] andReturnValue:OCMOCK_VALUE(yes)] isEnabled];
   STAssertTrue([factoredExtension canSetEnabled], nil);
   
   // TODO(mrossetti):Test installing by calling setEnabled:(YES|NO).

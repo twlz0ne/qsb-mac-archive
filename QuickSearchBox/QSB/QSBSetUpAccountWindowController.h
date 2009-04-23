@@ -32,6 +32,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class HGSAccountType;
+
 // A window controller that manages the account setup sheet that drops
 // out of the preferences window.
 //
@@ -43,12 +45,12 @@
 //
 @interface QSBSetUpAccountWindowController : NSWindowController {
  @private
-  IBOutlet NSArrayController *accountTypeDisplayNamesController_;
   IBOutlet NSView *setupContainerView_;  // Account view inserts here.
+  IBOutlet NSArrayController *accountTypeController_;
+  NSArray *visibleAccountTypes_;  // List of account types we offer to user.
+  HGSAccountType *selectedAccountType_;
   // The currently installed account setup view controller.
   NSViewController *installedSetupViewController_;
-  NSArray *accountTypeDisplayNames_;  // List of account type names for popup.
-  NSString *selectedAccountType_;
   __weak NSWindow *parentWindow_;
 }
 
@@ -56,3 +58,15 @@
 - (id)initWithParentWindow:(NSWindow *)parentWindow;
 
 @end
+
+/*!
+ A string specifying the name of the nib to be loaded and used for
+ setting up a new account.
+ */
+extern NSString *const kQSBSetUpAccountViewNibName;
+
+/*!
+ A string specifying the name of the class of the view controller used in
+ the account set up view specified by kQSBSetUpAccountViewNibName.
+*/
+extern NSString *const kQSBSetUpAccountViewControllerClassName;

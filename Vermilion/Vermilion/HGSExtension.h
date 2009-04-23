@@ -38,6 +38,8 @@
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 
+@class HGSProtoExtension;
+
 /*!
   Information about extensions that a UI can display.
 */
@@ -48,8 +50,14 @@
   NSImage *icon_;
   NSString *identifier_;
   NSBundle *bundle_;
+  BOOL userVisible_;
+  __weak HGSProtoExtension *protoExtension_;
 }
 
+/*!
+ Return the protoExtension associated with this extension.
+ */
+@property (readonly, assign) HGSProtoExtension *protoExtension;
 /*!
  Return the bundle associated with this extension.
  */
@@ -103,10 +111,31 @@
   be found.
 */
 @property (readonly, retain) NSString *defaultIconName;
+
 /*!
- Designated initializer.
- */
+ Return whether this extension would normally be presented to the user
+ in the user interface.  For example, not all account types are shown
+ to the user in the 'Account Type' popup of QSB.  User visibility is
+ normally controlled by the kHGSExtensionIsUserVisible key in the
+ extension's section of the plugin's plist and defaults to YES if
+ not otherwise specified.
+ 
+ @result YES if the extension should be presented to the user.
+*/
+@property (nonatomic, assign) BOOL userVisible;
+
+/*!
+ Default initializer.
+*/
 - (id)initWithConfiguration:(NSDictionary *)configuration;
+
+/*!
+ Primary initializer used when installing an extension as part of enabling a
+ protoExtension.  Some extensions require knowledge of their protoExtension.
+ This initializer calls [self initWithConfiguration:].
+*/
+- (id)initWithConfiguration:(NSDictionary *)configuration
+                      owner:(HGSProtoExtension *)owner;
 
 /*!
   Return an objectForInfoDictionaryKey for this extension
@@ -165,12 +194,20 @@ extern NSString *const kHGSExtensionBundleKey;
 /*!
   Types of accounts in which the extension is interested.  This may be a
   single NSString specifying the account type, or an array of NSStrings.
+  The account type is typically expressed in reverse-DNS format.
 */
 extern NSString *const kHGSExtensionDesiredAccountTypes;
 /*!
-  Type of accounts in which the extension is offering.
+  Type of accounts in which the extension is offering.  Appropriate only
+  for extensions of type HGSAccountType.
 */
 extern NSString *const kHGSExtensionOfferedAccountType;
+/*!
+  Class name of the account class deriving from HGSAccount which the
+  extension is offering.  Appropriate only for extensions of type
+  HGSAccountType.
+*/
+extern NSString *const kHGSExtensionOfferedAccountClass;
 /*!
   YES if the extension presented to the user in the preferences panel.  If this
   is not present then YES is assumed.

@@ -22,15 +22,25 @@
 	<array>
 		<dict>
 			<key>HGSExtensionClass</key>
-			<string>TwitterAccount</string>
+			<string>HGSAccountType</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.twitter.account</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Twitter Accounts</string>
-			<key>HGSExtensionPoint</key>
-			<string>HGSAccountsExtensionPoint</string>
-			<key>HGSExtensionOfferedAccountType</key>
 			<string>Twitter</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSAccountTypesExtensionPoint</string>
+			<key>HGSExtensionOfferedAccountType</key>
+			<string>com.google.qsb.twitter.account</string>
+			<key>HGSExtensionOfferedAccountClass</key>
+			<string>TwitterAccount</string>
+			<key>QSBSetUpAccountViewNibName</key>
+			<string>SetUpTwitterAccountView</string>
+			<key>QSBSetUpAccountViewControllerClassName</key>
+			<string>SetUpTwitterAccountViewController</string>
+			<key>QSBEditAccountWindowNibName</key>
+			<string>EditTwitterAccount</string>
+			<key>QSBEditAccountWindowControllerClassName</key>
+			<string>EditTwitterAccountWindowController</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -44,7 +54,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.text.action.sendtwittermessage</string>
 			<key>HGSExtensionDesiredAccountTypes</key>
-			<string>Twitter</string>
+			<string>com.google.qsb.twitter.account</string>
 			<key>HGSExtensionIsEnabledByDefault</key>
 			<true/>
 		</dict>

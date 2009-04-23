@@ -34,23 +34,11 @@
 #import "HGSBundle.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
-#import "HGSSimpleAccountEditController.h"
 #import "KeychainItem.h"
-
-
-@interface HGSSimpleAccount ()
-
-// Finalize the account editing.
-- (void)accountSheetDidEnd:(NSWindow *)sheet
-                returnCode:(int)returnCode
-               contextInfo:(void *)contextInfo;
-
-@end
 
 
 @implementation HGSSimpleAccount
 
-@synthesize accountEditController = accountEditController_;
 @synthesize connection = connection_;
 
 - (id)initWithName:(NSString *)userName {
@@ -80,7 +68,6 @@
 
 - (void)dealloc {
   [self setConnection:nil];
-  [accountEditController_ release];
   [super dealloc];
 }
 
@@ -108,13 +95,6 @@
   return password;
 }
 
-+ (NSViewController *)
-    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow {
-  HGSLogDebug(@"Class '%@', deriving from HGSSimpleAccount, should override "
-              @"accountSetupViewToInstallWithParentWindow.", [self class]);
-  return nil;
-}
-
 - (void)setPassword:(NSString *)password {
   KeychainItem *keychainItem = [self keychainItem];
   NSString *userName = [self userName];
@@ -130,31 +110,8 @@
   [super setPassword:password];
 }
 
-- (void)editWithParentWindow:(NSWindow *)parentWindow {
-  NSString * const editNibName = [self editNibName];
-  if ([NSBundle loadNibNamed:editNibName
-                       owner:self]) {
-    HGSSimpleAccountEditController *accountEditController
-      = [self accountEditController];
-    NSWindow *editAccountSheet = [accountEditController editAccountSheet];
-    [NSApp beginSheet:editAccountSheet
-       modalForWindow:parentWindow
-        modalDelegate:self
-       didEndSelector:@selector(accountSheetDidEnd:returnCode:contextInfo:)
-          contextInfo:nil];
-  } else {
-    HGSLog(@"Failed to load nib '%@'.", editNibName);
-  }
-}
-
 - (NSString *)adjustUserName:(NSString *)userName {
   return userName;
-}
-
-- (NSString *)editNibName {
-  HGSLogDebug(@"Class '%@', deriving from HGSSimpleAccount, should override "
-              @"editNibName.", [self class]);
-  return nil;
 }
 
 - (void)authenticate {
@@ -172,8 +129,8 @@
 
 - (NSURLRequest *)accountURLRequest {
   KeychainItem* keychainItem 
-  = [KeychainItem keychainItemForService:[self identifier] 
-                                username:nil];
+    = [KeychainItem keychainItemForService:[self identifier] 
+                                  username:nil];
   NSString *userName = [keychainItem username];
   NSString *password = [keychainItem password];
   NSURLRequest *accountRequest = [self accountURLRequestForUserName:userName
@@ -202,13 +159,6 @@
   KeychainItem *item = [KeychainItem keychainItemForService:keychainServiceName 
                                                    username:userName];
   return item;
-}
-
-- (void)accountSheetDidEnd:(NSWindow *)sheet
-                returnCode:(int)returnCode
-               contextInfo:(void *)contextInfo {
-  [sheet orderOut:self];
-  [self setAccountEditController:nil];
 }
 
 #pragma mark NSURLConnection Delegate Methods

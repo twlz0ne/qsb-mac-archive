@@ -48,10 +48,7 @@
  
   NOTE: Not thread-safe.
 */
-@interface HGSAccountsExtensionPoint : HGSExtensionPoint {
- @private
-  NSMutableDictionary *accountTypes_;  // NSString
-}
+@interface HGSAccountsExtensionPoint : HGSExtensionPoint
 
 /*!
   Register all accounts contained in the array of dictionaries as while
@@ -62,15 +59,6 @@
 
 /*! Returns a dictionary describing all registered accounts. */
 - (NSArray *)accountsAsArray;
-
-/*! Registers an account type. */
-- (void)addAccountType:(NSString *)accountType withClass:(Class)accountClass;
-
-/*! Returns the class for an account type */
-- (Class)classForAccountType:(NSString *)accountType;
-
-/*! A convenience method that returns an array of all account type names. */
-- (NSArray *)visibleAccountTypeDisplayNames;
 
 /*!
   A convenience method that returns an array of all acccounts

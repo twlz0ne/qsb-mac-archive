@@ -17,16 +17,13 @@
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<object class="NSCustomObject" id="1001">
-				<string key="NSClassName">TwitterAccount</string>
+				<string key="NSClassName">EditTwitterAccountWindowController</string>
 			</object>
 			<object class="NSCustomObject" id="1003">
 				<string key="NSClassName">FirstResponder</string>
 			</object>
 			<object class="NSCustomObject" id="1004">
 				<string key="NSClassName">NSApplication</string>
-			</object>
-			<object class="NSCustomObject" id="186018340">
-				<string key="NSClassName">TwitterAccountEditController</string>
 			</object>
 			<object class="NSWindowTemplate" id="1005">
 				<int key="NSWindowStyleMask">1</int>
@@ -247,38 +244,6 @@
 			<object class="NSMutableArray" key="connectionRecords">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">cancelEditAccountSheet:</string>
-						<reference key="source" ref="186018340"/>
-						<reference key="destination" ref="952175564"/>
-					</object>
-					<int key="connectionID">23</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">acceptEditAccountSheet:</string>
-						<reference key="source" ref="186018340"/>
-						<reference key="destination" ref="688240970"/>
-					</object>
-					<int key="connectionID">24</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">editAccountSheet_</string>
-						<reference key="source" ref="186018340"/>
-						<reference key="destination" ref="1005"/>
-					</object>
-					<int key="connectionID">36</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">account_</string>
-						<reference key="source" ref="186018340"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">37</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">initialFirstResponder</string>
 						<reference key="source" ref="1005"/>
@@ -289,54 +254,66 @@
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">window</string>
-						<reference key="source" ref="186018340"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="1005"/>
 					</object>
-					<int key="connectionID">42</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: account_.userName</string>
-						<reference key="source" ref="221488347"/>
-						<reference key="destination" ref="186018340"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="221488347"/>
-							<reference key="NSDestination" ref="186018340"/>
-							<string key="NSLabel">value: account_.userName</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">account_.userName</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">43</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: password</string>
-						<reference key="source" ref="550720424"/>
-						<reference key="destination" ref="186018340"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="550720424"/>
-							<reference key="NSDestination" ref="186018340"/>
-							<string key="NSLabel">value: password</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">password</string>
-							<object class="NSDictionary" key="NSOptions">
-								<string key="NS.key.0">NSContinuouslyUpdatesValue</string>
-								<integer value="1" key="NS.object.0"/>
-							</object>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">44</int>
+					<int key="connectionID">46</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">openTwitterHomePage:</string>
-						<reference key="source" ref="186018340"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="896224245"/>
 					</object>
-					<int key="connectionID">45</int>
+					<int key="connectionID">47</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">cancelEditAccountSheet:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="952175564"/>
+					</object>
+					<int key="connectionID">48</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">acceptEditAccountSheet:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="688240970"/>
+					</object>
+					<int key="connectionID">50</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: account.userName</string>
+						<reference key="source" ref="221488347"/>
+						<reference key="destination" ref="1001"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="221488347"/>
+							<reference key="NSDestination" ref="1001"/>
+							<string key="NSLabel">value: account.userName</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">account.userName</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">52</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: account.password</string>
+						<reference key="source" ref="550720424"/>
+						<reference key="destination" ref="1001"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="550720424"/>
+							<reference key="NSDestination" ref="1001"/>
+							<string key="NSLabel">value: account.password</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">account.password</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">53</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -492,11 +469,6 @@
 						<reference key="parent" ref="438512294"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">22</int>
-						<reference key="object" ref="186018340"/>
-						<reference key="parent" ref="1002"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">38</int>
 						<reference key="object" ref="896224245"/>
 						<object class="NSMutableArray" key="children">
@@ -533,7 +505,6 @@
 					<string>15.IBPluginDependency</string>
 					<string>16.IBPluginDependency</string>
 					<string>2.IBPluginDependency</string>
-					<string>22.IBPluginDependency</string>
 					<string>3.IBPluginDependency</string>
 					<string>38.IBAttributePlaceholdersKey</string>
 					<string>38.IBPluginDependency</string>
@@ -556,7 +527,6 @@
 					<integer value="0"/>
 					<string>{196, 240}</string>
 					<string>{{357, 418}, {480, 270}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -604,67 +574,21 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">45</int>
+			<int key="maxID">53</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBPartialClassDescription">
-					<string key="className">HGSAccount</string>
-					<string key="superclassName">HGSExtension</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../Vermilion/Vermilion/HGSAccount.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">HGSExtension</string>
-					<string key="superclassName">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../Vermilion/Vermilion/HGSExtension.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">HGSSimpleAccount</string>
-					<string key="superclassName">HGSAccount</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../Vermilion/Vermilion/HGSSimpleAccount.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">HGSSimpleAccountEditController</string>
-					<string key="superclassName">NSWindowController</string>
+					<string key="className">EditTwitterAccountWindowController</string>
+					<string key="superclassName">QSBEditSimpleAccountWindowController</string>
 					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSMutableArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>acceptEditAccountSheet:</string>
-							<string>cancelEditAccountSheet:</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSMutableArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>account_</string>
-							<string>editAccountSheet_</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>HGSSimpleAccount</string>
-							<string>NSWindow</string>
-						</object>
+						<string key="NS.key.0">openTwitterHomePage:</string>
+						<string key="NS.object.0">id</string>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../Vermilion/Vermilion/HGSSimpleAccountEditController.h</string>
+						<string key="minorKey">../../Vermilion/Modules/Twitter/TwitterAccount.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -673,6 +597,10 @@
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">../externals/google-toolbox-for-mac/UnitTesting/GTMAppKit+UnitTesting.h</string>
 					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSButton</string>
+					<reference key="sourceIdentifier" ref="287150620"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSCell</string>
@@ -741,21 +669,33 @@
 					<reference key="sourceIdentifier" ref="287150620"/>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">TwitterAccount</string>
-					<string key="superclassName">HGSSimpleAccount</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="192383128">
+					<string key="className">QSBEditAccountWindowController</string>
+					<string key="superclassName">NSWindowController</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSMutableArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>acceptEditAccountSheet:</string>
+							<string>cancelEditAccountSheet:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../Vermilion/Modules/Twitter/TwitterAccount.h</string>
+						<string key="minorKey">QSBEditAccountWindowController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">TwitterAccountEditController</string>
-					<string key="superclassName">HGSSimpleAccountEditController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">openTwitterHomePage:</string>
-						<string key="NS.object.0">id</string>
+					<string key="className">QSBEditSimpleAccountWindowController</string>
+					<string key="superclassName">QSBEditAccountWindowController</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">QSBEditSimpleAccountWindowController.h</string>
 					</object>
-					<reference key="sourceIdentifier" ref="192383128"/>
 				</object>
 			</object>
 		</object>

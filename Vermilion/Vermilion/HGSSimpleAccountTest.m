@@ -190,9 +190,12 @@ static NSString *const kServiceName
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  NSNumber *versionNumber
+    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"HGSSimpleAccount D", kHGSAccountUserNameKey,
                                  bundleMock, kHGSExtensionBundleKey,
+                                 versionNumber, kQSBAccountsPrefVersionKey,
                                  nil];
   HGSAccount *account
     = [[[SimpleAccountWithFakeKeychain alloc] initWithConfiguration:configuration]
@@ -210,7 +213,7 @@ static NSString *const kServiceName
     = [[[SimpleAccount alloc] initWithName:@"HGSSimpleAccount E"]
        autorelease];
   NSString *identifier = [account identifier];
-  STAssertEqualObjects(identifier, kServiceName, nil);
+  STAssertEqualObjects(identifier, @"SimpleAccountType.HGSSimpleAccount E", nil);
   NSString *userName = [account userName];
   STAssertEqualObjects(userName, @"HGSSimpleAccount E", nil);
   NSString *displayName = [account displayName];
@@ -241,17 +244,9 @@ static NSString *const kServiceName
   STAssertTrue(notified, nil);
   
   // Null operations.
-  [account editWithParentWindow:nil];
   [account authenticate];
   
-  // Class Accessors
-  NSViewController *setupController
-    = [SimpleAccount setupViewControllerToInstallWithParentWindow:nil];
-  STAssertNil(setupController, nil);
-  
   // Other Accessors
-  NSString *editNibName = [account editNibName];
-  STAssertNil(editNibName, nil);
   BOOL authenticated = [account authenticateWithPassword:nil];
   STAssertTrue(authenticated, nil);
   [account setAuthenticated:YES];

@@ -32,20 +32,28 @@
 
 #import "QSBSetUpAccountWindowController.h"
 #import <Vermilion/Vermilion.h>
+#import "QSBApplicationDelegate.h"
+#import "QSBSetUpAccountViewController.h"
+
+NSString *const kQSBSetUpAccountViewNibName = @"QSBSetUpAccountViewNibName";
+NSString *const kQSBSetUpAccountViewControllerClassName
+  = @"QSBSetUpAccountViewControllerClassName";
+
 
 @interface QSBSetUpAccountWindowController ()
 
-@property (nonatomic, retain, readwrite) NSArray *accountTypeDisplayNames;
-@property (nonatomic, assign, readwrite) NSString *selectedAccountType;
+@property (nonatomic, retain, readwrite) NSArray *visibleAccountTypes;
+@property (nonatomic, retain, readwrite) HGSAccountType *selectedAccountType;
 
 - (void)setInstalledSetupViewController:(NSViewController *)setupViewController;
 
 @end
 
+
 @implementation QSBSetUpAccountWindowController
 
+@synthesize visibleAccountTypes = visibleAccountTypes_;
 @synthesize selectedAccountType = selectedAccountType_;
-@synthesize accountTypeDisplayNames = accountTypeDisplayNames_;
 
 - (id)initWithParentWindow:(NSWindow *)parentWindow {
   parentWindow_ = parentWindow;
@@ -55,81 +63,100 @@
 
 - (id)init {
   if ((self = [super initWithWindowNibName:@"SetUpAccount"])) {
-    HGSAccountsExtensionPoint *accountsPoint 
-      = [HGSExtensionPoint accountsPoint];
-    accountTypeDisplayNames_
-      = [[accountsPoint visibleAccountTypeDisplayNames] retain];
+    HGSExtensionPoint *accountTypesPoint 
+      = [HGSExtensionPoint accountTypesPoint];
+    NSArray *visibleAccountTypes = [accountTypesPoint extensions];
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"userVisible == YES"];
+    visibleAccountTypes_
+      = [[visibleAccountTypes filteredArrayUsingPredicate:pred] retain];
   }
   return self;
 }
 
 - (void) dealloc {
-  [accountTypeDisplayNames_ release];
+  [visibleAccountTypes_ release];
+  [selectedAccountType_ release];
   [installedSetupViewController_ release];
   [super dealloc];
 }
 
 - (void)awakeFromNib {
-  NSSortDescriptor *sort 
-    = [[[NSSortDescriptor alloc] initWithKey:@"self" 
+  NSSortDescriptor *newSort 
+    = [[[NSSortDescriptor alloc] initWithKey:@"self.displayName" 
                                    ascending:YES] autorelease];
-  [accountTypeDisplayNamesController_
-   setSortDescriptors:[NSArray arrayWithObject:sort]];
-  NSArray *arrangedObjects
-    = [accountTypeDisplayNamesController_ arrangedObjects];
-  NSString *type = [arrangedObjects objectAtIndex:0];
-  [self setSelectedAccountType:type];
+  [accountTypeController_ setSortDescriptors:[NSArray arrayWithObject:newSort]];
+  NSArray *arrangedTypes = [accountTypeController_ arrangedObjects];
+  HGSAccountType *accountType = [arrangedTypes objectAtIndex:0];
+  if (accountType) {
+    [self setSelectedAccountType:accountType];
+  }
 }
 
-- (void)setSelectedAccountType:(NSString *)accountType {
-  selectedAccountType_ = accountType;
-  HGSAccountsExtensionPoint *accountsPoint 
-    = [HGSExtensionPoint accountsPoint];
+- (void)setSelectedAccountType:(HGSAccountType *)accountType {
+  if (selectedAccountType_ != accountType) {
+    HGSProtoExtension *accountProto = [accountType protoExtension];
+    NSString *setUpAccountControllerClassName
+      = [accountProto objectForKey:kQSBSetUpAccountViewControllerClassName];
+    Class setUpAccountControllerClass
+      = NSClassFromString(setUpAccountControllerClassName);
+    NSBundle *accountTypeBundle
+      = [NSBundle bundleForClass:setUpAccountControllerClass];
+    NSString *setUpAccountNibName
+      = [accountProto objectForKey:kQSBSetUpAccountViewNibName];
+    QSBSetUpAccountViewController *loadedViewController
+      = [[[setUpAccountControllerClass alloc]
+          initWithNibName:setUpAccountNibName bundle:accountTypeBundle]
+         autorelease];
+    if (loadedViewController) {
+      [loadedViewController loadView];
+      [loadedViewController setParentWindow:parentWindow_];
+      [self setInstalledSetupViewController:loadedViewController];
 
-  Class accountClass = [accountsPoint classForAccountType:accountType];
-  NSViewController *viewControllerToInstall
-    = [accountClass setupViewControllerToInstallWithParentWindow:parentWindow_];
-  if (viewControllerToInstall) {
-    [self setInstalledSetupViewController:viewControllerToInstall];
-  } else {
-    HGSLog(@"Failed to find setupViewController for account class '%@'",
-           accountClass);
+      [selectedAccountType_ release];
+      selectedAccountType_ = [accountType retain];
+    } else {
+      HGSLog(@"Failed to load set up account nib '%@'.", setUpAccountNibName);
+    }
   }
 }
 
 - (void)setInstalledSetupViewController:(NSViewController *)setupViewController {
-  if (installedSetupViewController_ != setupViewController) {
-    // Remove any previously installed setup view.
-    NSView *oldSetupView = [installedSetupViewController_ view];
-    [oldSetupView removeFromSuperview];
-    [installedSetupViewController_ autorelease];
-    installedSetupViewController_ = [setupViewController retain];
-    
-    NSView *setupView = [installedSetupViewController_ view];
-    
-    // 1) Adjust the window height to accommodate the new view, 2) adjust
-    // the width of the new view to fit the container, then 3) install the
-    // new view.
-    // Assumption: The container view is set to resize with the window.
-    NSRect containerFrame = [setupContainerView_ frame];
-    NSRect setupViewFrame = [setupView frame];
-    CGFloat deltaHeight = NSHeight(setupViewFrame) - NSHeight(containerFrame);
-    NSWindow *setupWindow = [setupContainerView_ window];
-    NSRect setupWindowFrame = [setupWindow frame];
-    setupWindowFrame.origin.y -= deltaHeight;
-    setupWindowFrame.size.height += deltaHeight;
-    [setupWindow setFrame:setupWindowFrame display:YES];
-    
-    containerFrame = [setupContainerView_ frame];  // Refresh
-    CGFloat deltaWidth = NSWidth(containerFrame) - NSWidth(setupViewFrame);
-    setupViewFrame.size.width += deltaWidth;
-    [setupView setFrame:setupViewFrame];
-    
-    [setupContainerView_ addSubview:setupView];
-    
-    // Set the focused field.
-    NSView *wannabeKeyView = [setupView nextKeyView];
-    [setupWindow makeFirstResponder:wannabeKeyView];
+  if (setupViewController) {
+    if (installedSetupViewController_ != setupViewController) {
+      // Remove any previously installed setup view.
+      NSView *oldSetupView = [installedSetupViewController_ view];
+      [oldSetupView removeFromSuperview];
+      [installedSetupViewController_ autorelease];
+      installedSetupViewController_ = [setupViewController retain];
+      
+      NSView *setupView = [installedSetupViewController_ view];
+      
+      // 1) Adjust the window height to accommodate the new view, 2) adjust
+      // the width of the new view to fit the container, then 3) install the
+      // new view.
+      // Assumption: The container view is set to resize with the window.
+      NSRect containerFrame = [setupContainerView_ frame];
+      NSRect setupViewFrame = [setupView frame];
+      CGFloat deltaHeight = NSHeight(setupViewFrame) - NSHeight(containerFrame);
+      NSWindow *setupWindow = [setupContainerView_ window];
+      NSRect setupWindowFrame = [setupWindow frame];
+      setupWindowFrame.origin.y -= deltaHeight;
+      setupWindowFrame.size.height += deltaHeight;
+      [setupWindow setFrame:setupWindowFrame display:YES];
+      
+      containerFrame = [setupContainerView_ frame];  // Refresh
+      CGFloat deltaWidth = NSWidth(containerFrame) - NSWidth(setupViewFrame);
+      setupViewFrame.size.width += deltaWidth;
+      [setupView setFrame:setupViewFrame];
+      
+      [setupContainerView_ addSubview:setupView];
+      
+      // Set the focused field.
+      NSView *wannabeKeyView = [setupView nextKeyView];
+      [setupWindow makeFirstResponder:wannabeKeyView];
+    }
+  } else {
+    HGSLogDebug(@"Attempt to set a nil setupViewController.");
   }
 }
 

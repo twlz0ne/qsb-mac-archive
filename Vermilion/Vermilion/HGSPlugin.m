@@ -69,6 +69,23 @@ static NSString *const kHGSPluginAPIVersionKey
 @synthesize protoExtensions = protoExtensions_;
 @synthesize enabled = enabled_;
 
+// TODO(mrossetti): Move this and extensionsWithType: up into QSB.
++ (NSSet *)keyPathsForValuesAffectingSourceExtensions {
+  return [NSSet setWithObject:@"protoExtensions"];
+}
+
++ (NSSet *)keyPathsForValuesAffectingActionExtensions {
+  return [NSSet setWithObject:@"protoExtensions"];
+}
+
++ (NSSet *)keyPathsForValuesAffectingServiceExtensions {
+  return [NSSet setWithObject:@"protoExtensions"];
+}
+
++ (NSSet *)keyPathsForValuesAffectingAccountTypeExtensions {
+  return [NSSet setWithObject:@"protoExtensions"];
+}
+
 + (void)load {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   HGSPluginLoader *loader = [HGSPluginLoader sharedPluginLoader];
@@ -165,7 +182,6 @@ static NSString *const kHGSPluginAPIVersionKey
 - (void)setEnabled:(BOOL)isEnabled {
   if ([self isEnabled] != isEnabled) {
     enabled_ = isEnabled;
-    
     // Install/enable or disable the plugin.
     if (isEnabled) {
       [self install];
@@ -198,9 +214,7 @@ static NSString *const kHGSPluginAPIVersionKey
   // Lock and load all enable-able sources and actions.
   for (HGSProtoExtension *protoExtension in [self protoExtensions]) {
     if ([protoExtension isEnabled]) {
-      if (![protoExtension isInstalled]) {
-        [protoExtension install];
-      }
+      [protoExtension install];
     }
   }
   if ([factorableProtoExtensions_ count]) {
@@ -239,8 +253,33 @@ static NSString *const kHGSPluginAPIVersionKey
 }
 
 - (void)installAccountTypes {
-  NSArray *protoExtensions = [self protoExtensions];
-  [protoExtensions makeObjectsPerformSelector:@selector(installAccountTypes)];
+  NSArray *accountTypeProtoExtensions = [self accountTypeExtensions];
+  [accountTypeProtoExtensions makeObjectsPerformSelector:@selector(install)];
+}
+
+// TODO(mrossetti): Move this and convenience functions following up into QSB.
+- (NSArray *)extensionsWithType:(NSString *)type {
+  NSArray *filteredExtensions = [self protoExtensions];
+  NSPredicate *pred
+    = [NSPredicate predicateWithFormat:@"extensionPointKey == %@", type];
+  filteredExtensions = [filteredExtensions filteredArrayUsingPredicate:pred];
+  return filteredExtensions;
+}
+
+- (NSArray *)sourceExtensions {
+  return [self extensionsWithType:kHGSSourcesExtensionPoint];
+}
+
+- (NSArray *)actionExtensions {
+  return [self extensionsWithType:kHGSActionsExtensionPoint];
+}
+
+- (NSArray *)serviceExtensions {
+  return [self extensionsWithType:kHGSServicesExtensionPoint];
+}
+
+- (NSArray *)accountTypeExtensions {
+  return [self extensionsWithType:kHGSAccountTypesExtensionPoint];
 }
 
 - (NSString *)description {

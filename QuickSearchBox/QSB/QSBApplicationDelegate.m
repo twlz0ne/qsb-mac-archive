@@ -72,16 +72,14 @@ static NSString *const kQSBPluginConfigurationPrefPluginsKey
 static const NSInteger kQSBPluginConfigurationPrefCurrentVersion = 1;
 
 // The preference containing the information about our known
-// accounts. It is a dictionary with two keys:
-// kQSBAccountsPrefVersionKey and kQSBAccountsPrefAccountsKey.
+// accounts. It is a dictionary with one key (kQSBAccountsPrefKey) that
+// contains an array of accounts.  Older versions of preferences have an 
+// outer dictionary container with this key (kQSBAccountsPrefKey) which 
+// contained the array of accounts with the kQSBAccountsPrefAccountsKey.
 static NSString *const kQSBAccountsPrefKey = @"QSBAccountsPrefKey";
-// The version of the preferences data stored in the dictionary (NSNumber).
-static NSString *const kQSBAccountsPrefVersionKey 
-= @"QSBAccountsPrefVersionKey";
-// The key for an NSArray of account information.
+// The old key for an NSArray of account information.
 static NSString *const kQSBAccountsPrefAccountsKey 
-= @"QSBAccountsPrefAccountsKey";
-static const NSInteger kQSBAccountsPrefCurrentVersion = 1;
+  = @"QSBAccountsPrefAccountsKey";
 
 
 static NSString *const kQSBHomepageKey = @"QSBHomepageURL";
@@ -113,6 +111,9 @@ static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 // Reconcile what we previously knew about accounts and saved in our
 // preferences with what we now know about accounts.
 - (void)inventoryAccounts;
+
+// Update our preferences with the current account information.
+- (void)updateAccountsPrefs;
 
 // Reconcile what we previously knew about plugins and extensions
 // and had saved in our preferences with a new inventory
@@ -715,19 +716,25 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
   HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
   NSArray *factorablePlugins = [pluginsPoint extensions];
-  
-  // Install the account type extensions.  We do this here because we 
-  // want the account types to be available before factoring extensions  
-  // that rely on those account types.
+
+  // Installing extensions is done in this order:
+  //   1. Install account type extensions.
+  //   2. Install previously setup accounts from our preferences.  This 
+  //      step relies on the account types having been installed in Step 1.
+  //   3. Factor all factorable extensions.  This step relies on accounts
+  //      having been reconstituted in Step 2.
+  //   4. Install all non-account type extensions.
+
+  // Step 1: Install the account type extensions.
   [factorablePlugins makeObjectsPerformSelector:@selector(installAccountTypes)];
-  
-  // Identify our accounts now that we know about available account types.
+
+  // Step 2: Reconstitute all previously set up accounts.
   [self inventoryAccounts];
   
-  // Factor the new extensions now that we know all available accounts.
+  // Step 3: Factor the new extensions now that we know all available accounts.
   [factorablePlugins makeObjectsPerformSelector:@selector(factorProtoExtensions)];
 
-  // Now go through our plugins and set enabled states based on what
+  // Step 4: Go through our plugins and set enabled states based on what
   // the user has saved off in their prefs.
   for (HGSPlugin *plugin in factorablePlugins) {
     NSString *pluginIdentifier = [plugin identifier];
@@ -754,14 +761,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     NSArray *protoExtensions = [plugin protoExtensions];
     for (HGSProtoExtension *protoExtension in protoExtensions) {
       BOOL protoExtensionEnabled = YES;
-      
-      // TODO(dmaclach): Temporary hack while we get accounts sorted out.
-      // Turn basic account prototypes off.
-      NSString *extensionPointKey = [protoExtension extensionPointKey];
-      if ([extensionPointKey isEqualToString:kHGSAccountsExtensionPoint]) {
-        protoExtensionEnabled = NO;
-      }
-      
       NSString *protoExtensionID = [protoExtension identifier];
       NSDictionary *oldExtensionDict = nil;
       for (oldPluginDict in pluginsFromPrefs) {
@@ -789,7 +788,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     }
   }
   [self setPlugins:factorablePlugins];
-  
 }
 
 - (void)setPlugins:(NSArray *)plugins {
@@ -895,18 +893,27 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)inventoryAccounts {
-  HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
   // Retrieve list of known accounts.
   NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-  NSDictionary *dict = [standardDefaults objectForKey:kQSBAccountsPrefKey];
-  if ([dict isKindOfClass:[NSDictionary class]]) {
-    NSNumber *version = [dict valueForKey:kQSBAccountsPrefVersionKey];
-    if ([version integerValue] == kQSBAccountsPrefCurrentVersion) {
-      NSArray *accounts = [dict objectForKey:kQSBAccountsPrefAccountsKey];
-      [accountsPoint addAccountsFromArray:accounts];
-    }
+  NSArray *accounts = [standardDefaults arrayForKey:kQSBAccountsPrefKey];
+  if (!accounts) {
+    // We may have an older version of account information.
+    NSDictionary *dict = [standardDefaults dictionaryForKey:kQSBAccountsPrefKey];
+    accounts = [dict objectForKey:kQSBAccountsPrefAccountsKey];
   }
-  // TODO(dmaclach): alert user that their prefs have been ignored.
+  HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
+  [accountsPoint addAccountsFromArray:accounts];
+  [self updateAccountsPrefs];  // In case any accounts have been updated.
+}
+
+- (void)updateAccountsPrefs {
+  // Update preferences to current account knowledge.
+  NSArray *archivableAccounts
+    = [[HGSExtensionPoint accountsPoint] accountsAsArray]; 
+  NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
+  [standardDefaults setObject:archivableAccounts
+                       forKey:kQSBAccountsPrefKey];
+  [standardDefaults synchronize];
 }
 
 #pragma mark Application Delegate Methods
@@ -1041,22 +1048,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)didAddOrRemoveAccount:(NSNotification *)notification {
-  // What should we do?
   [self willChangeValueForKey:@"accounts"];
-
-  // Update preferences to current account knowledge.
-  NSArray *archivableAccounts
-    = [[HGSExtensionPoint accountsPoint] accountsAsArray]; 
-  NSNumber *vers = [NSNumber numberWithInteger:kQSBAccountsPrefCurrentVersion];
-  NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-                        archivableAccounts, kQSBAccountsPrefAccountsKey,
-                        vers, kQSBAccountsPrefVersionKey,
-                        nil];
-  NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-  [standardDefaults setObject:dict
-                       forKey:kQSBAccountsPrefKey];
-  [standardDefaults synchronize];
-
+  [self updateAccountsPrefs];
   [self didChangeValueForKey:@"accounts"];
 }
 

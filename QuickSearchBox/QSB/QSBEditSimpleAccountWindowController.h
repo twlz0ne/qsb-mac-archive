@@ -1,5 +1,5 @@
 //
-//  HGSCoreExtensionPoints.h
+//  QSBSimpleAccountEditController.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,27 +30,37 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Foundation/Foundation.h>
+/*!
+ @header A window controller useful for editing a 'simple' account.
+ @discussion Provides a base class for a window controller used
+ by account type extensions for editing the credentials for a
+ 'simple' account, that is one that has an account name and a
+ password.
+ */
 
-#import "HGSExtensionPoint.h"
+#import "QSBEditAccountWindowController.h"
 
-@class HGSAccountsExtensionPoint;
+/*!
+  A controller which manages a window used to update the password
+  for an HGSSimpleAccount type of account.
+*/
+@interface QSBEditSimpleAccountWindowController : QSBEditAccountWindowController {
+ @private
+  NSString *password_;
+}
 
-extern NSString* const kHGSActionsExtensionPoint;
-extern NSString* const kHGSSourcesExtensionPoint;
-extern NSString* const kHGSServicesExtensionPoint;
-extern NSString* const kHGSAccountsExtensionPoint;
-extern NSString* const kHGSPluginsExtensionPoint;
-extern NSString* const kHGSAccountTypesExtensionPoint;
+/*! The password being edited for the account. */
+@property (nonatomic, copy) NSString *password;
 
-@interface HGSExtensionPoint (HGSCoreExtensionPoints)
-
-// Some commonly used points
-+ (HGSExtensionPoint *)actionsPoint;
-+ (HGSExtensionPoint *)sourcesPoint;
-+ (HGSExtensionPoint *)servicesPoint;
-+ (HGSExtensionPoint *)pluginsPoint;
-+ (HGSAccountsExtensionPoint *)accountsPoint;
-+ (HGSExtensionPoint *)accountTypesPoint;
+/*!
+  Called when authentication fails, to see if remediation is possible.
+  The default returns NO.  Override this to determine if some additional
+  action can be performed (within the setup process) to fix the
+  authentication.  One common remediation is to respond to a captcha
+  request.  It is appropriate for this method to interact with the user
+  in some way.  In the case of a captcha request, for example, merely
+  presenting the captcha in the edit window is adequate and sufficient.
+*/
+- (BOOL)canGiveUserAnotherTry;
 
 @end

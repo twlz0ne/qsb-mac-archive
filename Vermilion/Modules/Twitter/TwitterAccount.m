@@ -31,20 +31,13 @@
 //
 
 #import "TwitterAccount.h"
-#import "HGSAccountsExtensionPoint.h"
-#import "GTMMethodCheck.h"
-#import "GTMNSString+URLArguments.h"
-#import "HGSBundle.h"
-#import "HGSLog.h"
-#import "KeychainItem.h"
 #import "GTMBase64.h"
 
-static NSString *const kSetUpTwitterAccountViewNibName
-  = @"SetUpTwitterAccountView";
 static NSString *const kTwitterVerifyAccountURLString
   = @"https://twitter.com/account/verify_credentials.xml";
 static NSString *const kTwitterURLString = @"http://twitter.com/";
-static NSString *const kTwitterAccountTypeName = @"Twitter";
+static NSString *const kTwitterAccountTypeName
+  = @"com.google.qsb.twitter.account";
 
 
 @interface TwitterAccount ()
@@ -56,31 +49,8 @@ static NSString *const kTwitterAccountTypeName = @"Twitter";
 
 @implementation TwitterAccount
 
-GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
-
-+ (NSViewController *)
-    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow {
-  NSBundle *ourBundle = HGSGetPluginBundle();
-  SetUpTwitterAccountViewController *loadedViewController
-    = [[[SetUpTwitterAccountViewController alloc]
-        initWithNibName:kSetUpTwitterAccountViewNibName bundle:ourBundle]
-       autorelease];
-  if (loadedViewController) {
-    [loadedViewController loadView];
-    [loadedViewController setParentWindow:parentWindow];
-  } else {
-    loadedViewController = nil;
-    HGSLog(@"Failed to load nib '%@'.", kSetUpTwitterAccountViewNibName);
-  }
-  return loadedViewController;
-}
-
 - (NSString *)type {
   return kTwitterAccountTypeName;
-}
-
-- (NSString *)editNibName {
-  return @"EditTwitterAccount";
 }
 
 - (BOOL)authenticateWithPassword:(NSString *)password {
@@ -99,6 +69,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   }
   return authenticated;
 }
+
+#pragma mark Account Editing
 
 - (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
                                       password:(NSString *)password {
@@ -132,7 +104,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 @end
 
-@implementation TwitterAccountEditController
+@implementation EditTwitterAccountWindowController
 
 - (IBAction)openTwitterHomePage:(id)sender {
   BOOL success = [TwitterAccount openTwitterHomePage];

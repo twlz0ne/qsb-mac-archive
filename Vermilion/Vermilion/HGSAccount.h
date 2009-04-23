@@ -85,21 +85,6 @@
 - (NSDictionary *)configuration;
 
 /*!
-  Provide a view controller whose view will be installed in an account setup
-  window.  |parentWindow| is provided as a place off which to hang alerts.  The
-  default view controller provider returns nil.
-*/
-+ (NSViewController *)
-    setupViewControllerToInstallWithParentWindow:(NSWindow *)parentWindow;
-
-/*!
-  Do whatever is appropriate in order to edit the account.  |parentWindow| is
-  provided as a place off which to hang an edit sheet, if desired.  The default
-  account edit function does nothing.
-*/
-- (void)editWithParentWindow:(NSWindow *)parentWindow;
-
-/*!
   Do what is appropriate in order to remove the account.  The default removes
   the account from the accounts extensions point.  If you derive a subclass
   then you should call super's (this) remove.
@@ -111,6 +96,12 @@
   credentials.  The default does nothing.
 */
 - (void)authenticate;
+
+/*!
+ Given a dictionary describing an account, upgrade that dictionary to the
+ latest version.
+*/
++ (NSDictionary *)upgradeConfiguration:(NSDictionary *)configuration;
 
 @end
 
@@ -126,6 +117,18 @@
 - (BOOL)accountWillBeRemoved:(HGSAccount *)account;
 
 @end
+
+/*! The version of the preferences data stored in the dictionary (NSNumber). */
+extern NSString *const kQSBAccountsPrefVersionKey;
+
+/*! Current version of an account description in preferences. */
+extern NSInteger const kQSBAccountsPrefCurrentVersion;
+
+/*!
+  Original version of an account preferences.  There was no version
+  specified prior to version 1.
+*/
+extern NSInteger const kQSBAccountsPrefVersion0;
 
 /*!
   Notification sent whenever an account has been changed. The |object| sent

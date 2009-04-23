@@ -33,7 +33,75 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSAccount.h"
+#import "HGSAccountType.h"
+#import "HGSCoreExtensionPoints.h"
+#import "HGSExtensionPoint.h"
+#import "HGSPlugin.h"
+#import "HGSProtoExtension.h"
 #import <OCMock/OCMock.h>
+
+#pragma mark Supporting Classes
+
+static NSString *const kTestAccountTypeID = @"com.google.qsb.test.account";
+static NSString *const kMockGoogleAccountTypeID
+  = @"com.google.qsb.google.account";
+static NSString *const kMockGoogleAppsAccountTypeID
+  = @"com.google.qsb.googleapps.account";
+static NSString *const kTestAccountTypeClass = @"TestAccountType";
+static NSString *const kTestAccountType = @"BaseAccount";
+static NSString *const kTestAccountClass = @"BaseAccount";
+static NSString *const kTestAccountTypeName = @"Test Account Type";
+
+@interface TestAccountType : HGSAccountType
+@end
+
+
+@implementation TestAccountType
+
+- (NSString *)type {
+  return kTestAccountTypeID;
+}
+
+@end
+
+
+@interface BaseAccount : HGSAccount
+@end
+
+
+@implementation BaseAccount
+
+- (NSString *)type {
+  return kTestAccountTypeID;
+}
+
+@end
+
+@interface MockGoogleAccount : HGSAccount
+@end
+
+
+@implementation MockGoogleAccount
+
+- (NSString *)type {
+  return kMockGoogleAccountTypeID;
+}
+
+@end
+
+@interface MockGoogleAppsAccount : HGSAccount
+@end
+
+
+@implementation MockGoogleAppsAccount
+
+- (NSString *)type {
+  return kMockGoogleAppsAccountTypeID;
+}
+
+@end
+
+#pragma mark Test Class
 
 @interface HGSAccountTest : GTMTestCase {
  @private
@@ -51,16 +119,6 @@
 
 @end
 
-@interface BaseAccount : HGSAccount
-@end
-
-@implementation BaseAccount
-
-- (NSString *)type {
-  return @"BaseAccountType";
-}
-
-@end
 
 @implementation HGSAccountTest
 
@@ -120,15 +178,17 @@
   STAssertNil(account, @"|initWithName:@\"\"| should not create new HSGAccount");
   account = [[[HGSAccount alloc] initWithName:@"USERNAME"] autorelease];
   STAssertNil(account, nil);
-  account = [[[BaseAccount alloc] initWithName:@"BASENAME A"] autorelease];
-  STAssertNotNil(account, nil);
+
   // initWithConfiguration:
   NSDictionary *configuration = [NSDictionary dictionary];
   account
     = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
   STAssertNil(account, nil);
+  NSNumber *versionNumber
+    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME A", kHGSAccountUserNameKey,
+                   versionNumber, kQSBAccountsPrefVersionKey,
                    nil];
   account
     = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -136,6 +196,17 @@
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME B", kHGSAccountUserNameKey,
                    @"DUMMY TYPE B", kHGSAccountTypeKey,
+                   versionNumber, kQSBAccountsPrefVersionKey,
+                   nil];
+  account
+    = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
+  STAssertNil(account, nil);
+  configuration = [NSDictionary dictionaryWithObjectsAndKeys:
+                   @"USERNAME B", kHGSAccountUserNameKey,
+                   @"DUMMY TYPE B", kHGSAccountTypeKey,
+                   @"DUMMY NAME B", kHGSExtensionUserVisibleNameKey,
+                   @"DUMMY IDENTIFIER B", kHGSExtensionIdentifierKey,
+                   versionNumber, kQSBAccountsPrefVersionKey,
                    nil];
   account
     = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -147,7 +218,9 @@
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME C", kHGSAccountUserNameKey,
+                   @"DUMMY TYPE C", kHGSAccountTypeKey,
                    bundleMock, kHGSExtensionBundleKey,
+                   versionNumber, kQSBAccountsPrefVersionKey,
                    nil];
   account
     = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -158,9 +231,13 @@
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  NSNumber *versionNumber
+    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME D", kHGSAccountUserNameKey,
+                                 @"DUMMY TYPE D", kHGSAccountTypeKey,
                                  bundleMock, kHGSExtensionBundleKey,
+                                 versionNumber, kQSBAccountsPrefVersionKey,
                                  nil];
   HGSAccount *account
     = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -169,25 +246,64 @@
   NSString * userName = [result objectForKey:kHGSAccountUserNameKey];
   STAssertEqualObjects(userName, @"USERNAME D", nil);
   NSString * accountType = [result objectForKey:kHGSAccountTypeKey];
-  STAssertEqualObjects(accountType, @"BaseAccountType", nil);
+  STAssertEqualObjects(accountType, kTestAccountTypeID, nil);
 }
 
-- (void)testAccessors {
+- (void)testTypesAndAccessors {
+  // We need a bundle.
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
-  NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
+  BOOL yes = YES;
+  [[[bundleMock stub] andReturnValue:OCMOCK_VALUE(yes)] isLoaded];
+  
+  // We need a plugin
+  id pluginMock = [OCMockObject mockForClass:[HGSPlugin class]];
+  [[[pluginMock stub] andReturn:@"PLUGIN"] displayName];
+  [[[pluginMock stub] andReturn:bundleMock] bundle];
+
+  // We need an account type extension point.
+  HGSExtensionPoint *accountTypesPoint = [HGSExtensionPoint accountTypesPoint];
+  STAssertNotNil(accountTypesPoint, nil);
+
+  // We need at least one account type.
+  NSDictionary *configuration
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       bundleMock, kHGSExtensionBundleKey,
+       kTestAccountTypeClass, kHGSExtensionClassKey,
+       kTestAccountTypeID, kHGSExtensionIdentifierKey,
+       kTestAccountTypeName, kHGSExtensionUserVisibleNameKey,
+       kHGSAccountTypesExtensionPoint, kHGSExtensionPointKey,
+       kTestAccountType, kHGSExtensionOfferedAccountType,
+       kTestAccountClass, kHGSExtensionOfferedAccountClass,
+       nil];
+  HGSProtoExtension *accountTypeProto
+    = [[[HGSProtoExtension alloc] initWithConfiguration:configuration
+                                                 plugin:pluginMock]
+     autorelease];
+  STAssertNotNil(accountTypeProto, nil);
+  [accountTypeProto install];
+  HGSAccountType *accountType
+    = [accountTypesPoint extensionWithIdentifier:kTestAccountTypeID];
+  STAssertNotNil(accountType, nil);
+  
+  // Let's add an account.
+  NSNumber *versionNumber
+    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+  NSDictionary *accountConfig = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME E", kHGSAccountUserNameKey,
                                  bundleMock, kHGSExtensionBundleKey,
-                               nil];
+                                 kTestAccountTypeID, kHGSAccountTypeKey,
+                                 versionNumber, kQSBAccountsPrefVersionKey,
+                                 nil];
   HGSAccount *account
-    = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
+    = [[[BaseAccount alloc] initWithConfiguration:accountConfig] autorelease];
   NSString * userName = [account userName];
   STAssertEqualObjects(userName, @"USERNAME E", nil);
   NSString *displayName = [account displayName];
-  STAssertEqualObjects(displayName, @"USERNAME E (BaseAccountType)", nil);
-  NSString *accountType = [account type];
-  STAssertEqualObjects(accountType, @"BaseAccountType", nil);
+  STAssertEqualObjects(displayName, @"USERNAME E (Test Account Type)", nil);
+  NSString *accountTypeName = [account type];
+  STAssertEqualObjects(accountTypeName, kTestAccountTypeID, nil);
   NSString *password = [account password];
   STAssertNil(password, nil);
   BOOL isEditable = [account isEditable];
@@ -196,22 +312,20 @@
   STAssertNotNil(description, nil);
   
   // Null operations.
-  [account editWithParentWindow:nil];
   [account authenticate];
-  
-  // Class Accessors
-  NSViewController *setupController
-    = [HGSAccount setupViewControllerToInstallWithParentWindow:nil];
-  STAssertNil(setupController, nil);
 }
 
 - (void)testSetPassword {
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  NSNumber *versionNumber
+    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME F", kHGSAccountUserNameKey,
+                                 @"DUMMY TYPE F", kHGSAccountTypeKey,
                                  bundleMock, kHGSExtensionBundleKey,
+                                 versionNumber, kQSBAccountsPrefVersionKey,
                                 nil];
   HGSAccount *account
     = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -224,15 +338,64 @@
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  NSNumber *versionNumber
+    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME G", kHGSAccountUserNameKey,
+                                 @"DUMMY TYPE G", kHGSAccountTypeKey,
                                  bundleMock, kHGSExtensionBundleKey,
-                                nil];
+                                 versionNumber, kQSBAccountsPrefVersionKey,
+                                 nil];
   HGSAccount *account
     = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
   [self setAccount:account];
   [account remove];
   STAssertTrue([self receivedWillBeRemovedNotification], nil);
+}
+
+- (void)testUpgradeAccount {
+  // We have to use a real bundle for this particular test.
+  NSBundle *bundleMock = [NSBundle bundleForClass:[self class]];
+  NSNumber *badVersionNumber = [NSNumber numberWithInt:666];
+  NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 @"USERNAME G", kHGSAccountUserNameKey,
+                                 @"DUMMY TYPE G", kHGSAccountTypeKey,
+                                 bundleMock, kHGSExtensionBundleKey,
+                                 badVersionNumber, kQSBAccountsPrefVersionKey,
+                                 nil];
+  HGSAccount *account
+    = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
+  STAssertNil(account, nil);
+
+  NSNumber *oldVersionNumber
+    = [NSNumber numberWithInt:kQSBAccountsPrefVersion0];
+  configuration = [NSDictionary dictionaryWithObjectsAndKeys:
+                   @"USERNAME G", kHGSAccountUserNameKey,
+                   @"GoogleAccount", kHGSAccountTypeKey,
+                   bundleMock, kHGSExtensionBundleKey,
+                   oldVersionNumber, kQSBAccountsPrefVersionKey,
+                   nil];
+  account
+    = [[[MockGoogleAccount alloc] initWithConfiguration:configuration]
+       autorelease];
+  STAssertNotNil(account, nil);
+  // Testing for nil is adequate since the -[type] accesses the member function
+  // which returns a constant.  But let's just make sure.
+  NSString *accountType = [account type];
+  STAssertEqualObjects(accountType, kMockGoogleAccountTypeID, nil);
+
+  configuration = [NSDictionary dictionaryWithObjectsAndKeys:
+                   @"USERNAME G", kHGSAccountUserNameKey,
+                   @"GoogleAppsAccount", kHGSAccountTypeKey,
+                   bundleMock, kHGSExtensionBundleKey,
+                   oldVersionNumber, kQSBAccountsPrefVersionKey,
+                   nil];
+  account
+    = [[[MockGoogleAppsAccount alloc] initWithConfiguration:configuration]
+       autorelease];
+  STAssertNotNil(account, nil);
+  accountType = [account type];
+  STAssertEqualObjects(accountType, kMockGoogleAppsAccountTypeID, nil);
 }
 
 @end

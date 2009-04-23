@@ -22,27 +22,49 @@
 	<array>
 		<dict>
 			<key>HGSExtensionClass</key>
-			<string>GoogleAccount</string>
+			<string>HGSAccountType</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.google.account</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Google Accounts</string>
-			<key>HGSExtensionPoint</key>
-			<string>HGSAccountsExtensionPoint</string>
-			<key>HGSExtensionOfferedAccountType</key>
 			<string>Google</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSAccountTypesExtensionPoint</string>
+			<key>HGSExtensionOfferedAccountType</key>
+			<string>com.google.qsb.google.account</string>
+			<key>HGSExtensionOfferedAccountClass</key>
+			<string>GoogleAccount</string>
+			<key>QSBSetUpAccountViewNibName</key>
+			<string>SetUpGoogleAccountView</string>
+			<key>QSBSetUpAccountViewControllerClassName</key>
+			<string>GoogleAccountSetUpViewController</string>
+			<key>QSBEditAccountWindowNibName</key>
+			<string>EditGoogleAccount</string>
+			<key>QSBEditAccountWindowControllerClassName</key>
+			<string>GoogleAccountEditController</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
-			<string>GoogleAppsAccount</string>
+			<string>HGSAccountType</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.googleapps.account</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Google Apps Accounts</string>
+			<string>Google Apps</string>
 			<key>HGSExtensionPoint</key>
-			<string>HGSAccountsExtensionPoint</string>
+			<string>HGSAccountTypesExtensionPoint</string>
 			<key>HGSExtensionOfferedAccountType</key>
-			<string>GoogleApps</string>
+			<string>com.google.qsb.googleapps.account</string>
+			<key>HGSExtensionOfferedAccountClass</key>
+			<string>GoogleAppsAccount</string>
+			<key>HGSExtensionIsUserVisible</key>
+			<false/>
+			<key>QSBSetUpAccountViewNibName</key>
+			<string>SetUpGoogleAccountView</string>
+			<key>QSBSetUpAccountViewControllerClassName</key>
+			<string>GoogleAccountSetUpViewController</string>
+			<key>QSBEditAccountWindowNibName</key>
+			<string>EditGoogleAccount</string>
+			<key>QSBEditAccountWindowControllerClassName</key>
+			<string>GoogleAccountEditController</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

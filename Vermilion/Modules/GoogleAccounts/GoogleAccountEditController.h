@@ -30,14 +30,20 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
+/*!
+ @header
+ @discussion
+*/
 
-// NOTE: This class exposed here purely to satisfy Interface Builder.
+#import "QSBEditSimpleAccountWindowController.h"
 
-// A controller which manages a window used to edit the password
-// for a Google account.
-//
-@interface GoogleAccountEditController : HGSSimpleAccountEditController {
+/*!
+ A controller which manages a window used to edit the password
+ for a Google account.
+
+ NOTE: This class exposed here purely to satisfy Interface Builder.
+*/
+@interface GoogleAccountEditController : QSBEditSimpleAccountWindowController {
  @private
   IBOutlet NSView *captchaContainerView_;
   IBOutlet NSTextField *captchaTextField_;

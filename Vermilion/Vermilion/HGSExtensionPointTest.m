@@ -75,6 +75,12 @@
 @implementation MyOtherTestExtension
 @end
 
+@interface DifferentTestExtension : BaseTestExtension
+@end
+
+@implementation DifferentTestExtension
+@end
+
 
 @implementation HGSExtensionPointTest
 
@@ -108,16 +114,15 @@
   STAssertEquals([extensionList count], (NSUInteger)5,
                  @"not all extensions present");
 
-  // now change the class kind to be empty, should have no effect
-  [newPoint setKindOfClass:nil];
-  extensionList = [newPoint extensions];
-  STAssertEquals([extensionList count], (NSUInteger)5,
-                 @"not all extensions present");
-
-  // change to a different class, should remove all elements of the list
+  // change to a derivative class, should retain all elements of the list
   [newPoint setKindOfClass:[MyOtherTestExtension class]];
   extensionList = [newPoint extensions];
+  STAssertEquals([extensionList count], (NSUInteger)0,
+                 @"extra extensions present");
 
+  // change to a different class, should remove all elements of the list
+  [newPoint setKindOfClass:[DifferentTestExtension class]];
+  extensionList = [newPoint extensions];
   STAssertEquals([extensionList count], (NSUInteger)0,
                  @"extra extensions present");
 }
@@ -137,8 +142,8 @@
 
   // create a new object that inherits from some other class and make sure
   // it fails to add correclty.
-  MyOtherTestExtension* badExtension
-    = [[[MyOtherTestExtension alloc] init] autorelease];
+  DifferentTestExtension* badExtension
+    = [[[DifferentTestExtension alloc] init] autorelease];
   STAssertFalse([newPoint extendWithObject:badExtension],
                 @"kind of class check failed");
 }
@@ -147,7 +152,8 @@
   HGSExtensionPoint* newPoint
     = [HGSExtensionPoint pointWithIdentifier:@"testExtendingPoint"];
   STAssertNotNil(newPoint, @"extension point creation failed");
-
+  [newPoint setKindOfClass:[MyTestExtension class]];
+  
   // test extending with nil object. There should be zero extensions at this
   // point.
   STAssertFalse([newPoint extendWithObject:nil],
@@ -218,8 +224,8 @@
   STAssertNil(result, @"found something with an identifier that was nil");
 
   NSString *description = [newPoint description];
-  STAssertTrue([description hasPrefix:@"HGSExtensionPoint <(null)>"],
-               @"Bad Description: %@", description);
+  STAssertTrue([description hasPrefix:@"HGSExtensionPoint, Class: 'MyTestExte"
+                @"nsion', Extensions: ("], @"Bad Description: %@", description);
 }
 
 - (void)pointDidAddNotification:(NSNotification *)notification {
@@ -258,6 +264,7 @@
   HGSExtensionPoint* newPoint
     = [HGSExtensionPoint pointWithIdentifier:@"testNotification"];
   STAssertNotNil(newPoint, @"extension point creation failed");
+  [newPoint setKindOfClass:[MyTestExtension class]];
 
   NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
   [nc addObserver:self selector:@selector(pointDidAddNotification:)

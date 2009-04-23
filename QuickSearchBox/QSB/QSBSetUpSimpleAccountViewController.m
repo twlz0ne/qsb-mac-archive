@@ -1,5 +1,6 @@
 //
-//  HGSSimpleAccountSetUpViewController.m
+//  QSBSimpleAccountSetUpViewController.m
+//
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -29,63 +30,20 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSSimpleAccountSetUpViewController.h"
-#import "HGSBundle.h"
-#import "HGSCoreExtensionPoints.h"
-#import "HGSExtensionPoint.h"
-#import "HGSLog.h"
-#import "HGSSimpleAccount.h"
+#import "QSBSetUpSimpleAccountViewController.h"
+#import <Vermilion/Vermilion.h>
 #import "KeychainItem.h"
 
 
-@implementation HGSSimpleAccountSetUpViewController
+@implementation QSBSetUpSimpleAccountViewController
 
-@synthesize account = account_;
 @synthesize accountName = accountName_;
 @synthesize accountPassword = accountPassword_;
-@synthesize accountTypeClass = accountTypeClass_;
-
-- (id)init {
-  self = [self initWithNibName:nil
-                        bundle:nil
-              accountTypeClass:nil];
-  return self;
-}
-
-- (id)initWithNibName:(NSString *)nibNameOrNil
-               bundle:(NSBundle *)nibBundleOrNil
-      accountTypeClass:(Class)accountTypeClass {
-  if ((self = [super initWithNibName:nibNameOrNil
-                              bundle:nibBundleOrNil])) {
-    if (accountTypeClass) {
-      accountTypeClass_ = accountTypeClass;
-    } else {
-      [self release];
-      self = nil;
-    }
-  }
-  return self;
-}
 
 - (void)dealloc {
-  [account_ release];
   [accountName_ release];
   [accountPassword_ release];
   [super dealloc];
-}
-
-
-- (NSWindow *)parentWindow {
-  return parentWindow_;
-}
-
-- (void)setParentWindow:(NSWindow *)parentWindow {
-  parentWindow_ = parentWindow;
-  // This call also gives us an opportunity to flush some old settings
-  // from the previous use.
-  [self setAccount:nil];
-  [self setAccountName:nil];
-  [self setAccountPassword:nil];
 }
 
 - (IBAction)acceptSetupAccountSheet:(id)sender {
@@ -93,10 +51,11 @@
   NSString *userName = [self accountName];
   if ([userName length] > 0) {
     NSString *password = [self accountPassword];
-
+    
     // Create a new account entry.
+    Class accountTypeClass = [self accountTypeClass];
     HGSSimpleAccount *newAccount
-      = [[[accountTypeClass_ alloc] initWithName:userName] autorelease];
+      = [[[accountTypeClass alloc] initWithName:userName] autorelease];
     [self setAccount:newAccount];
     
     // Update the account name in case initWithName: adjusted it.
@@ -114,11 +73,11 @@
       = [HGSExtensionPoint accountsPoint];
     if ([accountsPoint extensionWithIdentifier:accountIdentifier]) {
       isGood = NO;
-      NSString *summary = HGSLocalizedString(@"Account already set up.",
-                                             nil);
+      NSString *summary = NSLocalizedString(@"Account already set up.",
+                                            nil);
       NSString *format
-        = HGSLocalizedString(@"The account '%@' has already been set up for "
-                             @"use in Quick Search Box.", nil);
+        = NSLocalizedString(@"The account '%@' has already been set up for "
+                            @"use in Quick Search Box.", nil);
       [self presentMessageOffWindow:sheet
                         withSummary:summary
                   explanationFormat:format
@@ -148,15 +107,15 @@
         if (isGood) {
           [NSApp endSheet:sheet];
           NSString *summary
-            = HGSLocalizedString(@"Enable searchable items for this account.",
-                                 nil);
+            = NSLocalizedString(@"Enable searchable items for this account.",
+                                nil);
           NSString *format
-            = HGSLocalizedString(@"One or more search sources may have been "
-                                 @"added for the account '%@'. It may be "
-                                 @"necessary to manually enable each search "
-                                 @"source that uses this account.  Do so via "
-                                 @"the 'Searchable Items' tab in Preferences.",
-                                 nil);
+            = NSLocalizedString(@"One or more search sources may have been "
+                                @"added for the account '%@'. It may be "
+                                @"necessary to manually enable each search "
+                                @"source that uses this account.  Do so via "
+                                @"the 'Searchable Items' tab in Preferences.",
+                                nil);
           [self presentMessageOffWindow:[self parentWindow]
                             withSummary:summary
                       explanationFormat:format
@@ -171,12 +130,12 @@
       } else if (![self canGiveUserAnotherTryOffWindow:sheet]) {
         // If we can't help the user fix things, tell them they've got
         // something wrong.
-        NSString *summary = HGSLocalizedString(@"Could not authenticate that "
-                                               @"account.", nil);
+        NSString *summary = NSLocalizedString(@"Could not authenticate that "
+                                              @"account.", nil);
         NSString *format
-          = HGSLocalizedString(@"The account '%@' could not be authenticated. "
-                               @"Please check the account name and password "
-                               @"and try again.", nil);
+          = NSLocalizedString(@"The account '%@' could not be authenticated. "
+                              @"Please check the account name and password "
+                              @"and try again.", nil);
         [self presentMessageOffWindow:sheet
                           withSummary:summary
                     explanationFormat:format
@@ -189,8 +148,7 @@
 - (IBAction)cancelSetupAccountSheet:(id)sender {
   [self setAccountName:nil];
   [self setAccountPassword:nil];
-  NSWindow *sheet = [sender window];
-  [NSApp endSheet:sheet];
+  [super cancelSetupAccountSheet:sender];
 }
 
 - (BOOL)canGiveUserAnotherTryOffWindow:(NSWindow *)window {
@@ -203,15 +161,10 @@
                      alertStyle:(NSAlertStyle)style {
   NSString *accountName = [self accountName];
   NSString *explanation = [NSString stringWithFormat:format, accountName];
-  NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-  [alert setAlertStyle:style];
-  [alert setMessageText:summary];
-  [alert setInformativeText:explanation];
-  [alert beginSheetModalForWindow:parentWindow
-                    modalDelegate:self
-                   didEndSelector:nil
-                      contextInfo:nil];
+  [self presentMessageOffWindow:parentWindow
+                    withSummary:summary
+                    explanation:explanation
+                     alertStyle:style];
 }
 
 @end
-
