@@ -157,7 +157,9 @@ CGFloat HGSScoreForAbbreviation(NSString *nsStr,
                 + matchRanges[currMatchRange - 1].length)) 
               * kHGSIsStrongMissMultiplier);
     score /= strLength;
-    
+    if (score < 0.3) {
+      score = 0;
+    }
   }
   
   free(matchRangeDecent);

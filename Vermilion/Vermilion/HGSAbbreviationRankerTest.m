@@ -79,7 +79,7 @@
     { @"Adobe Photoshop CS3", @"ap3", @"pho" },
     { @"Adobe Photoshop CS3", @"beph", @"ep" },
     { @"Vincent Newbury", @"vn", @"vc" },
-    { @"Vincent Newbury", @"iy", @"dm" },
+    { @"Vincent Newbury", @"vn", @"dm" },
   };
   
   for (size_t i = 0; i < sizeof(tests) / sizeof (tests[0]); ++i) {
@@ -110,4 +110,36 @@
   }
 }
   
+- (void)testLowRank {
+  struct {
+    NSString *abbreviation;
+    NSString *phrase;
+  } tests[] = {
+    { @"stringWithString", @"Unfortunately, this part of Florida is "
+      @"wall-to-wall retirement community. Coming back from Corkscrew, we "
+      @"spent 45 minutes stopped on I-75 because of a horrible roll-over crash."
+      @" The traffic on the island was also pretty bad--it took us about 50 "
+      @"minutes to go the 3+ miles to get off the island one evening for "
+      @"diner. Pedestrians were lapping us."
+    },
+    { @"stringWithString", @"We landed in a field across the street from an "
+      @"elementary school. Keith, the pilot, hovered about a foot and his "
+      @"ground-crew-side-kick pulled us across the street to the sidewalk and "
+      @"a nice, grassy school field. Kids were just arriving for school and "
+      @"there were dozens plastered to the fence watching the excitement. "
+      @"One little kid fell off his bike. Keith contributes a ride to the "
+      @"top five readers at the scho" 
+    }
+  };
+  for (size_t i = 0; i < sizeof(tests) / sizeof (tests[0]); ++i) {
+    NSString *tokenizedPhrase = [HGSTokenizer tokenizeString:tests[i].phrase];
+    NSString *tokenizedAbbr 
+      = [HGSTokenizer tokenizeString:tests[i].abbreviation];
+    CGFloat score = HGSScoreForAbbreviation(tokenizedPhrase, 
+                                            tokenizedAbbr, 
+                                            NULL);
+    STAssertEquals(score, (CGFloat)0, @"%@ %@", tokenizedPhrase, tokenizedAbbr);  
+  }
+}  
+    
 @end
