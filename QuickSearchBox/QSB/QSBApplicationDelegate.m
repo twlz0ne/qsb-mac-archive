@@ -157,6 +157,31 @@ static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 
 @end
 
+static OSStatus QSBAppEventHandler(EventHandlerCallRef inHandlerCallRef, 
+                                   EventRef inEvent, void *inUserData) {
+  OSStatus err = eventNotHandledErr;
+  SEL selector = NULL;
+  switch(GetEventKind(inEvent)) {
+    case kEventAppLaunched:
+      selector = @selector(didLaunchApp:);
+      break;
+    case kEventAppTerminated:
+      selector = @selector(didTerminateApp:);
+      break;
+  }
+  if (selector) {
+    ProcessSerialNumber psn;
+    err = GetEventParameter(inEvent, kEventParamProcessID, 
+                            typeProcessSerialNumber, NULL,
+                            sizeof(psn), NULL, &psn);
+    if (err == noErr) {
+      NSValue *value = [NSValue valueWithBytes:&psn 
+                                      objCType:@encode(ProcessSerialNumber)];
+      [(id)inUserData performSelector:selector withObject:value];
+    }
+  }
+  return err;
+}
 
 @implementation QSBApplicationDelegate
 
@@ -174,17 +199,18 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if ((self = [super init])) {
     hgsDelegate_ = [[QSBHGSDelegate alloc] init];
     [[HGSPluginLoader sharedPluginLoader] setDelegate:hgsDelegate_];
-    NSNotificationCenter *workSpaceNC 
-      = [[NSWorkspace sharedWorkspace] notificationCenter];
-    [workSpaceNC addObserver:self
-                    selector:@selector(didLaunchApp:)
-                        name:NSWorkspaceDidLaunchApplicationNotification
-                      object:nil];
-    [workSpaceNC addObserver:self
-                    selector:@selector(didTerminateApp:)
-                        name:NSWorkspaceDidTerminateApplicationNotification
-                      object:nil];
 
+    EventTypeSpec appEvents[] = {
+      { kEventClassApplication, kEventAppLaunched },
+      { kEventClassApplication, kEventAppTerminated }
+    };
+    // Using CarbonEvents here instead of NSWorkspace notifications because
+    // the NSWorkspace notifications use WAY more memory (~256 k on my machine)
+    // just to exist. We don't need their level of sophistication.
+    InstallApplicationEventHandler(QSBAppEventHandler, 
+                                   sizeof(appEvents) / sizeof(appEvents[0]), 
+                                   appEvents, self, NULL);
+    
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self 
            selector:@selector(presentMessageToUser:) 
@@ -504,7 +530,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)hitHotKey:(id)sender {
   hotModifiersState_ = 0;
-  if (otherQSBPid_) {
+  if (otherQSBPSN_.highLongOfPSN || otherQSBPSN_.lowLongOfPSN) {
     // We bow down before the other QSB
     return;
   }
@@ -584,6 +610,67 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return doubleClickThreshold;
 }
 
+// If we launch up another QSB we will let it handle all the activations until
+// it dies. This is to make working with QSB easier for us as we can have a
+// version running all the time, even when we are debugging the newer version.
+// See "hitHotKey:" to see where otherQSBPSN_ is actually used.
+- (void)didLaunchApp:(NSValue *)psnValue {
+  if (otherQSBPSN_.highLongOfPSN == 0 && otherQSBPSN_.lowLongOfPSN == 0) {
+    ProcessSerialNumber psn;
+    [psnValue getValue:&psn];
+    NSDictionary *info
+      = GTMCFAutorelease(ProcessInformationCopyDictionary(&psn, 
+                                                          kProcessDictionaryIncludeAllInformationMask));
+    // bundleID is "optional"
+    NSString *bundleID = [info objectForKey:(NSString*)kCFBundleIdentifierKey];
+    if (!bundleID) return;
+    ProcessSerialNumber myPSN;
+    MacGetCurrentProcess(&myPSN);
+    NSString *myBundleID = [[NSBundle mainBundle] bundleIdentifier];
+    Boolean sameProcess;
+    if (SameProcess(&myPSN, &psn, &sameProcess) == noErr 
+        && !sameProcess 
+        && [bundleID isEqualToString:myBundleID]) {
+      otherQSBPSN_ = psn;
+      
+      // Fade out our dock tile
+      NSDockTile *tile = [NSApp dockTile];
+      NSRect tileRect = GTMNSRectOfSize([tile size]);
+      NSImage *appImage = [NSImage imageNamed:@"NSApplicationIcon"];
+      NSImage *newImage 
+        = [[[NSImage alloc] initWithSize:tileRect.size] autorelease];
+      [newImage lockFocus];
+      [appImage drawInRect:tileRect
+                  fromRect:GTMNSRectOfSize([appImage size]) 
+                 operation:NSCompositeCopy
+                  fraction:0.3];
+      [newImage unlockFocus];
+      NSImageView *imageView 
+        = [[[NSImageView alloc] initWithFrame:tileRect] autorelease];
+      [imageView setImageFrameStyle:NSImageFrameNone];
+      [imageView setImageScaling:NSImageScaleProportionallyDown];      
+      [imageView setImage:newImage];
+      [tile setContentView:imageView];
+      [tile display];
+    }
+  }
+}
+
+- (void)didTerminateApp:(NSValue *)psnValue {
+  if (otherQSBPSN_.highLongOfPSN != 0 || otherQSBPSN_.lowLongOfPSN != 0) {
+    ProcessSerialNumber psn;
+    [psnValue getValue:&psn];
+    Boolean sameProcess;
+    if (SameProcess(&otherQSBPSN_, &psn, &sameProcess) == noErr 
+        && sameProcess) {
+      otherQSBPSN_.highLongOfPSN = 0;
+      otherQSBPSN_.lowLongOfPSN = 0;
+      NSDockTile *tile = [NSApp dockTile];
+      [tile setContentView:nil];
+      [tile display];
+    }
+  }
+}
 
 #pragma mark Plugins & Extensions Management
 
@@ -951,63 +1038,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)pluginOrExtensionDidChangeEnabled:(NSNotification*)notification {
   // A plugin or extension has been enabled or disabled.  Update our prefs.
   [self updatePluginPreferences];
-}
-
-// If we launch up another QSB we will let it handle all the activations until
-// it dies. This is to make working with QSB easier for us as we can have a
-// version running all the time, even when we are debugging the newer version.
-// See "hitHotKey:" to see where otherQSBPid_ is actually used.
-- (void)didLaunchApp:(NSNotification *)notification {
-  if (!otherQSBPid_) {
-    NSDictionary *userInfo = [notification userInfo];
-    NSString *bundleID 
-      = [userInfo objectForKey:@"NSApplicationBundleIdentifier"];
-    NSString *myBundleID = [[NSBundle mainBundle] bundleIdentifier];
-    NSNumber *nsPid = [userInfo objectForKey:@"NSApplicationProcessIdentifier"];
-    pid_t pid = [nsPid intValue];
-    if (pid != getpid() && [bundleID isEqualToString:myBundleID]) {
-      otherQSBPid_ = pid;
-      
-      // Fade out our dock tile
-      NSDockTile *tile = [NSApp dockTile];
-      NSRect tileRect = GTMNSRectOfSize([tile size]);
-      NSImage *appImage = [NSImage imageNamed:@"NSApplicationIcon"];
-      NSImage *newImage 
-        = [[[NSImage alloc] initWithSize:tileRect.size] autorelease];
-      [newImage lockFocus];
-      [appImage drawInRect:tileRect
-                  fromRect:GTMNSRectOfSize([appImage size]) 
-                 operation:NSCompositeCopy
-                  fraction:0.3];
-      [newImage unlockFocus];
-      NSImageView *imageView 
-        = [[[NSImageView alloc] initWithFrame:tileRect] autorelease];
-      [imageView setImageFrameStyle:NSImageFrameNone];
-      [imageView setImageScaling:NSImageScaleProportionallyDown];      
-      [imageView setImage:newImage];
-      [tile setContentView:imageView];
-      [tile display];
-    }
-  }
-}
-
-- (void)didTerminateApp:(NSNotification *)notification {
-  if (otherQSBPid_) {
-    NSDictionary *userInfo = [notification userInfo];
-    NSString *bundleID 
-      = [userInfo objectForKey:@"NSApplicationBundleIdentifier"];
-    if ([bundleID isEqualToString:[[NSBundle mainBundle] bundleIdentifier]]) {
-      NSNumber *nsDeadPid 
-        = [userInfo objectForKey:@"NSApplicationProcessIdentifier"];
-      pid_t deadPid = [nsDeadPid intValue];
-      if (deadPid == otherQSBPid_) {
-        otherQSBPid_ = 0;
-        NSDockTile *tile = [NSApp dockTile];
-        [tile setContentView:nil];
-        [tile display];
-      }
-    }
-  }
 }
 
 - (void)didAddOrRemoveAccount:(NSNotification *)notification {

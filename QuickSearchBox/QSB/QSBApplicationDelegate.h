@@ -56,7 +56,7 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
   NSUInteger hotModifiersState_;
   NSTimeInterval lastHotModifiersEventCheckedTime_;
   NSStatusItem *statusItem_;  // STRONG
-  pid_t otherQSBPid_;  // The pid of any other qsb that is running
+  ProcessSerialNumber otherQSBPSN_;  // The psn of any other qsb that is running
   QSBPreferenceWindowController *prefsWindowController_;
   QSBHGSDelegate *hgsDelegate_;
   NSArray *plugins_;  // All available plugins, enabled or not.
