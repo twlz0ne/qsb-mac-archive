@@ -130,6 +130,9 @@ const NSTimeInterval kQSBAppearDelay;
 // Drop the selection from the Finder on the current selection
 - (IBAction)dropSelection:(id)sender;
 
+// Clears out the last pivot from the text box
+- (IBAction)clearTextOrLastPivot:(id)sender;
+
 // Search for a string in the UI
 - (void)searchForString:(NSString *)string;
 

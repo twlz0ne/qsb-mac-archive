@@ -492,7 +492,7 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
   }
 }
 
-- (void)clearTextOrLastPivot:(id)sender {
+- (IBAction)clearTextOrLastPivot:(id)sender {
   NSString *savedQueryString = [searchTextFieldEditor_ string];
   if ([savedQueryString length]) {
     // If there is any freestanding text clear that text.
