@@ -32,7 +32,6 @@
 
 #import "HGSPython.h"
 #import "HGSResult.h"
-#import "HGSSearchOperation.h"
 #import "HGSQuery.h"
 #import "HGSLog.h"
 #import "HGSAction.h"
@@ -44,8 +43,8 @@
 
 const NSString *kHGSPythonPrivateValuesKey = @"kHGSPythonPrivateValuesKey";
 
-NSString *const kPythonModuleNameKey = @"PythonModule";
-NSString *const kPythonClassNameKey = @"PythonClass";
+NSString *const kPythonModuleNameKey = @"HGSPythonModule";
+NSString *const kPythonClassNameKey = @"HGSPythonClass";
 
 static const char *kAddSysPathFuncName = "AddPathToSysPath";
 static const char *kQueryClassName = "Query";
@@ -649,7 +648,17 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                 }
               }
               if (image && strlen(image) > 0) {
-                url = [NSURL URLWithString:[NSString stringWithUTF8String:image]];
+                NSString *imageURL = [NSString stringWithUTF8String:image];
+                url = [NSURL URLWithString:imageURL];
+                if (![url scheme]) {
+                  // If they didn't give us a full URL, let's look in our
+                  // bundle.
+                  NSBundle *bundle = [[self->operation_ source] bundle];
+                  NSString *path = [bundle pathForResource:imageURL ofType:nil];
+                  if (path) {
+                    url = [NSURL fileURLWithPath:path isDirectory:NO];
+                  }
+                }
                 if (url) {
                   [attributes setObject:url 
                                  forKey:kHGSObjectAttributeIconPreviewFileKey];

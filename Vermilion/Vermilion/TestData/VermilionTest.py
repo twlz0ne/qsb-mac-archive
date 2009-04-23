@@ -92,7 +92,7 @@ class VermilionAction(object):
   def __init__(self):
     pass
     
-  def AppliesToResult(self, result):
+  def AppliesToResults(self, result):
     return True
 
   def Perform(self, result, pivot_object=None):
@@ -109,7 +109,7 @@ def main(argv=None):
     return 1
   
   query = Vermilion.Query(argv[0])
-  search = Screensaver()
+  search = VermilionTest()
   if not search.IsValidSourceForQuery(Vermilion.Query(argv[0])):
     print 'Not a valid query'
     return 1

@@ -34,7 +34,7 @@
 #import "HGSLog.h"
 #import "HGSBundle.h"
 
-static const char *const kHGSPythonAppliesToResult = "AppliesToResult";
+static const char *const kHGSPythonAppliesToResults = "AppliesToResults";
 static const char *const kHGSPythonPerform = "Perform";
 
 @implementation HGSPythonAction
@@ -100,11 +100,11 @@ static const char *const kHGSPythonPerform = "Perform";
       [self release];
       return nil;
     }
-    appliesTo_ = PyString_FromString(kHGSPythonAppliesToResult);
+    appliesTo_ = PyString_FromString(kHGSPythonAppliesToResults);
     if (!appliesTo_) {
       NSString *error = [HGSPython lastErrorString];
       HGSLogDebug(@"could not create Python string %s.\n%@", 
-                  kHGSPythonAppliesToResult, error);
+                  kHGSPythonAppliesToResults, error);
       [self release];
       return nil;
     }
@@ -164,12 +164,6 @@ static const char *const kHGSPythonPerform = "Perform";
   }
   
   return result;
-}
-
-- (NSSet*)directObjectTypes {
-  // TODO(hawk): update this to fetch a list of types from the plugin set like
-  // the applescript actions do.
-  return [NSSet setWithObject:@"*"];
 }
 
 - (BOOL)appliesToResults:(HGSResultArray *)results {

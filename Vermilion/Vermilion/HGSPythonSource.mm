@@ -131,12 +131,6 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
   return op;
 }
 
-- (NSSet *)pivotableTypes {
-  // TODO(hawk): We need to let the python scripts say what types they can
-  // pivot on so we can avoid sending all pivots to the sources.
-  return [NSSet setWithObject:@"*"];
-}
-
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   BOOL isValid = [super isValidSourceForQuery:query];  
   if (isValid) {
@@ -169,6 +163,11 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
 
 - (PyObject *)instance {
   return instance_;
+}
+
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult *)result {
+  // Python sources won't archive
+  return nil;
 }
 
 @end

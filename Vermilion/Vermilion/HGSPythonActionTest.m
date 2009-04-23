@@ -51,6 +51,7 @@
                           @"VermilionTest", kPythonModuleNameKey,
                           @"VermilionAction", kPythonClassNameKey,
                           @"python.test", kHGSExtensionIdentifierKey,
+                          @"*", @"HGSActionDirectObjectTypes",
                           bundle, kHGSExtensionBundleKey,
                           nil];
   STAssertNotNil(config, nil);

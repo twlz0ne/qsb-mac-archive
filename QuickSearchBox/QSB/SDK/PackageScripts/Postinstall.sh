@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#  Preinstall.sh
+#  Postinstall.sh
 #
 #  Copyright (c) 2009 Google Inc. All rights reserved.
 #
@@ -45,5 +45,12 @@ then
   mkdir -p "$QSB_XCODE_SHARED_DIR/Project Templates/QSB/"
   cp -R "$QSB_INSTALL_DIR/QSBPlugin" "$QSB_XCODE_SHARED_DIR/Project Templates/QSB/"
 fi
+
+if [ -e "$QSB_INSTALL_DIR/QSB Python Plugin" ]
+then
+  mkdir -p "$QSB_XCODE_SHARED_DIR/Project Templates/QSB/"
+  cp -R "$QSB_INSTALL_DIR/QSB Python Plugin" "$QSB_XCODE_SHARED_DIR/Project Templates/QSB/"
+fi
+
 
 rm -rf "$QSB_INSTALL_DIR"
