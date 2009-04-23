@@ -189,8 +189,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                         source:self
                     attributes:attributes];
   [self indexResult:result
-         nameString:title
-  otherStringsArray:otherTermStrings];
+               name:title
+         otherTerms:otherTermStrings];
 }
 
 - (void)setConnection:(NSURLConnection *)connection {

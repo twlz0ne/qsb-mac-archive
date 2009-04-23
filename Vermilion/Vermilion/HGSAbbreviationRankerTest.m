@@ -31,7 +31,7 @@
 //
 
 #import "HGSAbbreviationRanker.h"
-
+#import "HGSTokenizer.h"
 #import "GTMSenTestCase.h"
 
 @interface HGSAbbreviationRankerTest : GTMTestCase 
@@ -39,51 +39,75 @@
 
 @implementation HGSAbbreviationRankerTest
 
-- (float)rankFor:(NSString*)abbreviation inTitle:(NSString*)title {
-  float score = HGSScoreForAbbreviation((CFStringRef)title,
-                                        (CFStringRef)abbreviation,
-                                        nil);
-  return score;
+- (void)assertAbbreviation:(NSString *)abbreviation
+               isBetterFor:(NSString *)title1
+                   thanFor:(NSString*)title2 {
+  NSString *tokenizedTitle1 = [HGSTokenizer tokenizeString:title1];
+  NSString *tokenizedTitle2 = [HGSTokenizer tokenizeString:title2];
+  CGFloat score1 = HGSScoreForAbbreviation(tokenizedTitle1, abbreviation, NULL);
+  CGFloat score2 = HGSScoreForAbbreviation(tokenizedTitle2, abbreviation, NULL);
+  STAssertGreaterThan(score1, score2,
+                      @"%@ should be a better abbreviation for "
+                      @"%@ (%.03f - %@) than for %@ (%.03f - %@)",
+                      abbreviation,  
+                      title1, score1, tokenizedTitle1,
+                      title2, score2, tokenizedTitle2);
 }
 
-- (void)assertRankFor:(NSString*)abbreviation
-              inTitle:(NSString*)title
-           aboveScore:(float)expectedScore {
-  float score = [self rankFor:abbreviation inTitle:title];
-  STAssertTrue(score > expectedScore,
-               @"'%@' in '%@' should score above %.03f (Got: %.03f)",
-               abbreviation,
-               title,
-               expectedScore,
-               score);
+- (void)assertRankFor:(NSString *)abbreviation1
+         isBetterThan:(NSString *)abbreviation2
+             forTitle:(NSString*)title {
+  NSString *tokenizedTitle = [HGSTokenizer tokenizeString:title];
+  CGFloat score1 = HGSScoreForAbbreviation(tokenizedTitle, abbreviation1, NULL);
+  CGFloat score2 = HGSScoreForAbbreviation(tokenizedTitle, abbreviation2, NULL);
+  STAssertGreaterThan(score1, score2,
+                      @"%@ (%.03f) should be a better abbreviation than "
+                      @"%@ (%.03f) for %@ (%@)",
+                      abbreviation1,  score1,
+                      abbreviation2, score2,
+                      title, tokenizedTitle);
 }
 
-- (void)assertRankFor:(NSString*)abbreviation
-              inTitle:(NSString*)title
-           belowScore:(float)expectedScore {
-  float score = [self rankFor:abbreviation inTitle:title];
-  STAssertTrue(score < expectedScore,
-               @"'%@' in '%@' should score below %.03f (Got: %.03f)",
-               abbreviation,
-               title,
-               expectedScore,
-               score);
+- (void)testCompareAbbreviations {
+  struct {
+    NSString *name;
+    NSString *abbreviation1;
+    NSString *abbreviation2;
+  } tests[] = {
+    { @"Adobe Photoshop CS3", @"ph", @"p" },
+    { @"Adobe Photoshop CS3", @"pshop", @"shop" },
+    { @"Adobe Photoshop CS3", @"ap3", @"pho" },
+    { @"Adobe Photoshop CS3", @"beph", @"ep" },
+    { @"Vincent Newbury", @"vn", @"vc" },
+    { @"Vincent Newbury", @"iy", @"dm" },
+  };
+  
+  for (size_t i = 0; i < sizeof(tests) / sizeof (tests[0]); ++i) {
+    [self assertRankFor:tests[i].abbreviation1
+           isBetterThan:tests[i].abbreviation2 
+               forTitle:tests[i].name];
+  }
 }
 
-- (void)testRankForBBCSportsPipeCricket {
-  [self assertRankFor:@"cricket" inTitle:@"BBC SPORTS | Cricket" aboveScore:0.8f];
+- (void)testCompareTitles {
+  struct {
+    NSString *abbreviation;
+    NSString *title1;
+    NSString *title2;
+  } tests[] = {
+    { @"vnc", @"JollyVNC", @"Interactive measurements calculator, weights and measures /metric conversion" },
+    { @"ap3", @"Adobe Photoshop CS3", @"Adobe Photoshop CS4.app" },
+    { @"earth", @"Google Earth", @"Where are the Google Engineers?" },
+    { @"earth", @"Google Earth", @"sequence grabber determining the capture resolution of an iidc device" },
+    { @"ear", @"Google Earth", @"gsearch" },
+    { @"mai", @"Mail", @"GMail" },
+  };
+  
+  for (size_t i = 0; i < sizeof(tests) / sizeof (tests[0]); ++i) {
+    [self assertAbbreviation:tests[i].abbreviation
+                 isBetterFor:tests[i].title1 
+                     thanFor:tests[i].title2];
+  }
 }
-
-- (void)testRankForBBCSportsCricket {
-  [self assertRankFor:@"cricket" inTitle:@"BBC Sports Cricket" aboveScore:0.8f];
-}
-
-- (void)testRankForCalculator {
-  // This scores 0.83.
-  //[self assertRankFor:@"al" inTitle:@"Calculator" belowScore:0.8f];
-  [self assertRankFor:@"tor" inTitle:@"Calculator" belowScore:0.8f];
-  [self assertRankFor:@"lc" inTitle:@"Calculator" belowScore:0.8f];
-  [self assertRankFor:@"cal" inTitle:@"Calculator" aboveScore:0.8f];
-}
-
+  
 @end

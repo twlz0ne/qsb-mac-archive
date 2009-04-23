@@ -58,7 +58,7 @@ typedef enum {
 @interface HGSQuery : NSObject {
  @private
   NSString *rawQueryString_;
-  NSSet *uniqueWords_;
+  NSString *normalizedQueryString_;
   HGSResultArray *results_;
   HGSQuery *parent_;
   NSInteger maxDesiredResults_;
@@ -77,13 +77,10 @@ typedef enum {
 @property (readonly, retain) HGSResultArray *results;
 
 /*!
-  Returns a set of unique words found in the query string ie: query ::  "Foo
-  Bar" baz "mumble foo" returns a set w/ ::   ( "baz", "bar", "foo", "mumble" )
-  
-  NOTE: the strings are all forced to lower case, and diacriticals will have
-  been removed.
+  Breaks the string with spaces. All diacriticals are removed, and everything
+  is lowercase.
 */
-@property (readonly, retain) NSSet *uniqueWords;
+@property (readonly, retain) NSString *normalizedQueryString;
 
 /*!
   A "parent" is a query that has asked for this one to be created.  Usually to

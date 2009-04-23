@@ -30,67 +30,22 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSTokenizer.h"
+#import "HGSTokenizer.h"    
+#import "GTMGarbageCollection.h"
+#import "HGSLog.h"
+#import "HGSStringUtil.h"
 
-//
-// Design/Impl Issues
-//
-// Things that probably need followup either at this level or at the Predicate
-// level, but noting them here for now.
-//
-// - email addresses : both in the query and in the content we want to search
-//   you really don't want these broken into strings because you get lots of
-//   false matches, so when breaking up the query and when doing the indexing
-//   some layer needs to realize it's an email address and mail it a whole term.
-// - email addresses, part 2 : but you always what to match a sub part of an
-//   email address, prefix handles matching the account, but you might also
-//   want to match the domain name.
-// - domains : when domain appear in document, you probably don't want them
-//   broken up either.
-// - urls : should these be broken into all of their parts?
-// - implicite quotes : if we did phrases, could some of the above be handled
-//   within the predicate layer by realizing it's not just a sequence of words
-//   and adding the implice phrase so we match the full address, instead of
-//   the free standing words.
-//
-
-@interface HGSTokenizerEnumerator : NSEnumerator {
- @private
+@interface HGSTokenizerInternal : NSEnumerator {
+@private
   CFStringTokenizerRef tokenizer_;
-  NSString *stringToTokenize_;
-  BOOL wordsOnly_;
-  NSCharacterSet *nonWhiteSpaceCharSet_;
-  // rangeToScan_ is used for feeding any non whitespace between words back.
-  NSRange rangeToScan_;
-  // savedWordRange_ is for a token range already returned that we haven't
-  // been ready to return yet.
-  NSRange savedWordRange_;
-  // atEnd_ marks when the tokenizer has hit the end, so we don't call it
-  // again.
-  BOOL atEnd_;
+  CFCharacterSetRef numberSet_;
 }
-- (id)initWithString:(NSString *)stringToTokenize wordsOnly:(BOOL)wordsOnly;
-- (void)setString:(NSString *)stringToTokenize wordsOnly:(BOOL)wordsOnly;
+
+- (NSString *)tokenizeString:(NSString *)string;
 @end
-
-static inline NSString *HGSTokenizerEnumeratorNextWord(CFStringTokenizerRef ref,
-                                                       NSString *string) {
-  // Small little common routine that we want to be really fast.
-  NSString *result = nil;
-  CFStringTokenizerTokenType type;
-  type = CFStringTokenizerAdvanceToNextToken(ref);
-  if (type != kCFStringTokenizerTokenNone) {
-    CFRange cfTokenRange = CFStringTokenizerGetCurrentTokenRange(ref);
-    NSRange nsTokenRange = NSMakeRange(cfTokenRange.location, 
-                                       cfTokenRange.length);
-    result = [string substringWithRange:nsTokenRange];
-  }
-  return result;
-}
-
-@implementation HGSTokenizerEnumerator
-
-- (id)initWithString:(NSString *)stringToTokenize wordsOnly:(BOOL)wordsOnly {
+  
+@implementation HGSTokenizerInternal
+- (id)init {
   if ((self = [super init])) {
     // The header comments for CFStringTokenizerCreate and
     // kCFStringTokenizerUnitWord indicate the locale is unused for UnitWord;
@@ -101,15 +56,10 @@ static inline NSString *HGSTokenizerEnumeratorNextWord(CFStringTokenizerRef ref,
                                          CFRangeMake(0,0), 
                                          kCFStringTokenizerUnitWord, 
                                          NULL);
-    if (tokenizer_) {
-      [self setString:stringToTokenize wordsOnly:wordsOnly];
-    }
-    if (!stringToTokenize_ ||
-        !tokenizer_ ||
-        (wordsOnly_  && nonWhiteSpaceCharSet_)) {
-      [self release];
-      self = nil;
-    }
+    numberSet_ 
+      = CFCharacterSetCreateWithCharactersInString(NULL, 
+                                                   CFSTR("0123456789,."));
+    HGSAssert(tokenizer_, nil);
   }
   return self;
 }
@@ -117,184 +67,130 @@ static inline NSString *HGSTokenizerEnumeratorNextWord(CFStringTokenizerRef ref,
 - (void)dealloc {
   if (tokenizer_) {
     CFRelease(tokenizer_);
+    tokenizer_ = NULL;
   }
-  [stringToTokenize_ release];
-  [nonWhiteSpaceCharSet_ release];
-
+  if (numberSet_) {
+    CFRelease(numberSet_);
+    numberSet_ = NULL;
+  }
   [super dealloc];
 }
 
-- (void)setString:(NSString *)stringToTokenize wordsOnly:(BOOL)wordsOnly {
-  [stringToTokenize_ autorelease];
-  stringToTokenize_ = [stringToTokenize copy];
-  wordsOnly_ = wordsOnly;
-  savedWordRange_.location = NSNotFound;
+- (NSString *)tokenizeString:(NSString *)string {
+  // Using define because the compiler gets upset when I use a const int
+  // telling me that it can't protect me due to a variable sized array.
+  // I am using a fixed size array and CF functions instead of a variable 
+  // sized NSArray because it doubles our speed, and this is a performance
+  // sensitive routine.
+  NSLocale *currentLocale = [NSLocale currentLocale];
+  NSStringCompareOptions options = (NSDiacriticInsensitiveSearch 
+                                    | NSWidthInsensitiveSearch);
+  string = [string stringByFoldingWithOptions:options 
+                                       locale:currentLocale];
+  
+  // Used define hear because of
+  // Radar 6765569 stack-protector gives bad warning when working with consts
+  #define kHGSTokenizerInternalMaxRanges 100
+  CFRange tokensRanges[kHGSTokenizerInternalMaxRanges];
+  CFIndex currentRange = 0;
+  
+  CFRange tokenRange = CFRangeMake(0, [string length]);
   CFStringTokenizerSetString(tokenizer_,
-                             (CFStringRef)stringToTokenize,
-                             CFRangeMake(0, [stringToTokenize length]));
-  if (!wordsOnly_ && !nonWhiteSpaceCharSet_) {
-    NSCharacterSet *wsSet = 
-      [NSCharacterSet whitespaceAndNewlineCharacterSet];
-    nonWhiteSpaceCharSet_ = [[wsSet invertedSet] retain];
-  }
-}
-
-- (id)nextObject {
-  NSString *result = nil;
-  
-  // For wordsOnly we just use what the tokenizer says
-  if (wordsOnly_) {
-    return HGSTokenizerEnumeratorNextWord(tokenizer_, stringToTokenize_);
-  }
-  
-  // Not wordsOnly gets a little more complicated...
-
-  // One would hope we could have used kCFStringTokenizerUnitWordBoundary for
-  // not wordOnly mode, but in UnitWordBoundry "ABC_123" comes through as one
-  // token but in UnitWord it gets broken into "ABC" and "123", so we always use
-  // UnitWord and keep a side car of anything we skip and pull out the non
-  // whitespace ourselves.
-  
-  // Do we still have something to scan?
-  if (rangeToScan_.length > 0) {
-    // find any non whitespace in it
-    NSRange firstNonWhitespace =
-      [stringToTokenize_ rangeOfCharacterFromSet:nonWhiteSpaceCharSet_
-                                         options:0
-                                           range:rangeToScan_];
-    if (firstNonWhitespace.location != NSNotFound) {
-      // pick off that one char
-      result = [stringToTokenize_ substringWithRange:firstNonWhitespace];
-      NSUInteger charsToAdvance =
-        firstNonWhitespace.location - rangeToScan_.location + 1;
-      rangeToScan_.location += charsToAdvance;
-      rangeToScan_.length -= charsToAdvance;
-      return result;
+                             (CFStringRef)string,
+                             tokenRange);
+  while (currentRange < kHGSTokenizerInternalMaxRanges) {
+    CFStringTokenizerTokenType tokenType
+      = CFStringTokenizerAdvanceToNextToken(tokenizer_);
+    if (tokenType == kCFStringTokenizerTokenNone) {
+      break;
     }
-    // clear our marker
-    rangeToScan_.length = 0;
-  }
-  
-  // see if we have a saved word range from a past call, and use it.
-  if (savedWordRange_.location != NSNotFound) {
-    result = [stringToTokenize_ substringWithRange:savedWordRange_];
-    // advance the start of rangeToScan_ to the end of what we've used
-    rangeToScan_.location = NSMaxRange(savedWordRange_);
-    // clear our flag
-    savedWordRange_.location = NSNotFound;
-    return result;
-  }
-  
-  // did we already finish w/ the tokeninzer?
-  if (atEnd_) {
-    return nil;
-  }
-
-  CFStringTokenizerTokenType tokenType;
-  tokenType = CFStringTokenizerAdvanceToNextToken(tokenizer_);
-  if (tokenType == kCFStringTokenizerTokenNone) {
-    // at end, see if we skipped anything
-    if (rangeToScan_.location != [stringToTokenize_ length]) {
-      rangeToScan_.length = [stringToTokenize_ length] - rangeToScan_.location;
-      NSRange firstNonWhitespace =
-        [stringToTokenize_ rangeOfCharacterFromSet:nonWhiteSpaceCharSet_
-                                          options:0
-                                             range:rangeToScan_];
-      if (firstNonWhitespace.location != NSNotFound) {
-        // pick off that one char
-        result = [stringToTokenize_ substringWithRange:firstNonWhitespace];
-        // setup rangeToScan_ for next time
-        NSUInteger charsToAdvance =
-          firstNonWhitespace.location - rangeToScan_.location + 1;
-        rangeToScan_.location += charsToAdvance;
-        rangeToScan_.length -= charsToAdvance;
-        // mark that we hit the end
-        atEnd_ = YES;
-        return result;
+    CFRange subTokenRanges[kHGSTokenizerInternalMaxRanges];
+    CFIndex rangeCount 
+      = CFStringTokenizerGetCurrentSubTokens(tokenizer_, 
+                                             subTokenRanges, 
+                                             kHGSTokenizerInternalMaxRanges, 
+                                             NULL);
+    // If our subtokens contain numbers we want to rejoin the numbers back
+    // up. 
+    if (tokenType & kCFStringTokenizerTokenHasHasNumbersMask) {
+      BOOL makingNumber = NO;
+      CFRange newRange = CFRangeMake(subTokenRanges[0].location, 0);
+      for (CFIndex i = 0; 
+           i < rangeCount && currentRange < kHGSTokenizerInternalMaxRanges;  
+           ++i) {
+        UniChar theChar 
+          = CFStringGetCharacterAtIndex((CFStringRef)string, 
+                                        subTokenRanges[i].location);
+        BOOL isNumber 
+          = CFCharacterSetIsCharacterMember(numberSet_, theChar) ? YES : NO;
+        if (isNumber == YES) {
+          if (!makingNumber) {
+            if (newRange.length > 0) {
+              tokensRanges[currentRange++] = newRange;
+            }
+            newRange = CFRangeMake(subTokenRanges[i].location, 0);
+            makingNumber = YES;
+          } 
+          newRange.length += subTokenRanges[i].length;
+        } else {
+          makingNumber = NO;
+          if (newRange.length > 0) {
+            tokensRanges[currentRange++] = newRange;
+            newRange = CFRangeMake(subTokenRanges[i].location, 0);
+          }
+          if (currentRange < kHGSTokenizerInternalMaxRanges) {
+            tokensRanges[currentRange++] = subTokenRanges[i];
+          }
+        }
       }
-    }
-  } else {
-    CFRange cfTokenRange = CFStringTokenizerGetCurrentTokenRange(tokenizer_);
-    NSRange tokenRange = NSMakeRange(cfTokenRange.location, 
-                                     cfTokenRange.length);
-    // see if we skipped over anything that wasn't whitespace
-    if (rangeToScan_.location != tokenRange.location) {
-      rangeToScan_.length = tokenRange.location - rangeToScan_.location;
-      NSRange firstNonWhitespace =
-        [stringToTokenize_ rangeOfCharacterFromSet:nonWhiteSpaceCharSet_
-                                           options:0
-                                             range:rangeToScan_];
-      if (firstNonWhitespace.location != NSNotFound) {
-        // pick off that one char
-        result = [stringToTokenize_ substringWithRange:firstNonWhitespace];
-        // setup rangeToScan_ for next time
-        NSUInteger charsToAdvance =
-        firstNonWhitespace.location - rangeToScan_.location + 1;
-        rangeToScan_.location += charsToAdvance;
-        rangeToScan_.length -= charsToAdvance;
-        // save off what we found for later
-        savedWordRange_ = tokenRange;
-        return result;
+      if (newRange.length > 0) {
+        tokensRanges[currentRange++] = newRange;
       }
-      // clear our marker
-      rangeToScan_.length = 0;
+    } else {
+      if (rangeCount + currentRange > kHGSTokenizerInternalMaxRanges) {
+        rangeCount = kHGSTokenizerInternalMaxRanges - currentRange;
+      }
+      memcpy(&tokensRanges[currentRange], subTokenRanges, 
+             sizeof(CFRange) * rangeCount);
+      currentRange += rangeCount;
     }
-    
-    // use what we found
-    result = [stringToTokenize_ substringWithRange:tokenRange];
-    // advance the start of rangeToScan_ to the end of what we've used
-    rangeToScan_.location = NSMaxRange(tokenRange);
   }
-  return result;
-}
-
-- (NSArray *)allObjects {
-  NSArray *results = nil;
-  if (wordsOnly_) {
-    // Words only is our most common and simplest path, and calling
-    // allObject on our enumerator happens in one of our critical paths
-    // in Vermilion. We have optimized this path so that we get rid of
-    // the NSEnumerator machinary calling nextObject on us a pile of times.
-    NSMutableArray *mutableArray = [NSMutableArray array];
-    NSString *result;
-    while ((result = HGSTokenizerEnumeratorNextWord(tokenizer_, 
-                                                    stringToTokenize_))) {
-      [mutableArray addObject:result];
+  NSInteger length = [string length] + currentRange;
+  NSMutableString *finalString = [NSMutableString stringWithCapacity:length];
+  // Now that we have all of our ranges, break out our strings.
+  for (CFIndex i = 0; i < currentRange; ++i) {
+    NSRange nsRange = NSMakeRange(tokensRanges[i].location, 
+                                  tokensRanges[i].length);
+    NSString *subString = [string substringWithRange:nsRange];
+    subString = [subString stringByFoldingWithOptions:NSCaseInsensitiveSearch
+                                               locale:currentLocale];
+    if (i != 0) {
+      [finalString appendString:@" "];
     }
-    results = mutableArray;
-  } else {
-    results = [super allObjects];
+    [finalString appendString:subString];
   }
-  return results;
+  return finalString;
 }
 
 @end
 
 @implementation HGSTokenizer
-
-+ (NSEnumerator *)wordEnumeratorForString:(NSString *)stringToTokenize {
-  return [[[HGSTokenizerEnumerator alloc] initWithString:stringToTokenize
-                                               wordsOnly:YES] autorelease];
-}
-
-+ (NSEnumerator *)tokenEnumeratorForString:(NSString *)stringToTokenize {
-  return [[[HGSTokenizerEnumerator alloc] initWithString:stringToTokenize
-                                               wordsOnly:NO] autorelease];
-}
-
-+ (NSArray *)tokenizeString:(NSString *)string wordsOnly:(BOOL)wordsOnly {
-  NSThread *currentThread = [NSThread currentThread];
-  NSMutableDictionary *threadDictionary = [currentThread threadDictionary];
-  NSString *const kHGSTokenizerThreadTokenizer = @"HGSTokenizerThreadTokenizer";
-  HGSTokenizerEnumerator *enumerator =
-    [threadDictionary objectForKey:kHGSTokenizerThreadTokenizer];
-  if (!enumerator) {
-    enumerator = 
-      [[[HGSTokenizerEnumerator alloc] initWithString:@"" 
-                                            wordsOnly:wordsOnly] autorelease];
-    [threadDictionary setObject:enumerator forKey:kHGSTokenizerThreadTokenizer];
++ (NSString *)tokenizeString:(NSString *)string {
+  NSString *tokenizedString = nil;
+  if (string) {
+    NSThread *currentThread = [NSThread currentThread];
+    NSMutableDictionary *threadDictionary = [currentThread threadDictionary];
+    NSString *kHGSTokenizerThreadTokenizer = @"HGSTokenizerThreadTokenizer";
+    HGSTokenizerInternal *internalTokenizer 
+      = [threadDictionary objectForKey:kHGSTokenizerThreadTokenizer];
+    if (!internalTokenizer) {
+      internalTokenizer = [[[HGSTokenizerInternal alloc] init] autorelease];
+      [threadDictionary setObject:internalTokenizer 
+                           forKey:kHGSTokenizerThreadTokenizer];
+    }
+    tokenizedString = [internalTokenizer tokenizeString:string];
   }
-  [enumerator setString:string wordsOnly:wordsOnly];
-  return [enumerator allObjects];
+  return tokenizedString;
 }
 @end
+

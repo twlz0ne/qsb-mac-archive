@@ -36,6 +36,6 @@
 // if a hitmask is provided, that mask will be updated with the locations of the
 // matched characters
 
-CGFloat HGSScoreForAbbreviation(CFStringRef string,
-                                CFStringRef abbr, 
-                                NSMutableIndexSet* hitMask);
+CGFloat HGSScoreForAbbreviation(NSString *string,
+                                NSString *abbr, 
+                                NSMutableIndexSet** outHitMask);

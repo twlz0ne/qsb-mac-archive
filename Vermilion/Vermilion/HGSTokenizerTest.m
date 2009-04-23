@@ -41,162 +41,68 @@
 @implementation HGSTokenizerTest
 
 - (void)testInit {
-  STAssertNil([HGSTokenizer wordEnumeratorForString:nil], nil);
-  STAssertNotNil([HGSTokenizer wordEnumeratorForString:@""], nil);
-
-  STAssertNil([HGSTokenizer tokenEnumeratorForString:nil], nil);
-  STAssertNotNil([HGSTokenizer tokenEnumeratorForString:@""], nil);
+  STAssertNil([HGSTokenizer tokenizeString:nil], nil);
+  STAssertNotNil([HGSTokenizer tokenizeString:@""], nil);
 }
 
-- (void)testWordEnumASCBasics {
-  NSEnumerator *e;
-  
-  // simple test
-  
-  e = [HGSTokenizer wordEnumeratorForString:@"this, this is a test."];
-  STAssertNotNil(e, nil);
-  STAssertEqualObjects([e nextObject], @"this", nil);
-  STAssertEqualObjects([e nextObject], @"this", nil);
-  STAssertEqualObjects([e nextObject], @"is", nil);
-  STAssertEqualObjects([e nextObject], @"a", nil);
-  STAssertEqualObjects([e nextObject], @"test", nil);
-  STAssertNil([e nextObject], nil);
-
-  // test allObjects
-
-  e = [HGSTokenizer wordEnumeratorForString:@"this, this is a test."];
-  STAssertNotNil(e, nil);
-  NSArray *allTokens = [e allObjects];
-  STAssertNotNil(allTokens, nil);
-  NSArray *expectedTokens =
-    [NSArray arrayWithObjects:@"this", @"this", @"is", @"a", @"test", nil];
-  STAssertEqualObjects(allTokens, expectedTokens, nil);
+- (void)testTokenize {
+  NSString *tokenizedString = [HGSTokenizer tokenizeString:@"this, this is a test."];
+  STAssertEqualObjects(tokenizedString, @"this this is a test", nil);
 
   // now bang through a few different cases
-  
-  NSString *testData[] = {
-    // format: query, words, nil.  a final nil ends all tests.
-    @"ABC 123 A1B2C3 ABC-123 ABC_123 A#B",
-    @"ABC", @"123", @"A1B2C3", @"ABC", @"123", @"ABC", @"123", @"A", @"B", nil,
-    
-    @"  abc123  ",
-    @"abc123", nil,
-
-    @"_-+  abc123 &*#.",
-    @"abc123", nil,
-    
-    @"- - a -a- - ",
-    @"a", @"a", nil,
-    
-    // test what we do w/ hyphenated words and underscore connections, not so
-    // much to force the behavior, but so we realize when it changes and think
-    // through any downstream effects.
-    @"abc-xyz abc--xyz abc_xyz",
-    @"abc", @"xyz", @"abc", @"xyz", @"abc", @"xyz", nil,
-    
-    // test what we do w/ contractions for the same reason.
-    @"can't say i'd like that. i''d?",
-    @"can't", @"say", @"i'd", @"like", @"that", @"i", @"d", nil,
-    
-    // test what happens w/ colons also for the same reasons.
-    @"abc:xyz abc::xyz",
-    @"abc", @"xyz", @"abc", @"xyz", nil,
-    
-    nil,
+  struct {
+    NSString *string;
+    NSString *tokenized;
+  } testData[] = {
+    {
+      // camelcase
+      @"MacPython2.4",
+      @"mac python 2.4"
+    },
+    {
+      @"NSStringFormatter",
+      @"ns string formatter"
+    },
+    {
+      // format: query, words, nil.  a final nil ends all tests.
+      @"ABC 123 A1B2C3 ABC-123 ABC_123 A#B A1.2b",
+      @"abc 123 a 1 b 2 c 3 abc 123 abc 123 a b a 1.2 b"
+    },
+    {
+      @"  abc123  ",
+      @"abc 123"
+    },
+    {
+      @"_-+  abc123 &*#.",
+      @"abc 123"
+    },
+    {
+      @"- - a -a- - ",
+      @"a a"
+    },
+    {
+      // test what we do w/ hyphenated words and underscore connections, not so
+      // much to force the behavior, but so we realize when it changes and think
+      // through any downstream effects.
+      @"abc-xyz abc--xyz abc_xyz",
+      @"abc xyz abc xyz abc xyz"
+    },
+    {
+      // test what we do w/ contractions for the same reason.
+      @"can't say i'd like that. i''d?",
+      @"can't say i'd like that i d"
+    },
+    {
+      // test what happens w/ colons also for the same reasons.
+      @"abc:xyz abc::xyz",
+      @"abc xyz abc xyz", 
+    }
   };
   
-  NSString **scan = testData;
-  while (*scan != nil) {
+  for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); ++i) {
     // collect the query
-    NSString *query = *scan;
-    ++scan;
-    e = [HGSTokenizer wordEnumeratorForString:query];
-    STAssertNotNil(e, @"failed to make enum for query -- %@", query);
-    for (int idx = 0; *scan != nil; ++scan, ++idx) {
-      STAssertEqualObjects([e nextObject], *scan,
-                           @"item %d of query -- %@", idx, query);
-    }
-    STAssertNil([e nextObject],
-                   @"failed to get nil at end of query -- %@", query);
-    // advance to the next test
-    ++scan;
-  }
-}
-
-- (void)testTokenEnumASCBasics {
-  NSEnumerator *e;
-  
-  // simple test
-  
-  e = [HGSTokenizer tokenEnumeratorForString:@"this, this is a test."];
-  STAssertNotNil(e, nil);
-  STAssertEqualObjects([e nextObject], @"this", nil);
-  STAssertEqualObjects([e nextObject], @",", nil);
-  STAssertEqualObjects([e nextObject], @"this", nil);
-  STAssertEqualObjects([e nextObject], @"is", nil);
-  STAssertEqualObjects([e nextObject], @"a", nil);
-  STAssertEqualObjects([e nextObject], @"test", nil);
-  STAssertEqualObjects([e nextObject], @".", nil);
-  STAssertNil([e nextObject], nil);
-  
-  // test allObjects
-  
-  e = [HGSTokenizer tokenEnumeratorForString:@"this, this is a test."];
-  STAssertNotNil(e, nil);
-  NSArray *allTokens = [e allObjects];
-  STAssertNotNil(allTokens, nil);
-  NSArray *expectedTokens =
-  [NSArray arrayWithObjects:@"this", @",", @"this", @"is", @"a", @"test", @".", nil];
-  STAssertEqualObjects(allTokens, expectedTokens, nil);
-  
-  // now bang through a few different cases
-
-  NSString *testData[] = {
-    // format: query, words, nil.  a final nil ends all tests.
-    @"ABC 123 A1B2C3 ABC-123 ABC_123 A#B",
-    @"ABC", @"123", @"A1B2C3", @"ABC", @"-", @"123", @"ABC", @"_", @"123", @"A", @"#", @"B", nil,
-    
-    @"  abc123  ",
-    @"abc123", nil,
-    
-    @"_-+  abc123 &*#.",
-    @"_", @"-", @"+", @"abc123", @"&", @"*", @"#", @".", nil,
-    
-    @"- - a -a- - ",
-    @"-", @"-", @"a", @"-", @"a", @"-", @"-", nil,
-    
-    // test what we do w/ hyphenated words and underscore connections, not so
-    // much to force the behavior, but so we realize when it changes and think
-    // through any downstream effects.
-    @"abc-xyz abc--xyz abc_xyz",
-    @"abc", @"-", @"xyz", @"abc", @"-", @"-", @"xyz", @"abc", @"_", @"xyz", nil,
-    
-    // test what we do w/ contractions for the same reason.
-    @"can't say i'd like that. i''d?",
-    @"can't", @"say", @"i'd", @"like", @"that", @".", @"i", @"'", @"'", @"d", @"?", nil,
-    
-    // test what happens w/ colons also for the same reasons.
-    @"abc:xyz abc::xyz",
-    @"abc", @":", @"xyz", @"abc", @":", @":", @"xyz", nil,
-
-    nil,
-  };
-  
-  NSString **scan = testData;
-  while (*scan != nil) {
-    // collect the query
-    NSString *query = *scan;
-    ++scan;
-    e = [HGSTokenizer tokenEnumeratorForString:query];
-    STAssertNotNil(e, @"failed to make enum for query -- %@", query);
-    for (int idx = 0; *scan != nil; ++scan, ++idx) {
-      STAssertEqualObjects([e nextObject], *scan,
-                           @"item %d of query -- %@", idx, query);
-    }
-    STAssertNil([e nextObject],
-                @"failed to get nil at end of query -- %@", query);
-    // advance to the next test
-    ++scan;
+    NSString *tokenTest = [HGSTokenizer tokenizeString:testData[i].string];
+    STAssertEqualObjects(tokenTest, testData[i].tokenized, nil);
   }
 }
 

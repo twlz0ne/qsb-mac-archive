@@ -31,189 +31,147 @@
 //
 
 #import "HGSAbbreviationRanker.h"
+#import <AssertMacros.h>
 
+// TODO(dmaclach): possibly make these variables we can adjust?
+//                 If we do so, make sure that they don't affect performance
+//                 too badly.
+static const CGFloat kHGSIsPrefixMultiplier = 1.0;
+static const CGFloat kHGSIsFrontOfWordMultiplier = 0.8;
+static const CGFloat kHGSIsWeakHitMultipier = 0.6;
+static const CGFloat kHGSIsStrongMissMultiplier = 0.5;
+static const CGFloat kHGSNoMatchScore = 0.0;
 
-const float kIgnoredCharactersScore = 0.9f;
-const float kMinorSkippedCharactersPenalty = 0.15f;
-const float kMajorSkippedCharactersPenalty = 1.0f;
-const float kNoMatchScore = 0.0f;
-
-CGFloat HGSScoreForAbbreviationWithRanges(CFStringRef str, 
-                                          CFStringRef abbr, 
-                                          NSMutableIndexSet* mask, 
-                                          CFRange strRange, 
-                                          CFRange abbrRange);
-
-CGFloat HGSScoreForAbbreviation(CFStringRef str,
-                                CFStringRef abbr, 
-                                NSMutableIndexSet* mask) {
-  if (!str) return 0.0;
-  return HGSScoreForAbbreviationWithRanges(str, abbr, mask,
-                                           CFRangeMake(0, CFStringGetLength(str)),
-                                           CFRangeMake(0, CFStringGetLength(abbr)));
-}
-
-
-// This function is called recursively with gradually smaller ranges
-// for example:
-// 1: "APHO", "Adobe Photoshop" = 1.0 + (2) / strlen
-// 2: "PHO", "dobe Photoshop" = (3)
-// 3: "", "toshop" = 0.9
-// 
-// Generally each character is worth 0.0 to 1.0
-// Skipped characters are worth 0.0, but sometimes are worth more if 
-// they are skipped on the way to a space
-// All incomplete letters are given a score of 0.9
-//
-// Example: Adobe Photoshop with abbreviation APHO
-//
-// * Match           (1.0)
-// - Minor deduction (0.85)
-// = Major deduction (0.0)
-// . End of string   (0.9)
-//
-// Adobe Photoshop
-// *----=***...... 
-// Map Show
-// =**==**.
-
-CGFloat HGSScoreForAbbreviationWithRanges(CFStringRef str, // The string
-                                          CFStringRef abbr, // The abbreviation
-                                          NSMutableIndexSet* mask, // The hitmask
-                                          CFRange strRange, // string range
-                                          CFRange abbrRange) { // abbreviation range
-  NSInteger i, j;
-  CGFloat score = 0.0;
+CGFloat HGSScoreForAbbreviation(NSString *nsStr,
+                                NSString *nsAbbr, 
+                                NSMutableIndexSet** outHitMask) {
+  // TODO(dmaclach) add support for higher plane UTF16
+  CGFloat score = kHGSNoMatchScore;
+  require_quiet(nsStr && nsAbbr, BadParams);
+  CFStringRef str = (CFStringRef)nsStr;
+  CFStringRef abbr = (CFStringRef)nsAbbr;
+  CFIndex strLength = CFStringGetLength(str);
+  CFIndex abbrLength = CFStringGetLength(abbr);
+  CFCharacterSetRef whiteSpaceSet 
+    = CFCharacterSetGetPredefined(kCFCharacterSetWhitespace);
+  Boolean ownStrChars = false;
+  Boolean ownAbbrChars = false;
   
-  CFRange matchedRange, remainingStrRange, adjustedStrRange = strRange;
-  
-  // If we have exhausted the abbreviation, deduct some points for all remaining letters
-  if (!abbrRange.length)
-    return kIgnoredCharactersScore;
-  
-  // Return 0 if the abbreviation is longer than the string
-  if (abbrRange.length > strRange.length) 
-    return kNoMatchScore;
-  
-  // Optimization: search for the first character of the abbreviation to make
-  // sure it exists in the string
-  UniChar u = CFStringGetCharacterAtIndex(abbr,abbrRange.location);
-  UniChar uc = toupper(u);
-  UniChar *chars = (UniChar*)malloc(strRange.length * sizeof(UniChar));
-  if (!chars) return kNoMatchScore;
-  Boolean found = NO;
-  CFStringGetCharacters(str, strRange, chars);
-  for (i = 0; i < strRange.length; ++i) {
-    if (chars[i] == u || chars[i] == uc) {
-      found = YES;
-      break;
-    }
+  const UniChar *strChars = CFStringGetCharactersPtr(str);
+  if (!strChars) {
+    strChars = malloc(sizeof(unichar) * strLength);
+    require(strChars, CouldNotAllocateStrChars);
+    ownStrChars = true;
+    CFStringGetCharacters(str, CFRangeMake(0, strLength), (UniChar *)strChars);
   }
-  free(chars);
-
-  // If the character is not found, return 0
-  if (!found)
-    return kNoMatchScore;
+  const UniChar *abbrChars = CFStringGetCharactersPtr(abbr);
+  if (!abbrChars) {
+    abbrChars = malloc(sizeof(unichar) * abbrLength);
+    require(abbrChars, CouldNotAllocateAbbrChars);
+    ownAbbrChars = true;
+    CFStringGetCharacters(abbr, 
+                          CFRangeMake(0, abbrLength), 
+                          (UniChar *)abbrChars);
+  }
+  CFRange *matchRanges = calloc(sizeof(CFRange), abbrLength);
+  require(matchRanges, CouldNotAllocateRanges);
+  BOOL *matchRangeDecent = calloc(1, abbrLength);
+  require(matchRangeDecent, CouldNotAllocateRangesDecent);
   
-  adjustedStrRange.length -= i;
-  adjustedStrRange.location += i;
-
-  // Search for steadily smaller portions of the abbreviation
-  for (i = abbrRange.length; i > 0; --i) {
-    CFStringRef curAbbr = CFStringCreateWithSubstring(NULL,
-                                                      abbr, 
-                                                      CFRangeMake(abbrRange.location, i));
-    
-    BOOL foundShorterAbbr = CFStringFindWithOptions(
-      str, 
-      curAbbr, 
-      CFRangeMake(adjustedStrRange.location, 
-                  adjustedStrRange.length - abbrRange.length + i),
-      kCFCompareCaseInsensitive,
-      &matchedRange);
-    CFRelease(curAbbr);
-    
-    // ABBREVIATION was not found, try ABBREVIATIO
-    if (!foundShorterAbbr) continue; 
-    
-     // If a mask was set, add the matched indexes
-    if (mask)
-      [mask addIndexesInRange:NSMakeRange(matchedRange.location,
-                                          matchedRange.length)];
-    
-    // update the remaining ranges
-    remainingStrRange.location = matchedRange.location + matchedRange.length;
-    remainingStrRange.length = strRange.location
-                               + strRange.length
-                               - remainingStrRange.location;
-    
-    // Search what is left of the string with the rest of the abbreviation
-    CFRange remainingAbbrRange = CFRangeMake(abbrRange.location + i, 
-                                             abbrRange.length - i);
-    CGFloat remainingScore = HGSScoreForAbbreviationWithRanges(str, 
-                                                               abbr,
-                                                               mask,
-                                                               remainingStrRange,
-                                                               remainingAbbrRange);
-    
-    // If there was a match from the remaining letters, then score ourselves
-    if (remainingScore > kNoMatchScore) {
-      // Score starts out as the number of characters covered
-      score = remainingStrRange.location - strRange.location;
-      
-      // ignore skipped characters if is first letter of a word
-      if (matchedRange.location > strRange.location) {
-        //if some letters were skipped
-        
-        static CFCharacterSetRef whitespaceSet = NULL;
-        if (!whitespaceSet)
-          whitespaceSet = CFCharacterSetGetPredefined(kCFCharacterSetWhitespace);
-        
-        static CFCharacterSetRef uppercaseSet = NULL;
-        if (!uppercaseSet)
-          uppercaseSet = CFCharacterSetGetPredefined(kCFCharacterSetUppercaseLetter);
-       
-        if (CFCharacterSetIsCharacterMember(whitespaceSet,
-                 CFStringGetCharacterAtIndex(str, matchedRange.location - 1))) {
-          // If there is a space before the match, reduce score for all
-          // skipped spaces, but be nicer about other characters
-          
-          for (j = matchedRange.location - 2; j >= strRange.location; --j) {
-            if (CFCharacterSetIsCharacterMember(whitespaceSet,
-                                         CFStringGetCharacterAtIndex(str, j))) {
-              score -= kMajorSkippedCharactersPenalty;
-            } else {
-              score -= kMinorSkippedCharactersPenalty;
+  CFIndex stringIndex = 0;
+  CFIndex abbrIndex = 0;
+  CFIndex currMatchRange = 0;
+  for (; stringIndex < strLength && abbrIndex < abbrLength; ++stringIndex) {
+    UniChar abbrChar = abbrChars[abbrIndex];
+    UniChar strChar = strChars[stringIndex];
+    if (abbrChar == strChar) {
+      if (matchRanges[currMatchRange].length == 0) {
+        matchRanges[currMatchRange].location = stringIndex;
+      }
+      matchRanges[currMatchRange].length += 1;
+      abbrIndex += 1;
+    } else {
+      // We missed a character
+      if (matchRanges[currMatchRange].length > 0) {
+        currMatchRange += 1;
+      }
+      // Let's scan forward and see if our missing character hits the 
+      // first letter of an upcoming word
+      for (CFIndex nextHitIndex = stringIndex; 
+           nextHitIndex < strLength; 
+           ++nextHitIndex) {
+        UniChar nextStrChar = strChars[nextHitIndex];
+        if (CFCharacterSetIsCharacterMember(whiteSpaceSet, nextStrChar)) {
+          if (nextHitIndex < strLength - 1) {
+            nextStrChar = strChars[nextHitIndex + 1];
+            if (nextStrChar == abbrChar) {
+              // We've got a front of word match. Let's use it instead.
+              stringIndex = nextHitIndex;
             }
           }
-          
-        } else if (CFCharacterSetIsCharacterMember(uppercaseSet, 
-                     CFStringGetCharacterAtIndex(str, matchedRange.location))) {
-          // If the match starts with a cap, reduce score for all
-          // skipped caps, but be nicer about other characters
-          
-          for (j = matchedRange.location - 1; j >= strRange.location; --j) {
-            if (CFCharacterSetIsCharacterMember(uppercaseSet,
-                                         CFStringGetCharacterAtIndex(str, j))) {
-              score -= kMajorSkippedCharactersPenalty;
-            } else {
-              score -= kMinorSkippedCharactersPenalty;
-            }
-          }
-        } else {
-          // heavily penalize all characters skipped
-          score -= (matchedRange.location - strRange.location)
-                   * kMajorSkippedCharactersPenalty;
+          break;
         }
       }
-      
-      // add score from the rest of the string
-      score += remainingScore * remainingStrRange.length;
-      
-      // divide total score by the string length
-      score /= strRange.length;
-      break;
     }
   }
+  currMatchRange += 1;
+  if (abbrIndex != abbrLength) {
+    score = 0;
+  } else {
+    // Time to compare our ranges
+    if (outHitMask) {
+      *outHitMask = [NSMutableIndexSet indexSet];
+    }
+    for (CFIndex i = 0; i < currMatchRange; ++i) {
+      if (outHitMask) {
+        [*outHitMask addIndexesInRange:((NSRange*)matchRanges)[i]];
+      }
+      CFIndex location = matchRanges[i].location;
+      if (location == 0) {
+        // We have a prefix match
+        score = matchRanges[i].length * kHGSIsPrefixMultiplier;
+        matchRangeDecent[0] = YES;
+      } else {
+        if (CFCharacterSetIsCharacterMember(whiteSpaceSet, 
+                                            strChars[location - 1])) {
+          score += matchRanges[i].length * kHGSIsFrontOfWordMultiplier;
+          matchRangeDecent[i] = YES;
+        } else {
+          matchRangeDecent[i] = matchRanges[i].length >= 3;
+          score += matchRanges[i].length * kHGSIsWeakHitMultipier;
+        }
+        // Now match for the missed characters
+        if (matchRangeDecent[i]) {
+          if (i == 0) {
+            score += matchRanges[i].location * kHGSIsStrongMissMultiplier;
+          } else if (matchRangeDecent[i - 1]) {
+            score += ((matchRanges[i].location - 
+                      (matchRanges[i - 1].location + matchRanges[i-1].length))
+                      * kHGSIsStrongMissMultiplier);
+          }
+        }
+      }
+    }
+    score += ((strLength - 
+               (matchRanges[currMatchRange - 1].location 
+                + matchRanges[currMatchRange - 1].length)) 
+              * kHGSIsStrongMissMultiplier);
+    score /= strLength;
+    
+  }
+  
+  free(matchRangeDecent);
+CouldNotAllocateRangesDecent:
+  free(matchRanges);
+CouldNotAllocateRanges:
+  if (ownAbbrChars) {
+    free((UniChar *)abbrChars);
+  }
+CouldNotAllocateAbbrChars:
+  if (ownStrChars) {
+    free((UniChar *)strChars);
+  }
+CouldNotAllocateStrChars:
+BadParams:
   return score;
 }

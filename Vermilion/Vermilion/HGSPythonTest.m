@@ -61,29 +61,17 @@
   STAssertNotNil(rawQuery, nil);
   STAssertEqualObjects(rawQuery, @"Hello world", nil);
   
-  PyObject *uniqueWordsString = PyString_FromString("unique_words");
-  STAssertNotNULL(uniqueWordsString, nil);
-
-  PyObject *uniqueWords = PyObject_GetAttr(py, uniqueWordsString);
-  STAssertNotNULL(uniqueWords, nil);
-  STAssertTrue(PyList_Check(uniqueWords), nil);
-  STAssertEquals(PyList_Size(uniqueWords), (Py_ssize_t )2, nil);
+  NSString *normalizedQuery = [HGSPython stringAttribute:@"normalized_query"
+                                              fromObject:py];
+  STAssertNotNil(normalizedQuery, nil);
+  STAssertEqualObjects(normalizedQuery, @"hello world", nil);
   
-  PyObject *hello = PyList_GetItem(uniqueWords, 1);
-  STAssertNotNULL(hello, nil);
-  STAssertEquals(strcmp(PyString_AsString(hello), "hello"), 0, nil);
-  
-  PyObject *world = PyList_GetItem(uniqueWords, 0);
-  STAssertNotNULL(world, nil);
-  STAssertEquals(strcmp(PyString_AsString(world), "world"), 0, nil);
-  
-  PyObject *pivotObjectString = PyString_FromString("unique_words");
+  PyObject *pivotObjectString = PyString_FromString("pivot_object");
   STAssertNotNULL(pivotObjectString, nil);
 
   PyObject *pivotObject = PyObject_GetAttr(py, pivotObjectString);
   STAssertNotNULL(pivotObject, nil);
   
-  Py_DECREF(uniqueWords);
   Py_DECREF(pivotObjectString);
   Py_DECREF(py);
 }

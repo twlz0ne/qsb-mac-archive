@@ -137,9 +137,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     HGSResult *actionObject = [self objectFromAction:action
                                          resultArray:nil];
     // Index our result
-    [self indexResult:actionObject
-           nameString:[actionObject displayName]
-          otherString:nil];
+    [self indexResult:actionObject];
   }
 }
 

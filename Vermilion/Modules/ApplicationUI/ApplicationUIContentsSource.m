@@ -34,7 +34,6 @@
 #import "ApplicationUISource.h"
 #import "GTMAXUIElement.h"
 #import "ApplicationUIAction.h"
-#import "HGSStringUtil.h"
 #import "HGSTokenizer.h"
 #import "QSBHGSDelegate.h"
 
@@ -73,7 +72,7 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
             recursionDepth:(NSUInteger)depth {
   if (depth > kApplicationUIContentsSourceMaximumRecursion) return NO;
   HGSQuery *query = [operation query];
-  NSSet *uniqueWords = [query uniqueWords];
+  NSString *normalizedQuery = [query normalizedQueryString];
   BOOL addedElement = NO;
   for (GTMAXUIElement *element in elements) {
     if ([operation isCancelled]) return NO;
@@ -91,40 +90,35 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
       value = [element accessibilityAttributeValue:NSAccessibilityTitleAttribute];
     } 
     if (value) {
-      value = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:value];
-      NSArray *terms = [[HGSTokenizer wordEnumeratorForString:value] allObjects];
-      for(NSString *term in terms) {
-        NSUInteger termLen = [term length];
-        for (NSString *aWord in uniqueWords) {
-          if (([aWord length] <= termLen) && [term hasPrefix:aWord]) {
-            NSString *name 
-              = [window stringValueForAttribute:NSAccessibilityTitleAttribute];
-            if ([name length] == 0) continue;
-            NSString *nameString 
-              = [name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-            NSString *uriString 
-              = [NSString stringWithFormat:@"AppUISource://%@/%p", 
-                 nameString, window];
-            NSURL *uri = [NSURL URLWithString:uriString];
-            NSDictionary *attributes
-              = [NSDictionary dictionaryWithObjectsAndKeys:
-                 window, kAppUISourceAttributeElementKey, 
-                 windowIcon_, kHGSObjectAttributeIconKey,
-                 nil];
-            HGSResult *result 
-              = [HGSResult resultWithURL:uri
-                                    name:name
-                                    type:kHGSTypeAppUIItem
-                                  source:self
-                              attributes:attributes];
-            [results addObject:result];
-            addedElement = YES;
-            break;
-          }
-        }
-        if (addedElement) {
-          break;
-        }
+      NSString *normalizedValue = [HGSTokenizer tokenizeString:value];
+      CGFloat rank 
+        = HGSScoreForAbbreviation(normalizedValue, normalizedQuery, NULL);
+      if (rank > 0) {
+        NSString *name 
+          = [window stringValueForAttribute:NSAccessibilityTitleAttribute];
+        if ([name length] == 0) continue;
+        NSString *nameString 
+          = [name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString *uriString 
+          = [NSString stringWithFormat:@"AppUISource://%@/%p", 
+             nameString, window];
+        NSURL *uri = [NSURL URLWithString:uriString];
+        NSNumber *nsRank = [NSNumber numberWithFloat:rank];
+        NSDictionary *attributes
+          = [NSDictionary dictionaryWithObjectsAndKeys:
+             window, kAppUISourceAttributeElementKey, 
+             windowIcon_, kHGSObjectAttributeIconKey,
+             nsRank, kHGSObjectAttributeRankKey,
+             nil];
+        HGSResult *result 
+          = [HGSResult resultWithURL:uri
+                                name:name
+                                type:kHGSTypeAppUIItem
+                              source:self
+                          attributes:attributes];
+        [results addObject:result];
+        addedElement = YES;
+        break;
       }
     }
     if (!addedElement) {

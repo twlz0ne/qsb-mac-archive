@@ -31,29 +31,16 @@
 //
 
 #import "HGSStringUtil.h"
-#import "GTMGarbageCollection.h"
 
 @implementation HGSStringUtil
 
 + (NSString *)stringByLowercasingAndStrippingDiacriticals:(NSString *)str {
-  if (![str length]) return [[str copy] autorelease];
-  
-  NSMutableString *mutableStr = [NSMutableString stringWithString:str];
-
-  if (mutableStr) {
-    
-    // Force an en_US locale so everything is handled in a consitent way.  (if
-    // we let in the user or system one, we could get different behavior between
-    // runs, and that could cause different results/indexing/etc).
-    CFLocaleRef locale = CFLocaleCreate(kCFAllocatorDefault, CFSTR("en_US"));
-    GTMCFAutorelease(locale);
-
-    CFOptionFlags optionsFlags =  kCFCompareDiacriticInsensitive |
-                                  kCFCompareCaseInsensitive |
-                                  kCFCompareWidthInsensitive;
-    CFStringFold((CFMutableStringRef)mutableStr, optionsFlags, locale);
-  }
-  return mutableStr;
+  NSLocale *locale 
+    = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
+  NSStringCompareOptions options = (NSCaseInsensitiveSearch 
+                                    | NSDiacriticInsensitiveSearch 
+                                    | NSWidthInsensitiveSearch);
+  return [str stringByFoldingWithOptions:options locale:locale];
 }
 
 @end

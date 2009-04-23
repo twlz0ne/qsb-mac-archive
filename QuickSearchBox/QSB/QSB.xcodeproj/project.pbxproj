@@ -22,12 +22,25 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 8B148D9D0F705F4F002E05FA /* Build configuration list for PBXAggregateTarget "QSB SDK" */;
 			buildPhases = (
-				8B148D850F705F35002E05FA /* ShellScript */,
+				8B148D850F705F35002E05FA /* Build SDK */,
 			);
 			dependencies = (
+				8B2E2A470F9901C900F80E11 /* PBXTargetDependency */,
 			);
 			name = "QSB SDK";
 			productName = "QSB SDK";
+		};
+		8B2E2A400F99018600F80E11 /* HeaderDoc */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 8B2E2A840F9901E300F80E11 /* Build configuration list for PBXAggregateTarget "HeaderDoc" */;
+			buildPhases = (
+				8B2E2A3F0F99018600F80E11 /* ShellScript */,
+			);
+			dependencies = (
+				8B2E2A450F9901C700F80E11 /* PBXTargetDependency */,
+			);
+			name = HeaderDoc;
+			productName = HeaderDoc;
 		};
 		8B77DEFE0F284A4C00FA2A3C /* Release Notes */ = {
 			isa = PBXAggregateTarget;
@@ -232,7 +245,6 @@
 		5ACEF2CB0F40EBFC007EA38B /* PluginVerifyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ACEF2C90F40EBFC007EA38B /* PluginVerifyWindow.xib */; };
 		5AED32BA0EAFDF1F004C7187 /* HGSOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AED32B80EAFDF1F004C7187 /* HGSOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5AED32BB0EAFDF1F004C7187 /* HGSOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AED32B90EAFDF1F004C7187 /* HGSOperation.m */; };
-		5AED32BD0EAFDF2C004C7187 /* HGSOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AED32BC0EAFDF2C004C7187 /* HGSOperationTest.m */; };
 		5AED35E70EB7D978004C7187 /* HGSIconProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AED35E50EB7D978004C7187 /* HGSIconProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5AED35E80EB7D978004C7187 /* HGSIconProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AED35E60EB7D978004C7187 /* HGSIconProvider.m */; };
 		5AF0EB6F0F6074A00041E0B9 /* DictionaryActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0EB6C0F6074A00041E0B9 /* DictionaryActions.m */; };
@@ -258,7 +270,6 @@
 		5AF0F4F90F671E6A0041E0B9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		5AF0F5890F671F100041E0B9 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		5AF0F5B90F6720B10041E0B9 /* Mount.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5AF0F4880F671D9C0041E0B9 /* Mount.hgs */; };
-		5AF0F7D80F68489A0041E0B9 /* HGSCodeSignatureTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0F7D70F68489A0041E0B9 /* HGSCodeSignatureTest.m */; };
 		5AF2C4800E5E19A400F4D546 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
 		5AF2C4810E5E19A400F4D546 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		5AF2C4820E5E19A400F4D546 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -275,7 +286,6 @@
 		6200551B0F78567300C806A1 /* HGSSimpleAccountSetUpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 620055190F78567300C806A1 /* HGSSimpleAccountSetUpViewController.m */; };
 		620055690F78595F00C806A1 /* GoogleAccountEditController.m in Sources */ = {isa = PBXBuildFile; fileRef = 620055660F78595F00C806A1 /* GoogleAccountEditController.m */; };
 		6200556A0F78595F00C806A1 /* GoogleAccountSetUpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 620055680F78595F00C806A1 /* GoogleAccountSetUpViewController.m */; };
-		6200571F0F7A909E00C806A1 /* KeychainItemTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6200571E0F7A909E00C806A1 /* KeychainItemTest.m */; };
 		6200F9750E785F4400F046EC /* MoreSeparator.png in Resources */ = {isa = PBXBuildFile; fileRef = 6200F9740E785F4400F046EC /* MoreSeparator.png */; };
 		6200F99D0E785FE700F046EC /* MoreShowAllTableResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200F99B0E785FE700F046EC /* MoreShowAllTableResultView.xib */; };
 		6200F9E00E78623500F046EC /* MoreFoldResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200F9DE0E78623500F046EC /* MoreFoldResultView.xib */; };
@@ -284,7 +294,6 @@
 		6211C51D0F312E7E003A5122 /* HGSSimpleAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */; };
 		6219B5340E8C1DB3008643F4 /* BaseResultsViews.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */; };
 		621B1E3B0E4CD7B800EEF553 /* PreferencesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 621B1E390E4CD7B800EEF553 /* PreferencesWindow.xib */; };
-		621BCE960F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 621BCE950F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m */; };
 		621D21BB0E438F2000D739F2 /* QSBCategoryTextAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 621D21BA0E438F2000D739F2 /* QSBCategoryTextAttachment.m */; };
 		6223C9AD0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.m */; };
 		6223CBB30E761AEB00F61030 /* QSBResultsViewBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223CBB10E761AEB00F61030 /* QSBResultsViewBaseController.m */; };
@@ -618,6 +627,39 @@
 		8B735FF80EC9066500E74421 /* QSBPlugin.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B735FF60EC9066500E74421 /* QSBPlugin.plist */; };
 		8B77DC4A0F279D3600FA2A3C /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8B77DCDD0F27A31000FA2A3C /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
+		8B7911010F9FCAD3006BFE1E /* HGSAccountsExtensionPointTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9E0F6B09FE003BDBDD /* HGSAccountsExtensionPointTest.m */; };
+		8B7911020F9FCAD3006BFE1E /* HGSAccountTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA910F6B09FE003BDBDD /* HGSAccountTest.m */; };
+		8B7911030F9FCAD3006BFE1E /* HGSActionOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9B0F6B09FE003BDBDD /* HGSActionOperationTest.m */; };
+		8B7911040F9FCAD3006BFE1E /* HGSActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4D28A4C0DF98DFF00FC6C31 /* HGSActionTest.m */; };
+		8B7911050F9FCAD3006BFE1E /* HGSBundleTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9A0F6B09FE003BDBDD /* HGSBundleTest.m */; };
+		8B7911060F9FCAD3006BFE1E /* HGSCallbackSearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA30F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m */; };
+		8B7911070F9FCAD3006BFE1E /* HGSCodeSignatureTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0F7D70F68489A0041E0B9 /* HGSCodeSignatureTest.m */; };
+		8B7911080F9FCAD3006BFE1E /* HGSCoreExtensionPointsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA8610F813E2A00DF4F12 /* HGSCoreExtensionPointsTest.m */; };
+		8B7911090F9FCAD3006BFE1E /* HGSExtensionPointTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA8600F813E2A00DF4F12 /* HGSExtensionPointTest.m */; };
+		8B79110A0F9FCAD3006BFE1E /* HGSExtensionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA950F6B09FE003BDBDD /* HGSExtensionTest.m */; };
+		8B79110B0F9FCAD3006BFE1E /* HGSIconProviderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA930F6B09FE003BDBDD /* HGSIconProviderTest.m */; };
+		8B79110C0F9FCAD3006BFE1E /* HGSLRUCacheTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA990F6B09FE003BDBDD /* HGSLRUCacheTest.m */; };
+		8B79110D0F9FCAD3006BFE1E /* HGSMemorySearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA980F6B09FE003BDBDD /* HGSMemorySearchSourceTest.m */; };
+		8B79110E0F9FCAD3006BFE1E /* HGSMixerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA00F6B09FE003BDBDD /* HGSMixerTest.m */; };
+		8B79110F0F9FCAD3006BFE1E /* HGSOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AED32BC0EAFDF2C004C7187 /* HGSOperationTest.m */; };
+		8B7911100F9FCAD3006BFE1E /* HGSPluginLoaderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85A0F813E2A00DF4F12 /* HGSPluginLoaderTest.m */; };
+		8B7911110F9FCAD3006BFE1E /* HGSPluginTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA970F6B09FE003BDBDD /* HGSPluginTest.m */; };
+		8B7911120F9FCAD3006BFE1E /* HGSProtoExtensionFactoringTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 621BCE950F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m */; };
+		8B7911130F9FCAD3006BFE1E /* HGSProtoExtensionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA20F6B09FE003BDBDD /* HGSProtoExtensionTest.m */; };
+		8B7911140F9FCAD3006BFE1E /* HGSPythonActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA940F6B09FE003BDBDD /* HGSPythonActionTest.m */; };
+		8B7911150F9FCAD3006BFE1E /* HGSPythonSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA960F6B09FE003BDBDD /* HGSPythonSourceTest.m */; };
+		8B7911160F9FCAD3006BFE1E /* HGSPythonTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA10F6B09FE003BDBDD /* HGSPythonTest.m */; };
+		8B7911170F9FCAD3006BFE1E /* HGSQueryControllerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA920F6B09FE003BDBDD /* HGSQueryControllerTest.m */; };
+		8B7911180F9FCAD3006BFE1E /* HGSQueryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153660E9FA04400C0EAA9 /* HGSQueryTest.m */; };
+		8B7911190F9FCAD3006BFE1E /* HGSResultTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4D28DDD0DF9C11300FC6C31 /* HGSResultTest.m */; };
+		8B79111A0F9FCAD3006BFE1E /* HGSSearchOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9C0F6B09FE003BDBDD /* HGSSearchOperationTest.m */; };
+		8B79111B0F9FCAD3006BFE1E /* HGSSearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CABA0F6B0A4A003BDBDD /* HGSSearchSourceTest.m */; };
+		8B79111C0F9FCAD3006BFE1E /* HGSSimpleAccountTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9D0F6B09FE003BDBDD /* HGSSimpleAccountTest.m */; };
+		8B79111D0F9FCAD3006BFE1E /* HGSSQLiteBackedCacheTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */; };
+		8B79111E0F9FCAD3006BFE1E /* HGSStringUtilTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153370E9F9C5400C0EAA9 /* HGSStringUtilTest.m */; };
+		8B79111F0F9FCAD3006BFE1E /* HGSTokenizerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D1535A0E9F9E2900C0EAA9 /* HGSTokenizerTest.m */; };
+		8B7911200F9FCAD3006BFE1E /* KeychainItemTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6200571E0F7A909E00C806A1 /* KeychainItemTest.m */; };
+		8B7911210F9FCAD3006BFE1E /* NSString+ReadableURLTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D1491B0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m */; };
 		8B8257990D189EA6002A6C3C /* QSBGrayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8257980D189EA6002A6C3C /* QSBGrayView.m */; };
 		8B8B13060EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B8B13070EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
@@ -660,26 +702,6 @@
 		8B9250DF0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B9250DC0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m */; };
 		8B92527B0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B92527A0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m */; };
 		8B9257170EE9CCF300F3DF32 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
-		8B95CAA40F6B09FE003BDBDD /* HGSAccountTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA910F6B09FE003BDBDD /* HGSAccountTest.m */; };
-		8B95CAA50F6B09FE003BDBDD /* HGSQueryControllerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA920F6B09FE003BDBDD /* HGSQueryControllerTest.m */; };
-		8B95CAA60F6B09FE003BDBDD /* HGSIconProviderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA930F6B09FE003BDBDD /* HGSIconProviderTest.m */; };
-		8B95CAA70F6B09FE003BDBDD /* HGSPythonActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA940F6B09FE003BDBDD /* HGSPythonActionTest.m */; };
-		8B95CAA80F6B09FE003BDBDD /* HGSExtensionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA950F6B09FE003BDBDD /* HGSExtensionTest.m */; };
-		8B95CAA90F6B09FE003BDBDD /* HGSPythonSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA960F6B09FE003BDBDD /* HGSPythonSourceTest.m */; };
-		8B95CAAA0F6B09FE003BDBDD /* HGSPluginTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA970F6B09FE003BDBDD /* HGSPluginTest.m */; };
-		8B95CAAB0F6B09FE003BDBDD /* HGSMemorySearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA980F6B09FE003BDBDD /* HGSMemorySearchSourceTest.m */; };
-		8B95CAAC0F6B09FE003BDBDD /* HGSLRUCacheTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA990F6B09FE003BDBDD /* HGSLRUCacheTest.m */; };
-		8B95CAAD0F6B09FE003BDBDD /* HGSBundleTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9A0F6B09FE003BDBDD /* HGSBundleTest.m */; };
-		8B95CAAE0F6B09FE003BDBDD /* HGSActionOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9B0F6B09FE003BDBDD /* HGSActionOperationTest.m */; };
-		8B95CAAF0F6B09FE003BDBDD /* HGSSearchOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9C0F6B09FE003BDBDD /* HGSSearchOperationTest.m */; };
-		8B95CAB00F6B09FE003BDBDD /* HGSSimpleAccountTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9D0F6B09FE003BDBDD /* HGSSimpleAccountTest.m */; };
-		8B95CAB10F6B09FE003BDBDD /* HGSAccountsExtensionPointTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9E0F6B09FE003BDBDD /* HGSAccountsExtensionPointTest.m */; };
-		8B95CAB30F6B09FE003BDBDD /* HGSMixerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA00F6B09FE003BDBDD /* HGSMixerTest.m */; };
-		8B95CAB40F6B09FE003BDBDD /* HGSPythonTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA10F6B09FE003BDBDD /* HGSPythonTest.m */; };
-		8B95CAB50F6B09FE003BDBDD /* HGSProtoExtensionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA20F6B09FE003BDBDD /* HGSProtoExtensionTest.m */; };
-		8B95CAB60F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA30F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m */; };
-		8B95CABB0F6B0A4A003BDBDD /* HGSSearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CABA0F6B0A4A003BDBDD /* HGSSearchSourceTest.m */; };
-		8B95CB4C0F6B1CA9003BDBDD /* HGSSQLiteBackedCacheTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */; };
 		8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B95CCB60F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */; };
@@ -700,9 +722,6 @@
 		8BAAA8670F813E2A00DF4F12 /* HGSExtensionPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85E0F813E2A00DF4F12 /* HGSExtensionPoint.m */; };
 		8BAAA8680F813E2A00DF4F12 /* HGSPluginLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BAAA85F0F813E2A00DF4F12 /* HGSPluginLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BAAA86B0F813E2A00DF4F12 /* HGSCoreExtensionPoints.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BAAA8620F813E2A00DF4F12 /* HGSCoreExtensionPoints.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8BAAA8770F813E3800DF4F12 /* HGSPluginLoaderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85A0F813E2A00DF4F12 /* HGSPluginLoaderTest.m */; };
-		8BAAA8780F813E3800DF4F12 /* HGSExtensionPointTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA8600F813E2A00DF4F12 /* HGSExtensionPointTest.m */; };
-		8BAAA8790F813E3800DF4F12 /* HGSCoreExtensionPointsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA8610F813E2A00DF4F12 /* HGSCoreExtensionPointsTest.m */; };
 		8BB658F20F73034600E20B99 /* GTMNSObject+UnitTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55DAE20E78829300D39CB0 /* GTMNSObject+UnitTesting.m */; };
 		8BB658F40F73035000E20B99 /* GTMAppKit+UnitTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55DAE40E78829300D39CB0 /* GTMAppKit+UnitTesting.m */; };
 		8BB6594B0F73036600E20B99 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
@@ -847,9 +866,7 @@
 		E46933010DDB7A0200C5A64A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		E46933200DDB7A8200C5A64A /* ActionSource.m in Sources */ = {isa = PBXBuildFile; fileRef = E46932F10DDB79DA00C5A64A /* ActionSource.m */; };
 		E4D1B0DD0DD0B253004BFB52 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E429DF760AC1907A00E747D8 /* Security.framework */; };
-		E4D28A920DF9971600FC6C31 /* HGSActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4D28A4C0DF98DFF00FC6C31 /* HGSActionTest.m */; };
 		E4D28B330DF9AA0C00FC6C31 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
-		E4D28DDE0DF9C11300FC6C31 /* HGSResultTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4D28DDD0DF9C11300FC6C31 /* HGSResultTest.m */; };
 		E4F551550DF730D7008A846E /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		F40FEB390EC4C81700B32381 /* FilesystemDirectorySearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F10EF650DCF6F63002FCB08 /* FilesystemDirectorySearchSource.m */; };
 		F40FEC2A0EC4DBBA00B32381 /* HGSWebSearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F7357290DC92B53003DB5C6 /* HGSWebSearchSource.m */; };
@@ -863,16 +880,12 @@
 		F49FBAE20EF02B440059DDFC /* GTMFileSystemKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = F49FBAE00EF02B440059DDFC /* GTMFileSystemKQueue.m */; };
 		F4CC19680ED1B91800D6976A /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		F4CC19690ED1B91900D6976A /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
-		F4D1491C0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D1491B0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m */; };
 		F4D1494B0E9A438B00C0EAA9 /* NSString+ReadableURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 644161EE0DE362CC00AC646D /* NSString+ReadableURL.m */; };
 		F4D14F120E9BE9A200C0EAA9 /* HGSDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = F4D14F110E9BE9A200C0EAA9 /* HGSDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F4D153380E9F9C5400C0EAA9 /* HGSStringUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = F4D153350E9F9C5400C0EAA9 /* HGSStringUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F4D153390E9F9C5400C0EAA9 /* HGSStringUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153360E9F9C5400C0EAA9 /* HGSStringUtil.m */; };
-		F4D1533B0E9F9C5B00C0EAA9 /* HGSStringUtilTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153370E9F9C5400C0EAA9 /* HGSStringUtilTest.m */; };
 		F4D1535B0E9F9E2900C0EAA9 /* HGSTokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = F4D153580E9F9E2900C0EAA9 /* HGSTokenizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F4D1535C0E9F9E2900C0EAA9 /* HGSTokenizer.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153590E9F9E2900C0EAA9 /* HGSTokenizer.m */; };
-		F4D1535E0E9F9E3000C0EAA9 /* HGSTokenizerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D1535A0E9F9E2900C0EAA9 /* HGSTokenizerTest.m */; };
-		F4D153670E9FA04400C0EAA9 /* HGSQueryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153660E9FA04400C0EAA9 /* HGSQueryTest.m */; };
 		F4E3B5820EB6573300CB713D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		F4E3B5830EB6573300CB713D /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		F4E3B5BC0EB6580E00CB713D /* CalculatorSource.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E3B5BB0EB6580900CB713D /* CalculatorSource.m */; };
@@ -1098,6 +1111,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
+		};
+		8B2E2A440F9901C700F80E11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
+			remoteInfo = Vermilion;
+		};
+		8B2E2A460F9901C900F80E11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B2E2A400F99018600F80E11;
+			remoteInfo = HeaderDoc;
 		};
 		8B3D26700EAE8E7A004EA504 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -4693,7 +4720,6 @@
 				8B6F2CDE0DA2B7F50052CA40 /* Sources */,
 				8B6F2CDF0DA2B7F50052CA40 /* Frameworks */,
 				8B4888110F15D37D00786C1E /* Breakpad */,
-				8B95C8C40F6AB302003BDBDD /* HeaderDoc */,
 			);
 			buildRules = (
 			);
@@ -5033,6 +5059,7 @@
 				F4EF8F740ECB3EFF008DD6DA /* Build All */,
 				795F071909870215004C6BFE /* Test All */,
 				8B77DEFE0F284A4C00FA2A3C /* Release Notes */,
+				8B2E2A400F99018600F80E11 /* HeaderDoc */,
 				8B148D860F705F35002E05FA /* QSB SDK */,
 				8B3EECE20CEA86A100D933C0 /* QSB Core */,
 				8BD97D090E636D8C00F5C83B /* GTM */,
@@ -5676,13 +5703,14 @@
 			shellPath = /bin/sh;
 			shellScript = "codesign -f -s \"$CODE_SIGN_IDENTITY\" \"$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME\"\ncodesign -v \"$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME\";\nexit 0";
 		};
-		8B148D850F705F35002E05FA /* ShellScript */ = {
+		8B148D850F705F35002E05FA /* Build SDK */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Build SDK";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5702,6 +5730,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Build OCMock the way we want into our build folder\ncd \"${SRCROOT}/../externals/OCMock/Source\"\n/usr/bin/xcodebuild -project OCMock.xcodeproj -target OCMock -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHEROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"OCMock\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/OCMock.build/${CONFIGURATION}/OCMock.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"\n";
+		};
+		8B2E2A3F0F99018600F80E11 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(CONFIGURATION_BUILD_DIR)/$(FULL_PRODUCT_NAME)",
+				"$(SRCROOT)/../../Vermilion/Documentation/vermilion.hdoc",
+				"$(SRCROOT)/../../Vermilion/Documentation/headerdoc2html.config",
+				"$(SRCROOT)/../../Vermilion/Documentation/toctemplate.html",
+			);
+			outputPaths = (
+				"$(CONFIGURATION_BUILD_DIR)/Documentation/Vermilion",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "DOC_FOLDER=\"${CONFIGURATION_BUILD_DIR}/Documentation/Vermilion\"\ncd \"${SRCROOT}/../../Vermilion/Documentation\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"./vermilion.hdoc\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"${CONFIGURATION_BUILD_DIR}/${PUBLIC_HEADERS_FOLDER_PATH}\"\n/usr/bin/gatherheaderdoc $DOC_FOLDER";
 		};
 		8B3EED760CEA86A100D933C0 /* Post Build Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -5814,25 +5860,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHEROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/GData.build/${CONFIGURATION}/GDataFramework.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
-		};
-		8B95C8C40F6AB302003BDBDD /* HeaderDoc */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(CONFIGURATION_BUILD_DIR)/$(FULL_PRODUCT_NAME)",
-				"$(SRCROOT)/../../Vermilion/Documentation/vermilion.hdoc",
-				"$(SRCROOT)/../../Vermilion/Documentation/headerdoc2html.config",
-				"$(SRCROOT)/../../Vermilion/Documentation/toctemplate.html",
-			);
-			name = HeaderDoc;
-			outputPaths = (
-				"$(CONFIGURATION_BUILD_DIR)/Documentation/Vermilion",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "DOC_FOLDER=\"${CONFIGURATION_BUILD_DIR}/Documentation/Vermilion\"\ncd \"${SRCROOT}/../../Vermilion/Documentation\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"./vermilion.hdoc\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"${CONFIGURATION_BUILD_DIR}/${PUBLIC_HEADERS_FOLDER_PATH}\"\n/usr/bin/gatherheaderdoc $DOC_FOLDER";
 		};
 		8BA016650F13CF6800926923 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6720,46 +6747,46 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4D28A920DF9971600FC6C31 /* HGSActionTest.m in Sources */,
-				E4D28DDE0DF9C11300FC6C31 /* HGSResultTest.m in Sources */,
 				8B55D9380E786B5D00D39CB0 /* GTMSenTestCase.m in Sources */,
-				F4D1491C0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m in Sources */,
-				F4D1533B0E9F9C5B00C0EAA9 /* HGSStringUtilTest.m in Sources */,
-				F4D1535E0E9F9E3000C0EAA9 /* HGSTokenizerTest.m in Sources */,
-				F4D153670E9FA04400C0EAA9 /* HGSQueryTest.m in Sources */,
-				5AED32BD0EAFDF2C004C7187 /* HGSOperationTest.m in Sources */,
-				5AF0F7D80F68489A0041E0B9 /* HGSCodeSignatureTest.m in Sources */,
-				8B95CAA40F6B09FE003BDBDD /* HGSAccountTest.m in Sources */,
-				8B95CAA50F6B09FE003BDBDD /* HGSQueryControllerTest.m in Sources */,
-				8B95CAA60F6B09FE003BDBDD /* HGSIconProviderTest.m in Sources */,
-				8B95CAA70F6B09FE003BDBDD /* HGSPythonActionTest.m in Sources */,
-				8B95CAA80F6B09FE003BDBDD /* HGSExtensionTest.m in Sources */,
-				8B95CAA90F6B09FE003BDBDD /* HGSPythonSourceTest.m in Sources */,
-				8B95CAAA0F6B09FE003BDBDD /* HGSPluginTest.m in Sources */,
-				8B95CAAB0F6B09FE003BDBDD /* HGSMemorySearchSourceTest.m in Sources */,
-				8B95CAAC0F6B09FE003BDBDD /* HGSLRUCacheTest.m in Sources */,
-				8B95CAAD0F6B09FE003BDBDD /* HGSBundleTest.m in Sources */,
-				8B95CAAE0F6B09FE003BDBDD /* HGSActionOperationTest.m in Sources */,
-				8B95CAAF0F6B09FE003BDBDD /* HGSSearchOperationTest.m in Sources */,
-				8B95CAB00F6B09FE003BDBDD /* HGSSimpleAccountTest.m in Sources */,
-				8B95CAB10F6B09FE003BDBDD /* HGSAccountsExtensionPointTest.m in Sources */,
-				8B95CAB30F6B09FE003BDBDD /* HGSMixerTest.m in Sources */,
-				8B95CAB40F6B09FE003BDBDD /* HGSPythonTest.m in Sources */,
-				8B95CAB50F6B09FE003BDBDD /* HGSProtoExtensionTest.m in Sources */,
-				8B95CAB60F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m in Sources */,
-				8B95CABB0F6B0A4A003BDBDD /* HGSSearchSourceTest.m in Sources */,
-				8B95CB4C0F6B1CA9003BDBDD /* HGSSQLiteBackedCacheTest.m in Sources */,
 				8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */,
 				8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */,
 				8B95CE200F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m in Sources */,
 				8BB658F20F73034600E20B99 /* GTMNSObject+UnitTesting.m in Sources */,
 				8BB658F40F73035000E20B99 /* GTMAppKit+UnitTesting.m in Sources */,
 				8BB6594B0F73036600E20B99 /* GTMMethodCheck.m in Sources */,
-				6200571F0F7A909E00C806A1 /* KeychainItemTest.m in Sources */,
-				621BCE960F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m in Sources */,
-				8BAAA8770F813E3800DF4F12 /* HGSPluginLoaderTest.m in Sources */,
-				8BAAA8780F813E3800DF4F12 /* HGSExtensionPointTest.m in Sources */,
-				8BAAA8790F813E3800DF4F12 /* HGSCoreExtensionPointsTest.m in Sources */,
+				8B7911010F9FCAD3006BFE1E /* HGSAccountsExtensionPointTest.m in Sources */,
+				8B7911020F9FCAD3006BFE1E /* HGSAccountTest.m in Sources */,
+				8B7911030F9FCAD3006BFE1E /* HGSActionOperationTest.m in Sources */,
+				8B7911040F9FCAD3006BFE1E /* HGSActionTest.m in Sources */,
+				8B7911050F9FCAD3006BFE1E /* HGSBundleTest.m in Sources */,
+				8B7911060F9FCAD3006BFE1E /* HGSCallbackSearchSourceTest.m in Sources */,
+				8B7911070F9FCAD3006BFE1E /* HGSCodeSignatureTest.m in Sources */,
+				8B7911080F9FCAD3006BFE1E /* HGSCoreExtensionPointsTest.m in Sources */,
+				8B7911090F9FCAD3006BFE1E /* HGSExtensionPointTest.m in Sources */,
+				8B79110A0F9FCAD3006BFE1E /* HGSExtensionTest.m in Sources */,
+				8B79110B0F9FCAD3006BFE1E /* HGSIconProviderTest.m in Sources */,
+				8B79110C0F9FCAD3006BFE1E /* HGSLRUCacheTest.m in Sources */,
+				8B79110D0F9FCAD3006BFE1E /* HGSMemorySearchSourceTest.m in Sources */,
+				8B79110E0F9FCAD3006BFE1E /* HGSMixerTest.m in Sources */,
+				8B79110F0F9FCAD3006BFE1E /* HGSOperationTest.m in Sources */,
+				8B7911100F9FCAD3006BFE1E /* HGSPluginLoaderTest.m in Sources */,
+				8B7911110F9FCAD3006BFE1E /* HGSPluginTest.m in Sources */,
+				8B7911120F9FCAD3006BFE1E /* HGSProtoExtensionFactoringTest.m in Sources */,
+				8B7911130F9FCAD3006BFE1E /* HGSProtoExtensionTest.m in Sources */,
+				8B7911140F9FCAD3006BFE1E /* HGSPythonActionTest.m in Sources */,
+				8B7911150F9FCAD3006BFE1E /* HGSPythonSourceTest.m in Sources */,
+				8B7911160F9FCAD3006BFE1E /* HGSPythonTest.m in Sources */,
+				8B7911170F9FCAD3006BFE1E /* HGSQueryControllerTest.m in Sources */,
+				8B7911180F9FCAD3006BFE1E /* HGSQueryTest.m in Sources */,
+				8B7911190F9FCAD3006BFE1E /* HGSResultTest.m in Sources */,
+				8B79111A0F9FCAD3006BFE1E /* HGSSearchOperationTest.m in Sources */,
+				8B79111B0F9FCAD3006BFE1E /* HGSSearchSourceTest.m in Sources */,
+				8B79111C0F9FCAD3006BFE1E /* HGSSimpleAccountTest.m in Sources */,
+				8B79111D0F9FCAD3006BFE1E /* HGSSQLiteBackedCacheTest.m in Sources */,
+				8B79111E0F9FCAD3006BFE1E /* HGSStringUtilTest.m in Sources */,
+				8B79111F0F9FCAD3006BFE1E /* HGSTokenizerTest.m in Sources */,
+				8B7911200F9FCAD3006BFE1E /* KeychainItemTest.m in Sources */,
+				8B7911210F9FCAD3006BFE1E /* NSString+ReadableURLTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6921,6 +6948,16 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 8B20E43E0DB432BA001E429B /* PBXContainerItemProxy */;
+		};
+		8B2E2A450F9901C700F80E11 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
+			targetProxy = 8B2E2A440F9901C700F80E11 /* PBXContainerItemProxy */;
+		};
+		8B2E2A470F9901C900F80E11 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B2E2A400F99018600F80E11 /* HeaderDoc */;
+			targetProxy = 8B2E2A460F9901C900F80E11 /* PBXContainerItemProxy */;
 		};
 		8B3D266F0EAE8E7A004EA504 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7853,6 +7890,34 @@
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/AppleScriptPlugins-Info.plist";
 				PRODUCT_NAME = AppleScriptPlugins;
 				WRAPPER_EXTENSION = hgs;
+			};
+			name = Release;
+		};
+		8B2E2A410F99018600F80E11 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = HeaderDoc;
+			};
+			name = Debug;
+		};
+		8B2E2A420F99018600F80E11 /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = HeaderDoc;
+			};
+			name = "Debug-gcov";
+		};
+		8B2E2A430F99018600F80E11 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = HeaderDoc;
+				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -9120,6 +9185,16 @@
 				8B20E4490DB432BA001E429B /* Debug */,
 				8B95CBBD0F6B1DEE003BDBDD /* Debug-gcov */,
 				8B20E44A0DB432BA001E429B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8B2E2A840F9901E300F80E11 /* Build configuration list for PBXAggregateTarget "HeaderDoc" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B2E2A410F99018600F80E11 /* Debug */,
+				8B2E2A420F99018600F80E11 /* Debug-gcov */,
+				8B2E2A430F99018600F80E11 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

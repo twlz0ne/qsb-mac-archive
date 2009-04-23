@@ -34,6 +34,7 @@
 #import "ApplicationUISource.h"
 #import "GTMAXUIElement.h"
 #import "ApplicationUIAction.h"
+#import "HGSStringUtil.h"
 
 NSString *const kAppUISourceAttributeElementKey 
   = @"kHGSAppUISourceAttributeElementKey";

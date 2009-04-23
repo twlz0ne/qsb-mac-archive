@@ -230,9 +230,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   [self clearResultIndex];
   
   for (HGSResult *corpus in visibleCorpora_) {
-    [self indexResult:corpus
-           nameString:[corpus displayName]
-          otherString:nil];
+    [self indexResult:corpus];
   }
   
   return YES;

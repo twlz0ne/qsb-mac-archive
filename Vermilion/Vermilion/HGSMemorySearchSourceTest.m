@@ -121,13 +121,13 @@
                                          attributes:nil];
   STAssertNotNil(result, nil);
   [memSource indexResult:result
-              nameString:@"testName"
-       otherStringsArray:[NSArray arrayWithObjects:@"foo", @"bar", @"bam", nil]];
+                    name:@"testName"
+              otherTerms:[NSArray arrayWithObjects:@"foo", @"bar", @"bam", nil]];
   
   id searchQueryMock = [OCMockObject mockForClass:[HGSQuery class]];
   HGSSearchOperation *op 
     = [[[HGSSearchOperation alloc] initWithQuery:searchQueryMock] autorelease];
-  [[[searchQueryMock stub] andReturn:[NSSet setWithObject:@"foo"]] uniqueWords];
+  [[[searchQueryMock stub] andReturn:@"foo"] normalizedQueryString];
   [memSource performSearchOperation:op];
 }
 @end

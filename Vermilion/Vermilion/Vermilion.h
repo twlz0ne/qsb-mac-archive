@@ -58,4 +58,3 @@
 #import <Vermilion/HGSSimpleAccount.h>
 #import <Vermilion/HGSSimpleAccountEditController.h>
 #import <Vermilion/HGSSimpleAccountSetUpViewController.h>
-#import <Vermilion/HGSStringUtil.h>

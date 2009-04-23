@@ -118,9 +118,7 @@
     HGSResult *result = [HGSResult resultWithFilePath:subpath
                                                source:self
                                            attributes:nil];
-    [self indexResult:result
-           nameString:[result displayName]
-          otherString:nil];
+    [self indexResult:result];
   }
   [self saveResultsCache];
 }

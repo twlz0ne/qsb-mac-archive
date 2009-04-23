@@ -385,29 +385,19 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
     }
   }
 
-  // Split the query string into a real spotlight query
-
-  //NSString *const kPredicateString = @"(kMDItemTextContent = '*%@*'cd || kMDItemTitle = '*%@*'cd)";
-  NSString *const kPredicateString = @"(* = \"%@*\"cdw || kMDItemTextContent = \"%@*\"cdw)";
-
-  NSSet *queryWords = [query uniqueWords];
-  for (NSString *queryTerm in queryWords) {
-    NSString *predicateSegment
-      = [NSString stringWithFormat:kPredicateString, queryTerm, queryTerm];
-    [predicateSegments addObject:predicateSegment];
-  }
-
-  // Since Spotlight can return a lot of stuff, we only run the query if any
-  // one of the following are true:
-  //   - We got a pivot
-  //   - We had > 1 component to the query
-  //   - The only component is at least 4 characters
-  if (!pivotObject &&
-      ([queryWords count] == 1) &&
-      ([[queryWords anyObject] length] < 4)) {
+  // Since Spotlight can return a lot of stuff, we only run the query if
+  // it is at least 5 characters long
+  NSString *rawQuery = [query rawQueryString];
+  if (([rawQuery length] < 5)) {
     // doesn't meet out min requirements
     return;
   }
+  
+  NSString *const kPredicateString = @"(* = \"%@*\"cdw || kMDItemTextContent = \"%@*\"cdw)";
+
+  NSString *predicateSegment 
+    = [NSString stringWithFormat:kPredicateString, rawQuery, rawQuery];
+  [predicateSegments addObject:predicateSegment];
 
   // if we have a uti filter, add it
   NSString *utiFilter = [self utiFilter];
@@ -597,18 +587,16 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   
   //  if (fsName) [result setValue:fsName forKey:(NSString *)kMDItemFSName];
   // check for a name match
-  NSSet* queryWords = [context->query_ uniqueWords];
-  NSStringCompareOptions searchOpts = NSCaseInsensitiveSearch |
-    NSDiacriticInsensitiveSearch | NSWidthInsensitiveSearch;
-  for (NSString *term in queryWords) {
-    // TODO(dmaclach): probably want to do some segmenting here so it's not a
-    // match in the middle
-    if ((displayName && ([displayName rangeOfString:term options:searchOpts].location != NSNotFound)) ||
-        (fsName && ([fsName rangeOfString:term options:searchOpts].location != NSNotFound)) ||
-        (title && ([title rangeOfString:term options:searchOpts].location != NSNotFound))) {
-      rankFlags |= eHGSNameMatchRankFlag;
-      break;
+  NSString *normalizedString = [context->query_ normalizedQueryString];
+  CGFloat rank = HGSScoreForAbbreviation(displayName, normalizedString, NULL);
+  if (!(rank > 0)) {
+    rank = HGSScoreForAbbreviation(fsName, normalizedString, NULL);
+    if (!(rank > 0)) {
+      rank = HGSScoreForAbbreviation(title, normalizedString, NULL);
     }
+  }
+  if (rank > 0) {
+    rankFlags |= eHGSNameMatchRankFlag;
   }
   
   // Persistent user paths (Dock, Finder sidebar, etc.)
@@ -670,7 +658,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   NSDictionary *hgsAttributes 
     = [NSDictionary dictionaryWithObjectsAndKeys:
        lastUsedDate, kHGSObjectAttributeLastUsedDateKey,
-       [NSNumber numberWithUnsignedInteger:rankFlags], kHGSObjectAttributeRankKey,
+       [NSNumber numberWithUnsignedInteger:rankFlags], kHGSObjectAttributeRankFlagsKey,
        (isURL ? uriPath : nil), kHGSObjectAttributeSourceURLKey,
        nil];
   

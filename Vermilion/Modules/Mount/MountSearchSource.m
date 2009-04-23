@@ -189,8 +189,8 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
                                                  source:self
                                              attributes:attributes];
         [self indexResult:hgsResult 
-               nameString:name 
-        otherStringsArray:otherTerms];
+                     name:name 
+               otherTerms:otherTerms];
       }
     }
   }

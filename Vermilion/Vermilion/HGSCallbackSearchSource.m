@@ -71,21 +71,6 @@
   return NO;
 }
 
-- (NSSet *)normalizedTokenSetForString:(NSString*)string {
-  NSSet *set = nil;
-  if ([string length]) {
-    // do our normalization...
-    NSString *preppedString
-      = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:string];
-    
-    // now split them into terms and use sets to keep each just once...
-    NSArray *terms = [HGSTokenizer tokenizeString:preppedString
-                                        wordsOnly:YES];
-    set = [NSSet setWithArray:terms];
-  }
-  return set;
-}  
-
 @end
 
 @implementation HGSCallbackSearchOperation

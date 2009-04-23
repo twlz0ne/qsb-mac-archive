@@ -34,8 +34,6 @@
 
 static NSString *kTrashResultType = HGS_SUBTYPE(@"trash", @"Trash");
 static NSString *kTrashResultUrl = @"gtrash://trash/result";
-static NSStringCompareOptions kPathCompareOptions
-  = NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch;
 
 @interface TrashSearchSource : HGSCallbackSearchSource {
  @private
@@ -68,27 +66,24 @@ static NSStringCompareOptions kPathCompareOptions
   // and can be pivoted upon and acted upon by the normal
   // contingent of plugins.
   HGSResult *pivotObject = [query pivotObject];
+  BOOL isValid = NO;
   if (pivotObject) {
-    return [[pivotObject type] isEqual:kTrashResultType];
+    isValid = [[pivotObject type] isEqual:kTrashResultType];
   } else {
     NSString *trash = [HGSLocalizedString(@"Trash", @"Trash") lowercaseString];
-    NSSet *terms = [query uniqueWords];
-    for (NSString *term in terms) {
-      if ([trash hasPrefix:term]) {
-        return YES;
-      }
-    }
+    NSString *queryString = [query normalizedQueryString];
+    isValid = [trash hasPrefix:queryString];
   }
-  return NO;
+  return isValid;
 }
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
-  NSMutableSet *results = [NSMutableSet set];
-
-  HGSResult *pivotObject = [[operation query] pivotObject];
+  NSMutableArray *results = [NSMutableArray array];
+  HGSQuery *query = [operation query];
+  HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
     OSErr err = noErr;
-    NSSet *terms = [[operation query] uniqueWords];
+    NSString *normalizedQueryString = [query normalizedQueryString];
     for (ItemCount i = 1; err == noErr || err != nsvErr; ++i) {
       FSVolumeRefNum refNum;
       HFSUniStr255 name;
@@ -106,25 +101,26 @@ static NSStringCompareOptions kPathCompareOptions
             NSArray *contents
               = [[NSFileManager defaultManager]
                  directoryContentsAtPath:basePath];
+            NSUInteger normalizedLength = [normalizedQueryString length];
             for (NSString *file in contents) {
-              BOOL add = NO;
-              if ([terms count] == 0) {
-                add = YES;
+              CGFloat rank = 0;
+              if (normalizedLength == 0) {
+                rank = 1.0;
               } else {
-                for (NSString *term in terms) {
-                  NSRange range = [file rangeOfString:term
-                                              options:kPathCompareOptions];
-                  if (range.location != NSNotFound) {
-                    add = YES;
-                  }
-                }
+                rank = HGSScoreForAbbreviation(file,
+                                               normalizedQueryString, 
+                                               NULL);
               }
-              if (add) {
+              if (rank > 0) {
+                NSNumber *nsRank = [NSNumber numberWithFloat:rank];
+                NSDictionary *attributes 
+                  = [NSDictionary dictionaryWithObjectsAndKeys:
+                     nsRank, kHGSObjectAttributeRankKey, nil];
                 NSString *fullPath
                   = [basePath stringByAppendingPathComponent:file];
                 HGSResult *result = [HGSResult resultWithFilePath:fullPath
                                                            source:self
-                                                       attributes:nil];
+                                                       attributes:attributes];
                 [results addObject:result];
               }
             }
@@ -147,7 +143,7 @@ static NSStringCompareOptions kPathCompareOptions
     [results addObject:result];
   }
 
-  [operation setResults:[results allObjects]];
+  [operation setResults:results];
 }
 
 @end

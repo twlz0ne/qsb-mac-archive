@@ -121,9 +121,7 @@ static NSString* const kCachedNameTerms = @"NameTerms";
                           type:HGS_SUBTYPE(kHGSTypeWebBookmark, @"safari")
                         source:self
                     attributes:attributes];
-  [self indexResult:result
-         nameString:title
-        otherString:nil];
+  [self indexResult:result];
 }
 
 - (void)updateIndex {

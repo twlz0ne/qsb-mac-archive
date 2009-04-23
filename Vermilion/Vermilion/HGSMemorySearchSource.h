@@ -59,20 +59,22 @@
 // Clear out the data currenting indexing w/in the source
 - (void)clearResultIndex;
 
-// Add a result to the memory index.  |nameString| are the words that count as
-// name matches for |hgsResult|.  |otherString| are the words that can be used
-// to match |hgsResult| but of less importance.  The two strings (|nameString|
-// and |otherString|) will be properly broken into terms for the caller, so they
-// don't need to worry about the details.  |otherString| can be nil since it's
+// Add a result to the memory index.  |name| are the words that count as
+// name matches for |hgsResult|.  |otherTerm| are the words that can be used
+// to match |hgsResult| but of less importance.  The two strings (|name|
+// and |otherTerm|) will be properly broken into terms for the caller, so they
+// don't need to worry about the details.  |otherTerm| can be nil since it's
 // optional.
-- (void)indexResult:(HGSResult*)hgsResult
-         nameString:(NSString*)nameString
-        otherString:(NSString*)otherString;
+- (void)indexResult:(HGSResult *)hgsResult
+               name:(NSString *)name
+          otherTerm:(NSString *)otherTerm;
 // Like the above, but takes an array of "other" strings.
-- (void)indexResult:(HGSResult*)hgsResult
-         nameString:(NSString*)nameString
-  otherStringsArray:(NSArray*)otherStrings;
-
+- (void)indexResult:(HGSResult *)hgsResult
+               name:(NSString *)name
+         otherTerms:(NSArray *)otherTerms;
+// Like the above, but uses [hgsResult displayName] as the name, and has
+// no otherTerms
+- (void)indexResult:(HGSResult *)hgsResult;
 // Save the contents of the memory index to disk. If the contents of the index
 // haven't changed since the last call to saveResultsCache or loadResultsCache,
 // the write is skipped (although there is still a small amount of overhead

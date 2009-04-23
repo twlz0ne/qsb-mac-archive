@@ -161,8 +161,8 @@ static NSURL* domainURLForURLString(NSString* urlString) {
                     attributes:attributes];
   // Get description terms, and store those as non-title-match data.
   [self indexResult:result
-         nameString:nameString
-        otherString:[dict objectForKey:@"Description"]];
+               name:nameString
+          otherTerm:[dict objectForKey:@"Description"]];
 }
 
 - (void)updateIndex {

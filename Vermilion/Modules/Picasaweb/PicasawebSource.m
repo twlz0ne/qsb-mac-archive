@@ -305,8 +305,8 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                           source:self
                                       attributes:attributes];
     [self indexResult:result
-           nameString:albumTitle
-          otherString:albumDescription];
+                 name:albumTitle
+            otherTerm:albumDescription];
     
     // Now index the photos in the album.
     NSURL *photoInfoFeedURL = [[album feedLink] URL];
@@ -449,8 +449,8 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                       attributes:attributes];
     
     [self indexResult:result
-           nameString:photoTitle
-    otherStringsArray:otherStrings];
+                 name:photoTitle
+           otherTerms:otherStrings];
     
   }
 }

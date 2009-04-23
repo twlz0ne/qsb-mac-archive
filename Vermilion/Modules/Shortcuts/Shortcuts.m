@@ -52,7 +52,6 @@
 #if TARGET_OS_IPHONE
 #import "GMOSourceConfigProvider.h"
 #else
-#import "GTMNSFileManager+Carbon.h"
 #import "QSBSearchWindowController.h"
 #import "QSBSearchViewController.h"
 #import "QSBSearchController.h"
@@ -81,6 +80,8 @@ static const unsigned int kMaxEntriesPerShortcut = 3;
   HGSSQLiteBackedCache *cache_;
 }
 
+@property (readonly, retain) HGSSQLiteBackedCache *cache;
+
 // Tell the database that "object" was selected for shortcut, and let it do its
 // magic internally to update itself.
 - (BOOL)updateShortcutFromController:(QSBSearchController *)searchController 
@@ -104,7 +105,7 @@ static inline int KeyLength(NSString *a, NSString *b, void *c) {
 }
 
 @implementation ShortcutsSource
-GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
+@synthesize cache = cache_;
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -156,13 +157,9 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
   return defaultObject;
 }
 
-- (HGSSQLiteBackedCache *)cache {
-  return cache_;
-}
-
 - (HGSResult *)unarchiveResultForIdentifier:(NSString *)identifier {
   id object = [[self cache] valueForKey:identifier];
-  
+  HGSResult *result = nil;
   // Make sure we get out dictionary we expect of source name and object
   if ([object isKindOfClass:[NSDictionary class]] &&
       ([object count] == 1)) {
@@ -171,14 +168,14 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
     NSDictionary *archivedRep = [archiveDict objectForKey:sourceName];
     if ([archivedRep isKindOfClass:[NSDictionary class]]) {
       HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
-      HGSSearchSource *source = [sourcesPoint extensionWithIdentifier:sourceName];
-      HGSResult *result = [source resultWithArchivedRepresentation:archivedRep];
-      return result;
+      HGSSearchSource *source 
+       = [sourcesPoint extensionWithIdentifier:sourceName];
+      result = [source resultWithArchivedRepresentation:archivedRep];
     } else {
       HGSLogDebug(@"didn't have a dictionary for the hgsobject's archived rep");
     }
   }
-  return nil;
+  return result;
 }
 
 // TODO(alcor): move storage of shortcuts to a sqlite db
@@ -190,9 +187,9 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
   [defaults synchronize];
 }
 
-- (NSMutableArray *)arrayForShortcut:(NSString *)key {
+- (NSArray *)arrayForShortcut:(NSString *)key {
   NSMutableDictionary *shortcutDB = [self readShortcutData];
-  NSMutableArray *valueArray = [shortcutDB objectForKey:key];
+  NSArray *valueArray = [shortcutDB objectForKey:key];
   return valueArray;
 }
 
@@ -227,18 +224,19 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
   }
   
   HGSSearchSource *source = [result source];
-  NSMutableDictionary *archiveDict = [source archiveRepresentationForResult:result];
+  NSMutableDictionary *archiveDict 
+    = [source archiveRepresentationForResult:result];
   if (!archiveDict || [archiveDict count] == 0) {
     return NO;
   }
   
-  NSMutableArray *valueArray = [self arrayForShortcut:normalizeShortcut];
-  // see if we have an array for the given shortcut
-  
   NSString *idString = [identifier absoluteString];
   
   @synchronized ([self class]) {
-
+    NSMutableArray *valueArray 
+      = [[[self arrayForShortcut:normalizeShortcut] mutableCopy] autorelease];
+    // see if we have an array for the given shortcut
+    
     int currentIndex = [valueArray indexOfObject:idString];
     
     // The only way to be inserted at 0 is if you are in 2nd place, 
@@ -252,10 +250,8 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
       if (!valueArray) {
         valueArray = [NSMutableArray array]; 
       } else {
-        valueArray = [[valueArray mutableCopy] autorelease];
+        [valueArray removeObject:idString];
       }
-
-      [valueArray removeObject:idString];
       [valueArray insertObject:idString atIndex:newIndex];
     }
     
@@ -284,42 +280,33 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
   NSArray *results = [self rankedObjectsForShortcut:queryString];
   NSMutableArray *rankedResults 
     = [NSMutableArray arrayWithCapacity:[results count]];
-  NSEnumerator *enumerator = [results objectEnumerator];
-  HGSResult *result;
-  for (NSUInteger i = 0; (result = [enumerator nextObject]); ++i) {
+  NSUInteger rank = 1000;
+  for (HGSResult *result in results) {
     // Decrease the score for each
     HGSMutableResult *mutableResult = [[result mutableCopy] autorelease];
-    [mutableResult setRank:1000 - i];
+    [mutableResult setRank:rank];
+    rank -= 1;
     [rankedResults addObject:mutableResult];
   }
   [operation setResults:rankedResults];
 }
 
 - (NSArray *)rankedIdentifiersForNormalizedShortcut:(NSString *)normalizeShortcut {
-  
-  NSMutableArray *valueArray = [NSMutableArray array];
   NSDictionary *shortcutDB = [self readShortcutData];
   NSArray *keyArray = [[shortcutDB allKeys] sortedArrayUsingFunction:KeyLength
                                                              context:NULL];
-  
   NSMutableSet *identifierSet = [NSMutableSet set];
-  NSEnumerator *keys = [keyArray objectEnumerator];
-  NSString *key;
-  while ((key = [keys nextObject])) {
+  for (NSString *key in keyArray) {
     if ([key hasPrefix:normalizeShortcut]) {
-      NSString *identifier;
-      NSEnumerator *idEnumerator 
-        = [[shortcutDB objectForKey:key] objectEnumerator];
-      while ((identifier = [idEnumerator nextObject])) {
+      for(NSString *identifier in [shortcutDB objectForKey:key]) {
         // Filter out duplicates
         if (![identifierSet containsObject:identifier]) {
           [identifierSet addObject:identifier];
-          [valueArray addObject:identifier];
         }
       }
     }
   }
-  return valueArray;
+  return [identifierSet allObjects];
 }
 
 - (NSArray *)rankedObjectsForShortcut:(NSString *)shortcut {
@@ -328,12 +315,9 @@ GTM_METHOD_CHECK(NSFileManager, gtm_aliasDataForPath:);
   NSArray *identifiers 
     = [self rankedIdentifiersForNormalizedShortcut:normalizeShortcut];
   
-  NSMutableArray *results = [NSMutableArray array];
-  
-  NSEnumerator *idEnumerator = [identifiers objectEnumerator];
-  NSString *identifier = nil;
-  while ((identifier = [idEnumerator nextObject])) {
-    
+  NSMutableArray *results 
+    = [NSMutableArray arrayWithCapacity:[identifiers count]];
+  for (NSString *identifier in identifiers) {
     HGSResult *result = [self unarchiveResultForIdentifier:identifier];
     if (result) {
       [results addObject:result];

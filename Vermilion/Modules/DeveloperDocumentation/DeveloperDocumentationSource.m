@@ -150,9 +150,7 @@ static NSString *const kiPhoneReferenceDocSetPath
                               type:HGS_SUBTYPE(kHGSTypeFile, @"developerdocs")
                             source:self
                         attributes:attributes];  
-      [self indexResult:result
-             nameString:name
-            otherString:nil];
+      [self indexResult:result];
     }
     [innerPool release];
   }

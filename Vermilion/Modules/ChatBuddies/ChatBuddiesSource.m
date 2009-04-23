@@ -404,8 +404,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       NSString *name = [self nameStringForBuddy:buddyResult];
       NSArray *otherStrings = [self otherTermStringsForBuddy:buddyResult];
       [self indexResult:buddyResult
-             nameString:name
-      otherStringsArray:otherStrings];
+                   name:name
+             otherTerms:otherStrings];
     }
   }
 }
@@ -459,8 +459,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
           NSString *name = [self nameStringForBuddy:newBuddy];
           NSArray *terms = [self otherTermStringsForBuddy:newBuddy];
           [self indexResult:newBuddy
-                 nameString:name
-          otherStringsArray:terms];
+                       name:name
+                 otherTerms:terms];
         }
       }  // @syncronized(buddyResults_)
     } else {

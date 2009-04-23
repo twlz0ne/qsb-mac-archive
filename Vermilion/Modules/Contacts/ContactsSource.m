@@ -193,8 +193,8 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
                         attributes:attributes];
       [newResults addObject:hgsResult];
       [self indexResult:hgsResult
-             nameString:name
-      otherStringsArray:otherTermStrings];
+                   name:name
+             otherTerms:otherTermStrings];
     }
   }
   

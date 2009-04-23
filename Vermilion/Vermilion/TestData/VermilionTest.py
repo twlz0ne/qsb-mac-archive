@@ -53,7 +53,7 @@ except ImportError:
     class Query(object):
       def __init__(self, phrase):
         self.raw_query = phrase
-        self.unique_words = phrase.split(" ")
+        self.normalized_query = phrase
         self.pivot_object = None
         self.finished = False
         self.results = []

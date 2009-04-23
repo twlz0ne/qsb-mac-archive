@@ -32,11 +32,10 @@
 
 #import "HGSQuery.h"
 #import "HGSTokenizer.h"
-#import "HGSStringUtil.h"
 
 @implementation HGSQuery
 
-@synthesize uniqueWords = uniqueWords_;
+@synthesize normalizedQueryString = normalizedQueryString_;
 @synthesize rawQueryString = rawQueryString_;
 @synthesize results = results_;
 @synthesize parent = parent_;
@@ -57,16 +56,9 @@
     if (!rawQueryString_ && results_) {
       rawQueryString_ = @"";
     }
-    NSString *prepedQuery
-      = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:rawQueryString_];
-    
-    // first, just collect all the words
-    NSArray *wordsArray = [HGSTokenizer tokenizeString:prepedQuery wordsOnly:YES];
-    if (wordsArray) {
-      // now unique them
-      uniqueWords_ = [[NSSet alloc] initWithArray:wordsArray];
-    }
-    if (!uniqueWords_) {
+    normalizedQueryString_ 
+      = [[HGSTokenizer tokenizeString:rawQueryString_] retain];
+    if (!normalizedQueryString_) {
       [self release];
       self = nil;
     }
@@ -76,7 +68,7 @@
 
 - (void)dealloc {
   [rawQueryString_ release];
-  [uniqueWords_ release];
+  [normalizedQueryString_ release];
   [results_ release];
   [parent_ release];
   [super dealloc];

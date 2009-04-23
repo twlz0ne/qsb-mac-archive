@@ -261,9 +261,7 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
   [self clearResultIndex];
   for (SharedFileListStorage* storage in storage_) {
     for (HGSResult *result in [storage results]) {
-      [self indexResult:result
-             nameString:[result displayName]
-            otherString:nil];   
+      [self indexResult:result];   
     }
   }
 }

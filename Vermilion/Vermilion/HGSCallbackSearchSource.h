@@ -55,7 +55,4 @@
 // meaning a thread will be created for each search operation.
 - (BOOL)isSearchConcurrent;
 
-// Given a string (for example a "name" of a result), tokenizes it for
-// easy searching for matches.
-- (NSSet *)normalizedTokenSetForString:(NSString*)string;
 @end

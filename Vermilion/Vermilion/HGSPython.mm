@@ -54,11 +54,14 @@ static const char *kPythonResultDisplayNameKey = "DISPLAY_NAME";
 static const char *kPythonResultSnippetKey = "SNIPPET";
 static const char *kPythonResultImageKey = "IMAGE";
 static const char *kPythonResultDefaultActionKey = "DEFAULT_ACTION";
+static const char *kHGSPythonNormalizedQueryMemberName = "normalized_query";
+static const char *kHGSPythonRawQueryMemberName = "raw_query";
+static const char *kHGSPythonPivotObjectMemberName = "pivot_object";
 
 typedef struct {
   PyObject_HEAD
   PyObject  *rawQuery_;    // string
-  PyObject  *uniqueWords_; // list
+  PyObject  *normalizedQuery_; // string
   PyObject  *pivotObject_; // dictionary
   HGSPythonSearchOperation  *operation_;
 } Query;
@@ -84,15 +87,16 @@ static PyMethodDef QueryMethods[] = {
 };
 
 static PyMemberDef QueryMembers[] = {
-  { const_cast<char*>("unique_words"), 
-    T_OBJECT_EX, offsetof(Query, uniqueWords_), 0,
-    const_cast<char*>("A list of unique words found in the query string. Each "
-                      "word is a string that has been lower cased with "
-                      "diacriticals removed.")},
-  { const_cast<char*>("raw_query"), 
+  { const_cast<char*>(kHGSPythonNormalizedQueryMemberName), 
+    T_OBJECT_EX, offsetof(Query, normalizedQuery_), 0,
+    const_cast<char*>("The raw query broken into tokens delimited by spaces. "
+                      "It has also been normalized to having no diacriticals "
+                      "or excess punctuation, and has been converted to "
+                      "lowercase.")},
+  { const_cast<char*>(kHGSPythonRawQueryMemberName), 
     T_OBJECT_EX, offsetof(Query, rawQuery_), 0,
     const_cast<char*>("The unprocessed query entered by the user.") },
-  { const_cast<char*>("pivot_object"),
+  { const_cast<char*>(kHGSPythonPivotObjectMemberName),
     T_OBJECT_EX, offsetof(Query, pivotObject_), 0,
     const_cast<char*>("If present, the original search result from which this "
                       "query is pivoting.") },
@@ -321,32 +325,22 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPython, sharedPython);
   PyObject *result = nil;  
   if (vermilionModule_) {
     PythonStackLock gilLock;
-    NSSet *queryWords = [query uniqueWords];
     PyObject *moduleDict = PyModule_GetDict(vermilionModule_);
     if (moduleDict) {
       PyObject *func = PyDict_GetItemString(moduleDict, "Query");
       if (func) {
         PyObject *args = PyTuple_New(3);
         if (args) {
-          // Create the query_words argument
-          PyObject *pyQueryWords = PyList_New([queryWords count]);
-          if (pyQueryWords) {
-            Py_ssize_t index = 0;
-            for (NSString *word in queryWords) {
-              const char *utf8 = [word UTF8String];
-              if (utf8) {
-                PyList_SetItem(pyQueryWords, index, PyString_FromString(utf8));
-              } else {
-                PyList_SetItem(pyQueryWords, index, PyString_FromString(""));
-              }
-              index++;
-            }
-            // PyTuple_SetItem steals the ref to pyQueryWords
-            PyTuple_SetItem(args, 0, pyQueryWords);
+          // Create the normalized_query argument (ref stolen by PyTuple_SetItem
+          const char *utf8 = [[query normalizedQueryString] UTF8String];
+          if (utf8) {
+            PyTuple_SetItem(args, 0, PyString_FromString(utf8));
+          } else {
+            PyTuple_SetItem(args, 0, PyString_FromString(""));
           }
           
           // Create the raw_query argument (ref stolen by PyTuple_SetItem()
-          const char *utf8 = [[query rawQueryString] UTF8String];
+          utf8 = [[query rawQueryString] UTF8String];
           if (utf8) {
             PyTuple_SetItem(args, 1, PyString_FromString(utf8));
           } else {
@@ -499,8 +493,8 @@ static PyObject *QueryNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
       Py_DECREF(self);
       return nil;
     }
-    self->uniqueWords_ = PyList_New(0);
-    if (!self->uniqueWords_) {
+    self->normalizedQuery_ = PyString_FromString("");
+    if (!self->normalizedQuery_) {
       Py_DECREF(self);
       return nil;
     }
@@ -516,7 +510,7 @@ static PyObject *QueryNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 // Destructor
 static void QueryDealloc(Query *self) {
     Py_XDECREF(self->rawQuery_);
-    Py_XDECREF(self->uniqueWords_);
+    Py_XDECREF(self->normalizedQuery_);
     Py_XDECREF(self->pivotObject_);
     [self->operation_ release];
     self->ob_type->tp_free((PyObject *)self);
@@ -525,21 +519,21 @@ static void QueryDealloc(Query *self) {
 // Like Obj-C, the Python C API uses a two step alloc/init process
 static int QueryInit(Query *self, PyObject *args, PyObject *kwds) {
   static const char *kwlist[] = {
-    "query_words",
-    "raw_query",
-    "pivot_object",
+    kHGSPythonNormalizedQueryMemberName,
+    kHGSPythonRawQueryMemberName,
+    kHGSPythonPivotObjectMemberName,
     nil
   };
-  PyObject *queryWords = nil, *rawQuery = nil, *pivotObject = nil, *tmp;
+  PyObject *normalizedQuery = nil, *rawQuery = nil, *pivotObject = nil, *tmp;
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", 
-                                   const_cast<char**>(kwlist), &queryWords, 
+                                   const_cast<char**>(kwlist), &normalizedQuery, 
                                    &rawQuery, &pivotObject)) {
     return -1;
   }
-  if (queryWords) {
-    tmp = self->uniqueWords_;
-    Py_INCREF(queryWords);
-    self->uniqueWords_ = queryWords;
+  if (normalizedQuery) {
+    tmp = self->normalizedQuery_;
+    Py_INCREF(normalizedQuery);
+    self->normalizedQuery_ = normalizedQuery;
     Py_XDECREF(tmp);
   }
   if (rawQuery) {
@@ -560,11 +554,11 @@ static int QueryInit(Query *self, PyObject *args, PyObject *kwds) {
 static PyObject *QueryGetAttr(Query *self, char *name) {
   PyObject *result = nil;
 
-  if (!strcmp(name, "unique_words")) {
-    result = self->uniqueWords_;
-  } else if (!strcmp(name, "raw_query")) {
+  if (!strcmp(name, kHGSPythonNormalizedQueryMemberName)) {
+    result = self->normalizedQuery_;
+  } else if (!strcmp(name, kHGSPythonRawQueryMemberName)) {
     result = self->rawQuery_;
-  } else if (!strcmp(name, "pivot_object")) {
+  } else if (!strcmp(name, kHGSPythonPivotObjectMemberName)) {
     result = self->pivotObject_;
   }
   

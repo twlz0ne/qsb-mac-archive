@@ -382,8 +382,8 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   NSArray* authorArray = [self authorArrayForGDataPeople:[doc authors]];
 
   [self indexResult:result
-         nameString:docTitle
-  otherStringsArray:authorArray];
+               name:docTitle
+         otherTerms:authorArray];
 }
 
 - (NSArray*)authorArrayForGDataPeople:(NSArray*)people {

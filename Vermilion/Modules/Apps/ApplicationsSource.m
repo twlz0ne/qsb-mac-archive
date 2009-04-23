@@ -146,10 +146,10 @@ static NSString *const kApplicationSourcePredicateString
   indexing_ = YES;
   [self clearResultIndex];
   NSArray *mdAttributeNames = [NSArray arrayWithObjects:
-                               (NSString*)kMDItemTitle,
-                               (NSString*)kMDItemDisplayName,
-                               (NSString*)kMDItemPath,
-                               (NSString*)kMDItemLastUsedDate,
+                               (NSString *)kMDItemTitle,
+                               (NSString *)kMDItemDisplayName,
+                               (NSString *)kMDItemPath,
+                               (NSString *)kMDItemLastUsedDate,
                                nil];
   NSUInteger resultCount = [query resultCount];
   //TODO(dmaclach): remove this once real ranking is in
@@ -174,8 +174,11 @@ static NSString *const kApplicationSourcePredicateString
     if (!name) {
       name = [mdAttributes objectForKey:(NSString*)kMDItemDisplayName];
     }
+    
+    NSString *fileSystemName = [path lastPathComponent];
+    fileSystemName = [fileSystemName stringByDeletingPathExtension];
     if (!name) {
-      name = [[path lastPathComponent] stringByDeletingPathExtension];
+      name = fileSystemName;
     }
         
     if ([self pathIsPrefPane:path]) {
@@ -202,16 +205,21 @@ static NSString *const kApplicationSourcePredicateString
 
     // create a HGSResult to talk to the rest of the application
     HGSResult *hgsResult 
-      = [HGSResult resultWithURL:[NSURL fileURLWithPath:path]
-                            name:name
-                            type:kHGSTypeFileApplication
+      = [HGSResult resultWithFilePath:path
                           source:self
                       attributes:attributes];
     
     // add it to the result array for searching
-    [self indexResult:hgsResult
-           nameString:name
-          otherString:nil];
+    // By adding the display name and the file system name this should help
+    // with the can't find Quicksilver problem because somebody decided
+    // to get fancy and encode Quicksilver's name in fancy high UTF codes.
+    if (![name isEqualToString:fileSystemName]) {
+      [self indexResult:hgsResult
+                   name:name
+              otherTerm:fileSystemName];
+    } else {
+      [self indexResult:hgsResult];
+    }
   }
   
   // Due to a bug in 10.5.6 we can't find the network prefpane
@@ -235,9 +243,7 @@ static NSString *const kApplicationSourcePredicateString
                           source:self
                       attributes:attributes];
 
-    [self indexResult:hgsResult
-           nameString:name
-          otherString:nil];
+    [self indexResult:hgsResult];
   } else {
     HGSLog(@"Unable to find Network.prefpane");
   }

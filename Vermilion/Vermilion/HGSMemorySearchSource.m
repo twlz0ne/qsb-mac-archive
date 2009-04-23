@@ -38,24 +38,14 @@
 #import "HGSDelegate.h"
 #import "HGSPluginLoader.h"
 #import "HGSLog.h"
+#import "HGSAbbreviationRanker.h"
 
 static NSString* const kHGSMemorySourceResultKey = @"HGSMSResultObject";
-static NSString* const kHGSMemorySourceNameTermsKey = @"HGSMSNameTerms";
+static NSString* const kHGSMemorySourceNameKey = @"HGSMSName";
 static NSString* const kHGSMemorySourceOtherTermsKey = @"HGSMSOtherTerms";
-
-// Done as a C func so it can be inlined below to make matching as fast/simple
-// as possible.
-static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *term) {
-  // Since we normalized all the strings up front, we can do hasPrefix for the
-  // matches.
-  NSUInteger termLen = [term length];
-  for (NSString *aWord in wordSet) {
-    if (([aWord length] >= termLen) && [aWord hasPrefix:term]) {
-      return YES;
-    }
-  }
-  return NO;
-}
+static NSString* const kHGSMemorySourceVersionKey = @"HGSMSVersion";
+static NSString* const kHGSMemorySourceEntriesKey = @"HGSMSEntries";
+static NSString* const kHGSMemorySourceVersion = @"1";
 
 // HGSMemorySearchSourceObject is our internal storage for caching
 // results with the terms that match for them. We used to use an
@@ -63,30 +53,30 @@ static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *t
 @interface HGSMemorySearchSourceObject : NSObject {
  @private
   HGSResult *result_;
-  NSSet *nameTerms_;
-  NSSet *otherTerms_;
+  NSString *name_;
+  NSArray *otherTerms_;
 }
 @property (nonatomic, retain, readonly) HGSResult *result;
-@property (nonatomic, retain, readonly) NSSet *nameTerms;
-@property (nonatomic, retain, readonly) NSSet *otherTerms;
+@property (nonatomic, copy, readonly) NSString *name;
+@property (nonatomic, retain, readonly) NSArray *otherTerms;
 
 - (id)initWithResult:(HGSResult *)result 
-           nameTerms:(NSSet *)nameTerms 
-          otherTerms:(NSSet *)otherTerms;
+                name:(NSString *)name 
+          otherTerms:(NSArray *)otherTerms;
 
 @end
 
 @implementation HGSMemorySearchSourceObject
 @synthesize result = result_;
-@synthesize nameTerms = nameTerms_;
+@synthesize name = name_;
 @synthesize otherTerms = otherTerms_;
 
 - (id)initWithResult:(HGSResult *)result 
-           nameTerms:(NSSet *)nameTerms 
-          otherTerms:(NSSet *)otherTerms {
+                name:(NSString *)nameTerms 
+          otherTerms:(NSArray *)otherTerms {
   if ((self = [super init])) {
     result_ = [result retain];
-    nameTerms_ = [nameTerms retain];
+    name_ = [nameTerms copy];
     otherTerms_ = [otherTerms retain];
   }
   return self;
@@ -94,7 +84,7 @@ static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *t
 
 - (void)dealloc {
   [result_ release];
-  [nameTerms_ release];
+  [name_ release];
   [otherTerms_ release];
   [super dealloc];
 }
@@ -128,12 +118,11 @@ static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *t
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
   HGSQuery* query = [operation query];
   NSMutableArray* results = [NSMutableArray array];
-  NSSet* queryWords = [query uniqueWords];
-  NSUInteger queryWordsCount = [queryWords count];
-  
+  NSString *normalizedQuery = [query normalizedQueryString];
+  NSUInteger normalizedLength = [normalizedQuery length];
   @synchronized(resultsArray_) {
 
-    if ((queryWordsCount == 0) && ([query pivotObject] != nil)) {
+    if ((normalizedLength == 0) && ([query pivotObject])) {
       // Per the note above this class in the header, if we get a pivot w/o
       // any query terms, we match everything so the subclass can filter it
       // w/in |processMatchingResults:forQuery:|.
@@ -151,48 +140,46 @@ static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *t
         [results addObject:resultCopy];
       }
         
-    } else if (queryWordsCount > 0) {
+    } else if (normalizedLength > 0) {
 
       // Match the terms
-      NSEnumerator* indexEnumerator = [resultsArray_ objectEnumerator];
-      HGSMemorySearchSourceObject* indexObject;
-      while (((indexObject = [indexEnumerator nextObject])) 
-             && ![operation isCancelled]) {
+      for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
+        if ([operation isCancelled]) break;
         HGSResult* result = [indexObject result];
-        NSSet* titleTermsSet = [indexObject nameTerms];
-        NSSet* otherTermsSet = [indexObject otherTerms];
+        NSString* name = [indexObject name];
+        
 
-        BOOL matchedAllTerms = YES;
-        BOOL hasNameMatch = NO;
-        for (NSString *queryTerm in queryWords) {
-          BOOL hasMatch
-            = WordSetContainsPrefixMatchForTerm(titleTermsSet, queryTerm);
-          if (hasMatch) {
-            hasNameMatch = YES;
-          } else {
-            hasMatch = WordSetContainsPrefixMatchForTerm(otherTermsSet, 
-                                                         queryTerm);
+        CGFloat rank = HGSScoreForAbbreviation(name,
+                                               normalizedQuery, 
+                                               NULL);
+        BOOL hasNameMatch = rank > 0;
+        if (!(rank > 0)) {
+          NSArray* otherTerms = [indexObject otherTerms];
+          for (NSString *otherTerm in otherTerms) {
+            CGFloat otherRank = HGSScoreForAbbreviation(otherTerm,
+                                                        normalizedQuery, 
+                                                        NULL);
+            if (otherRank > rank) {
+              // TODO(dmaclach): do we want to blend these somehow instead
+              // of a strict replacement policy?
+              rank = otherRank;
+            }
+            if (rank > 0.9) {
+              break;
+            }
           }
-          if (!hasMatch) {
-            matchedAllTerms = NO;
-            break;
-          }
-        }
-        if (matchedAllTerms) {
-          // Copy the result so any attributes looked up and cached don't stick.
-          // Also take care of any dup folding not leaving set attirubtes on 
-          // other objects.
+        } 
+          
+        if (rank > 0) {
+          // Copy the result so we can apply rank to it
           HGSMutableResult *resultCopy = [[result mutableCopy] autorelease];
           if (hasNameMatch) {
             [resultCopy addRankFlags:eHGSNameMatchRankFlag];
           } else {
+            rank *= 0.5;
             [resultCopy removeRankFlags:eHGSNameMatchRankFlag];
-            // TODO(alcor): handle ranking correctly
-            // For now, halve the rank of anything that isn't a name match
-            // This prevents uppity contacts from matching on domains and other
-            // things.
-            [resultCopy setRank:[resultCopy rank] / 2];
           }
+          [resultCopy setRank:rank];
           [results addObject:resultCopy];
         }
       }
@@ -214,36 +201,55 @@ static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *t
   }
 }
 
-- (void)indexResult:(HGSResult*)hgsResult
-         nameString:(NSString*)nameString
-        otherString:(NSString*)otherString {
-  // must have result and name string
-  if (hgsResult) {
-    NSSet *nameTermsSet = [self normalizedTokenSetForString:nameString];
-    NSSet *otherTermsSet = [self normalizedTokenSetForString:otherString];
-    if (nameTermsSet || otherTermsSet) {
-      HGSMemorySearchSourceObject *resultsArrayObject 
-        = [[HGSMemorySearchSourceObject alloc] initWithResult:hgsResult
-                                                    nameTerms:nameTermsSet
-                                                   otherTerms:otherTermsSet];
-      if (resultsArrayObject) {
-        @synchronized(resultsArray_) {
-          // Into the list
-          [resultsArray_ addObject:resultsArrayObject];
-        }
-        [resultsArrayObject release];
+- (void)indexResult:(HGSResult *)hgsResult
+      tokenizedName:(NSString *)name
+         otherTerms:(NSArray *)otherTerms {
+  if ([name length] || otherTerms) {
+    HGSMemorySearchSourceObject *resultsArrayObject 
+      = [[HGSMemorySearchSourceObject alloc] initWithResult:hgsResult
+                                                       name:name
+                                                 otherTerms:otherTerms];
+    if (resultsArrayObject) {
+      @synchronized(resultsArray_) {
+        // Into the list
+        [resultsArray_ addObject:resultsArrayObject];
       }
+      [resultsArrayObject release];
     }
   }
 }
 
-- (void)indexResult:(HGSResult*)hgsResult
-         nameString:(NSString*)nameString
-  otherStringsArray:(NSArray*)otherStrings {
-  // do a simple join of the otherStrings
-  return [self indexResult:hgsResult
-                nameString:nameString
-               otherString:[otherStrings componentsJoinedByString:@"\n"]];
+- (void)indexResult:(HGSResult *)hgsResult
+               name:(NSString *)name
+         otherTerms:(NSArray *)otherTerms {
+  // must have result and name string
+  if (hgsResult) {
+    name = [HGSTokenizer tokenizeString:name];
+    NSUInteger count = [otherTerms count];
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:count];
+    for (NSString *term in otherTerms) {
+      term = [HGSTokenizer tokenizeString:term];
+      [array addObject:term];
+    }
+    [self indexResult:hgsResult 
+        tokenizedName:name 
+           otherTerms:array];
+  }
+}
+
+- (void)indexResult:(HGSResult *)hgsResult
+               name:(NSString *)name
+          otherTerm:(NSString *)otherTerm {
+  NSArray *otherTerms = otherTerm ? [NSArray arrayWithObject:otherTerm] : nil;
+  [self indexResult:hgsResult
+               name:name
+         otherTerms:otherTerms];
+}
+
+- (void)indexResult:(HGSResult *)hgsResult {
+  [self indexResult:hgsResult 
+               name:[hgsResult displayName] 
+         otherTerms:nil];
 }
 
 - (void)saveResultsCache {
@@ -265,23 +271,26 @@ static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *t
         HGSResult *result = [resultObject result];
         NSDictionary *archivedRep = [self archiveRepresentationForResult:result];
         if (archivedRep) {
-          NSString *nameTerms = [[[resultObject nameTerms] allObjects] 
-                                 componentsJoinedByString: @" "];
-          NSString *otherTerms = [[[resultObject otherTerms] allObjects] 
-                                  componentsJoinedByString: @" "];
+          NSString *name = [resultObject name];
+          NSArray *otherTerms = [resultObject otherTerms];
           NSDictionary *cacheObject
             = [NSDictionary dictionaryWithObjectsAndKeys:
                                   archivedRep, kHGSMemorySourceResultKey,
-                                  nameTerms, kHGSMemorySourceNameTermsKey,
+                                  name, kHGSMemorySourceNameKey,
                                   otherTerms, kHGSMemorySourceOtherTermsKey,
                                   nil];
           [archiveObjects addObject:cacheObject];
         }
       }
-      
-      NSData *data = [NSKeyedArchiver archivedDataWithRootObject:archiveObjects];
-      [data writeToFile:cachePath_ atomically:YES];
-      cacheHash_ = hash;
+      NSMutableDictionary *cache = [NSMutableDictionary dictionary];
+      [cache setObject:archiveObjects forKey:kHGSMemorySourceEntriesKey];
+      [cache setObject:kHGSMemorySourceVersion 
+                forKey:kHGSMemorySourceVersionKey];
+      if ([cache writeToFile:cachePath_ atomically:YES]) {
+        cacheHash_ = hash;
+      } else {
+        HGSLogDebug(@"Unable to saveResultsCache for %@", cachePath_);
+      }
     }
   }
 }
@@ -291,24 +300,34 @@ static inline BOOL WordSetContainsPrefixMatchForTerm(NSSet *wordSet, NSString *t
   // This routine can allocate a lot of temporary objects, so we wrap it
   // in an autorelease pool to keep our memory usage down.
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSData *data = [NSData dataWithContentsOfFile:cachePath_];
-  if (data) {
-    NSArray *archiveObjects = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    for (NSDictionary *cacheObject in archiveObjects) {
-      HGSResult *result = [self resultWithArchivedRepresentation:
-                           [cacheObject
-                            objectForKey:kHGSMemorySourceResultKey]];
-      if (result) {
-        NSString *nameTerms =
-          [cacheObject objectForKey:kHGSMemorySourceNameTermsKey];
-        NSString *otherTerms =
-          [cacheObject objectForKey:kHGSMemorySourceOtherTermsKey];
-        [self indexResult:result
-               nameString:nameTerms
-              otherString:otherTerms];
-        cacheHash_ ^= [result hash];
+  @try {
+    NSDictionary *cache = [NSDictionary dictionaryWithContentsOfFile:cachePath_];
+    if (cache) {
+      NSString *version = [cache objectForKey:kHGSMemorySourceVersionKey];
+      if ([version isEqualToString:kHGSMemorySourceVersion]) {
+        NSArray *entries = [cache objectForKey:kHGSMemorySourceEntriesKey];
+        for (NSDictionary *cacheObject in entries) {
+          NSDictionary *entry 
+            = [cacheObject objectForKey:kHGSMemorySourceResultKey];
+          HGSResult *result = [self resultWithArchivedRepresentation:entry];
+          if (result) {
+            NSString *name =
+             [cacheObject objectForKey:kHGSMemorySourceNameKey];
+            NSArray *otherTerms =
+              [cacheObject objectForKey:kHGSMemorySourceOtherTermsKey];
+            [self indexResult:result
+                tokenizedName:name
+                   otherTerms:otherTerms];
+            cacheHash_ ^= [result hash];
+          }
+        }
       }
     }
+  }
+  @catch(NSException *e) {
+    HGSLog(@"Unable to load results cache for %@ (%@)", self, e);
+    cacheHash_ = 0;
+    [self clearResultIndex];
   }
   [pool release];
 }

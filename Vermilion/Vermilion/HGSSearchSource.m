@@ -113,7 +113,7 @@ static NSSet *CopyStringSetFromId(id value) {
       }
     }
   } else {
-    isValid = [[query uniqueWords] count] > 0;
+    isValid = [[query normalizedQueryString] length] > 0;
   }
   return isValid;
 }
@@ -153,6 +153,9 @@ static NSSet *CopyStringSetFromId(id value) {
     NSString *key = kHGSObjectDefaultArchiveKeys[i];
     id value = [result valueForKey:key];
     if (value) {
+      if ([value isMemberOfClass:[NSURL class]]) {
+        value = [value absoluteString];
+      }
       [dict setObject:value forKey:key];
     }
   }

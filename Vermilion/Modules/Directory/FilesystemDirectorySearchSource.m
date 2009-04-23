@@ -80,8 +80,7 @@
     while ((subpath = [enumerator nextObject])) {
       if (!showInvisibles && [subpath hasPrefix:@"."]) continue;
       
-      float score = HGSScoreForAbbreviation((CFStringRef)subpath, 
-                                            (CFStringRef)queryString, nil);
+      float score = HGSScoreForAbbreviation(subpath, queryString, nil);
       
       // if we have a query string, we exact prefix match (no tokenize, etc.)
       //if ([queryString length] && ![subpath hasCaseInsensitivePrefix:queryString]) continue;

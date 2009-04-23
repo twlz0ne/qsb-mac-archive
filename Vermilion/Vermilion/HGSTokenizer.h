@@ -32,19 +32,23 @@
 
 #import <Foundation/Foundation.h>
 
+/*!
+ @header 
+ HGSTokenizer is our standard tokenizer for breaking up strings that we index.
+ As implemented currently it breaks according to the Unicode standard 
+ ( http://www.unicode.org/reports/tr29/#Word_Boundaries ). It then strips out
+ all punctuation, and breaks the tokens again at camelcaps boundaries and
+ alpha/number boundaries.
+ 
+ Therefore, according to the unicode spec, "MacPython2.4" should not break,
+ but we break it as "Mac" "Python" "2.4". Numbers are defined as [0-9\.,]+.
+ 
+ This tokenizer break all Roman languages and CZJK.
+*/ 
 
+/*!
+ @classdesign HGSTokenizer is thread safe.
+*/
 @interface HGSTokenizer : NSObject
-
-// returns all "word" tokens (skips punct and whitespace) -- to find how to
-// index text.
-+ (NSEnumerator *)wordEnumeratorForString:(NSString *)stringToTokenize;
-
-// returns all non whitespace tokens - for building something like a query
-// parser when symbols have meaning
-+ (NSEnumerator *)tokenEnumeratorForString:(NSString *)stringToTokenize;
-
-// Returns all tokens. If wordsOnly is 'YES', it returns the same tokens that
-// wordEnumeratorForString would return. If wordsOnly is 'NO', it returns
-// the same tokens that tokenEnumeratorForString would return.
-+ (NSArray *)tokenizeString:(NSString *)string wordsOnly:(BOOL)wordsOnly;
++ (NSString *)tokenizeString:(NSString *)string;
 @end
