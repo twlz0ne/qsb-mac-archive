@@ -7948,9 +7948,6 @@
 		8B2E2A410F99018600F80E11 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = HeaderDoc;
 			};
 			name = Debug;
@@ -7965,11 +7962,7 @@
 		8B2E2A430F99018600F80E11 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = HeaderDoc;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
