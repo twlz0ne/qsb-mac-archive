@@ -1052,7 +1052,7 @@ doCommandBySelector:(SEL)commandSelector {
   SEL action = [menuItem action];
   SEL showSearchWindowSel = @selector(showSearchWindow:);
   SEL hideSearchWindowSel = @selector(hideSearchWindow:);
-  BOOL searchWindowActive = ![[self window] ignoresMouseEvents];
+  BOOL searchWindowActive = [[self window] isVisible];
   if (action == showSearchWindowSel && searchWindowActive) {
     [menuItem setAction:hideSearchWindowSel];
     [menuItem setTitle:NSLocalizedString(@"Hide Quick Search Box", nil)];
