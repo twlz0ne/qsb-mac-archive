@@ -1027,6 +1027,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     [searchWindowController_ selectResults:results];
   } else {
     NSString *userText = [pasteboard stringForType:NSStringPboardType];
+    NSCharacterSet *ws = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    userText = [userText stringByTrimmingCharactersInSet:ws];
     [searchWindowController_ searchForString:userText];
   }
   [searchWindowController_ showSearchWindowBecause:kQSBServicesMenuChangeVisiblityToggle];    
