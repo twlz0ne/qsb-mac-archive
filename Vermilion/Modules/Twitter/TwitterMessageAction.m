@@ -48,7 +48,7 @@ static NSString *const kSendStatusFormat
   NSURLConnection *twitterConnection_;
 }
 
-// Called by performActionWithInfo: to actually send the message.
+// Called by performWithInfo: to actually send the message.
 - (void)sendTwitterStatus:(NSString *)twitterMessage;
 
 // Utility function to send notification so user can be notified of

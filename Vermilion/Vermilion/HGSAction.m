@@ -161,7 +161,7 @@ static NSSet *CopyStringSetFromId(id value) {
 - (BOOL)performWithInfo:(NSDictionary*)info {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   if ([defaults boolForKey:kHGSValidateActionBehaviorsPrefKey]) {
-    HGSLog(@"ERROR: Action %@ forgot to override performActionWithInfo:.",
+    HGSLog(@"ERROR: Action %@ forgot to override performWithInfo:.",
            [self class]);
   }
   [self doesNotRecognizeSelector:_cmd];

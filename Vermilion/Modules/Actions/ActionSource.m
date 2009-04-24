@@ -45,7 +45,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 // ActionPivotObjectProxy it will act exactly like the action it wraps
 // EXCEPT when invoked it will pass the pivot object from the predicate_
 // into the action as it's direct object.
-// See -[ActionPivotObjectProxy performActionWithInfo] for details.
+// See -[ActionPivotObjectProxy performWithInfo] for details.
 @interface ActionPivotObjectProxy : NSProxy {
  @private
   HGSAction *action_;
