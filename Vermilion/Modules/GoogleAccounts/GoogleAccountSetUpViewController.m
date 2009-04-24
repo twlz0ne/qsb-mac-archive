@@ -203,6 +203,9 @@
     [self setGoogleAppsCheckboxShowing:showCheckbox];
     [googleAppsCheckbox_ setEnabled:showCheckbox];
     [[googleAppsCheckbox_ animator] setHidden:!showCheckbox];
+    if (!showCheckbox) {
+      [self setGoogleAppsAccount:NO];
+    }
 
     BOOL captchaShowing = [self captchaImage] != nil;
     CGFloat newHeight = [self windowHeightWithCheckboxShowing:showCheckbox

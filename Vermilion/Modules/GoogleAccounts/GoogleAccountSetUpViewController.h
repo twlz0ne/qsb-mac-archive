@@ -53,9 +53,9 @@
   NSImage *captchaImage_;
   NSString *captchaText_;
   BOOL googleAppsAccount_;
-  // Have to use |checkboxShowing_| because we animate showing of the checkbox 
-  // and the 'hidden' atttribute of the checkbox field is not reliable 
-  // until the animation has completed.
+  // Have to use |googleAppsCheckboxShowing| because we animate showing of
+  // the checkbox and the 'hidden' atttribute of the checkbox field is not
+  // reliable until the animation has completed.
   BOOL googleAppsCheckboxShowing_;
   BOOL windowSizesDetermined_;  // NO until we've calculated window sizes.
   // Precalculated window heights to accommodate animations.  A delta cannot
