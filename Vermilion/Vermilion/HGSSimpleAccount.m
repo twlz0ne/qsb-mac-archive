@@ -35,6 +35,12 @@
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
 #import "KeychainItem.h"
+#import <GData/GDataHTTPFetcher.h>
+
+
+// Authentication retry timing constants.
+static const NSTimeInterval kAuthenticationRetryInterval = 0.1;
+static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
 
 
 @implementation HGSSimpleAccount
@@ -124,7 +130,43 @@
 }
 
 - (BOOL)authenticateWithPassword:(NSString *)password {
-  return YES;
+  BOOL authenticated = NO;
+  // Test this account to see if we can connect.
+  NSString *userName = [self userName];
+  NSURLRequest *accountRequest = [self accountURLRequestForUserName:userName
+                                                           password:password];
+  if (accountRequest) {
+    GDataHTTPFetcher* authenticateFetcher
+    = [GDataHTTPFetcher httpFetcherWithRequest:accountRequest];
+    NSArray *modes = [NSArray arrayWithObjects:
+                      NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil];
+    [authenticateFetcher setRunLoopModes:modes];
+    [authenticateFetcher setIsRetryEnabled:YES];
+    authenticationResult_ = NO;
+    if ([authenticateFetcher beginFetchWithDelegate:self
+                                  didFinishSelector:@selector(authenticateFetcher:
+                                                              finishedWithData:)
+                                    didFailSelector:@selector(authenticateFetcher:
+                                                              failedWithError:)]) {
+      // Block until this fetch is done to make it appear synchronous. Sleep
+      // for a second and then check again until is has completed.  Just in
+      // case, put an upper limit of 30 seconds before we bail.
+      authenticationFinished_ = NO;
+      NSDate *startTime = [NSDate date];
+      NSRunLoop* loop = [NSRunLoop currentRunLoop];
+      while (!authenticationFinished_) {
+        [loop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:
+                            kAuthenticationRetryInterval]];
+        NSTimeInterval elapsedTime = -[startTime timeIntervalSinceNow];
+        if (elapsedTime > kAuthenticationGiveUpInterval) {
+          [authenticateFetcher stopFetching];
+          authenticationFinished_ = YES;
+        }
+      }
+    }
+    authenticated = authenticationResult_;
+  }
+  return authenticated;
 }
 
 - (NSURLRequest *)accountURLRequest {
@@ -159,6 +201,20 @@
   KeychainItem *item = [KeychainItem keychainItemForService:keychainServiceName 
                                                    username:userName];
   return item;
+}
+
+#pragma mark GDataHTTPFetcher Callback Methods
+
+- (void)authenticateFetcher:(GDataHTTPFetcher *)fetcher
+           finishedWithData:(NSData *)data {
+  authenticationResult_ = YES;
+  authenticationFinished_ = YES;
+}
+
+- (void)authenticateFetcher:(GDataHTTPFetcher *)fetcher
+            failedWithError:(NSError *)error {
+  authenticationResult_ = NO;
+  authenticationFinished_ = YES;
 }
 
 #pragma mark NSURLConnection Delegate Methods

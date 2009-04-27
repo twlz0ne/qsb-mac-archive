@@ -84,6 +84,9 @@
 @interface HGSSimpleAccount : HGSAccount {
  @private
   NSURLConnection *connection_; // Used by async authentication.
+  // Set by and only useful within the authenticateWithPassword fetch loop.
+  BOOL authenticationResult_;  // YES if the account authenticated.
+  BOOL authenticationFinished_;  // Set by the fetch to exit loop.
 }
 
 @property (nonatomic, retain) NSURLConnection *connection;

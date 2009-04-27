@@ -32,6 +32,7 @@
 
 #import "TwitterAccount.h"
 #import "GTMBase64.h"
+#import <GData/GDataHTTPFetcher.h>
 
 static NSString *const kTwitterVerifyAccountURLString
   = @"https://twitter.com/account/verify_credentials.xml";
@@ -51,23 +52,6 @@ static NSString *const kTwitterAccountTypeName
 
 - (NSString *)type {
   return kTwitterAccountTypeName;
-}
-
-- (BOOL)authenticateWithPassword:(NSString *)password {
-  BOOL authenticated = NO;
-  // Test this account to see if we can connect.
-  NSString *userName = [self userName];
-  NSURLRequest *accountRequest = [self accountURLRequestForUserName:userName
-                                                           password:password];
-  if (accountRequest) {
-    NSURLResponse *accountResponse = nil;
-    NSError *error = nil;
-    [NSURLConnection sendSynchronousRequest:accountRequest
-                          returningResponse:&accountResponse
-                                      error:&error];
-    authenticated = (error == nil);
-  }
-  return authenticated;
 }
 
 #pragma mark Account Editing

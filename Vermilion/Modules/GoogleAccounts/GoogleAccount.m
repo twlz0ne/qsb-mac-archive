@@ -101,23 +101,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return userName;
 }
 
-- (BOOL)authenticateWithPassword:(NSString *)password {
-  BOOL authenticated = NO;
-  // Test this account to see if we can connect.
-  NSString *userName = [self userName];
-  NSURLRequest *accountRequest = [self accountURLRequestForUserName:userName
-                                                           password:password];
-  if (accountRequest) {
-    NSURLResponse *accountResponse = nil;
-    NSError *error = nil;
-    NSData *result = [NSURLConnection sendSynchronousRequest:accountRequest
-                                           returningResponse:&accountResponse
-                                                       error:&error];
-    authenticated = [self validateResult:result];
-  }
-  return authenticated;
-}
-
 - (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
                                       password:(NSString *)password {
   NSString *encodedAccountName = [userName gtm_stringByEscapingForURLArgument];
