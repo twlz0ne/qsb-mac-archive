@@ -216,9 +216,7 @@ static NSString *const kServiceName
   STAssertEqualObjects(identifier, @"SimpleAccountType.HGSSimpleAccount E", nil);
   NSString *userName = [account userName];
   STAssertEqualObjects(userName, @"HGSSimpleAccount E", nil);
-  NSString *displayName = [account displayName];
-  STAssertEqualObjects(displayName, @"HGSSimpleAccount E (SimpleAccountType)",
-                       nil);
+  // displayName tested in HGSAccountTest, not here.
   NSString *accountType = [account type];
   STAssertEqualObjects(accountType, @"SimpleAccountType", nil);
   BOOL isEditable = [account isEditable];
@@ -248,7 +246,7 @@ static NSString *const kServiceName
   
   // Other Accessors
   BOOL authenticated = [account authenticateWithPassword:nil];
-  STAssertTrue(authenticated, nil);
+  STAssertFalse(authenticated, nil);
   [account setAuthenticated:YES];
   authenticated = [account isAuthenticated];
   STAssertTrue(authenticated, nil);
