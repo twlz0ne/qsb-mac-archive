@@ -119,16 +119,16 @@
 @end
 
 /*! The version of the preferences data stored in the dictionary (NSNumber). */
-extern NSString *const kQSBAccountsPrefVersionKey;
+extern NSString *const kHGSAccountsPrefVersionKey;
 
 /*! Current version of an account description in preferences. */
-extern NSInteger const kQSBAccountsPrefCurrentVersion;
+extern NSInteger const kHGSAccountsPrefCurrentVersion;
 
 /*!
   Original version of an account preferences.  There was no version
   specified prior to version 1.
 */
-extern NSInteger const kQSBAccountsPrefVersion0;
+extern NSInteger const kHGSAccountsPrefVersion0;
 
 /*!
   Notification sent whenever an account has been changed. The |object| sent

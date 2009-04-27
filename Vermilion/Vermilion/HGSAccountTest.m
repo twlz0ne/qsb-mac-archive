@@ -182,10 +182,10 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
     = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
   STAssertNil(account, nil);
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME A", kHGSAccountUserNameKey,
-                   versionNumber, kQSBAccountsPrefVersionKey,
+                   versionNumber, kHGSAccountsPrefVersionKey,
                    nil];
   account
     = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -193,7 +193,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME B", kHGSAccountUserNameKey,
                    @"DUMMY TYPE B", kHGSAccountTypeKey,
-                   versionNumber, kQSBAccountsPrefVersionKey,
+                   versionNumber, kHGSAccountsPrefVersionKey,
                    nil];
   account
     = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -203,7 +203,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
                    @"DUMMY TYPE B", kHGSAccountTypeKey,
                    @"DUMMY NAME B", kHGSExtensionUserVisibleNameKey,
                    @"DUMMY IDENTIFIER B", kHGSExtensionIdentifierKey,
-                   versionNumber, kQSBAccountsPrefVersionKey,
+                   versionNumber, kHGSAccountsPrefVersionKey,
                    nil];
   account
     = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -217,7 +217,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
                    @"USERNAME C", kHGSAccountUserNameKey,
                    @"DUMMY TYPE C", kHGSAccountTypeKey,
                    bundleMock, kHGSExtensionBundleKey,
-                   versionNumber, kQSBAccountsPrefVersionKey,
+                   versionNumber, kHGSAccountsPrefVersionKey,
                    nil];
   account
     = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -229,12 +229,12 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME D", kHGSAccountUserNameKey,
                                  @"DUMMY TYPE D", kHGSAccountTypeKey,
                                  bundleMock, kHGSExtensionBundleKey,
-                                 versionNumber, kQSBAccountsPrefVersionKey,
+                                 versionNumber, kHGSAccountsPrefVersionKey,
                                  nil];
   HGSAccount *account
     = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -286,12 +286,12 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   
   // Let's add an account.
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
   NSDictionary *accountConfig = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME E", kHGSAccountUserNameKey,
                                  bundleMock, kHGSExtensionBundleKey,
                                  kTestAccountTypeID, kHGSAccountTypeKey,
-                                 versionNumber, kQSBAccountsPrefVersionKey,
+                                 versionNumber, kHGSAccountsPrefVersionKey,
                                  nil];
   HGSAccount *account
     = [[[BaseAccount alloc] initWithConfiguration:accountConfig] autorelease];
@@ -317,12 +317,12 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME F", kHGSAccountUserNameKey,
                                  @"DUMMY TYPE F", kHGSAccountTypeKey,
                                  bundleMock, kHGSExtensionBundleKey,
-                                 versionNumber, kQSBAccountsPrefVersionKey,
+                                 versionNumber, kHGSAccountsPrefVersionKey,
                                 nil];
   HGSAccount *account
     = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -336,12 +336,12 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME G", kHGSAccountUserNameKey,
                                  @"DUMMY TYPE G", kHGSAccountTypeKey,
                                  bundleMock, kHGSExtensionBundleKey,
-                                 versionNumber, kQSBAccountsPrefVersionKey,
+                                 versionNumber, kHGSAccountsPrefVersionKey,
                                  nil];
   HGSAccount *account
     = [[[BaseAccount alloc] initWithConfiguration:configuration] autorelease];
@@ -358,19 +358,19 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
                                  @"USERNAME G", kHGSAccountUserNameKey,
                                  @"DUMMY TYPE G", kHGSAccountTypeKey,
                                  bundleMock, kHGSExtensionBundleKey,
-                                 badVersionNumber, kQSBAccountsPrefVersionKey,
+                                 badVersionNumber, kHGSAccountsPrefVersionKey,
                                  nil];
   HGSAccount *account
     = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
   STAssertNil(account, nil);
 
   NSNumber *oldVersionNumber
-    = [NSNumber numberWithInt:kQSBAccountsPrefVersion0];
+    = [NSNumber numberWithInt:kHGSAccountsPrefVersion0];
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME G", kHGSAccountUserNameKey,
                    @"GoogleAccount", kHGSAccountTypeKey,
                    bundleMock, kHGSExtensionBundleKey,
-                   oldVersionNumber, kQSBAccountsPrefVersionKey,
+                   oldVersionNumber, kHGSAccountsPrefVersionKey,
                    nil];
   account
     = [[[MockGoogleAccount alloc] initWithConfiguration:configuration]
@@ -385,7 +385,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
                    @"USERNAME G", kHGSAccountUserNameKey,
                    @"GoogleAppsAccount", kHGSAccountTypeKey,
                    bundleMock, kHGSExtensionBundleKey,
-                   oldVersionNumber, kQSBAccountsPrefVersionKey,
+                   oldVersionNumber, kHGSAccountsPrefVersionKey,
                    nil];
   account
     = [[[MockGoogleAppsAccount alloc] initWithConfiguration:configuration]

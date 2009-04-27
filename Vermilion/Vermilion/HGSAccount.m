@@ -41,12 +41,12 @@
 
 
 // The version of the preferences data stored in the dictionary (NSNumber).
-NSString *const kQSBAccountsPrefVersionKey 
-  = @"QSBAccountsPrefVersionKey";
+NSString *const kHGSAccountsPrefVersionKey 
+  = @"HGSAccountsPrefVersionKey";
 
 // Account versions
-NSInteger const kQSBAccountsPrefVersion0 = 0;
-NSInteger const kQSBAccountsPrefCurrentVersion = 1;
+NSInteger const kHGSAccountsPrefVersion0 = 0;
+NSInteger const kHGSAccountsPrefCurrentVersion = 1;
 
 NSString *const kHGSAccountDisplayNameFormat = @"%@ (%@)";
 NSString *const kHGSAccountIdentifierFormat = @"%@.%@";
@@ -67,18 +67,25 @@ NSString *const kHGSAccountIdentifierFormat = @"%@.%@";
   if ([userName length]) {
     // NOTE: The following call to -[type] resolves to a constant string
     // defined per-class.
-    NSString *accountType = [self type];
+    NSString *accountTypeIdentifier = [self type];
+    HGSExtensionPoint *accountTypesPoint = [HGSExtensionPoint accountTypesPoint];
+    HGSAccountType *accountType
+      = [accountTypesPoint extensionWithIdentifier:accountTypeIdentifier];
+    HGSProtoExtension *protoAccountType = [accountType protoExtension];
+    NSString *accountTypeName
+      = [protoAccountType objectForKey:kHGSExtensionUserVisibleNameKey];
     NSString *name = [NSString stringWithFormat:kHGSAccountDisplayNameFormat,
-                      userName, accountType];
-    NSString *identifier = [NSString stringWithFormat:kHGSAccountIdentifierFormat, 
-                            accountType, userName];
+                      userName, accountTypeName];
+    NSString *identifier
+      = [NSString stringWithFormat:kHGSAccountIdentifierFormat, 
+         accountTypeIdentifier, userName];
     NSBundle *bundle = HGSGetPluginBundle();
-    NSDictionary *configuration
-      = [NSDictionary dictionaryWithObjectsAndKeys:
-         name, kHGSExtensionUserVisibleNameKey,
-         identifier, kHGSExtensionIdentifierKey,
-         bundle, kHGSExtensionBundleKey,
-         nil];
+    NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
+                                   userName, kHGSAccountUserNameKey,
+                                   name, kHGSExtensionUserVisibleNameKey,
+                                   identifier, kHGSExtensionIdentifierKey,
+                                   bundle, kHGSExtensionBundleKey,
+                                   nil];
     if ((self = [super initWithConfiguration:configuration])) {
       userName_ = [userName copy];
       if (!userName_ || ![self type]) {
@@ -167,11 +174,11 @@ NSString *const kHGSAccountIdentifierFormat = @"%@.%@";
 
 - (NSDictionary *)configuration {
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
   NSDictionary *accountDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                [self userName], kHGSAccountUserNameKey,
                                [self type], kHGSAccountTypeKey,
-                               versionNumber, kQSBAccountsPrefVersionKey,
+                               versionNumber, kHGSAccountsPrefVersionKey,
                                nil];
   return accountDict;
 }
@@ -218,9 +225,9 @@ NSString *const kHGSAccountIdentifierFormat = @"%@.%@";
 
 + (NSDictionary *)upgradeConfiguration:(NSDictionary *)configuration {
   NSNumber *versionNumber
-    = [configuration valueForKey:kQSBAccountsPrefVersionKey];
+    = [configuration valueForKey:kHGSAccountsPrefVersionKey];
   NSInteger version = [versionNumber integerValue];
-  if (!versionNumber || version != kQSBAccountsPrefCurrentVersion) {
+  if (!versionNumber || version != kHGSAccountsPrefCurrentVersion) {
     // The configuration is NOT of the latest version.
     NSMutableDictionary *upgradedAccount = nil;
     if (version == 0) {
@@ -260,9 +267,9 @@ NSString *const kHGSAccountIdentifierFormat = @"%@.%@";
         }
       }
       NSNumber *updatedVersionNumber
-        = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+        = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
       [upgradedAccount setObject:updatedVersionNumber
-                          forKey:kQSBAccountsPrefVersionKey];
+                          forKey:kHGSAccountsPrefVersionKey];
 
     } else {
       HGSLog(@"Failed to upgrade account from version %d, account description: %@",

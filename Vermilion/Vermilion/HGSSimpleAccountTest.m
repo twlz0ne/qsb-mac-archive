@@ -191,11 +191,11 @@ static NSString *const kServiceName
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"HGSSimpleAccount D", kHGSAccountUserNameKey,
                                  bundleMock, kHGSExtensionBundleKey,
-                                 versionNumber, kQSBAccountsPrefVersionKey,
+                                 versionNumber, kHGSAccountsPrefVersionKey,
                                  nil];
   HGSAccount *account
     = [[[SimpleAccountWithFakeKeychain alloc] initWithConfiguration:configuration]

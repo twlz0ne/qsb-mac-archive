@@ -306,36 +306,36 @@ static NSString *const kAccountTypeAName = @"Account Type A";
   
   // Add several accounts.
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kQSBAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
   NSDictionary *accountDict1 = [NSDictionary dictionaryWithObjectsAndKeys:
                                 kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account1", kHGSAccountUserNameKey,
-                                versionNumber, kQSBAccountsPrefVersionKey,
+                                versionNumber, kHGSAccountsPrefVersionKey,
                                 nil];
   NSDictionary *accountDict2 = [NSDictionary dictionaryWithObjectsAndKeys:
                                 kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account2", kHGSAccountUserNameKey,
-                                versionNumber, kQSBAccountsPrefVersionKey,
+                                versionNumber, kHGSAccountsPrefVersionKey,
                                 nil];
   NSDictionary *accountDict3 = [NSDictionary dictionaryWithObjectsAndKeys:
                                 kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account3", kHGSAccountUserNameKey,
-                                versionNumber, kQSBAccountsPrefVersionKey,
+                                versionNumber, kHGSAccountsPrefVersionKey,
                                 nil];
   NSDictionary *accountDict4 = [NSDictionary dictionaryWithObjectsAndKeys:
                                 kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account4", kHGSAccountUserNameKey,
-                                versionNumber, kQSBAccountsPrefVersionKey,
+                                versionNumber, kHGSAccountsPrefVersionKey,
                                 nil];
   NSDictionary *accountDict5 = [NSDictionary dictionaryWithObjectsAndKeys:
                                 kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account5", kHGSAccountUserNameKey,
-                                versionNumber, kQSBAccountsPrefVersionKey,
+                                versionNumber, kHGSAccountsPrefVersionKey,
                                 nil];
   NSArray *accountDicts = [NSArray arrayWithObjects:accountDict1, accountDict2,
                            accountDict3, accountDict4, accountDict5, nil];
