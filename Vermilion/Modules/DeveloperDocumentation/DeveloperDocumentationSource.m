@@ -32,6 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import "QSBHGSDelegate.h"
+#import "GTMSystemVersion.h"
 
 // Private interface that we've borrowed.
 @interface DSADocSet : NSObject
@@ -60,15 +61,24 @@ static NSString *const kiPhoneReferenceDocSetPath
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    condition_ = [[NSCondition alloc] init];
-    NSOperation *op 
-      = [[[NSInvocationOperation alloc] initWithTarget:self
-                                              selector:@selector(indexDocumentationOperation)
-                                                object:nil]
-       autorelease];
-    [[HGSOperationQueue sharedOperationQueue] addOperation:op];
-    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-    docSetIcon_ = [[ws iconForFileType:@"docset"] retain];
+    if ([GTMSystemVersion isSnowLeopardOrGreater]) {
+      // We don't support Snow Leopard.
+      // TODO(mrossetti): Update this source for Snow Leopard.
+      HGSLog(@"The Developer Documentation source is not supported under "
+             @"Snow Leopard.");
+      [self release];
+      self = nil;
+    } else {
+      condition_ = [[NSCondition alloc] init];
+      NSOperation *op 
+        = [[[NSInvocationOperation alloc] initWithTarget:self
+                                                selector:@selector(indexDocumentationOperation)
+                                                  object:nil]
+         autorelease];
+      [[HGSOperationQueue sharedOperationQueue] addOperation:op];
+      NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+      docSetIcon_ = [[ws iconForFileType:@"docset"] retain];
+    }
   }
   return self;
 }
