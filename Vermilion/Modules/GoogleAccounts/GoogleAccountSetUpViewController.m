@@ -181,15 +181,11 @@
                              range:domainRange];
           showCheckbox = (gmailResult != NSOrderedSame);
         }
-        NSString *googleDomain = @"@google.com"; // Not localized.
-        NSUInteger googleDomainLength = [googleDomain length];
-        if (showCheckbox && domainLength <= googleDomainLength) {
-          NSRange domainRange = NSMakeRange(0, domainLength);
-          NSComparisonResult googleResult
-            = [googleDomain compare:domainString
-                            options:NSCaseInsensitiveSearch
-                              range:domainRange];
-          showCheckbox = (googleResult != NSOrderedSame);
+        // If it's not a match to gmail.com then see if it is a
+        // Google corporate domain match.
+        if (showCheckbox) {
+          showCheckbox
+            = ![GoogleAccount isPartialMatchToGoogleDomain:domainString];
         }
       }
     }

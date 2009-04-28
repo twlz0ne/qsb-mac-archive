@@ -56,6 +56,9 @@
 // Open google.com in the user's preferred browser.
 + (BOOL)openGoogleHomePage;
 
+// Determine if the supplied domain is a partial match to a Google corp domain.
++ (BOOL)isPartialMatchToGoogleDomain:(NSString *)domain;
+
 @end
 
 

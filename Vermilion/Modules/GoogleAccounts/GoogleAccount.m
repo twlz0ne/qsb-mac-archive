@@ -38,6 +38,8 @@
 #import "HGSLog.h"
 
 
+static NSString *const kGoogleDomain = @"@google.com";
+static NSString *const kGoogleUKDomain = @"@google.co.uk";
 static NSString *const kGoogleURLString = @"http://www.google.com/";
 static NSString *const kAccountTestFormat
   = @"https://www.google.com/accounts/ClientLogin?Email=%@&Passwd=%@"
@@ -109,12 +111,17 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSString *accountType = kHostedAccountType;
   if (!hosted) {
     accountType = kGoogleAccountType;
-    NSString *googleDomain = @"@google.com"; // Not localized.
     NSRange atRange = [userName rangeOfString:@"@"];
     if (atRange.location != NSNotFound) {
       NSString *domainString = [userName substringFromIndex:atRange.location];
+      // TODO(mrossetti): Determine if it is sufficient to test the domain
+      // against '@google.~'.
       NSComparisonResult result
-        = [googleDomain compare:domainString options:NSCaseInsensitiveSearch];
+        = [kGoogleDomain compare:domainString options:NSCaseInsensitiveSearch];
+      if (result != NSOrderedSame) {
+        result = [kGoogleUKDomain compare:domainString
+                                  options:NSCaseInsensitiveSearch];
+      }
       if (result == NSOrderedSame) {
         accountType = kGoogleCorpAccountType;
       }
@@ -192,6 +199,29 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     }
   }
   return validated;
+}
+
++ (BOOL)isPartialMatchToGoogleDomain:(NSString *)domain {
+  BOOL isPartialMatch = NO;
+  NSUInteger domainLength = [domain length];
+  NSUInteger googleDomainLength = [kGoogleDomain length];
+  NSUInteger googleUKDomainLength = [kGoogleUKDomain length];
+  NSRange domainRange = NSMakeRange(0, domainLength);
+  if (domainLength <= googleDomainLength) {
+    NSComparisonResult googleResult
+      = [kGoogleDomain compare:domain
+                       options:NSCaseInsensitiveSearch
+                         range:domainRange];
+    isPartialMatch = (googleResult == NSOrderedSame);
+  }
+  if (!isPartialMatch && domainLength <= googleUKDomainLength) {
+    NSComparisonResult googleResult
+      = [kGoogleUKDomain compare:domain
+                         options:NSCaseInsensitiveSearch
+                           range:domainRange];
+    isPartialMatch = (googleResult == NSOrderedSame);
+  }
+  return isPartialMatch;
 }
 
 + (BOOL)openGoogleHomePage {
