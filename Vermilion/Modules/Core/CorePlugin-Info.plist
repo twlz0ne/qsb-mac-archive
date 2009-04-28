@@ -119,24 +119,6 @@
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
-			<string>FileSystemOpenWithSource</string>
-			<key>HGSExtensionPoint</key>
-			<string>HGSSourcesExtensionPoint</string>
-			<key>HGSExtensionIdentifier</key>
-			<string>com.google.filesystem.openwith.source</string>
-			<key>HGSExtensionUserVisibleName</key>
-			<string>Open With…</string>
-			<key>HGSSearchSourcePivotableTypes</key>
-			<array>
-				<string>file</string>
-				<string>webpage</string>
-				<string>handlers</string>
-			</array>
-			<key>HGSSearchSourceCannotArchive</key>
-			<true/>
-		</dict>
-		<dict>
-			<key>HGSExtensionClass</key>
 			<string>FileSystemOpenAction</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
@@ -146,18 +128,6 @@
 			<string>*</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.filesystem.action.open</string>
-		</dict>
-		<dict>
-			<key>HGSExtensionClass</key>
-			<string>FileSystemOpenWithAction</string>
-			<key>HGSExtensionPoint</key>
-			<string>HGSActionsExtensionPoint</string>
-			<key>HGSExtensionUserVisibleName</key>
-			<string>Open With…</string>
-			<key>HGSActionDirectObjectTypes</key>
-			<string>handler.application</string>
-			<key>HGSExtensionIdentifier</key>
-			<string>com.google.filesystem.action.openwith</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
