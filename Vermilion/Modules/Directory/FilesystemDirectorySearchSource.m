@@ -33,6 +33,7 @@
 #import <Vermilion/Vermilion.h>
 #import "NSString+CaseInsensitive.h"
 #import "HGSAbbreviationRanker.h"
+#import "HGSTokenizer.h"
 
 // This source provides results for directory restricted searches:
 // If a pivot object is a folder, it will find direct children with a prefix
@@ -64,32 +65,29 @@
   NSFileManager *fm = [NSFileManager defaultManager];
   HGSQuery *query = [operation query];
   // use the raw query since we're trying to match paths to specific folders.
-  NSString *queryString = [query rawQueryString];
   HGSResult *pivotObject = [query pivotObject];
   BOOL isApplication = [pivotObject conformsToType:kHGSTypeFileApplication];
   if (pivotObject) {
+    NSString *normalizedQueryString = [query normalizedQueryString];
     NSURL *url = [pivotObject url];
     NSString *path = [url path];
-    
     NSMutableArray *results = [NSMutableArray array];
-    
     NSArray *contents = [fm directoryContentsAtPath:path];
-    NSEnumerator *enumerator = [contents objectEnumerator];
-    NSString *subpath;
     BOOL showInvisibles = ([query flags] & eHGSQueryShowAlternatesFlag) != 0;
-    while ((subpath = [enumerator nextObject])) {
+    for (NSString *subpath in contents) {
       if (!showInvisibles && [subpath hasPrefix:@"."]) continue;
       
-      float score = HGSScoreForAbbreviation(subpath, queryString, nil);
+      NSString *tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
+      float score = HGSScoreForAbbreviation(tokenizedSubpath, 
+                                            normalizedQueryString, 
+                                            nil);
       
-      // if we have a query string, we exact prefix match (no tokenize, etc.)
-      //if ([queryString length] && ![subpath hasCaseInsensitivePrefix:queryString]) continue;
       if (score <= 0.0) continue;
       
       subpath = [path stringByAppendingPathComponent:subpath];
       
       NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-      if (isApplication && ![queryString length]) {
+      if (isApplication && ![normalizedQueryString length]) {
         [attributes setObject:[NSNumber numberWithInt:eHGSBelowFoldRankFlag] 
                        forKey:kHGSObjectAttributeRankFlagsKey];
       }
@@ -105,8 +103,9 @@
 
     [operation setResults:results];
   } else {
+    // use the raw query since we're trying to match paths to specific folders.
     // we treat the input as a raw path, so no tokenizing, etc.
-    NSString *path = queryString;
+    NSString *path = [query rawQueryString];
     
     // Convert file urls
     if ([path hasPrefix:@"file:"]) {
@@ -132,16 +131,19 @@
         BOOL isDirectory = NO;
         if ([fm fileExistsAtPath:container isDirectory:&isDirectory]
             && isDirectory) {
-          NSMutableArray *contents = [NSMutableArray array];
-          NSEnumerator *e
-            = [[fm directoryContentsAtPath:container] objectEnumerator];
-          while ((path = [e nextObject])) {
+          NSArray *dirContents = [fm directoryContentsAtPath:container];
+          NSUInteger count = [dirContents count];
+          NSMutableArray *contents = [NSMutableArray arrayWithCapacity:count];
+          for (path in [fm directoryContentsAtPath:container]) {
             if ([path hasCaseInsensitivePrefix:partialPath]) {
               LSItemInfoRecord infoRec;
-              if (noErr == LSCopyItemInfoForURL((CFURLRef)[NSURL fileURLWithPath:path],
+              NSURL *fileURL = [NSURL fileURLWithPath:path];
+              if (noErr == LSCopyItemInfoForURL((CFURLRef)fileURL,
                                                 kLSRequestBasicFlagsOnly,
                                                 &infoRec)) {
-                if (infoRec.flags & kLSItemInfoIsInvisible) continue;
+                if (infoRec.flags & kLSItemInfoIsInvisible) {
+                  continue;
+                }
               }
               path = [container stringByAppendingPathComponent:path];
               HGSResult *result = [HGSResult resultWithFilePath:path
@@ -155,7 +157,6 @@
       }
     }
   }
-  
   [operation finishQuery];
 }
 @end
