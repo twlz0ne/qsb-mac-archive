@@ -126,9 +126,6 @@ static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
       [buildPaths addObject:pluginsDir];
     }
     
-    // The current working directory (to support plugin development)
-    [buildPaths addObject:[fm currentDirectoryPath]];
-    
     // Any system wide plugins (we use the folder if it exists, but we don't
     // create it.
     FSRef folderRef;
