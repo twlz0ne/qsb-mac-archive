@@ -34,8 +34,15 @@
 #import "HGSResult.h"
 #import "HGSLog.h"
 
-NSString* const kHGSActionDirectObjectsKey = @"HGSActionDirectObjects";
-NSString* const kHGSActionIndirectObjectsKey = @"HGSActionIndirectObjects";
+NSString *const kHGSActionDirectObjectsKey = @"HGSActionDirectObjects";
+NSString *const kHGSActionIndirectObjectsKey = @"HGSActionIndirectObjects";
+NSString *const kHGSActionDirectObjectTypesKey = @"HGSActionDirectObjectTypes";
+NSString *const kHGSActionIndirectObjectTypesKey 
+  = @"HGSActionIndirectObjectTypes";
+NSString *const kHGSActionIndirectObjectOptionalKey 
+  = @"HGSActionIndirectObjectOptional";
+NSString *const kHGSActionDoesActionCauseUIContextChangeKey
+  = @"HGSActionDoesActionCauseUIContextChange";
 
 // The result is already retained for you
 static NSSet *CopyStringSetFromId(id value) {  
@@ -57,7 +64,6 @@ static NSSet *CopyStringSetFromId(id value) {
 @synthesize directObjectTypes = directObjectTypes_;
 @synthesize indirectObjectTypes = indirectObjectTypes_;
 @synthesize indirectObjectOptional = indirectObjectOptional_;
-@synthesize showInGlobalSearchResults = showInGlobalSearchResults_;
 @synthesize causesUIContextChange = causesUIContextChange_;
 
 + (void)initialize {
@@ -78,23 +84,18 @@ static NSSet *CopyStringSetFromId(id value) {
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
     
-    id value = [configuration objectForKey:@"HGSActionDirectObjectTypes"];
+    id value = [configuration objectForKey:kHGSActionDirectObjectTypesKey];
     directObjectTypes_ = CopyStringSetFromId(value);
     
-    value = [configuration objectForKey:@"HGSActionIndirectObjectTypes"];
+    value = [configuration objectForKey:kHGSActionIndirectObjectTypesKey];
     indirectObjectTypes_ = CopyStringSetFromId(value);
     
-    value = [configuration objectForKey:@"HGSActionIndirectObjectOptional"];
+    value = [configuration objectForKey:kHGSActionIndirectObjectOptionalKey];
     // Default is NO, so just call boolValue on nil
     indirectObjectOptional_ = [value boolValue];
-    
+  
     value 
-      = [configuration objectForKey:@"HGSActionShowActionInGlobalSearchResults"];
-    // Default is NO, so just call boolValue on nil
-    showInGlobalSearchResults_ = [value boolValue];
-    
-    value 
-      = [configuration objectForKey:@"HGSActionDoesActionCauseUIContextChange"];
+      = [configuration objectForKey:kHGSActionDoesActionCauseUIContextChangeKey];
     // Default is YES, so only call boolValue if it's non nil.
     if (value) {
       causesUIContextChange_ = [value boolValue];
@@ -152,6 +153,10 @@ static NSSet *CopyStringSetFromId(id value) {
 - (id)displayIconForResults:(HGSResultArray *)result {
   // default to our init icon
   return [self icon];
+}
+
+- (BOOL)showInGlobalSearchResults {
+  return [self directObjectTypes] == nil;
 }
 
 // Subclasses should override to perform the action. Actions can have either one

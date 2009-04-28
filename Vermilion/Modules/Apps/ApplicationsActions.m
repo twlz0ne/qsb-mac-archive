@@ -31,15 +31,18 @@
 //
 
 #import <Vermilion/Vermilion.h>
+#import "GTMNSWorkspace+Running.h"
+#import "GTMMethodCheck.h"
 
 @interface ApplicationsQuitAction : HGSAction
 - (BOOL)performWithInfo:(NSDictionary*)info;
 @end
 
 @implementation ApplicationsQuitAction
+GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
 
 - (BOOL)appliesToResult:(HGSResult *)result {
-  NSArray *apps = [[NSWorkspace sharedWorkspace] launchedApplications];
+  NSArray *apps = [[NSWorkspace sharedWorkspace] gtm_launchedApplications];
   for (NSDictionary *app in apps) {
     NSString *path = [app objectForKey:@"NSApplicationPath"];
     NSURL *url = [result url];

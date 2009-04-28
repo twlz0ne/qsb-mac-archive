@@ -30,21 +30,6 @@
 --  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --
 
-on playNow()
-	tell application "iTunes" to play
-end playNow
-
-on pauseNow()
-	tell application "iTunes" to pause
-end pauseNow
-
-on goForward()
-	tell application "iTunes" to next track
-end goForward
-
-on goBack()
-	tell application "iTunes" to previous track
-end goBack
 
 on isPlaying()
 	tell application "System Events"
@@ -223,3 +208,88 @@ on filtered_duplicate_tracks(theRecord, thePlaylist, playFirst) -- normal versio
 	
 	return theTracks
 end filtered_duplicate_tracks
+
+
+-- Actions
+on toggleRepeat()
+	tell application "iTunes"
+		tell current playlist
+			if song repeat is off then
+				set song repeat to one
+			else if song repeat is one then
+				set song repeat to all
+			else
+				set song repeat to off
+			end if
+		end tell
+	end tell
+end toggleRepeat
+
+on toggleShuffle()
+	tell application "iTunes" to tell current playlist to set shuffle to not shuffle
+end toggleShuffle
+
+on setRatingTo0()
+	tell application "iTunes" to set rating of current track to 0
+end setRatingTo0
+
+on setRatingTo1()
+	tell application "iTunes" to set rating of current track to 20
+end setRatingTo1
+
+on setRatingTo2()
+	tell application "iTunes" to set rating of current track to 40
+end setRatingTo2
+
+on setRatingTo3()
+	tell application "iTunes" to set rating of current track to 60
+end setRatingTo3
+
+on setRatingTo4()
+	tell application "iTunes" to set rating of current track to 80
+end setRatingTo4
+
+on setRatingTo5()
+	tell application "iTunes" to set rating of current track to 100
+end setRatingTo5
+
+on decreaseVolume()
+	tell application "iTunes" to set sound volume to sound volume - 10
+end decreaseVolume
+
+on increaseVolume()
+	tell application "iTunes" to set sound volume to sound volume + 10
+end increaseVolume
+
+on toggleMute()
+	tell application "iTunes" to set mute to not mute
+end toggleMute
+
+on increaseRating()
+	tell application "iTunes"
+		if rating of current track is less than 100 then set rating of current track to (rating of current track) + 20
+	end tell
+end increaseRating
+
+on decreaseRating()
+	tell application "iTunes"
+		if rating of current track is greater than 0 then set rating of current track to (rating of current track) - 20
+	end tell
+end decreaseRating
+
+on playNow()
+	tell application "iTunes" to play
+end playNow
+
+on pauseNow()
+	tell application "iTunes" to pause
+end pauseNow
+
+on goForward()
+	tell application "iTunes" to next track
+end goForward
+
+on goBack()
+	tell application "iTunes" to previous track
+end goBack
+

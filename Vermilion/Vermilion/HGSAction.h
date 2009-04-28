@@ -57,12 +57,13 @@
   NSSet *directObjectTypes_;
   NSSet *indirectObjectTypes_;
   BOOL indirectObjectOptional_;
-  BOOL showInGlobalSearchResults_;
   BOOL causesUIContextChange_;
 }
 
 /*!
-  The types of direct objects that are valid for this action
+  The types of direct objects that are valid for this action.
+  If directObjectTypes is nil, then the action is shown in the first
+  layer of search results.
   @result The value of "HGSActionDirectObjectTypes" from config dict.
 */
 @property (readonly, retain) NSSet *directObjectTypes;
@@ -79,8 +80,7 @@
 @property (readonly) BOOL indirectObjectOptional;
 /*!
   Should this action appear in global search results list (ie-no pivot).
-  @result NO or the value of "HGSActionShowActionInGlobalSearchResults" from
-          config dict.
+  @result Defautls to YES if directObjectTypes is nil.
 */
 @property (readonly) BOOL showInGlobalSearchResults;
 /*!
@@ -168,3 +168,37 @@ extern NSString* const kHGSActionDirectObjectsKey;
  @see //google_vermilion_ref/occ/instm/HGSAction/performWithInfo: performWithInfo:
 */
 extern NSString* const kHGSActionIndirectObjectsKey;
+
+/*!
+ Configuration key for direct object types that the action supports.
+ Default is nil, which means that the action is a global action, and not
+ result specific.
+ 
+ Type is NSString, NSArray or NSSet. '*' matches Dall types.
+*/
+extern NSString* const kHGSActionDirectObjectTypesKey;
+
+/*!
+ Configuration key for indirect object types that the action supports.
+ Default is nil, which means no indirect objects.
+ 
+ Type is NSString, NSArray or NSSet. '*' matches all types.
+*/
+extern NSString* const kHGSActionIndirectObjectTypesKey;
+
+/*!
+ Configuration key for whether indirect object types are optional.
+ Default is NO.
+ 
+ Type is Boolean.
+*/
+extern NSString* const kHGSActionIndirectObjectOptionalKey;
+
+/*!
+ Configuration key for whether the action should cause a UI context change
+ away from QSB. If there's a context change QSB will disappear.
+ Default is YES.
+ 
+ Type is Boolean.
+*/
+extern NSString* const kHGSActionDoesActionCauseUIContextChangeKey;

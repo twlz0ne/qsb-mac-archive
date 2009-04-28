@@ -251,6 +251,8 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+  [[[bundleMock stub] andReturn:@"bundle.executable"]
+   objectForInfoDictionaryKey:@"CFBundleExecutable"];
   BOOL yes = YES;
   [[[bundleMock stub] andReturnValue:OCMOCK_VALUE(yes)] isLoaded];
   

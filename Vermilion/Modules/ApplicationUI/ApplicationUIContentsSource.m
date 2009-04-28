@@ -36,6 +36,7 @@
 #import "ApplicationUIAction.h"
 #import "HGSTokenizer.h"
 #import "QSBHGSDelegate.h"
+#import "GTMNSWorkspace+Running.h"
 
 // Turns out the Finder has a couple of places with recursive
 // accessibility references. 10 should be deep enough for most cases.
@@ -175,7 +176,7 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
   if ([GTMAXUIElement isAccessibilityEnabled]) {
-    NSArray *apps = [[NSWorkspace sharedWorkspace] launchedApplications];
+    NSArray *apps = [[NSWorkspace sharedWorkspace] gtm_launchedApplications];
     pid_t mypid = getpid();
     NSMutableArray *results = [NSMutableArray array];
     for (NSDictionary *appInfo in apps) {

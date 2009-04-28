@@ -150,6 +150,7 @@ static NSString *const kApplicationSourcePredicateString
                                (NSString *)kMDItemDisplayName,
                                (NSString *)kMDItemPath,
                                (NSString *)kMDItemLastUsedDate,
+                               (NSString *)kMDItemCFBundleIdentifier,
                                nil];
   NSUInteger resultCount = [query resultCount];
   //TODO(dmaclach): remove this once real ranking is in
@@ -203,6 +204,13 @@ static NSString *const kApplicationSourcePredicateString
     
     [attributes setObject:date forKey:kHGSObjectAttributeLastUsedDateKey];
 
+    // Grab a bundle ID
+    NSString *bundleID 
+      = [mdAttributes objectForKey:(NSString *)kMDItemCFBundleIdentifier];
+    if (bundleID) {
+      [attributes setObject:bundleID forKey:kHGSObjectAttributeBundleIDKey];
+    }
+    
     // create a HGSResult to talk to the rest of the application
     HGSResult *hgsResult 
       = [HGSResult resultWithFilePath:path
@@ -235,7 +243,8 @@ static NSString *const kApplicationSourcePredicateString
     NSURL *networkURL = [NSURL fileURLWithPath:networkPath];
     // Unfortunately last used date is hidden from us.
     [attributes removeObjectForKey:kHGSObjectAttributeLastUsedDateKey];
-
+    [attributes setObject:@"com.apple.preference.network"
+                   forKey:kHGSObjectAttributeBundleIDKey];
     HGSResult *hgsResult 
       = [HGSResult resultWithURL:networkURL
                             name:name
@@ -262,10 +271,11 @@ static NSString *const kApplicationSourcePredicateString
       || [name isEqualToString:NSMetadataQueryDidUpdateNotification] ) {
     NSMetadataQuery *query = [notification object];
     [query_ disableUpdates]; 
-    NSOperation *op = [[[NSInvocationOperation alloc] initWithTarget:self
-                                                            selector:@selector(parseResultsOperation:)
-                                                              object:query]
-                       autorelease];
+    NSOperation *op 
+      = [[[NSInvocationOperation alloc] initWithTarget:self
+                                              selector:@selector(parseResultsOperation:)
+                                                object:query]
+         autorelease];
     [[HGSOperationQueue sharedOperationQueue] addOperation:op];
   }
 }

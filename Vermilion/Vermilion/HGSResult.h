@@ -63,14 +63,14 @@ extern NSString* const kHGSObjectAttributeSourceURLKey;  // NSString
 extern NSString* const kHGSObjectAttributeIconKey;  // NSImage
 extern NSString* const kHGSObjectAttributeImmediateIconKey;  // NSImage
 extern NSString* const kHGSObjectAttributeIconPreviewFileKey;  // NSURL
-extern NSString *const kHGSObjectAttributeCompoundIconPreviewFileKey;  // NSURL
+extern NSString* const kHGSObjectAttributeCompoundIconPreviewFileKey;  // NSURL
 extern NSString* const kHGSObjectAttributeIsSyntheticKey;  // NSNumber (BOOL)
 extern NSString* const kHGSObjectAttributeIsContainerKey;  // NSNumber (BOOL)
 extern NSString* const kHGSObjectAttributeDefaultActionKey;  // id<HGSAction>
 extern NSString* const kHGSObjectAttributeContactEmailKey; // NSString - Primary email address
 extern NSString* const kHGSObjectAttributeEmailAddressesKey; // NSArray of NSString - Related email addresses
-extern NSString* const kHGSObjectAttributeContactsKey; // NSArray of NSString - Names of related people
-
+extern NSString* const kHGSObjectAttributeContactsKey;  // NSArray of NSString - Names of related people
+extern NSString* const kHGSObjectAttributeBundleIDKey;  // NSString - Bundle ID
 extern NSString* const kHGSObjectAttributeAlternateActionURIKey; // NSURL - url to be opened for accessory cell in mobile
 
 extern NSString* const kHGSObjectAttributeWebSearchDisplayStringKey; // Display string to replace "Search %@" when it doesn't make sense

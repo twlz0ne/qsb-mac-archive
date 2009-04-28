@@ -59,7 +59,7 @@ NSString* const kHGSObjectAttributeIsContainerKey = @"kHGSObjectAttributeIsConta
 NSString* const kHGSObjectAttributeRankKey = @"kHGSObjectAttributeRank";
 NSString* const kHGSObjectAttributeRankFlagsKey = @"kHGSObjectAttributeRankFlags";
 NSString* const kHGSObjectAttributeDefaultActionKey = @"kHGSObjectAttributeDefaultActionKey";
-
+NSString* const kHGSObjectAttributeBundleIDKey = @"kHGSObjectAttributeBundleID";
 NSString* const kHGSObjectAttributeWebSearchDisplayStringKey = @"kHGSObjectAttributeWebSearchDisplayString";
 NSString* const kHGSObjectAttributeWebSearchTemplateKey = @"kHGSObjectAttributeWebSearchTemplate";
 NSString* const kHGSObjectAttributeAllowSiteSearchKey = @"kHGSObjectAttributeAllowSiteSearch";

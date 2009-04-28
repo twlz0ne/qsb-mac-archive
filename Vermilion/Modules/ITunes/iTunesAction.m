@@ -34,11 +34,18 @@
 #import "GTMMethodCheck.h"
 #import "GTMNSAppleScript+Handler.h"
 #import "GTMObjectSingleton.h"
+#import "HGSAppleScriptAction.h"
+#import "GTMDebugThreadValidation.h"
 #import "GTMNSWorkspace+Running.h"
 
-static NSString *const kITunesAppleScriptHandlerKey = @"kITunesAppleScriptHandlerKey";
-static NSString *const kITunesAppleScriptParametersKey = @"kITunesAppleScriptParametersKey";
-static NSString *const kiTunesBundleID = @"com.apple.iTunes";
+static NSString *const kITunesAppleScriptHandlerKey 
+  = @"kITunesAppleScriptHandlerKey";
+static NSString *const kITunesAppleScriptParametersKey 
+  = @"kITunesAppleScriptParametersKey";
+static NSString *const kITunesPlayerInfoNotification 
+  = @"com.apple.iTunes.playerInfo";
+static NSString *const kITunesAppBundleID = @"com.apple.iTunes";
+static NSString *const kITunesShowIfPlayingKey = @"ITunesShowIfPlaying";
 
 @interface ITunesPlayAction : HGSAction
 @end
@@ -53,19 +60,24 @@ static NSString *const kiTunesBundleID = @"com.apple.iTunes";
 @interface ITunesAddToPartyShuffleAction : ITunesPartyShuffleAction
 @end
 
-@interface ITunesAppAction : HGSAction {
- @private
-  NSString *command_;
-}
-- (BOOL)isPlaying;
+enum ITunesAppPlayingState {
+  eITunesPaused = 0,
+  eITunesPlaying = 1,
+  eITunesUnknown = 2
+};
 
+@interface ITunesAppPlayingAction : HGSAppleScriptAction {
+ @private
+  BOOL showIfPlaying_;
+  enum ITunesAppPlayingState playingState_;
+}
+
+- (BOOL)isPlaying;
 @end
 
 @interface ITunesActionSupport : NSObject {
   NSAppleScript *script_; // STRONG
-  BOOL iTunesIsRunning_;
 }
-- (NSAppleScript *)appleScript;
 @end
 
 @implementation ITunesActionSupport
@@ -73,39 +85,21 @@ static NSString *const kiTunesBundleID = @"com.apple.iTunes";
 GTMOBJECT_SINGLETON_BOILERPLATE(ITunesActionSupport, sharedSupport);
 
 - (id)init {
-  self = [super init];
-  if (self) {
-    NSNotificationCenter *workSpaceNC = [[NSWorkspace sharedWorkspace] notificationCenter];
-    [workSpaceNC addObserver:self
-                    selector:@selector(didLaunchApp:)
-                        name:NSWorkspaceDidLaunchApplicationNotification
-                      object:nil];
-    [workSpaceNC addObserver:self
-                    selector:@selector(didTerminateApp:)
-                        name:NSWorkspaceDidTerminateApplicationNotification
-                      object:nil];
-    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-    iTunesIsRunning_ = [ws gtm_isAppWithIdentifierRunning:kiTunesBundleID];
-  }
-  return self;
-}
-
-- (NSAppleScript *)appleScript {
-  @synchronized(self) {
+  if ((self = [super init])) {
+    NSBundle *bundle = HGSGetPluginBundle();
+    NSString *path = [bundle pathForResource:@"iTunes"
+                                      ofType:@"scpt"
+                                 inDirectory:@"Scripts"];
+    NSURL *url = [NSURL fileURLWithPath:path];
+    NSDictionary *error = nil;
+    script_ = [[NSAppleScript alloc] initWithContentsOfURL:url error:&error];
     if (!script_) {
-      NSBundle *bundle = HGSGetPluginBundle();
-      NSString *path = [bundle pathForResource:@"iTunes"
-                                        ofType:@"scpt"
-                                   inDirectory:@"Scripts"];
-      NSURL *url = [NSURL fileURLWithPath:path];
-      NSDictionary *error = nil;
-      script_ = [[NSAppleScript alloc] initWithContentsOfURL:url error:&error];
-      if (!script_) {
-        HGSLogDebug(@"Unable to load script: %@ error: %@", url, error);
-      }
+      HGSLogDebug(@"Unable to load script: %@ error: %@", url, error);
+      [self release];
+      self = nil;
     }
-  }
-  return script_;
+  }  
+  return self;
 }
 
 - (void)dealloc {
@@ -118,37 +112,13 @@ GTMOBJECT_SINGLETON_BOILERPLATE(ITunesActionSupport, sharedSupport);
   NSAppleEventDescriptor *result;
   NSString *handler = [params objectForKey:kITunesAppleScriptHandlerKey];
   NSArray *args = [params objectForKey:kITunesAppleScriptParametersKey];
-  result = [[self appleScript] gtm_executePositionalHandler:handler
-                                                 parameters:args
-                                                      error:&errorDictionary];
+  result = [script_ gtm_executePositionalHandler:handler
+                                      parameters:args
+                                           error:&errorDictionary];
   if (errorDictionary) {
     HGSLog(@"iTunes script failed %@(%@): %@", handler, args, errorDictionary);
   }
   return result;
-}
-
-- (void)didLaunchApp:(NSNotification *)notification {
-  if (!iTunesIsRunning_) {
-    NSDictionary *userInfo = [notification userInfo];
-    NSString *bundleID = [userInfo objectForKey:@"NSApplicationBundleIdentifier"];
-    if ([bundleID isEqualToString:kiTunesBundleID]) {
-      iTunesIsRunning_ = YES;
-    }
-  }
-}
-
-- (void)didTerminateApp:(NSNotification *)notification {
-  if (iTunesIsRunning_) {
-    NSDictionary *userInfo = [notification userInfo];
-    NSString *bundleID = [userInfo objectForKey:@"NSApplicationBundleIdentifier"];
-    if ([bundleID isEqualToString:kiTunesBundleID]) {
-      iTunesIsRunning_ = NO;
-    }
-  }
-}
-
-- (BOOL)iTunesIsRunning {
-  return iTunesIsRunning_;
 }
 
 @end
@@ -275,65 +245,63 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
 }
 @end
 
-// Actions that are applied to the iTunes application rather than
-// iTunes search results
-@implementation ITunesAppAction
-
+// Actions that are applied to the iTunes application while it's playing
+// music
+@implementation ITunesAppPlayingAction
 GTM_METHOD_CHECK(NSWorkspace, gtm_isAppWithIdentifierRunning:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    command_ = [[configuration objectForKey:@"iTunesCommand"] retain];
+    NSDistributedNotificationCenter *nc 
+      = [NSDistributedNotificationCenter defaultCenter];
+    [nc addObserver:self selector:@selector(iTunesPlayerInfoNotification:)
+               name:kITunesPlayerInfoNotification object:NULL];
+    playingState_ = eITunesUnknown;
+    showIfPlaying_
+      = [[configuration objectForKey:kITunesShowIfPlayingKey] boolValue];
   }
   return self;
 }
 
 - (void)dealloc {
-  [command_ release];
+  NSDistributedNotificationCenter *nc 
+    = [NSDistributedNotificationCenter defaultCenter];
+  [nc removeObserver:self];
   [super dealloc];
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
-  NSDictionary *scriptParams = [NSDictionary dictionaryWithObjectsAndKeys:
-                                command_, kITunesAppleScriptHandlerKey,
-                                nil];
-  ITunesActionSupport *support = [ITunesActionSupport sharedSupport];
-  [support performSelectorOnMainThread:@selector(execute:)
-                            withObject:scriptParams
-                         waitUntilDone:NO];
-  return YES;
+- (void)iTunesPlayerInfoNotification:(NSNotification *)notification {
+  NSString *state = [[notification userInfo] objectForKey:@"Player State"];
+  BOOL isPlaying = [state isEqualToString:@"Playing"];
+  playingState_ = isPlaying ? eITunesPlaying : eITunesPaused;
 }
 
 - (BOOL)isPlaying {
-  NSDictionary *scriptParams = [NSDictionary dictionaryWithObjectsAndKeys:
-                                @"isPlaying", kITunesAppleScriptHandlerKey,
-                                 nil];
-  ITunesActionSupport *support = [ITunesActionSupport sharedSupport];
-  NSAppleEventDescriptor *result = [support execute:scriptParams];
-  return [result booleanValue];
+  if (playingState_ == eITunesUnknown) {
+    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+    if ([ws gtm_isAppWithIdentifierRunning:kITunesAppBundleID]) {
+      NSDictionary *scriptParams = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    @"isPlaying", kITunesAppleScriptHandlerKey,
+                                    nil];
+      ITunesActionSupport *support = [ITunesActionSupport sharedSupport];
+      NSAppleEventDescriptor *result = [support execute:scriptParams];
+      BOOL isPlaying = [result booleanValue];
+      playingState_ = isPlaying ? eITunesPlaying : eITunesPaused;
+    } else {
+      playingState_ = eITunesPaused;
+    }
+  }
+  return playingState_ == eITunesPlaying;
 }
 
 - (BOOL)showInGlobalSearchResults {
-  return [[ITunesActionSupport sharedSupport] iTunesIsRunning];
+  BOOL shouldShow = [super showInGlobalSearchResults];
+  return shouldShow && (showIfPlaying_ == [self isPlaying]);
 }
 
 - (BOOL)appliesToResults:(HGSResultArray *)results {
   BOOL doesApply = [super appliesToResults:results];
-  if (doesApply) {
-    doesApply = NO;
-    if ([results count] == 1) {
-      if ([[ITunesActionSupport sharedSupport] iTunesIsRunning]) {
-        HGSResult *result = [results objectAtIndex:0];
-        NSURL *url = [result url];
-        NSString *path = [url path];
-        // I only check the suffix here instead of a more comprehensive check
-        // of the bundle ID, because grabbing the bundle each time is expensive
-        // at pivot time,  and we don't want to slow ourselves down. This is a 
-        // "weaker" check, but is sufficient for our purposes.
-        doesApply = [path hasSuffix:@"/iTunes.app"];
-      }
-    }
-  }
-  return doesApply;
+  return doesApply && (showIfPlaying_ == [self isPlaying]);
 }
+
 @end

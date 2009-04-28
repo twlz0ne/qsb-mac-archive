@@ -35,6 +35,7 @@
 #import "GTMAXUIElement.h"
 #import "ApplicationUIAction.h"
 #import "HGSStringUtil.h"
+#import "GTMNSWorkspace+Running.h"
 
 NSString *const kAppUISourceAttributeElementKey 
   = @"kHGSAppUISourceAttributeElementKey";
@@ -93,7 +94,7 @@ NSString *const kAppUISourceAttributeElementKey
     if ([appURL isFileURL]) {
       NSString *path = [appURL path];
       NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-      NSArray *runningApps = [ws launchedApplications];
+      NSArray *runningApps = [ws gtm_launchedApplications];
       NSPredicate *pred 
         = [NSPredicate predicateWithFormat:@"SELF.NSApplicationPath == %@", 
            path];

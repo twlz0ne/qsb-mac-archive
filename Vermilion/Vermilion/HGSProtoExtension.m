@@ -240,14 +240,17 @@
   NSBundle *bundle = [configuration_ objectForKey:kHGSExtensionBundleKey];
   HGSExtension *extension = nil;
   
-  // Ensure the bundle is loaded
-  if (![bundle isLoaded]) {
-    // TODO(dmaclach): if we move stats, python, etc. from the current extension
-    // loading, we can make all plugin's not get loaded until here, so we don't
-    // may costs during startup for loading and never load a code bundle if it
-    // has no active sources/actions.
-    if (![bundle load]) {
-      HGSLog(@"Unable to load bundle %@", bundle);
+  if ([bundle objectForInfoDictionaryKey:@"CFBundleExecutable"]) {
+    // Ensure the bundle is loaded
+    if (![bundle isLoaded]) {
+      // TODO(dmaclach): if we move stats, python, etc. from the current
+      // extension loading, we can make all plugin's not get loaded until here,
+      // so we don't may costs during startup for loading and never load a code
+      // bundle if it has no active sources/actions.
+      if (![bundle load]) {
+        HGSLog(@"Unable to load bundle %@", bundle);
+        return;
+      }
     }
   }
   

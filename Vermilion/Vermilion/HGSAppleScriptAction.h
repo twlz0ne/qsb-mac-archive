@@ -1,5 +1,5 @@
 //
-//  AppleScriptPluginsAction.h
+//  HGSAppleScriptAction.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,35 +30,20 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
+#import "HGSAction.h"
 
-extern NSString *const kHGSAppleScriptPListVersionKey;  // int
-extern const NSInteger kHGSAppleScriptCurrentVersion;
-extern NSString *const kHGSAppleScriptScriptsKey;  // array of dictionaries
+extern NSString *const kHGSAppleScriptFileNameKey;
+extern NSString *const kHGSAppleScriptHandlerNameKey;
+extern NSString *const kHGSAppleScriptApplicationsKey;
+extern NSString *const kHGSAppleScriptBundleIDKey;
+extern NSString *const kHGSAppleScriptMustBeRunningKey;
 
-// kHGSAppleScriptScriptsKey keys
-extern NSString *const kHGSAppleScriptDisplayNameKey;  // format string
-extern NSString *const kHGSAppleScriptIconKey;  // relative path to bundle
-extern NSString *const kHGSAppleScriptDescriptionKey;  // string
-extern NSString *const kHGSAppleScriptHandlerKey;  // string
-extern NSString *const kHGSAppleScriptDisplayInGlobalResultsKey;  // BOOL
-extern NSString *const kHGSAppleScriptSupportedTypesKey;  // Array of string
-extern NSString *const kHGSAppleScriptRequiredRunningAppKey;  // string (bundleid)
-extern NSString *const kHGSAppleScriptSwitchContextsKey; // BOOL (default YES)
-
-@interface AppleScriptPluginsAction : HGSAction {
+@interface HGSAppleScriptAction : HGSAction {
  @private
-  NSAppleScript *script_;  // the script we are running
-  NSString *description_;
-  NSString *handler_;  // the handler that this script calls
-  BOOL displayInGlobalResults_;  // do we want it displayed in global results
-  NSString *requiredRunningAppBundleID_;  // only display when this app is up
-  NSSet *supportedTypes_;  // set of types we support
-  BOOL switchContexts_;  //  should we switch contexts when run
+  NSAppleScript *script_;
+  NSString *handlerName_;
+  NSArray *requiredApplications_;
 }
 
-- (id)initWithScript:(NSAppleScript *)script 
-                path:(NSString *)path
-          attributes:(NSDictionary *)attributes;
+- (id)initWithConfiguration:(NSDictionary *)configuration;
 @end
-
