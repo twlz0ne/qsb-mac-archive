@@ -1,4 +1,4 @@
-This template builds a basic Objective-C plugin for Quick Search Box.
+This template builds a basic AppleScript plugin for Quick Search Box.
 
 It requires that you set up two source trees in Xcode to compile. You will have 
 to have the QuickSearchBox source tree downloaded to your machine. Instructions 
@@ -31,7 +31,7 @@ update the "CFBundleIdentifier" and the two "HGSExtensionIdentifier" entries
 to be something appropriate. You will find the "HGSExtensionIdentifier" entries
 under the "HGSExtension" entry.
 
-Now you are ready to add your own code in the two source files to actually
+Now you are ready to add your own code in the *.applescript file to
 make your plugin do something.
 
 If you are developing plugins, please join our mailing list:

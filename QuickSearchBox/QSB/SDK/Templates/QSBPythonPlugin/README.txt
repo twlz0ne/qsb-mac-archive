@@ -25,7 +25,7 @@ The plugin should now build cleanly.
 You should only have to add the source trees to Xcode the first time you 
 build a QSB plugin.
 
-Before you start coding you plugin, you will now want to make some changes in
+Before you start coding you plugin, you will want to make some changes in
 the Info.plist file to make your plugin unique. Open the Info.plist file and
 update the "CFBundleIdentifier" and the two "HGSExtensionIdentifier" entries 
 to be something appropriate. You will find the "HGSExtensionIdentifier" entries
