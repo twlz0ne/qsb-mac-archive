@@ -25,6 +25,7 @@
 				8B148D850F705F35002E05FA /* Build SDK */,
 			);
 			dependencies = (
+				8B989F5A0FA7B977009DC652 /* PBXTargetDependency */,
 			);
 			name = "QSB SDK";
 			productName = "QSB SDK";
@@ -1318,6 +1319,34 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
+		8B989F400FA7B93C009DC652 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA /* ___PROJECTNAME___.hgs */;
+			remoteInfo = "___PROJECTNAME___";
+		};
+		8B989F460FA7B93C009DC652 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B989F2A0FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA /* ___PROJECTNAME___.hgs */;
+			remoteInfo = "___PROJECTNAME___";
+		};
+		8B989F4C0FA7B93C009DC652 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA /* ___PROJECTNAME___.hgs */;
+			remoteInfo = "___PROJECTNAME___";
+		};
+		8B989F590FA7B977009DC652 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B2E2A400F99018600F80E11 /* HeaderDoc */;
+			remoteInfo = HeaderDoc;
+		};
 		8BC6744D0F58B097003B5C6A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -2124,6 +2153,29 @@
 		8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMRegex.h; sourceTree = "<group>"; };
 		8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMRegex.m; sourceTree = "<group>"; };
 		8B95CE1F0F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAbbreviationRankerTest.m; sourceTree = "<group>"; };
+		8B989F090FA7B93C009DC652 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8B989F0A0FA7B93C009DC652 /* Nodes.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Nodes.xml; sourceTree = "<group>"; };
+		8B989F0B0FA7B93C009DC652 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8B989F0D0FA7B93C009DC652 /* background.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = background.tiff; sourceTree = "<group>"; };
+		8B989F0E0FA7B93C009DC652 /* License.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = License.rtf; sourceTree = "<group>"; };
+		8B989F0F0FA7B93C009DC652 /* Welcome.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Welcome.rtf; sourceTree = "<group>"; };
+		8B989F110FA7B93C009DC652 /* QSBPlistStructDefs.xcodeplugin */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = QSBPlistStructDefs.xcodeplugin; sourceTree = "<group>"; };
+		8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "___PROJECTNAME___.xcodeproj"; sourceTree = "<group>"; };
+		8B989F170FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = "___PROJECTNAMEASIDENTIFIER___.applescript"; sourceTree = "<group>"; };
+		8B989F270FA7B93C009DC652 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8B989F280FA7B93C009DC652 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		8B989F2A0FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "___PROJECTNAME___.xcodeproj"; sourceTree = "<group>"; };
+		8B989F2D0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER____Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "___PROJECTNAMEASIDENTIFIER____Prefix.pch"; sourceTree = "<group>"; };
+		8B989F2E0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___Action.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "___PROJECTNAMEASIDENTIFIER___Action.m"; sourceTree = "<group>"; };
+		8B989F2F0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___Source.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "___PROJECTNAMEASIDENTIFIER___Source.m"; sourceTree = "<group>"; };
+		8B989F310FA7B93C009DC652 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		8B989F320FA7B93C009DC652 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8B989F330FA7B93C009DC652 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "___PROJECTNAME___.xcodeproj"; sourceTree = "<group>"; };
+		8B989F380FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "___PROJECTNAMEASIDENTIFIER___.png"; sourceTree = "<group>"; };
+		8B989F390FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = "___PROJECTNAMEASIDENTIFIER___.py"; sourceTree = "<group>"; };
+		8B989F3A0FA7B93C009DC652 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8B989F3B0FA7B93C009DC652 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		8BA019C20F14303400926923 /* GTMSQLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMSQLite.m; sourceTree = "<group>"; };
 		8BA019C30F14303400926923 /* GTMSQLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMSQLite.h; sourceTree = "<group>"; };
 		8BA01C000F147DB000926923 /* GTMNSWorkspace+Running.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSWorkspace+Running.h"; sourceTree = "<group>"; };
@@ -3394,6 +3446,7 @@
 				62521AB60EFAC30000A6E647 /* QSBViewTableViewDelegateProtocol.h */,
 				7F3F7EC30F39FCE70054680A /* QSBHGSResult+NSPasteboard.h */,
 				7F3F7EC40F39FCE70054680A /* QSBHGSResult+NSPasteboard.m */,
+				8B989F070FA7B93C009DC652 /* SDK */,
 				8B07C41B0B69234900827344 /* BuildScripts */,
 				8B5EC6870CEE61BF00AD3BBD /* Resources */,
 				8B5EC6BC0CEE61BF00AD3BBD /* ScriptingSupport */,
@@ -3742,6 +3795,116 @@
 				8B924E000EE7A58700F3DF32 /* TypeCategories.plist */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		8B989F070FA7B93C009DC652 /* SDK */ = {
+			isa = PBXGroup;
+			children = (
+				8B989F080FA7B93C009DC652 /* DocumentationResources */,
+				8B989F0B0FA7B93C009DC652 /* Info.plist */,
+				8B989F0C0FA7B93C009DC652 /* PackageResources */,
+				8B989F100FA7B93C009DC652 /* Plugins */,
+				8B989F120FA7B93C009DC652 /* Templates */,
+			);
+			path = SDK;
+			sourceTree = "<group>";
+		};
+		8B989F080FA7B93C009DC652 /* DocumentationResources */ = {
+			isa = PBXGroup;
+			children = (
+				8B989F090FA7B93C009DC652 /* Info.plist */,
+				8B989F0A0FA7B93C009DC652 /* Nodes.xml */,
+			);
+			path = DocumentationResources;
+			sourceTree = "<group>";
+		};
+		8B989F0C0FA7B93C009DC652 /* PackageResources */ = {
+			isa = PBXGroup;
+			children = (
+				8B989F0D0FA7B93C009DC652 /* background.tiff */,
+				8B989F0E0FA7B93C009DC652 /* License.rtf */,
+				8B989F0F0FA7B93C009DC652 /* Welcome.rtf */,
+			);
+			path = PackageResources;
+			sourceTree = "<group>";
+		};
+		8B989F100FA7B93C009DC652 /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				8B989F110FA7B93C009DC652 /* QSBPlistStructDefs.xcodeplugin */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
+		8B989F120FA7B93C009DC652 /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				8B989F130FA7B93C009DC652 /* QSBAppleScriptPlugin */,
+				8B989F290FA7B93C009DC652 /* QSBPlugin */,
+				8B989F340FA7B93C009DC652 /* QSBPythonPlugin */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
+		8B989F130FA7B93C009DC652 /* QSBAppleScriptPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */,
+				8B989F170FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___.applescript */,
+				8B989F270FA7B93C009DC652 /* Info.plist */,
+				8B989F280FA7B93C009DC652 /* README.txt */,
+			);
+			path = QSBAppleScriptPlugin;
+			sourceTree = "<group>";
+		};
+		8B989F150FA7B93C009DC652 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8B989F410FA7B93C009DC652 /* ___PROJECTNAME___.hgs */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8B989F290FA7B93C009DC652 /* QSBPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				8B989F2A0FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */,
+				8B989F2D0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER____Prefix.pch */,
+				8B989F2E0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___Action.m */,
+				8B989F2F0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___Source.m */,
+				8B989F300FA7B93C009DC652 /* InfoPlist.strings */,
+				8B989F320FA7B93C009DC652 /* Info.plist */,
+				8B989F330FA7B93C009DC652 /* README.txt */,
+			);
+			path = QSBPlugin;
+			sourceTree = "<group>";
+		};
+		8B989F2B0FA7B93C009DC652 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8B989F470FA7B93C009DC652 /* ___PROJECTNAME___.hgs */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8B989F340FA7B93C009DC652 /* QSBPythonPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */,
+				8B989F380FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___.png */,
+				8B989F390FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___.py */,
+				8B989F3A0FA7B93C009DC652 /* Info.plist */,
+				8B989F3B0FA7B93C009DC652 /* README.txt */,
+			);
+			path = QSBPythonPlugin;
+			sourceTree = "<group>";
+		};
+		8B989F360FA7B93C009DC652 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8B989F4D0FA7B93C009DC652 /* ___PROJECTNAME___.hgs */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		8BA6236D0F12B97E008182B5 /* XcodeConfig */ = {
@@ -4988,6 +5151,18 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = 8B989F150FA7B93C009DC652 /* Products */;
+					ProjectRef = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+				},
+				{
+					ProductGroup = 8B989F2B0FA7B93C009DC652 /* Products */;
+					ProjectRef = 8B989F2A0FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+				},
+				{
+					ProductGroup = 8B989F360FA7B93C009DC652 /* Products */;
+					ProjectRef = 8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+				},
+				{
 					ProductGroup = 8B637B4D0F2777C300997738 /* Products */;
 					ProjectRef = 8B637B4C0F2777C300997738 /* GData.xcodeproj */;
 				},
@@ -5120,6 +5295,27 @@
 			fileType = "compiled.mach-o.executable";
 			path = DevelopmentTestTool;
 			remoteRef = 8B637B5A0F2777C300997738 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8B989F410FA7B93C009DC652 /* ___PROJECTNAME___.hgs */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "___PROJECTNAME___.hgs";
+			remoteRef = 8B989F400FA7B93C009DC652 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8B989F470FA7B93C009DC652 /* ___PROJECTNAME___.hgs */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "___PROJECTNAME___.hgs";
+			remoteRef = 8B989F460FA7B93C009DC652 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8B989F4D0FA7B93C009DC652 /* ___PROJECTNAME___.hgs */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "___PROJECTNAME___.hgs";
+			remoteRef = 8B989F4C0FA7B93C009DC652 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -5644,7 +5840,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "set -o errexit\necho \"Building SDK Package\"\n\nSDK_PACKAGE_DIR=\"${TEMP_DIR}/QSB SDK\"\nTEMPLATE_DIR=\"${SDK_PACKAGE_DIR}/Library/Application Support/Developer/Shared/Xcode/Project Templates/QSB\"\nPLUGIN_DIR=\"${SDK_PACKAGE_DIR}/Library/Application Support/Developer/Shared/Xcode/Plug-ins/\"\n\nmkdir -p \"${TEMPLATE_DIR}\"\nmkdir -p \"${PLUGIN_DIR}\"\n\nfind \"${SDK_PACKAGE_DIR}\" -name \"*.pbxuser\" ! -name \"default.pbxuser\" -exec rm {} \\;\n\nditto \"${SRCROOT}/SDK/Templates\" \"${TEMPLATE_DIR}\"\nditto \"${SRCROOT}/SDK/Plugins\" \"${PLUGIN_DIR}\"\n\n\"${SYSTEM_DEVELOPER_UTILITIES_DIR}/PackageMaker.app/Contents/MacOS/PackageMaker\" -v --root \"${SDK_PACKAGE_DIR}\" -x \"/CVS$\" -x \"/\\.svn$\" -x \"/\\.cvsignore$\" -x \"/\\.cvspass$\" -x /\"\\.DS_Store$\" -x \"/build$\" -x \"/*\\.mode*\" --out \"${CONFIGURATION_BUILD_DIR}/Google Quick Search Box SDK.pkg\" -t \"Google Quick Search Box SDK\" --resources \"${SRCROOT}/SDK/PackageResources\" --target 10.5 --domain system --id \"com.google.qsb.sdk.pkg\"";
+			shellScript = "set -o errexit\necho \"Building SDK Package\"\n\nSDK_PACKAGE_DIR=\"${TEMP_DIR}/QSB SDK\"\nTEMPLATE_DIR=\"${SDK_PACKAGE_DIR}/Library/Application Support/Developer/Shared/Xcode/Project Templates/QSB\"\nPLUGIN_DIR=\"${SDK_PACKAGE_DIR}/Library/Application Support/Developer/Shared/Xcode/Plug-ins/\"\nDOCUMENTATION_DIR=\"${SDK_PACKAGE_DIR}/Library/Developer/Shared/Documentation/DocSets/com.google.qsb.docset\"\nDOCUMENTATION_CONTENTS_DIR=\"${DOCUMENTATION_DIR}/Contents\"\nDOCUMENTATION_RESOURCES_DIR=\"${DOCUMENTATION_CONTENTS_DIR}/Resources\"\nDOCUMENTATION_DOCUMENTS_DIR=\"${DOCUMENTATION_RESOURCES_DIR}/Documents\"\nINSTALLER_DIR=\"${SDK_PACKAGE_DIR}/Google Quick Search Box SDK\"\n\nif [ -d \"${SDK_PACKAGE_DIR}\" ]; then\n  rm -Rf  \"${SDK_PACKAGE_DIR}\"\nfi\n\nmkdir -p \"${TEMPLATE_DIR}\"\nmkdir -p \"${PLUGIN_DIR}\"\nmkdir -p \"${DOCUMENTATION_DOCUMENTS_DIR}\"\nmkdir -p \"${INSTALLER_DIR}\"\n\nditto \"${SRCROOT}/SDK/Templates\" \"${TEMPLATE_DIR}\"\nditto \"${SRCROOT}/SDK/Plugins\" \"${PLUGIN_DIR}\"\nditto \"${BUILT_PRODUCTS_DIR}/Documentation/Vermilion\" \"${DOCUMENTATION_DOCUMENTS_DIR}\"\ncp \"${SRCROOT}/SDK/DocumentationResources/Info.plist\" \"${DOCUMENTATION_CONTENTS_DIR}/Info.plist\"\ncp \"${SRCROOT}/SDK/DocumentationResources/Nodes.xml\" \"${DOCUMENTATION_RESOURCES_DIR}/Nodes.xml\"\n\n# Index documentation\n\"${SYSTEM_DEVELOPER_BIN_DIR}/docsetutil\" index \"${DOCUMENTATION_DIR}\"\n\nfind \"${SDK_PACKAGE_DIR}\" -name \"*.pbxuser\" ! -name \"default.pbxuser\" -exec rm {} \\;\n\nchmod -R 755 \"${SDK_PACKAGE_DIR}\"\n\n\"${SYSTEM_DEVELOPER_UTILITIES_DIR}/PackageMaker.app/Contents/MacOS/PackageMaker\" -v --root \"${SDK_PACKAGE_DIR}\" -x \"/CVS$\" -x \"/\\.svn$\" -x \"/\\.cvsignore$\" -x \"/\\.cvspass$\" -x /\"\\.DS_Store$\" -x \"/build$\" -x \"/*\\.mode*\" --out \"${INSTALLER_DIR}/Google Quick Search Box SDK.pkg\" -t \"Google Quick Search Box SDK\" --resources \"${SRCROOT}/SDK/PackageResources\" --domain system --id \"com.google.qsb.sdk.pkg\" --version \"${GOOGLE_VERSIONINFO_LONG}\" --info \"${SRCROOT}/SDK/Info.plist\" --target 10.4 \n\necho \"Creating SDK Disk Image\"\n/usr/bin/hdiutil create -format UDRO -srcfolder \"${INSTALLER_DIR}\" -volname \"Google Quick Search Box SDK\" -ov \"${CONFIGURATION_BUILD_DIR}/GoogleQuickSearchBoxSDK-${GOOGLE_VERSIONINFO_LONG}.${CONFIGURATION}.dmg\"";
 		};
 		8B148F950F7156B6002E05FA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -5666,7 +5862,7 @@
 			files = (
 			);
 			inputPaths = (
-				"$(CONFIGURATION_BUILD_DIR)/$(FULL_PRODUCT_NAME)",
+				"$(CONFIGURATION_BUILD_DIR)/Vermilion.framework",
 				"$(SRCROOT)/../../Vermilion/Documentation/vermilion.hdoc",
 				"$(SRCROOT)/../../Vermilion/Documentation/headerdoc2html.config",
 				"$(SRCROOT)/../../Vermilion/Documentation/toctemplate.html",
@@ -5676,7 +5872,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "DOC_FOLDER=\"${CONFIGURATION_BUILD_DIR}/Documentation/Vermilion\"\ncd \"${SRCROOT}/../../Vermilion/Documentation\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"./vermilion.hdoc\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"${CONFIGURATION_BUILD_DIR}/${PUBLIC_HEADERS_FOLDER_PATH}\"\n/usr/bin/gatherheaderdoc $DOC_FOLDER";
+			shellScript = "DOC_FOLDER=\"${CONFIGURATION_BUILD_DIR}/Documentation/Vermilion\"\ncd \"${SRCROOT}/../../Vermilion/Documentation\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"./vermilion.hdoc\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"${CONFIGURATION_BUILD_DIR}/Vermilion.framework/Versions/A/Headers\"\n/usr/bin/gatherheaderdoc $DOC_FOLDER";
 		};
 		8B3EED760CEA86A100D933C0 /* Post Build Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6955,6 +7151,11 @@
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 8B7DAB030DB9B288008B5C71 /* PBXContainerItemProxy */;
 		};
+		8B989F5A0FA7B977009DC652 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B2E2A400F99018600F80E11 /* HeaderDoc */;
+			targetProxy = 8B989F590FA7B977009DC652 /* PBXContainerItemProxy */;
+		};
 		8BC6744E0F58B097003B5C6A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B77E0DB0F28FC3B00FA2A3C /* GData */;
@@ -7337,6 +7538,14 @@
 				8B924DFD0EE7A57C00F3DF32 /* English */,
 			);
 			name = TypeCategories.plist;
+			sourceTree = "<group>";
+		};
+		8B989F300FA7B93C009DC652 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8B989F310FA7B93C009DC652 /* English */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 		8BC685550F5ED38C003B5C6A /* SetUpAccount.xib */ = {
