@@ -43,11 +43,11 @@
  Therefore, according to the unicode spec, "MacPython2.4" should not break,
  but we break it as "Mac" "Python" "2.4". Numbers are defined as [0-9\.,]+.
  
- This tokenizer break all Roman languages and CZJK.
+ This tokenizer breaks all Roman languages and CZJK.
 */ 
 
 /*!
- @classdesign HGSTokenizer is thread safe.
+ HGSTokenizer is thread safe.
 */
 @interface HGSTokenizer : NSObject
 + (NSString *)tokenizeString:(NSString *)string;
