@@ -65,24 +65,18 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
       fileName = @"main";
     }
     NSBundle *bundle = [configuration objectForKey:kHGSExtensionBundleKey];
-    NSString *scriptPath = [bundle pathForResource:fileName 
-                                            ofType:@"scpt" 
-                                       inDirectory:@"Scripts"];
-    if (!scriptPath) {
-      scriptPath = [bundle pathForResource:fileName 
-                                    ofType:@"applescript" 
-                               inDirectory:@"Scripts"];
+    scriptPath_ = [bundle pathForResource:fileName 
+                                   ofType:@"scpt" 
+                              inDirectory:@"Scripts"];
+    if (!scriptPath_) {
+      scriptPath_ = [bundle pathForResource:fileName 
+                                     ofType:@"applescript" 
+                                inDirectory:@"Scripts"];
     }
-    NSDictionary *err = nil;
-    if (scriptPath) {
-      NSURL *url = [NSURL fileURLWithPath:scriptPath];
-      
-      script_ = [[NSAppleScript alloc] initWithContentsOfURL:url error:&err];
-    }
-    if (!script_) {
+    if (!scriptPath_) {
       [self release];
       self = nil;
-      HGSLog(@"Unable to load script %@ (%@)", fileName, err);
+      HGSLog(@"Unable to locate script %@", fileName);
     } else {
       handlerName_ = [configuration objectForKey:kHGSAppleScriptHandlerNameKey];
       if (!handlerName_ && [script_ gtm_hasOpenDocumentsHandler]) {
@@ -100,6 +94,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
 - (void)dealloc {
   [handlerName_ release];
   [requiredApplications_ release];
+  [scriptPath_ release];
   [script_ release];
   [super dealloc];
 }
@@ -159,44 +154,63 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
   return showInResults;
 }
 
+- (void)loadScript {
+  NSDictionary *err = nil;
+  NSURL *url = [NSURL fileURLWithPath:scriptPath_];
+  script_ = [[NSAppleScript alloc] initWithContentsOfURL:url error:&err];
+  if (!script_) {
+    HGSLog(@"Unable to load script at %@ (%@)", scriptPath_, err);
+  }
+}
+
 - (BOOL)performWithInfo:(NSDictionary*)info {
   // If we have a handler we call it
   // if not and it supports open, we call that
   // otherwise we just run the script.
   BOOL wasGood = NO;
-  NSDictionary *error = nil;
-  if (handlerName_) {
-    HGSResultArray *directObjects 
-      = [info objectForKey:kHGSActionDirectObjectsKey];
-    NSArray *urls = [directObjects urls];
-    
-    if ([handlerName_ isEqualToString:kHGSOpenDocAppleEvent]) {
-      NSAppleEventDescriptor *target 
-        = [[NSProcessInfo processInfo] gtm_appleEventDescriptor];
-      NSAppleEventDescriptor *openDoc 
-        = [NSAppleEventDescriptor appleEventWithEventClass:kCoreEventClass 
-                                                   eventID:kAEOpenDocuments
-                                          targetDescriptor:target 
-                                                  returnID:kAutoGenerateReturnID 
-                                             transactionID:kAnyTransactionID];
-      [openDoc setParamDescriptor:[urls gtm_appleEventDescriptor]
-                       forKeyword:keyDirectObject];
-      [script_ gtm_executeAppleEvent:openDoc error:&error];
-    } else {
-      NSArray *params = [NSArray arrayWithObjects:urls, nil];
-      
-      [script_ gtm_executePositionalHandler:handlerName_ 
-                                 parameters:params 
-                                      error:&error];
+  @synchronized(self) {
+    if (!script_) {
+      [self performSelectorOnMainThread:@selector(loadScript) 
+                             withObject:nil 
+                          waitUntilDone:YES];
     }
-  } else {
-    [script_ executeAndReturnError:&error];
+    wasGood = script_ != nil;
   }
-  if (!error) {
-    wasGood = YES;
-  } else {
-    //TODO(dmaclach): Handle error logging to user better
-    HGSLogDebug(@"Applescript Error: %@", error);
+  if (wasGood) {
+    NSDictionary *error = nil;
+    if (handlerName_) {
+      HGSResultArray *directObjects 
+        = [info objectForKey:kHGSActionDirectObjectsKey];
+      NSArray *urls = [directObjects urls];
+      
+      if ([handlerName_ isEqualToString:kHGSOpenDocAppleEvent]) {
+        NSAppleEventDescriptor *target 
+          = [[NSProcessInfo processInfo] gtm_appleEventDescriptor];
+        NSAppleEventDescriptor *openDoc 
+          = [NSAppleEventDescriptor appleEventWithEventClass:kCoreEventClass 
+                                                     eventID:kAEOpenDocuments
+                                            targetDescriptor:target 
+                                                    returnID:kAutoGenerateReturnID 
+                                               transactionID:kAnyTransactionID];
+        [openDoc setParamDescriptor:[urls gtm_appleEventDescriptor]
+                         forKeyword:keyDirectObject];
+        [script_ gtm_executeAppleEvent:openDoc error:&error];
+      } else {
+        NSArray *params = [NSArray arrayWithObjects:urls, nil];
+        
+        [script_ gtm_executePositionalHandler:handlerName_ 
+                                   parameters:params 
+                                        error:&error];
+      }
+    } else {
+      [script_ executeAndReturnError:&error];
+    }
+    if (!error) {
+      wasGood = YES;
+    } else {
+      //TODO(dmaclach): Handle error logging to user better
+      HGSLogDebug(@"Applescript Error: %@", error);
+    }
   }
   return wasGood;
 }

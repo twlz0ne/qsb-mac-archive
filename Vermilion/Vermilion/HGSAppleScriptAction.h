@@ -40,6 +40,7 @@ extern NSString *const kHGSAppleScriptMustBeRunningKey;
 
 @interface HGSAppleScriptAction : HGSAction {
  @private
+  NSString *scriptPath_;
   NSAppleScript *script_;
   NSString *handlerName_;
   NSArray *requiredApplications_;
