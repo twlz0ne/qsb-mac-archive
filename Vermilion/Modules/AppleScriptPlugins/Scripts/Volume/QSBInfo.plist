@@ -32,7 +32,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.volumeapplescript.action.minVolume</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Min Volunme</string>
+			<string>Min Volume</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>minVolume.icns</string>
 			<key>HGSAppleScriptHandlerName</key>

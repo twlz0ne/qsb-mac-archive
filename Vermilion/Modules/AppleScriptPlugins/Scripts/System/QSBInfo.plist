@@ -32,7 +32,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.shutdown</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Shutdown</string>
+			<string>Shut Down</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>shutDown.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
