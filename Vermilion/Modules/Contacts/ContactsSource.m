@@ -128,6 +128,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   
   ABAddressBook *sab = [ABAddressBook sharedAddressBook];
   for (ABPerson *person in [sab people]) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSString *name = nil;
     NSString *firstName = [person valueForProperty:kABFirstNameProperty];
     NSString *lastName = [person valueForProperty:kABLastNameProperty];
@@ -196,6 +197,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
                    name:name
              otherTerms:otherTermStrings];
     }
+    [pool release];
   }
   
   @synchronized(self) {

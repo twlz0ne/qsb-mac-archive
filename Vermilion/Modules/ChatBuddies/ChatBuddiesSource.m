@@ -97,9 +97,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                    || myStatus == IMPersonStatusAway
                    || myStatus == IMPersonStatusAvailable);
     NSArray *services = [IMService allServices];
-    NSEnumerator *serviceEnum = [services objectEnumerator];
-    IMService *service = nil;
-    while ((service = [serviceEnum nextObject])) {
+    for (IMService *service in services) {
+      NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
       if ([service status] == IMServiceStatusLoggedIn) {
         [availableServices_ addObject:[service name]];
       }
@@ -113,6 +112,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                                     source:self];
         [buddyResults_ addObject:newBuddy];
       }
+      [pool release];
     }
     [self updateIndex];
   }

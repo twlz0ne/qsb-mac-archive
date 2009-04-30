@@ -78,6 +78,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
       self = nil;
       HGSLog(@"Unable to locate script %@", fileName);
     } else {
+      [scriptPath_ retain];
       handlerName_ = [configuration objectForKey:kHGSAppleScriptHandlerNameKey];
       if (!handlerName_ && [script_ gtm_hasOpenDocumentsHandler]) {
         handlerName_ = kHGSOpenDocAppleEvent;

@@ -82,11 +82,13 @@
   // I am using a fixed size array and CF functions instead of a variable 
   // sized NSArray because it doubles our speed, and this is a performance
   // sensitive routine.
-  NSLocale *currentLocale = [NSLocale currentLocale];
-  NSStringCompareOptions options = (NSDiacriticInsensitiveSearch 
-                                    | NSWidthInsensitiveSearch);
-  string = [string stringByFoldingWithOptions:options 
-                                       locale:currentLocale];
+  CFLocaleRef currentLocale = (CFLocaleRef)[NSLocale currentLocale];
+  CFOptionFlags options = (kCFCompareDiacriticInsensitive 
+                           | kCFCompareWidthInsensitive);
+  CFMutableStringRef normalizedString 
+    = CFStringCreateMutableCopy(NULL, 0, (CFStringRef)string);
+  if (!normalizedString) return nil;
+  CFStringFold(normalizedString, options, currentLocale);
   
   // Used define hear because of
   // Radar 6765569 stack-protector gives bad warning when working with consts
@@ -94,10 +96,8 @@
   CFRange tokensRanges[kHGSTokenizerInternalMaxRanges];
   CFIndex currentRange = 0;
   
-  CFRange tokenRange = CFRangeMake(0, [string length]);
-  CFStringTokenizerSetString(tokenizer_,
-                             (CFStringRef)string,
-                             tokenRange);
+  CFRange tokenRange = CFRangeMake(0, CFStringGetLength(normalizedString));
+  CFStringTokenizerSetString(tokenizer_, normalizedString, tokenRange);
   while (currentRange < kHGSTokenizerInternalMaxRanges) {
     CFStringTokenizerTokenType tokenType
       = CFStringTokenizerAdvanceToNextToken(tokenizer_);
@@ -159,16 +159,20 @@
   NSMutableString *finalString = [NSMutableString stringWithCapacity:length];
   // Now that we have all of our ranges, break out our strings.
   for (CFIndex i = 0; i < currentRange; ++i) {
-    NSRange nsRange = NSMakeRange(tokensRanges[i].location, 
-                                  tokensRanges[i].length);
-    NSString *subString = [string substringWithRange:nsRange];
-    subString = [subString stringByFoldingWithOptions:NSCaseInsensitiveSearch
-                                               locale:currentLocale];
+    NSString *subString 
+      = (NSString *)CFStringCreateWithSubstring(NULL,
+                                                (CFStringRef)normalizedString, 
+                                                tokensRanges[i]);
     if (i != 0) {
       [finalString appendString:@" "];
     }
     [finalString appendString:subString];
+    [subString release];
   }
+  CFRelease(normalizedString);
+  CFStringFold((CFMutableStringRef)finalString, 
+               kCFCompareCaseInsensitive, 
+               (CFLocaleRef)currentLocale);
   return finalString;
 }
 
