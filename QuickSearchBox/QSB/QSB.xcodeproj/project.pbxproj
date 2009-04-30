@@ -351,7 +351,6 @@
 		62B7CE0E0E63747300299B23 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		62B7CE9F0E6375AA00299B23 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		62C051BA0F31307100DFBB1B /* HGSSimpleAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		62C053D20F32081400DFBB1B /* twitter_t.png in Resources */ = {isa = PBXBuildFile; fileRef = 62C053D10F32081400DFBB1B /* twitter_t.png */; };
 		62C25E270F8BF17500DA57E7 /* PicasaPlaceholder.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */; };
 		62C5C9D70FA12F1C000896CD /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		62C5CAD60FA13197000896CD /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
@@ -721,6 +720,8 @@
 		8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B95CE200F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CE1F0F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m */; };
 		8B98A2C80FA96ECF009DC652 /* WelcomeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8B98A2C70FA96ECF009DC652 /* WelcomeWindow.xib */; };
+		8B98A4290FA9F49D009DC652 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B98A4280FA9F49D009DC652 /* Localizable.strings */; };
+		8B98A4550FAA0C6D009DC652 /* Twitter.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B98A4540FAA0C6D009DC652 /* Twitter.icns */; };
 		8BA019C40F14303400926923 /* GTMSQLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BA019C20F14303400926923 /* GTMSQLite.m */; };
 		8BA019C50F14303400926923 /* GTMSQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BA019C30F14303400926923 /* GTMSQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BA01A860F1431DD00926923 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BB275AB0D6F81EA008DC1CA /* libsqlite3.dylib */; };
@@ -1324,28 +1325,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8D5B49B6048680CD000E48DA /* ___PROJECTNAME___.hgs */;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA;
 			remoteInfo = "___PROJECTNAME___";
 		};
 		8B989F460FA7B93C009DC652 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8B989F2A0FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8D5B49B6048680CD000E48DA /* ___PROJECTNAME___.hgs */;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA;
 			remoteInfo = "___PROJECTNAME___";
 		};
 		8B989F4C0FA7B93C009DC652 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8D5B49B6048680CD000E48DA /* ___PROJECTNAME___.hgs */;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA;
 			remoteInfo = "___PROJECTNAME___";
 		};
 		8B989F590FA7B977009DC652 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B2E2A400F99018600F80E11 /* HeaderDoc */;
+			remoteGlobalIDString = 8B2E2A400F99018600F80E11;
 			remoteInfo = HeaderDoc;
 		};
 		8BC6744D0F58B097003B5C6A /* PBXContainerItemProxy */ = {
@@ -1829,7 +1830,6 @@
 		62AD18A40F16B034000D380C /* QSBPathControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPathControl.h; sourceTree = "<group>"; };
 		62AD18A50F16B034000D380C /* QSBPathControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPathControl.m; sourceTree = "<group>"; };
 		62AD99140F33AB190063579F /* google_products.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = google_products.png; sourceTree = "<group>"; };
-		62C053D10F32081400DFBB1B /* twitter_t.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = twitter_t.png; sourceTree = "<group>"; };
 		62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PicasaPlaceholder.icns; sourceTree = "<group>"; };
 		62D0E9640EF058950028522C /* HGSAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAccount.h; sourceTree = "<group>"; };
 		62D0E96A0EF059B40028522C /* HGSAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccount.m; sourceTree = "<group>"; };
@@ -2178,6 +2178,8 @@
 		8B989F3A0FA7B93C009DC652 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8B989F3B0FA7B93C009DC652 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		8B98A2C50FA96EBB009DC652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/WelcomeWindow.xib; sourceTree = "<group>"; };
+		8B98A4260FA9F499009DC652 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8B98A4540FAA0C6D009DC652 /* Twitter.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Twitter.icns; sourceTree = "<group>"; };
 		8BA019C20F14303400926923 /* GTMSQLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMSQLite.m; sourceTree = "<group>"; };
 		8BA019C30F14303400926923 /* GTMSQLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMSQLite.h; sourceTree = "<group>"; };
 		8BA01C000F147DB000926923 /* GTMNSWorkspace+Running.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSWorkspace+Running.h"; sourceTree = "<group>"; };
@@ -3047,8 +3049,9 @@
 				62A4AD110F2FCE0E0007CD99 /* TwitterAccount.m */,
 				62A4AD120F2FCE0E0007CD99 /* TwitterMessageAction.m */,
 				62A4AD0D0F2FCE0E0007CD99 /* SetUpTwitterAccountView.xib */,
+				8B98A4280FA9F49D009DC652 /* Localizable.strings */,
 				62A4AEFA0F30E22E0007CD99 /* EditTwitterAccount.xib */,
-				62C053D10F32081400DFBB1B /* twitter_t.png */,
+				8B98A4540FAA0C6D009DC652 /* Twitter.icns */,
 				62A4AD0F0F2FCE0E0007CD99 /* Twitter-Info.plist */,
 			);
 			path = Twitter;
@@ -5432,7 +5435,8 @@
 			files = (
 				62A4AD130F2FCE0E0007CD99 /* SetUpTwitterAccountView.xib in Resources */,
 				62A4AEFC0F30E22E0007CD99 /* EditTwitterAccount.xib in Resources */,
-				62C053D20F32081400DFBB1B /* twitter_t.png in Resources */,
+				8B98A4290FA9F49D009DC652 /* Localizable.strings in Resources */,
+				8B98A4550FAA0C6D009DC652 /* Twitter.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7558,6 +7562,14 @@
 				8B98A2C50FA96EBB009DC652 /* English */,
 			);
 			name = WelcomeWindow.xib;
+			sourceTree = "<group>";
+		};
+		8B98A4280FA9F49D009DC652 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8B98A4260FA9F499009DC652 /* English */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		8BC685550F5ED38C003B5C6A /* SetUpAccount.xib */ = {

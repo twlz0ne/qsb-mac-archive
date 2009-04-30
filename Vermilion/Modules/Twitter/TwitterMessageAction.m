@@ -53,9 +53,8 @@ static NSString *const kSendStatusFormat
 
 // Utility function to send notification so user can be notified of
 // success or failure.
-- (void)informUserWithSummary:(NSString *)message
-                  description:(NSString *)description
-                 successCode:(NSInteger)successCode;
+- (void)informUserWithDescription:(NSString *)description
+                      successCode:(NSInteger)successCode;
 
 @end
 
@@ -113,12 +112,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     NSString *password = [keychainItem password];
     if (username && password) {
       if ([twitterMessage length] > 140) {
-        NSString *summary = HGSLocalizedString(@"Twitter", nil);
         NSString *warningString
-          = HGSLocalizedString(@"Message too long — truncated.", nil);
-        [self informUserWithSummary:summary
-                        description:warningString
-                        successCode:kHGSSuccessCodeError];
+          = HGSLocalizedString(@"Message too long — truncated.", 
+                               @"A dialog label explaining that their Twitter "
+                               @"message was too long and was truncated");
+        [self informUserWithDescription:warningString
+                            successCode:kHGSSuccessCodeError];
         twitterMessage = [twitterMessage substringToIndex:140];
       }
       
@@ -158,27 +157,32 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         = [[NSURLConnection alloc] initWithRequest:sendStatusRequest 
                                           delegate:self];
     } else {
-      NSString *summary = HGSLocalizedString(@"Twitter", nil);
       NSString *errorString
-        = HGSLocalizedString(@"Could not tweet — password issue!", nil);
-      [self informUserWithSummary:summary
-                      description:errorString
-                      successCode:kHGSSuccessCodeError];
+        = HGSLocalizedString(@"Could not tweet. Please check the password for "
+                             @"account %@", 
+                             @"A dialog label explaining that the user could "
+                             @"not send their Twitter data due to a bad "
+                             @"password for account %@");
+      errorString = [NSString stringWithFormat:errorString, username];
+      [self informUserWithDescription:errorString
+                          successCode:kHGSSuccessCodeError];
       HGSLog(@"Cannot send Twitter status message due to missing keychain "
              @"item for '%@'.", account_);
     }
   }
 }
 
-- (void)informUserWithSummary:(NSString *)summary
-                  description:(NSString *)description
-                  successCode:(NSInteger)successCode {
+- (void)informUserWithDescription:(NSString *)description
+                      successCode:(NSInteger)successCode {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   NSBundle *bundle = HGSGetPluginBundle();
-  NSString *path = [bundle pathForResource:@"twitter_t" ofType:@"png"];
+  NSString *path = [bundle pathForResource:@"Twitter" ofType:@"icns"];
   NSImage *twitterT
     = [[[NSImage alloc] initByReferencingFile:path] autorelease];
   NSNumber *successNumber = [NSNumber numberWithInt:successCode];
+  NSString *summary 
+    = HGSLocalizedString(@"Twitter", 
+                         @"A dialog title. Twitter is a product name");
   NSDictionary *messageDict
     = [NSDictionary dictionaryWithObjectsAndKeys:
        summary, kHGSSummaryMessageKey,
@@ -222,13 +226,15 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
       [sender continueWithoutCredentialForAuthenticationChallenge:challenge];
     }
   } else {
-    NSString *summary = HGSLocalizedString(@"Could not tweet!", nil);
-    NSString *errorFormat
-      = HGSLocalizedString(@"Check password for account '%@'.", nil);
-    NSString *errorString = [NSString stringWithFormat:errorFormat, userName];
-    [self informUserWithSummary:summary
-                    description:errorString
-                    successCode:kHGSSuccessCodeError];
+    NSString *errorString
+      = HGSLocalizedString(@"Could not tweet. Please check the password for "
+                           @"account %@", 
+                           @"A dialog label explaining that the user could "
+                           @"not send their Twitter data due to a bad "
+                           @"password for account %@");
+    errorString = [NSString stringWithFormat:errorString, userName];
+    [self informUserWithDescription:errorString
+                        successCode:kHGSSuccessCodeError];
     HGSLog(@"Twitter status message failed due to authentication failure "
            @"for account ''.", userName);
   }
@@ -236,10 +242,12 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
   HGSAssert(connection == twitterConnection_, nil);
-  NSString *successString = HGSLocalizedString(@"Message tweeted!", nil);
-  [self informUserWithSummary:successString
-                  description:nil
-                  successCode:0];
+  NSString *successString = HGSLocalizedString(@"Message tweeted!", 
+                                               @"A dialog label explaning that "
+                                               @"the user's message has been "
+                                               @"successfully sent to Twitter");
+  [self informUserWithDescription:successString
+                      successCode:kHGSSuccessCodeSuccess];
   [twitterConnection_ release];
   twitterConnection_ = nil;
 }
@@ -247,14 +255,14 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 - (void)connection:(NSURLConnection *)connection
   didFailWithError:(NSError *)error {
   HGSAssert(twitterConnection_ == connection, nil);
-  NSString *summary = HGSLocalizedString(@"Twitter", nil);
   NSString *errorFormat
-    = HGSLocalizedString(@"Could not tweet! (%d)", nil);
+    = HGSLocalizedString(@"Could not tweet! (%d)", 
+                         @"A dialog label explaining to the user that we could "
+                         @"not tweet. %d is an error code.");
   NSString *errorString = [NSString stringWithFormat:errorFormat,
                            [error code]];
-  [self informUserWithSummary:summary
-                  description:errorString
-                  successCode:kHGSSuccessCodeBadError];
+  [self informUserWithDescription:errorString
+                      successCode:kHGSSuccessCodeBadError];
   HGSLog(@"Twitter status message failed due to error %d: '%@'.",
          [error code], [error localizedDescription]);
   [twitterConnection_ release];
