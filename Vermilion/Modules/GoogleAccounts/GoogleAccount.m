@@ -89,7 +89,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (NSString *)adjustUserName:(NSString *)userName {
   if ([userName rangeOfString:@"@"].location == NSNotFound) {
-    NSString *countryGMailCom = HGSLocalizedString(@"@gmail.com", nil);
+    NSString *countryGMailCom 
+      = HGSLocalizedString(@"@gmail.com", @"The gmail domain extension.");
     userName = [userName stringByAppendingString:countryGMailCom];
   }
   return userName;

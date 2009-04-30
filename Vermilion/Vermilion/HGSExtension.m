@@ -123,7 +123,8 @@ NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
             if (![name length]) {
               HGSLogDebug(@"Unable to get a name for %@", self);
               name = HGSLocalizedString(@"Unknown Name", 
-                                        @"Unknown plugin name");
+                                        @"A label denoting a plugin missing"
+                                        @"it's name.");
             }
           }
         }

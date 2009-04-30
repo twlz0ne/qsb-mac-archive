@@ -290,9 +290,12 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                            [albumURL scheme],
                                            [albumURL host]]];
     NSMutableArray *cellArray = [NSMutableArray array];
+    NSString *picasaWeb = HGSLocalizedString(@"Picasaweb", 
+                                             @"A label denoting the picasaweb "
+                                             @"service.");
     NSDictionary *picasawebCell 
       = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-         HGSLocalizedString(@"Picasaweb", nil), kQSBPathCellDisplayTitleKey,
+         picasaWeb, kQSBPathCellDisplayTitleKey,
          baseURL, kQSBPathCellURLKey,
          nil];
     [cellArray addObject:picasawebCell];
@@ -327,7 +330,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     // Set up the snippet and detail.
     [attributes setObject:albumDescription 
                    forKey:kHGSObjectAttributeSnippetKey];
-    NSString *albumDetail = HGSLocalizedString(@"%u photos", nil);
+    NSString *albumDetail = HGSLocalizedString(@"%u photos", 
+                                               @"A label denoting %u number of "
+                                               @"online photos");
     NSUInteger photoCount = [[album photosUsed] unsignedIntValue];
     albumDetail = [NSString stringWithFormat:albumDetail, photoCount],
     [attributes setObject:albumDetail forKey:kHGSObjectAttributeSnippetKey];
@@ -378,7 +383,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
       // If the login credentials are bad, don't keep trying.
       [updateTimer_ invalidate];
     }
-    NSString *fetchType = HGSLocalizedString(@"album", nil);
+    NSString *fetchType = HGSLocalizedString(@"album", 
+                                             @"A label denoting a Picasaweb "
+                                             @"Photo Album");
     [self reportErrorForFetchType:fetchType errorCode:errorCode];
   }
 }
@@ -404,9 +411,12 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                            [photoURL scheme],
                                            [photoURL host]]];
     NSMutableArray *cellArray = [NSMutableArray array];
+    NSString *picasaWeb = HGSLocalizedString(@"Picasaweb", 
+                                             @"A label denoting the picasaweb "
+                                             @"service.");
     NSDictionary *picasawebCell 
       = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-         HGSLocalizedString(@"Picasaweb", nil), kQSBPathCellDisplayTitleKey,
+         picasaWeb, kQSBPathCellDisplayTitleKey,
          baseURL, kQSBPathCellURLKey,
          nil];
     [cellArray addObject:picasawebCell];
@@ -513,7 +523,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
       // will immediately see that the account status has changed.
       [account_ authenticate];
     }
-    NSString *fetchType = HGSLocalizedString(@"photo", nil);
+    NSString *fetchType = HGSLocalizedString(@"photo", 
+                                             @"A label denoting a Picasaweb "
+                                             @"photo");
     [self reportErrorForFetchType:fetchType errorCode:errorCode];
   }
 }
@@ -530,20 +542,30 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   if (timeSinceLastErrorReport > kErrorReportingInterval) {
     previousErrorReportingTime_ = currentTime;
     NSString *errorSummary
-      = HGSLocalizedString(@"Picasaweb fetch problem.", nil);
+      = HGSLocalizedString(@"Picasaweb fetch problem.", 
+                           @"A dialog title denoting that we have encountered "
+                           @"an error fetching data from Picasaweb.");
     NSString *errorString = nil;
     // A 404 from Picasa usually means that Picasa has not been enabled for
     // this account.  For additional information see:
     // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5
     if (errorCode == 404) {
       NSString *errorFormat
-        = HGSLocalizedString(@"Have you enabled Picasa for your '%@' account? "
-                             @"(%d)", nil);
+        = HGSLocalizedString(@"Have you enabled Picasa for your '%1$@' account? "
+                             @"(%2$d)", 
+                             @"A dialog label asking if the user has enabled "
+                             @"their Picasa account for the username %1$@. "
+                             @"%2$d is an error code returned from Picasaweb");
       errorString = [NSString stringWithFormat:errorFormat,
                      username, errorCode];
     } else {
       NSString *errorFormat
-        = HGSLocalizedString(@"Picasaweb %@ fetch for %@ failed. (%d)", nil);
+        = HGSLocalizedString(@"Picasaweb %1$@ fetch for account '%2$@' failed. "
+                             @"(%3$d)", 
+                             @"A dialog label explaining that the fetch for "
+                             @"the item denoted by %1$@ from the account with "
+                             @"the username %2$@ failed. %3$d is an error code "
+                             @"returned from Picasaweb");
       errorString = [NSString stringWithFormat:errorFormat,
                      fetchType, username, errorCode];
     }

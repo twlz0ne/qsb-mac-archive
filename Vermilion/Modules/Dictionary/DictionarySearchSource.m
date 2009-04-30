@@ -128,7 +128,10 @@ static const int kMinQueryLength = 3;
       if (action) {
         [attributes setObject:action forKey:kHGSObjectAttributeDefaultActionKey];
       }
-      NSString *definitionFormat = HGSLocalizedString(@"Definition of %@", nil);
+      NSString *definitionFormat 
+        = HGSLocalizedString(@"Definition of %@", 
+                             @"A label for a result denoting the dictionary "
+                             @"definition of the term represented by %@.");
       NSString *name
         = [NSString stringWithFormat:definitionFormat,
            [query substringWithRange:NSMakeRange(range.location, range.length)]];

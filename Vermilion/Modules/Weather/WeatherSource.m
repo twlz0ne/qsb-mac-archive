@@ -39,8 +39,6 @@ static NSString *const kWeatherDataURL
 static NSString *const kWeatherResultURL
   = @"http://www.google.com/search?q=weather%%20%@";
 
-static NSString *const kWeatherPrefix = @"weather ";
-
 @interface WeatherSource : HGSCallbackSearchSource {
  @private
   NSCharacterSet *nonDigitSet_;
@@ -90,7 +88,10 @@ static NSString *const kWeatherPrefix = @"weather ";
         isValid = [pred evaluateWithObject:rawQuery];
       }
     } else {
-      NSString *localizedPrefix = HGSLocalizedString(kWeatherPrefix, nil);  
+      NSString *localizedPrefix = HGSLocalizedString(@"weather ", 
+                                                     @"A label denoting that "
+                                                     @"the user is looking for "
+                                                     @"weather information");  
       NSUInteger prefixLen = [localizedPrefix length];
       if (len > prefixLen) {
         isValid = [rawQuery compare:localizedPrefix
@@ -113,7 +114,11 @@ static NSString *const kWeatherPrefix = @"weather ";
     location = rawQuery;
   } else {
     // Extract what's after our marker
-    location = [rawQuery substringFromIndex:[kWeatherPrefix length]];
+    NSString *localizedPrefix = HGSLocalizedString(@"weather ", 
+                                                   @"A label denoting that "
+                                                   @"the user is looking for "
+                                                   @"weather information");  
+    location = [rawQuery substringFromIndex:[localizedPrefix length]];
   }
   NSString *escapedLocation = [location gtm_stringByEscapingForURLArgument];
   
@@ -138,10 +143,10 @@ static NSString *const kWeatherPrefix = @"weather ";
       NSString *units = nil;
       if (metric) {
         xPath = @"/xml_api_reply/weather/current_conditions/temp_c/@data";
-        units = HGSLocalizedString(@"C", @"Celsius");
+        units = HGSLocalizedString(@"C", @"Label for unit to denote Celsius");
       } else {
         xPath = @"/xml_api_reply/weather/current_conditions/temp_f/@data";
-        units = HGSLocalizedString(@"F", @"Farenheit");
+        units = HGSLocalizedString(@"F", @"Label for unit to denot Farenheit");
       }
       NSString *temp
         = [[[xmlDoc nodesForXPath:xPath error:nil] lastObject] stringValue];
@@ -155,18 +160,28 @@ static NSString *const kWeatherPrefix = @"weather ";
         = [[[xmlDoc nodesForXPath:xPath error:nil] lastObject] stringValue];
       
       if ([city length] && [temp length]&& [wind length]) {
-        NSString *localizedString = HGSLocalizedString(@"Weather for %@", nil);
+        NSString *localizedString 
+          = HGSLocalizedString(@"Weather for %@", 
+                               @"A label in a result denoting that we are "
+                               @"displaying the weather for the city %@");
         NSString *title
           = [NSString stringWithFormat:localizedString, city];
         NSString *details = nil;
         if ([condition length]) {
-          localizedString = HGSLocalizedString(@"%@°%@ - %@ - %@",
-                                               @"Weather condition details");
+          localizedString = HGSLocalizedString(@"%1$@°%2$@ - %3$@ - %4$@",
+                                               @"Weather condition details. "
+                                               @"%1$@ is temperature "
+                                               @"%2$@ is units "
+                                               @"%3$@ is condition and "
+                                               @"%4$@ is wind data.");
           details = [NSString stringWithFormat:localizedString, temp, units, 
                      condition, wind];
         } else {
-          localizedString = HGSLocalizedString(@"%@°%@ - %@",
-                                               @"Weather details");
+          localizedString = HGSLocalizedString(@"%1$@°%2$@ - %3$@",
+                                               @"Weather condition details. "
+                                               @"%1$@ is temperature "
+                                               @"%2$@ is units and"
+                                               @"%3$@ is wind data.");
           details = [NSString stringWithFormat:localizedString, temp, units, 
                      wind];
         }          

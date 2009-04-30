@@ -35,9 +35,9 @@
 	<key>itunes</key>
 	<string>^Music</string>
 	<key>message</key>
-	<string>^Other</string>
+	<string>^Others</string>
 	<key>onebox</key>
-	<string>^Other</string>
+	<string>^Others</string>
 	<key>search</key>
 	<string>^Webpages</string>
 	<key>search.googlesearch</key>

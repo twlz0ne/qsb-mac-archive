@@ -162,6 +162,8 @@ static NSString *const kApplicationSourcePredicateString
        rank, kHGSObjectAttributeRankKey,
        nil];
   NSString *prefPaneString = HGSLocalizedString(@"Preference Pane", 
+                                                @"A label denoting that this "
+                                                @"result is a System "
                                                 @"Preference Pane");
   for (NSUInteger i = 0; i < resultCount; ++i) {
     NSMetadataItem *result = [query resultAtIndex:i];

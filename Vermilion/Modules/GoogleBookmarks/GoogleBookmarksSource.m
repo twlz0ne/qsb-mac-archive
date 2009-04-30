@@ -232,7 +232,10 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
     [updateTimer_ invalidate];
     NSString *errorFormat
       = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
-                           @"password.", nil);
+                           @"password.", 
+                           @"A label in a dialog denoting that authentication "
+                           @"for the account with username %@ failed due to a "
+                           @"validation error");
     NSString *errorString = [NSString stringWithFormat:errorFormat,
                              [account_ displayName]];
     [self reportConnectionFailure:errorString successCode:kHGSSuccessCodeError];
@@ -271,7 +274,10 @@ didReceiveResponse:(NSURLResponse *)response {
   [bookmarkData_ release];
   bookmarkData_ = nil;
   NSString *errorFormat
-    = HGSLocalizedString(@"Fetch for '%@' failed. (%d)", nil);
+    = HGSLocalizedString(@"Fetch for '%1$@' failed. (%2$d)", 
+                         @"A dialog label denoting that an attempt to fetch "
+                         @"data with the account for username $1$@ failed with "
+                         @"errorcode %2$d");
   NSString *errorString = [NSString stringWithFormat:errorFormat,
                            [account_ displayName], [error code]];
   [self reportConnectionFailure:errorString successCode:kHGSSuccessCodeBadError];
@@ -306,7 +312,10 @@ didReceiveResponse:(NSURLResponse *)response {
     = currentTime - previousErrorReportingTime_;
   if (timeSinceLastErrorReport > kErrorReportingInterval) {
     previousErrorReportingTime_ = currentTime;
-    NSString *errorSummary = HGSLocalizedString(@"Google Bookmarks", nil);
+    NSString *errorSummary = HGSLocalizedString(@"Google Bookmarks", 
+                                                @"A dialog title denoting that "
+                                                @"this dialog has to do with "
+                                                @"Google Bookmarks");
     NSNumber *successNumber = [NSNumber numberWithInt:successCode];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     NSDictionary *messageDict

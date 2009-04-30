@@ -545,7 +545,9 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     // Build two cells, the first with Address Book or Google Contacts,
     // the second with the contact entry.
     // TODO(mrossetti): Accommodate Google Contacts when available.
-    NSString *serviceName = HGSLocalizedString(@"Contact", nil);
+    NSString *serviceName = HGSLocalizedString(@"Contact", 
+                                               @"A label denoting that this "
+                                               @"result is a contact.");
     NSURL *serviceURL = nil;
     NSString *contactName = [result valueForKey:kHGSObjectAttributeNameKey];
     NSURL *contactURL = [result url];

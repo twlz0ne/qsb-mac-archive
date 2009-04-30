@@ -70,7 +70,10 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
   if (pivotObject) {
     isValid = [[pivotObject type] isEqual:kTrashResultType];
   } else {
-    NSString *trash = [HGSLocalizedString(@"Trash", @"Trash") lowercaseString];
+    NSString *trash = HGSLocalizedString(@"Trash", 
+                                         @"The label for a result denoting the "
+                                         @"trash can found on your dock.");
+    trash = [trash lowercaseString];
     NSString *queryString = [query normalizedQueryString];
     isValid = [trash hasPrefix:queryString];
   }
@@ -133,7 +136,9 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
       = [NSDictionary dictionaryWithObjectsAndKeys:
          trashIcon_, kHGSObjectAttributeIconKey,
          nil];
-    NSString *trash = HGSLocalizedString(@"Trash", @"Trash");
+    NSString *trash = HGSLocalizedString(@"Trash", 
+                                         @"The label for a result denoting the "
+                                         @"trash can found on your dock.");
     HGSResult *result 
       = [HGSResult resultWithURL:[NSURL URLWithString:kTrashResultUrl]
                             name:trash

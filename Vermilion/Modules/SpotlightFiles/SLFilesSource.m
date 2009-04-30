@@ -285,7 +285,8 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
 }
 
 - (NSString *)displayName {
-  return HGSLocalizedString(@"Spotlight", @"Spotlight");
+  return HGSLocalizedString(@"Spotlight", 
+                            @"A label denoting a Spotlight result.");
 }
 
 @end

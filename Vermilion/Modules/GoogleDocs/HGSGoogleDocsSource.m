@@ -259,18 +259,23 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   if (timeSinceLastErrorReport > kErrorReportingInterval) {
     previousErrorReportingTime_ = currentTime;
     NSString *errorSummary
-      = HGSLocalizedString(@"Google Docs fetch problem.", nil);
+      = HGSLocalizedString(@"Google Docs fetch problem.", 
+                           @"A dialog title for a dialog describing a Google "
+                           @"Docs data fetch problem.");
     NSString *errorString = nil;
     if (errorCode == kGDataBadAuthentication) {
       NSString *errorFormat
         = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
-                             @"password.", nil);
+                             @"password.", 
+                             @"A dialog lable denoting that authentication for "
+                             @"account with username %@ failed");
       errorString = [NSString stringWithFormat:errorFormat,
                      [account_ displayName]];
       
     } else {
-      NSString *errorFormat = HGSLocalizedString(@"Fetch for '%@' failed. (%d)",
-                                                 nil);
+      NSString *errorFormat 
+        = HGSLocalizedString(@"Fetch for '%1$@' failed. (%2$d)",
+                             nil);
       errorString = [NSString stringWithFormat:errorFormat,
                      [account_ displayName], [error code]];
     }
@@ -320,7 +325,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                          [docURL scheme],
                                          [docURL host]]];
   NSMutableArray *cellArray = [NSMutableArray array];
-  NSString *docsString = HGSLocalizedString(@"Google Docs", nil);
+  NSString *docsString = HGSLocalizedString(@"Google Docs", 
+                                            @"A label denoting a Google Docs "
+                                            @"result");
   NSDictionary *googleDocsCell 
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        docsString, kQSBPathCellDisplayTitleKey,

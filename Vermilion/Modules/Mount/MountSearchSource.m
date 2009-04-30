@@ -157,10 +157,14 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
         break;
     }
     if (ipString) {
+      NSString *mount = HGSLocalizedString(@"mount", 
+                                           @"A label for a result denoting a "
+                                           @"network mount point");
+      NSString *share = HGSLocalizedString(@"share", 
+                                           @"A label for a result denoting a "
+                                           @"network share point");    
       NSMutableArray *otherTerms = [NSMutableArray arrayWithObjects:
-                                    HGSLocalizedString(@"mount", @"mount"),
-                                    HGSLocalizedString(@"shares", @"shares"),
-                                    nil];
+                                    mount, share, nil];
       NSString *urlString = nil, *type = nil, *scheme = nil;
       
       for (NSString *key in configuration_) {

@@ -149,7 +149,9 @@ static inline int KeyLength(NSString *a, NSString *b, void *c) {
 - (id)defaultObjectForKey:(NSString *)key {
   id defaultObject = nil;
   if ([key isEqualToString:kHGSExtensionUserVisibleNameKey]) {
-    defaultObject = HGSLocalizedString(@"Shortcuts", nil);
+    defaultObject = HGSLocalizedString(@"Shortcuts", 
+                                       @"A result label denoting a user "
+                                       @"defined shortcut string for a result");
   }
   if (!defaultObject) {
     defaultObject = [super defaultObjectForKey:key];

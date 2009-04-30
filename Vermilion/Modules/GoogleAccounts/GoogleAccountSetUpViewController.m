@@ -165,7 +165,8 @@
   
   BOOL showCheckbox = NO;
   if (userName) {
-    NSString *gmailDomain = HGSLocalizedString(@"@gmail.com", nil);
+    NSString *gmailDomain = HGSLocalizedString(@"@gmail.com", 
+                                               @"The gmail domain extension.");
     NSRange atRange = [userName rangeOfString:@"@"];
     if (atRange.location != NSNotFound) {
       NSString *domainString = [userName substringFromIndex:atRange.location];

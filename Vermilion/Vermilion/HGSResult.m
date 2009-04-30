@@ -554,7 +554,9 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
     displayName = [result displayName];
   } else {
     // TODO(alcor): make this nicer
-    displayName = HGSLocalizedString(@"Multiple Items", nil);
+    displayName = HGSLocalizedString(@"Multiple Items",
+                                     @"A label denoting that this result "
+                                     @"represents multiple items");
   }
   return displayName;
 }

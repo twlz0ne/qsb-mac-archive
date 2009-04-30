@@ -117,7 +117,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 }
 
 - (NSString *)displayName {
-  return HGSLocalizedString(@"Google",@"Google");
+  return HGSLocalizedString(@"Google", 
+                            @"A label representing Google as a search source.");
 }
 
 - (void)main {

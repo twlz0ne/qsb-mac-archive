@@ -87,7 +87,9 @@ static NSString *const kDateTimeMarker = @"[DTS]";
   NSString *fileType = NSFileTypeForHFSTypeCode(kClippingTextType);
   NSImage *image = [ws iconForFileType:fileType];
  
-  NSString *details = HGSLocalizedString(@"Text", nil);
+  NSString *details = HGSLocalizedString(@"Text", 
+                                         @"A result label denoting text "
+                                         @"typed in by the user");
   // Default action for text right now is large type
   HGSAction *largeTypeAction = [self defaultAction];
   // Cheat, force this result high in the list.
@@ -139,7 +141,11 @@ static NSString *const kDateTimeMarker = @"[DTS]";
                                options:NSCaseInsensitiveSearch
                                  range:NSMakeRange(0, [worker length])];
     
-    details = HGSLocalizedString(@"Stamped text input", nil);
+    details = HGSLocalizedString(@"Stamped text input", 
+                                 @"A result label denoting text "
+                                 @"typed in by the user that contains "
+                                 @"some special markers that we replace with "
+                                 @"data, such as the current date.");
 
     // Cheat, force this result high in the list.
     // TODO(dmaclach): figure out a cleaner way to get results like this high
