@@ -239,9 +239,13 @@ static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
         = [firstCell objectForKey:kQSBPathCellDisplayTitleKey];
       if ([firstCellTitle isEqualToString:homeDisplay]) {
         compCount = 1;
+        NSString *home = NSLocalizedString(@"Home", 
+                                           @"A label in a result denoting the "
+                                           @"user's home folder in a generic "
+                                           @"way.");
         componentToAdd 
           = [NSDictionary dictionaryWithObjectsAndKeys:
-             HGSLocalizedString(@"Home", nil), kQSBPathCellDisplayTitleKey,
+             home, kQSBPathCellDisplayTitleKey,
              [NSURL fileURLWithPath:homeDirectory], kQSBPathCellURLKey,
              nil];
       } else {

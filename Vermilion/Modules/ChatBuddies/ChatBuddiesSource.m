@@ -133,46 +133,63 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
            object:nil];
   
   imStatusStrings_ = [[NSArray alloc] initWithObjects:
-                      HGSLocalizedString(@"MyIMStatusUnknown", 
-                                         @"MyIMStatusUnknown"),
-                      HGSLocalizedString(@"MyIMStatusOffline", 
-                                         @"MyIMStatusOffline"),
-                      HGSLocalizedString(@"MyIMStatusIdle", 
-                                         @"MyIMStatusIdle"),
-                      HGSLocalizedString(@"MyIMStatusAway", 
-                                         @"MyIMStatusAway"),
+                      HGSLocalizedString(@"My Status Unknown", 
+                                         @"A label describing that the user's "
+                                         @"online status is currently unknown."),
+                      HGSLocalizedString(@"I'm Offline", 
+                                         @"A label describing that the user's "
+                                         @"currently offline."),
+                      HGSLocalizedString(@"I'm Idle", 
+                                         @"A label describing that the user's "
+                                         @"currently idle."),
+                      HGSLocalizedString(@"I'm Away", 
+                                         @"A label describing that the user's "
+                                         @"currently away."),
                       HGSLocalizedString(@"MyIMStatusAvailable", 
-                                         @"MyIMStatusAvailable"),
-                      HGSLocalizedString(@"MyIMStatusNoStatus", 
-                                         @"MyIMStatusNoStatus"),
+                                         @"A label describing that the user's "
+                                         @"currently available."),
+                      HGSLocalizedString(@"My Status Not Set", 
+                                         @"A label describing that the user's "
+                                         @"online status is not set."),
                       nil];
   
   serviceStatusStrings_ = [[NSArray alloc] initWithObjects:
-                           HGSLocalizedString(@"ServiceStatusLoggedOut", 
-                                              @"ServiceStatusLoggedOut"),
-                           HGSLocalizedString(@"ServiceStatusDisconnected", 
-                                              @"ServiceStatusDisconnected"),
-                           HGSLocalizedString(@"ServiceStatusLoggingOut", 
-                                              @"ServiceStatusLoggingOut"),
-                           HGSLocalizedString(@"ServiceStatusLoggingIn", 
-                                              @"ServiceStatusLoggingIn"),
-                           HGSLocalizedString(@"ServiceStatusLoggedIn", 
-                                              @"ServiceStatusLoggedIn"),
+                           HGSLocalizedString(@"Service Offline", 
+                                              @"A label describing that a "
+                                              @"chat service is offline."),
+                           HGSLocalizedString(@"Service Disconnected", 
+                                              @"A label describing that a "
+                                              @"chat service is disconnected."),
+                           HGSLocalizedString(@"Service Logging Out", 
+                                              @"A label describing that a "
+                                              @"chat service is logging out."),
+                           HGSLocalizedString(@"Service Logging In", 
+                                              @"A label describing that a "
+                                              @"chat service is logging in."),
+                           HGSLocalizedString(@"Service Logged In", 
+                                              @"A label describing that a "
+                                              @"chat service is logged in."),
                            nil];
   
   buddyStatusStrings_ = [[NSArray alloc] initWithObjects:
-                         HGSLocalizedString(@"BuddyStatusUnknown",
-                                            @"BuddyStatusUnknown"),
-                         HGSLocalizedString(@"BuddyStatusOffline", 
-                                            @"BuddyStatusOffline"),
-                         HGSLocalizedString(@"BuddyStatusIdle",
-                                            @"BuddyStatusIdle"),
-                         HGSLocalizedString(@"BuddyStatusAway",
-                                            @"BuddyStatusAway"),
-                         HGSLocalizedString(@"BuddyStatusAvailable",
-                                            @"BuddyStatusAvailable"),
-                         HGSLocalizedString(@"BuddyStatusNone",
-                                            @"BuddyStatusNone"),
+                         HGSLocalizedString(@"Unknown",
+                                            @"A label describing that a "
+                                            @"buddy's status is unknown."),
+                         HGSLocalizedString(@"Offline", 
+                                            @"A label describing that a "
+                                            @"buddy's status is offline."),
+                         HGSLocalizedString(@"Idle",
+                                            @"A label describing that a "
+                                            @"buddy's status is idle."),
+                         HGSLocalizedString(@"Away",
+                                            @"A label describing that a "
+                                            @"buddy's status is away."),
+                         HGSLocalizedString(@"Available",
+                                            @"A label describing that a "
+                                            @"buddy's status is available."),
+                         HGSLocalizedString(@"No buddy status",
+                                            @"A label describing that a "
+                                            @"buddy's status is not set."),
                          nil];
   
   return self;  
