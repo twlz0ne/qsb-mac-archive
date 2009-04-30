@@ -52,14 +52,6 @@ static NSString *const kCaptchaImageURLPrefix
   = @"http://www.google.com/accounts/";
 
 
-@interface GoogleAccount ()
-
-// Check the authentication results to see if the request authenticated.
-- (BOOL)validateResult:(NSData *)result;
-
-@end
-
-
 @interface GoogleAccountSetUpViewController ()
 
 @property (nonatomic, getter=isGoogleAppsCheckboxShowing)
@@ -148,7 +140,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return accountRequest;
 }
 
-- (BOOL)validateResult:(NSData *)result {
+- (BOOL)validateResult:(NSData *)result statusCode:(NSInteger)statusCode {
   NSString *answer = [[[NSString alloc] initWithData:result
                                             encoding:NSUTF8StringEncoding]
                       autorelease];
@@ -232,30 +224,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     NSBeep();
   }
   return success;
-}
-
-#pragma mark NSURLConnection Delegate Methods
-
-- (void)connection:(NSURLConnection *)connection 
-didReceiveResponse:(NSURLResponse *)response {
-  HGSAssert(connection == [self connection], nil);
-  [responseData_ release];
-  responseData_ = [[NSMutableData alloc] init];
-}
-
-- (void)connection:(NSURLConnection *)connection 
-    didReceiveData:(NSData *)data {
-  HGSAssert(connection == [self connection], nil);
-  [responseData_ appendData:data];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-  HGSAssert(connection == [self connection], nil);
-  [self setConnection:nil];
-  BOOL validated = [self validateResult:responseData_];
-  [responseData_ release];
-  responseData_ = nil;
-  [self setAuthenticated:validated];
 }
 
 @end

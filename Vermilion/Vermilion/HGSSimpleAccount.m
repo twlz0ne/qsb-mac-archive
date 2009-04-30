@@ -137,11 +137,14 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
                                                            password:password];
   if (accountRequest) {
     GDataHTTPFetcher* authenticateFetcher
-    = [GDataHTTPFetcher httpFetcherWithRequest:accountRequest];
+      = [GDataHTTPFetcher httpFetcherWithRequest:accountRequest];
     NSArray *modes = [NSArray arrayWithObjects:
                       NSDefaultRunLoopMode, NSModalPanelRunLoopMode, nil];
     [authenticateFetcher setRunLoopModes:modes];
     [authenticateFetcher setIsRetryEnabled:YES];
+    [authenticateFetcher
+     setCookieStorageMethod:kGDataHTTPFetcherCookieStorageMethodFetchHistory];
+    [authenticateFetcher clearDatedDataHistory];
     authenticationResult_ = NO;
     if ([authenticateFetcher beginFetchWithDelegate:self
                                   didFinishSelector:@selector(authenticateFetcher:
@@ -167,6 +170,11 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
     authenticated = authenticationResult_;
   }
   return authenticated;
+}
+
+- (BOOL)validateResult:(NSData *)result statusCode:(NSInteger)statusCode {
+  HGSAssert(@"Must be overridden by subclass", nil);
+  return NO;
 }
 
 - (NSURLRequest *)accountURLRequest {
@@ -207,7 +215,8 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
 
 - (void)authenticateFetcher:(GDataHTTPFetcher *)fetcher
            finishedWithData:(NSData *)data {
-  authenticationResult_ = YES;
+  NSInteger statusCode = [fetcher statusCode];
+  authenticationResult_ = [self validateResult:data statusCode:statusCode];
   authenticationFinished_ = YES;
 }
 

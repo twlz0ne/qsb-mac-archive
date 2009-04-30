@@ -111,6 +111,13 @@
 - (BOOL)authenticateWithPassword:(NSString *)password;
 
 /*!
+ Check the authentication results and/or response status code to see if the
+ request authenticated.  Each concrete account class must provide an
+ override of this method.
+ */
+- (BOOL)validateResult:(NSData *)result statusCode:(NSInteger)statusCode;
+
+/*!
  Return an NSURLRequest appropriate for authenticating the account
  using the credentials currently stored in the keychain.
 */

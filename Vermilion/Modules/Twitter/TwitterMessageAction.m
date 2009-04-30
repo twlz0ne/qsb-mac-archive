@@ -34,6 +34,7 @@
 #import "GTMMethodCheck.h"
 #import "GTMNSString+URLArguments.h"
 #import "KeychainItem.h"
+#import <GData/GDataHTTPFetcher.h>
 
 static NSString *const kMessageBodyFormat = @"status=%@";
 static NSString *const kSendStatusFormat
@@ -45,7 +46,6 @@ static NSString *const kSendStatusFormat
 @interface TwitterSendMessageAction : HGSAction <HGSAccountClientProtocol> {
  @private
   HGSSimpleAccount *account_;
-  NSURLConnection *twitterConnection_;
 }
 
 // Called by performWithInfo: to actually send the message.
@@ -86,7 +86,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [account_ release];
-  [twitterConnection_ release];
   [super dealloc];
 }
 
@@ -139,6 +138,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         = [NSMutableURLRequest requestWithURL:sendStatusURL 
                                   cachePolicy:NSURLRequestReloadIgnoringCacheData 
                               timeoutInterval:15.0];
+      [sendStatusRequest
+       setCachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData];
       [sendStatusRequest setHTTPMethod:@"POST"];
       [sendStatusRequest setHTTPShouldHandleCookies:NO];
       [sendStatusRequest setValue:@"QuickSearchBox"
@@ -153,9 +154,17 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       NSData *bodyData
         = [encodedMessageBody dataUsingEncoding:NSUTF8StringEncoding];
       [sendStatusRequest setHTTPBody:bodyData];
-      twitterConnection_ 
-        = [[NSURLConnection alloc] initWithRequest:sendStatusRequest 
-                                          delegate:self];
+
+      GDataHTTPFetcher* tweetFetcher
+        = [GDataHTTPFetcher httpFetcherWithRequest:sendStatusRequest];
+      [tweetFetcher setIsRetryEnabled:YES];
+      [tweetFetcher
+       setCookieStorageMethod:kGDataHTTPFetcherCookieStorageMethodFetchHistory];
+      [tweetFetcher beginFetchWithDelegate:self
+                         didFinishSelector:@selector(tweetFetcher:
+                                                     finishedWithData:)
+                           didFailSelector:@selector(tweetFetcher:
+                                                     failedWithError:)];
     } else {
       NSString *errorString
         = HGSLocalizedString(@"Could not tweet. Please check the password for "
@@ -170,6 +179,42 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
              @"item for '%@'.", account_);
     }
   }
+}
+
+- (void)tweetFetcher:(GDataHTTPFetcher *)fetcher
+    finishedWithData:(NSData *)data {
+  NSInteger statusCode = [fetcher statusCode];
+  if (statusCode == 200) {
+    NSString *successString
+      = HGSLocalizedString(@"Message tweeted!",
+                           @"A dialog label explaning that the user's message "
+                           @"has been successfully sent to Twitter");
+    [self informUserWithDescription:successString
+                        successCode:kHGSSuccessCodeSuccess];
+  } else {
+    NSString *errorFormat
+      = HGSLocalizedString(@"Could not tweet! (%d)", 
+                           @"A dialog label explaining to the user that we could "
+                           @"not tweet. %d is an status code.");
+    NSString *errorString = [NSString stringWithFormat:errorFormat, statusCode];
+    [self informUserWithDescription:errorString
+                        successCode:kHGSSuccessCodeBadError];
+    HGSLog(@"Twitter status message failed due to status %d.", statusCode);
+  }
+}
+
+- (void)tweetFetcher:(GDataHTTPFetcher *)fetcher
+     failedWithError:(NSError *)error {
+  NSString *errorFormat
+    = HGSLocalizedString(@"Could not tweet! (%d)", 
+                         @"A dialog label explaining to the user that we could "
+                         @"not tweet. %d is an error code.");
+  NSString *errorString = [NSString stringWithFormat:errorFormat,
+                           [error code]];
+  [self informUserWithDescription:errorString
+                      successCode:kHGSSuccessCodeBadError];
+  HGSLog(@"Twitter status message failed due to error %d: '%@'.",
+         [error code], [error localizedDescription]);
 }
 
 - (void)informUserWithDescription:(NSString *)description
@@ -199,74 +244,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (void)loginCredentialsChanged:(NSNotification *)notification {
   HGSAccount *account = [notification object];
   HGSAssert(account == account_, @"Notification from bad account!");
-}
-
-#pragma mark NSURLConnection Delegate Methods
-
-- (void)connection:(NSURLConnection *)connection 
-didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-  HGSAssert(connection == twitterConnection_, nil);
-  KeychainItem* keychainItem 
-    = [KeychainItem keychainItemForService:[account_ identifier]
-                                  username:nil];
-  NSString *userName = [keychainItem username];
-  NSString *password = [keychainItem password];
-  // See if the account still validates.
-  BOOL accountAuthenticates = [account_ authenticateWithPassword:password];
-  if (accountAuthenticates) {
-    id<NSURLAuthenticationChallengeSender> sender = [challenge sender];
-    NSInteger previousFailureCount = [challenge previousFailureCount];
-    if (userName && password && previousFailureCount < 3) {
-      NSURLCredential *creds 
-        = [NSURLCredential credentialWithUser:userName
-                                     password:password
-                                  persistence:NSURLCredentialPersistenceNone];
-      [sender useCredential:creds forAuthenticationChallenge:challenge];
-    } else {
-      [sender continueWithoutCredentialForAuthenticationChallenge:challenge];
-    }
-  } else {
-    NSString *errorString
-      = HGSLocalizedString(@"Could not tweet. Please check the password for "
-                           @"account %@", 
-                           @"A dialog label explaining that the user could "
-                           @"not send their Twitter data due to a bad "
-                           @"password for account %@");
-    errorString = [NSString stringWithFormat:errorString, userName];
-    [self informUserWithDescription:errorString
-                        successCode:kHGSSuccessCodeError];
-    HGSLog(@"Twitter status message failed due to authentication failure "
-           @"for account ''.", userName);
-  }
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-  HGSAssert(connection == twitterConnection_, nil);
-  NSString *successString = HGSLocalizedString(@"Message tweeted!", 
-                                               @"A dialog label explaning that "
-                                               @"the user's message has been "
-                                               @"successfully sent to Twitter");
-  [self informUserWithDescription:successString
-                      successCode:kHGSSuccessCodeSuccess];
-  [twitterConnection_ release];
-  twitterConnection_ = nil;
-}
-
-- (void)connection:(NSURLConnection *)connection
-  didFailWithError:(NSError *)error {
-  HGSAssert(twitterConnection_ == connection, nil);
-  NSString *errorFormat
-    = HGSLocalizedString(@"Could not tweet! (%d)", 
-                         @"A dialog label explaining to the user that we could "
-                         @"not tweet. %d is an error code.");
-  NSString *errorString = [NSString stringWithFormat:errorFormat,
-                           [error code]];
-  [self informUserWithDescription:errorString
-                      successCode:kHGSSuccessCodeBadError];
-  HGSLog(@"Twitter status message failed due to error %d: '%@'.",
-         [error code], [error localizedDescription]);
-  [twitterConnection_ release];
-  twitterConnection_ = nil;
 }
 
 #pragma mark HGSAccountClientProtocol Methods

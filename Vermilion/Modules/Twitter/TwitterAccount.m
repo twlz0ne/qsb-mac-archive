@@ -63,6 +63,8 @@ static NSString *const kTwitterAccountTypeName
     = [NSMutableURLRequest requestWithURL:accountTestURL
                               cachePolicy:NSURLRequestUseProtocolCachePolicy
                           timeoutInterval:15.0];
+  [accountRequest
+   setCachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData];
   NSString *authStr = [NSString stringWithFormat:@"%@:%@",
                        userName, password];
   NSData *authData = [authStr dataUsingEncoding:NSASCIIStringEncoding];
@@ -70,6 +72,12 @@ static NSString *const kTwitterAccountTypeName
   NSString *authValue = [NSString stringWithFormat:@"Basic %@", authBase64];
   [accountRequest setValue:authValue forHTTPHeaderField:@"Authorization"];
   return accountRequest;
+}
+
+- (BOOL)validateResult:(NSData *)result statusCode:(NSInteger)statusCode {
+  // A 200 means verified, a 401 means not verified.
+  BOOL valid = (statusCode == 200);
+  return valid;
 }
 
 + (BOOL)openTwitterHomePage {
