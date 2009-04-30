@@ -160,11 +160,12 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
     = [NSMutableDictionary dictionaryWithCapacity:[rawDict count]];
   NSBundle *bundle = [NSBundle mainBundle];
   for (NSString *rawCategoryName in [rawDict allKeys]) {
-    rawCategoryName = [bundle localizedStringForKey:rawCategoryName 
-                                              value:nil 
-                                              table:nil];
+    NSString *localizedCategoryName 
+      = [bundle localizedStringForKey:rawCategoryName 
+                                value:nil 
+                                table:nil];
     [localizedDict setObject:[rawDict objectForKey:rawCategoryName]
-                      forKey:NSLocalizedString(rawCategoryName, nil)];
+                      forKey:localizedCategoryName];
   }
   NSArray *sortedCategories = [[localizedDict allKeys]
                                sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];

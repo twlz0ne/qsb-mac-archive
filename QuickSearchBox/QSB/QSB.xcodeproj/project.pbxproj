@@ -720,6 +720,7 @@
 		8B95CD210F6EDF9D003BDBDD /* GTMRegex.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */; };
 		8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B95CE200F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CE1F0F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m */; };
+		8B98A2C80FA96ECF009DC652 /* WelcomeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8B98A2C70FA96ECF009DC652 /* WelcomeWindow.xib */; };
 		8BA019C40F14303400926923 /* GTMSQLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BA019C20F14303400926923 /* GTMSQLite.m */; };
 		8BA019C50F14303400926923 /* GTMSQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BA019C30F14303400926923 /* GTMSQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BA01A860F1431DD00926923 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BB275AB0D6F81EA008DC1CA /* libsqlite3.dylib */; };
@@ -2176,6 +2177,7 @@
 		8B989F390FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = "___PROJECTNAMEASIDENTIFIER___.py"; sourceTree = "<group>"; };
 		8B989F3A0FA7B93C009DC652 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8B989F3B0FA7B93C009DC652 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		8B98A2C50FA96EBB009DC652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/WelcomeWindow.xib; sourceTree = "<group>"; };
 		8BA019C20F14303400926923 /* GTMSQLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMSQLite.m; sourceTree = "<group>"; };
 		8BA019C30F14303400926923 /* GTMSQLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMSQLite.h; sourceTree = "<group>"; };
 		8BA01C000F147DB000926923 /* GTMNSWorkspace+Running.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSWorkspace+Running.h"; sourceTree = "<group>"; };
@@ -3505,11 +3507,12 @@
 				7F79A24A0F0AA289000D14CB /* TopSearchStatusResultView.xib */,
 				623A002F0E9BC5A6002A8401 /* TopSeparatorResultView.xib */,
 				623A002C0E9BC534002A8401 /* TopStandardResultView.xib */,
+				7F7F908F0F32570F00B39433 /* TopSearchIconResultView.xib */,
+				7F7F90910F32570F00B39433 /* TopSearchForResultView.xib */,
+				8B98A2C70FA96ECF009DC652 /* WelcomeWindow.xib */,
 				8B5EC6B50CEE61BF00AD3BBD /* WhiteGoogle.ai */,
 				8B5EC6B60CEE61BF00AD3BBD /* WhiteGoogle.pdf */,
 				7F9AD9D30D904A8E004825C4 /* WhiteLargeGoogle.pdf */,
-				7F7F908F0F32570F00B39433 /* TopSearchIconResultView.xib */,
-				7F7F90910F32570F00B39433 /* TopSearchForResultView.xib */,
 				7F7357CE0DC93426003DB5C6 /* SmallIcons */,
 				8B6119090F434C0C00E29B40 /* GrabFinderSelectionAsPosixPaths.applescript */,
 			);
@@ -5595,6 +5598,7 @@
 				7FE2542C0F5CE3E4004FE5A6 /* blue-nav.icns in Resources */,
 				8BC685570F5ED38C003B5C6A /* SetUpAccount.xib in Resources */,
 				62ECB7AA0F86A17100C7B435 /* CategorySingulars.strings in Resources */,
+				8B98A2C80FA96ECF009DC652 /* WelcomeWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7546,6 +7550,14 @@
 				8B989F310FA7B93C009DC652 /* English */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		8B98A2C70FA96ECF009DC652 /* WelcomeWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8B98A2C50FA96EBB009DC652 /* English */,
+			);
+			name = WelcomeWindow.xib;
 			sourceTree = "<group>";
 		};
 		8BC685550F5ED38C003B5C6A /* SetUpAccount.xib */ = {
