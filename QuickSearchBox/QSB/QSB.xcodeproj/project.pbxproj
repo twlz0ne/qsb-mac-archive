@@ -283,6 +283,22 @@
 		6200F99D0E785FE700F046EC /* MoreShowAllTableResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200F99B0E785FE700F046EC /* MoreShowAllTableResultView.xib */; };
 		6200F9E00E78623500F046EC /* MoreFoldResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200F9DE0E78623500F046EC /* MoreFoldResultView.xib */; };
 		6200FC100E78896A00F046EC /* MoreCategoryResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200FC0E0E78896A00F046EC /* MoreCategoryResultView.xib */; };
+		620CB3790FAA83D40029801C /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
+		620CB37A0FAA83DB0029801C /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
+		620CB3870FAA84060029801C /* QSBPluginUI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
+		620CB3920FAA84260029801C /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
+		620CB39E0FAA844D0029801C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
+		620CB41C0FAA84520029801C /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
+		620CB4CF0FAA84590029801C /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E429DF760AC1907A00E747D8 /* Security.framework */; };
+		620CB5090FAA845D0029801C /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		620CB5690FAA85160029801C /* QSBEditAccountWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D9B86C0F94E453005EF9BC /* QSBEditAccountWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		620CB56A0FAA85160029801C /* QSBEditAccountWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D9B86B0F94E453005EF9BC /* QSBEditAccountWindowController.m */; };
+		620CB56B0FAA85160029801C /* QSBEditSimpleAccountWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D9B78B0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		620CB56C0FAA85160029801C /* QSBEditSimpleAccountWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D9B78C0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.m */; };
+		620CB56D0FAA85160029801C /* QSBSetUpAccountViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 62F974C10F8EF33E001C55B6 /* QSBSetUpAccountViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		620CB56E0FAA85160029801C /* QSBSetUpAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F974C20F8EF33E001C55B6 /* QSBSetUpAccountViewController.m */; };
+		620CB56F0FAA85160029801C /* QSBSetUpSimpleAccountViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 62F974C80F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		620CB5700FAA85160029801C /* QSBSetUpSimpleAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F974C90F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.m */; };
 		62115E670F3226F7007FEA2A /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		6211C51D0F312E7E003A5122 /* HGSSimpleAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */; };
 		6219B5340E8C1DB3008643F4 /* BaseResultsViews.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */; };
@@ -363,16 +379,6 @@
 		62D5B51E0E648FF400C66E15 /* InstantMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629A95630E5F244D005AE855 /* InstantMessage.framework */; };
 		62D5B58D0E6491B500C66E15 /* InstantMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629A95630E5F244D005AE855 /* InstantMessage.framework */; };
 		62D5B6A00E64D0DC00C66E15 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
-		62D9B86D0F94E453005EF9BC /* QSBEditAccountWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D9B86B0F94E453005EF9BC /* QSBEditAccountWindowController.m */; };
-		62D9B87F0F94ED13005EF9BC /* QSBSetUpSimpleAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F974C90F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.m */; };
-		62D9B8800F94ED14005EF9BC /* QSBSetUpSimpleAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F974C90F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.m */; };
-		62D9B8830F94ED34005EF9BC /* QSBSetUpAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F974C20F8EF33E001C55B6 /* QSBSetUpAccountViewController.m */; };
-		62D9B8840F94ED35005EF9BC /* QSBSetUpAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F974C20F8EF33E001C55B6 /* QSBSetUpAccountViewController.m */; };
-		62D9B8850F94ED39005EF9BC /* QSBSetUpAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F974C20F8EF33E001C55B6 /* QSBSetUpAccountViewController.m */; };
-		62D9B8860F94ED42005EF9BC /* QSBEditAccountWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D9B86B0F94E453005EF9BC /* QSBEditAccountWindowController.m */; };
-		62D9B8870F94ED43005EF9BC /* QSBEditAccountWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D9B86B0F94E453005EF9BC /* QSBEditAccountWindowController.m */; };
-		62D9B8880F94ED4B005EF9BC /* QSBEditSimpleAccountWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D9B78C0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.m */; };
-		62D9B8890F94ED4C005EF9BC /* QSBEditSimpleAccountWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D9B78C0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.m */; };
 		62E190960EBA4A570002241B /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62E72A7B0F4F4ADE00A68815 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62E72A7A0F4F4ADE00A68815 /* Growl.framework */; };
 		62E72AB80F4F6E6700A68815 /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 62E72A7A0F4F4ADE00A68815 /* Growl.framework */; };
@@ -388,8 +394,6 @@
 		62F150040DD4EE3D00BCAE1A /* ResultsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 62F150020DD4EE3C00BCAE1A /* ResultsWindow.xib */; };
 		62F380F90EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F380F80EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m */; };
 		62F381020EA7FC1900370F6F /* QSBTopSearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F381000EA7FC1900370F6F /* QSBTopSearchController.m */; };
-		62F974C30F8EF33E001C55B6 /* QSBSetUpAccountViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 62F974C10F8EF33E001C55B6 /* QSBSetUpAccountViewController.h */; };
-		62F974CA0F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 62F974C80F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.h */; };
 		62FDEA9D0F536A4A00A66631 /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = 62FDEA9C0F536A4A00A66631 /* Growl Registration Ticket.growlRegDict */; };
 		62FF5B860F8D846F00B21B5D /* HGSAccountType.m in Sources */ = {isa = PBXBuildFile; fileRef = 62FF5B840F8D846F00B21B5D /* HGSAccountType.m */; };
 		62FF5B870F8D846F00B21B5D /* HGSAccountType.h in Headers */ = {isa = PBXBuildFile; fileRef = 62FF5B850F8D846F00B21B5D /* HGSAccountType.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1019,6 +1023,27 @@
 			remoteGlobalIDString = 03BF2D3708F1C69500978C59;
 			remoteInfo = Test;
 		};
+		620CB3620FAA838F0029801C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 620CB3080FAA827E0029801C;
+			remoteInfo = QSBPluginUI;
+		};
+		620CB36D0FAA83A40029801C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 620CB3080FAA827E0029801C;
+			remoteInfo = QSBPluginUI;
+		};
+		620CB36F0FAA83AA0029801C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 620CB3080FAA827E0029801C;
+			remoteInfo = QSBPluginUI;
+		};
 		622911BC0F2E8034005D34CE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1613,6 +1638,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				620CB3870FAA84060029801C /* QSBPluginUI.framework in Copy Frameworks */,
 				8B6128F90F4642C100E29B40 /* JSON.framework in Copy Frameworks */,
 				8B6C0D060F32C86100E51E5D /* GData.framework in Copy Frameworks */,
 				8BDCCC0A0F18700200CDDA78 /* GoogleBreakpad.framework in Copy Frameworks */,
@@ -1763,6 +1789,7 @@
 		6200F99C0E785FE700F046EC /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MoreShowAllTableResultView.xib; sourceTree = "<group>"; };
 		6200F9DF0E78623500F046EC /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MoreFoldResultView.xib; sourceTree = "<group>"; };
 		6200FC0F0E78896A00F046EC /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MoreCategoryResultView.xib; sourceTree = "<group>"; };
+		620CB3090FAA827E0029801C /* QSBPluginUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = QSBPluginUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSimpleAccount.h; sourceTree = "<group>"; };
 		6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleAccount.m; sourceTree = "<group>"; };
 		6219B5330E8C1DB3008643F4 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/BaseResultsViews.xib; sourceTree = "<group>"; };
@@ -1825,6 +1852,7 @@
 		6282B2220DD8985000AC9C3C /* QSBSearchWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSearchWindowController.h; sourceTree = "<group>"; };
 		629446390EDE190B009295EA /* GTMNSArray+Merge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSArray+Merge.h"; sourceTree = "<group>"; };
 		6294463A0EDE190B009295EA /* GTMNSArray+Merge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSArray+Merge.m"; sourceTree = "<group>"; };
+		62977A960FAA8D9700C6CB59 /* QSBPluginUI-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "QSBPluginUI-Info.plist"; path = "Resources/QSBPluginUI-Info.plist"; sourceTree = "<group>"; };
 		629A95630E5F244D005AE855 /* InstantMessage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InstantMessage.framework; path = System/Library/Frameworks/InstantMessage.framework; sourceTree = SDKROOT; };
 		62A16A8D0ED484DF0074F41B /* HGSPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSPlugin.h; sourceTree = "<group>"; };
 		62A16A8E0ED484DF0074F41B /* HGSPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPlugin.m; sourceTree = "<group>"; };
@@ -2473,6 +2501,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		620CB3070FAA827E0029801C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				620CB39E0FAA844D0029801C /* Foundation.framework in Frameworks */,
+				620CB41C0FAA84520029801C /* AppKit.framework in Frameworks */,
+				620CB4CF0FAA84590029801C /* Security.framework in Frameworks */,
+				620CB5090FAA845D0029801C /* Vermilion.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		623ADD3C0EC0CC17001651D1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2522,6 +2561,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				620CB3790FAA83D40029801C /* QSBPluginUI.framework in Frameworks */,
 				62A4AC830F2FCD950007CD99 /* Foundation.framework in Frameworks */,
 				62A4AC840F2FCD950007CD99 /* Vermilion.framework in Frameworks */,
 				62A4AC850F2FCD950007CD99 /* Cocoa.framework in Frameworks */,
@@ -2533,6 +2573,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				620CB37A0FAA83DB0029801C /* QSBPluginUI.framework in Frameworks */,
 				62EA8BC50F2E7DE200C92E0B /* Foundation.framework in Frameworks */,
 				62EA8BC60F2E7DE200C92E0B /* Vermilion.framework in Frameworks */,
 				62EA8BC80F2E7DE200C92E0B /* Cocoa.framework in Frameworks */,
@@ -2600,6 +2641,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				620CB3920FAA84260029801C /* QSBPluginUI.framework in Frameworks */,
 				8B6129B30F46446D00E29B40 /* JSON.framework in Frameworks */,
 				8BD982BC0E63746200F5C83B /* GTM.framework in Frameworks */,
 				8B459D890DA4417C001148C5 /* Vermilion.framework in Frameworks */,
@@ -2784,6 +2826,7 @@
 			isa = PBXGroup;
 			children = (
 				8B3EED7C0CEA86A100D933C0 /* Quick Search Box.app */,
+				620CB3090FAA827E0029801C /* QSBPluginUI.framework */,
 				8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */,
 				8BD97D0A0E636D8C00F5C83B /* GTM.framework */,
 				8B77E0DC0F28FC3B00FA2A3C /* GData.framework */,
@@ -3034,6 +3077,22 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		620CB5600FAA84970029801C /* QSBPluginUI */ = {
+			isa = PBXGroup;
+			children = (
+				62D9B86C0F94E453005EF9BC /* QSBEditAccountWindowController.h */,
+				62D9B86B0F94E453005EF9BC /* QSBEditAccountWindowController.m */,
+				62D9B78B0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.h */,
+				62D9B78C0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.m */,
+				62F974C10F8EF33E001C55B6 /* QSBSetUpAccountViewController.h */,
+				62F974C20F8EF33E001C55B6 /* QSBSetUpAccountViewController.m */,
+				62F974C80F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.h */,
+				62F974C90F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.m */,
+				62977A940FAA8D5000C6CB59 /* Resources */,
+			);
+			name = QSBPluginUI;
+			sourceTree = "<group>";
+		};
 		623ADD740EC0CC31001651D1 /* EmailActions */ = {
 			isa = PBXGroup;
 			children = (
@@ -3072,6 +3131,14 @@
 				627FAEB50DF9D71D00E3E765 /* RecentDocumentsSource.m */,
 			);
 			path = RecentDocuments;
+			sourceTree = "<group>";
+		};
+		62977A940FAA8D5000C6CB59 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				62977A960FAA8D9700C6CB59 /* QSBPluginUI-Info.plist */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		62A4AD0C0F2FCE0E0007CD99 /* Twitter */ = {
@@ -3405,16 +3472,12 @@
 				8B21631E0EB9022300183DE4 /* QSBDetailedRowViewController.m */,
 				7FA450BB0EF88741006FD4E9 /* QSBDraggableImageView.h */,
 				7FA450BA0EF88741006FD4E9 /* QSBDraggableImageView.m */,
-				62D9B86C0F94E453005EF9BC /* QSBEditAccountWindowController.h */,
-				62D9B86B0F94E453005EF9BC /* QSBEditAccountWindowController.m */,
-				62D9B78B0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.h */,
-				62D9B78C0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.m */,
-				62F381010EA7FC1900370F6F /* QSBTopSearchController.h */,
-				62F381000EA7FC1900370F6F /* QSBTopSearchController.m */,
 				8B8257970D189EA6002A6C3C /* QSBGrayView.h */,
 				8B8257980D189EA6002A6C3C /* QSBGrayView.m */,
 				8BF5178F0EDBC11000D981A0 /* QSBHGSDelegate.h */,
 				8BF517900EDBC11000D981A0 /* QSBHGSDelegate.m */,
+				7F3F7EC30F39FCE70054680A /* QSBHGSResult+NSPasteboard.h */,
+				7F3F7EC40F39FCE70054680A /* QSBHGSResult+NSPasteboard.m */,
 				8BE8488D0E9425C200C611B0 /* QSBKeyMap.h */,
 				8BE8488E0E9425C200C611B0 /* QSBKeyMap.m */,
 				8BE848B30E94313A00C611B0 /* QSBKeyMapTest.m */,
@@ -3440,12 +3503,8 @@
 				F487E3A80E59D4D0005B47E6 /* QSBPreferences.m */,
 				625A2C960E5614F3008CA9BF /* QSBPreferenceWindowController.h */,
 				625A2C970E5614F3008CA9BF /* QSBPreferenceWindowController.m */,
-				8B5EC6660CEE61BF00AD3BBD /* QSBSearchController.h */,
-				8B5EC6670CEE61BF00AD3BBD /* QSBSearchController.m */,
 				8B5EC6680CEE61BF00AD3BBD /* QSBQueryBoundingView.h */,
 				8B5EC6690CEE61BF00AD3BBD /* QSBQueryBoundingView.m */,
-				62ED5EE30E8AADA800C9C2C3 /* QSBSearchViewController.h */,
-				62ED5EE40E8AADB200C9C2C3 /* QSBSearchViewController.m */,
 				8BC350B90F2BD7D3001ADD5B /* QSBResultIconView.h */,
 				8BC350BA0F2BD7D3001ADD5B /* QSBResultIconView.m */,
 				624DD9EB0E9EA5D90029EF72 /* QSBResultRowViewController.h */,
@@ -3458,14 +3517,14 @@
 				8B5EC6710CEE61BF00AD3BBD /* QSBResultTableView.m */,
 				7F3F758A0E152A57001AF34E /* QSBScrollView.h */,
 				7F3F758B0E152A57001AF34E /* QSBScrollView.m */,
+				8B5EC6660CEE61BF00AD3BBD /* QSBSearchController.h */,
+				8B5EC6670CEE61BF00AD3BBD /* QSBSearchController.m */,
+				62ED5EE30E8AADA800C9C2C3 /* QSBSearchViewController.h */,
+				62ED5EE40E8AADB200C9C2C3 /* QSBSearchViewController.m */,
 				6282B2220DD8985000AC9C3C /* QSBSearchWindowController.h */,
 				6282B2210DD8985000AC9C3C /* QSBSearchWindowController.m */,
-				62F974C10F8EF33E001C55B6 /* QSBSetUpAccountViewController.h */,
-				62F974C20F8EF33E001C55B6 /* QSBSetUpAccountViewController.m */,
 				624137510F2A657B009229E6 /* QSBSetUpAccountWindowController.h */,
 				624137520F2A657B009229E6 /* QSBSetUpAccountWindowController.m */,
-				62F974C80F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.h */,
-				62F974C90F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.m */,
 				7F3F75930E152BA5001AF34E /* QSBSmallScroller.h */,
 				7F3F75940E152BA5001AF34E /* QSBSmallScroller.m */,
 				8BCFD1800D34004F003A33F4 /* QSBTableResult.h */,
@@ -3476,6 +3535,8 @@
 				623AFDBC0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.m */,
 				624DD9F70E9EAA150029EF72 /* QSBTopResultsViewControllers.h */,
 				624DD9F80E9EAA150029EF72 /* QSBTopResultsViewControllers.m */,
+				62F381010EA7FC1900370F6F /* QSBTopSearchController.h */,
+				62F381000EA7FC1900370F6F /* QSBTopSearchController.m */,
 				626585210F43BD4C008A94B2 /* QSBUserMessenger.h */,
 				626585220F43BD4C008A94B2 /* QSBUserMessenger.m */,
 				62521AB20EFAC30000A6E647 /* QSBViewTableViewCell.h */,
@@ -3483,8 +3544,7 @@
 				62521AB40EFAC30000A6E647 /* QSBViewTableViewColumn.h */,
 				62521AB50EFAC30000A6E647 /* QSBViewTableViewColumn.m */,
 				62521AB60EFAC30000A6E647 /* QSBViewTableViewDelegateProtocol.h */,
-				7F3F7EC30F39FCE70054680A /* QSBHGSResult+NSPasteboard.h */,
-				7F3F7EC40F39FCE70054680A /* QSBHGSResult+NSPasteboard.m */,
+				620CB5600FAA84970029801C /* QSBPluginUI */,
 				8B989F070FA7B93C009DC652 /* SDK */,
 				8B07C41B0B69234900827344 /* BuildScripts */,
 				8B5EC6870CEE61BF00AD3BBD /* Resources */,
@@ -4310,6 +4370,17 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		620CB3040FAA827E0029801C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				620CB5690FAA85160029801C /* QSBEditAccountWindowController.h in Headers */,
+				620CB56B0FAA85160029801C /* QSBEditSimpleAccountWindowController.h in Headers */,
+				620CB56D0FAA85160029801C /* QSBSetUpAccountViewController.h in Headers */,
+				620CB56F0FAA85160029801C /* QSBSetUpSimpleAccountViewController.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B6F2CDC0DA2B7F50052CA40 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -4350,8 +4421,6 @@
 				8BAAA8680F813E2A00DF4F12 /* HGSPluginLoader.h in Headers */,
 				8BAAA86B0F813E2A00DF4F12 /* HGSCoreExtensionPoints.h in Headers */,
 				62FF5B870F8D846F00B21B5D /* HGSAccountType.h in Headers */,
-				62F974C30F8EF33E001C55B6 /* QSBSetUpAccountViewController.h in Headers */,
-				62F974CA0F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.h in Headers */,
 				627B43C00FA0E3D9006BE269 /* HGSGoogleAccountTypes.h in Headers */,
 				8B791D860FA1FC24006BFE1E /* HGSAppleScriptAction.h in Headers */,
 			);
@@ -4558,6 +4627,24 @@
 			productReference = 5AF2C4860E5E19A400F4D546 /* iTunes.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
+		620CB3080FAA827E0029801C /* QSBPluginUI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 620CB30E0FAA827F0029801C /* Build configuration list for PBXNativeTarget "QSBPluginUI" */;
+			buildPhases = (
+				620CB3040FAA827E0029801C /* Headers */,
+				620CB3060FAA827E0029801C /* Sources */,
+				620CB3070FAA827E0029801C /* Frameworks */,
+				620CB5340FAA84680029801C /* Breakpad */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = QSBPluginUI;
+			productName = QSBPluginUI;
+			productReference = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		623ADD320EC0CC17001651D1 /* Email URL Action */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 623ADD420EC0CC17001651D1 /* Build configuration list for PBXNativeTarget "Email URL Action" */;
@@ -4647,6 +4734,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				620CB3700FAA83AA0029801C /* PBXTargetDependency */,
 				62A4AC7A0F2FCD950007CD99 /* PBXTargetDependency */,
 				62C5CAD30FA1318D000896CD /* PBXTargetDependency */,
 			);
@@ -4667,6 +4755,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				620CB36E0FAA83A40029801C /* PBXTargetDependency */,
 				62EA8BBE0F2E7DE200C92E0B /* PBXTargetDependency */,
 				62C5C8B90FA12E0C000896CD /* PBXTargetDependency */,
 			);
@@ -4801,6 +4890,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				620CB3630FAA838F0029801C /* PBXTargetDependency */,
 				8BD97D8C0E636E1800F5C83B /* PBXTargetDependency */,
 				8B7DAB040DB9B288008B5C71 /* PBXTargetDependency */,
 				8B77E14F0F28FE4600FA2A3C /* PBXTargetDependency */,
@@ -5052,7 +5142,7 @@
 				8BD97D060E636D8C00F5C83B /* Resources */,
 				8BD97D070E636D8C00F5C83B /* Sources */,
 				8BD97D080E636D8C00F5C83B /* Frameworks */,
-				8B637BA20F27783A00997738 /* ShellScript */,
+				8B637BA20F27783A00997738 /* Breakpad */,
 			);
 			buildRules = (
 			);
@@ -5231,6 +5321,7 @@
 				8B2E2A400F99018600F80E11 /* HeaderDoc */,
 				8B148D860F705F35002E05FA /* QSB SDK */,
 				8B3EECE20CEA86A100D933C0 /* QSB Core */,
+				620CB3080FAA827E0029801C /* QSBPluginUI */,
 				8BD97D090E636D8C00F5C83B /* GTM */,
 				8B6F2CE00DA2B7F50052CA40 /* Vermilion */,
 				8B77E0DB0F28FC3B00FA2A3C /* GData */,
@@ -5239,21 +5330,24 @@
 				8B63DD670D9458E500395A2B /* QSB Core Test */,
 				E4F551320DF73059008A846E /* Vermilion Test */,
 				E46932F50DDB7A0200C5A64A /* Actions */,
-				8B6F2F400DA2C37C0052CA40 /* Applications */,
 				8B3D2A2A0EAFDA66004EA504 /* Application UI */,
+				8B6F2F400DA2C37C0052CA40 /* Applications */,
 				F4E3B57B0EB6573300CB713D /* Calculator */,
 				33EEA68A0DD0D9C0005766AB /* Camino Bookmarks */,
 				623FA35E0E5C8D97003630C1 /* ChatBuddies */,
 				8B6F2F200DA2BB660052CA40 /* Contacts */,
 				F4FEECCC0EC4BF99000758EC /* CorePlugin */,
 				8B3D266E0EAE8E7A004EA504 /* Developer Documentation */,
+				5AF0EB620F60744E0041E0B9 /* Dictionary */,
 				7F9415CE0EEF52970049AE06 /* Directory Scanner */,
 				623ADD320EC0CC17001651D1 /* Email URL Action */,
 				33D2CADF0DD24C2500C1FBDC /* Google Bookmarks */,
 				8B3EF76E0EF2C8000036FFBD /* Google Corpora */,
 				33D2C5F20DD1068000C1FBDC /* Google Docs */,
+				62EA8BBD0F2E7DE200C92E0B /* GoogleAccounts */,
 				8B735F9A0EC905E900E74421 /* Images AppleScript */,
 				5AF2C4780E5E19A400F4D546 /* iTunes */,
+				5AF0F4870F671D9C0041E0B9 /* Mount */,
 				8BCCD3590EC8F93C00688D64 /* Networking AppleScript */,
 				6263CAE80EB79F3600FF03A1 /* Picasaweb */,
 				627FAEBA0DF9D73500E3E765 /* Recent Documents */,
@@ -5263,13 +5357,10 @@
 				8B6F2EF80DA2BA260052CA40 /* Spotlight Files */,
 				8BCCD2620EC8E5EC00688D64 /* System AppleScript */,
 				7FF019AA0EB089CB001A2C7B /* Terminal */,
+				5AF0EE210F61D0850041E0B9 /* Trash */,
+				62A4AC790F2FCD950007CD99 /* Twitter */,
 				8BCCD2C70EC8F8C200688D64 /* Volume AppleScript */,
 				F4E3B6FC0EB66AA900CB713D /* Weather */,
-				62EA8BBD0F2E7DE200C92E0B /* GoogleAccounts */,
-				62A4AC790F2FCD950007CD99 /* Twitter */,
-				5AF0EB620F60744E0041E0B9 /* Dictionary */,
-				5AF0EE210F61D0850041E0B9 /* Trash */,
-				5AF0F4870F671D9C0041E0B9 /* Mount */,
 			);
 		};
 /* End PBXProject section */
@@ -5866,6 +5957,20 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
 		};
+		620CB5340FAA84680029801C /* Breakpad */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Breakpad;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
+		};
 		62A4AC860F2FCD950007CD99 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -6003,13 +6108,14 @@
 			shellPath = /bin/sh;
 			shellScript = "# Build JSON the way we want into our build folder\ncd \"${SRCROOT}/../externals/json-framework\"\n/usr/bin/xcodebuild -project JSON.xcodeproj -target JSON -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHEROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" SDKROOT=\"${SDKROOT}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"JSON\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/JSON.build/${CONFIGURATION}/JSON.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
 		};
-		8B637BA20F27783A00997738 /* ShellScript */ = {
+		8B637BA20F27783A00997738 /* Breakpad */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = Breakpad;
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6583,6 +6689,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		620CB3060FAA827E0029801C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				620CB56A0FAA85160029801C /* QSBEditAccountWindowController.m in Sources */,
+				620CB56C0FAA85160029801C /* QSBEditSimpleAccountWindowController.m in Sources */,
+				620CB56E0FAA85160029801C /* QSBSetUpAccountViewController.m in Sources */,
+				620CB5700FAA85160029801C /* QSBSetUpSimpleAccountViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		623ADD3A0EC0CC17001651D1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -6631,10 +6748,6 @@
 				62A4AC810F2FCD950007CD99 /* GTMMethodCheck.m in Sources */,
 				62A4AEAC0F30DF9F0007CD99 /* GTMBase64.m in Sources */,
 				62115E670F3226F7007FEA2A /* HGSBundle.m in Sources */,
-				62D9B87F0F94ED13005EF9BC /* QSBSetUpSimpleAccountViewController.m in Sources */,
-				62D9B8830F94ED34005EF9BC /* QSBSetUpAccountViewController.m in Sources */,
-				62D9B8860F94ED42005EF9BC /* QSBEditAccountWindowController.m in Sources */,
-				62D9B8880F94ED4B005EF9BC /* QSBEditSimpleAccountWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6647,10 +6760,6 @@
 				622912F40F2EAF80005D34CE /* GTMMethodCheck.m in Sources */,
 				620055690F78595F00C806A1 /* GoogleAccountEditController.m in Sources */,
 				6200556A0F78595F00C806A1 /* GoogleAccountSetUpViewController.m in Sources */,
-				62D9B8800F94ED14005EF9BC /* QSBSetUpSimpleAccountViewController.m in Sources */,
-				62D9B8840F94ED35005EF9BC /* QSBSetUpAccountViewController.m in Sources */,
-				62D9B8870F94ED43005EF9BC /* QSBEditAccountWindowController.m in Sources */,
-				62D9B8890F94ED4C005EF9BC /* QSBEditSimpleAccountWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6762,8 +6871,6 @@
 				5ACEF2B80F40EAF5007EA38B /* QSBPluginVerifyWindowController.m in Sources */,
 				626585230F43BD4C008A94B2 /* QSBUserMessenger.m in Sources */,
 				8B611BFC0F43949600E29B40 /* QSBPathForFileURLCommand.m in Sources */,
-				62D9B86D0F94E453005EF9BC /* QSBEditAccountWindowController.m in Sources */,
-				62D9B8850F94ED39005EF9BC /* QSBSetUpAccountViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7049,6 +7156,21 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 5AF2C47A0E5E19A400F4D546 /* PBXContainerItemProxy */;
+		};
+		620CB3630FAA838F0029801C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 620CB3080FAA827E0029801C /* QSBPluginUI */;
+			targetProxy = 620CB3620FAA838F0029801C /* PBXContainerItemProxy */;
+		};
+		620CB36E0FAA83A40029801C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 620CB3080FAA827E0029801C /* QSBPluginUI */;
+			targetProxy = 620CB36D0FAA83A40029801C /* PBXContainerItemProxy */;
+		};
+		620CB3700FAA83AA0029801C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 620CB3080FAA827E0029801C /* QSBPluginUI */;
+			targetProxy = 620CB36F0FAA83AA0029801C /* PBXContainerItemProxy */;
 		};
 		622911BD0F2E8034005D34CE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7928,6 +8050,33 @@
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/iTunes/iTunes-Info.plist";
 				PRODUCT_NAME = iTunes;
 				WRAPPER_EXTENSION = hgs;
+			};
+			name = Release;
+		};
+		620CB30B0FAA827E0029801C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/Resources/QSBPluginUI-Info.plist";
+				PRODUCT_NAME = QSBPluginUI;
+			};
+			name = Debug;
+		};
+		620CB30C0FAA827E0029801C /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/Resources/QSBPluginUI-Info.plist";
+				PRODUCT_NAME = QSBPluginUI;
+			};
+			name = "Debug-gcov";
+		};
+		620CB30D0FAA827E0029801C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/Resources/QSBPluginUI-Info.plist";
+				PRODUCT_NAME = QSBPluginUI;
 			};
 			name = Release;
 		};
@@ -9319,6 +9468,16 @@
 				5AF2C4840E5E19A400F4D546 /* Debug */,
 				8B95CBCC0F6B1DEE003BDBDD /* Debug-gcov */,
 				5AF2C4850E5E19A400F4D546 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		620CB30E0FAA827F0029801C /* Build configuration list for PBXNativeTarget "QSBPluginUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				620CB30B0FAA827E0029801C /* Debug */,
+				620CB30C0FAA827E0029801C /* Debug-gcov */,
+				620CB30D0FAA827E0029801C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
