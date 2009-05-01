@@ -1114,6 +1114,13 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
+		6265EF9A0FABB044009B382A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
+			remoteInfo = Vermilion;
+		};
 		627FAEBC0DF9D73500E3E765 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -4782,6 +4789,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				6265EF9B0FABB044009B382A /* PBXTargetDependency */,
 			);
 			name = QSBPluginUI;
 			productName = QSBPluginUI;
@@ -7379,6 +7387,11 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 6263CAEA0EB79F3600FF03A1 /* PBXContainerItemProxy */;
+		};
+		6265EF9B0FABB044009B382A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
+			targetProxy = 6265EF9A0FABB044009B382A /* PBXContainerItemProxy */;
 		};
 		627FAEBB0DF9D73500E3E765 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
