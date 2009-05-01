@@ -53,6 +53,7 @@ static const char *kPythonResultDisplayNameKey = "DISPLAY_NAME";
 static const char *kPythonResultSnippetKey = "SNIPPET";
 static const char *kPythonResultImageKey = "IMAGE";
 static const char *kPythonResultDefaultActionKey = "DEFAULT_ACTION";
+static const char *kPythonResultTypeKey = "TYPE";
 static const char *kHGSPythonNormalizedQueryMemberName = "normalized_query";
 static const char *kHGSPythonRawQueryMemberName = "raw_query";
 static const char *kHGSPythonPivotObjectMemberName = "pivot_object";
@@ -228,6 +229,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPython, sharedPython);
                                  [kHGSObjectAttributeIconPreviewFileKey UTF8String]);
       PyModule_AddStringConstant(vermilionModule_, kPythonResultDefaultActionKey,
                                  [kHGSObjectAttributeDefaultActionKey UTF8String]);
+      PyModule_AddStringConstant(vermilionModule_, kPythonResultTypeKey,
+                                 [kHGSObjectAttributeTypeKey UTF8String]);
       // Add our implemented-in-C Query class
       if (PyType_Ready(&QueryType) >= 0) {
         Py_INCREF(&QueryType);
@@ -264,6 +267,14 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPython, sharedPython);
     if (value && (pyValue = PyString_FromString([value UTF8String]))) {
       PyDict_SetItemString(dict, 
                            [kHGSObjectAttributeNameKey UTF8String], pyValue);
+      Py_DECREF(pyValue);
+    }
+    
+    // Type
+    value = [result valueForKey:kHGSObjectAttributeTypeKey];
+    if (value && (pyValue = PyString_FromString([value UTF8String]))) {
+      PyDict_SetItemString(dict,
+                           [kHGSObjectAttributeTypeKey UTF8String], pyValue);
       Py_DECREF(pyValue);
     }
     
@@ -589,6 +600,7 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
           PyObject *dict = PyList_GET_ITEM(pythonResults, i);
           char *identifier = nil, *displayName = nil, *snippet = nil;
           char *image = nil, *defaultAction = nil;
+          NSString *type = kHGSTypePython;
           if (PyDict_Check(dict)) {
             NSMutableDictionary *privateValues 
               = [NSMutableDictionary dictionary];
@@ -617,6 +629,11 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                 } else if ([key isEqual:kHGSObjectAttributeDefaultActionKey]) {
                   if (PyString_Check(pyValue)) {
                     defaultAction = PyString_AsString(pyValue);
+                  }
+                } else if ([key isEqual:kHGSObjectAttributeTypeKey]) {
+                  if (PyString_Check(pyValue)) {
+                    type = [NSString stringWithUTF8String:
+                            PyString_AsString(pyValue)];
                   }
                 } else if (pyValue) {
                   HGSPythonObject *pyObj 
@@ -669,7 +686,7 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
               HGSResult *result 
                 = [HGSResult resultWithURL:url
                                       name:displayNameString
-                                      type:kHGSTypePython
+                                      type:type
                                     source:[self->operation_ source]
                                 attributes:attributes];
               

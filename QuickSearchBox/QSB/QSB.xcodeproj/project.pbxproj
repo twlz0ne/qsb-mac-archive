@@ -106,6 +106,7 @@
 				5AF0EC1C0F6075420041E0B9 /* PBXTargetDependency */,
 				5AF0EF3F0F61D33F0041E0B9 /* PBXTargetDependency */,
 				5AF0F53C0F671E750041E0B9 /* PBXTargetDependency */,
+				5A0BB2E30FAB8B3100AA4858 /* PBXTargetDependency */,
 			);
 			name = "QSB Application";
 			productName = "Add Plugins To QSB";
@@ -225,6 +226,8 @@
 		33D2CBAE0DD2573100C1FBDC /* HGSMemorySearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 33D2CBAC0DD2573100C1FBDC /* HGSMemorySearchSource.m */; };
 		33EEA6BF0DD0DBAB005766AB /* CaminoBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 33EEA60F0DD0CC49005766AB /* CaminoBookmarksSource.m */; };
 		33EEA6E70DD0DBEC005766AB /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		5A0BB19E0FAB8A7D00AA4858 /* Screensaver.py in Resources */ = {isa = PBXBuildFile; fileRef = 5A0BB19C0FAB8A7D00AA4858 /* Screensaver.py */; };
+		5A0BB2EB0FAB8B4400AA4858 /* Screensaver.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */; };
 		5A11A3020E78414C007F4D67 /* iTunes.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 5A11A2DC0E784051007F4D67 /* iTunes.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
 		5A2710B90ECA52F200C72257 /* Vermilion.py in Resources */ = {isa = PBXBuildFile; fileRef = 5A2710B20ECA52F200C72257 /* Vermilion.py */; };
 		5A2710BA0ECA52F200C72257 /* HGSPython.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A2710B30ECA52F200C72257 /* HGSPython.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1021,6 +1024,13 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
+		5A0BB2E20FAB8B3100AA4858 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A0BB1670FAB8A6300AA4858 /* Screensaver */;
+			remoteInfo = Screensaver;
+		};
 		5AF0EC1B0F6075420041E0B9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1702,6 +1712,7 @@
 			dstPath = "Quick Search Box.app/Contents/PlugIns";
 			dstSubfolderSpec = 16;
 			files = (
+				5A0BB2EB0FAB8B4400AA4858 /* Screensaver.hgs in CopyFiles */,
 				8B3E03CD0EF39E350036FFBD /* Shortcuts.hgs in CopyFiles */,
 				8B3E03AE0EF39DF70036FFBD /* GoogleCorpora.hgs in CopyFiles */,
 				7F9417CA0EEF53E10049AE06 /* SharedFileList.hgs in CopyFiles */,
@@ -1776,6 +1787,9 @@
 		33EEA60B0DD0CC49005766AB /* CaminoBookmarks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "CaminoBookmarks-Info.plist"; sourceTree = "<group>"; };
 		33EEA60F0DD0CC49005766AB /* CaminoBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaminoBookmarksSource.m; sourceTree = "<group>"; };
 		33EEA68B0DD0D9C0005766AB /* CaminoBookmarks.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaminoBookmarks.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Screensaver.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A0BB19B0FAB8A7D00AA4858 /* Screensaver-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Screensaver-Info.plist"; sourceTree = "<group>"; };
+		5A0BB19C0FAB8A7D00AA4858 /* Screensaver.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Screensaver.py; sourceTree = "<group>"; };
 		5A11A2DC0E784051007F4D67 /* iTunes.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = iTunes.applescript; sourceTree = "<group>"; };
 		5A2710B20ECA52F200C72257 /* Vermilion.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Vermilion.py; sourceTree = "<group>"; };
 		5A2710B30ECA52F200C72257 /* HGSPython.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSPython.h; sourceTree = "<group>"; };
@@ -2934,6 +2948,7 @@
 				6263CAFB0EB79F3600FF03A1 /* Picasaweb.hgs */,
 				627FAECA0DF9D73500E3E765 /* RecentDocuments.hgs */,
 				33D2C40D0DD0E6C500C1FBDC /* SafariBookmarks.hgs */,
+				5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */,
 				7F9415CC0EEF52930049AE06 /* SharedFileList.hgs */,
 				7F5626110EF31C060030E922 /* Shortcuts.hgs */,
 				8B6F2EF90DA2BA260052CA40 /* SpotlightFiles.hgs */,
@@ -3077,6 +3092,15 @@
 				33EEA60F0DD0CC49005766AB /* CaminoBookmarksSource.m */,
 			);
 			path = CaminoBookmarks;
+			sourceTree = "<group>";
+		};
+		5A0BB19A0FAB8A7D00AA4858 /* Screensaver */ = {
+			isa = PBXGroup;
+			children = (
+				5A0BB19B0FAB8A7D00AA4858 /* Screensaver-Info.plist */,
+				5A0BB19C0FAB8A7D00AA4858 /* Screensaver.py */,
+			);
+			path = Screensaver;
 			sourceTree = "<group>";
 		};
 		5AF0EB6A0F6074A00041E0B9 /* Dictionary */ = {
@@ -3814,6 +3838,7 @@
 				6263CB060EB79FB300FF03A1 /* Picasaweb */,
 				627FAEB10DF9D71D00E3E765 /* RecentDocuments */,
 				33D2C4400DD0E8A600C1FBDC /* SafariBookmarks */,
+				5A0BB19A0FAB8A7D00AA4858 /* Screensaver */,
 				7F9417340EEF533B0049AE06 /* SharedFileList */,
 				8B3EF7660EF2C7CB0036FFBD /* Shortcuts */,
 				8B6F2D1D0DA2B83F0052CA40 /* SpotlightFiles */,
@@ -4664,6 +4689,21 @@
 			productReference = 33EEA68B0DD0D9C0005766AB /* CaminoBookmarks.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
+		5A0BB1670FAB8A6300AA4858 /* Screensaver */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A0BB16D0FAB8A6500AA4858 /* Build configuration list for PBXNativeTarget "Screensaver" */;
+			buildPhases = (
+				5A0BB1640FAB8A6300AA4858 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Screensaver;
+			productName = Screensaver;
+			productReference = 5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */;
+			productType = "com.apple.product-type.bundle";
+		};
 		5AF0EB620F60744E0041E0B9 /* Dictionary */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5AF0EB670F60744F0041E0B9 /* Build configuration list for PBXNativeTarget "Dictionary" */;
@@ -5465,6 +5505,7 @@
 				6263CAE80EB79F3600FF03A1 /* Picasaweb */,
 				627FAEBA0DF9D73500E3E765 /* Recent Documents */,
 				33D2C40C0DD0E6C500C1FBDC /* Safari Bookmarks */,
+				5A0BB1670FAB8A6300AA4858 /* Screensaver */,
 				7F9415C40EEF52930049AE06 /* Shared File List */,
 				8B3EF87F0EF2C8A80036FFBD /* Shortcuts */,
 				8B6F2EF80DA2BA260052CA40 /* Spotlight Files */,
@@ -5607,6 +5648,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				8BC6E1720FAA759E005A0F6F /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A0BB1640FAB8A6300AA4858 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A0BB19E0FAB8A7D00AA4858 /* Screensaver.py in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7286,6 +7335,11 @@
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 33EEA6BC0DD0DA12005766AB /* PBXContainerItemProxy */;
 		};
+		5A0BB2E30FAB8B3100AA4858 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A0BB1670FAB8A6300AA4858 /* Screensaver */;
+			targetProxy = 5A0BB2E20FAB8B3100AA4858 /* PBXContainerItemProxy */;
+		};
 		5AF0EC1C0F6075420041E0B9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5AF0EB620F60744E0041E0B9 /* Dictionary */;
@@ -8387,6 +8441,33 @@
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/CaminoBookmarks/CaminoBookmarks-Info.plist";
 				PRODUCT_NAME = CaminoBookmarks;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Release;
+		};
+		5A0BB16A0FAB8A6500AA4858 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Screensaver/Screensaver-Info.plist";
+				PRODUCT_NAME = Screensaver;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Debug;
+		};
+		5A0BB16B0FAB8A6500AA4858 /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Screensaver/Screensaver-Info.plist";
+				PRODUCT_NAME = Screensaver;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		5A0BB16C0FAB8A6500AA4858 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Screensaver/Screensaver-Info.plist";
+				PRODUCT_NAME = Screensaver;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = Release;
@@ -9867,6 +9948,16 @@
 				33EEA68D0DD0D9C1005766AB /* Debug */,
 				8B95CBC10F6B1DEE003BDBDD /* Debug-gcov */,
 				33EEA68E0DD0D9C1005766AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A0BB16D0FAB8A6500AA4858 /* Build configuration list for PBXNativeTarget "Screensaver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A0BB16A0FAB8A6500AA4858 /* Debug */,
+				5A0BB16B0FAB8A6500AA4858 /* Debug-gcov */,
+				5A0BB16C0FAB8A6500AA4858 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
