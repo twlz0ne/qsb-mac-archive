@@ -102,6 +102,13 @@ static NSString *const kAccountType = @"FactorableAccount";
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   [[[bundleMock stub] andReturn:@"bundle.executable"]
    objectForInfoDictionaryKey:@"CFBundleExecutable"];
+  [[[bundleMock stub] andReturn:kAccountTypeName] 
+   localizedStringForKey:kAccountTypeName 
+                   value:@"NOT_FOUND" table:@"InfoPlist"];  
+  NSString *value 
+    = [NSString stringWithFormat:@"testUserName (%@)", kAccountTypeName];
+  [[[bundleMock stub] andReturn:value] 
+   localizedStringForKey:value value:@"NOT_FOUND" table:@"InfoPlist"];  
   BOOL yes = YES;
   [[[bundleMock stub] andReturnValue:OCMOCK_VALUE(yes)] isLoaded];
 

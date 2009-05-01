@@ -120,6 +120,8 @@
   NSString *imagePath = [bundle pathForImageResource:@"Finder.icns"];
   STAssertNotNil(imagePath, nil);
   [[[bundleMock stub] andReturn:imagePath] pathForImageResource:@"testPath"];
+  [[[bundleMock stub] andReturn:@"testName"] 
+   localizedStringForKey:@"testName" value:@"NOT_FOUND" table:@"InfoPlist"];
   HGSExtension *extension 
     = [[[HGSExtension alloc] initWithConfiguration:config] autorelease];
   STAssertNotNil(extension, nil);
@@ -137,6 +139,8 @@
      [[[NSImage alloc] init] autorelease], kHGSExtensionIconImageKey,
      @"testPath", kHGSExtensionIconImagePathKey,
      nil];
+  [[[bundleMock stub] andReturn:@"testName"] 
+   localizedStringForKey:@"testName" value:@"NOT_FOUND" table:@"InfoPlist"];
   [[[bundleMock stub] andReturn:@"imagePath"] pathForImageResource:@"testPath"];
   extension 
     = [[[HGSExtension alloc] initWithConfiguration:config] autorelease];

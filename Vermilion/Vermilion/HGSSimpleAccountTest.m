@@ -197,6 +197,10 @@ static NSString *const kServiceName
                                  bundleMock, kHGSExtensionBundleKey,
                                  versionNumber, kHGSAccountsPrefVersionKey,
                                  nil];
+  NSString *value = @"HGSSimpleAccount D ((null))";
+  [[[bundleMock stub] andReturn:value] 
+   localizedStringForKey:value value:@"NOT_FOUND" table:@"InfoPlist"];  
+  
   HGSAccount *account
     = [[[SimpleAccountWithFakeKeychain alloc] initWithConfiguration:configuration]
        autorelease];

@@ -273,6 +273,9 @@ static NSString *const kAccountTypeAName = @"Account Type A";
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   [[[bundleMock stub] andReturn:@"bundle.executable"]
    objectForInfoDictionaryKey:@"CFBundleExecutable"];
+  [[[bundleMock stub] andReturn:kAccountTypeAName] 
+   localizedStringForKey:kAccountTypeAName 
+                   value:@"NOT_FOUND" table:@"InfoPlist"];
   BOOL yes = YES;
   [[[bundleMock stub] andReturnValue:OCMOCK_VALUE(yes)] isLoaded];
 
@@ -309,30 +312,50 @@ static NSString *const kAccountTypeAName = @"Account Type A";
   // Add several accounts.
   NSNumber *versionNumber
     = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
+  NSString *accountName = [NSString stringWithFormat:@"%@ (%@)", @"account1",
+                           kAccountTypeAName];
+  [[[bundleMock stub] andReturn:accountName] 
+   localizedStringForKey:accountName value:@"NOT_FOUND" table:@"InfoPlist"];  
   NSDictionary *accountDict1 = [NSDictionary dictionaryWithObjectsAndKeys:
                                 kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account1", kHGSAccountUserNameKey,
                                 versionNumber, kHGSAccountsPrefVersionKey,
                                 nil];
+  accountName = [NSString stringWithFormat:@"%@ (%@)", @"account2",
+                 kAccountTypeAName];
+  [[[bundleMock stub] andReturn:accountName] 
+   localizedStringForKey:accountName value:@"NOT_FOUND" table:@"InfoPlist"];
   NSDictionary *accountDict2 = [NSDictionary dictionaryWithObjectsAndKeys:
                                 kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account2", kHGSAccountUserNameKey,
                                 versionNumber, kHGSAccountsPrefVersionKey,
                                 nil];
+  accountName = [NSString stringWithFormat:@"%@ (%@)", @"account3",
+                 kAccountTypeAName];
+  [[[bundleMock stub] andReturn:accountName] 
+   localizedStringForKey:accountName value:@"NOT_FOUND" table:@"InfoPlist"];
   NSDictionary *accountDict3 = [NSDictionary dictionaryWithObjectsAndKeys:
                                 kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account3", kHGSAccountUserNameKey,
                                 versionNumber, kHGSAccountsPrefVersionKey,
                                 nil];
+  accountName = [NSString stringWithFormat:@"%@ (%@)", @"account4",
+                 kAccountTypeAName];
+  [[[bundleMock stub] andReturn:accountName] 
+   localizedStringForKey:accountName value:@"NOT_FOUND" table:@"InfoPlist"];
   NSDictionary *accountDict4 = [NSDictionary dictionaryWithObjectsAndKeys:
                                 kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
                                 @"account4", kHGSAccountUserNameKey,
                                 versionNumber, kHGSAccountsPrefVersionKey,
                                 nil];
+  accountName = [NSString stringWithFormat:@"%@ (%@)", @"account5",
+                 kAccountTypeAName];
+  [[[bundleMock stub] andReturn:accountName] 
+   localizedStringForKey:accountName value:@"NOT_FOUND" table:@"InfoPlist"];
   NSDictionary *accountDict5 = [NSDictionary dictionaryWithObjectsAndKeys:
                                 kAccountTypeAID, kHGSAccountTypeKey,
                                 bundleMock, kHGSExtensionBundleKey,
