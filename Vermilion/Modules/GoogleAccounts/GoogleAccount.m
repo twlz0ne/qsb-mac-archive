@@ -141,7 +141,9 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return accountRequest;
 }
 
-- (BOOL)validateResult:(NSData *)result statusCode:(NSInteger)statusCode {
+- (BOOL)validateResult:(NSData *)result
+              response:(NSURLResponse *)response
+                 error:(NSError *)error {
   NSString *answer = [[[NSString alloc] initWithData:result
                                             encoding:NSUTF8StringEncoding]
                       autorelease];

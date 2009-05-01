@@ -382,7 +382,6 @@
 		62B7CE9F0E6375AA00299B23 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		62C051BA0F31307100DFBB1B /* HGSSimpleAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62C25E270F8BF17500DA57E7 /* PicasaPlaceholder.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */; };
-		62C5C9D70FA12F1C000896CD /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		62C5CAD60FA13197000896CD /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		62D0E96B0EF059B40028522C /* HGSAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D0E96A0EF059B40028522C /* HGSAccount.m */; };
 		62D0E96F0EF05D0E0028522C /* HGSAccountsExtensionPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D0E96D0EF05D0E0028522C /* HGSAccountsExtensionPoint.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1028,7 +1027,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 5A0BB1670FAB8A6300AA4858 /* Screensaver */;
+			remoteGlobalIDString = 5A0BB1670FAB8A6300AA4858;
 			remoteInfo = Screensaver;
 		};
 		5AF0EC1B0F6075420041E0B9 /* PBXContainerItemProxy */ = {
@@ -1142,13 +1141,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
-		};
-		62C5C8B80FA12E0C000896CD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B77E0DB0F28FC3B00FA2A3C;
-			remoteInfo = GData;
 		};
 		62C5CAD20FA1318D000896CD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2670,7 +2662,6 @@
 				62EA8BC50F2E7DE200C92E0B /* Foundation.framework in Frameworks */,
 				62EA8BC60F2E7DE200C92E0B /* Vermilion.framework in Frameworks */,
 				62EA8BC80F2E7DE200C92E0B /* Cocoa.framework in Frameworks */,
-				62C5C9D70FA12F1C000896CD /* GData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4909,7 +4900,6 @@
 			dependencies = (
 				620CB36E0FAA83A40029801C /* PBXTargetDependency */,
 				62EA8BBE0F2E7DE200C92E0B /* PBXTargetDependency */,
-				62C5C8B90FA12E0C000896CD /* PBXTargetDependency */,
 			);
 			name = GoogleAccounts;
 			productName = Files;
@@ -7409,11 +7399,6 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 62B7CDE50E63743500299B23 /* PBXContainerItemProxy */;
-		};
-		62C5C8B90FA12E0C000896CD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B77E0DB0F28FC3B00FA2A3C /* GData */;
-			targetProxy = 62C5C8B80FA12E0C000896CD /* PBXContainerItemProxy */;
 		};
 		62C5CAD30FA1318D000896CD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

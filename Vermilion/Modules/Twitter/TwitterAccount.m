@@ -32,7 +32,6 @@
 
 #import "TwitterAccount.h"
 #import "GTMBase64.h"
-#import <GData/GDataHTTPFetcher.h>
 
 static NSString *const kTwitterVerifyAccountURLString
   = @"https://twitter.com/account/verify_credentials.xml";
@@ -74,9 +73,16 @@ static NSString *const kTwitterAccountTypeName
   return accountRequest;
 }
 
-- (BOOL)validateResult:(NSData *)result statusCode:(NSInteger)statusCode {
-  // A 200 means verified, a 401 means not verified.
-  BOOL valid = (statusCode == 200);
+- (BOOL)validateResult:(NSData *)result
+              response:(NSURLResponse *)response
+                 error:(NSError *)error {
+  BOOL valid = NO;
+  if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+    NSHTTPURLResponse *httpURLResponse = (NSHTTPURLResponse *)response;
+    NSInteger statusCode = [httpURLResponse statusCode];
+    // A 200 means verified, a 401 means not verified.
+    valid = (statusCode == 200);
+  }
   return valid;
 }
 

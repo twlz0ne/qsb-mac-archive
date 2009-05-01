@@ -111,11 +111,13 @@
 - (BOOL)authenticateWithPassword:(NSString *)password;
 
 /*!
- Check the authentication results and/or response status code to see if the
+ Check the authentication results, response and/or error to see if the
  request authenticated.  Each concrete account class must provide an
  override of this method.
  */
-- (BOOL)validateResult:(NSData *)result statusCode:(NSInteger)statusCode;
+- (BOOL)validateResult:(NSData *)result
+              response:(NSURLResponse *)response
+                 error:(NSError *)error;
 
 /*!
  Return an NSURLRequest appropriate for authenticating the account
