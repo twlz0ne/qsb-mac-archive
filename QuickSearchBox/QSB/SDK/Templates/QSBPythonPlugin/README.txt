@@ -11,14 +11,14 @@ To set up the source trees in Xcode:
 3) Set the "Setting Name" of your new tree to "QSBBUILDROOT"
 4) Set the "Display Name" to "QSBBUILDROOT"
 5) Set the path to the debug build directory for QSB. For me the path looks 
-   like this "~/src QuickSearchBox/QSB/build/Debug". If you use a common build 
-   directory or some other customized build location, you will have to set it 
-   here.
+   like this "/Users/dmaclach/src/QuickSearchBox/QSB/build/Debug". If you use a 
+   common build directory or some other customized build location, you will 
+   have to set it here.
 6) Click on the "Plus" button again
 7) Set the "Setting Name" of your new tree to "QSBSRCROOT"
 8) Set the "Display Name" to "QSBSRCROOT"
 9) Set the path to the root directory for QSB. For me the path looks 
-   like this "~/src QuickSearchBox".
+   like this "/Users/dmaclach/src/QuickSearchBox".
 
 The plugin should now build cleanly.
 
