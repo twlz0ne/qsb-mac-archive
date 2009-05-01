@@ -80,7 +80,7 @@
 				</dict>
 			</dict>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Mount</string>
+			<string>^Mount</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 		</dict>

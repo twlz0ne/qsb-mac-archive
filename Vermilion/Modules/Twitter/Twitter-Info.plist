@@ -26,7 +26,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.twitter.account</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Twitter</string>
+			<string>^Twitter</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSAccountTypesExtensionPoint</string>
 			<key>HGSExtensionOfferedAccountType</key>
@@ -48,7 +48,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Send Twitter Status</string>
+			<string>^Send Twitter Status</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>text</string>
 			<key>HGSExtensionIdentifier</key>

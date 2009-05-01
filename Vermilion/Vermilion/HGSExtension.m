@@ -89,6 +89,19 @@ NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
     }
     NSString *name 
       = [configuration objectForKey:kHGSExtensionUserVisibleNameKey];
+    if (name) {
+      // First check our InfoPlist.strings file
+      NSString *localizedName = [bundle_ localizedStringForKey:name 
+                                                         value:@"NOT_FOUND" 
+                                                         table:@"InfoPlist"];
+      if ([localizedName isEqualToString:@"NOT_FOUND"]) {
+        // Then our Localizable.strings file
+        localizedName = [bundle_ localizedStringForKey:name 
+                                                 value:nil 
+                                                 table:nil];
+      }
+      name = localizedName; 
+    }
     NSString *iconPath
       = [configuration objectForKey:kHGSExtensionIconImagePathKey];
     NSString *identifier 

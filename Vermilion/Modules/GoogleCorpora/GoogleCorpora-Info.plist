@@ -26,7 +26,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Google Apps</string>
+			<string>^Google Apps</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.googlecorpora.source</string>
 		</dict>

@@ -28,7 +28,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.trash.source</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Trash</string>
+			<string>^Trash</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSSearchSourceCannotArchive</key>
@@ -44,7 +44,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Move to Trash</string>
+			<string>^Move to Trash</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>MoveToTrash.icns</string>
 		</dict>

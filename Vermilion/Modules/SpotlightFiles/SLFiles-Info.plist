@@ -30,7 +30,7 @@
 			<key>HGSSearchSourcePivotableTypes</key>
 			<string>contact</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Spotlight Results</string>
+			<string>^Spotlight Results</string>
 			<key>HGSExtensionIsEnabledByDefault</key>
 			<false/>
 		</dict>

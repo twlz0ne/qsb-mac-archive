@@ -26,7 +26,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.google.account</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Google</string>
+			<string>^Google</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSAccountTypesExtensionPoint</string>
 			<key>HGSExtensionOfferedAccountType</key>
@@ -48,7 +48,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.googleapps.account</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Google Apps</string>
+			<string>^Google Apps</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSAccountTypesExtensionPoint</string>
 			<key>HGSExtensionOfferedAccountType</key>

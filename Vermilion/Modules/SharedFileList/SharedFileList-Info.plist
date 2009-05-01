@@ -28,7 +28,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.sharedFileList.source</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Recent Applications and Documents</string>
+			<string>^Recent Applications and Documents</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

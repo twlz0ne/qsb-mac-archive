@@ -29,6 +29,8 @@
 			<string>com.google.qsb.weather.source</string>
 			<key>HGSSearchSourceCannotArchive</key>
 			<true/>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Weather</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

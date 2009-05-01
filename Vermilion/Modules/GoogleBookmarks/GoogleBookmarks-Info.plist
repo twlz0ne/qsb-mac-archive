@@ -28,7 +28,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Google Bookmarks</string>
+			<string>^Google Bookmarks</string>
 			<key>HGSExtensionDesiredAccountTypes</key>
 			<string>kHGSGoogleAccountTypeID</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>

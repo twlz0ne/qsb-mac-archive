@@ -28,7 +28,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Decrease iTunes Rating</string>
+			<string>^Decrease iTunes Rating</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>decreaseRating</string>
 			<key>HGSAppleScriptFileName</key>
@@ -51,7 +51,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Increase iTunes Rating</string>
+			<string>^Increase iTunes Rating</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>increaseRating</string>
 			<key>HGSAppleScriptFileName</key>
@@ -74,7 +74,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Toggle iTunes Mute</string>
+			<string>^Toggle iTunes Mute</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>toggleMute</string>
 			<key>HGSAppleScriptFileName</key>
@@ -97,7 +97,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Increase iTunes Volume</string>
+			<string>^Increase iTunes Volume</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>increaseVolume</string>
 			<key>HGSAppleScriptFileName</key>
@@ -120,7 +120,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Decrease iTunes Volume</string>
+			<string>^Decrease iTunes Volume</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>decreaseVolume</string>
 			<key>HGSAppleScriptFileName</key>
@@ -143,7 +143,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Set iTunes Rating To 5</string>
+			<string>^Set iTunes Rating To 5</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>setRatingTo5</string>
 			<key>HGSAppleScriptFileName</key>
@@ -166,7 +166,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Set iTunes Rating To 4</string>
+			<string>^Set iTunes Rating To 4</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>setRatingTo4</string>
 			<key>HGSAppleScriptFileName</key>
@@ -189,7 +189,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Set iTunes Rating To 3</string>
+			<string>^Set iTunes Rating To 3</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>setRatingTo3</string>
 			<key>HGSAppleScriptFileName</key>
@@ -212,7 +212,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Set iTunes Rating To 2</string>
+			<string>^Set iTunes Rating To 2</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>setRatingTo2</string>
 			<key>HGSAppleScriptFileName</key>
@@ -235,7 +235,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Set iTunes Rating To 1</string>
+			<string>^Set iTunes Rating To 1</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>setRatingTo1</string>
 			<key>HGSAppleScriptFileName</key>
@@ -258,7 +258,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Set iTunes Rating To 0</string>
+			<string>^Set iTunes Rating To 0</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>setRatingTo0</string>
 			<key>HGSAppleScriptFileName</key>
@@ -281,7 +281,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Toggle iTunes Shuffle</string>
+			<string>^Toggle iTunes Shuffle</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>toggleShuffle</string>
 			<key>HGSAppleScriptFileName</key>
@@ -304,7 +304,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Toggle iTunes Repeat</string>
+			<string>^Toggle iTunes Repeat</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>toggleRepeat</string>
 			<key>HGSAppleScriptFileName</key>
@@ -326,8 +326,8 @@
 			<string>com.google.qsb.itunes.source</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
-			<key>HGSExtensionUserVisibleName</key>
-			<string>iTunes Music</string>
+			<key>^HGSExtensionUserVisibleName</key>
+			<string>^iTunes Music</string>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<string>itunes</string>
 		</dict>
@@ -339,7 +339,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.itunes.action.play</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Play in iTunes</string>
+			<string>^Play in iTunes</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>itunes</string>
 			<key>HGSExtensionIconImagePath</key>
@@ -355,7 +355,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>itunes.track</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Play in iTunes DJ</string>
+			<string>^Play in iTunes DJ</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>PlayInPartyShuffle.icns</string>
 		</dict>
@@ -369,7 +369,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>itunes.track</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Add to iTunes DJ</string>
+			<string>^Add to iTunes DJ</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>AddToPartyShuffle.icns</string>
 		</dict>
@@ -381,7 +381,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.itunes.action.playapp</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Play iTunes</string>
+			<string>^Play iTunes</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>playNow</string>
 			<key>HGSExtensionIconImagePath</key>
@@ -408,7 +408,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.itunes.action.pauseapp</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Pause iTunes</string>
+			<string>^Pause iTunes</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>pauseNow</string>
 			<key>HGSExtensionIconImagePath</key>
@@ -435,7 +435,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.itunes.action.nextapp</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Next iTunes Track</string>
+			<string>^Next iTunes Track</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>goForward</string>
 			<key>HGSExtensionIconImagePath</key>
@@ -460,7 +460,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Previous iTunes Track</string>
+			<string>^Previous iTunes Track</string>
 			<key>HGSAppleScriptHandlerName</key>
 			<string>goBack</string>
 			<key>HGSExtensionIconImagePath</key>

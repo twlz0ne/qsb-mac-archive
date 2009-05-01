@@ -30,7 +30,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file.directory</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Show in Terminal</string>
+			<string>^Show in Terminal</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

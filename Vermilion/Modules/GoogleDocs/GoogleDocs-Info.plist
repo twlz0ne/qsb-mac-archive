@@ -33,7 +33,7 @@
 				<string>kHGSGoogleAppsAccountTypeID</string>
 			</array>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Google Docs</string>
+			<string>^Google Docs</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<array>
 				<string>com.googlecode.precpitate.docs.pdf</string>

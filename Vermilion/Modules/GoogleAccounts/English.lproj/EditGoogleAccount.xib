@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.02">
+<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">9G55</string>
-		<string key="IBDocument.InterfaceBuilderVersion">670</string>
+		<string key="IBDocument.InterfaceBuilderVersion">677</string>
 		<string key="IBDocument.AppKitVersion">949.43</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
@@ -13,6 +13,15 @@
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+		</object>
+		<object class="NSMutableDictionary" key="IBDocument.Metadata">
+			<bool key="EncodedWithXMLCoder">YES</bool>
+			<object class="NSArray" key="dict.sortedKeys">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
+			<object class="NSMutableArray" key="dict.values">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -47,8 +56,8 @@
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="797645938">
 								<int key="NSCellFlags">68288064</int>
-								<int key="NSCellFlags2">272630784</int>
-								<string key="NSContents">Google Account Name:</string>
+								<int key="NSCellFlags2">71304192</int>
+								<string key="NSContents">^Account Name:</string>
 								<object class="NSFont" key="NSSupport" id="1024653336">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">1.300000e+01</double>
@@ -78,13 +87,13 @@
 						<object class="NSTextField" id="256748602">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{97, 226}, {68, 17}}</string>
+							<string key="NSFrame">{{16, 226}, {148, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="424317049">
 								<int key="NSCellFlags">68288064</int>
-								<int key="NSCellFlags2">272630784</int>
-								<string key="NSContents">Password:</string>
+								<int key="NSCellFlags2">71304192</int>
+								<string key="NSContents">^Password:</string>
 								<reference key="NSSupport" ref="1024653336"/>
 								<reference key="NSControlView" ref="256748602"/>
 								<reference key="NSBackgroundColor" ref="588623303"/>
@@ -128,14 +137,14 @@
 						<object class="NSButton" id="688240970">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{307, 12}, {96, 32}}</string>
+							<string key="NSFrame">{{298, 12}, {104, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<int key="NSTag">1000</int>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="790578330">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Update</string>
+								<string key="NSContents">^Update</string>
 								<reference key="NSSupport" ref="1024653336"/>
 								<int key="NSTag">1000</int>
 								<reference key="NSControlView" ref="688240970"/>
@@ -150,14 +159,14 @@
 						<object class="NSButton" id="952175564">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{211, 12}, {96, 32}}</string>
+							<string key="NSFrame">{{194, 12}, {104, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<int key="NSTag">1001</int>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="246929307">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Cancel</string>
+								<string key="NSContents">^Cancel</string>
 								<reference key="NSSupport" ref="1024653336"/>
 								<reference key="NSControlView" ref="952175564"/>
 								<int key="NSButtonFlags">-2038284033</int>
@@ -209,8 +218,8 @@
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSTextFieldCell" key="NSCell" id="416523260">
 										<int key="NSCellFlags">67239424</int>
-										<int key="NSCellFlags2">272629760</int>
-										<string key="NSContents">Type the characters you see in the picture below.</string>
+										<int key="NSCellFlags2">138412032</int>
+										<string key="NSContents">^Type the characters you see in the picture below.</string>
 										<object class="NSFont" key="NSSupport">
 											<string key="NSName">LucidaGrande</string>
 											<double key="NSSize">1.300000e+01</double>
@@ -224,13 +233,13 @@
 								<object class="NSTextField" id="758183887">
 									<reference key="NSNextResponder" ref="133927717"/>
 									<int key="NSvFlags">268</int>
-									<string key="NSFrame">{{0, 17}, {195, 17}}</string>
+									<string key="NSFrame">{{0, 17}, {226, 17}}</string>
 									<reference key="NSSuperview" ref="133927717"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSTextFieldCell" key="NSCell" id="751820716">
 										<int key="NSCellFlags">68288064</int>
-										<int key="NSCellFlags2">272630784</int>
-										<string key="NSContents">Letters are not case-sensitive.</string>
+										<int key="NSCellFlags2">138413056</int>
+										<string key="NSContents">^Letters are not case-sensitive.</string>
 										<reference key="NSSupport" ref="1024653336"/>
 										<reference key="NSControlView" ref="758183887"/>
 										<reference key="NSBackgroundColor" ref="588623303"/>
@@ -278,13 +287,13 @@
 						<object class="NSTextField" id="325215987">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{71, 289}, {274, 26}}</string>
+							<string key="NSFrame">{{71, 289}, {328, 26}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="624710005">
 								<int key="NSCellFlags">68288064</int>
 								<int key="NSCellFlags2">272630784</int>
-								<string key="NSContents">Update your Google password.</string>
+								<string key="NSContents">^Update your Google password.</string>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">ArialRoundedMTBold</string>
 									<double key="NSSize">1.800000e+01</double>
@@ -326,13 +335,13 @@
 						<object class="NSTextField" id="500637644">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">-2147483380</int>
-							<string key="NSFrame">{{168, 202}, {195, 17}}</string>
+							<string key="NSFrame">{{168, 202}, {231, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="901196764">
 								<int key="NSCellFlags">68288064</int>
 								<int key="NSCellFlags2">272630784</int>
-								<string key="NSContents">This is a Google Apps account</string>
+								<string key="NSContents">^This is a Google Apps account</string>
 								<reference key="NSSupport" ref="1024653336"/>
 								<reference key="NSControlView" ref="500637644"/>
 								<reference key="NSBackgroundColor" ref="588623303"/>
@@ -569,13 +578,13 @@
 							<reference ref="550720424"/>
 							<reference ref="987902970"/>
 							<reference ref="325215987"/>
-							<reference ref="688240970"/>
-							<reference ref="952175564"/>
 							<reference ref="133927717"/>
 							<reference ref="256748602"/>
 							<reference ref="708356355"/>
 							<reference ref="221488347"/>
 							<reference ref="500637644"/>
+							<reference ref="688240970"/>
+							<reference ref="952175564"/>
 						</object>
 						<reference key="parent" ref="1005"/>
 					</object>
@@ -823,9 +832,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{404, 724}, {417, 335}}</string>
+					<string>{{739, 470}, {417, 335}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{404, 724}, {417, 335}}</string>
+					<string>{{739, 470}, {417, 335}}</string>
 					<integer value="0"/>
 					<string>{196, 240}</string>
 					<string>{{357, 418}, {480, 270}}</string>
