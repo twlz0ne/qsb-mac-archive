@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>HGSPluginAPIVersion</key>
-	<integer>2</integer>
+	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
 	<key>CFBundleName</key>
 	<string>Volume AppleScript</string>
 	<key>CFBundleIdentifier</key>
@@ -18,7 +18,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.networkingapplescript.action.getip</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Get IP</string>
+			<string>^Get IP</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>getIP.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
@@ -34,7 +34,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.networkingapplescript.action.getexternalip</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Get External IP</string>
+			<string>^Get External IP</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>getExternalIP.icns</string>
 			<key>HGSAppleScriptHandlerName</key>

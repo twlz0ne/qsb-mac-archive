@@ -7,7 +7,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.google.qsb.plugin.systemapplescript</string>
 	<key>HGSPluginAPIVersion</key>
-	<integer>2</integer>
+	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
 	<key>HGSExtensions</key>
 	<array>
 		<dict>
@@ -18,7 +18,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.showallapplications</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Show All Applications</string>
+			<string>^Show All Applications</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>showAll.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
@@ -32,7 +32,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.shutdown</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Shut Down</string>
+			<string>^Shut Down</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>shutDown.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
@@ -46,7 +46,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.sleep</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Sleep</string>
+			<string>^Sleep</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>sleep.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
@@ -60,7 +60,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.restart</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Restart</string>
+			<string>^Restart</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>restart.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
@@ -74,7 +74,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.quitVisibleApplications</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Quit Visible Applications</string>
+			<string>^Quit Visible Applications</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>quitVisibleApps.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
@@ -88,7 +88,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.logOut</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Log Out</string>
+			<string>^Log Out</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>logout.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
@@ -102,7 +102,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.lockScreen</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Lock Screen</string>
+			<string>^Lock Screen</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>lockScreen.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
@@ -116,7 +116,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.hideOthers</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Hide Others</string>
+			<string>^Hide Others</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>hideOthers.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
@@ -130,7 +130,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.emptytrash</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Empty Trash</string>
+			<string>^Empty Trash</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>emptyTrash.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
@@ -144,7 +144,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.ejectdisktray</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Eject Disk Tray</string>
+			<string>^Eject Disk Tray</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>ejectDiskTray.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
@@ -158,7 +158,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.systemapplescript.action.closedisktray</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Close Disk Tray</string>
+			<string>^Close Disk Tray</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>closeDiskTray.icns</string>
 			<key>HGSAppleScriptHandlerName</key>

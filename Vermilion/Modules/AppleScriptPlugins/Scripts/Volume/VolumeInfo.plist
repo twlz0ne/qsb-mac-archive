@@ -2,12 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleName</key>
-	<string>Images AppleScript</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.google.qsb.plugin.imagesapplescript</string>
 	<key>HGSPluginAPIVersion</key>
-	<integer>2</integer>
+	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
+	<key>CFBundleName</key>
+	<string>Volume AppleScript</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.google.qsb.plugin.volumeapplescript</string>
 	<key>HGSExtensions</key>
 	<array>
 		<dict>
@@ -16,13 +16,13 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.qsb.imagesapplescript.action.rotateCW</string>
+			<string>com.google.qsb.volumeapplescript.action.maxVolume</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Rotate Clockwise 90 Degrees</string>
+			<string>^Max Volume</string>
+			<key>HGSExtensionIconImagePath</key>
+			<string>maxVolume.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
-			<string>rotateCW</string>
-			<key>HGSActionDirectObjectTypes</key>
-			<string>file.media.image</string>
+			<string>maxVolume</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -30,13 +30,13 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.qsb.imagesapplescript.action.rotateCCW</string>
+			<string>com.google.qsb.volumeapplescript.action.minVolume</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Rotate Counter Clockwise 90 Degrees</string>
+			<string>^Min Volume</string>
+			<key>HGSExtensionIconImagePath</key>
+			<string>minVolume.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
-			<string>rotateCCW</string>
-			<key>HGSActionDirectObjectTypes</key>
-			<string>file.media.image</string>
+			<string>minVolume</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -44,13 +44,13 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.qsb.imagesapplescript.action.scale</string>
+			<string>com.google.qsb.volumeapplescript.action.midVolume</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Scale</string>
+			<string>^Mid Volume</string>
+			<key>HGSExtensionIconImagePath</key>
+			<string>midVolume.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
-			<string>scale</string>
-			<key>HGSActionDirectObjectTypes</key>
-			<string>file.media.image</string>
+			<string>midVolume</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -58,13 +58,13 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.qsb.imagesapplescript.action.convert</string>
+			<string>com.google.qsb.volumeapplescript.action.mutevolume</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Convert</string>
+			<string>^Mute Volume</string>
+			<key>HGSExtensionIconImagePath</key>
+			<string>muteVolume.icns</string>
 			<key>HGSAppleScriptHandlerName</key>
-			<string>convert</string>
-			<key>HGSActionDirectObjectTypes</key>
-			<string>file.media.image</string>
+			<string>muteVolume</string>
 		</dict>
 	</array>
 </dict>
