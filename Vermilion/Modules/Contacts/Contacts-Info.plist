@@ -28,7 +28,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Address Book Contacts</string>
+			<string>^Address Book Contacts Source</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<string>com.apple.addressbook.person</string>
 			<key>HGSSearchSourcePivotableTypes</key>
@@ -50,7 +50,7 @@
 				<string>text.emailaddress</string>
 			</array>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Email</string>
+			<string>^Email</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>gmail.icns</string>
 		</dict>
@@ -67,7 +67,7 @@
 				<string>text.instantmessage</string>
 			</array>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Instant Message</string>
+			<string>^Instant Message</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>action-chat-icon</string>
 		</dict>
@@ -81,7 +81,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>contact</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Video Chat</string>
+			<string>^Video Chat</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>action-videochat-icon</string>
 		</dict>
@@ -95,7 +95,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>contact</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Audio Chat</string>
+			<string>^Audio Chat</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>action-audiochat-icon</string>
 		</dict>

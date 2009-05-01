@@ -30,7 +30,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>webpage</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Email URL</string>
+			<string>^Email URL</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

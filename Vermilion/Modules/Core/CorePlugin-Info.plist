@@ -28,7 +28,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>URL Detection</string>
+			<string>^URL Detection</string>
 			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 		</dict>
@@ -42,7 +42,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.core.filesystemdirectory.source</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>File System Directories</string>
+			<string>^File System Directories</string>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<array>
 				<string>file.directory</string>
@@ -59,7 +59,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.core.websearch.source</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Web Search</string>
+			<string>^Web Search</string>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<string>webpage</string>
 		</dict>
@@ -73,7 +73,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Google Search</string>
+			<string>^Google Search</string>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<string>webpage</string>
 		</dict>
@@ -87,7 +87,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.core.suggest.source</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Search Suggestions</string>
+			<string>^Search Suggestions</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -99,7 +99,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.core.opensearchsuggest.source</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Open Search Suggestions</string>
+			<string>^Open Search Suggestions</string>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<string>suggestion</string>
 		</dict>
@@ -113,7 +113,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.core.textinput.source</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Text Input</string>
+			<string>^Text Input</string>
 			<key>HGSSearchSourceCannotArchive</key>
 			<true/>
 		</dict>
@@ -123,7 +123,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Open</string>
+			<string>^Open</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>*</string>
 			<key>HGSExtensionIdentifier</key>
@@ -135,7 +135,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Show Large Type</string>
+			<string>^Show Large Type</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>*</string>
 			<key>HGSExtensionIdentifier</key>
@@ -147,7 +147,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Open With…</string>
+			<string>^Open With…</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>*</string>
 			<key>HGSExtensionIdentifier</key>
@@ -159,7 +159,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Eject</string>
+			<string>^Eject</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file.directory.volume</string>
 			<key>HGSExtensionIdentifier</key>
@@ -173,7 +173,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Show in Finder</string>
+			<string>^Show in Finder</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file</string>
 		</dict>
@@ -185,7 +185,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Quick Look</string>
+			<string>^Quick Look</string>
 			<key>HGSExtensionIconImagePath</key>
 			<string>QuickLook.png</string>
 			<key>HGSActionDirectObjectTypes</key>
@@ -199,7 +199,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Get Info</string>
+			<string>^Get Info</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file</string>
 		</dict>

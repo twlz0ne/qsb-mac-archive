@@ -28,7 +28,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Application UI Source</string>
+			<string>^Application UI Source</string>
 			<key>HGSSearchSourceCannotArchive</key>
 			<true/>
 			<key>HGSSearchSourcePivotableTypes</key>
@@ -45,7 +45,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.ui.contents.source</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Application UI Content Source</string>
+			<string>^Application UI Content Source</string>
 			<key>HGSSearchSourceCannotArchive</key>
 			<true/>
 			<key>HGSExtensionIsEnabledByDefault</key>

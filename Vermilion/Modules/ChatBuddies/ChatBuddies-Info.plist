@@ -28,7 +28,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>iChat Buddies</string>
+			<string>^iChat Buddies Source</string>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<array>
 				<string>file.application</string>

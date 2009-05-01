@@ -26,7 +26,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.directory.source.Documents</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Documents Folder</string>
+			<string>^Documents Folder</string>
 			<key>rootPath</key>
 			<string>~/Documents</string>
 			<key>HGSExtensionPoint</key>
@@ -38,7 +38,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.directory.source.Downloads</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Downloads Folder</string>
+			<string>^Downloads Folder</string>
 			<key>rootPath</key>
 			<string>~/Downloads</string>
 			<key>HGSExtensionPoint</key>
@@ -52,7 +52,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.directory.source.Desktop</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Desktop Folder</string>
+			<string>^Desktop Folder</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 		</dict>
@@ -62,7 +62,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.directory.source.SystemVolume</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>System Volume</string>
+			<string>^System Volume</string>
 			<key>rootPath</key>
 			<string>/</string>
 			<key>HGSExtensionPoint</key>
@@ -76,7 +76,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.directory.source.Home</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Home Folder</string>
+			<string>^Home Folder</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 		</dict>

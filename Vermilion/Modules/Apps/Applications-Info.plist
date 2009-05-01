@@ -31,6 +31,8 @@
 			<string>file.application</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<string>com.apple.application</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Applications Source</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -42,7 +44,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file.application</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Quit</string>
+			<string>^Quit</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

@@ -28,7 +28,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.dictionary.source</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Dictionary</string>
+			<string>^Dictionary</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSSearchSourceCannotArchive</key>
@@ -44,7 +44,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>dictionary.definition</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Show in Dictionary</string>
+			<string>^Show in Dictionary</string>
 		</dict>
 	</array>
 </dict>

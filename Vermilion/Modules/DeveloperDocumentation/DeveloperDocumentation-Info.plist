@@ -28,7 +28,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.developerdocumentation.source</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Developer Documentation</string>
+			<string>^Developer Documentation</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<string>com.apple.xcode.docset</string>
 		</dict>
