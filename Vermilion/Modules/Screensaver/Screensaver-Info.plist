@@ -28,7 +28,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Screen Savers</string>
+			<string>^Screen Savers</string>
 			<key>HGSPythonModule</key>
 			<string>Screensaver</string>
 			<key>HGSPythonClass</key>
@@ -48,7 +48,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Set as Screen Saver</string>
+			<string>^Set as Screen Saver</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<array>
 				<string>script.python.screensaver</string>
