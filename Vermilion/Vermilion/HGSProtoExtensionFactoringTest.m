@@ -161,6 +161,8 @@ static NSString *const kAccountType = @"FactorableAccount";
   STAssertEquals([accounts count], (NSUInteger)1, nil);
   HGSAccount *account = [accounts objectAtIndex:0];
   [account setAuthenticated:YES];
+  [[[bundleMock stub] andReturn:@"DISPLAY NAME"] 
+   localizedStringForKey:@"DISPLAY NAME" value:@"NOT_FOUND" table:@"InfoPlist"];  
 
   // Create the factorable extension.
   NSDictionary *factorConfiguration
@@ -177,6 +179,10 @@ static NSString *const kAccountType = @"FactorableAccount";
     = [[[HGSProtoExtension alloc] initWithConfiguration:factorConfiguration
                                                  plugin:pluginMock]
        autorelease];
+  value = @"DISPLAY NAME (testUserName (Factorable Account Type))";
+  [[[bundleMock stub] andReturn:value] 
+   localizedStringForKey:value value:@"NOT_FOUND" table:@"InfoPlist"];  
+
   NSArray *factored = [protoExtensionI factor];
   STAssertEquals([factored count], (NSUInteger)1, nil);
 
