@@ -326,7 +326,7 @@
 			<string>com.google.qsb.itunes.source</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
-			<key>^HGSExtensionUserVisibleName</key>
+			<key>HGSExtensionUserVisibleName</key>
 			<string>^iTunes Music</string>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<string>itunes</string>

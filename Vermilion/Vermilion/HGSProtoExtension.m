@@ -87,47 +87,64 @@
 - (id)initWithConfiguration:(NSDictionary *)configuration
                      plugin:(HGSPlugin *)plugin {
   if ((self = [super init])) {
+    configuration_ 
+      = [[NSMutableDictionary alloc] initWithDictionary:configuration];
     if (plugin) {
-      configuration_ 
-        = [[NSMutableDictionary alloc] initWithDictionary:configuration];
-      
-      plugin_ = plugin;
-      
-      NSString *displayName = [self displayName];
-      if (!displayName) {
-        displayName = [plugin displayName];
-        [configuration_ setObject:displayName 
-                           forKey:kHGSExtensionUserVisibleNameKey];
-      }
-      
-      NSString *className = [self className];
-      NSString *identifier = [self identifier];
-      NSString *extensionPointKey = [self extensionPointKey];
-      
-      if (!className || !identifier || !extensionPointKey) {
-        HGSLog(@"Unable to create proto extension %@ (%@)", 
-               [self displayName], [self class]);
-        [self release];
-        return nil;
-      }
-      
       NSBundle *pluginBundle = [plugin bundle];
       if (pluginBundle) {
         [configuration_ setObject:pluginBundle forKey:kHGSExtensionBundleKey];
-
-        // TODO(mrossetti): Review this policy in light of accounts and net access.
+        
+        // TODO(mrossetti): Review this policy in light of accounts and net 
+        // access.
         // Always enable new extensions.
         // Do not use mutator since we do not want the side-effects.
         enabled_ = YES;
-        NSNumber *enabled = [configuration objectForKey:kHGSExtensionEnabledKey];
+        NSNumber *enabled 
+          = [configuration objectForKey:kHGSExtensionEnabledKey];
         if (enabled) {
           enabled_ = [enabled boolValue]; 
         } else {
-          enabled = [configuration objectForKey:kHGSExtensionIsEnabledByDefault];
+          enabled 
+            = [configuration objectForKey:kHGSExtensionIsEnabledByDefault];
           if (enabled) {
             enabled_ = [enabled boolValue];
           }
         }
+        
+        plugin_ = plugin;
+        
+        NSString *displayName 
+          = [configuration_ objectForKey:kHGSExtensionUserVisibleNameKey];
+        if (displayName) {
+          // First check our InfoPlist.strings file
+          NSString *localizedName 
+            = [pluginBundle localizedStringForKey:displayName 
+                                            value:@"NOT_FOUND" 
+                                            table:@"InfoPlist"];
+          if ([localizedName isEqualToString:@"NOT_FOUND"]) {
+            // Then our Localizable.strings file
+            localizedName = [pluginBundle localizedStringForKey:displayName 
+                                                          value:nil 
+                                                          table:nil];
+          }
+          displayName = localizedName;
+        }
+        if (!displayName) {
+          displayName = [plugin displayName];
+        }
+        [configuration_ setObject:displayName 
+                           forKey:kHGSExtensionUserVisibleNameKey];
+        
+        NSString *className = [self className];
+        NSString *identifier = [self identifier];
+        NSString *extensionPointKey = [self extensionPointKey];
+        
+        if (!className || !identifier || !extensionPointKey) {
+          HGSLog(@"Unable to create proto extension %@ (%@)", 
+                 [self displayName], [self class]);
+          [self release];
+          self = nil;
+        }        
       } else {
         HGSLogDebug(@"Plugin must have a bundle.");
         [self release];

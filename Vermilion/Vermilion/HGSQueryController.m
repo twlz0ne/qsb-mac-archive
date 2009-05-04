@@ -298,8 +298,8 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
       searchType = [searchType substringToIndex:dotRange.location];
     } else {
       searchType = nil;  // Not found.
-      category = @"^Other";
-      HGSLogDebug(@"No category found for type '%@'.  Using 'Other'.", type);
+      category = @"^Others";
+      HGSLogDebug(@"No category found for type '%@'.  Using 'Others'.", type);
     }
   }
   
