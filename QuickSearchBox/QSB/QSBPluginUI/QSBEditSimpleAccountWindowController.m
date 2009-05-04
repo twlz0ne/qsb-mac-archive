@@ -57,13 +57,18 @@
     [account setAuthenticated:YES];
   } else if (![self canGiveUserAnotherTry]) {
     NSString *summaryFormat = NSLocalizedString(@"Could not set up that %@ "
-                                                @"account.", nil);
+                                                @"account.", 
+                                                @"A dialog title denoting that "
+                                                @"we were unable to set up the "
+                                                @"%@ account");
     NSString *summary = [NSString stringWithFormat:summaryFormat,
                          [account type]];
     NSString *explanationFormat
-      = NSLocalizedString(@"The %@ account '%@' could not be set up for "
+      = NSLocalizedString(@"The %1$@ account '%2$@' could not be set up for "
                           @"use.  Please check your password and try "
-                          @"again.", nil);
+                          @"again.", 
+                          @"A dialog label explaining in detail that we could "
+                          @"not set up an account of type 1 with username 2.");
     NSString *explanation = [NSString stringWithFormat:explanationFormat,
                              [account type],
                              [account userName]];

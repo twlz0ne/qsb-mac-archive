@@ -275,7 +275,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     } else {
       NSString *errorFormat 
         = HGSLocalizedString(@"Fetch for '%1$@' failed. (%2$d)",
-                             nil);
+                             @"A dialog label denoting that an attempt to "
+                             @"fetch data with the account for username $1$@ "
+                             @"failed with errorcode %2$d");
       errorString = [NSString stringWithFormat:errorFormat,
                      [account_ displayName], [error code]];
     }

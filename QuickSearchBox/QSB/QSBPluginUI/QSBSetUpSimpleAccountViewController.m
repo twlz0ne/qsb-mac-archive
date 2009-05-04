@@ -74,10 +74,17 @@
     if ([accountsPoint extensionWithIdentifier:accountIdentifier]) {
       isGood = NO;
       NSString *summary = NSLocalizedString(@"Account already set up.",
-                                            nil);
+                                            @"A dialog title denoting that an "
+                                            @"account of that type with that "
+                                            @"login information has already "
+                                            @"been set up.");
       NSString *format
         = NSLocalizedString(@"The account '%@' has already been set up for "
-                            @"use in Quick Search Box.", nil);
+                            @"use in Quick Search Box.", 
+                            @"A dialog label explaining in detail that an "
+                            @"account of that type with that "
+                            @"login information has already "
+                            @"been set up.");
       [self presentMessageOffWindow:sheet
                         withSummary:summary
                   explanationFormat:format
@@ -108,14 +115,18 @@
           [NSApp endSheet:sheet];
           NSString *summary
             = NSLocalizedString(@"Enable searchable items for this account.",
-                                nil);
+                                @"A dialog title telling the user that they "
+                                @"should enable some searchable items for "
+                                @"the account they just set up.");
           NSString *format
             = NSLocalizedString(@"One or more search sources may have been "
                                 @"added for the account '%@'. It may be "
                                 @"necessary to manually enable each search "
                                 @"source that uses this account.  Do so via "
                                 @"the 'Searchable Items' tab in Preferences.",
-                                nil);
+                                @"A dialog label telling the user in detail "
+                                @"how they should enable some searchable items "
+                                @"for the account they just set up.");
           [self presentMessageOffWindow:[self parentWindow]
                             withSummary:summary
                       explanationFormat:format
@@ -131,11 +142,18 @@
         // If we can't help the user fix things, tell them they've got
         // something wrong.
         NSString *summary = NSLocalizedString(@"Could not authenticate that "
-                                              @"account.", nil);
+                                              @"account.", 
+                                              @"A dialog title denoting that "
+                                              @"we were unable to authenticate "
+                                              @"the account with the user info "
+                                              @"given to us".);
         NSString *format
           = NSLocalizedString(@"The account '%@' could not be authenticated. "
                               @"Please check the account name and password "
-                              @"and try again.", nil);
+                              @"and try again.", 
+                              @"A dialog label explaining in detail that "
+                              @"we were unable to authenticate the account "
+                              @"with the user info given to us".);
         [self presentMessageOffWindow:sheet
                           withSummary:summary
                     explanationFormat:format
