@@ -8591,6 +8591,7 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/QSBPluginUI/Resources/QSBPluginUI-Info.plist";
+				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
 				PRODUCT_NAME = QSBPluginUI;
 			};
 			name = Debug;
@@ -8600,6 +8601,7 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/QSBPluginUI/Resources/QSBPluginUI-Info.plist";
+				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
 				PRODUCT_NAME = QSBPluginUI;
 			};
 			name = "Debug-gcov";
@@ -8609,6 +8611,7 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/QSBPluginUI/Resources/QSBPluginUI-Info.plist";
+				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
 				PRODUCT_NAME = QSBPluginUI;
 			};
 			name = Release;
