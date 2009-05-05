@@ -200,20 +200,23 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 - (void)startAlbumInfoFetch {
   if ([activeTickets_ count] == 0) {
-    KeychainItem* keychainItem 
-      = [KeychainItem keychainItemForService:[account_ identifier]
-                                    username:nil];
-    NSString *username = [keychainItem username];
-    NSString *password = [keychainItem password];
-    if (!picasawebService_ && username && password) {
-      picasawebService_ = [[GDataServiceGooglePhotos alloc] init];
-      [picasawebService_ setUserAgent:@"PicasawebSource"];
-      [picasawebService_ setUserCredentialsWithUsername:username
-                                               password:password];
-      [picasawebService_ setServiceShouldFollowNextLinks:YES];
-      [picasawebService_ setIsServiceRetryEnabled:YES];
-    } else {
-      [updateTimer_ invalidate];
+    if (!picasawebService_) {
+      KeychainItem* keychainItem 
+        = [KeychainItem keychainItemForService:[account_ identifier]
+                                      username:nil];
+      NSString *username = [keychainItem username];
+      NSString *password = [keychainItem password];
+      if (username && password) {
+        picasawebService_ = [[GDataServiceGooglePhotos alloc] init];
+        [picasawebService_ setUserAgent:@"PicasawebSource"];
+        [picasawebService_ setUserCredentialsWithUsername:username
+                                                 password:password];
+        [picasawebService_ setServiceShouldFollowNextLinks:YES];
+        [picasawebService_ setIsServiceRetryEnabled:YES];
+      } else {
+        [updateTimer_ invalidate];
+        return;
+      }
     }
 
     // Mark us as in the middle of a fetch so that if credentials change during
@@ -532,10 +535,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 - (void)reportErrorForFetchType:(NSString *)fetchType
                       errorCode:(NSInteger)errorCode {
-  KeychainItem* keychainItem 
-    = [KeychainItem keychainItemForService:[account_ identifier]
-                                  username:nil];
-  NSString *username = [keychainItem username];
+  NSString *username = [picasawebService_ username];
   NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
   NSTimeInterval timeSinceLastErrorReport
     = currentTime - previousErrorReportingTime_;

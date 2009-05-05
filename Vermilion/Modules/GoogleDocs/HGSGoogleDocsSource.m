@@ -338,10 +338,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   [cellArray addObject:googleDocsCell];
   
   // See if there's an intervening folder.
-  KeychainItem* keychainItem 
-    = [KeychainItem keychainItemForService:[account_ identifier]
-                                  username:nil];
-  NSString *userName = [keychainItem username];
+  NSString *userName = [docService_ username];
   NSString *folderScheme = [kGDataNamespaceDocuments
                             stringByAppendingFormat:@"/folders/%@",
                             userName];
