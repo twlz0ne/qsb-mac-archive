@@ -62,8 +62,6 @@ static NSString *const kTwitterAccountTypeName
     = [NSMutableURLRequest requestWithURL:accountTestURL
                               cachePolicy:NSURLRequestUseProtocolCachePolicy
                           timeoutInterval:15.0];
-  [accountRequest
-   setCachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData];
   NSString *authStr = [NSString stringWithFormat:@"%@:%@",
                        userName, password];
   NSData *authData = [authStr dataUsingEncoding:NSASCIIStringEncoding];

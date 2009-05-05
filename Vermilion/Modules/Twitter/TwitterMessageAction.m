@@ -138,8 +138,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         = [NSMutableURLRequest requestWithURL:sendStatusURL 
                                   cachePolicy:NSURLRequestReloadIgnoringCacheData 
                               timeoutInterval:15.0];
-      [sendStatusRequest
-       setCachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData];
       [sendStatusRequest setHTTPMethod:@"POST"];
       [sendStatusRequest setHTTPShouldHandleCookies:NO];
       [sendStatusRequest setValue:@"QuickSearchBox"
