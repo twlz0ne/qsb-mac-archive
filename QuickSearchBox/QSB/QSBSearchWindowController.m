@@ -68,6 +68,7 @@ static const CGFloat kResultsAnimationDistance = 12.0;
 
 static NSString * const kQSBSearchWindowDimBackground
   = @"QSBSearchWindowDimBackground";
+static NSString * const kQSBHideQSBWhenInactivePrefKey = @"hideQSBWhenInactive";
 static NSString * const kQSBSearchWindowFrameTopPrefKey
   = @"QSBSearchWindow Top QSBSearchResultsWindow";
 static NSString * const kQSBSearchWindowFrameLeftPrefKey
@@ -1152,7 +1153,15 @@ doCommandBySelector:(SEL)commandSelector {
     [searchTextFieldEditor_ selectAll:self];
   }
   if (![[self window] ignoresMouseEvents]) {
-    [self hideSearchWindow:self];
+    BOOL hideWhenInactive = YES;
+    NSNumber *hideNumber = [[NSUserDefaults standardUserDefaults]
+                            objectForKey:kQSBHideQSBWhenInactivePrefKey];
+    if (hideNumber) {
+      hideWhenInactive = [hideNumber boolValue];
+    }
+    if (hideWhenInactive) {
+      [self hideSearchWindow:self];
+    }
   }
 }
 
@@ -1168,7 +1177,15 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (void)applicationWillResignActive:(NSNotification *)notification {
   if ([[self window] isVisible]) {
-    [self hideSearchWindowBecause:kQSBActivationChangeVisiblityToggle];
+    BOOL hideWhenInactive = YES;
+    NSNumber *hideNumber = [[NSUserDefaults standardUserDefaults]
+                            objectForKey:kQSBHideQSBWhenInactivePrefKey];
+    if (hideNumber) {
+      hideWhenInactive = [hideNumber boolValue];
+    }
+    if (hideWhenInactive) {
+      [self hideSearchWindowBecause:kQSBActivationChangeVisiblityToggle];
+    }
   }
 }
 

@@ -214,6 +214,10 @@
 /* A label denoting options that control how results are displayed. */
 "Results:" = "Results:";
 
+/* A checkbox that overrides the automatic hiding of the search & results
+    windows when QSB becomes inactive. */
+"Hide QSB when it becomes inactive" = "Hide QSB when it becomes inactive";
+
 /* A checkbox controlling if the user wants to enabled the more results window. */
 "Enable 'More Results'" = "Enable 'More Results'";
 
