@@ -297,18 +297,18 @@ static inline int KeyLength(NSString *a, NSString *b, void *c) {
   NSDictionary *shortcutDB = [self readShortcutData];
   NSArray *keyArray = [[shortcutDB allKeys] sortedArrayUsingFunction:KeyLength
                                                              context:NULL];
-  NSMutableSet *identifierSet = [NSMutableSet set];
+  NSMutableArray *identifierArray = [NSMutableArray array];
   for (NSString *key in keyArray) {
     if ([key hasPrefix:normalizeShortcut]) {
       for(NSString *identifier in [shortcutDB objectForKey:key]) {
         // Filter out duplicates
-        if (![identifierSet containsObject:identifier]) {
-          [identifierSet addObject:identifier];
+        if (![identifierArray containsObject:identifier]) {
+          [identifierArray addObject:identifier];
         }
       }
     }
   }
-  return [identifierSet allObjects];
+  return identifierArray;
 }
 
 - (NSArray *)rankedObjectsForShortcut:(NSString *)shortcut {
