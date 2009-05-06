@@ -42,9 +42,22 @@ static const NSTimeInterval kAuthenticationRetryInterval = 0.1;
 static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
 
 
+@interface HGSSimpleAccount ()
+
+@property (nonatomic, retain) NSURLConnection *authenticationConnection;
+@property (nonatomic, retain) NSMutableData *authenticationData;
+@property (nonatomic, retain) NSURLResponse *authenticationResponse;
+
+- (void)resetAuthenticationTemporaries;
+
+@end
+
+
 @implementation HGSSimpleAccount
 
-@synthesize connection = connection_;
+@synthesize authenticationConnection = authenticationConnection_;
+@synthesize authenticationData = authenticationData_;
+@synthesize authenticationResponse = authenticationResponse_;
 
 - (id)initWithName:(NSString *)userName {
   // Perform any adjustments on the account name required.
@@ -72,7 +85,7 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
 }
 
 - (void)dealloc {
-  [self setConnection:nil];
+  [self resetAuthenticationTemporaries];
   [super dealloc];
 }
 
@@ -124,7 +137,7 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
   if (accountRequest) {
     NSURLConnection *connection
       = [NSURLConnection connectionWithRequest:accountRequest delegate:self];
-    [self setConnection:connection];
+    [self setAuthenticationConnection:connection];
   }
 }
 
@@ -140,16 +153,12 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
     NSData *result = [NSURLConnection sendSynchronousRequest:accountRequest
                                            returningResponse:&accountResponse
                                                        error:&error];
-    authenticated = [self validateResult:result
-                                response:accountResponse
-                                   error:error];
+    authenticated = [self validateResult:result response:accountResponse];
   }
   return authenticated;
 }
 
-- (BOOL)validateResult:(NSData *)result
-              response:(NSURLResponse *)response
-                 error:(NSError *)error {
+- (BOOL)validateResult:(NSData *)result response:(NSURLResponse *)response {
   HGSAssert(@"Must be overridden by subclass", nil);
   return NO;
 }
@@ -172,10 +181,16 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
   return nil;
 }
 
-- (void)setConnection:(NSURLConnection *)connection {
-  [connection_ cancel];
-  [connection_ release];
-  connection_ = [connection retain];
+- (void)resetAuthenticationTemporaries {
+  [self setAuthenticationConnection:nil];
+  [self setAuthenticationResponse:nil];
+  [self setAuthenticationData:nil];
+}
+
+- (void)setAuthenticationConnection:(NSURLConnection *)connection {
+  [authenticationConnection_ cancel];
+  [authenticationConnection_ release];
+  authenticationConnection_ = [connection retain];
 }
 
 #pragma mark HGSSimpleAccount Private Methods
@@ -191,22 +206,39 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
 #pragma mark NSURLConnection Delegate Methods
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-  HGSAssert(connection == connection_, nil);
-  [self setConnection:nil];
-  [self setAuthenticated:YES];
+  HGSAssert(connection == authenticationConnection_, nil);
+  BOOL authenticated = [self validateResult:authenticationData_
+                                   response:authenticationResponse_];
+  [self resetAuthenticationTemporaries];
+  [self setAuthenticated:authenticated];
 }
 
 - (void)connection:(NSURLConnection *)connection 
 didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-  HGSAssert(connection == connection_, nil);
+  HGSAssert(connection == authenticationConnection_, nil);
+  [self resetAuthenticationTemporaries];
   [self setAuthenticated:NO];
 }
 
 - (void)connection:(NSURLConnection *)connection
   didFailWithError:(NSError *)error {
-  HGSAssert(connection == connection_, nil);
-  [self setConnection:nil];
+  HGSAssert(connection == authenticationConnection_, nil);
+  [self resetAuthenticationTemporaries];
   [self setAuthenticated:NO];
+}
+
+- (void)connection:(NSURLConnection *)connection 
+didReceiveResponse:(NSURLResponse *)response {
+  HGSAssert(connection == authenticationConnection_, nil);
+  [self setAuthenticationResponse:response];
+  [self setAuthenticationData:[[[NSMutableData alloc] init] autorelease]];
+}
+
+- (void)connection:(NSURLConnection *)connection 
+    didReceiveData:(NSData *)data {
+  HGSAssert(connection == authenticationConnection_, nil);
+  NSMutableData *authenticationData = [self authenticationData];
+  [authenticationData appendData:data];
 }
 
 @end

@@ -60,7 +60,7 @@ static NSString *const kTwitterAccountTypeName
   NSURL *accountTestURL = [NSURL URLWithString:kTwitterVerifyAccountURLString];
   NSMutableURLRequest *accountRequest
     = [NSMutableURLRequest requestWithURL:accountTestURL
-                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                              cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
                           timeoutInterval:15.0];
   NSString *authStr = [NSString stringWithFormat:@"%@:%@",
                        userName, password];
@@ -71,9 +71,7 @@ static NSString *const kTwitterAccountTypeName
   return accountRequest;
 }
 
-- (BOOL)validateResult:(NSData *)result
-              response:(NSURLResponse *)response
-                 error:(NSError *)error {
+- (BOOL)validateResult:(NSData *)result response:(NSURLResponse *)response {
   BOOL valid = NO;
   if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
     NSHTTPURLResponse *httpURLResponse = (NSHTTPURLResponse *)response;
@@ -88,14 +86,6 @@ static NSString *const kTwitterAccountTypeName
   NSURL *twitterURL = [NSURL URLWithString:kTwitterURLString];
   BOOL success = [[NSWorkspace sharedWorkspace] openURL:twitterURL];
   return success;
-}
-
-#pragma mark NSURLConnection Delegate Methods
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-  HGSAssert(connection == [self connection], nil);
-  [self setConnection:nil];
-  [self setAuthenticated:YES];
 }
 
 @end

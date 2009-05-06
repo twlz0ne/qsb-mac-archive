@@ -136,14 +136,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSURL *accountTestURL = [NSURL URLWithString:accountTestString];
   NSURLRequest *accountRequest
     = [NSURLRequest requestWithURL:accountTestURL
-                       cachePolicy:NSURLRequestUseProtocolCachePolicy
+                       cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
                    timeoutInterval:15.0];
   return accountRequest;
 }
 
-- (BOOL)validateResult:(NSData *)result
-              response:(NSURLResponse *)response
-                 error:(NSError *)error {
+- (BOOL)validateResult:(NSData *)result response:(NSURLResponse *)response {
   NSString *answer = [[[NSString alloc] initWithData:result
                                             encoding:NSUTF8StringEncoding]
                       autorelease];

@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3066"/>
+			<integer value="2788"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -26,11 +26,6 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSUserDefaultsController" id="955577340">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>disableAutomaticHiding</string>
-					<string>hideQSBWhenInactive</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSArrayController" id="680293682">
@@ -72,6 +67,7 @@
 					<string>isValidAccount</string>
 					<string>isValid</string>
 					<string>isAuthenticated</string>
+					<string>authenticated</string>
 				</object>
 				<bool key="NSEditable">YES</bool>
 				<object class="_NSManagedProxy" key="_NSManagedProxy"/>
@@ -1040,7 +1036,7 @@
 								<object class="NSTabViewItem" id="195811188">
 									<string key="NSIdentifier">accounts</string>
 									<object class="NSView" key="NSView" id="799104047">
-										<nil key="NSNextResponder"/>
+										<reference key="NSNextResponder" ref="1019790971"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1238,6 +1234,7 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 33}, {514, 272}}</string>
+										<reference key="NSSuperview" ref="1019790971"/>
 									</object>
 									<string key="NSLabel">^Accounts</string>
 									<reference key="NSColor" ref="1072716316"/>
@@ -1246,7 +1243,7 @@
 								<object class="NSTabViewItem" id="748663966">
 									<string key="NSIdentifier">debug</string>
 									<object class="NSView" key="NSView" id="175173399">
-										<reference key="NSNextResponder" ref="1019790971"/>
+										<nil key="NSNextResponder"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2315,21 +2312,20 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 33}, {514, 272}}</string>
-										<reference key="NSSuperview" ref="1019790971"/>
 									</object>
 									<string key="NSLabel">^Under the Hood</string>
 									<reference key="NSColor" ref="1072716316"/>
 									<reference key="NSTabView" ref="1019790971"/>
 								</object>
 							</object>
-							<reference key="NSSelectedTabViewItem" ref="748663966"/>
+							<reference key="NSSelectedTabViewItem" ref="195811188"/>
 							<reference key="NSFont" ref="298552886"/>
 							<int key="NSTvFlags">0</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
 							<object class="NSMutableArray" key="NSSubviews">
 								<bool key="EncodedWithXMLCoder">YES</bool>
-								<reference ref="175173399"/>
+								<reference ref="799104047"/>
 							</object>
 						</object>
 					</object>
@@ -2830,26 +2826,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">textColor: arrangedObjects.isAuthenticated</string>
-						<reference key="source" ref="148637981"/>
-						<reference key="destination" ref="376406925"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="148637981"/>
-							<reference key="NSDestination" ref="376406925"/>
-							<string key="NSLabel">textColor: arrangedObjects.isAuthenticated</string>
-							<string key="NSBinding">textColor</string>
-							<string key="NSKeyPath">arrangedObjects.isAuthenticated</string>
-							<object class="NSDictionary" key="NSOptions">
-								<string key="NS.key.0">NSValueTransformerName</string>
-								<string key="NS.object.0">QSBBooleanToColorTransformer</string>
-							</object>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">2934</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: values.StatsCollectStatistics</string>
 						<reference key="source" ref="51013644"/>
 						<reference key="destination" ref="955577340"/>
@@ -3152,6 +3128,26 @@
 						</object>
 					</object>
 					<int key="connectionID">3135</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">textColor: arrangedObjects.authenticated</string>
+						<reference key="source" ref="148637981"/>
+						<reference key="destination" ref="376406925"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="148637981"/>
+							<reference key="NSDestination" ref="376406925"/>
+							<string key="NSLabel">textColor: arrangedObjects.authenticated</string>
+							<string key="NSBinding">textColor</string>
+							<string key="NSKeyPath">arrangedObjects.authenticated</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSValueTransformerName</string>
+								<string key="NS.object.0">QSBBooleanToColorTransformer</string>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">3136</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -4874,7 +4870,7 @@ b3AgcmVzdWx0cycuA</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3135</int>
+			<int key="maxID">3136</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

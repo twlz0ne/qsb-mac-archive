@@ -60,6 +60,9 @@ static void OpenAtLoginItemsChanged(LSSharedFileListRef inList, void *context);
 - (NSArray *)sourceSortDescriptor;
 - (void)setSourceSortDescriptor:(NSArray *)value;
 
+// Make each account authenticate.
+- (void)authenticateAccounts;
+
 @end
   
 
@@ -299,10 +302,6 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   if (prefsColorWellWasShowing_) {
     [[NSColorPanel sharedColorPanel] setIsVisible:YES];
   }
-  // Validate the accounts so that the user will have up-to-date
-  // knowledge of account status.
-  NSArray *accounts = [accountsListController_ arrangedObjects];
-  [accounts makeObjectsPerformSelector:@selector(authenticate)];
 }
 
 - (void)hidePreferences {
@@ -395,7 +394,21 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   }
 }
 
+- (void)authenticateAccounts {
+  // Validate the accounts so that the user will have up-to-date
+  // knowledge of account status.
+  NSArray *accounts = [accountsListController_ arrangedObjects];
+  [accounts makeObjectsPerformSelector:@selector(authenticate)];
+}
+
 #pragma mark Delegate Methods
+
+- (void)windowDidBecomeKey:(NSNotification *)notification {
+  NSWindow *window = [notification object];
+  if (window == [self window]) {
+    [self authenticateAccounts];
+  }
+}
 
 - (void)windowDidResignKey:(NSNotification *)notification {
   NSWindow *window = [notification object];
