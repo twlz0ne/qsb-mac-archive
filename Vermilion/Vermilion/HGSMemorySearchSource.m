@@ -295,7 +295,7 @@ static NSString* const kHGSMemorySourceVersion = @"1";
   }
 }
 
-- (void)loadResultsCache {
+- (BOOL)loadResultsCache {
   cacheHash_ = 0;
   // This routine can allocate a lot of temporary objects, so we wrap it
   // in an autorelease pool to keep our memory usage down.
@@ -330,6 +330,7 @@ static NSString* const kHGSMemorySourceVersion = @"1";
     [self clearResultIndex];
   }
   [pool release];
+  return cacheHash_ != 0;
 }
 
 @end

@@ -47,9 +47,8 @@
   if ((self = [super initWithConfiguration:configuration])) {
     path_ = [configuration objectForKey:@"rootPath"];
     path_ = [[path_ stringByStandardizingPath] retain];
-    [self loadResultsCache];
 
-    if (![resultsArray_ count]) {
+    if (![self loadResultsCache]) {
       [self recacheContents];
     } else {
       [self performSelector:@selector(recacheContents)

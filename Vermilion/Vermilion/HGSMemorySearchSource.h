@@ -50,8 +50,8 @@
 // to |processMatchingResults:forQuery:|, the subclass then has the
 // responsibility to filter based on the pivot object.
 @interface HGSMemorySearchSource : HGSCallbackSearchSource {
-  NSMutableArray* resultsArray_;
  @private
+  NSMutableArray* resultsArray_;
   NSUInteger cacheHash_;
   NSString *cachePath_;
 }
@@ -86,7 +86,8 @@
 
 // Load the results saved by a previous call to saveResultsCache, populating
 // the memory index (and overwriting any existing entries in the index).
-- (void)loadResultsCache;
+// Returns yes if anything was loaded into the cache.
+- (BOOL)loadResultsCache;
 @end
 
 // These are methods subclasses can override to control behaviors

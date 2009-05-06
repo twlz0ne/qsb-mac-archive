@@ -73,9 +73,8 @@ static NSString *const kApplicationSourcePredicateString
            selector:@selector(queryNotification:) 
                name:nil 
              object:query_];
-    [self loadResultsCache];
     condition_ = [[NSCondition alloc] init];
-    if (![resultsArray_ count]) {
+    if (![self loadResultsCache]) {
       // Cache didn't exist, hold queries until the first indexing run completes
       [self startQuery:nil];
     } else {
