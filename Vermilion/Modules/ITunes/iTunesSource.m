@@ -37,6 +37,8 @@
 #import "iTunesSource.h"
 #import "GTMSQLite.h"
 #import "GTMGarbageCollection.h"
+#import "HGSAbbreviationRanker.h"
+#import "HGSTokenizer.h"
 
 NSString *const kITunesAttributeTrackIdKey = @"kITunesAttributeTrackIdKey";
 NSString *const kITunesAttributeArtistKey = @"kITunesAttributeArtistKey";
@@ -47,6 +49,7 @@ NSString *const kITunesAttributeIconFileKey = @"kITunesAttributeIconFileKey";
 NSString *const kITunesAttributePlaylistKey = @"kITunesAttributePlaylistKey";
 NSString *const kITunesAttributePlaylistIdKey = @"kITunesAttributePlaylistIdKey";
 
+static const CGFloat kGenreMatchAdjustment = -0.2;
 static const NSUInteger kMaxSearchResults = 100;
 static const NSTimeInterval kInitialIndexDelay = 10; // 10 seconds
 static const NSTimeInterval kUpdateTimeInterval = 600; // 10 minutes
@@ -159,17 +162,24 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                 byComposer:(NSString *)composer
                    inGenre:(NSString *)genre
                 atLocation:(NSString *)location
-                playListID:(NSString *)playListID;
+                playListID:(NSString *)playListID
+                 matchedBy:(NSString *)queryString;
 - (HGSResult *)albumResult:(NSString *)album
                   byArtist:(NSString *)artist
                 byComposer:(NSString *)composer
                    inGenre:(NSString *)genre
-              withIconFile:(NSString *)iconFilePath;
-- (HGSResult *)artistResult:(NSString *)artist;
-- (HGSResult *)composerResult:(NSString *)composer;
-- (HGSResult *)genreResult:(NSString *)genre;
+              withIconFile:(NSString *)iconFilePath
+                 matchedBy:(NSString *)queryString;
+- (HGSResult *)artistResult:(NSString *)artist
+                  matchedBy:(NSString *)queryString;
+- (HGSResult *)composerResult:(NSString *)composer
+                    matchedBy:(NSString *)queryString;
+- (HGSResult *)genreResult:(NSString *)genre
+                 matchedBy:(NSString *)queryString;
 - (HGSResult *)playListResult:(NSString *)playlist
-                   playlistId:(NSString *)playlistId;
+                   playlistId:(NSString *)playlistId
+                    matchedBy:(NSString *)queryString;
+- (CGFloat)rankForString:(NSString *)string matchedBy:(NSString *)queryString;
 - (HGSAction *)defaultAction;
 - (NSImage *)iconForGenre:(NSString *)genre;
 @end
@@ -433,7 +443,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   NSString *genre = [pivotObject valueForKey:kITunesAttributeGenreKey];
   
   if ([artist length]) {
-    [results addObject:[self artistResult:artist]];
+    [results addObject:[self artistResult:artist matchedBy:nil]];
   }
   
   if ([album length]) {
@@ -443,16 +453,17 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                                    byArtist:artist
                                  byComposer:composer
                                     inGenre:genre
-                               withIconFile:path];
+                               withIconFile:path
+                                  matchedBy:nil];
     [results addObject:newAlbum];
   }
   
   if ([composer length]) {
-    [results addObject:[self composerResult:composer]];
+    [results addObject:[self composerResult:composer matchedBy:nil]];
   }
   
   if ([genre length]) {
-    [results addObject:[self genreResult:genre]];
+    [results addObject:[self genreResult:genre matchedBy:nil]];
   }
   
   // Add all playlists to which the track belongs
@@ -474,7 +485,8 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
         NSString *playlistId = [statement resultStringAtPosition:0];
         NSString *playlist = [statement resultStringAtPosition:1];
         [results addObject:[self playListResult:playlist
-                                     playlistId:playlistId]];
+                                     playlistId:playlistId
+                                      matchedBy:nil]];
       }
     }
     [statement finalizeStatement];
@@ -523,7 +535,8 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                                     byComposer:composer
                                        inGenre:genre
                                     atLocation:location
-                                    playListID:nil]];
+                                    playListID:nil
+                                     matchedBy:query]];
         }
       }
     }
@@ -573,7 +586,8 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                                       byComposer:composer
                                          inGenre:genre
                                       atLocation:location
-                                        playListID:playListID];
+                                        playListID:playListID
+                                       matchedBy:query];
           [results addObject:result];
         }
       }
@@ -635,7 +649,8 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                                       byArtist:artist
                                     byComposer:composer
                                        inGenre:genre
-                                  withIconFile:location]];
+                                  withIconFile:location
+                                     matchedBy:query]];
         }
       }
     }
@@ -714,13 +729,14 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                                       byComposer:composer
                                          inGenre:genre
                                       atLocation:location
-                                      playListID:nil]];
+                                      playListID:nil
+                                       matchedBy:query]];
           }
           NSRange range = [artist rangeOfString:query 
                                         options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Artist matched
-            [results addObject:[self artistResult:artist]];
+            [results addObject:[self artistResult:artist matchedBy:query]];
           }
           range = [album rangeOfString:query 
                                options:kResultStringCompareOptions];
@@ -730,19 +746,20 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                                         byArtist:artist
                                       byComposer:composer
                                          inGenre:genre
-                                   withIconFile:location]];
+                                   withIconFile:location
+                                       matchedBy:query]];
           }
           range = [composer rangeOfString:query 
                                   options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Composer matched
-            [results addObject:[self composerResult:composer]];
+            [results addObject:[self composerResult:composer matchedBy:query]];
           }
           range = [genre rangeOfString:query 
                                options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Genre matched
-            [results addObject:[self genreResult:genre]];
+            [results addObject:[self genreResult:genre matchedBy:query]];
           }
         }
       }
@@ -768,7 +785,8 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
           NSString *playlistId = [statement resultStringAtPosition:0];
           NSString *playlist = [statement resultStringAtPosition:1];
           [results addObject:[self playListResult:playlist
-                                       playlistId:playlistId]];
+                                       playlistId:playlistId
+                                        matchedBy:query]];
         }
       }
       
@@ -800,10 +818,13 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                 byComposer:(NSString *)composer
                    inGenre:(NSString *)genre
                 atLocation:(NSString *)location 
-                playListID:(NSString *)playListID {
+                playListID:(NSString *)playListID
+                 matchedBy:(NSString *)queryString {
+  CGFloat rank = [self rankForString:track matchedBy:queryString];
   NSMutableDictionary *attributes 
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        [NSNumber numberWithInt:trackNumber], kITunesAttributeTrackIdKey,
+       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        nil];
   NSInteger artistLength = [artist length], albumLength = [album length];
@@ -842,14 +863,17 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                   byArtist:(NSString *)artist
                 byComposer:(NSString *)composer
                    inGenre:(NSString *)genre
-              withIconFile:(NSString *)iconFilePath {
+              withIconFile:(NSString *)iconFilePath
+                 matchedBy:(NSString *)queryString {
   NSString *albumUrlString 
     = [NSString stringWithFormat:kAlbumUrlFormat,
        [album stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+  CGFloat rank = [self rankForString:album matchedBy:queryString];
   NSMutableDictionary *attributes 
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        [NSURL URLWithString:iconFilePath], kHGSObjectAttributeIconPreviewFileKey,
+       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
        albumIcon_, kHGSObjectAttributeIconKey,
        nil];
   if ([artist length]) {
@@ -873,16 +897,20 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                        attributes:attributes];
 }
 
-- (HGSResult *)artistResult:(NSString *)artist {
+- (HGSResult *)artistResult:(NSString *)artist 
+                  matchedBy:(NSString *)queryString {
   NSString *artistUrlString 
     = [NSString stringWithFormat:kArtistUrlFormat,
        [artist stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
   HGSAction *action = [self defaultAction];
-  NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                              artist, kITunesAttributeArtistKey,
-                              artistIcon_, kHGSObjectAttributeIconKey,
-                              action, kHGSObjectAttributeDefaultActionKey,
-                              nil];
+  CGFloat rank = [self rankForString:artist matchedBy:queryString];
+  NSDictionary *attributes 
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       artist, kITunesAttributeArtistKey,
+       artistIcon_, kHGSObjectAttributeIconKey,
+       action, kHGSObjectAttributeDefaultActionKey,
+       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
+       nil];
   return [HGSResult resultWithURL:[NSURL URLWithString:artistUrlString]
                              name:artist
                              type:kTypeITunesArtist
@@ -890,17 +918,20 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                        attributes:attributes];
 }
 
-- (HGSResult *)composerResult:(NSString *)composer {
+- (HGSResult *)composerResult:(NSString *)composer
+                    matchedBy:(NSString *)queryString {
   NSString *composerUrlString 
     = [NSString stringWithFormat:kComposerUrlFormat,
        [composer stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
   HGSAction *action = [self defaultAction];
-  NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                              composer, kITunesAttributeComposerKey,
-                              composerIcon_, kHGSObjectAttributeIconKey,
-                              action, kHGSObjectAttributeDefaultActionKey,
-                              nil];
-  
+  CGFloat rank = [self rankForString:composer matchedBy:queryString];
+  NSDictionary *attributes 
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       composer, kITunesAttributeComposerKey,
+       composerIcon_, kHGSObjectAttributeIconKey,
+       action, kHGSObjectAttributeDefaultActionKey,
+       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
+       nil];
   return [HGSResult resultWithURL:[NSURL URLWithString:composerUrlString]
                              name:composer
                              type:kTypeITunesComposer
@@ -934,17 +965,21 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   return icon;
 }
 
-- (HGSResult *)genreResult:(NSString *)genre {
+- (HGSResult *)genreResult:(NSString *)genre
+                 matchedBy:(NSString *)queryString {
   NSString *genreUrlString 
     = [NSString stringWithFormat:kGenreUrlFormat,
        [genre stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
   
   NSImage *icon = [self iconForGenre:genre];
+  CGFloat rank = [self rankForString:genre 
+                           matchedBy:queryString] + kGenreMatchAdjustment;
   NSDictionary *attributes 
     = [NSDictionary dictionaryWithObjectsAndKeys:
        genre, kITunesAttributeGenreKey,
        icon, kHGSObjectAttributeIconKey, 
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
+       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
        nil];
   return [HGSResult resultWithURL:[NSURL URLWithString:genreUrlString]
                              name:genre
@@ -954,16 +989,19 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
 }
 
 - (HGSResult *)playListResult:(NSString *)playlist
-                   playlistId:(NSString *)playlistId {
+                   playlistId:(NSString *)playlistId
+                    matchedBy:(NSString *)queryString {
   NSString *playlistUrlString 
     = [NSString stringWithFormat:kPlaylistUrlFormat,
        [playlist stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+  CGFloat rank = [self rankForString:playlist matchedBy:queryString];
   NSDictionary *attributes
     = [NSDictionary dictionaryWithObjectsAndKeys:
        playlistId, kITunesAttributePlaylistIdKey,
        playlist, kITunesAttributePlaylistKey,
        playlistIcon_, kHGSObjectAttributeIconKey,
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
+       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
        nil];
   return [HGSResult resultWithURL:[NSURL URLWithString:playlistUrlString]
                              name:playlist
@@ -982,4 +1020,15 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   }
   return action;
 }
+
+- (CGFloat)rankForString:(NSString *)string matchedBy:(NSString *)queryString {
+  CGFloat rank = 0;
+  if (string && queryString) {
+    string = [HGSTokenizer tokenizeString:string];
+    queryString = [HGSTokenizer tokenizeString:queryString];
+    rank = HGSScoreForAbbreviation(string, queryString, NULL);
+  }
+  return rank;
+}
+
 @end
