@@ -38,8 +38,6 @@
 //
 @interface GoogleAccount : HGSSimpleAccount {
  @private
-  // Temporary container for account authentication exchange.
-  NSMutableData *responseData_;
   // The presence of a captchaImage_ indicates that one such should be shown
   // to the user and the resulting captchaText be included in the
   // authentication reply.  The consumer of this image (i.e. the UI) should
@@ -47,6 +45,9 @@
   NSImage *captchaImage_;  // The captcha image presented to the user.
   NSString *captchaText_;  // The user's response.
   NSString *captchaToken_;  // Captcha token.
+  // Set by and only useful within authentication.
+  NSURLConnection *authenticationConnection_;
+  NSMutableData *authenticationData_;
 }
 
 @property (nonatomic, retain) NSImage *captchaImage;

@@ -42,7 +42,13 @@
 @class TwitterAccountEditController;
 
 /*! A class which manages a Twitter account. */
-@interface TwitterAccount : HGSSimpleAccount
+@interface TwitterAccount : HGSSimpleAccount {
+ @private
+  // Set by and only useful within authentication.
+  BOOL authCompleted_;
+  BOOL authSucceeded_;
+}
+
 @end
 
 /*

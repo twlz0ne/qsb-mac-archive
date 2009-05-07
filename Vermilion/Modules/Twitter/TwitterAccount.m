@@ -32,6 +32,7 @@
 
 #import "TwitterAccount.h"
 #import "GTMBase64.h"
+#import <GData/GDataHTTPFetcher.h>
 
 static NSString *const kTwitterVerifyAccountURLString
   = @"https://twitter.com/account/verify_credentials.xml";
@@ -39,15 +40,29 @@ static NSString *const kTwitterURLString = @"http://twitter.com/";
 static NSString *const kTwitterAccountTypeName
   = @"com.google.qsb.twitter.account";
 
+// Authentication timing constants.
+static const NSTimeInterval kAuthenticationRetryInterval = 0.1;
+static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
+static const NSTimeInterval kAuthenticationTimeOutInterval = 15.0;
+
 
 @interface TwitterAccount ()
+
+// Check the authentication response to see if the account authenticated.
+- (BOOL)validateResponse:(NSURLResponse *)response;
 
 // Open twitter.com in the user's preferred browser.
 + (BOOL)openTwitterHomePage;
 
+@property (nonatomic, assign) BOOL authCompleted;
+@property (nonatomic, assign) BOOL authSucceeded;
+
 @end
 
 @implementation TwitterAccount
+
+@synthesize authCompleted = authCompleted_;
+@synthesize authSucceeded = authSucceeded_;
 
 - (NSString *)type {
   return kTwitterAccountTypeName;
@@ -55,23 +70,85 @@ static NSString *const kTwitterAccountTypeName
 
 #pragma mark Account Editing
 
-- (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
-                                      password:(NSString *)password {
-  NSURL *accountTestURL = [NSURL URLWithString:kTwitterVerifyAccountURLString];
-  NSMutableURLRequest *accountRequest
-    = [NSMutableURLRequest requestWithURL:accountTestURL
+- (void)authenticate {
+  NSString *userName = [self userName];
+  NSString *password = [self password];
+  NSURL *authURL = [NSURL URLWithString:kTwitterVerifyAccountURLString];
+  NSMutableURLRequest *authRequest
+    = [NSMutableURLRequest requestWithURL:authURL
                               cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
-                          timeoutInterval:15.0];
-  NSString *authStr = [NSString stringWithFormat:@"%@:%@",
-                       userName, password];
-  NSData *authData = [authStr dataUsingEncoding:NSASCIIStringEncoding];
-  NSString *authBase64 = [GTMBase64 stringByEncodingData:authData];
-  NSString *authValue = [NSString stringWithFormat:@"Basic %@", authBase64];
-  [accountRequest setValue:authValue forHTTPHeaderField:@"Authorization"];
-  return accountRequest;
+                          timeoutInterval:kAuthenticationTimeOutInterval];
+  if (authRequest) {
+    [authRequest setHTTPShouldHandleCookies:NO];
+    GDataHTTPFetcher* authSetFetcher
+      = [GDataHTTPFetcher httpFetcherWithRequest:authRequest];
+    [authSetFetcher setIsRetryEnabled:YES];
+    if ([userName length]) {
+      [authSetFetcher setCredential:
+       [NSURLCredential credentialWithUser:userName
+                                  password:password
+                               persistence:NSURLCredentialPersistenceNone]];
+    }
+    [authSetFetcher
+     setCookieStorageMethod:kGDataHTTPFetcherCookieStorageMethodFetchHistory];
+    [authSetFetcher beginFetchWithDelegate:self
+                         didFinishSelector:@selector(authSetFetcher:
+                                                     finishedWithData:)
+                           didFailSelector:@selector(authSetFetcher:
+                                                     failedWithError:)];
+  }
 }
 
-- (BOOL)validateResult:(NSData *)result response:(NSURLResponse *)response {
+- (BOOL)authenticateWithPassword:(NSString *)password {
+  BOOL authenticated = NO;
+  // Test this account to see if we can connect.
+  NSString *userName = [self userName];
+  NSURL *authURL = [NSURL URLWithString:kTwitterVerifyAccountURLString];
+  NSMutableURLRequest *authRequest
+    = [NSMutableURLRequest requestWithURL:authURL
+                              cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
+                          timeoutInterval:kAuthenticationTimeOutInterval];
+  if (authRequest) {
+    [authRequest setHTTPShouldHandleCookies:NO];
+    [self setAuthCompleted:NO];
+    [self setAuthSucceeded:NO];
+    GDataHTTPFetcher* authFetcher
+      = [GDataHTTPFetcher httpFetcherWithRequest:authRequest];
+    [authFetcher setIsRetryEnabled:YES];
+    [authFetcher
+     setCookieStorageMethod:kGDataHTTPFetcherCookieStorageMethodFetchHistory];
+    if (userName) {
+      [authFetcher setCredential:
+       [NSURLCredential credentialWithUser:userName
+                                  password:password
+                               persistence:NSURLCredentialPersistenceNone]];
+    }
+    [authFetcher beginFetchWithDelegate:self
+                      didFinishSelector:@selector(authFetcher:
+                                                  finishedWithData:)
+                        didFailSelector:@selector(authFetcher:
+                                                  failedWithError:)];
+    // Block until this fetch is done to make it appear synchronous. Sleep
+    // for a second and then check again until is has completed.  Just in
+    // case, put an upper limit of 30 seconds before we bail.
+    NSTimeInterval endTime
+      = [NSDate timeIntervalSinceReferenceDate] + kAuthenticationGiveUpInterval;
+    NSRunLoop* loop = [NSRunLoop currentRunLoop];
+    while (![self authCompleted]) {
+      NSDate *sleepTilDate
+        = [NSDate dateWithTimeIntervalSinceNow:kAuthenticationRetryInterval];
+      [loop runUntilDate:sleepTilDate];
+      if ([NSDate timeIntervalSinceReferenceDate] > endTime) {
+        [authFetcher stopFetching];
+        [self setAuthCompleted:YES];
+      }
+    }
+    authenticated = [self authSucceeded];
+  }
+  return authenticated;
+}
+
+- (BOOL)validateResponse:(NSURLResponse *)response {
   BOOL valid = NO;
   if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
     NSHTTPURLResponse *httpURLResponse = (NSHTTPURLResponse *)response;
@@ -86,6 +163,40 @@ static NSString *const kTwitterAccountTypeName
   NSURL *twitterURL = [NSURL URLWithString:kTwitterURLString];
   BOOL success = [[NSWorkspace sharedWorkspace] openURL:twitterURL];
   return success;
+}
+
+#pragma mark GDataHTTPFetcher Delegate Methods
+
+- (void)authSetFetcher:(GDataHTTPFetcher *)fetcher
+      finishedWithData:(NSData *)data {
+  NSURLResponse *response = [fetcher response];
+  BOOL authenticated = [self validateResponse:response];
+  [self setAuthenticated:authenticated];
+}
+
+- (void)authSetFetcher:(GDataHTTPFetcher *)fetcher
+       failedWithError:(NSError *)error {
+  HGSLogDebug(@"Authentication failed for account '%@' (%@), error: '%@' (%d)",
+              [self userName], [self type], [error localizedDescription],
+              [error code]);
+  [self setAuthenticated:NO];
+}
+
+- (void)authFetcher:(GDataHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)data {
+  NSURLResponse *response = [fetcher response];
+  BOOL authenticated = [self validateResponse:response];
+  [self setAuthCompleted:YES];
+  [self setAuthSucceeded:authenticated];
+}
+
+- (void)authFetcher:(GDataHTTPFetcher *)fetcher
+    failedWithError:(NSError *)error {
+  HGSLogDebug(@"Authentication failed for account '%@' (%@), error: '%@' (%d)",
+              [self userName], [self type], [error localizedDescription],
+              [error code]);
+  [self setAuthCompleted:YES];
+  [self setAuthSucceeded:NO];
 }
 
 @end

@@ -67,6 +67,22 @@ static NSString *const kCaptchaImageURLPrefix
 @end
 
 
+@interface GoogleAccount ()
+
+@property (nonatomic, retain) NSURLConnection *authenticationConnection;
+@property (nonatomic, retain) NSMutableData *authenticationData;
+
+- (NSURLRequest *)accountURLRequest;
+- (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
+                                      password:(NSString *)password;
+- (void)resetAuthenticationTemporaries;
+
+// Check the authentication results to see if the account authenticated.
+- (BOOL)validateResult:(NSData *)result;
+
+@end
+
+
 @implementation GoogleAccount
 
 GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
@@ -74,12 +90,14 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 @synthesize captchaImage = captchaImage_;
 @synthesize captchaText = captchaText_;
 @synthesize captchaToken = captchaToken_;
+@synthesize authenticationConnection = authenticationConnection_;
+@synthesize authenticationData = authenticationData_;
 
 - (void)dealloc {
-  [responseData_ release];
   [captchaImage_ release];
   [captchaText_ release];
   [captchaToken_ release];
+  [self resetAuthenticationTemporaries];
   [super dealloc];
 }
 
@@ -94,6 +112,40 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     userName = [userName stringByAppendingString:countryGMailCom];
   }
   return userName;
+}
+
+- (void)authenticate {
+  NSURLRequest *authRequest = [self accountURLRequest];
+  if (authRequest) {
+    NSURLConnection *connection
+      = [NSURLConnection connectionWithRequest:authRequest delegate:self];
+    [self setAuthenticationConnection:connection];
+  }
+}
+
+- (BOOL)authenticateWithPassword:(NSString *)password {
+  BOOL authenticated = NO;
+  // Test this account to see if we can connect.
+  NSString *userName = [self userName];
+  NSURLRequest *authRequest = [self accountURLRequestForUserName:userName
+                                                        password:password];
+  if (authRequest) {
+    NSURLResponse *accountResponse = nil;
+    NSError *error = nil;
+    NSData *result = [NSURLConnection sendSynchronousRequest:authRequest
+                                           returningResponse:&accountResponse
+                                                       error:&error];
+    authenticated = [self validateResult:result];
+  }
+  return authenticated;
+}
+
+- (NSURLRequest *)accountURLRequest {
+  NSString *userName = [self userName];
+  NSString *password = [self password];
+  NSURLRequest *accountRequest = [self accountURLRequestForUserName:userName
+                                                           password:password];
+  return accountRequest;
 }
 
 - (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
@@ -141,7 +193,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return accountRequest;
 }
 
-- (BOOL)validateResult:(NSData *)result response:(NSURLResponse *)response {
+- (BOOL)validateResult:(NSData *)result {
   NSString *answer = [[[NSString alloc] initWithData:result
                                             encoding:NSUTF8StringEncoding]
                       autorelease];
@@ -227,6 +279,52 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return success;
 }
 
+- (void)resetAuthenticationTemporaries {
+  [self setAuthenticationConnection:nil];
+  [self setAuthenticationData:nil];
+}
+
+- (void)setAuthenticationConnection:(NSURLConnection *)connection {
+  [authenticationConnection_ cancel];
+  [authenticationConnection_ release];
+  authenticationConnection_ = [connection retain];
+}
+
+#pragma mark NSURLConnection Delegate Methods
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+  HGSAssert(connection == authenticationConnection_, nil);
+  BOOL authenticated = [self validateResult:authenticationData_];
+  [self resetAuthenticationTemporaries];
+  [self setAuthenticated:authenticated];
+}
+
+- (void)connection:(NSURLConnection *)connection 
+didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+  HGSAssert(connection == authenticationConnection_, nil);
+  [self resetAuthenticationTemporaries];
+  [self setAuthenticated:NO];
+}
+
+- (void)connection:(NSURLConnection *)connection
+  didFailWithError:(NSError *)error {
+  HGSAssert(connection == authenticationConnection_, nil);
+  [self resetAuthenticationTemporaries];
+  [self setAuthenticated:NO];
+}
+
+- (void)connection:(NSURLConnection *)connection 
+didReceiveResponse:(NSURLResponse *)response {
+  HGSAssert(connection == authenticationConnection_, nil);
+  [self setAuthenticationData:[[[NSMutableData alloc] init] autorelease]];
+}
+
+- (void)connection:(NSURLConnection *)connection 
+    didReceiveData:(NSData *)data {
+  HGSAssert(connection == authenticationConnection_, nil);
+  NSMutableData *authenticationData = [self authenticationData];
+  [authenticationData appendData:data];
+}
 @end
 
 

@@ -49,21 +49,13 @@
  specialization of HGSSimpleAccount should have:
 
   - Concrete account class (see GoogleAccount) providing:
-    - an +[accountType] method returning the name of the account
-      type class which this account offers to sources and actions
-      adhering to the HGSAccountClientProtocol
-    - an -[accountURLRequestForUserName:password:] method that composes
-      an NSURLRequest suitable for synchronously authenticating the
-      account.
-    - and -[authenticateWithPassword:] method that performs a synchronous
+    - a -[type] method returning a (constant) string giving the
+      type of the account class which this account offers to sources
+      and actions adhering to the HGSAccountClientProtocol.
+    - an -[authenticateWithPassword:] method that performs a synchronous
       authentication of the account.  (Note: this method _should not_
       set |authenticated|.
     Optional:
-    - an -[accountURLRequest] method that composes an NSURLRequest 
-      suitable for asynchronously authenticating the account. 
-      (The default implementation retrieves the userName and
-      password from the keychain and calls through to
-      -[accountURLRequestForUserName:password:].)
     - an -[authenticate] method that performs an asynchronous authentication
       of the account and sets |authenticated|.
 
@@ -81,13 +73,7 @@
 
  See Vermilion/Modules/GoogleAccount/ for an example.
 */
-@interface HGSSimpleAccount : HGSAccount {
- @private
-  // Set by and only useful within authentication.
-  NSURLConnection *authenticationConnection_;
-  NSMutableData *authenticationData_;
-  NSURLResponse *authenticationResponse_;
-}
+@interface HGSSimpleAccount : HGSAccount
 
 /*!
  Adjust the account name, if desired.  The default implementation
@@ -107,27 +93,6 @@
  authenticated_ in this method.
 */
 - (BOOL)authenticateWithPassword:(NSString *)password;
-
-/*!
- Check the authentication results, response and/or error to see if the
- request authenticated.  Each concrete account class must provide an
- override of this method.
- */
-- (BOOL)validateResult:(NSData *)result
-              response:(NSURLResponse *)response;
-
-/*!
- Return an NSURLRequest appropriate for authenticating the account
- using the credentials currently stored in the keychain.
-*/
-- (NSURLRequest *)accountURLRequest;
-
-/*!
- Return an NSURLRequest appropriate for authenticating the account
- using the proposed account name and password.
-*/
-- (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
-                                      password:(NSString *)password;
 
 @end
 
