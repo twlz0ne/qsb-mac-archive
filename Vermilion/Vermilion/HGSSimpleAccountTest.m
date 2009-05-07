@@ -263,8 +263,6 @@ static NSString *const kServiceName
   NSURLRequest *urlRequest = [account accountURLRequestForUserName:nil
                                                        password:nil];
   STAssertNil(urlRequest, nil);
-  NSURLConnection *connection = [account connection];
-  STAssertNil(connection, nil);
   
   // Removal
   [account remove];
