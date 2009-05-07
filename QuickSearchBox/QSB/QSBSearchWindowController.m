@@ -582,7 +582,6 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
 }
 
 - (void)selectResults:(HGSResultArray *)results {
-  
   // Selecting destroys the stack
   [self clearAllViewControllersAndSearchString];
   
@@ -599,7 +598,6 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
   [activeSearchViewController_ setResults:results];
   [self updatePivotToken];
   [self showResultsWindow];
-  
 }
 
 - (IBAction)grabSelection:(id)sender {
@@ -622,7 +620,8 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
         HGSResultArray *results
           = [HGSResultArray arrayWithFilePaths:paths];
         [self selectResults:results];
-}
+        showResults_ = ([results count] > 0);
+      }
     }
   }
 }
@@ -997,7 +996,7 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (void)setResultsWindowHeight:(CGFloat)newHeight
-                     animating:(bool)animating {
+                     animating:(BOOL)animating {
   
   // Don't let one of these trigger during our animations, they can cause
   // view corruption
@@ -1143,23 +1142,23 @@ doCommandBySelector:(SEL)commandSelector {
                                                     selector:@selector(resetQuery:) 
                                                     userInfo:nil 
                                                      repeats:NO];
-  // If we've pivoted and have a token in the search text box we will just
-  // blow everything away (http://b/issue?id=1567906), otherwise we will
-  // select all of the text, so the next time the user brings us up we will
-  // immediately replace their selection with what they type.
-  if ([activeSearchViewController_ parentSearchViewController]) {
-    [self clearAllViewControllersAndSearchString];
-  } else {
-    [searchTextFieldEditor_ selectAll:self];
+  BOOL hideWhenInactive = YES;
+  NSNumber *hideNumber = [[NSUserDefaults standardUserDefaults]
+                          objectForKey:kQSBHideQSBWhenInactivePrefKey];
+  if (hideNumber) {
+    hideWhenInactive = [hideNumber boolValue];
   }
-  if (![[self window] ignoresMouseEvents]) {
-    BOOL hideWhenInactive = YES;
-    NSNumber *hideNumber = [[NSUserDefaults standardUserDefaults]
-                            objectForKey:kQSBHideQSBWhenInactivePrefKey];
-    if (hideNumber) {
-      hideWhenInactive = [hideNumber boolValue];
+  if (hideWhenInactive) {
+    // If we've pivoted and have a token in the search text box we will just
+    // blow everything away (http://b/issue?id=1567906), otherwise we will
+    // select all of the text, so the next time the user brings us up we will
+    // immediately replace their selection with what they type.
+    if ([activeSearchViewController_ parentSearchViewController]) {
+      [self clearAllViewControllersAndSearchString];
+    } else {
+      [searchTextFieldEditor_ selectAll:self];
     }
-    if (hideWhenInactive) {
+    if (![[self window] ignoresMouseEvents]) {
       [self hideSearchWindow:self];
     }
   }
@@ -1312,8 +1311,8 @@ doCommandBySelector:(SEL)commandSelector {
   NSRect frame = [resultsWindow_ frame];
   [resultsWindow_ setAlphaValue:0.0];  
   
-  [resultsWindow_ setFrame:NSOffsetRect(frame, 0.0, kResultsAnimationDistance) 
-                   display:YES];
+  [[resultsWindow_ animator]
+   setFrame:NSOffsetRect(frame, 0.0, kResultsAnimationDistance) display:YES];
   NSWindow *searchWindow = [self window];
   // Fix for stupid Apple ordering bug. By removing and re-adding all the
   // the children we keep the window list in the right order.
@@ -1347,8 +1346,8 @@ doCommandBySelector:(SEL)commandSelector {
                                              onScreen:[window screen]];
   [window setFrame:exposeRect display:YES animate:YES];
 }
-- (void)updatePivotToken {
 
+- (void)updatePivotToken {
   // Place a text box with the pivot term into the query search box.
   HGSResultArray *results = [activeSearchViewController_ results];
   NSString *pivotString = [results displayName];
@@ -1432,7 +1431,7 @@ doCommandBySelector:(SEL)commandSelector {
     [NSAnimationContext beginGrouping];
     [[NSAnimationContext currentContext] setDuration:kQSBPushPopDuration];
     [[[activeSearchViewController_ view] animator] setFrame:[self leftOffscreenViewRect]];
-    [[[searchViewController view] animator] setFrame:[self mainViewRect]];
+    [[[viewController view] animator] setFrame:[self mainViewRect]];
     [NSAnimationContext endGrouping];
     [self performSelector:@selector(removeQueryView:)
                withObject:activeSearchViewController_

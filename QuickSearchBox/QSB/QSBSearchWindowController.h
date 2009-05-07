@@ -122,7 +122,7 @@ const NSTimeInterval kQSBAppearDelay;
 // the results window fits comfortably on the screen along with the
 // search box window.
 - (void)setResultsWindowHeight:(float)height
-                     animating:(bool)animating;
+                     animating:(BOOL)animating;
 
 // Grab the selection from the Finder
 - (IBAction)grabSelection:(id)sender;
