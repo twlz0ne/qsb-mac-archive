@@ -38,7 +38,7 @@
 
 static NSString *const kMessageBodyFormat = @"status=%@";
 static NSString *const kSendStatusFormat
-  = @"https://%@:%@@twitter.com/statuses/update.xml?"
+  = @"https://twitter.com/statuses/update.xml?"
     @"source=googlequicksearchboxmac&status=%@";
 
 // An action that will send a status update message for a Twitter account.
@@ -124,11 +124,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         = [twitterMessage gtm_stringByEscapingForURLArgument];
       NSString *encodedMessageBody
         = [NSString stringWithFormat:kMessageBodyFormat, encodedMessage];
-      NSString *encodedAccountName
-        = [username gtm_stringByEscapingForURLArgument];
-      NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
       NSString *sendStatusString = [NSString stringWithFormat:kSendStatusFormat,
-                                    encodedAccountName, encodedPassword,
                                     encodedMessage];
       NSURL *sendStatusURL = [NSURL URLWithString:sendStatusString];
       
@@ -158,6 +154,10 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       [tweetFetcher setIsRetryEnabled:YES];
       [tweetFetcher
        setCookieStorageMethod:kGDataHTTPFetcherCookieStorageMethodFetchHistory];
+      [tweetFetcher setCredential:
+       [NSURLCredential credentialWithUser:username
+                                  password:password
+                               persistence:NSURLCredentialPersistenceNone]];
       [tweetFetcher beginFetchWithDelegate:self
                          didFinishSelector:@selector(tweetFetcher:
                                                      finishedWithData:)
