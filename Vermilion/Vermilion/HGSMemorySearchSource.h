@@ -32,23 +32,30 @@
 
 #import "HGSCallbackSearchSource.h"
 
+/*!
+ @header
+ @discussion
+*/
+
 @class HGSQuery;
 
-// Subclass of HGSCallbackSearchSource that handles the search logic for simple
-// sources that precompute all possible results and keep them in memory.
-//
-// When a query comes in, all matching items will be found, then passed through
-// |processMatchingResults:forQuery:| and returned. The default implementation
-// of that method does nothing, so by default results will be returned
-// unchanged.
-//
-// HGSMemorySearchSource gets the base behavior for |pivotableTypes| and
-// |isValidSourceForQuery:|, meaning it will support a query w/o a context
-// object, but not match if there is a context (pivot) object.  Subclasses can
-// override this method to support pivots.  When a query w/ a pivot w/o a search
-// term comes in, all objects are returned as matches, meaning they all get sent
-// to |processMatchingResults:forQuery:|, the subclass then has the
-// responsibility to filter based on the pivot object.
+/*!
+ Subclass of HGSCallbackSearchSource that handles the search logic for simple
+ sources that precompute all possible results and keep them in memory.
+
+ When a query comes in, all matching items will be found, then passed through
+ |processMatchingResults:forQuery:| and returned. The default implementation
+ of that method does nothing, so by default results will be returned
+ unchanged.
+
+ HGSMemorySearchSource gets the base behavior for |pivotableTypes| and
+ |isValidSourceForQuery:|, meaning it will support a query without a context
+ object, but not match if there is a context (pivot) object.  Subclasses can
+ override this method to support pivots.  When a query with a pivot without a 
+ search term comes in, all objects are returned as matches, meaning they all get 
+ sent to |processMatchingResults:forQuery:|, the subclass then has the
+ responsibility to filter based on the pivot object.
+*/
 @interface HGSMemorySearchSource : HGSCallbackSearchSource {
  @private
   NSMutableArray* resultsArray_;
@@ -56,48 +63,73 @@
   NSString *cachePath_;
 }
 
-// Clear out the data currenting indexing w/in the source
+/*! Clear out the data currenting indexing w/in the source. */
 - (void)clearResultIndex;
 
-// Add a result to the memory index.  |name| are the words that count as
-// name matches for |hgsResult|.  |otherTerm| are the words that can be used
-// to match |hgsResult| but of less importance.  The two strings (|name|
-// and |otherTerm|) will be properly broken into terms for the caller, so they
-// don't need to worry about the details.  |otherTerm| can be nil since it's
-// optional.
+/*!
+ Add a result to the memory index.
+ 
+ The two strings (name and otherTerm) will be properly tokenized for the caller, 
+ so pass them in as raw unnormalized, untokenized strings.
+ @param hgsResult the result to index
+ @param name are the words that count as name matches for hgsResult. 
+ @param otherTerm is another term that can be used to match hgsResult but is
+        of less importance than name. This argument is optional and can be nil.
+*/
 - (void)indexResult:(HGSResult *)hgsResult
                name:(NSString *)name
           otherTerm:(NSString *)otherTerm;
-// Like the above, but takes an array of "other" strings.
+/*!
+ Add a result to the memory index. 
+ 
+ The strings (name and otherTerms) will be properly tokenized for the caller, 
+ so pass them in as raw unnormalized, untokenized strings.
+ @param hgsResult the result to index
+ @param name are the words that count as name matches for hgsResult. 
+ @param otherTerms is an array of terms that can be used to match hgsResult but 
+ are of less importance than name. This argument is optional and can be nil.
+*/
 - (void)indexResult:(HGSResult *)hgsResult
                name:(NSString *)name
          otherTerms:(NSArray *)otherTerms;
-// Like the above, but uses [hgsResult displayName] as the name, and has
-// no otherTerms
+/*!
+ Add a result to the memory index. 
+ Equivalent to calling 
+ @link indexResult:name:otherTerm: indexResult:name:otherTerm: @/link
+ with name set to the displayName of the hgsResult, and nil for otherTerm. 
+ @param hgsResult the result to index
+*/
 - (void)indexResult:(HGSResult *)hgsResult;
-// Save the contents of the memory index to disk. If the contents of the index
-// haven't changed since the last call to saveResultsCache or loadResultsCache,
-// the write is skipped (although there is still a small amount of overhead
-// in determining whether or not the index has changed). The usage pattern is
-// to call saveResultsCache after each periodic or event-triggered indexing
-// pass, and call loadResultsCache once at startup so that the previous
-// index is immediately available, though perhaps a little stale.
+/*!
+ Save the contents of the memory index to disk. If the contents of the index
+ haven't changed since the last call to saveResultsCache or loadResultsCache,
+ the write is skipped (although there is still a small amount of overhead
+ in determining whether or not the index has changed). The usage pattern is
+ to call saveResultsCache after each periodic or event-triggered indexing
+ pass, and call loadResultsCache once at startup so that the previous
+ index is immediately available, though perhaps a little stale.
+ @seealso //google_vermilion_ref/occ/instm/HGSMemorySearchSource/loadResultsCache loadResultsCache
+*/
 - (void)saveResultsCache;
-
-// Load the results saved by a previous call to saveResultsCache, populating
-// the memory index (and overwriting any existing entries in the index).
-// Returns yes if anything was loaded into the cache.
+/*!
+ Load the results saved by a previous call to 
+ saveResultsCache, populating
+ the memory index (and overwriting any existing entries in the index).
+ @result Returns yes if anything was loaded into the cache.
+ @seealso //google_vermilion_ref/occ/instm/HGSMemorySearchSource/saveResultsCache saveResultsCache
+*/
 - (BOOL)loadResultsCache;
 @end
 
-// These are methods subclasses can override to control behaviors
+/*! These are methods subclasses can override to control behaviors. */
 @interface HGSMemorySearchSource (ProtectedMethods)
 
-// Called after matching results are found, before the array is returned.
-// |results| is an array of HGSObjects matching the query. The array and results
-// may be modified in any way, but note that the result objects are references
-// to the cached versions, not copies, so modifications to result objects that
-// are not intended to be persistent should be made to a substituted copy.
+/*!
+ Called after matching results are found, before the array is returned.
+ The array and results in the array may be modified in any way.
+ @param results is an array of HGSObjects matching the query. 
+ @param query is the query that the results matched to.
+*/
 - (void)processMatchingResults:(NSMutableArray*)results
                       forQuery:(HGSQuery *)query;
 
