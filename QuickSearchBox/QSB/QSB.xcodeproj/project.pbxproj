@@ -2414,6 +2414,9 @@
 		8BC6E62E0FAAC537005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8BC6E67F0FAAC560005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8BC6E6830FAAC580005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		8BC964C60FB292F90095555F /* headerdoc2html.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = headerdoc2html.config; sourceTree = "<group>"; };
+		8BC964C70FB292F90095555F /* toctemplate.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html.documentation; path = toctemplate.html; sourceTree = "<group>"; };
+		8BC964C80FB292F90095555F /* vermilion.hdoc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vermilion.hdoc; sourceTree = "<group>"; };
 		8BCB416D0E82E879007F8FD6 /* GTMTestTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMTestTimer.h; sourceTree = "<group>"; };
 		8BCCD26D0EC8E5EC00688D64 /* System.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = System.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BCCD2A20EC8E67300688D64 /* closeDiskTray.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = closeDiskTray.icns; sourceTree = "<group>"; };
@@ -3809,6 +3812,7 @@
 		8B6F2CE50DA2B83F0052CA40 /* Vermilion */ = {
 			isa = PBXGroup;
 			children = (
+				8BC964C50FB292F90095555F /* Documentation */,
 				8BC3F43D0F17C7BE00896770 /* Resources */,
 				8B6F2D5D0DA2B88E0052CA40 /* Vermilion */,
 				8B6F2D100DA2B83F0052CA40 /* Modules */,
@@ -4320,6 +4324,16 @@
 				8BC3F4A20F17C7C000896770 /* thunderstorm64.gif */,
 			);
 			path = WeatherIcons;
+			sourceTree = "<group>";
+		};
+		8BC964C50FB292F90095555F /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				8BC964C60FB292F90095555F /* headerdoc2html.config */,
+				8BC964C70FB292F90095555F /* toctemplate.html */,
+				8BC964C80FB292F90095555F /* vermilion.hdoc */,
+			);
+			path = Documentation;
 			sourceTree = "<group>";
 		};
 		8BCCCE750EC8A97B00688D64 /* Scripts */ = {
