@@ -689,8 +689,9 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                                       type:type
                                     source:[self->operation_ source]
                                 attributes:attributes];
-              
-              [results addObject:result];
+              if (result) {
+                [results addObject:result];
+              }
             }
           }
         }

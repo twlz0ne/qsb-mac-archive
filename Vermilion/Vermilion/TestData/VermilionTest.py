@@ -49,6 +49,7 @@ except ImportError:
     DISPLAY_NAME = 'DISPLAY_NAME'
     SNIPPET = 'SNIPPET'
     IMAGE = 'IMAGE'
+    TYPE = 'TYPE'
     DEFAULT_ACTION = "DEFAULT_ACTION"
     class Query(object):
       def __init__(self, phrase):
@@ -72,9 +73,9 @@ class VermilionTest(object):
     try:
       results = []
       result = {}
-      path, name = entry
-      result[Vermilion.IDENTIFIER] = "file://%s" % raw_query
-      result[Vermilion.DISPLAY_NAME] = "%s Result" % raw_query
+      result[Vermilion.IDENTIFIER] = "file:///dev/null"
+      result[Vermilion.DISPLAY_NAME] = "%s Result" % query.normalized_query
+      result[Vermilion.TYPE] = "python.test.type"
       result["CustomKey"] = "CustomValue"
       results.append(result)
       query.SetResults(results)
