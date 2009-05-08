@@ -57,6 +57,16 @@
   return self;
 }
 
+- (id)initWithWindowNibName:(NSString *)windowNibName {
+  self = [self initWithWindowNibName:windowNibName parentWindow:nil];
+  return self;
+}
+
+- (id)init {
+  self = [self initWithWindowNibName:nil parentWindow:nil];
+  return self;
+}
+
 - (void)dealloc {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self];
@@ -76,8 +86,6 @@
          selector:@selector(parentWindowMoved:) 
              name:NSWindowDidMoveNotification 
            object:parentWindow_];
-  
-  // FOR AN EXAMPLE OF SHOWING A WINDOW SEE showResultsWindow
 }
 
 - (void)close {

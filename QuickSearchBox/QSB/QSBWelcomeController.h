@@ -32,15 +32,21 @@
 
 #import <Cocoa/Cocoa.h>
 
-
+// A window controller that manages its window as a child window of another
+// window.  The child window is kept positioned relative to the parent
+// window as the parent is moved by centering the child horizontally
+// and tucking the child just below the parent such that the parent overlaps
+// the child a bit.
 @interface QSBWelcomeController : NSWindowController {
  @private
   __weak NSWindow *parentWindow_;
 }
 
+// Designated initializer.  |parentWindow| is required.
 - (id)initWithWindowNibName:(NSString *)windowNibName
                parentWindow:(NSWindow *)parentWindow;
 
+// Hide the window associated with this controller using animation.
 - (void)setHidden:(BOOL)hidden;
 
 @end

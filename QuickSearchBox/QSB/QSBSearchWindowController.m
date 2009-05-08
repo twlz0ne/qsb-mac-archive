@@ -1644,17 +1644,13 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (void)closeWelcomeWindow {
   QSBWelcomeController *welcomeController = [self welcomeController];
-  if (welcomeController) {
-    [welcomeController close];
-    [self setWelcomeController:nil];
-  }
+  [welcomeController close];
+  [self setWelcomeController:nil];
 }
 
 - (void)setWelcomeHidden:(BOOL)hidden {
   QSBWelcomeController *welcomeController = [self welcomeController];
-  if (welcomeController) {
-    [welcomeController setHidden:hidden];
-  }
+  [welcomeController setHidden:hidden];
 }
 
 @end
