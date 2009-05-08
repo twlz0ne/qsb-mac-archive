@@ -40,6 +40,7 @@
 @class QSBCustomPanel;
 @class QSBSearchViewController;
 @class CAAnimation;
+@class QSBWelcomeController;
 
 const NSTimeInterval kQSBAppearDelay;
 
@@ -73,7 +74,10 @@ const NSTimeInterval kQSBAppearDelay;
   NSArray *corpora_;
   // Our last visibility change userinfo dictionary for notifications
   NSDictionary *visibilityChangedUserInfo_;
+  // The welcome window controller.
+  QSBWelcomeController *welcomeController_;
 }
+
 @property(nonatomic, retain) QSBSearchViewController *activeSearchViewController;
 
 // Designated initializer

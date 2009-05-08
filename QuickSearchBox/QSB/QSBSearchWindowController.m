@@ -53,6 +53,7 @@
 #import "GTMNSAppleEventDescriptor+Foundation.h"
 #import "NSString+CaseInsensitive.h"
 #import "QSBTableResult.h"
+#import "QSBWelcomeController.h"
 
 static const NSTimeInterval kQSBShowDuration = 0.1;
 static const NSTimeInterval kQSBHideDuration = 0.3;
@@ -76,8 +77,8 @@ static NSString * const kQSBSearchWindowFrameLeftPrefKey
 static NSString * const kQSBUserPrefBackgroundColorKey = @"backgroundColor";
 static NSString * const kQSBQueryStringKey = @"queryString";
 
-static NSString * const kQSBMainInterfaceNibName
-  = @"MainInterfaceNibName";
+static NSString * const kQSBMainInterfaceNibName = @"MainInterfaceNibName";
+static NSString * const kQSBWelcomeWindowNibName = @"WelcomeWindow";
 
 // NSNumber value in seconds that controls how fast the QSB clears out
 // an old query once it's put in the background.
@@ -92,6 +93,9 @@ static const unichar kZeroWidthNoBreakSpace = 0xFEFF;
 static const NSInteger kBaseCorporaTagValue = 10000;
   
 @interface QSBSearchWindowController ()
+
+@property (nonatomic, retain) QSBWelcomeController *welcomeController;
+
 - (void)updateLogoView;
 - (void)updateImageView;
 - (BOOL)firstLaunch;
@@ -171,12 +175,23 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 - (void)updatePivotToken;
 
 - (void)hideSearchWindowBecause:(NSString *)toggle;
+
+// Presents the welcome window.
+- (void)showWelcomeWindow;
+
+// Closes and disposes of the welcome window and its controller.
+- (void)closeWelcomeWindow;
+
+// Change the visibility of the welcome window.
+- (void)setWelcomeHidden:(BOOL)hidden;
+
 @end
 
 
 @implementation QSBSearchWindowController
 
 @synthesize activeSearchViewController = activeSearchViewController_;
+@synthesize welcomeController = welcomeController_;
 
 GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
 GTM_METHOD_CHECK(NSObject, 
@@ -352,6 +367,7 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
   [activeSearchViewController_ release];
   [corpora_ release];
   [visibilityChangedUserInfo_ release];
+  [welcomeController_ release];
   [super dealloc];
 }
 
@@ -376,8 +392,12 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
   [NSObject cancelPreviousPerformRequestsWithTarget:self
                                            selector:@selector(displayResults:)
                                              object:nil];
+  
   if ([activeSearchViewController_ queryString]
       || [activeSearchViewController_ results]) {
+    // Dispose of the welcome window if it is being shown.
+    [self closeWelcomeWindow];
+
     BOOL likelyResult = [[self selection] rank] > 1.0;
     NSTimeInterval delay 
       = likelyResult ? kQSBLongerAppearDelay : kQSBAppearDelay;
@@ -925,6 +945,7 @@ doCommandBySelector:(SEL)commandSelector {
   [NSAnimationContext beginGrouping];
   [[NSAnimationContext currentContext] setDuration:kQSBShowDuration];
   [[searchWindow animator] setAlphaValue:1.0];
+  [self setWelcomeHidden:NO];
   [NSAnimationContext endGrouping];
   
   if ([[activeSearchViewController_ queryString] length]) {
@@ -985,6 +1006,7 @@ doCommandBySelector:(SEL)commandSelector {
   }  else {
     [NSAnimationContext beginGrouping];
     [self hideResultsWindow];
+    [self setWelcomeHidden:YES];
     [[NSAnimationContext currentContext] setDuration:kQSBHideDuration];
     [[searchWindow animator] setAlphaValue:0.0];
     [NSAnimationContext endGrouping];    
@@ -1166,10 +1188,9 @@ doCommandBySelector:(SEL)commandSelector {
 
 #pragma mark NSApplication Notification Methods
 
-
-
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
-  if ([NSApp keyWindow] == nil) {
+  if ([NSApp keyWindow] == nil
+      || [NSApp keyWindow] == [[self welcomeController] window]) {
     [self showSearchWindowBecause:kQSBActivationChangeVisiblityToggle];
   }
 }
@@ -1187,7 +1208,6 @@ doCommandBySelector:(SEL)commandSelector {
     }
   }
 }
-
 
 - (void)applicationDidChangeScreenParameters:(NSNotification *)notification {
   if ([[self window] isVisible]) {
@@ -1215,9 +1235,20 @@ doCommandBySelector:(SEL)commandSelector {
     = [processDict valueForKey:kGTMWorkspaceRunningIsHidden];
   
   if (![doNotActivateOnStartup boolValue]) {
+    // During startup we may inadvertently be made inactive, most likely due
+    // to keychain access requests, so let's just force ourself to be
+    // active.
+    id notificationObject = [notification object];
+    if ([notificationObject isKindOfClass:[NSApplication class]]) {
+      NSApplication *application = notificationObject;
+      [application activateIgnoringOtherApps:YES];
+    }
     // UI elements don't get activated by default, so if the user launches
     // us from the finder, and we are a UI element, force ourselves active.
     [self showSearchWindowBecause:kQSBAppLaunchedChangeVisiblityToggle];
+    if ([self firstLaunch]) {
+      [self showWelcomeWindow];
+    }
   }
 }
 
@@ -1597,6 +1628,33 @@ doCommandBySelector:(SEL)commandSelector {
     }
   }
   return proposedFrame;
+}
+
+#pragma mark Welcome Window
+
+- (void)showWelcomeWindow {
+  QSBWelcomeController *welcomeController
+    = [[[QSBWelcomeController alloc]
+       initWithWindowNibName:kQSBWelcomeWindowNibName
+                parentWindow:[self window]] autorelease];
+  [self setWelcomeController:welcomeController];
+  HGSAssert(welcomeController, @"Failed to load WelcomeWindow.nib.");
+  [welcomeController window];  // Force the nib to load.
+}
+
+- (void)closeWelcomeWindow {
+  QSBWelcomeController *welcomeController = [self welcomeController];
+  if (welcomeController) {
+    [welcomeController close];
+    [self setWelcomeController:nil];
+  }
+}
+
+- (void)setWelcomeHidden:(BOOL)hidden {
+  QSBWelcomeController *welcomeController = [self welcomeController];
+  if (welcomeController) {
+    [welcomeController setHidden:hidden];
+  }
 }
 
 @end
