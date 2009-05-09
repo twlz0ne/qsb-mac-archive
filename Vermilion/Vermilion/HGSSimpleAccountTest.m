@@ -260,9 +260,6 @@ static NSString *const kServiceName
   [account setAuthenticated:YES];
   authenticated = [account isAuthenticated];
   STAssertTrue(authenticated, nil);
-  NSURLRequest *urlRequest = [account accountURLRequestForUserName:nil
-                                                       password:nil];
-  STAssertNil(urlRequest, nil);
   
   // Removal
   [account remove];
