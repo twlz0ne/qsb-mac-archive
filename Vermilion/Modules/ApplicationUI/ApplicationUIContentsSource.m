@@ -174,35 +174,37 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
   }
 }
 
+- (BOOL)isValidSourceForQuery:(HGSQuery *)query {
+  return [GTMAXUIElement isAccessibilityEnabled];
+}
+
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
-  if ([GTMAXUIElement isAccessibilityEnabled]) {
-    NSArray *apps = [[NSWorkspace sharedWorkspace] gtm_launchedApplications];
-    pid_t mypid = getpid();
-    NSMutableArray *results = [NSMutableArray array];
-    for (NSDictionary *appInfo in apps) {
-      NSNumber *nspid = [appInfo objectForKey:@"NSApplicationProcessIdentifier"];
-      if (nspid) {
-        pid_t pid = [nspid intValue];
-        if (pid != mypid) {
-          GTMAXUIElement *appElement 
-            = [GTMAXUIElement elementWithProcessIdentifier:pid];
-          NSArray *windows 
-            = [appElement accessibilityAttributeValue:NSAccessibilityWindowsAttribute];
-          if (windows) {
-            for (GTMAXUIElement *window in windows) {
-              NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-              [self addResultsForQuery:operation
-                            fromWindow:window
-                               toArray:results];
-              [pool release];
-              if ([operation isCancelled]) return;
-            }
+  NSArray *apps = [[NSWorkspace sharedWorkspace] gtm_launchedApplications];
+  pid_t mypid = getpid();
+  NSMutableArray *results = [NSMutableArray array];
+  for (NSDictionary *appInfo in apps) {
+    NSNumber *nspid = [appInfo objectForKey:@"NSApplicationProcessIdentifier"];
+    if (nspid) {
+      pid_t pid = [nspid intValue];
+      if (pid != mypid) {
+        GTMAXUIElement *appElement 
+          = [GTMAXUIElement elementWithProcessIdentifier:pid];
+        NSArray *windows 
+          = [appElement accessibilityAttributeValue:NSAccessibilityWindowsAttribute];
+        if (windows) {
+          for (GTMAXUIElement *window in windows) {
+            NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+            [self addResultsForQuery:operation
+                          fromWindow:window
+                             toArray:results];
+            [pool release];
+            if ([operation isCancelled]) return;
           }
         }
       }
     }
-    [operation setResults:results];
   }
+  [operation setResults:results];
 }
    
 - (id)provideValueForKey:(NSString*)key result:(HGSResult*)result {
