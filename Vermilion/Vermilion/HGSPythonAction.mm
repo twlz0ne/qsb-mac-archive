@@ -146,7 +146,8 @@ static const char *const kHGSPythonPerform = "Perform";
     PyObject *pyDirects = [sharedPython tupleForResults:directs];
     PyObject *pyIndirects = [sharedPython tupleForResults:indirects];
     if (pyDirects) {
-      // TODO(hawk): add pivot object to the call
+      [[[NSThread currentThread] threadDictionary]
+       setValue:[self bundle] forKey:kHGSPythonThreadBundleKey];
       PyObject *pythonResult =
         PyObject_CallMethodObjArgs(instance_,
                                    perform_,
@@ -174,6 +175,8 @@ static const char *const kHGSPythonPerform = "Perform";
     HGSPython *sharedPython = [HGSPython sharedPython];
     PyObject *pyResult = [sharedPython tupleForResults:results];
     if (pyResult) {
+      [[[NSThread currentThread] threadDictionary]
+       setValue:[self bundle] forKey:kHGSPythonThreadBundleKey];
       PyObject *pyApplies =
         PyObject_CallMethodObjArgs(instance_,
                                    appliesTo_,

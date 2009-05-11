@@ -40,6 +40,7 @@ from datetime import datetime
 
 try:
   import Vermilion
+  import VermilionLocalize
 except ImportError:
   # Vermilion is provided in native code by the Quick Search
   # runtime. Create a stub Result class here so that we
@@ -76,6 +77,7 @@ class VermilionTest(object):
       result[Vermilion.IDENTIFIER] = "file:///dev/null"
       result[Vermilion.DISPLAY_NAME] = "%s Result" % query.normalized_query
       result[Vermilion.TYPE] = "python.test.type"
+      result[Vermilion.SNIPPET] = VermilionLocalize.String("Localized Value")
       result["CustomKey"] = "CustomValue"
       results.append(result)
       query.SetResults(results)

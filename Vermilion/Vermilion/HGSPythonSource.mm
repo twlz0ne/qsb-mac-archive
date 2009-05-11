@@ -140,6 +140,8 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
                                              withSearchOperation:nil];
       
     if (instance_ && isValidSourceForQuery_ && pyQuery) {
+      [[[NSThread currentThread] threadDictionary]
+       setValue:[self bundle] forKey:kHGSPythonThreadBundleKey];
       PyObject *pyValid =
         PyObject_CallMethodObjArgs(instance_,
                                    isValidSourceForQuery_,
@@ -192,6 +194,8 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
       PythonStackLock gilLock;
       PyObject *performSearchString = PyString_FromString(kPerformSearch);
       if (performSearchString) {
+        [[[NSThread currentThread] threadDictionary]
+         setValue:[[self source] bundle] forKey:kHGSPythonThreadBundleKey];
         PyObject_CallMethodObjArgs(instance,
                                    performSearchString,
                                    query,

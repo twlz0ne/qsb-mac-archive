@@ -104,7 +104,12 @@
   STAssertFalse([op isCancelled], nil);
   
   STAssertNotNil(results_, nil);
-  
+  STAssertEquals([results_ count], (NSUInteger)1, nil);
+  NSString *snippet = [[results_ objectAtIndex:0]
+                       valueForKey:kHGSObjectAttributeSnippetKey];
+  STAssertEqualStrings(snippet, @"Localized Value in English",
+                       @"localized string failed");
+
   PyObject *py = [sharedPython objectForQuery:query
                           withSearchOperation:nil];
   STAssertNotNULL(py, nil);

@@ -240,6 +240,7 @@
 		5A4D237C0F462D2000F5C05B /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A4D237B0F462D2000F5C05B /* libcrypto.dylib */; };
 		5A4D23FC0F4CD22B00F5C05B /* HGSCodeSignature.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A4D23FD0F4CD22B00F5C05B /* HGSCodeSignature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */; };
+		5A5DF3E80FB3780A0068A25D /* Localizable.strings in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A5DF3DC0FB377790068A25D /* Localizable.strings */; };
 		5A61D1CF0F71CEAE007B9111 /* ApplicationsActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A61D1CE0F71CEAE007B9111 /* ApplicationsActions.m */; };
 		5A8A3B120E71BCBB00A0DB4F /* iTunesAlbumBrowserIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B090E71BCBB00A0DB4F /* iTunesAlbumBrowserIcon.png */; };
 		5A8A3B130E71BCBB00A0DB4F /* iTunesArtistBrowserIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B0A0E71BCBB00A0DB4F /* iTunesArtistBrowserIcon.png */; };
@@ -1688,6 +1689,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
+				5A5DF3E80FB3780A0068A25D /* Localizable.strings in CopyFiles */,
 				5AC3E8240F7C2F7300F171EB /* VermilionTest.py in CopyFiles */,
 				8B0D21600F79660400FD4A12 /* RoundRectAndDropShadow.tiff in CopyFiles */,
 			);
@@ -1806,6 +1808,7 @@
 		5A4D237B0F462D2000F5C05B /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSCodeSignature.h; sourceTree = "<group>"; };
 		5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCodeSignature.m; sourceTree = "<group>"; };
+		5A5DF3DD0FB377790068A25D /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = Localizable.strings; sourceTree = "<group>"; };
 		5A61D1CE0F71CEAE007B9111 /* ApplicationsActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationsActions.m; sourceTree = "<group>"; };
 		5A8A3B090E71BCBB00A0DB4F /* iTunesAlbumBrowserIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesAlbumBrowserIcon.png; sourceTree = "<group>"; };
 		5A8A3B0A0E71BCBB00A0DB4F /* iTunesArtistBrowserIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesArtistBrowserIcon.png; sourceTree = "<group>"; };
@@ -3116,6 +3119,14 @@
 			path = Screensaver;
 			sourceTree = "<group>";
 		};
+		5A5DF3DB0FB377790068A25D /* English.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				5A5DF3DC0FB377790068A25D /* Localizable.strings */,
+			);
+			path = English.lproj;
+			sourceTree = "<group>";
+		};
 		5AF0EB6A0F6074A00041E0B9 /* Dictionary */ = {
 			isa = PBXGroup;
 			children = (
@@ -3469,6 +3480,7 @@
 		8B0D215D0F7965FE00FD4A12 /* TestData */ = {
 			isa = PBXGroup;
 			children = (
+				5A5DF3DB0FB377790068A25D /* English.lproj */,
 				8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */,
 				5AC3E8230F7C2F6200F171EB /* VermilionTest.py */,
 				8B0D215E0F7965FE00FD4A12 /* RoundRectAndDropShadow.tiff */,
@@ -7770,6 +7782,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		5A5DF3DC0FB377790068A25D /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5A5DF3DD0FB377790068A25D /* English */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		5ACEF2C90F40EBFC007EA38B /* PluginVerifyWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (

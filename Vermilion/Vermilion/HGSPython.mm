@@ -42,6 +42,7 @@
 #import <Python/structmember.h>
 
 const NSString *kHGSPythonPrivateValuesKey = @"kHGSPythonPrivateValuesKey";
+const NSString *kHGSPythonThreadBundleKey = @"HGSPythonThreadBundleKey";
 
 NSString *const kPythonModuleNameKey = @"HGSPythonModule";
 NSString *const kPythonClassNameKey = @"HGSPythonClass";
@@ -73,6 +74,7 @@ static PyObject *QueryGetAttr(Query *self, char *name);
 static int QuerySetAttr(Query *self, char *name, PyObject *value);
 static PyObject *QuerySetResults(Query *self, PyObject *args);
 static PyObject *QueryFinish(Query *self, PyObject *unused);
+static PyObject *LocalizeString(PyObject *self, PyObject *args);
 
 static PyMethodDef QueryMethods[] = {
   {
@@ -153,6 +155,13 @@ static PyTypeObject QueryType = {
   0,                            // tp_del
 };
 
+static PyMethodDef LocalizeMethods[] = {
+  { "String", LocalizeString, METH_VARARGS,
+    "Returns the localized version of a string."
+  },
+  { NULL, NULL, 0, NULL }
+};
+
 // A simple wrapper for PyObject which allows it to be used in
 // Objective-C containers
 @implementation HGSPythonObject
@@ -210,6 +219,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPython, sharedPython);
     Py_SetProgramName(pythonPath);
     Py_InitializeEx(0);
     PyEval_InitThreads();
+    Py_InitModule("VermilionLocalize", LocalizeMethods);
     
     // Release the global intepreter lock (which is automatically
     // locked by PyEval_InitThreads())
@@ -713,4 +723,20 @@ static PyObject *QueryFinish(Query *self, PyObject *unused) {
                                      withObject:nil
                                   waitUntilDone:NO];
   Py_RETURN_NONE;
+}
+
+static PyObject *LocalizeString(PyObject *self, PyObject *args) {
+  char *str;
+  if (!PyArg_ParseTuple(args, "s", &str)) {
+    HGSLogDebug(@"VermilionLocalize.String() requires an argument");
+    return PyString_FromString("");
+  }
+  NSBundle *bundle = [[[NSThread currentThread] threadDictionary]
+                      valueForKey:kHGSPythonThreadBundleKey];
+  NSString *key = [NSString stringWithUTF8String:str];
+  NSString *localized = [bundle localizedStringForKey:key value:@"" table:nil];
+  if (localized) {
+    return PyString_FromString([localized UTF8String]);
+  }
+  return PyString_FromString(str);
 }

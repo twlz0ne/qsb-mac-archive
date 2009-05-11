@@ -21,6 +21,7 @@ from datetime import datetime
 
 try:
   import Vermilion
+  import VermilionLocalize
 except ImportError:
   # Vermilion is provided in native code by the Quick Search
   # runtime. Create a stub Result class here so that we
@@ -127,9 +128,11 @@ class Screensaver(object):
       else:
         # If the user is searching for "screen saver" or "screensaver",
         # return all of the screen savers
+        screensaver = VermilionLocalize.String("screensaver")
+        screen_saver = VermilionLocalize.String("screen saver")
         raw_query = query.raw_query.lower()
-        if ("screen saver".startswith(raw_query) or
-            "screensaver".startswith(raw_query)):
+        if (screensaver.startswith(raw_query) or
+            screen_saver.startswith(raw_query)):
           for key in self._savers.iterkeys():
             results.append(self.CreateResult(self._savers[key]))
         else:
@@ -170,7 +173,8 @@ class Screensaver(object):
     result = {}
     path, name = entry
     result[Vermilion.IDENTIFIER] = "file://%s" % urllib.quote(path)
-    result[Vermilion.DISPLAY_NAME] = "%s Screen Saver" % name
+    format = VermilionLocalize.String("%s Screen Saver")
+    result[Vermilion.DISPLAY_NAME] = format % name
     result[Vermilion.TYPE] = SCREEN_SAVER_TYPE
     result[SCREEN_SAVER_NAME_KEY] = name
     result[SCREEN_SAVER_PATH_KEY] = path
