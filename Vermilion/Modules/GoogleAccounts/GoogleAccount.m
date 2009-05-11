@@ -159,15 +159,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     NSRange atRange = [userName rangeOfString:@"@"];
     if (atRange.location != NSNotFound) {
       NSString *domainString = [userName substringFromIndex:atRange.location];
-      // TODO(mrossetti): Determine if it is sufficient to test the domain
-      // against '@google.~'.
-      NSComparisonResult result
-        = [kGoogleDomain compare:domainString options:NSCaseInsensitiveSearch];
-      if (result != NSOrderedSame) {
-        result = [kGoogleUKDomain compare:domainString
-                                  options:NSCaseInsensitiveSearch];
-      }
-      if (result == NSOrderedSame) {
+      if ([GoogleAccount isMatchToGoogleDomain:domainString]) {
         accountType = kGoogleCorpAccountType;
       }
     }
@@ -244,6 +236,18 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     }
   }
   return validated;
+}
+
++ (BOOL)isMatchToGoogleDomain:(NSString *)domain {
+  // TODO(mrossetti): Determine if it is sufficient to test the domain
+  // against '@google.~'.
+  NSComparisonResult result
+    = [kGoogleDomain compare:domain options:NSCaseInsensitiveSearch];
+  if (result != NSOrderedSame) {
+    result = [kGoogleUKDomain compare:domain
+                              options:NSCaseInsensitiveSearch];
+  }
+  return (result == NSOrderedSame);
 }
 
 + (BOOL)isPartialMatchToGoogleDomain:(NSString *)domain {

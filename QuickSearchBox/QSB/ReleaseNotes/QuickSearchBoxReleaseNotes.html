@@ -214,6 +214,36 @@
         Allows pivoting on any search or suggestion (eventually for querying
         but for now only for actions)
     </li>
+    <li>
+        <a href="http://code.google.com/p/qsb-mac/issues/detail?id=419">
+        Issue 419</a>: Fixed a problem where activation of the preference
+        window did not show current authentication status (i.e. red text)
+        upon activation.
+    </li>
+    <li>
+        <a href="http://code.google.com/p/qsb-mac/issues/detail?id=390">
+        Issue 390</a>: Looked into why a 'Grab' (cmd-g) would not keep the
+        results window open.  Fixed it by setting showResults_ if there were
+        any results. Then fixed the results being misplaced vertically by
+        using an animator on an instance of setFrame for the window.
+    </li>
+    <li>
+        Added a 'Welcome' window which is presented upon first launch of
+        the Quick Search Box and which will continue to appear until a
+        query is started of the application is quit.
+    </li>
+    <li>
+        <a href="http://code.google.com/p/qsb-mac/issues/detail?id=381">
+        Issue 381</a>: The search box no longer gets hidden at startup if
+        a keychain access authorization was also required at startup.
+    </li>
+    <li>
+        Google corporate accounts (currently, accounts with a domain of
+        'google.com' or 'google.uk.co') are now interpreted as 'hosted'
+        accounts and will allow Google Corpora search sources to be used.
+        In order to get this behaviour it is necessary to remove and
+        re-add the Google corporate account.
+    </li>
  </ul>
 </body>
 </html>

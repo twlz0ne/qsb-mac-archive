@@ -77,6 +77,16 @@
 
 - (IBAction)acceptSetupAccountSheet:(id)sender {
   BOOL isAppsAccount = [self isGoogleAppsAccount];
+  
+  if (!isAppsAccount) {
+    // Special test for Google corporate accounts.
+    NSString *accountName = [self accountName];
+    NSRange atRange = [accountName rangeOfString:@"@"];
+    if (atRange.location != NSNotFound) {
+      NSString *domain = [accountName substringFromIndex:atRange.location];
+      isAppsAccount = [GoogleAccount isMatchToGoogleDomain:domain];
+    }
+  }
   Class accountClass = (isAppsAccount)
                        ? [GoogleAppsAccount class]
                        : [GoogleAccount class];
