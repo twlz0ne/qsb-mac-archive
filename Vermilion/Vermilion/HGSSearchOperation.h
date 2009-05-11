@@ -41,6 +41,10 @@
 @class HGSQuery;
 @class HGSSearchSource;
 
+/*!
+ Combines a search source and a query into an operation that will be executed
+ to get results.
+*/
 @interface HGSSearchOperation : NSObject {
  @private
   BOOL finished_;

@@ -45,9 +45,6 @@
  on global (cross-provider) heuristics. The mixer also handles merging
  duplicate results together (lower ranked into higher ranked).
 */
-// TODO(pinkerton): should it also handle the annotation phase?
-// TODO(pinkerton): needs unit tests badly
-
 @interface HGSMixer : NSObject
 /*!
  Sort and de-dupe |providerArrays| into one results array.
