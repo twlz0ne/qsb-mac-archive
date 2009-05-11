@@ -31,12 +31,9 @@
 //
 
 #import <Vermilion/Vermilion.h>
-#import <CoreServices/CoreServices.h>
-#import <Carbon/Carbon.h>
 
-extern NSString *kDictionaryRangeLocationKey;
-extern NSString *kDictionaryRangeLengthKey;
 extern NSString *kDictionaryTermKey;
+static NSString *const kDictUrlFormat = @"dict://%@";
 
 @interface ShowInDictionaryAction : HGSAction
 - (BOOL)performWithInfo:(NSDictionary*)info;
@@ -48,15 +45,17 @@ extern NSString *kDictionaryTermKey;
   HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
   for (HGSResult *result in directObjects) {
-    CFRange range;
-    range.location = [[result valueForKey:kDictionaryRangeLocationKey] intValue];
-    range.length = [[result valueForKey:kDictionaryRangeLengthKey] intValue];
+    // We were useing HIDictionaryWindowShow(), but randoom crashes in that
+    // function caused a switch to using a dict:// URL (which gives us the
+    // exact behavior we want anyway)
     NSString *term = [result valueForKey:kDictionaryTermKey];
-    CGPoint origin = { 0, 0 };
-    if (range.location != kCFNotFound && range.length != kCFNotFound &&
-        [term isKindOfClass:[NSString class]]) {
-      HIDictionaryWindowShow(NULL, (CFTypeRef)term, range, NULL,
-                             origin, NO,  NULL);
+    if ([term isKindOfClass:[NSString class]] && [term length]) {
+      NSString *escapedTerm =
+        [term stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+      NSString *dictURLString
+        = [NSString stringWithFormat:kDictUrlFormat, escapedTerm];
+      NSURL *dictURL = [NSURL URLWithString:dictURLString];
+      [[NSWorkspace sharedWorkspace] openURL:dictURL];
     }
   }
 
