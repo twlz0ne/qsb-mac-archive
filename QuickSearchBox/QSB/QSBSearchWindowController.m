@@ -672,7 +672,15 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
 }
 
 - (BOOL)insertNewlineQSB {
-  [self openResultsTableItem:nil];
+  // We need to let our fast sources have a chance to get to the query
+  // In the case of a really fast typist, they can sometimes overwhelm our
+  // event queue. This delay is enough to give our initial results a chance
+  // to populate the table before we select something.
+  [NSTimer scheduledTimerWithTimeInterval:0.1
+                                   target:self 
+                                 selector:@selector(openResultsTableItem:) 
+                                 userInfo:NULL 
+                                  repeats:NO];
   return YES;
 }
 
@@ -1258,8 +1266,6 @@ doCommandBySelector:(SEL)commandSelector {
   NSString *queryString = [[obj object] stringValue];
   if (![queryString length]) {
     queryString = nil;
-  } else {
-    termChangedAndAwaitingAction_ = YES;
   }
 
   [activeSearchViewController_ setQueryString:queryString];

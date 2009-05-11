@@ -67,8 +67,6 @@ const NSTimeInterval kQSBAppearDelay;
   NSTimer *findPasteBoardChangedTimer_;
   BOOL insertFindPasteBoardString_;  // should we use the find pasteboard string
   BOOL showResults_;
-  // YES after search text changes but results not yet acted upon.
-  BOOL termChangedAndAwaitingAction_;
   CAAnimation *searchWindowSetAlphaAnimation_;
   // Our list of corpora for the searchMenu
   NSArray *corpora_;
