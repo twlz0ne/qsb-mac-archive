@@ -204,7 +204,7 @@
 		<key>kHGSCorporaSourceAttributeHideCorpus</key>
 		<true/>
 		<key>kHGSCorporaSourceAttributeIconNameKey</key>
-		<string>search-site-icon</string>
+		<string>googlecom</string>
 		<key>kHGSObjectAttributeSearchInline</key>
 		<true/>
 		<key>kHGSObjectAttributeInlineBrowserLimit</key>

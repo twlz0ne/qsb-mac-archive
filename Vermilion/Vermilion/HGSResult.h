@@ -104,10 +104,10 @@ extern NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey;  // NS
 #define kHGSTypeWebpage @"webpage"
 #define kHGSTypeOnebox  @"onebox"
 #define kHGSTypeAction  @"action"
-#define kHGSTypeSuggest @"suggestion"
-#define kHGSTypeSearch  @"search"
-#define kHGSTypeScript  @"script"
 #define kHGSTypeText    @"text"
+#define kHGSTypeScript  @"script"
+#define kHGSTypeSearch           HGS_SUBTYPE(kHGSTypeText, @"search")
+#define kHGSTypeSuggest          HGS_SUBTYPE(kHGSTypeText, @"suggestion")
 #define kHGSTypeDirectory        HGS_SUBTYPE(kHGSTypeFile, @"directory")
 #define kHGSTypeTextFile         HGS_SUBTYPE(kHGSTypeFile, @"text")
 #define kHGSTypeFileApplication  HGS_SUBTYPE(kHGSTypeFile, @"application")

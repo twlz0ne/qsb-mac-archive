@@ -143,18 +143,6 @@
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
-			<string>FileSystemOpenWithAction</string>
-			<key>HGSExtensionPoint</key>
-			<string>HGSActionsExtensionPoint</string>
-			<key>HGSExtensionUserVisibleName</key>
-			<string>^Open With…</string>
-			<key>HGSActionDirectObjectTypes</key>
-			<string>*</string>
-			<key>HGSExtensionIdentifier</key>
-			<string>com.google.filesystem.action.openwith</string>
-		</dict>
-		<dict>
-			<key>HGSExtensionClass</key>
 			<string>FileSystemEjectAction</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
