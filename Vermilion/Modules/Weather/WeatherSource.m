@@ -42,6 +42,8 @@ static NSString *const kWeatherResultURL
 @interface WeatherSource : HGSCallbackSearchSource {
  @private
   NSCharacterSet *nonDigitSet_;
+  NSPredicate *canadianPostalCodePredicate_;
+  NSPredicate *britishPostalCodePredicate_;
 }
 @end
 
@@ -51,13 +53,27 @@ static NSString *const kWeatherResultURL
   if ((self = [super initWithConfiguration:configuration])) {
     nonDigitSet_
       = [[[NSCharacterSet decimalDigitCharacterSet] invertedSet] retain];
+    NSString *canadianPostalCodeRE 
+      = @"^[:letter:][0-9][:letter:]\\s?[0-9][:letter:][0-9]$";
+    canadianPostalCodePredicate_ 
+      = [[NSPredicate predicateWithFormat:@"SELF MATCHES %@", 
+          canadianPostalCodeRE] retain];
+    // TODO(dmaclach): Add support for SAN[ ]{0,1}TA1 once 1691089 is fixed.
+    NSString *britishPostalCodeRE
+      = @"^([A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]|[A-HK-Y][0-9]([0-9]|"
+        @"[ABEHMNPRV-Y]))|[0-9][A-HJKS-UW])[ ]{0,1}[0-9]"
+        @"[ABD-HJLNP-UW-Z]{2})$";
+    britishPostalCodePredicate_ 
+      = [[NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", 
+          britishPostalCodeRE] retain];
   }
   return self;
 }
 
 - (void)dealloc {
   [nonDigitSet_ release];
-  
+  [canadianPostalCodePredicate_ release];
+  [britishPostalCodePredicate_ release];
   [super dealloc];
 }
 
@@ -72,20 +88,9 @@ static NSString *const kWeatherResultURL
       NSRange range = [rawQuery rangeOfCharacterFromSet:nonDigitSet_];
       isValid = (range.location == NSNotFound);
     } else if (len > 5 && len <= 8) {
-      NSString *canadianPostalCodeRE 
-        = @"^[:letter:][0-9][:letter:]\\s?[0-9][:letter:][0-9]$";
-      NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", 
-                           canadianPostalCodeRE];
-      isValid = [pred evaluateWithObject:rawQuery];
+      isValid = [canadianPostalCodePredicate_ evaluateWithObject:rawQuery];
       if (!isValid) {
-        // TODO(dmaclach): Add support for SAN[ ]{0,1}TA1 once 1691089 is fixed.
-        NSString *britishPostalCodeRE
-          = @"^([A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]|[A-HK-Y][0-9]([0-9]|"
-            @"[ABEHMNPRV-Y]))|[0-9][A-HJKS-UW])[ ]{0,1}[0-9]"
-            @"[ABD-HJLNP-UW-Z]{2})$";
-        pred = [NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", 
-                             britishPostalCodeRE];
-        isValid = [pred evaluateWithObject:rawQuery];
+        isValid = [britishPostalCodePredicate_ evaluateWithObject:rawQuery];
       }
     } else {
       NSString *localizedPrefix = HGSLocalizedString(@"weather ", 
