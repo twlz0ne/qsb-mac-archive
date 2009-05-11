@@ -206,11 +206,12 @@ static NSString *const kiPhoneReferenceDocSetPath
 
 #pragma mark -
 
-- (void)performSearchOperation:(HGSSearchOperation *)operation {
-  HGSQuery *query = [operation query];
+- (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   NSString *queryString = [query rawQueryString];
-  if ([queryString length] < 4) return;
-  
+  return [queryString length] >= 4 ? YES : NO;
+}
+
+- (void)performSearchOperation:(HGSSearchOperation *)operation {
   // make sure we're done any parsing
   [condition_ lock];
   while (!indexed_) {
