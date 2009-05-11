@@ -177,22 +177,14 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
 
 - (id)initWithQuery:(HGSQuery*)query
              source:(HGSPythonSource *)source {
-  self = [super initWithQuery:query];
-  if (self) {
-    source_ = [source retain];
-  }
+  self = [super initWithQuery:query source:source];
   return self;
-}
-
-- (void)dealloc {
-  [source_ release];
-  [super dealloc];
 }
 
 - (void)main {
   BOOL running = NO;
-  
-  if ([source_ instance]) {
+  PyObject *instance = [(HGSPythonSource*)[self source] instance];
+  if (instance) {
     HGSQuery *hgsQuery = [self query];
     PyObject *query = [[HGSPython sharedPython] objectForQuery:hgsQuery
                                            withSearchOperation:self];
@@ -200,7 +192,7 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
       PythonStackLock gilLock;
       PyObject *performSearchString = PyString_FromString(kPerformSearch);
       if (performSearchString) {
-        PyObject_CallMethodObjArgs([source_ instance],
+        PyObject_CallMethodObjArgs(instance,
                                    performSearchString,
                                    query,
                                    nil);
@@ -234,10 +226,6 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
 
 - (BOOL)isConcurrent {
   return YES;
-}
-
-- (HGSPythonSource *)source {
-  return source_;
 }
 
 @end

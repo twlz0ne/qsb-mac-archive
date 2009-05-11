@@ -41,6 +41,10 @@
 #import "HGSLog.h"
 #import "HGSBundle.h"
 #import "GTMDebugThreadValidation.h"
+#import "HGSOperation.h"
+#import "HGSMemorySearchSource.h"
+#import "GTMObjectSingleton.h"
+#import <mach/mach_time.h>
 
 NSString *kHGSQueryControllerWillStartNotification 
   = @"HGSQueryControllerWillStartNotification";
@@ -62,6 +66,16 @@ static CFStringRef ResultsDictionaryCopyDescriptionCallBack(const void *value);
 static Boolean ResultsDictionaryEqualCallBack(const void *value1, 
                                        const void *value2);
 static CFHashCode ResultsDictionaryHashCallBack(const void *value);
+
+@interface HGSSourceRanker : NSObject {
+ @private
+  NSMutableDictionary *rankDictionary_;
+}
++ (HGSSourceRanker *)sharedSourceRanker;
+- (void)addTimeDataPoint:(UInt64)machTime 
+               forSource:(HGSSearchSource *)source;
+- (NSArray *)orderedSources;
+@end
 
 @interface HGSQueryController()
 + (NSString *)categoryForType:(NSString *)type;
@@ -87,6 +101,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     pendingQueryOperations_ = [[NSMutableArray alloc] init];
     parsedQuery_ = [query retain];
     mixer_ = [mixer retain];
+    operationStartTimes_ = [[NSMutableDictionary alloc] init];
     CFDictionaryKeyCallBacks keyCallBacks = {
       0,
       ResultsDictionaryRetainCallBack,
@@ -109,7 +124,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   [self cancel];
   [rankedResults_ release];
   [slowSourceTimer_ invalidate];
-  [slowSourceTimer_ release];
+  [operationStartTimes_ release];
   [queryOperations_ release];
   [parsedQuery_ release];
   [pendingQueryOperations_ release];
@@ -123,15 +138,20 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
 - (void)startQuery {
   // Spin through the Sources checking to see if they are valid for the source
   // and kick off the SearchOperations.  
-  HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
+  HGSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kHGSQueryControllerWillStartNotification object:self];
-  for (HGSSearchSource *source in [sourcesPoint extensions]) {
+  HGSSourceRanker *sourceRanker = [HGSSourceRanker sharedSourceRanker];
+  for (HGSSearchSource *source in [sourceRanker orderedSources]) {
     // Check if the source likes the query string
     if ([source isValidSourceForQuery:parsedQuery_]) {
       HGSSearchOperation* operation;
       operation = [source searchOperationForQuery:parsedQuery_];
       if (operation) {
+        [nc addObserver:self 
+               selector:@selector(searchOperationWillStart:)
+                   name:kHGSSearchOperationWillStartNotification
+                 object:operation];
         [nc addObserver:self 
                selector:@selector(searchOperationDidFinish:) 
                    name:kHGSSearchOperationDidFinishNotification 
@@ -143,7 +163,11 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
         [queryOperations_ addObject:operation];
         [pendingQueryOperations_ addObject:operation];
         
-        [operation startQuery];
+        NSOperation *nsOp = [operation searchOperation];
+        [nsOp setQueuePriority:NSOperationQueuePriorityVeryHigh];
+        [queue addOperation:nsOp];
+        [nc postNotificationName:kHGSSearchOperationDidQueueNotification 
+                          object:operation];
       }
     }
   }
@@ -160,15 +184,16 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     NSTimeInterval slowSourceTimeout
       = [sd doubleForKey:kQuerySlowSourceTimeoutSecondsPrefKey];
     slowSourceTimer_
-      = [[NSTimer scheduledTimerWithTimeInterval:slowSourceTimeout
-                                          target:self
-                                        selector:@selector(cancelPendingSearchOperations:)
-                                        userInfo:nil
-                                         repeats:NO] retain];
+      = [NSTimer scheduledTimerWithTimeInterval:slowSourceTimeout
+                                         target:self
+                                       selector:@selector(cancelPendingSearchOperations:)
+                                       userInfo:nil
+                                        repeats:NO];
   }
 }
 
 - (void)cancelPendingSearchOperations:(NSTimer*)timer {
+  slowSourceTimer_ = nil;
   if ([self queriesFinished]) return;
 
   NSUserDefaults *sd = [NSUserDefaults standardUserDefaults];
@@ -257,7 +282,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     NSArray* operationResultArrays = [nsSourceResults allValues];
     // mix and de-dupe
     NSMutableArray* results = [mixer_ mix:operationResultArrays
-                                    query:parsedQuery_];
+                                queryController:self];
 
     rankedResults_ = [results retain];
   }
@@ -334,6 +359,14 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
           
 #pragma mark Notifications
 
+- (void)searchOperationWillStart:(NSNotification *)notification {
+  HGSSearchOperation *operation = [notification object];
+  UInt64 startTime = mach_absolute_time();
+  NSNumber *nsStartTime = [NSNumber numberWithUnsignedLongLong:startTime];
+  [operationStartTimes_ setObject:nsStartTime
+                           forKey:[[operation source] identifier]];
+}
+
 //
 // -searchOperationDidFinish:
 //
@@ -349,12 +382,16 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
             [operation description]);
 
   [pendingQueryOperations_ removeObject:operation];
-  
+  HGSSearchSource *source = [operation source];
+  NSString *sourceID = [source identifier];
+  NSNumber *startTime = [operationStartTimes_ objectForKey:sourceID];
+  UInt64 deltaTime = mach_absolute_time() - [startTime unsignedLongLongValue];
+  [[HGSSourceRanker sharedSourceRanker] addTimeDataPoint:deltaTime
+                                               forSource:source];  
   // If this is the last query operation to complete then report as overall
   // query completion and cancel our timer.
   if ([self queriesFinished]) {
     [slowSourceTimer_ invalidate];
-    [slowSourceTimer_ release];
     slowSourceTimer_ = nil;
 
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -416,3 +453,99 @@ CFHashCode ResultsDictionaryHashCallBack(const void *value) {
   return (CFHashCode)value;
 }
 
+// Keep track of the average running time for a given source.
+// These are stored by HGSSourceRanker in it's rankDictionary keyed
+// by source identifier. In the future we may use other criteria to determine
+// the order in which to run sources (such as rank relevancy).
+@interface HGSSourceRankerDataPoint : NSObject {
+ @private
+  UInt64 runTime_;
+  NSUInteger entries_;
+}
+- (void)addTimeDataPoint:(UInt64)machTime;
+- (UInt64)averageTime;
+@end
+
+NSInteger HGSSourceRankerSort(id src1, id src2, void *rankDict) {
+  HGSSearchSource *source1 = (HGSSearchSource *)src1;
+  HGSSearchSource *source2 = (HGSSearchSource *)src2;
+  NSDictionary *rankDictionary = (NSDictionary *)rankDict;
+  NSString *id1 = [source1 identifier];
+  NSString *id2 = [source2 identifier];
+  HGSSourceRankerDataPoint *dp1 = [rankDictionary objectForKey:id1];
+  HGSSourceRankerDataPoint *dp2 = [rankDictionary objectForKey:id2];
+  UInt64 time1 = [dp1 averageTime];
+  UInt64 time2 = [dp2 averageTime];
+  NSInteger order = NSOrderedSame;
+  if (time1 > time2) {
+    order = NSOrderedDescending;
+  } else if (time2 < time1) {
+    order = NSOrderedAscending;
+  } else if (time1 == 0 && time2 == 0) {
+    // If we have no data on either of them, run memory search sources first.
+    // This will mainly apply for our first searches we run.
+    Class memSourceClass = [HGSMemorySearchSource class]; 
+    BOOL src1IsMemorySource = [source1 isKindOfClass:memSourceClass];
+    BOOL src2IsMemorySource = [source2 isKindOfClass:memSourceClass];
+    if (src1IsMemorySource && !src2IsMemorySource) {
+      order = NSOrderedAscending;
+    } else if (!src1IsMemorySource && src2IsMemorySource) {
+      order = NSOrderedDescending;
+    }
+  }
+  return order;
+}
+    
+@implementation HGSSourceRanker
+GTMOBJECT_SINGLETON_BOILERPLATE(HGSSourceRanker, sharedSourceRanker);
+
+- (id)init {
+  if ((self = [super init])) {
+    rankDictionary_ = [[NSMutableDictionary alloc] init];
+  }
+  return self;
+}
+
+- (void)dealloc {
+  [rankDictionary_ release];
+  [super dealloc];
+}
+
+- (void)addTimeDataPoint:(UInt64)machTime 
+               forSource:(HGSSearchSource *)source {
+  NSString *sourceID = [source identifier];
+  @synchronized (self) {
+    HGSSourceRankerDataPoint *dp = [rankDictionary_ objectForKey:sourceID];
+    if (!dp) {
+      dp = [[HGSSourceRankerDataPoint alloc] init];
+      [rankDictionary_ setObject:dp forKey:sourceID];
+    }
+    [dp addTimeDataPoint:machTime];
+  }
+}
+
+- (NSArray *)orderedSources {
+  HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
+  NSMutableArray *sources = [[[sourcesPoint extensions] mutableCopy] autorelease];
+  @synchronized (self) {
+    [sources sortUsingFunction:HGSSourceRankerSort context:rankDictionary_];
+  }
+  return sources;
+}
+@end
+
+@implementation HGSSourceRankerDataPoint
+- (void)addTimeDataPoint:(UInt64)machTime {
+  runTime_ += machTime;
+  entries_ += 1;
+}
+
+- (UInt64)averageTime {
+  return runTime_ / entries_;
+}
+
+- (NSString *)description {
+  return [NSString stringWithFormat:@"averageTime: %llu (runTime: %llu entries "
+          @"%lu)", [self averageTime], runTime_, entries_];
+}
+@end

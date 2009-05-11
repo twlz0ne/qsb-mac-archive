@@ -35,16 +35,17 @@
 #import "HGSOperation.h"
 #import "HGSLog.h"
 
-
-NSString *kHGSSearchOperationWillStartNotification 
+NSString *const kHGSSearchOperationDidQueueNotification
+  = @"HGSSearchOperationDidQueueNotification";
+NSString *const kHGSSearchOperationWillStartNotification 
   = @"HGSSearchOperationWillStartNotification";
-NSString *kHGSSearchOperationDidFinishNotification 
+NSString *const kHGSSearchOperationDidFinishNotification 
   = @"HGSSearchOperationDidFinishNotification";
-NSString *kHGSSearchOperationDidUpdateResultsNotification 
+NSString *const kHGSSearchOperationDidUpdateResultsNotification 
   = @"HGSSearchOperationDidUpdateResultsNotification";
-NSString *kHGSSearchOperationWasCancelledNotification
+NSString *const kHGSSearchOperationWasCancelledNotification
   = @"HGSSearchOperationWasCancelledNotification";
-NSString *kHGSSearchOperationNotificationResultsKey
+NSString *const kHGSSearchOperationNotificationResultsKey
    = @"HGSSearchOperationNotificationResultsKey";
 
 @interface NSNotificationCenter (HGSSearchOperation)
@@ -54,16 +55,28 @@ NSString *kHGSSearchOperationNotificationResultsKey
                                     userInfo:(NSDictionary *)info;
 @end
 
+@interface HGSSearchOperation ()
+@property (assign, getter=isFinished) BOOL finished;
+@end
+
 @implementation HGSSearchOperation
 
-- (id)initWithQuery:(HGSQuery*)query {
+@synthesize source = source_;
+@synthesize query = query_;
+@synthesize finished = finished_;
+@dynamic concurrent;
+@dynamic cancelled;
+
+- (id)initWithQuery:(HGSQuery*)query source:(HGSSearchSource *)source {
   if ((self = [super init])) {
+    source_ = [source retain];
     query_ = [query retain]; 
   }
   return self;
 }
 
 - (void)dealloc {
+  [source_ release];
   [operation_ release];
   [query_ release];
   [super dealloc];
@@ -71,10 +84,6 @@ NSString *kHGSSearchOperationNotificationResultsKey
 
 - (BOOL)isConcurrent {
   return NO;
-}
-
-- (BOOL)isFinished {
-  return queryFinished_;
 }
 
 - (void)cancel {
@@ -96,16 +105,12 @@ NSString *kHGSSearchOperationNotificationResultsKey
   return queryCancelled_ || [operation_ isCancelled];
 }
 
-- (HGSQuery *)query {
-  return query_;
-}
-
 // call to replace the results of the operation with something more up to date.
 // Threadsafe, can be called from any thread. Tells observers about the
 // presence of new results on the main thread.
 - (void)setResults:(NSArray*)results {
   if ([self isCancelled]) return;
-  HGSAssert(!queryFinished_, @"setting results after the query is done?");
+  HGSAssert(![self isFinished], @"setting results after the query is done?");
   // No point in telling the observers there weren't results.  The source
   // should be calling finishQuery shortly to let it know it's done.
   if ([results count] == 0) return;
@@ -134,7 +139,7 @@ NSString *kHGSSearchOperationNotificationResultsKey
     }
     // Make sure it's been marked as finished since it probably won't do that on
     // it's own now.
-    if (!queryFinished_) {
+    if (![self isFinished]) {
       [self finishQuery];
     }
   }
@@ -142,7 +147,9 @@ NSString *kHGSSearchOperationNotificationResultsKey
   
 - (void)queryOperation:(id)ignored {
   if (![self isCancelled]) {
-
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationWillStartNotification
+                                      object:self];
     if ([self isConcurrent]) {
       // Concurrents were queued just to get things started, we bounce to the
       // main loop to actually run them (and they have to call finished when
@@ -171,7 +178,7 @@ NSString *kHGSSearchOperationNotificationResultsKey
 }
 
 - (void)finishQuery {
-  if (queryFinished_) {
+  if ([self isFinished]) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if ([defaults boolForKey:kHGSValidateSearchSourceBehaviorsPrefKey]) {
       HGSLog(@"ERROR: finishedQuery called more than once for SearchOperation"
@@ -182,19 +189,10 @@ NSString *kHGSSearchOperationNotificationResultsKey
     // Never send the notification twice
     return;
   }
-  
-  queryFinished_ = YES;
+  [self setFinished:YES];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationDidFinishNotification
                                     object:self];
-  
-  if (!wasStarted_) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    if ([defaults boolForKey:kHGSValidateSearchSourceBehaviorsPrefKey]) {
-      HGSLog(@"ERROR: SearchOperation %@ seems to have overridden"
-             @" -startQuery instead of -main.", self);
-    }
-  }
 }
 
 - (void)main {
@@ -218,26 +216,10 @@ NSString *kHGSSearchOperationNotificationResultsKey
   return NSStringFromClass([self class]);
 }
 
-@end
-
-@implementation HGSSearchOperation (DoNotOverride)
-
-- (void)startQuery {
-  // We use this gate to help catch folks that override this instead of putting
-  // their work in main.
-  wasStarted_ = YES;
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationWillStartNotification
-                                    object:self];
-  
-  // We stick everything into the queue so we can get as much started in
-  // parallel as possible.
-  operation_
-    = [[NSInvocationOperation alloc] initWithTarget:self
-                                           selector:@selector(queryOperation:)
-                                             object:nil];
-  NSOperationQueue *operationQueue = [HGSOperationQueue sharedOperationQueue];
-  [operationQueue addOperation:operation_];
+- (NSOperation *)searchOperation {
+  return [[NSInvocationOperation alloc] initWithTarget:self
+                                              selector:@selector(queryOperation:)
+                                                object:nil];
 }
 
 @end

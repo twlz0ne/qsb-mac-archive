@@ -33,82 +33,112 @@
 #import <Foundation/Foundation.h>
 #import "GTMDefines.h"
 
+/*!
+  @header
+  @discussion
+*/
+
 @class HGSQuery;
+@class HGSSearchSource;
 
 @interface HGSSearchOperation : NSObject {
  @private
-  BOOL queryFinished_;
+  BOOL finished_;
   BOOL queryCancelled_;
   NSOperation *operation_;
+  HGSSearchSource *source_;
   HGSQuery *query_;
-  BOOL wasStarted_;
 }
 
-- (id)initWithQuery:(HGSQuery*)query;
+@property (readonly, retain) HGSSearchSource *source;
+@property (readonly, retain) HGSQuery *query;
+/*!
+ Is YES if the source will handle its own threading, or not require a
+ thread at all. The default is for sources to be non-concurrent (a thread will
+ be created on its behalf).
+ */
+@property (readonly, assign, getter=isConcurrent) BOOL concurrent;
+@property (readonly, assign, getter=isFinished) BOOL finished;
+@property (readonly, assign, getter=isCancelled) BOOL cancelled;
 
-// Returns YES if the source will handle its own threading, or not require a
-// thread at all. The default is for sources to be non-concurrent (a thread will
-// be created on its behalf).
-- (BOOL)isConcurrent;
+- (id)initWithQuery:(HGSQuery*)query source:(HGSSearchSource *)source;
 
-// Called to do the actual work and communicate with the search source. The
-// source can periodically call |-setResults| to push the results into the
-// observer and make them available for the UI. |-setResults| must be called at
-// least once, usually at the end of the query, unless there are no results.  If
-// your search operation returns |YES| for isConcurrent, then you *must* call
-// finishQuery when you are complete to single when you are done pushing
-// results.
+/*!
+ Called to do the actual work and communicate with the search source. The
+ source can periodically call |-setResults| to push the results into the
+ observer and make them available for the UI. |-setResults| must be called at
+ least once, usually at the end of the query, unless there are no results.  If
+ your search operation returns |YES| for isConcurrent, then you *must* call
+ finishQuery when you are complete to single when you are done pushing
+ results.
+*/
 - (void)main;
 
-// Call to replace the results of the operation with something more up to date.
-// Threadsafe, can be called from any thread. Tells the observer about the
-// presence of new results on the main thread.
+/*!
+ Call to replace the results of the operation with something more up to date.
+ Threadsafe, can be called from any thread. Tells the observer about the
+ presence of new results on the main thread.
+*/
 - (void)setResults:(NSArray*)results;
 
-// Call to indicate the query has been completed. Tells the observer on the main
-// thread.  This will be called for for the operation is it is NOT concurrent.
-// If an operation returns YES for isConcurrent, then the search operation must
-// call this to notify the source when it is done.
+/*!
+ Call to indicate the query has been completed. Tells the observer on the main
+ thread.  This will be called for for the operation is it is NOT concurrent.
+ If an operation returns YES for isConcurrent, then the search operation must
+ call this to notify the source when it is done.
+*/
 - (void)finishQuery;
 
-// Cancels this operation and clears the observer so no more notification will
-// come in.
+/*!
+ Cancels this operation and clears the observer so no more notification will
+ come in.
+*/
 - (void)cancel;
 
-- (BOOL)isFinished;
-- (BOOL)isCancelled;
-- (HGSQuery*)query;
-@end
-
-@interface HGSSearchOperation (DoNotOverride)
-
-// This is used by the engine to kick off the search operation, it should *NOT*
-// be overridden and instead the work should be done in main.
-- (void)startQuery;
+/*!
+ Returns an NSOperation representing the search.
+*/
+- (NSOperation *)searchOperation;
 
 @end
 
 #pragma mark Notifications
 
-// Posted when a search operation starts
-// Object is the search operation.
-GTM_EXTERN NSString *kHGSSearchOperationWillStartNotification;
+/*!
+ Posted when a search operation is added to the operation Queue.
+ Object is the search operation.
+ */
+GTM_EXTERN NSString *const kHGSSearchOperationDidQueueNotification;
 
-// Posted when the search has completed. May be called even when there are
-// more results that are possible, but the search has been stopped by the
-// user or by the search reaching a time threshhold. 
-// Object is the search operation.
-GTM_EXTERN NSString *kHGSSearchOperationDidFinishNotification;
+/*!
+ Posted when a search operation starts.
+ Object is the search operation.
+*/
+GTM_EXTERN NSString *const kHGSSearchOperationWillStartNotification;
 
-// Posted when a search operation is cancelled
-// Object is the search operation
-GTM_EXTERN NSString *kHGSSearchOperationWasCancelledNotification;
+/*!
+ Posted when the search has completed. May be called even when there are
+ more results that are possible, but the search has been stopped by the
+ user or by the search reaching a time threshhold. 
+ Object is the search operation.
+ */
+GTM_EXTERN NSString *const kHGSSearchOperationDidFinishNotification;
 
-// Posted when results are updated for this source.
-// Object is the search operation.
-// UserInfo contains HGSSearchOperationNotificationResultsKey
-GTM_EXTERN NSString *kHGSSearchOperationDidUpdateResultsNotification;
+/*!
+ Posted when a search operation is cancelled.
+ Object is the search operation.
+*/
+GTM_EXTERN NSString *const kHGSSearchOperationWasCancelledNotification;
 
-// Key for userinfo of HGSSearchOperationDidUpdateResultsNotification
-// Is an array of the current results.
-GTM_EXTERN NSString *kHGSSearchOperationNotificationResultsKey;
+/*!
+ Posted when results are updated for this source.
+ Object is the search operation.
+ UserInfo contains HGSSearchOperationNotificationResultsKey.
+*/
+GTM_EXTERN NSString *const kHGSSearchOperationDidUpdateResultsNotification;
+
+/*!
+ Key for userinfo of HGSSearchOperationDidUpdateResultsNotification.
+ Is an array of the current results.
+*/
+GTM_EXTERN NSString *const kHGSSearchOperationNotificationResultsKey;

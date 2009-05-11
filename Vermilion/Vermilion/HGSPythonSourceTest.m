@@ -35,6 +35,7 @@
 #import "HGSPythonSource.h"
 #import "HGSQuery.h"
 #import "HGSResult.h"
+#import "HGSOperation.h"
 
 @interface HGSPythonSourceTest : GTMTestCase {
   NSArray *results_;
@@ -88,7 +89,9 @@
                                           source:source] autorelease];
   STAssertNotNil(op, nil);
   
-  [op startQuery];
+  NSOperation *operation = [op searchOperation];
+  NSOperationQueue *operationQueue = [HGSOperationQueue sharedOperationQueue];
+  [operationQueue addOperation:operation];
   
   int loops = 0;
   while (![op isFinished] && loops++ < 20) {

@@ -126,7 +126,8 @@
   
   id searchQueryMock = [OCMockObject mockForClass:[HGSQuery class]];
   HGSSearchOperation *op 
-    = [[[HGSSearchOperation alloc] initWithQuery:searchQueryMock] autorelease];
+    = [[[HGSSearchOperation alloc] initWithQuery:searchQueryMock
+                                          source:memSource] autorelease];
   [[[searchQueryMock stub] andReturn:@"foo"] normalizedQueryString];
   [memSource performSearchOperation:op];
 }

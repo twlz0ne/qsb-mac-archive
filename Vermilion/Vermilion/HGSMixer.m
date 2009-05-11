@@ -31,7 +31,7 @@
 //
 
 #import "HGSMixer.h"
-#import "HGSQuery.h"
+#import "HGSQueryController.h"
 #import "HGSResult.h"
 
 static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
@@ -39,30 +39,31 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
 @interface HGSMixer()
 // these methods can be overridden to customize the behavior of the ranking
 // and de-duping.
-- (void)sortObjectsInSitu:(NSMutableArray*)objects;
-- (NSMutableArray *)mergeDuplicates:(NSArray*)objects;
+- (void)sortObjectsInSitu:(NSMutableArray*)objects
+          queryController:(HGSQueryController*)controller;
+- (NSMutableArray *)mergeDuplicates:(NSArray*)objects
+                    queryController:(HGSQueryController*)controller;
 @end
 
 @implementation HGSMixer
 
-- (NSMutableArray*)mix:(NSArray*)providerArrays query:(HGSQuery*)query {
+- (NSMutableArray*)mix:(NSArray*)providerArrays 
+       queryController:(HGSQueryController*)controller {
   // join all arrays into one big one. If we can normalize the rankings
   // somehow beforehand we can try to just pick off elements from the front
   // of each pre-sorted list, but until then, we just punt and work in one big
   // array.
   NSMutableArray* results = [NSMutableArray array];
-  NSEnumerator* it = [providerArrays objectEnumerator];
-  NSArray* curr = nil;
-  while ((curr = [it nextObject])) {
+  for (NSArray *curr in providerArrays) {
     [results addObjectsFromArray:curr];
   }
   
   // sort in global order
-  [self sortObjectsInSitu:results];
+  [self sortObjectsInSitu:results queryController:controller];
   
   // merge/remove duplicates
   //
-  results = [self mergeDuplicates:results];
+  results = [self mergeDuplicates:results queryController:controller];
   
   return results;
 }
@@ -74,9 +75,11 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
 // relevance sort, but can be overridden to apply multiple sorts or tweak
 // results to taste.
 //
-- (void)sortObjectsInSitu:(NSMutableArray*)objects {
+- (void)sortObjectsInSitu:(NSMutableArray*)objects 
+          queryController:(HGSQueryController*)controller {
   [objects sortUsingFunction:RelevanceCompare context:NULL];
 #if 0
+  if ([controller cancelled]) return;
   // TODO(pinkerton): move this into the regular compare when the name match
   //    bit is set.
   [results sortUsingFunction:NameCompare context:parsedQuery_];
@@ -88,10 +91,12 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
 //
 // merges/removes duplicate results
 //
-- (NSMutableArray *)mergeDuplicates:(NSArray*)results {
+- (NSMutableArray *)mergeDuplicates:(NSArray*)results 
+                    queryController:(HGSQueryController*)controller{
   NSMutableArray *singulars 
     = [NSMutableArray arrayWithCapacity:[results count]];
   for (HGSResult *currentResult in results) {
+    if ([controller cancelled]) break;
     // Check to see if it's a duplicate of any of the confirmed results
     NSUInteger count = [singulars count];
     NSUInteger i;

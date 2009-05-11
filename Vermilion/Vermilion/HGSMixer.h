@@ -30,30 +30,33 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion
+*/
+
 #import <Foundation/Foundation.h>
 
-@class HGSQuery;
+@class HGSQueryController;
 
-//
-// HGSMixer
-//
-// The mixer takes N arrays that are assumed to be internally sorted
-// and mixes them all together into a single array whose ranking is based
-// on global (cross-provider) heuristics. The mixer also handles merging
-// duplicate results together (lower ranked into higher ranked).
-//
+/*!
+ The mixer takes N arrays that are assumed to be internally sorted
+ and mixes them all together into a single array whose ranking is based
+ on global (cross-provider) heuristics. The mixer also handles merging
+ duplicate results together (lower ranked into higher ranked).
+*/
 // TODO(pinkerton): should it also handle the annotation phase?
 // TODO(pinkerton): needs unit tests badly
-//
 
-@interface HGSMixer : NSObject {
-  
-}
-
-// Sort and de-dupe |providerArrays| into one results array.
-// NOTE: if |query| has a max desired results limit set, then only that many
-// elements will be sorted and de-duped. The rest of the results will still be
-// returned (for use in estimating estimation of "More" counts, for example).
-- (NSMutableArray*)mix:(NSArray*)providerArrays query:(HGSQuery*)query;
+@interface HGSMixer : NSObject
+/*!
+ Sort and de-dupe |providerArrays| into one results array.
+ NOTE: if the query owned by |controller| has a max desired results limit set, 
+ then only that many elements will be sorted and de-duped. 
+ The rest of the results will still be returned (for use in estimating 
+ estimation of "More" counts, for example).
+*/
+- (NSMutableArray*)mix:(NSArray*)providerArrays 
+       queryController:(HGSQueryController*)controller;
 
 @end

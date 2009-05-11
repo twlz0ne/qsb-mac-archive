@@ -47,11 +47,7 @@
 - (id)initWithConfiguration:(NSDictionary *)configuration;
 @end
 
-@interface HGSPythonSearchOperation : HGSSearchOperation {
- @private
-  HGSPythonSource *source_;
-}
+@interface HGSPythonSearchOperation : HGSSearchOperation
 - (id)initWithQuery:(HGSQuery*)query
              source:(HGSPythonSource *)source;
-- (HGSPythonSource *)source;
 @end

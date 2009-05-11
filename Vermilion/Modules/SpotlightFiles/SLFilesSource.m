@@ -36,7 +36,6 @@
 #import "GTMGarbageCollection.h"
 #import "GTMExceptionalInlines.h"
 
-static NSString *const kSpotlightSourceEnableKey = @"SLFilesSourceEnable";
 static NSString *const kSpotlightSourceReturnIntermediateResultsKey = @"SLFilesSourceReturnIntermediateResults";
 static CFStringRef kSpotlightGroupIdAttribute = CFSTR("_kMDItemGroupId");
 
@@ -172,7 +171,6 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
 @interface SLFilesOperation : HGSSearchOperation {
  @private
   SLFilesCreateContext* context_;
-  SLFilesSource* callbackHandler_;  // weak
   // TODO: it's kind of hacky for these and their accessors to be hard-coded
   // into this object when they are only used from outside; maybe there should
   // just be a dictionary of arbitrary context (here or in all operations) that
@@ -181,6 +179,9 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   size_t nextQueryItemIndex_;
   BOOL mdQueryFinished_;
 }
+
+- (id)initWithQuery:(HGSQuery *)query source:(SLFilesSource *)source;
+
 // Runs |query|, calling back to |callbackHandler|.
 - (void)runMDQuery:(MDQueryRef)query;
 
@@ -199,19 +200,19 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
 @implementation SLFilesOperation
 GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
 
+- (id)initWithQuery:(HGSQuery *)query 
+             source:(SLFilesSource *)source {
+  return [super initWithQuery:query source:source];
+}
+
 - (void)dealloc {
   [context_ release];
   [accumulatedResults_ release];
   [super dealloc];
 }
 
-- (void)setSpotlightSource:(SLFilesSource*)slFilesSource {
-  callbackHandler_ = slFilesSource;
-}
-
 - (void)main {
-  HGSAssert(callbackHandler_ != nil, @"missing spotlight source");
-  [callbackHandler_ startSearchOperation:self];
+  [(SLFilesSource*)[self source] startSearchOperation:self];
 }
 
 - (void)runMDQuery:(MDQueryRef)query {
@@ -251,13 +252,14 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
                 name:nil
               object:(id)query];
   MDQueryStop(query);
-  [callbackHandler_ operationCompleted:self];
+  [(SLFilesSource*)[self source] operationCompleted:self];
 }
 
 - (void)queryNotification:(NSNotification*)notification {
   NSString *name = [notification name];
   if ([name isEqualToString:(NSString *)kMDQueryProgressNotification]) {
-    [callbackHandler_ operationReceivedNewResults:self withNotification:notification];
+    [(SLFilesSource*)[self source] operationReceivedNewResults:self 
+                                              withNotification:notification];
   } else if ([name isEqualToString:(NSString*)kMDQueryDidFinishNotification]) {
     mdQueryFinished_ = YES;
   }
@@ -297,8 +299,6 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
     NSDictionary *defaultsDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  [NSNumber numberWithBool:YES],
-                                  kSpotlightSourceEnableKey,
                                   [NSNumber numberWithBool:NO],
                                   kSpotlightSourceReturnIntermediateResultsKey,
                                   nil];
@@ -343,21 +343,38 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
 // to |observer|.
 - (HGSSearchOperation *)searchOperationForQuery:(HGSQuery *)query {
   SLFilesOperation *searchOp
-    = [[[SLFilesOperation alloc] initWithQuery:query] autorelease];
-  [searchOp setSpotlightSource:self];
+    = [[[SLFilesOperation alloc] initWithQuery:query source:self] autorelease];
   return searchOp;
+}
+
+- (BOOL)isValidSourceForQuery:(HGSQuery *)query {
+  BOOL isValid = NO;
+  HGSResult *pivotObject = [query pivotObject];
+  if (pivotObject) {
+    if ([pivotObject conformsToType:kHGSTypeContact]) {
+      NSString *name = [pivotObject valueForKey:kHGSObjectAttributeNameKey];
+      if (name) {
+        isValid = YES;
+      } else {
+        NSString *emailAddress 
+          = [pivotObject valueForKey:kHGSObjectAttributeContactEmailKey];
+        if (emailAddress) {
+          isValid = YES;
+        }
+      }
+    }
+  } else {
+    // Since Spotlight can return a lot of stuff, we only run the query if
+    // it is at least 5 characters long.
+    isValid = [[query rawQueryString] length] >= 5 ? YES : NO;
+  }
+  return isValid;
 }
 
 // run through the list of applications looking for the ones that match
 // somewhere in the title. When we find them, apply a local boost if possible.
 // When we're done, sort based on ranking.
 - (void)startSearchOperation:(HGSSearchOperation*)operation {
-
-  // Temporary user default to enable Spotlight search for the prototype
-  if (![[NSUserDefaults standardUserDefaults] boolForKey:kSpotlightSourceEnableKey] 
-      ||[operation isCancelled]) {
-    return;
-  }
   
   NSMutableArray *predicateSegments = [NSMutableArray array];
 
@@ -386,18 +403,11 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
     }
   }
 
-  // Since Spotlight can return a lot of stuff, we only run the query if
-  // it is at least 5 characters long
-  NSString *rawQuery = [query rawQueryString];
-  if (([rawQuery length] < 5)) {
-    // doesn't meet out min requirements
-    return;
-  }
-  
   NSString *const kPredicateString = @"(* = \"%@*\"cdw || kMDItemTextContent = \"%@*\"cdw)";
 
-  NSString *predicateSegment 
-    = [NSString stringWithFormat:kPredicateString, rawQuery, rawQuery];
+  NSString *rawQuery = [query rawQueryString];
+  NSString *predicateSegment  = [NSString stringWithFormat:kPredicateString, 
+                                 rawQuery, rawQuery];
   [predicateSegments addObject:predicateSegment];
 
   // if we have a uti filter, add it

@@ -36,20 +36,17 @@
 #import "HGSStringUtil.h"
 #import "HGSTokenizer.h"
 
-@interface HGSCallbackSearchOperation : HGSSearchOperation {
- @private
-  HGSCallbackSearchSource *callbackSource_;
-}
-- (id)initWithSource:(HGSCallbackSearchSource *)callbackSource
-               query:(HGSQuery*)query;
+@interface HGSCallbackSearchOperation : HGSSearchOperation 
+- (id)initWithQuery:(HGSQuery *)query 
+             source:(HGSCallbackSearchSource *)callbackSource;
 @end
 
 @implementation HGSCallbackSearchSource
 
 - (HGSSearchOperation *)searchOperationForQuery:(HGSQuery *)query {
   HGSCallbackSearchOperation* searchOp
-    = [[[HGSCallbackSearchOperation alloc] initWithSource:self
-                                                    query:query] autorelease];
+    = [[[HGSCallbackSearchOperation alloc] initWithQuery:query
+                                                  source:self] autorelease];
   return searchOp;
 }
 
@@ -75,11 +72,10 @@
 
 @implementation HGSCallbackSearchOperation
 
-- (id)initWithSource:(HGSCallbackSearchSource *)callbackSource
-               query:(HGSQuery*)query {
-  if ((self = [super initWithQuery:query])) {
-    callbackSource_ = [callbackSource retain];
-    if (!callbackSource_) {
+- (id)initWithQuery:(HGSQuery *)query 
+             source:(HGSCallbackSearchSource *)callbackSource {
+  if ((self = [super initWithQuery:query source:callbackSource])) {
+    if (!callbackSource) {
       HGSLogDebug(@"Tried to create a CallbackSearchSource's operation w/o the "
                   @"search source.");
       [self release];
@@ -89,26 +85,21 @@
   return self;
 }
 
-- (void)dealloc {
-  [callbackSource_ release];
-  [super dealloc];
-}
-
 - (NSString*)description {
   return [NSString stringWithFormat:@"%@ callbackSource:%@",
-          [super description], callbackSource_];
+          [super description], [self source]];
 }
 
 - (BOOL)isConcurrent {
-  return [callbackSource_ isSearchConcurrent];
+  return [(HGSCallbackSearchSource*)[self source] isSearchConcurrent];
 }
 
 - (void)main {
-  [callbackSource_ performSearchOperation:self];
+  [(HGSCallbackSearchSource*)[self source] performSearchOperation:self];
 }
 
 - (NSString *)displayName {
-  return [callbackSource_ displayName];
+  return [[self source] displayName];
 }
 
 @end

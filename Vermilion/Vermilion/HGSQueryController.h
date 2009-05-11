@@ -54,8 +54,9 @@
   BOOL cancelled_;
   HGSQuery* parsedQuery_;
   HGSMixer* mixer_;
-  NSTimer* slowSourceTimer_;
+  __weak NSTimer* slowSourceTimer_;
   CFMutableDictionaryRef sourceResults_; // keyed by source
+  NSMutableDictionary *operationStartTimes_;
   BOOL hasRealResults_;
   NSArray *rankedResults_;
 }

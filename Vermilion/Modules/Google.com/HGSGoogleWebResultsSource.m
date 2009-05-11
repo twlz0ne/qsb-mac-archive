@@ -48,7 +48,6 @@
 @interface HGSGoogleWebSearchOperation : HGSSearchOperation {
  @private
   GDataHTTPFetcher *fetcher_;
-  HGSSearchSource *source_;
 }
 @end
 
@@ -101,18 +100,9 @@ NSString *const kJSONQueryURL = @"http://ajax.googleapis.com/ajax/services/searc
 GTM_METHOD_CHECK(NSArray, commonPrefixForStringsWithOptions:);
 GTM_METHOD_CHECK(NSString, readableURLString);
 
-- (id)initWithQuery:(HGSQuery*)query
-             source:(HGSSearchSource *)source {
-  self = [super initWithQuery:query];
-  if (self) {
-    source_ = [source retain];
-  }
-  return self;
-}
 
 - (void)dealloc {
   [fetcher_ release];
-  [source_ release];
   [super dealloc];
 }
 
@@ -289,7 +279,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     HGSResult *result = [HGSResult resultWithURL:url
                                             name:name
                                             type:kHGSTypeWebpage // TODO: more complete type?
-                                          source:source_
+                                          source:[self source]
                                       attributes:attributes];
     
     [results addObject:result];
