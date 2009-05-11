@@ -185,28 +185,30 @@ NSString *const kAppUISourceAttributeElementKey
   }
 }
 
+- (BOOL)isValidSourceForQuery:(HGSQuery *)query {
+  return [GTMAXUIElement isAccessibilityEnabled];
+}
+
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
-  if ([GTMAXUIElement isAccessibilityEnabled]) {
-    HGSResult *pivotObject = [[operation query] pivotObject];
-    GTMAXUIElement *element 
-      = [pivotObject valueForKey:kAppUISourceAttributeElementKey];
-    if (!element) {
-      NSDictionary *appData = [self getAppInfoFromResult:pivotObject];
-      if (appData) {
-        NSNumber *pid 
-          = [appData objectForKey:@"NSApplicationProcessIdentifier"];
-        element = [GTMAXUIElement elementWithProcessIdentifier:[pid intValue]];
-      }     
-    }
-    if (element) {
-      NSMutableArray *results = [NSMutableArray array];
-      HGSQuery* query = [operation query];
-      NSString *rawString = [query rawQueryString];
-      rawString 
-        = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:rawString];
-      [self addResultsFromElement:element toArray:results matching:rawString];
-      [operation setResults:results];
-    }
+  HGSResult *pivotObject = [[operation query] pivotObject];
+  GTMAXUIElement *element 
+    = [pivotObject valueForKey:kAppUISourceAttributeElementKey];
+  if (!element) {
+    NSDictionary *appData = [self getAppInfoFromResult:pivotObject];
+    if (appData) {
+      NSNumber *pid 
+        = [appData objectForKey:@"NSApplicationProcessIdentifier"];
+      element = [GTMAXUIElement elementWithProcessIdentifier:[pid intValue]];
+    }     
+  }
+  if (element) {
+    NSMutableArray *results = [NSMutableArray array];
+    HGSQuery* query = [operation query];
+    NSString *rawString = [query rawQueryString];
+    rawString 
+      = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:rawString];
+    [self addResultsFromElement:element toArray:results matching:rawString];
+    [operation setResults:results];
   }
 }
 
