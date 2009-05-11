@@ -51,8 +51,9 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
   return YES;
 }
 
-- (BOOL)doesActionApplyTo:(HGSResult *)result {
-  return [result conformsToType:kHGSTypeFileApplication];
+- (BOOL)isValidSourceForQuery:(HGSQuery *)query {
+  HGSResult *pivotObject = [query pivotObject];
+  return pivotObject ? YES : NO;
 }
 
 - (void)performSearchOperation:(HGSSearchOperation *)operation {
