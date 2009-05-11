@@ -30,12 +30,20 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion
+*/
+
 #import <Foundation/Foundation.h>
 
-// Returns a 0.0-1.0 value for a strings match to an abbreviation
-// if a hitmask is provided, that mask will be updated with the locations of the
-// matched characters
-
+/*!
+ Scores how well a given abbreviation matches to a string.
+ @param string the string to match against.
+ @param abbr the abbreviation to compare to the string.
+ @param outHitMask if provided, the mask will be filled with the locations of the
+        characters in string that were matched by abbr.
+*/
 CGFloat HGSScoreForAbbreviation(NSString *string,
                                 NSString *abbr, 
                                 NSMutableIndexSet** outHitMask);

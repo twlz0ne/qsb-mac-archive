@@ -52,6 +52,8 @@ CGFloat HGSScoreForAbbreviation(NSString *nsStr,
   CFStringRef abbr = (CFStringRef)nsAbbr;
   CFIndex strLength = CFStringGetLength(str);
   CFIndex abbrLength = CFStringGetLength(abbr);
+  if (abbrLength > strLength) return score;
+  
   CFCharacterSetRef whiteSpaceSet 
     = CFCharacterSetGetPredefined(kCFCharacterSetWhitespace);
   Boolean ownStrChars = false;
