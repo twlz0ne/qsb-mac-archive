@@ -4,6 +4,9 @@
 #
 # Copyright 2007-2008 Google Inc. All rights reserved.
 
+set -o errexit
+set -o nounset
+set -o verbose
 
 # Strip "*.h" files
 find "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}" -iname '*.h' -delete

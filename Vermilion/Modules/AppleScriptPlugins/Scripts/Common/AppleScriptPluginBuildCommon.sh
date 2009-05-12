@@ -31,4 +31,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Get rid of unneeded executable
+
+set -o errexit
+set -o nounset
+set -o verbose
+
 rm -rf ${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}

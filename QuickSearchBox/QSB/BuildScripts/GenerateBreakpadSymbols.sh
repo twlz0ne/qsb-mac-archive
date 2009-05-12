@@ -8,6 +8,10 @@
 
 # Optional single command-line argument to override the symbol file base name
 
+set -o errexit
+set -o nounset
+set -o verbose
+
 GOOGLE_MAC_BREAKPAD_TOOLS="${SRCROOT}/../externals/GoogleBreakpad"
 
 if [ $# -eq 1 ]; then
