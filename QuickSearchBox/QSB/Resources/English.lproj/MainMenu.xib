@@ -8,9 +8,9 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="129"/>
+			<integer value="2063"/>
 			<integer value="488"/>
-			<integer value="172"/>
-			<integer value="403"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -80,7 +80,7 @@
 								</object>
 								<object class="NSMenuItem" id="39668108">
 									<reference key="NSMenu" ref="265213290"/>
-									<string type="base64-UTF8" key="NSTitle">XlByZWZlcmVuY2Vz4oCmA</string>
+									<string key="NSTitle">^Preferences...</string>
 									<string key="NSKeyEquiv">,</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -358,7 +358,7 @@
 					</object>
 					<object class="NSMenuItem" id="751995675">
 						<reference key="NSMenu" ref="188046495"/>
-						<string type="base64-UTF8" key="NSTitle">XlByZWZlcmVuY2Vz4oCmA</string>
+						<string key="NSTitle">^Preferences...</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -419,7 +419,7 @@
 					</object>
 					<object class="NSMenuItem" id="42313211">
 						<reference key="NSMenu" ref="446976823"/>
-						<string type="base64-UTF8" key="NSTitle">XlByZWZlcmVuY2Vz4oCmA</string>
+						<string key="NSTitle">^Preferences...</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -1291,7 +1291,7 @@
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{340, 537}, {163, 153}}</string>
+					<string>{{456, 537}, {163, 153}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1314,7 +1314,7 @@
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{289, 647}, {262, 43}}</string>
+					<string>{{405, 647}, {262, 43}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1323,18 +1323,18 @@
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{156, 690}, {249, 20}}</string>
+					<string>{{272, 690}, {249, 20}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{66, 723}, {279, 113}}</string>
+					<string>{{66, 807}, {279, 113}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{21, 1099}, {243, 23}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{54, 267}, {279, 143}}</string>
+					<string>{{272, 267}, {279, 143}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{0, 982}, {263, 163}}</string>
@@ -1356,7 +1356,7 @@
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{168, 467}, {303, 223}}</string>
+					<string>{{284, 467}, {303, 223}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>

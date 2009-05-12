@@ -26,7 +26,7 @@
 "^Show Large Type" = "Show Large Type";
 
 /* A label denoting the name of the Open action which allows you to open a result from the QSB with a given application. Do not include ^ in localization. */
-"^Open With…" = "Open With…";
+"^Open With..." = "Open With…";
 
 /* A label denoting the name of the Open action which allows you to eject a volume. Do not include ^ in localization. */
 "^Eject" = "Eject";
