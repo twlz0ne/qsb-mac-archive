@@ -300,7 +300,7 @@
 "Google Search" = "Google Search";
 
 /* A table result label for an item that allows you to search google for the token represented by %@. */
-"Search Google for “%@”" = "Search Google for “%@”";
+"Search Google for '%@'" = "Search Google for “%@”";
 
 /* A table result label for an item that will show the user all x things where x is %u and the things are %@. */
 "Show all %u %@..." = "Show all %1$u %2$@…";

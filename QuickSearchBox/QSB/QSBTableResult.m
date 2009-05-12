@@ -535,7 +535,10 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (NSArray *)displayPath {
-  NSString *string = NSLocalizedString(@"Search Google for “%@”", @""); 
+  NSString *string = NSLocalizedString(@"Search Google for '%@'", 
+                                       @"A table result label for an item that "
+                                       @"allows you to search google for the "
+                                       @"token represented by %@."); 
   string = [NSString stringWithFormat:string, [self displayName]];
   NSURL *url = [[self representedResult] url];
   
@@ -644,7 +647,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (NSString*)stringValue {
-  NSString *format = NSLocalizedString(@"Show all %u %@…", @"");
+  NSString *format = NSLocalizedString(@"Show all %u %@...", @"");
   return [NSString stringWithFormat:format, categoryCount_, [self categoryName]];
 }
 
