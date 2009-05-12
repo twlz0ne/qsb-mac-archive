@@ -101,7 +101,8 @@ end filePathForURL
 
 on repeater(results, aScript)
 	repeat with x in results
-		tell me to set thePath to filePathForURL(x)
+		set theURL to «class pURI» of x
+		tell me to set thePath to filePathForURL(theURL)
 		if length of thePath ≠ 0 then
 			set asFile to POSIX file (thePath)
 			set asAlias to (asFile as alias)

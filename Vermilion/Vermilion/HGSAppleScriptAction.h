@@ -30,14 +30,19 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion
+*/
+
 #import "HGSAction.h"
 
-extern NSString *const kHGSAppleScriptFileNameKey;
-extern NSString *const kHGSAppleScriptHandlerNameKey;
-extern NSString *const kHGSAppleScriptApplicationsKey;
-extern NSString *const kHGSAppleScriptBundleIDKey;
-extern NSString *const kHGSAppleScriptMustBeRunningKey;
-
+/*!
+ A wrapper for an action that is implemented with AppleScript. 
+ 
+ All the information required to configure the action is in the configuration 
+ dictionary passed in to initWithConfiguration.
+*/
 @interface HGSAppleScriptAction : HGSAction {
  @private
   NSString *scriptPath_;
@@ -48,3 +53,10 @@ extern NSString *const kHGSAppleScriptMustBeRunningKey;
 
 - (id)initWithConfiguration:(NSDictionary *)configuration;
 @end
+
+extern NSString *const kHGSAppleScriptFileNameKey;
+extern NSString *const kHGSAppleScriptHandlerNameKey;
+extern NSString *const kHGSAppleScriptApplicationsKey;
+extern NSString *const kHGSAppleScriptBundleIDKey;
+extern NSString *const kHGSAppleScriptMustBeRunningKey;
+

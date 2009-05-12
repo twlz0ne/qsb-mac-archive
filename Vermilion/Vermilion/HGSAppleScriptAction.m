@@ -182,9 +182,8 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
     if (handlerName_) {
       HGSResultArray *directObjects 
         = [info objectForKey:kHGSActionDirectObjectsKey];
-      NSArray *urls = [directObjects urls];
-      
       if ([handlerName_ isEqualToString:kHGSOpenDocAppleEvent]) {
+        NSArray *urls = [directObjects urls];
         NSAppleEventDescriptor *target 
           = [[NSProcessInfo processInfo] gtm_appleEventDescriptor];
         NSAppleEventDescriptor *openDoc 
@@ -197,10 +196,34 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
                          forKeyword:keyDirectObject];
         [script_ gtm_executeAppleEvent:openDoc error:&error];
       } else {
-        NSArray *params = [NSArray arrayWithObjects:urls, nil];
-        
+        NSMutableArray *params 
+          = [NSMutableArray arrayWithCapacity:[directObjects count]];
+        for (HGSResult *hgsResult in directObjects) {
+          NSURL *url = [hgsResult url];
+          NSString *urlString = [url absoluteString];
+          NSString *title = [hgsResult displayName];
+          NSAppleEventDescriptor *record 
+            = [NSAppleEventDescriptor recordDescriptor];
+          NSAppleEventDescriptor *desc = [title gtm_appleEventDescriptor];
+          if (desc) {
+            [record setDescriptor:[title gtm_appleEventDescriptor]
+                       forKeyword:pName];
+          } else {
+            HGSLogDebug(@"Unable to convert %@ to an appleEventDescriptor",
+                        title);
+          }
+          desc = [urlString gtm_appleEventDescriptor];
+          if (desc) {
+            [record setDescriptor:desc
+                       forKeyword:'pURI'];
+          } else {
+            HGSLogDebug(@"Unable to convert %@ to an appleEventDescriptor",
+                        urlString);
+          }
+          [params addObject:record];
+        }  
         [script_ gtm_executePositionalHandler:handlerName_ 
-                                   parameters:params 
+                                   parameters:[NSArray arrayWithObject:params] 
                                         error:&error];
       }
     } else {
@@ -209,8 +232,23 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
     if (!error) {
       wasGood = YES;
     } else {
-      //TODO(dmaclach): Handle error logging to user better
-      HGSLogDebug(@"Applescript Error: %@", error);
+      wasGood = NO;
+      NSString *summary 
+        = HGSLocalizedString(@"AppleScript Error", 
+                             @"A dialog title denoting an error caused while "
+                             @"attempting to execute an AppleScript");
+      NSString *description = [NSString stringWithFormat:@"%@\nError: %@", 
+                               [error objectForKey:@"NSAppleScriptErrorMessage"],
+                               [error objectForKey:@"NSAppleScriptErrorNumber"]];
+      NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+      NSDictionary *message 
+        = [NSDictionary dictionaryWithObjectsAndKeys:
+           summary, kHGSSummaryMessageKey,
+           description, kHGSDescriptionMessageKey,
+           nil];
+      [nc postNotificationName:kHGSUserMessageNotification 
+                        object:self
+                      userInfo:message];
     }
   }
   return wasGood;

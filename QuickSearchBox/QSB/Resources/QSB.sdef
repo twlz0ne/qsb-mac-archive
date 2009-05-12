@@ -154,8 +154,8 @@ Copyright 2007-2008 Google, Inc. All rights reserved.
        <cocoa key="title"/>
     </property>
 
-     <property name="URL" code="pURL" type="text"
-               description="url of the result">
+     <property name="URI" code="pURI" type="text"
+               description="uniform resource identifier of the result">
        <cocoa key="link"/>
      </property>
    </record-type>

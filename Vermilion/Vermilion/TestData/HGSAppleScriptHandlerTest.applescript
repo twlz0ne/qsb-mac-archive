@@ -34,8 +34,11 @@ on testHandler(results)
 	if (count of results) ≠ 2 then
 		error "Bad Count"
 	end if
-	if (item 1 of results) ≠ "applescript://test" then
-		error "Bad result"
+	if («class pURI» of item 1 of results) ≠ "applescript://test" then
+		error "Bad result url "
+	end if
+	if (name of item 1 of results) ≠ "test1" then
+		error "Bad result name"
 	end if
 end testHandler
 

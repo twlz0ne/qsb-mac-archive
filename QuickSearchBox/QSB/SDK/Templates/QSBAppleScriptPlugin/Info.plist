@@ -33,6 +33,8 @@
 			<string>___PROJECTNAMEASIDENTIFIER___</string>
 			<key>HGSAppleScriptFileName</key>
 			<string>___PROJECTNAMEASIDENTIFIER___</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file</string>
 		</dict>
 	</array>
 </dict>

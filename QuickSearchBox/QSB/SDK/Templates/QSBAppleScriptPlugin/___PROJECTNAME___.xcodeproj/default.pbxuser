@@ -146,7 +146,7 @@
 		isa = PBXFileReference;
 		lastKnownFileType = wrapper.application;
 		path = "Quick Search Box.app";
-		sourceTree = QSBROOT;
+		sourceTree = QSBBUILDROOT;
 	};
 	8D5B49AC048680CD000E48DA /* «PROJECTNAME» */ = {
 		activeExec = 0;
