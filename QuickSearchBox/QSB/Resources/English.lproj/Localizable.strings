@@ -136,8 +136,8 @@
 /* A label for an edit field allowing the user to set the keyboard shortcut to show and hide QSB. */
 "Keyboard shortcut:" = "Keyboard shortcut";
 
-/* The button label that resets the keyboard shortcut edit field to ⌘⌘ which is the default setting. */
-"Use Default (⌘⌘)" = "Use Default (⌘⌘)";
+/* The button label that resets the keyboard shortcut edit field to cmd-cmd which is the default setting. */
+"Use Default (cmd-cmd)" = "Use Default (⌘⌘)";
 
 /* A label denoting a group of preferences that affect the color and style of the QSB. */
 "Theme:" = "Theme:";
