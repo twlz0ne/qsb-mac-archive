@@ -44,14 +44,6 @@
 
 @implementation HGSPythonSourceTest
 
-- (void)setUp {
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self
-         selector:@selector(gotResults:)
-             name:kHGSSearchOperationDidUpdateResultsNotification
-           object:nil];
-}
-
 - (void)tearDown {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self];
@@ -90,6 +82,11 @@
   STAssertNotNil(op, nil);
   
   NSOperation *operation = [op searchOperation];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc addObserver:self
+         selector:@selector(gotResults:)
+             name:kHGSSearchOperationDidUpdateResultsNotification
+           object:op];
   NSOperationQueue *operationQueue = [HGSOperationQueue sharedOperationQueue];
   [operationQueue addOperation:operation];
   
