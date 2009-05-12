@@ -31,6 +31,7 @@
 //
 
 @class HGSCodeSignature;
+@class HGSResult;
 
 typedef enum {
   eHGSAllowAlways = 1,  // Permanently allow the plugin
