@@ -9267,6 +9267,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624C00F12C79E008182B5 /* QSBDebug.xcconfig */;
 			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
 				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -9834,6 +9835,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624C00F12C79E008182B5 /* QSBDebug.xcconfig */;
 			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"$(GTM_GENERAL_GCC_PREPROCESSOR_DEFINITIONS)",
@@ -9848,6 +9850,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624C10F12C79E008182B5 /* QSBRelease.xcconfig */;
 			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"$(GTM_GENERAL_GCC_PREPROCESSOR_DEFINITIONS)",
