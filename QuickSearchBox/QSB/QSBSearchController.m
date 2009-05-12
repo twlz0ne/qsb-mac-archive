@@ -241,6 +241,8 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
         }
       }
     }
+// TODO(alcor): reenable this once we get it cleaned up
+#if 0 // Disable message for now
   } else {
     if ([pivotObject conformsToType:kHGSTypeWebpage]) {
       NSString *queryString = [query rawQueryString];
@@ -256,6 +258,7 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
         [prefixResults addObject:message];
       }
     }
+#endif
   }
   
   // Build the actual list
