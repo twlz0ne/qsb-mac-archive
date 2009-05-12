@@ -114,7 +114,7 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(QSBROOT)",
+					"$(QSBBUILDROOT)",
 				);
 				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = "___PROJECTNAME___";
@@ -127,7 +127,7 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(QSBROOT)",
+					"$(QSBBUILDROOT)",
 				);
 				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = "___PROJECTNAME___";
