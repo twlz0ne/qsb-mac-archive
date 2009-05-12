@@ -11,7 +11,7 @@
 "Could not tweet. Please check the password for account %@" = "Could not tweet. Please check the password for account %@";
 
 /* A dialog label explaining that their Twitter message was too long and was truncated. */
-"Message too long — truncated." = "Message too long — truncated.";
+"Message too long - truncated." = "Message too long — truncated.";
 
 /* A dialog label explaning that the user's message has been successfully sent to Twitter. */
 "Message tweeted!" = "Message tweeted!";

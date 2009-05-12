@@ -112,7 +112,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     if (username && password) {
       if ([twitterMessage length] > 140) {
         NSString *warningString
-          = HGSLocalizedString(@"Message too long — truncated.", 
+          = HGSLocalizedString(@"Message too long - truncated.", 
                                @"A dialog label explaining that their Twitter "
                                @"message was too long and was truncated");
         [self informUserWithDescription:warningString
