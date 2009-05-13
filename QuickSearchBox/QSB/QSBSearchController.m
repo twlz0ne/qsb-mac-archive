@@ -302,17 +302,15 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
 
   // If there is still room in top results for things marked for showing
   // below the fold, then fill up top results with those below the fold items.
-  if (showMore) {
-    NSInteger availableToMove = [belowTheFoldResults count];
-    NSInteger countToMove = currentResultDisplayCount_ - [mainResults count];
-    countToMove = MIN(countToMove, availableToMove);
-    if (countToMove > 0) {
-      showMore = (countToMove < availableToMove);
-      for (NSInteger idx = 0; idx < countToMove; ++idx) {
-        QSBSourceTableResult *belowTheFoldResult
-          = [belowTheFoldResults objectAtIndex:idx];
-        [desktopResults_ addObject:belowTheFoldResult];
-      }
+  NSInteger availableToMove = [belowTheFoldResults count];
+  NSInteger countToMove = currentResultDisplayCount_ - [mainResults count];
+  countToMove = MIN(countToMove, availableToMove);
+  if (countToMove > 0) {
+    showMore &= (countToMove < availableToMove);
+    for (NSInteger idx = 0; idx < countToMove; ++idx) {
+      QSBSourceTableResult *belowTheFoldResult
+        = [belowTheFoldResults objectAtIndex:idx];
+      [desktopResults_ addObject:belowTheFoldResult];
     }
   }
   
