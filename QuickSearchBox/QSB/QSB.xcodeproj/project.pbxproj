@@ -547,7 +547,7 @@
 		8B3EFA360EF2CB1D0036FFBD /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F379C740D8FFD5C00A47C98 /* QuickLook.framework */; };
 		8B3EFF6A0EF312040036FFBD /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		8B3EFFA60EF31BC70036FFBD /* Shortcuts.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EFFA40EF31BC70036FFBD /* Shortcuts.m */; };
-		8B4099FF0F93DC0100DF540E /* GTMUILocalizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B4099FD0F93DC0100DF540E /* GTMUILocalizer.h */; };
+		8B4099FF0F93DC0100DF540E /* GTMUILocalizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B4099FD0F93DC0100DF540E /* GTMUILocalizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B409A000F93DC0100DF540E /* GTMUILocalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4099FE0F93DC0100DF540E /* GTMUILocalizer.m */; };
 		8B453B390FB9EFA900C0E951 /* QSBWelcomeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62FB1E4E0FB39B1A0080B342 /* QSBWelcomeController.m */; };
 		8B459D890DA4417C001148C5 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -622,7 +622,7 @@
 		8B6C0D060F32C86100E51E5D /* GData.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		8B6C0D3C0F32C8E500E51E5D /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		8B6C0D430F32C90200E51E5D /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
-		8B6C17300F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6C172E0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h */; };
+		8B6C17300F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6C172E0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6C17310F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C172F0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m */; };
 		8B6F2D740DA2B8AF0052CA40 /* HGSAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D600DA2B88E0052CA40 /* HGSAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6F2D780DA2B8AF0052CA40 /* HGSResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D640DA2B88E0052CA40 /* HGSResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -692,6 +692,14 @@
 		8B791D860FA1FC24006BFE1E /* HGSAppleScriptAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B791D820FA1FC24006BFE1E /* HGSAppleScriptAction.h */; };
 		8B791D890FA1FC35006BFE1E /* HGSAppleScriptActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B791D870FA1FC35006BFE1E /* HGSAppleScriptActionTest.m */; };
 		8B8257990D189EA6002A6C3C /* QSBGrayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8257980D189EA6002A6C3C /* QSBGrayView.m */; };
+		8B834AFF0FBCCFE200862FF5 /* GTMAbstractDOListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B834AFA0FBCCFE200862FF5 /* GTMAbstractDOListener.m */; };
+		8B834B000FBCCFE200862FF5 /* GTMLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B834AFB0FBCCFE200862FF5 /* GTMLogger.m */; };
+		8B834B020FBCCFE200862FF5 /* GTMTransientRootProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B834AFD0FBCCFE200862FF5 /* GTMTransientRootProxy.m */; };
+		8B834B030FBCCFE200862FF5 /* GTMTransientRootPortProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B834AFE0FBCCFE200862FF5 /* GTMTransientRootPortProxy.m */; };
+		8B834B570FBCD00000862FF5 /* GTMAbstractDOListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B834B530FBCD00000862FF5 /* GTMAbstractDOListener.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B834B580FBCD00000862FF5 /* GTMLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B834B540FBCD00000862FF5 /* GTMLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B834B590FBCD00000862FF5 /* GTMTransientRootProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B834B550FBCD00000862FF5 /* GTMTransientRootProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B834B5A0FBCD00000862FF5 /* GTMTransientRootPortProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B834B560FBCD00000862FF5 /* GTMTransientRootPortProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B8B13060EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B8B13070EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B8B13080EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
@@ -734,7 +742,7 @@
 		8B9257170EE9CCF300F3DF32 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B95CCB60F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
-		8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */; };
+		8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B95CD210F6EDF9D003BDBDD /* GTMRegex.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */; };
 		8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B95CE200F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CE1F0F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m */; };
@@ -2226,6 +2234,14 @@
 		8B7C373C0D78A415009885B4 /* NSString+CaseInsensitive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+CaseInsensitive.m"; sourceTree = "<group>"; };
 		8B8257970D189EA6002A6C3C /* QSBGrayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBGrayView.h; sourceTree = "<group>"; };
 		8B8257980D189EA6002A6C3C /* QSBGrayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBGrayView.m; sourceTree = "<group>"; };
+		8B834AFA0FBCCFE200862FF5 /* GTMAbstractDOListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMAbstractDOListener.m; sourceTree = "<group>"; };
+		8B834AFB0FBCCFE200862FF5 /* GTMLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMLogger.m; sourceTree = "<group>"; };
+		8B834AFD0FBCCFE200862FF5 /* GTMTransientRootProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMTransientRootProxy.m; sourceTree = "<group>"; };
+		8B834AFE0FBCCFE200862FF5 /* GTMTransientRootPortProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMTransientRootPortProxy.m; sourceTree = "<group>"; };
+		8B834B530FBCD00000862FF5 /* GTMAbstractDOListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMAbstractDOListener.h; sourceTree = "<group>"; };
+		8B834B540FBCD00000862FF5 /* GTMLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMLogger.h; sourceTree = "<group>"; };
+		8B834B550FBCD00000862FF5 /* GTMTransientRootProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMTransientRootProxy.h; sourceTree = "<group>"; };
+		8B834B560FBCD00000862FF5 /* GTMTransientRootPortProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMTransientRootPortProxy.h; sourceTree = "<group>"; };
 		8B8B13040EEBADE400E543D0 /* HGSBundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSBundle.h; sourceTree = "<group>"; };
 		8B8B13050EEBADE400E543D0 /* HGSBundle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSBundle.m; sourceTree = "<group>"; };
 		8B8B18630EEEEAAC00E543D0 /* GTMCarbonEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMCarbonEvent.h; sourceTree = "<group>"; };
@@ -4479,35 +4495,37 @@
 		F435DAAF0DBE4BC30069CDE8 /* Foundation */ = {
 			isa = PBXGroup;
 			children = (
+				8B834B530FBCD00000862FF5 /* GTMAbstractDOListener.h */,
+				8B834AFA0FBCCFE200862FF5 /* GTMAbstractDOListener.m */,
 				62A4AEAA0F30DF9F0007CD99 /* GTMBase64.h */,
 				62A4AEAB0F30DF9F0007CD99 /* GTMBase64.m */,
-				8BA019C20F14303400926923 /* GTMSQLite.m */,
-				8BA019C30F14303400926923 /* GTMSQLite.h */,
-				F49FBADF0EF02B440059DDFC /* GTMFileSystemKQueue.h */,
-				F49FBAE00EF02B440059DDFC /* GTMFileSystemKQueue.m */,
 				332AD8AB0DC93EB60009A7E9 /* GTMCalculatedRange.h */,
 				332AD8AC0DC93EB60009A7E9 /* GTMCalculatedRange.m */,
-				8B1B49330E5F994800A08972 /* GTMExceptionalInlines.m */,
 				8B1B49340E5F994800A08972 /* GTMExceptionalInlines.h */,
-				8B0CA2B20E48A6580004BFB2 /* GTMFourCharCode.m */,
+				8B1B49330E5F994800A08972 /* GTMExceptionalInlines.m */,
+				F49FBADF0EF02B440059DDFC /* GTMFileSystemKQueue.h */,
+				F49FBAE00EF02B440059DDFC /* GTMFileSystemKQueue.m */,
 				8B0CA2B30E48A6580004BFB2 /* GTMFourCharCode.h */,
+				8B0CA2B20E48A6580004BFB2 /* GTMFourCharCode.m */,
 				33A016DD0DD3D00A00578DE5 /* GTMGarbageCollection.h */,
 				332AD95E0DC946470009A7E9 /* GTMGeometryUtils.h */,
 				332AD95F0DC946470009A7E9 /* GTMGeometryUtils.m */,
+				8B834B540FBCD00000862FF5 /* GTMLogger.h */,
+				8B834AFB0FBCCFE200862FF5 /* GTMLogger.m */,
+				8BD46A810E43DD3C00BF3562 /* GTMNSAppleEventDescriptor+Foundation.h */,
+				8BD46A800E43DD3C00BF3562 /* GTMNSAppleEventDescriptor+Foundation.m */,
+				8BD46A7F0E43DD3C00BF3562 /* GTMNSAppleEventDescriptor+Handler.h */,
+				8BD46A7E0E43DD3C00BF3562 /* GTMNSAppleEventDescriptor+Handler.m */,
 				8BD46A7D0E43DD3C00BF3562 /* GTMNSAppleScript+Handler.h */,
 				8BD46A7C0E43DD3C00BF3562 /* GTMNSAppleScript+Handler.m */,
-				8BD46A7E0E43DD3C00BF3562 /* GTMNSAppleEventDescriptor+Handler.m */,
-				8BD46A7F0E43DD3C00BF3562 /* GTMNSAppleEventDescriptor+Handler.h */,
-				8BD46A800E43DD3C00BF3562 /* GTMNSAppleEventDescriptor+Foundation.m */,
-				8BD46A810E43DD3C00BF3562 /* GTMNSAppleEventDescriptor+Foundation.h */,
 				629446390EDE190B009295EA /* GTMNSArray+Merge.h */,
 				6294463A0EDE190B009295EA /* GTMNSArray+Merge.m */,
 				7F220C510DDB4B3200737C26 /* GTMNSDictionary+URLArguments.h */,
 				7F220C540DDB4B3200737C26 /* GTMNSDictionary+URLArguments.m */,
 				64C385BF0DBFDCF9005EBA69 /* GTMNSEnumerator+Filter.h */,
 				64C385C00DBFDCF9005EBA69 /* GTMNSEnumerator+Filter.m */,
-				8B8EC8A00EF17D7D0044D13F /* GTMNSFileManager+Carbon.m */,
 				8B8EC8A10EF17D7D0044D13F /* GTMNSFileManager+Carbon.h */,
+				8B8EC8A00EF17D7D0044D13F /* GTMNSFileManager+Carbon.m */,
 				8B6C172E0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h */,
 				8B6C172F0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m */,
 				7F220B6A0DDB403800737C26 /* GTMNSString+HTML.h */,
@@ -4518,8 +4536,14 @@
 				64C385BC0DBFDCF9005EBA69 /* GTMObjC2Runtime.m */,
 				8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */,
 				8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */,
+				8BA019C30F14303400926923 /* GTMSQLite.h */,
+				8BA019C20F14303400926923 /* GTMSQLite.m */,
 				332AD7380DC910A20009A7E9 /* GTMSystemVersion.h */,
 				332AD7390DC910A20009A7E9 /* GTMSystemVersion.m */,
+				8B834B560FBCD00000862FF5 /* GTMTransientRootPortProxy.h */,
+				8B834AFE0FBCCFE200862FF5 /* GTMTransientRootPortProxy.m */,
+				8B834B550FBCD00000862FF5 /* GTMTransientRootProxy.h */,
+				8B834AFD0FBCCFE200862FF5 /* GTMTransientRootProxy.m */,
 			);
 			path = Foundation;
 			sourceTree = "<group>";
@@ -4658,6 +4682,10 @@
 				8B6C17300F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h in Headers */,
 				8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */,
 				8B4099FF0F93DC0100DF540E /* GTMUILocalizer.h in Headers */,
+				8B834B570FBCD00000862FF5 /* GTMAbstractDOListener.h in Headers */,
+				8B834B580FBCD00000862FF5 /* GTMLogger.h in Headers */,
+				8B834B590FBCD00000862FF5 /* GTMTransientRootProxy.h in Headers */,
+				8B834B5A0FBCD00000862FF5 /* GTMTransientRootPortProxy.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6296,7 +6324,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build OCMock the way we want into our build folder\ncd \"${SRCROOT}/../externals/OCMock/Source\"\n/usr/bin/xcodebuild -project OCMock.xcodeproj -target OCMock -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"OCMock\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/OCMock.build/${CONFIGURATION}/OCMock.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"\n";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build OCMock the way we want into our build folder\ncd \"${SRCROOT}/../externals/OCMock/Source\"\n/usr/bin/xcodebuild -project OCMock.xcodeproj -target OCMock -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"OCMock\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/OCMock.build/${CONFIGURATION}/OCMock.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"\n";
 		};
 		8B2E2A3F0F99018600F80E11 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6359,7 +6387,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build JSON the way we want into our build folder\ncd \"${SRCROOT}/../externals/json-framework\"\n/usr/bin/xcodebuild -project JSON.xcodeproj -target JSON -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" SDKROOT=\"${SDKROOT}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"JSON\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/JSON.build/${CONFIGURATION}/JSON.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build JSON the way we want into our build folder\ncd \"${SRCROOT}/../externals/json-framework\"\n/usr/bin/xcodebuild -project JSON.xcodeproj -target JSON -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" SDKROOT=\"${SDKROOT}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"JSON\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/JSON.build/${CONFIGURATION}/JSON.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
 		};
 		8B637BA20F27783A00997738 /* Breakpad */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6427,7 +6455,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHEROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/GData.build/${CONFIGURATION}/GDataFramework.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/GData.build/${CONFIGURATION}/GDataFramework.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
 		};
 		8BA016650F13CF6800926923 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -7272,6 +7300,10 @@
 				8B6C17310F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m in Sources */,
 				8B95CD210F6EDF9D003BDBDD /* GTMRegex.m in Sources */,
 				8B409A000F93DC0100DF540E /* GTMUILocalizer.m in Sources */,
+				8B834AFF0FBCCFE200862FF5 /* GTMAbstractDOListener.m in Sources */,
+				8B834B000FBCCFE200862FF5 /* GTMLogger.m in Sources */,
+				8B834B020FBCCFE200862FF5 /* GTMTransientRootProxy.m in Sources */,
+				8B834B030FBCCFE200862FF5 /* GTMTransientRootPortProxy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
