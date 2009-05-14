@@ -42,7 +42,7 @@
 @class CAAnimation;
 @class QSBWelcomeController;
 
-const NSTimeInterval kQSBAppearDelay;
+extern const NSTimeInterval kQSBAppearDelay;
 
 @interface QSBSearchWindowController : NSWindowController {
  @private
