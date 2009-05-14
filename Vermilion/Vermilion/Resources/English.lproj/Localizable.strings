@@ -3,3 +3,6 @@
 
 /* A label denoting a plugin missing it's name. */
 "Unknown Name" = "Unknown Name";
+
+/* A dialog title denoting an error caused while attempting to execute an AppleScript */
+"AppleScript Error" = "AppleScript Error";
