@@ -34,6 +34,7 @@
 #import "GTMObjectSingleton.h"
 #import "HGSDelegate.h"
 #import "HGSCodeSignature.h"
+#import "HGSPluginBlacklist.h"
 #import <openssl/aes.h>
 #import <openssl/evp.h>
 #import <openssl/x509.h>
@@ -178,6 +179,13 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 }
 
 - (BOOL)isPluginBundleCertified:(NSBundle *)pluginBundle {
+  // Blacklisted plugins are never certified
+  HGSPluginBlacklist *bl = [HGSPluginBlacklist sharedPluginBlacklist];
+  if ([bl bundleIsBlacklisted:pluginBundle]) {
+    HGSLog(@"Blocked loading of blacklisted bundle %@", pluginBundle);
+    return NO;
+  }
+  
   if (!executableSignature_) {
     // If the host application is not signed, do not perform validation.
     return YES;
