@@ -124,8 +124,11 @@
 /* A checkbox controlling if we should display our icon as a menu in the menu bar for easy access to QSB. */
 "Show icon in menu bar" = "Show icon in menu bar";
 
-/* A checkbox controlling if we should display our icon in the dock for easy access to QSB. The user must restart QSB if they change this setting for it to take effect. */
-"Show icon in dock (Requires relaunch)" = "Show icon in dock (Requires relaunch)";
+/* A checkbox controlling if we should display our icon in the dock for easy access to QSB. */
+"Show icon in dock" = "Show icon in dock";
+
+/* A sublabel to mark the dock preference, which requires the app relaunch. */
+"Requires relaunch" = "Requires relaunch";
 
 /* A checkbox controlling if the QSB should be opened automatically when the user logs in. */
 "Open Quick Search Box at login" = "Open Quick Search Box at login";
