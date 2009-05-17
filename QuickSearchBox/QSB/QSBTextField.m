@@ -35,11 +35,11 @@
 #import "NSString+CaseInsensitive.h"
 
 @implementation QSBTextFieldEditor
-GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
+GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
 
 - (void)awakeFromNib {
   [self setEditable:YES];
-  [self setFieldEditor:NO];
+  [self setFieldEditor:YES];
   [self setSelectable:YES];
 }
 
@@ -98,7 +98,9 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
     
     NSString *typedString = [[self string] substringWithRange:charRange];
     NSRange substringRange = [completion rangeOfString:typedString
-                                            options:NSCaseInsensitiveSearch];
+                                               options:(NSWidthInsensitiveSearch 
+                                                        | NSCaseInsensitiveSearch
+                                                        | NSDiacriticInsensitiveSearch)];
     
     // If this string isn't found at the beginning or with a space prefix,
     // find the range of the last word and proceed with that.
@@ -107,7 +109,9 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
       NSString *lastWord =
       [[typedString componentsSeparatedByString:@" "] lastObject];
       substringRange = [completion rangeOfString:lastWord
-                                         options:NSCaseInsensitiveSearch];
+                                         options:(NSWidthInsensitiveSearch 
+                                                  | NSCaseInsensitiveSearch
+                                                  | NSDiacriticInsensitiveSearch)];
     }
     
     NSString *wordCompletion = @"";
@@ -138,7 +142,10 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
     }
   
     NSString *textFieldString = [storage string];
-    if ([completion hasCaseInsensitivePrefix:textFieldString]) {
+    if ([completion qsb_hasPrefix:textFieldString 
+                          options:(NSWidthInsensitiveSearch 
+                                   | NSCaseInsensitiveSearch
+                                   | NSDiacriticInsensitiveSearch)]) {
       [storage replaceCharactersInRange:charRange withString:completion];
       lastCompletionRange_ = NSMakeRange(NSMaxRange(stringRange), 
                                          [completion length] - charRange.length);

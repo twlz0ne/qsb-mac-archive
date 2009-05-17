@@ -198,7 +198,7 @@ GTM_METHOD_CHECK(NSObject,
                  gtm_addObserver:forKeyPath:selector:userInfo:options:);
 GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 GTM_METHOD_CHECK(NSAppleEventDescriptor, gtm_arrayValue);
-GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:)
+GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
 
 - (id)init {
   // Read the nib name from user defaults to allow for ui switching
@@ -805,14 +805,20 @@ doCommandBySelector:(SEL)commandSelector {
  indexOfSelectedItem:(int *)idx {
   *idx = 0;
   NSString *completion = nil;
-  NSString *queryString = [activeSearchViewController_ queryString];
+  // We grab the string from the textStorage instead of from the
+  // activeSearchController_ because the string from textStorage includes marked
+  // text.
+  NSString *queryString = [[textView textStorage] string];
   if ([queryString length]) {
     id result = [self selection];
     if (result && [result respondsToSelector:@selector(displayName)]) {
       completion = [result displayName];
       // If the query string is not a prefix of the completion then
       // ignore the completion.
-      if (![completion hasCaseInsensitivePrefix:queryString]) {
+      if (![completion qsb_hasPrefix:queryString 
+                             options:(NSWidthInsensitiveSearch 
+                                      | NSCaseInsensitiveSearch
+                                      | NSDiacriticInsensitiveSearch)]) {
         completion = nil;
       }
     }

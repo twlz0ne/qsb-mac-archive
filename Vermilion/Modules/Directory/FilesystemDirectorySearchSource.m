@@ -34,6 +34,7 @@
 #import "NSString+CaseInsensitive.h"
 #import "HGSAbbreviationRanker.h"
 #import "HGSTokenizer.h"
+#import "GTMMethodCheck.h"
 
 // This source provides results for directory restricted searches:
 // If a pivot object is a folder, it will find direct children with a prefix
@@ -44,6 +45,7 @@
 @end
 
 @implementation FilesystemDirectorySearchSource
+GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
 
 - (BOOL)isSearchConcurrent {
   return YES;
@@ -135,7 +137,10 @@
           NSUInteger count = [dirContents count];
           NSMutableArray *contents = [NSMutableArray arrayWithCapacity:count];
           for (path in [fm directoryContentsAtPath:container]) {
-            if ([path hasCaseInsensitivePrefix:partialPath]) {
+            if ([path qsb_hasPrefix:partialPath 
+                            options:(NSWidthInsensitiveSearch 
+                                   | NSCaseInsensitiveSearch
+                                   | NSDiacriticInsensitiveSearch)]) {
               LSItemInfoRecord infoRec;
               NSURL *fileURL = [NSURL fileURLWithPath:path];
               if (noErr == LSCopyItemInfoForURL((CFURLRef)fileURL,

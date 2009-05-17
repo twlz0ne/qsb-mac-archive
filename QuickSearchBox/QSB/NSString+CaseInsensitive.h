@@ -34,9 +34,12 @@
 
 #import <Foundation/Foundation.h>
 
-// Utilities for NSStrings and CaseInsensitive
+// Utilities for NSStrings and various options
 @interface NSString (GMNSStringCaseInsensitiveAdditions)
-- (BOOL)hasCaseInsensitivePrefix:(NSString *)aString;
-- (BOOL)hasCaseInsensitiveSuffix:(NSString *)aString;
-- (BOOL)containsCaseInsentive:(NSString *)aString;
+- (BOOL)qsb_hasPrefix:(NSString *)aString 
+              options:(NSStringCompareOptions)options;
+- (BOOL)qsb_hasSuffix:(NSString *)aString
+              options:(NSStringCompareOptions)options;
+- (BOOL)qsb_contains:(NSString *)aString
+             options:(NSStringCompareOptions)options;
 @end

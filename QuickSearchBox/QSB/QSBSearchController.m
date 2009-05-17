@@ -81,7 +81,7 @@ static const NSUInteger kDefaultMaximumResultsToCollect = 500;
 @synthesize parentSearchController = parentSearchController_;
 @synthesize queryIsInProcess = queryIsInProcess_;
 
-GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
+GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
 
 + (void)initialize {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -402,10 +402,13 @@ GTM_METHOD_CHECK(NSString, hasCaseInsensitivePrefix:);
     [queryString_ release];
     queryString_ = nil;
   } else if (![queryString_ isEqualToString:queryString]) {
+    NSStringCompareOptions options = (NSCaseInsensitiveSearch 
+                                      | NSWidthInsensitiveSearch 
+                                      | NSDiacriticInsensitiveSearch);
     isPrefix = ([queryString_ length] > 0 && 
                 [queryString length] > 0 && 
-                ([queryString hasCaseInsensitivePrefix:queryString_] || 
-                 [queryString_ hasCaseInsensitivePrefix:queryString]));
+                ([queryString qsb_hasPrefix:queryString_ options:options] || 
+                 [queryString_ qsb_hasPrefix:queryString options:options]));
     [queryString_ autorelease];
     queryString_ = [queryString copy];
   }

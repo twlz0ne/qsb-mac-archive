@@ -110,6 +110,10 @@
                                              subTokenRanges, 
                                              kHGSTokenizerInternalMaxRanges, 
                                              NULL);
+    if (rangeCount == 0) {
+      subTokenRanges[0] = CFStringTokenizerGetCurrentTokenRange(tokenizer_);
+      rangeCount = 1;
+    }
     // If our subtokens contain numbers we want to rejoin the numbers back
     // up. 
     if (tokenType & kCFStringTokenizerTokenHasHasNumbersMask) {

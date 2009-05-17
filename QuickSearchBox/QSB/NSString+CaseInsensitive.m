@@ -34,25 +34,28 @@
 
 @implementation NSString (GMNSStringCaseInsensitiveAdditions)
 
-- (BOOL)hasCaseInsensitivePrefix:(NSString *)aString {
+- (BOOL)qsb_hasPrefix:(NSString *)aString 
+              options:(NSStringCompareOptions)options {
   return ([self length] >= [aString length]) &&
     ([self compare:aString
-           options:NSCaseInsensitiveSearch 
+           options:options 
              range:NSMakeRange(0, [aString length])] == NSOrderedSame);}
 
-- (BOOL)hasCaseInsensitiveSuffix:(NSString *)aString {
+- (BOOL)qsb_hasSuffix:(NSString *)aString 
+              options:(NSStringCompareOptions)options {
   NSUInteger aLength = [aString length];
   NSUInteger bLength = [self length];
   NSInteger start = bLength - aLength;
   
   return start < 0 ? NO : [self compare:aString
-                                options:NSCaseInsensitiveSearch 
+                                options:options 
                                   range:NSMakeRange(start, 
                                                     aLength)] == NSOrderedSame;
 }
 
-- (BOOL)containsCaseInsentive:(NSString *)aString {
+- (BOOL)qsb_contains:(NSString *)aString 
+             options:(NSStringCompareOptions)options {
   return [self rangeOfString:aString 
-                     options:NSCaseInsensitiveSearch].location != NSNotFound;
+                     options:options].location != NSNotFound;
 }
 @end
