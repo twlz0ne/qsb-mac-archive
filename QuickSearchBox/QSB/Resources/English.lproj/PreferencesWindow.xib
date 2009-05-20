@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2325"/>
+			<integer value="2321"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -35,6 +35,15 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSUserDefaultsController" id="955577340">
+				<object class="NSMutableArray" key="NSDeclaredKeys">
+					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>QSBGoogleSuggest</string>
+					<string>QSBGoogleNavSuggest</string>
+					<string>QSBGoogleNavSuggestCount</string>
+					<string>QSBGoogleSuggestCount</string>
+					<string>GoogleSuggestCount</string>
+					<string>GoogleNavSuggestCount</string>
+				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSArrayController" id="680293682">
@@ -301,7 +310,7 @@
 								<object class="NSTabViewItem" id="168180836">
 									<string key="NSIdentifier">general</string>
 									<object class="NSView" key="NSView" id="1030809264">
-										<reference key="NSNextResponder" ref="1019790971"/>
+										<nil key="NSNextResponder"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -656,7 +665,6 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 33}, {514, 272}}</string>
-										<reference key="NSSuperview" ref="1019790971"/>
 									</object>
 									<string key="NSLabel">^Basics</string>
 									<reference key="NSColor" ref="1072716316"/>
@@ -665,7 +673,7 @@
 								<object class="NSTabViewItem" id="1017385275">
 									<string key="NSIdentifier">searchableItems</string>
 									<object class="NSView" key="NSView" id="614022034">
-										<nil key="NSNextResponder"/>
+										<reference key="NSNextResponder" ref="1019790971"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -979,6 +987,7 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 33}, {514, 272}}</string>
+										<reference key="NSSuperview" ref="1019790971"/>
 									</object>
 									<string key="NSLabel">^Searchable Items</string>
 									<reference key="NSColor" ref="1072716316"/>
@@ -2311,7 +2320,6 @@
 														<int key="NSsFlags">1</int>
 														<reference key="NSTarget" ref="501102356"/>
 														<string key="NSAction">_doScroller:</string>
-														<double key="NSCurValue">5.050505e-02</double>
 														<double key="NSPercent">9.852941e-01</double>
 													</object>
 												</object>
@@ -2331,14 +2339,14 @@
 									<reference key="NSTabView" ref="1019790971"/>
 								</object>
 							</object>
-							<reference key="NSSelectedTabViewItem" ref="168180836"/>
+							<reference key="NSSelectedTabViewItem" ref="1017385275"/>
 							<reference key="NSFont" ref="455195564"/>
 							<int key="NSTvFlags">0</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
 							<object class="NSMutableArray" key="NSSubviews">
 								<bool key="EncodedWithXMLCoder">YES</bool>
-								<reference ref="1030809264"/>
+								<reference ref="614022034"/>
 							</object>
 						</object>
 					</object>
@@ -2603,22 +2611,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.suggestCount</string>
-						<reference key="source" ref="119043785"/>
-						<reference key="destination" ref="955577340"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="119043785"/>
-							<reference key="NSDestination" ref="955577340"/>
-							<string key="NSLabel">value: values.suggestCount</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.suggestCount</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">2659</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
 						<string key="label">sortDescriptors: self.sourceSortDescriptor</string>
 						<reference key="source" ref="680293682"/>
 						<reference key="destination" ref="11512819"/>
@@ -2820,22 +2812,6 @@
 						</object>
 					</object>
 					<int key="connectionID">2912</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.navSuggestCount</string>
-						<reference key="source" ref="372371794"/>
-						<reference key="destination" ref="955577340"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="372371794"/>
-							<reference key="NSDestination" ref="955577340"/>
-							<string key="NSLabel">value: values.navSuggestCount</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.navSuggestCount</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">2923</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
@@ -3162,6 +3138,38 @@
 					</object>
 					<int key="connectionID">3136</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: values.GoogleSuggestCount</string>
+						<reference key="source" ref="119043785"/>
+						<reference key="destination" ref="955577340"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="119043785"/>
+							<reference key="NSDestination" ref="955577340"/>
+							<string key="NSLabel">value: values.GoogleSuggestCount</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">values.GoogleSuggestCount</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">3149</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: values.GoogleNavSuggestCount</string>
+						<reference key="source" ref="372371794"/>
+						<reference key="destination" ref="955577340"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="372371794"/>
+							<reference key="NSDestination" ref="955577340"/>
+							<string key="NSLabel">value: values.GoogleNavSuggestCount</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">values.GoogleNavSuggestCount</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">3150</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -3401,11 +3409,11 @@
 						<reference key="object" ref="614022034"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="119043785"/>
 							<reference ref="372371794"/>
 							<reference ref="1071455212"/>
 							<reference ref="795816087"/>
 							<reference ref="685778833"/>
+							<reference ref="119043785"/>
 						</object>
 						<reference key="parent" ref="1017385275"/>
 					</object>
@@ -4616,9 +4624,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{77, 95}, {560, 334}}</string>
+					<string>{{2637, 795}, {560, 334}}</string>
 					<boolean value="NO"/>
-					<string>{{77, 95}, {560, 334}}</string>
+					<string>{{2637, 795}, {560, 334}}</string>
 					<reference ref="8"/>
 					<string>{3.40282e+38, 3.40282e+38}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4857,7 +4865,7 @@ b3AgcmVzdWx0cycuA</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3144</int>
+			<int key="maxID">3150</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

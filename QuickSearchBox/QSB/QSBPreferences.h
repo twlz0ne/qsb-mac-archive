@@ -38,8 +38,13 @@
 @end
 
 // Number of suggestions
-#define kQSBSuggestCountKey @"suggestCount" // int
-#define kQSBNavSuggestCountKey @"navSuggestCount" // int
+// TODO(dmaclach): Move these out to the suggest source when we get
+// persource preferences. That is why they are NOT prefixed with
+// QSB as they are not QSB prefs.
+#define kGoogleSuggestCountKey @"GoogleSuggestCount" // BOOL
+#define kGoogleSuggestCountDefault 1
+#define kGoogleNavSuggestCountKey @"GoogleNavSuggestCount" // BOOL
+#define kGoogleNavSuggestCountDefault 1
 
 // int - QSB number of results in the menu
 #define kQSBResultCountKey                    @"QSBResultCount"

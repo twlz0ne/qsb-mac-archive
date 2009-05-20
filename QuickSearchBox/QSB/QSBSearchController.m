@@ -203,7 +203,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     // we need to rethink how it should work.
     
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    NSInteger suggestCount = [prefs integerForKey:kQSBSuggestCountKey];
+    NSInteger suggestCount = [prefs integerForKey:kGoogleSuggestCountKey];
     if (suggestCount) {
       if ([hgsSuggestions count] || [[self queryString] length] < 3) {
         [oldSuggestions_ autorelease];

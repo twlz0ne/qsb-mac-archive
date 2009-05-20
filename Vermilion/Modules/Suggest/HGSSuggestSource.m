@@ -167,8 +167,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   BOOL isValid = [super isValidSourceForQuery:query];
   if (isValid) {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    int suggestCount = [prefs integerForKey:kQSBSuggestCountKey];
-    int navSuggestCount = [prefs integerForKey:kQSBNavSuggestCountKey];
+    int suggestCount = [prefs integerForKey:kGoogleSuggestCountKey];
+    int navSuggestCount = [prefs integerForKey:kGoogleNavSuggestCountKey];
     
     // Don't show suggestions for queries under 3 letters
     if ([[query rawQueryString] length] < 3) {
@@ -385,8 +385,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   //[argumentDictionary setObject:@"t" forKey:@"news"];
   
   NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  NSNumber *suggestCount = [prefs objectForKey:kQSBSuggestCountKey];
-  NSNumber *navSuggestCount = [prefs objectForKey:kQSBNavSuggestCountKey];
+  NSNumber *suggestCount = [prefs objectForKey:kGoogleSuggestCountKey];
+  NSNumber *navSuggestCount = [prefs objectForKey:kGoogleNavSuggestCountKey];
   
   // Enable calculator suggestions.
   

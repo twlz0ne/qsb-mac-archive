@@ -60,6 +60,12 @@
      // Use Growl for user messages
      [NSNumber numberWithBool:kQSBUseGrowlDefault],
      kQSBUseGrowlKey,
+     // Do we show suggestions
+     [NSNumber numberWithInt:kGoogleSuggestCountDefault],
+     kGoogleSuggestCountKey,
+     // Do we show nav suggestions
+     [NSNumber numberWithInt:kGoogleNavSuggestCountDefault],
+     kGoogleNavSuggestCountKey,
      // done
      nil];
 
