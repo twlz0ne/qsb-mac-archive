@@ -45,9 +45,14 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
 
 - (void)deleteCompletion {
   if (lastCompletionRange_.length > 0) {
-    NSRange intersection = NSIntersectionRange(lastCompletionRange_, NSMakeRange(0, [[self textStorage] length]));
-    if (intersection.length) {
-      [[self textStorage] deleteCharactersInRange:intersection];
+    NSTextStorage *storage = [self textStorage];
+    NSRange intersection = NSIntersectionRange(lastCompletionRange_, 
+                                               NSMakeRange(0, [storage length]));
+    
+    if (intersection.length > 0) {
+      [storage beginEditing];
+      [storage deleteCharactersInRange:intersection];
+      [storage endEditing];
     }
     lastCompletionRange_ = NSMakeRange(0,0);
   }
@@ -58,9 +63,9 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   lastCompletionRange_ = NSMakeRange(0,0);
 }
 
-- (BOOL)shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString {
+- (void)keyDown:(NSEvent *)theEvent {
   [self deleteCompletion];
-  return [super shouldChangeTextInRange:affectedCharRange replacementString:replacementString];
+  [super keyDown:theEvent];
 }
 
 - (void)didChangeText {
@@ -90,6 +95,9 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
      forPartialWordRange:(NSRange)charRange 
                 movement:(int)movement
                  isFinal:(BOOL)flag {
+  if ([self hasMarkedText]) {
+    return;
+  }
   if ([completion length]) {
     NSTextStorage *storage = [self textStorage];
     NSArray *selection = [self selectedRanges];
@@ -158,7 +166,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
                              withString:appendString];
       lastCompletionRange_ = NSMakeRange(length, [appendString length]);
     }
-    
+
     [storage addAttribute:NSForegroundColorAttributeName 
                     value:[NSColor lightGrayColor] 
                     range:lastCompletionRange_];
@@ -172,10 +180,9 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
                       value:[NSNumber numberWithInt:1] 
                       range:ligatureRange];
       // De-ligature over the typed/autocompleted transition.
-      ligatureRange = NSMakeRange(lastCompletionRange_.location - 1,2);
       [storage addAttribute:NSLigatureAttributeName 
                       value:[NSNumber numberWithInt:0] 
-                      range:ligatureRange];
+                      range:lastCompletionRange_];
     }
     [storage endEditing];
     [self setSelectedRanges:selection];
