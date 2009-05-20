@@ -5117,7 +5117,6 @@
 				8B3EECE70CEA86A100D933C0 /* Resources */,
 				8B3EED6B0CEA86A100D933C0 /* Frameworks */,
 				8B3EED760CEA86A100D933C0 /* Post Build Script */,
-				7F9CDEC80DD9D9E1007C4BF4 /* CodeSign */,
 			);
 			buildRules = (
 			);
@@ -6283,20 +6282,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
-		};
-		7F9CDEC80DD9D9E1007C4BF4 /* CodeSign */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = CodeSign;
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\nCODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY:=0}\n\nif [ ${CODE_SIGN_IDENTITY} -ne 0 ] ; then\n\tcodesign -f -s \"$CODE_SIGN_IDENTITY\" \"$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME\"\n\tcodesign -v \"$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME\";\nelse\n\techo Not code signing because CODE_SIGN_IDENTITY is not set.\nfi\n\nexit 0";
 		};
 		8B148D850F705F35002E05FA /* Build SDK */ = {
 			isa = PBXShellScriptBuildPhase;
