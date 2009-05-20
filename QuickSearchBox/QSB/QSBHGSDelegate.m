@@ -155,16 +155,12 @@ static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
   return pluginPaths_;
 }
 
-- (NSString *)navSuggestHost {
-  return @"http://clients1.google.com";
-}
-
-- (NSString *)suggestHost {
-  return @"http://clients1.google.com";
-}
-
 - (NSString *)suggestLanguage {
   return preferredLanguage_;
+}
+
+- (NSString *)clientID {
+  return @"qsb-mac";
 }
 
 - (HGSPluginLoadResult)shouldLoadPluginAtPath:(NSString *)path

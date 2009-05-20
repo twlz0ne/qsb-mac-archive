@@ -54,7 +54,8 @@
 #import "HGSSQLiteBackedCache.h"
 #endif  // ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
 
-static NSString* const kHGSGoogleSuggestBase = @"%@/complete/search?";
+static NSString* const kHGSGoogleSuggestBase 
+  = @"http://clients1.google.com/complete/search?";
 
 static NSTimeInterval const kHGSNetworkTimeout = 10.0f;
 
@@ -96,6 +97,7 @@ typedef enum {
                                   withQuery:(HGSQuery *)query;
 // Language of suggestions
 - (NSString *)suggestLanguage;
+- (NSString *)clientID;
 // Filtering suggestions
 @end
 
@@ -181,11 +183,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
-  NSString *suggestHost
-    = [[[HGSPluginLoader sharedPluginLoader] delegate] suggestHost];
-  NSString *baseURL = [NSString stringWithFormat:kHGSGoogleSuggestBase, suggestHost];
   self = [self initWithConfiguration:configuration
-                            baseURL:baseURL];
+                            baseURL:kHGSGoogleSuggestBase];
   return self;
 }
 
@@ -361,16 +360,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
   NSMutableDictionary *argumentDictionary =
     [NSMutableDictionary dictionaryWithObjectsAndKeys:
-#if TARGET_OS_IPHONE
-    @"iphoneapp", @"client", 
-#else   
-     @"qsb-mac", @"client",
-#endif
-    @"t",@"hjson", // Horizontal JSON. http://wiki/Main/GoogleSuggestServerAPI
-    @"t", @"types", // Add type of suggest (SuggestResults::SuggestType)
-    [self suggestLanguage], @"hl", // Language (eg. en)
-    string, @"q", // Partial query.
-    nil]; 
+     [self clientID], @"client",
+     @"t",@"hjson", // Horizontal JSON. http://wiki/Main/GoogleSuggestServerAPI
+     @"t", @"types", // Add type of suggest (SuggestResults::SuggestType)
+     [self suggestLanguage], @"hl", // Language (eg. en)
+     string, @"q", // Partial query.
+     nil]; 
   
   // Enable spelling suggestions.
   [argumentDictionary setObject:@"t" forKey:@"spell"];
@@ -614,10 +609,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       }
 
       if (!([suggestionString hasPrefix:@"http://"])) {
-        HGSLog(@"Unexpected url %@ for navsuggestion: %@ from response: %@ "
-               @"for query: %@", 
-               suggestionString, suggestionItem, response, query);
-        continue;
+        suggestionString 
+          = [NSString stringWithFormat:@"http://%@", suggestionString];
       }
       urlString = suggestionString;
       NSNumber *yesValue = [NSNumber numberWithBool:YES];
@@ -822,6 +815,15 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     suggestedLanguage = @"en";  // Default, just in case.
   }
   return suggestedLanguage;
+}
+
+- (NSString *)clientID {
+  NSString *clientID = nil;
+  clientID = [[[HGSPluginLoader sharedPluginLoader] delegate] clientID];
+  if (!clientID) {
+    clientID = @"unknown";
+  }
+  return clientID;
 }
 
 #pragma mark HGSCallSearchSource Implementation

@@ -52,12 +52,9 @@ typedef enum {
 // Returns an array of strings w/ the plugin folders.
 - (NSArray*)pluginFolders;
 
-// TODO(dmaclach): revisit these and see how necessary they are
-- (NSString *)navSuggestHost;
-
-- (NSString *)suggestHost;
-
 - (NSString *)suggestLanguage;
+
+- (NSString *)clientID;
 
 // When a new plugin is loaded, this method is called to approve it. certRef
 // will contain the certificate that was used to code sign the plugin
