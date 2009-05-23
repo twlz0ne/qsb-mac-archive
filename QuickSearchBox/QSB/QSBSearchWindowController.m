@@ -1052,7 +1052,7 @@ doCommandBySelector:(SEL)commandSelector {
   // second, determine a frame that actually fits within the screen.
   NSRect actualFrame = [self fullyExposedFrameForFrame:proposedFrame
                                         respectingDock:YES
-                                              onScreen:[resultsWindow_ screen]];
+                                              onScreen:[queryWindow screen]];
 
   if (!NSEqualRects(actualFrame, proposedFrame)) {
     // We need to move the query window as well as the results window.
@@ -1384,10 +1384,7 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (void)forceWindowOnScreen {
   NSWindow *window = [self window];
-  NSRect exposeRect = [self fullyExposedFrameForFrame:[window frame]
-                                        respectingDock:YES
-                                             onScreen:[window screen]];
-  [window setFrame:exposeRect display:YES animate:YES];
+  [window center];
 }
 
 - (void)updatePivotToken {
