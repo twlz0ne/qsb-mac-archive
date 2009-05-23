@@ -175,7 +175,8 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  return [GTMAXUIElement isAccessibilityEnabled];
+  return [GTMAXUIElement isAccessibilityEnabled]
+    && [super isValidSourceForQuery:query];
 }
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {

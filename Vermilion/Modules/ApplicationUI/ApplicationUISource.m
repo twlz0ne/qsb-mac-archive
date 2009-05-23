@@ -186,7 +186,8 @@ NSString *const kAppUISourceAttributeElementKey
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  return [GTMAXUIElement isAccessibilityEnabled];
+  return [GTMAXUIElement isAccessibilityEnabled] 
+    && [super isValidSourceForQuery:query];
 }
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
