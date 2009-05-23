@@ -29,6 +29,8 @@
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Calculator Source</string>
+			<key>HGSSearchSourceCannotArchive</key>
+			<true/>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>
