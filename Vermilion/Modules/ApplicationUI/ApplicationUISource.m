@@ -34,7 +34,7 @@
 #import "ApplicationUISource.h"
 #import "GTMAXUIElement.h"
 #import "ApplicationUIAction.h"
-#import "HGSStringUtil.h"
+#import "HGSTokenizer.h"
 #import "GTMNSWorkspace+Running.h"
 
 NSString *const kAppUISourceAttributeElementKey 
@@ -109,7 +109,7 @@ NSString *const kAppUISourceAttributeElementKey
 
 - (void)addResultsFromElement:(GTMAXUIElement*)element 
                       toArray:(NSMutableArray*)array
-                     matching:(NSString *)rawString {
+                     matching:(NSString *)queryString {
   if (element) {
     NSArray *children 
       = [element accessibilityAttributeValue:NSAccessibilityChildrenAttribute];
@@ -121,7 +121,7 @@ NSString *const kAppUISourceAttributeElementKey
       NSString *role 
         = [child stringValueForAttribute:NSAccessibilityRoleAttribute];
       if ([placeHolderRoles containsObject:role]) {
-        [self addResultsFromElement:child toArray:array matching:rawString];
+        [self addResultsFromElement:child toArray:array matching:queryString];
       } else {
         NSNumber *enabled 
           = [child accessibilityAttributeValue:NSAccessibilityEnabledAttribute];
@@ -135,9 +135,10 @@ NSString *const kAppUISourceAttributeElementKey
         
         // Filter out the ones we don't want.
         NSString *compareName 
-          = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:name];
+          = [HGSTokenizer tokenizeString:name];
         
-        if ([rawString length] && ![compareName hasPrefix:rawString]) {
+        CGFloat score = HGSScoreForAbbreviation(compareName, queryString, NULL);
+        if ([queryString length] && !(score > 0.0)) {
           continue;
         }
         // TODO(dmaclach): deal with lower level UI elements such as 
@@ -165,6 +166,7 @@ NSString *const kAppUISourceAttributeElementKey
           = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              child, kAppUISourceAttributeElementKey,
              icon, kHGSObjectAttributeIconKey,
+             [NSNumber numberWithFloat:score], kHGSObjectAttributeRankKey,
              nil];
         HGSAction *defaultAction 
           = [ApplicationUIAction defaultActionForElement:child];
@@ -205,10 +207,8 @@ NSString *const kAppUISourceAttributeElementKey
   if (element) {
     NSMutableArray *results = [NSMutableArray array];
     HGSQuery* query = [operation query];
-    NSString *rawString = [query rawQueryString];
-    rawString 
-      = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:rawString];
-    [self addResultsFromElement:element toArray:results matching:rawString];
+    NSString *queryString = [query normalizedQueryString];
+    [self addResultsFromElement:element toArray:results matching:queryString];
     [operation setResults:results];
   }
 }
