@@ -54,6 +54,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   // We accept file: urls as queries, and raw paths starting with '/' or '~'.
   // (So we force yes since default is a word check)
+  // We do NOT call [super isValidForQuery:] because it will fail the / and ~
+  // check.
   BOOL isValid = YES;
   HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
