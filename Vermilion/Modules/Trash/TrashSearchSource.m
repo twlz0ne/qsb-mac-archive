@@ -31,6 +31,7 @@
 //
 
 #import <Vermilion/Vermilion.h>
+#import "HGSTokenizer.h"
 
 static NSString *kTrashResultType = HGS_SUBTYPE(@"trash", @"Trash");
 static NSString *kTrashResultUrl = @"gtrash://trash/result";
@@ -38,6 +39,8 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
 @interface TrashSearchSource : HGSCallbackSearchSource {
  @private
   NSImage *trashIcon_;
+  NSString *trashNameNormalized_;
+  NSString *trashName_;
 }
 @end
 
@@ -48,12 +51,19 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
     NSString *path = [HGSGetPluginBundle() pathForResource:@"MoveToTrash"
                                                     ofType:@"icns"];
     trashIcon_= [[NSImage alloc] initByReferencingFile:path];
+    trashName_ = HGSLocalizedString(@"Trash", 
+                                    @"The label for a result denoting the "
+                                    @"trash can found on your dock.");
+    [trashName_ retain];
+    trashNameNormalized_ = [[HGSTokenizer tokenizeString:trashName_] retain];
   }
   return self;
 }
 
 - (void) dealloc {
   [trashIcon_ release];
+  [trashName_ release];
+  [trashNameNormalized_ release];
   [super dealloc];
 }
 
@@ -70,12 +80,8 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
   if (pivotObject) {
     isValid = [[pivotObject type] isEqual:kTrashResultType];
   } else {
-    NSString *trash = HGSLocalizedString(@"Trash", 
-                                         @"The label for a result denoting the "
-                                         @"trash can found on your dock.");
-    trash = [trash lowercaseString];
     NSString *queryString = [query normalizedQueryString];
-    isValid = [trash hasPrefix:queryString];
+    isValid = [trashNameNormalized_ hasPrefix:queryString];
   }
   return isValid;
 }
@@ -84,9 +90,9 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
   NSMutableArray *results = [NSMutableArray array];
   HGSQuery *query = [operation query];
   HGSResult *pivotObject = [query pivotObject];
+  NSString *normalizedQueryString = [query normalizedQueryString];
   if (pivotObject) {
     OSErr err = noErr;
-    NSString *normalizedQueryString = [query normalizedQueryString];
     for (ItemCount i = 1; err == noErr || err != nsvErr; ++i) {
       FSVolumeRefNum refNum;
       HFSUniStr255 name;
@@ -132,16 +138,18 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
       }
     }
   } else {
+    CGFloat rank  = HGSScoreForAbbreviation(trashNameNormalized_,
+                                            normalizedQueryString, 
+                                            NULL);
     NSDictionary *attributes
       = [NSDictionary dictionaryWithObjectsAndKeys:
          trashIcon_, kHGSObjectAttributeIconKey,
+         [NSNumber numberWithFloat:rank], kHGSObjectAttributeRankKey,
          nil];
-    NSString *trash = HGSLocalizedString(@"Trash", 
-                                         @"The label for a result denoting the "
-                                         @"trash can found on your dock.");
+    
     HGSResult *result 
       = [HGSResult resultWithURL:[NSURL URLWithString:kTrashResultUrl]
-                            name:trash
+                            name:trashName_
                             type:kTrashResultType
                           source:self
                       attributes:attributes];
