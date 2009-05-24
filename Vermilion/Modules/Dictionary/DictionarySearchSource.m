@@ -42,7 +42,6 @@ NSString *kDictionaryTermKey = @"DictionaryTerm";
 static NSString *kShowInDictionaryAction
   = @"com.google.qsb.dictionary.action.open";
 static NSString *kDictionaryAppBundleId = @"com.apple.Dictionary";
-static NSString *kDictionaryPrefix = @"define";
 static const int kMinQueryLength = 3;
 
 @interface DictionarySearchSource : HGSCallbackSearchSource {
@@ -70,33 +69,38 @@ static const int kMinQueryLength = 3;
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  BOOL isValid = NO;
-  HGSResult *pivotObject = [query pivotObject];
-  if (pivotObject) {
-    if ([[pivotObject type] isEqual:kHGSTypeFileApplication]) {
-      NSURL *url = [pivotObject url];
-      NSBundle *bnd = [NSBundle bundleWithPath:[url path]];
-      if ([[bnd bundleIdentifier] isEqual:kDictionaryAppBundleId]) {
-        isValid = ([[query rawQueryString] length] > 0);
+  BOOL isValid = [super isValidSourceForQuery:query];
+  if (isValid) {
+    HGSResult *pivotObject = [query pivotObject];
+    if (pivotObject) {
+      if ([[pivotObject type] isEqual:kHGSTypeFileApplication]) {
+        NSURL *url = [pivotObject url];
+        NSBundle *bnd = [NSBundle bundleWithPath:[url path]];
+        if ([[bnd bundleIdentifier] isEqual:kDictionaryAppBundleId]) {
+          isValid = ([[query rawQueryString] length] > 0);
+        }
       }
-    }
-  } else {
-    isValid = [[query rawQueryString] hasPrefix:kDictionaryPrefix];
-    // TODO(alcor): we should support definitions below the fold for all queries
-    // but this isn't working yet.
+    } 
   }
   return isValid;
 }
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
   NSMutableSet *results = [NSMutableSet set];
-  NSString *query = [[operation query] rawQueryString];
+  HGSQuery *hgsQuery = [operation query];
+  NSString *query = [hgsQuery rawQueryString];
   
   BOOL highRelevance = NO;
-  if ([query hasPrefix:kDictionaryPrefix]) {
-    query = [query substringFromIndex:[kDictionaryPrefix length]];
-    NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@": "];
+  NSString *dictionaryPrefix = HGSLocalizedString(@"define:",
+                                                  @"prefix for explicit "
+                                                  @"dictionary searches of the "
+                                                  @"form define: foo");
+  if ([[query lowercaseString] hasPrefix:dictionaryPrefix]) {
+    query = [query substringFromIndex:[dictionaryPrefix length]];
+    NSCharacterSet *set = [NSCharacterSet whitespaceCharacterSet];
     query = [query stringByTrimmingCharactersInSet:set];
+    highRelevance = YES;
+  } else if ([hgsQuery pivotObject]) {
     highRelevance = YES;
   }
   CFRange range = DCSGetTermRangeInString(NULL, (CFStringRef)query, 0);

@@ -33,6 +33,10 @@
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSSearchSourceCannotArchive</key>
 			<true/>
+			<key>HGSSearchSourcePivotableTypes</key>
+			<array>
+				<string>file.application</string>
+			</array>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
