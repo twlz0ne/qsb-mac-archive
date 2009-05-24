@@ -73,6 +73,7 @@ static const int kMinQueryLength = 3;
   if (isValid) {
     HGSResult *pivotObject = [query pivotObject];
     if (pivotObject) {
+      isValid = NO;
       if ([[pivotObject type] isEqual:kHGSTypeFileApplication]) {
         NSURL *url = [pivotObject url];
         NSBundle *bnd = [NSBundle bundleWithPath:[url path]];
