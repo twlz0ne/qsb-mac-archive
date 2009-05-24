@@ -205,7 +205,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSInteger suggestCount = [prefs integerForKey:kGoogleSuggestCountKey];
     if (suggestCount) {
-      if ([hgsSuggestions count] || [[self queryString] length] < 3) {
+      NSUInteger length = [[self queryString] length];
+      if ([hgsSuggestions count] || length < 3 || length > 20) {
         [oldSuggestions_ autorelease];
         oldSuggestions_ = [hgsSuggestions retain]; 
       } else {
@@ -323,7 +324,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     }    
     [desktopResults_ addObject:[QSBFoldTableResult tableResult]];
   } else {
-    if ([suffixResults count] > 0 && [mainResults count] > 0) {
+    if ([suffixResults count] > 0) {
       [desktopResults_ addObjectsFromArray:suffixResults];
     }
     if (![controller queriesFinished]) {

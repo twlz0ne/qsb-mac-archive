@@ -172,8 +172,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     int suggestCount = [prefs integerForKey:kGoogleSuggestCountKey];
     int navSuggestCount = [prefs integerForKey:kGoogleNavSuggestCountKey];
     
-    // Don't show suggestions for queries under 3 letters
-    if ([[query rawQueryString] length] < 3) {
+    // Don't show suggestions for queries under 3 letters,
+    // and anything over 20 is probably a tweet or a text append, so we
+    // can stop showing suggestions there too.
+    NSUInteger length = [[query rawQueryString] length];
+    if (length < 3 || length > 20) {
       isValid = NO;
     } else if (suggestCount + navSuggestCount <= 0) {  
       isValid = NO;
