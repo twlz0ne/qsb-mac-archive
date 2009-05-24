@@ -208,7 +208,7 @@ static NSString *const kiPhoneReferenceDocSetPath
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   NSString *queryString = [query rawQueryString];
-  return [queryString length] >= 4 ? YES : NO;
+  return ([super isValidSourceForQuery:query] && [queryString length] >= 4);
 }
 
 - (void)performSearchOperation:(HGSSearchOperation *)operation {
