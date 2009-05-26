@@ -161,11 +161,16 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
       hasMoreStandardResults = YES;
       break;
     }
-    // See todo above, for now we "dedupe" simply by the fact that we're pulling
-    // from a list that just keeps getting things merged in, so we only need ptr
-    // compares.
+    // Simple de-dupe by looking for identical result matches.
     NSArray *mainHGSResults = [mainResults valueForKey:@"representedResult"];
-    if ([mainHGSResults indexOfObjectIdenticalTo:result] == NSNotFound) {
+    BOOL okayToAppend = YES;
+    for (HGSResult *currentResult in mainHGSResults) {
+      if ([currentResult isDuplicate:result]) {
+        okayToAppend = NO;
+        break;
+      }
+    }
+    if (okayToAppend) {
       QSBSourceTableResult *sourceResult
         = [QSBSourceTableResult tableResultWithResult:result];
       
