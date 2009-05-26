@@ -259,6 +259,11 @@
 		5AC3E8240F7C2F7300F171EB /* VermilionTest.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5AC3E8230F7C2F6200F171EB /* VermilionTest.py */; };
 		5ACEF2B80F40EAF5007EA38B /* QSBPluginVerifyWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACEF2B70F40EAF5007EA38B /* QSBPluginVerifyWindowController.m */; };
 		5ACEF2CB0F40EBFC007EA38B /* PluginVerifyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ACEF2C90F40EBFC007EA38B /* PluginVerifyWindow.xib */; };
+		5AEC5C5B0FBA2897005608EA /* SharedScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEC5C580FBA283C005608EA /* SharedScript.m */; };
+		5AEC5C720FBA2A29005608EA /* SharedScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEC5C580FBA283C005608EA /* SharedScript.m */; };
+		5AEC5C730FBA2A2A005608EA /* SharedScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEC5C580FBA283C005608EA /* SharedScript.m */; };
+		5AEC5C740FBA2A2C005608EA /* SharedScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEC5C580FBA283C005608EA /* SharedScript.m */; };
+		5AEC5C750FBA2A2E005608EA /* SharedScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEC5C580FBA283C005608EA /* SharedScript.m */; };
 		5AED32BA0EAFDF1F004C7187 /* HGSOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AED32B80EAFDF1F004C7187 /* HGSOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5AED32BB0EAFDF1F004C7187 /* HGSOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AED32B90EAFDF1F004C7187 /* HGSOperation.m */; };
 		5AED35E70EB7D978004C7187 /* HGSIconProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AED35E50EB7D978004C7187 /* HGSIconProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1838,6 +1843,7 @@
 		5ACEF2B60F40EAF5007EA38B /* QSBPluginVerifyWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPluginVerifyWindowController.h; sourceTree = "<group>"; };
 		5ACEF2B70F40EAF5007EA38B /* QSBPluginVerifyWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPluginVerifyWindowController.m; sourceTree = "<group>"; };
 		5ACEF2CA0F40EBFC007EA38B /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/PluginVerifyWindow.xib; sourceTree = "<group>"; };
+		5AEC5C580FBA283C005608EA /* SharedScript.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharedScript.m; sourceTree = "<group>"; };
 		5AED32B80EAFDF1F004C7187 /* HGSOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSOperation.h; sourceTree = "<group>"; };
 		5AED32B90EAFDF1F004C7187 /* HGSOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSOperation.m; sourceTree = "<group>"; };
 		5AED32BC0EAFDF2C004C7187 /* HGSOperationTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSOperationTest.m; sourceTree = "<group>"; };
@@ -3152,6 +3158,14 @@
 			path = English.lproj;
 			sourceTree = "<group>";
 		};
+		5AEC5C550FBA2824005608EA /* SharedScript */ = {
+			isa = PBXGroup;
+			children = (
+				5AEC5C580FBA283C005608EA /* SharedScript.m */,
+			);
+			path = SharedScript;
+			sourceTree = "<group>";
+		};
 		5AF0EB6A0F6074A00041E0B9 /* Dictionary */ = {
 			isa = PBXGroup;
 			children = (
@@ -3894,6 +3908,7 @@
 				33D2C4400DD0E8A600C1FBDC /* SafariBookmarks */,
 				5A0BB19A0FAB8A7D00AA4858 /* Screensaver */,
 				7F9417340EEF533B0049AE06 /* SharedFileList */,
+				5AEC5C550FBA2824005608EA /* SharedScript */,
 				8B3EF7660EF2C7CB0036FFBD /* Shortcuts */,
 				8B6F2D1D0DA2B83F0052CA40 /* SpotlightFiles */,
 				7F9FF9120DD27A530040408E /* Suggest */,
@@ -4774,6 +4789,7 @@
 			buildConfigurationList = 5A0BB16D0FAB8A6500AA4858 /* Build configuration list for PBXNativeTarget "Screensaver" */;
 			buildPhases = (
 				5A0BB1640FAB8A6300AA4858 /* Resources */,
+				5AEC5C7A0FBA2A4C005608EA /* Sources */,
 			);
 			buildRules = (
 			);
@@ -5289,6 +5305,7 @@
 				8B735F9B0EC905E900E74421 /* Resources */,
 				8B735FA20EC905E900E74421 /* AppleScript */,
 				8B735FA40EC905E900E74421 /* ShellScript */,
+				5AEC5C670FBA296C005608EA /* Sources */,
 			);
 			buildRules = (
 			);
@@ -5321,6 +5338,7 @@
 				8BCCD2630EC8E5EC00688D64 /* Resources */,
 				8BCCD2670EC8E5EC00688D64 /* AppleScript */,
 				8BCCD2690EC8E5EC00688D64 /* ShellScript */,
+				5AEC5C770FBA2A4C005608EA /* Sources */,
 			);
 			buildRules = (
 			);
@@ -5338,6 +5356,7 @@
 				8BCCD2C80EC8F8C200688D64 /* Resources */,
 				8BCCD2D70EC8F8C200688D64 /* AppleScript */,
 				8BCCD2D90EC8F8C200688D64 /* ShellScript */,
+				5AEC5C780FBA2A4C005608EA /* Sources */,
 			);
 			buildRules = (
 			);
@@ -5355,6 +5374,7 @@
 				8BCCD35A0EC8F93C00688D64 /* Resources */,
 				8BCCD36E0EC8F93C00688D64 /* AppleScript */,
 				8BCCD3700EC8F93C00688D64 /* ShellScript */,
+				5AEC5C790FBA2A4C005608EA /* Sources */,
 			);
 			buildRules = (
 			);
@@ -6912,6 +6932,46 @@
 			files = (
 				33EEA6BF0DD0DBAB005766AB /* CaminoBookmarksSource.m in Sources */,
 				8B8B130A0EEBADE400E543D0 /* HGSBundle.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AEC5C670FBA296C005608EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AEC5C5B0FBA2897005608EA /* SharedScript.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AEC5C770FBA2A4C005608EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AEC5C730FBA2A2A005608EA /* SharedScript.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AEC5C780FBA2A4C005608EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AEC5C740FBA2A2C005608EA /* SharedScript.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AEC5C790FBA2A4C005608EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AEC5C720FBA2A29005608EA /* SharedScript.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AEC5C7A0FBA2A4C005608EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AEC5C750FBA2A2E005608EA /* SharedScript.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
