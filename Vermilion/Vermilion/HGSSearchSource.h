@@ -32,7 +32,7 @@
 
 /*!
   @header
-  @discussion
+  @discussion HGSSearchSource
 */
 
 #import "HGSExtension.h"

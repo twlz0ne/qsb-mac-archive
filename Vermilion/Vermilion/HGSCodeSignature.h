@@ -32,7 +32,7 @@
 
 /*!
  @header
- @discussion
+ @discussion HGSCodeSignature
 */
 
 #import <Cocoa/Cocoa.h>

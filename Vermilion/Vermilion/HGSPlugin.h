@@ -32,7 +32,7 @@
 
 /*!
  @header
- @discussion
+ @discussion HGSPlugin
 */
 
 #import <Foundation/Foundation.h>

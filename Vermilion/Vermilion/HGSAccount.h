@@ -32,7 +32,7 @@
 
 /*!
   @header
-  @discussion
+  @discussion HGSAccount
 */
 
 #import <Foundation/Foundation.h>

@@ -33,7 +33,7 @@
 
 /*!
  @header
- @discussion
+ @discussion HGSQuery
 */
 
 #import <Foundation/Foundation.h>

@@ -34,7 +34,7 @@
 
 /*!
  @header
- @discussion
+ @discussion HGSMemorySearchSource
 */
 
 @class HGSQuery;

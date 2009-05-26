@@ -32,7 +32,7 @@
 
 /*!
  @header
- @discussion
+ @discussion HGSAbbreviationRanker
 */
 
 #import <Foundation/Foundation.h>

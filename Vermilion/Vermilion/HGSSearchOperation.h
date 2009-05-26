@@ -35,7 +35,7 @@
 
 /*!
   @header
-  @discussion
+  @discussion HGSSearchOperation
 */
 
 @class HGSQuery;

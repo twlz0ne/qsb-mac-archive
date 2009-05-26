@@ -32,7 +32,7 @@
 
 /*!
  @header
- @discussion
+ @discussion HGSExtension
 */
 
 #import <Foundation/Foundation.h>

@@ -32,7 +32,7 @@
 
 /*!
  @header
- @discussion
+ @discussion HGSSimpleAccount
 */
 
 #import "HGSAccount.h"

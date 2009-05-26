@@ -32,7 +32,7 @@
 
 /*!
  @header
- @discussion
+ @discussion HGSAction
 */
 
 #import <Foundation/Foundation.h>
@@ -130,10 +130,8 @@
   open". If there are two it should behave as "noun verb noun" such as "file
   'email to' hasselhoff" with the 2nd being the indirect object.
   
-  *** NB *** 
-  
-  Do not call this method directly. Wrap your action up in an
-  HGSActionOperation and use that instead.
+  <b>Do not call this method directly. Wrap your action up in an
+  HGSActionOperation and use that instead.</b>
   
   @param info keys: 
   1 kHGSActionDirectObjectsKey (HGSResultArray *) - the direct objects (reqd)  

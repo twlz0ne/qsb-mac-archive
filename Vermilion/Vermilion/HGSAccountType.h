@@ -32,7 +32,7 @@
 
 /*!
   @header
-  @discussion
+  @discussion HGSAccountType
 */
 
 #import "HGSExtension.h"

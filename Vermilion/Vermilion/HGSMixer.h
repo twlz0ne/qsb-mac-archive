@@ -32,7 +32,7 @@
 
 /*!
  @header
- @discussion
+ @discussion HGSMixer
 */
 
 #import <Foundation/Foundation.h>
