@@ -227,7 +227,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   
   // get us so that the IME windows appear above us as necessary.
   // http://b/issue?id=602250
-  [searchWindow setLevel:kCGStatusWindowLevel + 1];
+  [searchWindow setLevel:kCGStatusWindowLevel + 2];
   
   // Tell the window to tell us when it has changed position on the screen.
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -311,7 +311,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [searchWindow setAnimations:animations];
   [resultsWindow_ setCanBecomeKeyWindow:NO];
   [resultsWindow_ setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces]; 
-
+  
+  
   // Load up the base results views nib and install the subordinate results views.
   QSBSearchViewController *baseResultsController
     = [[[QSBSearchViewController alloc] initWithNibName:@"BaseResultsViews"
@@ -1369,6 +1370,7 @@ doCommandBySelector:(SEL)commandSelector {
   for (NSWindow *child in children) {
     [searchWindow addChildWindow:child ordered:NSWindowBelow];
   }
+  [resultsWindow_ setLevel:kCGStatusWindowLevel + 1];
   [resultsWindow_ setIgnoresMouseEvents:NO];
   [resultsWindow_ makeKeyAndOrderFront:self];
   [NSObject cancelPreviousPerformRequestsWithTarget:resultsWindow_ 
