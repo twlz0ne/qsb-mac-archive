@@ -8614,6 +8614,7 @@
 		};
 		5A0BB16A0FAB8A6500AA4858 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Screensaver/Screensaver-Info.plist";
 				PRODUCT_NAME = Screensaver;
@@ -8623,6 +8624,7 @@
 		};
 		5A0BB16B0FAB8A6500AA4858 /* Debug-gcov */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Screensaver/Screensaver-Info.plist";
 				PRODUCT_NAME = Screensaver;
@@ -8632,6 +8634,7 @@
 		};
 		5A0BB16C0FAB8A6500AA4858 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Screensaver/Screensaver-Info.plist";
 				PRODUCT_NAME = Screensaver;
@@ -9285,6 +9288,7 @@
 		};
 		8B735FA60EC905E900E74421 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Images/ImagesInfo.plist";
 				PRODUCT_NAME = Images;
@@ -9294,6 +9298,7 @@
 		};
 		8B735FA70EC905E900E74421 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Images/ImagesInfo.plist";
 				PRODUCT_NAME = Images;
@@ -9626,6 +9631,7 @@
 		};
 		8B95CBCB0F6B1DEE003BDBDD /* Debug-gcov */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Images/ImagesInfo.plist";
 				PRODUCT_NAME = Images;
@@ -9645,6 +9651,7 @@
 		};
 		8B95CBCE0F6B1DEE003BDBDD /* Debug-gcov */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Networking/NetworkingInfo.plist";
 				PRODUCT_NAME = Networking;
@@ -9717,6 +9724,7 @@
 		};
 		8B95CBD50F6B1DEE003BDBDD /* Debug-gcov */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/System/SystemInfo.plist";
 				PRODUCT_NAME = System;
@@ -9736,6 +9744,7 @@
 		};
 		8B95CBD70F6B1DEE003BDBDD /* Debug-gcov */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Volume/VolumeInfo.plist";
 				PRODUCT_NAME = Volume;
@@ -9832,6 +9841,7 @@
 		};
 		8BCCD26B0EC8E5EC00688D64 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/System/SystemInfo.plist";
 				PRODUCT_NAME = System;
@@ -9841,6 +9851,7 @@
 		};
 		8BCCD26C0EC8E5EC00688D64 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/System/SystemInfo.plist";
 				PRODUCT_NAME = System;
@@ -9850,6 +9861,7 @@
 		};
 		8BCCD2DB0EC8F8C200688D64 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Volume/VolumeInfo.plist";
 				PRODUCT_NAME = Volume;
@@ -9859,6 +9871,7 @@
 		};
 		8BCCD2DC0EC8F8C200688D64 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Volume/VolumeInfo.plist";
 				PRODUCT_NAME = Volume;
@@ -9868,6 +9881,7 @@
 		};
 		8BCCD3720EC8F93C00688D64 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Networking/NetworkingInfo.plist";
 				PRODUCT_NAME = Networking;
@@ -9877,6 +9891,7 @@
 		};
 		8BCCD3730EC8F93C00688D64 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Networking/NetworkingInfo.plist";
 				PRODUCT_NAME = Networking;
