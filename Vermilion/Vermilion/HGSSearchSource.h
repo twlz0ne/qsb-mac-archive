@@ -68,6 +68,14 @@
 @property (readonly) NSSet *pivotableTypes;
 
 /*!
+ Returns whether the results for the source should be added to the QSB shortcuts
+ list.
+ @result YES if the results from the given source should not be added to the
+         shortcuts list.
+ */
+@property (readonly) BOOL cannotArchive;
+
+/*!
   Allows a Search Sources to claim a set of file UTIs that should be ignored by
   any sources that walk file systems because this source is returning them
   through other means.  This allows a source to prevent something like a

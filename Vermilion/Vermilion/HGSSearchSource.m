@@ -54,6 +54,7 @@ static NSSet *CopyStringSetFromId(id value) {
 
 @implementation HGSSearchSource
 @synthesize pivotableTypes = pivotableTypes_;
+@synthesize cannotArchive = cannotArchive_;
 @synthesize utisToExcludeFromDiskSources = utisToExcludeFromDiskSources_;
 
 + (void)initialize {
