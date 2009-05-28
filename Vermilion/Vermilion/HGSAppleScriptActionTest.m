@@ -36,7 +36,11 @@
 #import "HGSResult.h"
 #import "HGSActionOperation.h"
 
-@interface HGSAppleScriptActionTest : GTMTestCase 
+@interface HGSAppleScriptActionTest : GTMTestCase {
+ @protected
+  BOOL actionWasGood_;
+  BOOL actionReceived_;
+}
 @end
 
 @implementation HGSAppleScriptActionTest
@@ -67,6 +71,36 @@
   HGSAppleScriptAction *action = [[[HGSAppleScriptAction alloc] 
                                    initWithConfiguration:config] autorelease];
   STAssertNil(action, nil);
+}
+
+- (void)actionReturned:(NSNotification *)ns {
+  NSDictionary *userInfo = [ns userInfo];
+  actionReceived_ = YES;
+  actionWasGood_ 
+    = [[userInfo objectForKey:kHGSActionCompletedSuccessfully] boolValue];
+}
+
+- (BOOL)waitOnActionOperationResult:(HGSActionOperation *)operation 
+                             action:(HGSAction *)action {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc addObserver:self
+         selector:@selector(actionReturned:) 
+             name:kHGSActionDidPerformNotification 
+           object:action];
+  actionWasGood_ = NO;
+  actionReceived_ = NO;
+  [operation performAction];
+  
+  int attempts = 0;
+  NSRunLoop *rl = [NSRunLoop currentRunLoop];
+  while (!actionReceived_ && attempts++ < 1000) {
+    NSDate *waitTime = [[NSDate alloc] initWithTimeIntervalSinceNow:0.01];
+    [rl runUntilDate:waitTime];
+    [waitTime release];
+  }
+  STAssertTrue(actionWasGood_, nil);
+  [nc removeObserver:self name:kHGSActionDidPerformNotification object:action];
+  return actionReceived_;
 }
 
 - (void)testAction {  
@@ -105,11 +139,9 @@
   HGSActionOperation *operation 
     = [[[HGSActionOperation alloc] initWithAction:action 
                                     directObjects:hgsResults] autorelease];
-  NSDictionary *opResults = [operation performAction];
-  BOOL wasGood = [[opResults objectForKey:kHGSActionCompletedSuccessfully] 
-                  boolValue];
-  STAssertTrue(wasGood, nil);
-  
+  STAssertTrue([self waitOnActionOperationResult:operation action:action], 
+               @"timed out waiting for action notification");
+  STAssertTrue(actionWasGood_, nil);
   NSDictionary *openConfig
     = [NSDictionary dictionaryWithObjectsAndKeys:
        bundle, kHGSExtensionBundleKey,
@@ -125,10 +157,9 @@
   operation 
     = [[[HGSActionOperation alloc] initWithAction:action 
                                     directObjects:hgsResults] autorelease];
-  opResults = [operation performAction];
-  wasGood = [[opResults objectForKey:kHGSActionCompletedSuccessfully] 
-             boolValue];
-  STAssertTrue(wasGood, nil);
+  STAssertTrue([self waitOnActionOperationResult:operation action:action],
+               @"timed out waiting for action notification");
+  STAssertTrue(actionWasGood_, nil);
 }
 
 - (void)testAppliesToRunningAppAction {  
