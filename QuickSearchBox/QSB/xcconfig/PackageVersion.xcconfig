@@ -53,7 +53,7 @@ GOOGLE_VERSION_FIXLEVEL = 0
 GOOGLE_VERSION_EXTRAINFO =
 
 // Copyright year range (ex. "2005" or "2005-2006")
-GOOGLE_VERSION_COPYRIGHT = 2005-2008
+GOOGLE_VERSION_COPYRIGHT = 2005-2009
 
 
 ////////////////////////////////////////////////////////////////////////////
