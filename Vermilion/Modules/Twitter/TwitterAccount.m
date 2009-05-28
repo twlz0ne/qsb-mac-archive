@@ -51,6 +51,13 @@ static const NSTimeInterval kAuthenticationTimeOutInterval = 15.0;
 // Check the authentication response to see if the account authenticated.
 - (BOOL)validateResponse:(NSURLResponse *)response;
 
+// Manually add the HTTP Basic authentication header for the given credentials,
+// bypassing NSURLCredential, which has a bug that caches previous credentials,
+// even when told not to.
+- (void)addAuthenticationToRequest:(NSMutableURLRequest *)request
+                          userName:(NSString *)userName
+                          password:(NSString *)password;
+
 // Open twitter.com in the user's preferred browser.
 + (BOOL)openTwitterHomePage;
 
@@ -80,15 +87,14 @@ static const NSTimeInterval kAuthenticationTimeOutInterval = 15.0;
                           timeoutInterval:kAuthenticationTimeOutInterval];
   if (authRequest) {
     [authRequest setHTTPShouldHandleCookies:NO];
+    if ([userName length]) {
+      [self addAuthenticationToRequest:authRequest
+                              userName:userName
+                              password:password];
+    }
     GDataHTTPFetcher* authSetFetcher
       = [GDataHTTPFetcher httpFetcherWithRequest:authRequest];
     [authSetFetcher setIsRetryEnabled:YES];
-    if ([userName length]) {
-      [authSetFetcher setCredential:
-       [NSURLCredential credentialWithUser:userName
-                                  password:password
-                               persistence:NSURLCredentialPersistenceNone]];
-    }
     [authSetFetcher
      setCookieStorageMethod:kGDataHTTPFetcherCookieStorageMethodFetchHistory];
     [authSetFetcher beginFetchWithDelegate:self
@@ -110,6 +116,11 @@ static const NSTimeInterval kAuthenticationTimeOutInterval = 15.0;
                           timeoutInterval:kAuthenticationTimeOutInterval];
   if (authRequest) {
     [authRequest setHTTPShouldHandleCookies:NO];
+    if (userName) {
+      [self addAuthenticationToRequest:authRequest
+                              userName:userName
+                              password:password];
+    }
     [self setAuthCompleted:NO];
     [self setAuthSucceeded:NO];
     GDataHTTPFetcher* authFetcher
@@ -117,12 +128,6 @@ static const NSTimeInterval kAuthenticationTimeOutInterval = 15.0;
     [authFetcher setIsRetryEnabled:YES];
     [authFetcher
      setCookieStorageMethod:kGDataHTTPFetcherCookieStorageMethodFetchHistory];
-    if (userName) {
-      [authFetcher setCredential:
-       [NSURLCredential credentialWithUser:userName
-                                  password:password
-                               persistence:NSURLCredentialPersistenceNone]];
-    }
     [authFetcher beginFetchWithDelegate:self
                       didFinishSelector:@selector(authFetcher:
                                                   finishedWithData:)
@@ -157,6 +162,17 @@ static const NSTimeInterval kAuthenticationTimeOutInterval = 15.0;
     valid = (statusCode == 200);
   }
   return valid;
+}
+
+- (void)addAuthenticationToRequest:(NSMutableURLRequest *)request
+                          userName:(NSString *)userName
+                          password:(NSString *)password {
+  NSString *formatted
+    = [NSString stringWithFormat:@"%@:%@", userName, password];
+  NSString *encoded = [GTMBase64 stringByEncodingData:
+                       [formatted dataUsingEncoding:NSUTF8StringEncoding]];
+  formatted = [NSString stringWithFormat:@"Basic %@", encoded];
+  [request setValue:formatted forHTTPHeaderField:@"Authorization"];
 }
 
 + (BOOL)openTwitterHomePage {
