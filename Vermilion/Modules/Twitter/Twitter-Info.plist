@@ -57,6 +57,8 @@
 			<string>com.google.qsb.twitter.account</string>
 			<key>HGSExtensionIsEnabledByDefault</key>
 			<true/>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>
