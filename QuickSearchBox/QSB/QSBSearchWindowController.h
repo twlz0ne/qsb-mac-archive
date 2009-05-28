@@ -39,7 +39,6 @@
 @class QSBMenuButton;
 @class QSBCustomPanel;
 @class QSBSearchViewController;
-@class CAAnimation;
 @class QSBWelcomeController;
 
 extern const NSTimeInterval kQSBAppearDelay;
@@ -67,7 +66,6 @@ extern const NSTimeInterval kQSBAppearDelay;
   NSTimer *findPasteBoardChangedTimer_;
   BOOL insertFindPasteBoardString_;  // should we use the find pasteboard string
   BOOL showResults_;
-  CAAnimation *searchWindowSetAlphaAnimation_;
   // Our list of corpora for the searchMenu
   NSArray *corpora_;
   // Our last visibility change userinfo dictionary for notifications

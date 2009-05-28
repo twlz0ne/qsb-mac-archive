@@ -80,6 +80,17 @@ static NSString * const kQSBQueryStringKey = @"queryString";
 static NSString * const kQSBMainInterfaceNibName = @"MainInterfaceNibName";
 static NSString * const kQSBWelcomeWindowNibName = @"WelcomeWindow";
 
+static NSString * const kQSBAnimationWindowAlphaValueName
+  = @"QSBAnimationWindowAlphaValueName";
+
+static NSString * const kQSBAnimationViewFrameOriginName
+  = @"QSBAnimationViewFrameOriginName";
+
+static NSString * const kQSBAnimationViewExitingKey 
+  = @"QSBAnimationViewExiting";
+
+static NSString * const kQSBAnimationNameKey = @"QSBAnimationName";
+
 // NSNumber value in seconds that controls how fast the QSB clears out
 // an old query once it's put in the background.
 static NSString *const kQSBResetQueryTimeoutPrefKey 
@@ -126,9 +137,6 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 // Flush all stacked view/query controllers and clear the search text
 // without any user visible view changes.
 - (void)clearAllViewControllersAndSearchString;
-
-// Remove the view associated with the search view controller from its parent.
-- (void)removeQueryView:(QSBSearchViewController *)controller;
 
 // Resets the query to blank after a given time interval
 - (void)resetQuery:(NSTimer *)timer;
@@ -299,15 +307,17 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [searchWindow setMovableByWindowBackground:YES];
   [searchWindow invalidateShadow];
   [searchWindow setAlphaValue:0.0];
-  searchWindowSetAlphaAnimation_ 
-    = [[searchWindow animationForKey:@"alphaValue"] copy];
-  [searchWindowSetAlphaAnimation_ setDelegate:self];
+  CAAnimation *searchWindowSetAlphaAnimation
+    = [[[searchWindow animationForKey:@"alphaValue"] copy] autorelease];
+  [searchWindowSetAlphaAnimation setDelegate:self];
+  [searchWindowSetAlphaAnimation setValue:kQSBAnimationWindowAlphaValueName 
+                                   forKey:kQSBAnimationNameKey];
   NSMutableDictionary *animations 
     = [NSMutableDictionary dictionaryWithDictionary:[searchWindow animations]];
   if (!animations) {
     animations = [NSMutableDictionary dictionary];
   }
-  [animations setObject:searchWindowSetAlphaAnimation_ forKey:@"alphaValue"];
+  [animations setObject:searchWindowSetAlphaAnimation forKey:@"alphaValue"];
   [searchWindow setAnimations:animations];
   [resultsWindow_ setCanBecomeKeyWindow:NO];
   [resultsWindow_ setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces]; 
@@ -1064,16 +1074,18 @@ doCommandBySelector:(SEL)commandSelector {
                               deltaPoint.x, deltaPoint.y);
     // TODO(mrossetti): Make sure that the window moves acceptably, otherwise
     // it might be necessary to not animate.
-    if (animating)
-      [[queryWindow animator] setFrame:queryFrame display:YES];
-    else
+    if (animating) {
+      [queryWindow setFrame:actualFrame display:YES animate:YES];
+    } else {
       [queryWindow setFrame:queryFrame display:YES];
+    }
   }
   
-  if (animating)
-    [[resultsWindow_ animator] setFrame:actualFrame display:YES];
-  else
+  if (animating) {
+    [resultsWindow_ setFrame:actualFrame display:YES animate:YES];
+  } else {
     [resultsWindow_ setFrame:actualFrame display:YES];
+  }
 }
 
 - (NSImageView *)previewImageView {
@@ -1133,6 +1145,8 @@ doCommandBySelector:(SEL)commandSelector {
                                            forKey:kQSBSearchWindowFrameLeftPrefKey];
   [[NSUserDefaults standardUserDefaults] setFloat:(float)topLeft.y
                                            forKey:kQSBSearchWindowFrameTopPrefKey];
+  CGFloat newWindowHeight = [activeSearchViewController_ windowHeight];
+  [self setResultsWindowHeight:newWindowHeight animating:NO];
 }
 
 #pragma mark NSWindow Notification Methods
@@ -1302,10 +1316,15 @@ doCommandBySelector:(SEL)commandSelector {
 #pragma mark Animations
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)finished {
-  if (finished) {
-   [self performSelector:@selector(animationStopped)
-              withObject:nil 
-              afterDelay:0.0];
+  NSString *name = [anim valueForKey:kQSBAnimationNameKey];
+  if ([name isEqualTo:kQSBAnimationWindowAlphaValueName] && finished) {
+    
+    [self performSelector:@selector(animationStopped)
+               withObject:nil 
+               afterDelay:0.0];
+  } else if ([name isEqualTo:kQSBAnimationViewFrameOriginName]) {
+    NSView *view = [anim valueForKey:kQSBAnimationViewExitingKey];
+    [view removeFromSuperview];
   }
 }
 
@@ -1344,9 +1363,10 @@ doCommandBySelector:(SEL)commandSelector {
   [[NSAnimationContext currentContext] setDuration:kQSBShortHideDuration];
   
   [resultsWindow_ setIgnoresMouseEvents:YES];
-  [[resultsWindow_ animator] setFrame:NSOffsetRect([resultsWindow_ frame], 
+  [resultsWindow_ setFrame:NSOffsetRect([resultsWindow_ frame], 
                                                    0.0, 0.0) 
-                              display:YES];
+                   display:YES
+                   animate:YES];
   [[resultsWindow_ animator] setAlphaValue:0.0];
   [NSAnimationContext endGrouping];
   
@@ -1359,8 +1379,9 @@ doCommandBySelector:(SEL)commandSelector {
   NSRect frame = [resultsWindow_ frame];
   [resultsWindow_ setAlphaValue:0.0];  
   
-  [[resultsWindow_ animator]
-   setFrame:NSOffsetRect(frame, 0.0, kResultsAnimationDistance) display:YES];
+  [resultsWindow_ setFrame:NSOffsetRect(frame, 0.0, kResultsAnimationDistance) 
+                   display:YES
+                   animate:YES];
   NSWindow *searchWindow = [self window];
   // Fix for stupid Apple ordering bug. By removing and re-adding all the
   // the children we keep the window list in the right order.
@@ -1447,6 +1468,25 @@ doCommandBySelector:(SEL)commandSelector {
   [self updatePivotToken];
 }
 
+- (void)prepareViewSlideAnimation:(NSView *)view exiting:(BOOL)exiting {
+  CAAnimation *animation = [NSView defaultAnimationForKey:@"frameOrigin"];
+  if (exiting) {
+    animation = [[animation copy] autorelease];
+    [animation setDelegate:self];
+    [animation setValue:kQSBAnimationViewFrameOriginName 
+                 forKey:kQSBAnimationNameKey];
+    [animation setValue:view forKey:kQSBAnimationViewExitingKey];
+  }
+  id viewAnimator = [view animator];
+  NSMutableDictionary *animations 
+    = [[[viewAnimator animations] mutableCopy] autorelease];
+  if (!animations) {
+    animations = [NSMutableDictionary dictionary];
+  }
+  [animations setValue:animation forKey:@"frameOrigin"];
+  [viewAnimator setAnimations:animations];
+}
+
 - (void)pushViewController:(NSViewController *)viewController {
   QSBSearchViewController *searchViewController = nil;
   if ([viewController isKindOfClass:[QSBSearchViewController class]]) {
@@ -1466,22 +1506,23 @@ doCommandBySelector:(SEL)commandSelector {
     [activeSearchViewController_ setSavedPivotQueryString:savedQueryString];
     [searchTextFieldEditor_ resetCompletion];
     
-    // Immediately resize the window.
-    [self setResultsWindowHeight:[activeSearchViewController_ windowHeight]
-                       animating:NO];
-    
     [[viewController view] setFrame:[self rightOffscreenViewRect]];
-    [[self resultsView] addSubview:[viewController view]];
+    
+    NSView *resultsView = [self resultsView];
+    NSView *viewControllerView = [viewController view];
+    [viewControllerView setFrame:[self rightOffscreenViewRect]];
+    [resultsView addSubview:viewControllerView];
+    
+    NSView *activeSearchView = [activeSearchViewController_ view];
+    [self prepareViewSlideAnimation:activeSearchView exiting:YES];
+    [self prepareViewSlideAnimation:viewControllerView exiting:NO];
     
     // Slide out the old and slide in the new
     [NSAnimationContext beginGrouping];
     [[NSAnimationContext currentContext] setDuration:kQSBPushPopDuration];
-    [[[activeSearchViewController_ view] animator] setFrame:[self leftOffscreenViewRect]];
-    [[[viewController view] animator] setFrame:[self mainViewRect]];
+    [[activeSearchView animator] setFrame:[self leftOffscreenViewRect]];
+    [[viewControllerView animator] setFrame:[self mainViewRect]];
     [NSAnimationContext endGrouping];
-    [self performSelector:@selector(removeQueryView:)
-               withObject:activeSearchViewController_
-               afterDelay:kQSBPushPopDuration];
   } else {
     [[viewController view] setFrame:[self mainViewRect]];
     [[self resultsView] addSubview:[viewController view]];
@@ -1509,40 +1550,37 @@ doCommandBySelector:(SEL)commandSelector {
     [searchTextFieldEditor_ insertText:savedQueryString];
     NSRange savedQueryRange = [parentSearchViewController savedPivotQueryRange];
     [searchTextFieldEditor_ setSelectedRange:savedQueryRange];
+        
+    NSView *resultsView = [self resultsView];
+    NSView *parentSearchView = [parentSearchViewController view];
+    [parentSearchView setFrame:[self leftOffscreenViewRect]];
+    [resultsView addSubview:parentSearchView];
     
-    // Immediately resize the window.
-    [self setResultsWindowHeight:[parentSearchViewController windowHeight]
-                       animating:NO];
-    
-    [[parentSearchViewController view] setFrame:[self leftOffscreenViewRect]];
-    [[self resultsView] addSubview:[parentSearchViewController view]];
+    NSView *activeView = [activeSearchViewController_ view];
+
+    [self prepareViewSlideAnimation:activeView exiting:YES];
+    [self prepareViewSlideAnimation:parentSearchView exiting:NO];
 
     // Slide the top controller out and the parent controller in.
-    NSTimeInterval delay = 0;
-    NSView *activeView = [activeSearchViewController_ view];
-    NSView *parentView = [parentSearchViewController view];
     NSRect mainViewRect = [self mainViewRect];
     NSRect rightOffscreenViewRect = [self rightOffscreenViewRect];
     if (animate) {
       [NSAnimationContext beginGrouping];
       [[NSAnimationContext currentContext] setDuration:kQSBPushPopDuration];
       [[activeView animator] setFrame:rightOffscreenViewRect];
-      [[parentView animator] setFrame:mainViewRect];
+      [[parentSearchView animator] setFrame:mainViewRect];
       [NSAnimationContext endGrouping];
-      delay = kQSBPushPopDuration;
     } else {
       [activeView setFrame:rightOffscreenViewRect];
-      [parentView setFrame:mainViewRect];
+      [parentSearchView setFrame:mainViewRect];
+      [activeView removeFromSuperview];
     }
-    [self performSelector:@selector(removeQueryView:)
-               withObject:activeSearchViewController_
-               afterDelay:delay];
     
     [activeSearchViewController_ setParentSearchViewController:nil];
     [self setActiveSearchViewController:parentSearchViewController];
 
     [self completeQueryText];
-}
+  }
   return parentSearchViewController;
 }
 
@@ -1552,9 +1590,6 @@ doCommandBySelector:(SEL)commandSelector {
   [searchTextField_ setStringValue:@""];
 }
 
-- (void)removeQueryView:(QSBSearchViewController *)queryController {
-  [[queryController view] removeFromSuperview];  
-}
 
 - (void)resetQuery:(NSTimer *)timer {
   queryResetTimer_ = nil;
