@@ -32,6 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import "GTMNSString+URLArguments.h"
+#import "GTMGoogleSearch.h"
 
 // TODO: should either of these get a hl= based on our running UI?
 static NSString *const kWeatherDataURL
@@ -126,9 +127,16 @@ static NSString *const kWeatherResultURL
     location = [rawQuery substringFromIndex:[localizedPrefix length]];
   }
   NSString *escapedLocation = [location gtm_stringByEscapingForURLArgument];
-  
-  NSString *urlStr = [NSString stringWithFormat:kWeatherDataURL, 
-                      escapedLocation];
+  GTMGoogleSearch *gsearch = [GTMGoogleSearch sharedInstance];
+  NSDictionary *arguments 
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       [NSNull null], @"q",
+       escapedLocation, @"weather",
+       @"xml", @"output",
+       nil];
+  NSString *urlStr = [gsearch searchURLFor:@"" 
+                                    ofType:@"ig/api" 
+                                 arguments:arguments];
   NSURL *url = [NSURL URLWithString:urlStr];
   if (url) {
     // TODO: make this an async using GDataHTTPFetcher (means this search op is
@@ -190,10 +198,13 @@ static NSString *const kWeatherResultURL
           details = [NSString stringWithFormat:localizedString, temp, units, 
                      wind];
         }          
-        
+
         // build an open url
-        NSString *resultURLStr
-          = [NSString stringWithFormat:kWeatherResultURL, escapedLocation];
+        NSString *searchStr = [NSString stringWithFormat:@"weather%%20%@", 
+                               escapedLocation];
+        NSString *resultURLStr = [gsearch searchURLFor:searchStr
+                                                ofType:GTMGoogleSearchWeb
+                                             arguments:nil];
         NSURL *resultURL = [NSURL URLWithString:resultURLStr];
         // Cheat, force this result high in the list.
         // TODO(dmaclach): figure out a cleaner way to get results like this 

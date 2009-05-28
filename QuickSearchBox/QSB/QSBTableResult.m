@@ -44,6 +44,7 @@
 #import "GTMNSObject+KeyValueObserving.h"
 #import "GTMMethodCheck.h"
 #import "QSBHGSDelegate.h"
+#import "GTMGoogleSearch.h"
 
 typedef enum {
   kQSBResultDescriptionTitle = 0,
@@ -496,14 +497,16 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (id)initWithQuery:(NSString*)query {
   NSString *name = nil;
   NSString *urlString = nil;
+  GTMGoogleSearch *googleSearch = [GTMGoogleSearch sharedInstance];
   if (![query length]) {
     name = NSLocalizedString(@"Google Search", @"");
-    urlString = @"http://www.google.com";
+    urlString = [googleSearch searchURLFor:nil ofType:@"webhp" arguments:nil];
   } else {
     name = query;
-    NSString *formatString = @"http://www.google.com/search?q=%@";
     NSString *cleanedQuery = [query gtm_stringByEscapingForURLArgument];
-    urlString = [NSString stringWithFormat:formatString, cleanedQuery];
+    urlString = [googleSearch searchURLFor:cleanedQuery 
+                                    ofType:GTMGoogleSearchWeb 
+                                 arguments:nil];
   }
   NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                               [self displayIcon], kHGSObjectAttributeIconKey, 

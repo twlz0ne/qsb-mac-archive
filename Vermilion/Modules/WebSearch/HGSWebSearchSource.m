@@ -35,6 +35,7 @@
 #import "GTMDefines.h"
 #import "GTMGarbageCollection.h"
 #import "GTMNSString+URLArguments.h"
+#import "GTMGoogleSearch.h"
 
 // TODO(dmaclach): should this be off webpage?
 #define kHGSTypeSearchCorpus @"searchcorpus"
@@ -52,8 +53,6 @@ static NSString *const kWebSourceIconName = @"blue-searchhistory";
 #endif
 
 static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchURLFormat";
-static NSString* const kGoogleSiteSearchFormat
-  = @"http://www.google.com/search?q=%1$@&as_sitesearch=%2$@";
 
 @implementation HGSWebSearchSource
 
@@ -82,11 +81,18 @@ static NSString* const kGoogleSiteSearchFormat
   } else {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     NSString *searchFormat = [ud stringForKey:kWebSourceSiteSearchOverrideKey];
-    if (!searchFormat) searchFormat = kGoogleSiteSearchFormat;
-    
-    urlString = [NSString stringWithFormat:searchFormat,
-                     escapedString,
-                     [[result url] host]];
+    NSString *host = [[result url] host];
+    if (!searchFormat) {
+      GTMGoogleSearch *googleSearch = [GTMGoogleSearch sharedInstance];
+      NSDictionary *arguments 
+        = [NSDictionary dictionaryWithObject:host forKey:@"as_sitesearch"];
+      urlString = [googleSearch searchURLFor:escapedString 
+                                      ofType:GTMGoogleSearchWeb 
+                                   arguments:arguments];
+    } else {
+      urlString = [NSString stringWithFormat:searchFormat,
+                   escapedString, [[result url] host]];
+    }
   }
   return [NSURL URLWithString:urlString];
 }

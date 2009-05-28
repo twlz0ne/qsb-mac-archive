@@ -31,6 +31,7 @@
 //
 
 #import <AppKit/AppKit.h>
+#import "GTMGoogleSearch.h"
 
 @interface QSBGoogleSuggestURLHandler : NSObject 
 @end
@@ -44,9 +45,12 @@
     if ([resourceSpec hasPrefix:slashslash]) {
       resourceSpec = [resourceSpec substringFromIndex:[slashslash length]];
     }
+    GTMGoogleSearch *googleSearch = [GTMGoogleSearch sharedInstance];
+    
     NSString *newURLString
-    = [NSString stringWithFormat:@"http://www.google.com/search?q=%@", 
-       resourceSpec];
+      = [googleSearch searchURLFor:resourceSpec 
+                            ofType:GTMGoogleSearchWeb 
+                         arguments:nil];
     url = [NSURL URLWithString:newURLString];
     isGood = [[NSWorkspace sharedWorkspace] openURL:url];
   }

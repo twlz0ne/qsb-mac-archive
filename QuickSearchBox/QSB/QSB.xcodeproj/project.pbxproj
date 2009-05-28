@@ -745,6 +745,7 @@
 		8B9250DF0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B9250DC0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m */; };
 		8B92527B0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B92527A0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m */; };
 		8B9257170EE9CCF300F3DF32 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
+		8B93E3A80FC8F7A50077616C /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B95CCB60F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -943,6 +944,9 @@
 		8BE8488F0E9425C200C611B0 /* QSBKeyMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BE8488E0E9425C200C611B0 /* QSBKeyMap.m */; };
 		8BE848B40E94313A00C611B0 /* QSBKeyMapTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BE848B30E94313A00C611B0 /* QSBKeyMapTest.m */; };
 		8BE84A790E94575000C611B0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
+		8BF442D30FC74ED500C29AA1 /* GTMGoogleSearch.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BF442D10FC74ED500C29AA1 /* GTMGoogleSearch.h */; };
+		8BF442D40FC74ED500C29AA1 /* GTMGoogleSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BF442D20FC74ED500C29AA1 /* GTMGoogleSearch.m */; };
+		8BF4444E0FC7780800C29AA1 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8BF517910EDBC11000D981A0 /* QSBHGSDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BF517900EDBC11000D981A0 /* QSBHGSDelegate.m */; };
 		8BF52D900EDFD52D00D981A0 /* HGSActionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA74AA0DA416B60052F620 /* HGSActionOperation.m */; };
 		8BF52D910EDFD53500D981A0 /* HGSActionOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FEA74A90DA416B60052F620 /* HGSActionOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1150,13 +1154,6 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
-		62A4AC7B0F2FCD950007CD99 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
-			remoteInfo = Vermilion;
-		};
 		62A4AD570F2FCFC50007CD99 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1165,20 +1162,6 @@
 			remoteInfo = Twitter;
 		};
 		62B7CDE50E63743500299B23 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
-			remoteInfo = Vermilion;
-		};
-		62C5CAD20FA1318D000896CD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B77E0DB0F28FC3B00FA2A3C;
-			remoteInfo = GData;
-		};
-		62EA8BBF0F2E7DE200C92E0B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
@@ -1381,35 +1364,21 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
-		8B77DC440F279D2100FA2A3C /* PBXContainerItemProxy */ = {
+		8B93E3B20FC8F81F0077616C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8BD97D090E636D8C00F5C83B;
-			remoteInfo = GTM;
+			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
+			remoteInfo = Vermilion;
 		};
-		8B77E14E0F28FE4600FA2A3C /* PBXContainerItemProxy */ = {
+		8B93E3B80FC8F84F0077616C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B77E0DB0F28FC3B00FA2A3C;
-			remoteInfo = test;
+			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
+			remoteInfo = Vermilion;
 		};
-		8B77E1520F28FE5900FA2A3C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B77E0DB0F28FC3B00FA2A3C;
-			remoteInfo = test;
-		};
-		8B77E15A0F28FE6D00FA2A3C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B77E0DB0F28FC3B00FA2A3C;
-			remoteInfo = test;
-		};
-		8B7DAB030DB9B288008B5C71 /* PBXContainerItemProxy */ = {
+		8B93E3BC0FC8F86B0077616C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
@@ -1451,20 +1420,6 @@
 			remoteGlobalIDString = 8B77E0DB0F28FC3B00FA2A3C;
 			remoteInfo = GData;
 		};
-		8BC674510F58B0B4003B5C6A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B77E0DB0F28FC3B00FA2A3C;
-			remoteInfo = GData;
-		};
-		8BC674530F58B0C0003B5C6A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B77E0DB0F28FC3B00FA2A3C;
-			remoteInfo = GData;
-		};
 		8BC6E47E0FAABEC6005A0F6F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1485,13 +1440,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B77DEFE0F284A4C00FA2A3C;
 			remoteInfo = "Release Notes";
-		};
-		8BD97D8B0E636E1800F5C83B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8BD97D090E636D8C00F5C83B;
-			remoteInfo = GTM;
 		};
 		8BD988250E645EFF00F5C83B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2504,6 +2452,8 @@
 		8BE9BF8909C5EF810074EFF3 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = System/Library/Frameworks/QuickTime.framework; sourceTree = SDKROOT; };
 		8BE9BFD109C5EFCE0074EFF3 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		8BEB40F40C34822800AA2572 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		8BF442D10FC74ED500C29AA1 /* GTMGoogleSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMGoogleSearch.h; sourceTree = "<group>"; };
+		8BF442D20FC74ED500C29AA1 /* GTMGoogleSearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMGoogleSearch.m; sourceTree = "<group>"; };
 		8BF4A7360E07324300D49C0F /* QSB.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSB.pch; sourceTree = "<group>"; };
 		8BF4F9C10E3E67470093B5E3 /* GTMLargeTypeWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMLargeTypeWindow.m; sourceTree = "<group>"; };
 		8BF4F9C20E3E67470093B5E3 /* GTMLargeTypeWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMLargeTypeWindow.h; sourceTree = "<group>"; };
@@ -2581,6 +2531,7 @@
 				33D2CB450DD24E4D00C1FBDC /* Vermilion.framework in Frameworks */,
 				33D2CB430DD24E3200C1FBDC /* Security.framework in Frameworks */,
 				33D2CB440DD24E3200C1FBDC /* Foundation.framework in Frameworks */,
+				8B93E3A80FC8F7A50077616C /* GTM.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2714,6 +2665,7 @@
 				62EA8BC50F2E7DE200C92E0B /* Foundation.framework in Frameworks */,
 				62EA8BC60F2E7DE200C92E0B /* Vermilion.framework in Frameworks */,
 				62EA8BC80F2E7DE200C92E0B /* Cocoa.framework in Frameworks */,
+				8BF4444E0FC7780800C29AA1 /* GTM.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4525,6 +4477,8 @@
 				33A016DD0DD3D00A00578DE5 /* GTMGarbageCollection.h */,
 				332AD95E0DC946470009A7E9 /* GTMGeometryUtils.h */,
 				332AD95F0DC946470009A7E9 /* GTMGeometryUtils.m */,
+				8BF442D10FC74ED500C29AA1 /* GTMGoogleSearch.h */,
+				8BF442D20FC74ED500C29AA1 /* GTMGoogleSearch.m */,
 				8B834B540FBCD00000862FF5 /* GTMLogger.h */,
 				8B834AFB0FBCCFE200862FF5 /* GTMLogger.m */,
 				8BD46A810E43DD3C00BF3562 /* GTMNSAppleEventDescriptor+Foundation.h */,
@@ -4701,6 +4655,7 @@
 				8B834B580FBCD00000862FF5 /* GTMLogger.h in Headers */,
 				8B834B590FBCD00000862FF5 /* GTMTransientRootProxy.h in Headers */,
 				8B834B5A0FBCD00000862FF5 /* GTMTransientRootPortProxy.h in Headers */,
+				8BF442D30FC74ED500C29AA1 /* GTMGoogleSearch.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4739,7 +4694,6 @@
 			);
 			dependencies = (
 				33D2C6280DD1074900C1FBDC /* PBXTargetDependency */,
-				8B77E1530F28FE5900FA2A3C /* PBXTargetDependency */,
 			);
 			name = "Google Docs";
 			productName = GoogleDocs;
@@ -4812,6 +4766,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				8B93E3B30FC8F81F0077616C /* PBXTargetDependency */,
 			);
 			name = Dictionary;
 			productName = Dictionary;
@@ -4830,6 +4785,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				8B93E3BD0FC8F86B0077616C /* PBXTargetDependency */,
 			);
 			name = Trash;
 			productName = Trash;
@@ -4848,6 +4804,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				8B93E3B90FC8F84F0077616C /* PBXTargetDependency */,
 			);
 			name = Mount;
 			productName = Mount;
@@ -4945,7 +4902,6 @@
 			);
 			dependencies = (
 				6263CAE90EB79F3600FF03A1 /* PBXTargetDependency */,
-				8B77E15B0F28FE6D00FA2A3C /* PBXTargetDependency */,
 			);
 			name = Picasaweb;
 			productName = GoogleDocs;
@@ -4984,8 +4940,6 @@
 			);
 			dependencies = (
 				620CB3700FAA83AA0029801C /* PBXTargetDependency */,
-				62A4AC7A0F2FCD950007CD99 /* PBXTargetDependency */,
-				62C5CAD30FA1318D000896CD /* PBXTargetDependency */,
 			);
 			name = Twitter;
 			productName = Files;
@@ -5005,7 +4959,6 @@
 			);
 			dependencies = (
 				620CB36E0FAA83A40029801C /* PBXTargetDependency */,
-				62EA8BBE0F2E7DE200C92E0B /* PBXTargetDependency */,
 			);
 			name = GoogleAccounts;
 			productName = Files;
@@ -5138,9 +5091,6 @@
 			);
 			dependencies = (
 				620CB3630FAA838F0029801C /* PBXTargetDependency */,
-				8BD97D8C0E636E1800F5C83B /* PBXTargetDependency */,
-				8B7DAB040DB9B288008B5C71 /* PBXTargetDependency */,
-				8B77E14F0F28FE4600FA2A3C /* PBXTargetDependency */,
 				8B6128E90F46427800E29B40 /* PBXTargetDependency */,
 			);
 			name = "QSB Core";
@@ -5436,7 +5386,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				8BC674520F58B0B4003B5C6A /* PBXTargetDependency */,
 				E4F5513B0DF730A0008A846E /* PBXTargetDependency */,
 				8B1490650F71576B002E05FA /* PBXTargetDependency */,
 			);
@@ -5496,9 +5445,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				8BC674540F58B0C0003B5C6A /* PBXTargetDependency */,
 				F4FEECCD0EC4BF99000758EC /* PBXTargetDependency */,
-				8B77DC450F279D2100FA2A3C /* PBXTargetDependency */,
 				8B61295E0F46444C00E29B40 /* PBXTargetDependency */,
 			);
 			name = CorePlugin;
@@ -7349,6 +7296,7 @@
 				8B834B000FBCCFE200862FF5 /* GTMLogger.m in Sources */,
 				8B834B020FBCCFE200862FF5 /* GTMTransientRootProxy.m in Sources */,
 				8B834B030FBCCFE200862FF5 /* GTMTransientRootPortProxy.m in Sources */,
+				8BF442D40FC74ED500C29AA1 /* GTMGoogleSearch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7535,11 +7483,6 @@
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 627FAEBC0DF9D73500E3E765 /* PBXContainerItemProxy */;
 		};
-		62A4AC7A0F2FCD950007CD99 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
-			targetProxy = 62A4AC7B0F2FCD950007CD99 /* PBXContainerItemProxy */;
-		};
 		62A4AD580F2FCFC50007CD99 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 62A4AC790F2FCD950007CD99 /* Twitter */;
@@ -7549,16 +7492,6 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 62B7CDE50E63743500299B23 /* PBXContainerItemProxy */;
-		};
-		62C5CAD30FA1318D000896CD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B77E0DB0F28FC3B00FA2A3C /* GData */;
-			targetProxy = 62C5CAD20FA1318D000896CD /* PBXContainerItemProxy */;
-		};
-		62EA8BBE0F2E7DE200C92E0B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
-			targetProxy = 62EA8BBF0F2E7DE200C92E0B /* PBXContainerItemProxy */;
 		};
 		7F9417890EEF53CD0049AE06 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7660,30 +7593,20 @@
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 8B6F2F420DA2C37C0052CA40 /* PBXContainerItemProxy */;
 		};
-		8B77DC450F279D2100FA2A3C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8BD97D090E636D8C00F5C83B /* GTM */;
-			targetProxy = 8B77DC440F279D2100FA2A3C /* PBXContainerItemProxy */;
-		};
-		8B77E14F0F28FE4600FA2A3C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B77E0DB0F28FC3B00FA2A3C /* GData */;
-			targetProxy = 8B77E14E0F28FE4600FA2A3C /* PBXContainerItemProxy */;
-		};
-		8B77E1530F28FE5900FA2A3C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B77E0DB0F28FC3B00FA2A3C /* GData */;
-			targetProxy = 8B77E1520F28FE5900FA2A3C /* PBXContainerItemProxy */;
-		};
-		8B77E15B0F28FE6D00FA2A3C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B77E0DB0F28FC3B00FA2A3C /* GData */;
-			targetProxy = 8B77E15A0F28FE6D00FA2A3C /* PBXContainerItemProxy */;
-		};
-		8B7DAB040DB9B288008B5C71 /* PBXTargetDependency */ = {
+		8B93E3B30FC8F81F0077616C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
-			targetProxy = 8B7DAB030DB9B288008B5C71 /* PBXContainerItemProxy */;
+			targetProxy = 8B93E3B20FC8F81F0077616C /* PBXContainerItemProxy */;
+		};
+		8B93E3B90FC8F84F0077616C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
+			targetProxy = 8B93E3B80FC8F84F0077616C /* PBXContainerItemProxy */;
+		};
+		8B93E3BD0FC8F86B0077616C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
+			targetProxy = 8B93E3BC0FC8F86B0077616C /* PBXContainerItemProxy */;
 		};
 		8B989F5A0FA7B977009DC652 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7694,16 +7617,6 @@
 			isa = PBXTargetDependency;
 			target = 8B77E0DB0F28FC3B00FA2A3C /* GData */;
 			targetProxy = 8BC6744D0F58B097003B5C6A /* PBXContainerItemProxy */;
-		};
-		8BC674520F58B0B4003B5C6A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B77E0DB0F28FC3B00FA2A3C /* GData */;
-			targetProxy = 8BC674510F58B0B4003B5C6A /* PBXContainerItemProxy */;
-		};
-		8BC674540F58B0C0003B5C6A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B77E0DB0F28FC3B00FA2A3C /* GData */;
-			targetProxy = 8BC674530F58B0C0003B5C6A /* PBXContainerItemProxy */;
 		};
 		8BC6E47F0FAABEC6005A0F6F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7719,11 +7632,6 @@
 			isa = PBXTargetDependency;
 			target = 8B77DEFE0F284A4C00FA2A3C /* Release Notes */;
 			targetProxy = 8BC6E4820FAABEE1005A0F6F /* PBXContainerItemProxy */;
-		};
-		8BD97D8C0E636E1800F5C83B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8BD97D090E636D8C00F5C83B /* GTM */;
-			targetProxy = 8BD97D8B0E636E1800F5C83B /* PBXContainerItemProxy */;
 		};
 		8BD988260E645EFF00F5C83B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

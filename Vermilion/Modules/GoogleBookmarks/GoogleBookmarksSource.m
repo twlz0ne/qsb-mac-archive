@@ -34,9 +34,8 @@
 #import "GTMMethodCheck.h"
 #import "GTMNSString+URLArguments.h"
 #import "KeychainItem.h"
+#import "GTMGoogleSearch.h"
 
-static NSString *const kBookmarkRequestFormat
-  = @"https://%@:%@@www.google.com/bookmarks/lookup?output=rss";
 
 static const NSTimeInterval kRefreshSeconds = 3600.0;  // 60 minutes.
 
@@ -115,9 +114,19 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   if (!currentlyFetching_ && userName && password) {
     NSString *encodedUserName = [userName gtm_stringByEscapingForURLArgument];
     NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
-    NSString *bookmarkRequestString
-      = [NSString stringWithFormat:kBookmarkRequestFormat,
-         encodedUserName, encodedPassword];
+    GTMGoogleSearch *gsearch = [GTMGoogleSearch sharedInstance];
+    NSDictionary *args = [NSDictionary dictionaryWithObject:@"rss" 
+                                                     forKey:@"output"];
+    NSString *bookmarkSearchURL = [gsearch searchURLFor:nil 
+                                                 ofType:@"bookmarks/lookup" 
+                                              arguments:args];
+    NSString *prefix = [NSString stringWithFormat:@"https://%@:%@@",
+                        encodedUserName, encodedPassword];
+    NSMutableString *bookmarkRequestString 
+      = [NSMutableString stringWithString:bookmarkSearchURL];
+    // Replacing the http:// with https, username and password
+    [bookmarkRequestString replaceCharactersInRange:NSMakeRange(0, 7) 
+                                         withString:prefix];
     NSURL *bookmarkRequestURL = [NSURL URLWithString:bookmarkRequestString];
     
     // Construct an NSMutableURLRequest for the URL and set appropriate

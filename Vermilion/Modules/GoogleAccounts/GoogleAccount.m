@@ -36,18 +36,13 @@
 #import "GTMNSString+URLArguments.h"
 #import "HGSGoogleAccountTypes.h"
 #import "HGSLog.h"
-
+#import "GTMGoogleSearch.h"
 
 static NSString *const kGoogleDomain = @"@google.com";
 static NSString *const kGoogleUKDomain = @"@google.co.uk";
-static NSString *const kGoogleURLString = @"http://www.google.com/";
-static NSString *const kAccountTestFormat
-  = @"https://www.google.com/accounts/ClientLogin?Email=%@&Passwd=%@"
-    @"&source=GoogleQuickSearch&accountType=%@";
 static NSString *const kGoogleAccountType = @"GOOGLE";
 static NSString *const kGoogleCorpAccountType = @"HOSTED_OR_GOOGLE";
 static NSString *const kHostedAccountType = @"HOSTED";
-static NSString *const kAccountCaptchaFormat = @"&logintoken=%@&logincaptcha=%@";
 static NSString *const kCaptchaImageURLPrefix
   = @"http://www.google.com/accounts/";
 
@@ -164,19 +159,30 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       }
     }
   }
-  NSString *accountTestString = [NSString stringWithFormat:kAccountTestFormat,
-                                 encodedAccountName, encodedPassword,
-                                 accountType];
+  GTMGoogleSearch *gsearch = [GTMGoogleSearch sharedInstance];
+  NSMutableDictionary *args = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                               encodedAccountName, @"Email",
+                               encodedPassword, @"Passwd",
+                               accountType, @"accountType",
+                               nil];
   NSString *captchaText = [self captchaText];
   if ([captchaText length]) {
     NSString *captchaToken = [self captchaToken];
-    accountTestString = [accountTestString stringByAppendingFormat:
-                         kAccountCaptchaFormat, captchaToken, captchaText];
+    [args setObject:captchaToken forKey:@"logintoken"];
+    [args setObject:captchaText forKey:@"logincaptcha"];
+    
     // Clear for next time.
     [self setCaptchaImage:nil];
     [self setCaptchaText:nil];
     [self setCaptchaToken:nil];
   }
+  
+  NSString *searchURL = [gsearch searchURLFor:nil 
+                                       ofType:@"accounts/ClientLogin" 
+                                    arguments:args];
+  NSString *accountTestString 
+    = [searchURL stringByReplacingCharactersInRange:NSMakeRange(0, 4)
+                                         withString:@"https"];
   NSURL *accountTestURL = [NSURL URLWithString:accountTestString];
   NSURLRequest *accountRequest
     = [NSURLRequest requestWithURL:accountTestURL
@@ -274,10 +280,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 + (BOOL)openGoogleHomePage {
-  NSURL *googleURL = [NSURL URLWithString:kGoogleURLString];
+  GTMGoogleSearch *gsearch = [GTMGoogleSearch sharedInstance];
+  NSString *url = [gsearch searchURLFor:nil ofType:@"webhp" arguments:nil];
+  NSURL *googleURL = [NSURL URLWithString:url];
   BOOL success = [[NSWorkspace sharedWorkspace] openURL:googleURL];
   if (!success) {
-    HGSLogDebug(@"Failed to open %@", kGoogleURLString);
+    HGSLogDebug(@"Failed to open %@", googleURL);
     NSBeep();
   }
   return success;
