@@ -34,6 +34,7 @@
 #import "GTMNSFileManager+Carbon.h"
 #import "GTMGarbageCollection.h"
 #import "GTMMethodCheck.h"
+#import "HGSTokenizer.h"
 
 // The RecentDocumentsSource provides results containing
 // the recent documents opened for the application being pivoted.
@@ -52,8 +53,12 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
+  BOOL isValid = NO;
   HGSResult *pivotObject = [query pivotObject];
-  return pivotObject ? YES : NO;
+  if (pivotObject) {
+    isValid = [super isValidSourceForQuery:query];
+  }
+  return isValid;
 }
 
 - (void)performSearchOperation:(HGSSearchOperation *)operation {
@@ -123,7 +128,9 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
           NSString *recentPath = [manager gtm_pathFromAliasData:aliasData];
 
           if (recentPath && [manager fileExistsAtPath:recentPath]) {
-            CGFloat rank = HGSScoreForAbbreviation(recentPath,
+            NSString *basename = [recentPath lastPathComponent];
+            NSString *tokenizedName = [HGSTokenizer tokenizeString:basename];
+            CGFloat rank = HGSScoreForAbbreviation(tokenizedName,
                                                    normalizedQuery, 
                                                    NULL);
             if (rank > 0) {
