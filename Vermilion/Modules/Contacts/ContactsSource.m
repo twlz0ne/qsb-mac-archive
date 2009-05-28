@@ -352,10 +352,10 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     { kABPhoneProperty, kHGSTypeTextPhoneNumber, @"callto:+%@", @"cleanPhoneNumber:" },
     { kABEmailProperty, kHGSTypeTextEmailAddress, @"mailto:%@", nil },
     { kABJabberInstantProperty, kHGSTypeTextInstantMessage, @"xmpp:%@", nil },
-    { kABAIMInstantProperty, kHGSTypeTextInstantMessage, @"aim:%@", nil },
+    { kABAIMInstantProperty, kHGSTypeTextInstantMessage, @"aim:goim?screenname=%@", nil },
     { kABICQInstantProperty, kHGSTypeTextInstantMessage, @"icq:%@", nil },
-    { kABYahooInstantProperty, kHGSTypeTextInstantMessage, @"ymsgr:%@", nil },
-    { kABMSNInstantProperty, kHGSTypeTextInstantMessage, @"msn:%@", nil },
+    { kABYahooInstantProperty, kHGSTypeTextInstantMessage, @"ymsgr:sendim?%@", nil },
+    { kABMSNInstantProperty, kHGSTypeTextInstantMessage, @"msn:chat?contact=%@", nil },
     { kABURLsProperty, kHGSTypeWebpage, @"%@", @"cleanURL:" }
   };
     

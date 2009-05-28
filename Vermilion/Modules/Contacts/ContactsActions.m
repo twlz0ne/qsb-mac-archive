@@ -110,7 +110,7 @@
 - (BOOL)performWithInfo:(NSDictionary*)info {
   HGSResultArray *directObjects 
     = [info objectForKey:kHGSActionDirectObjectsKey];
-  BOOL isGood = YES;
+  BOOL isGood = NO;
   
   //TODO(dmaclach): any way to make this a group chat?
   for (HGSResult *result in directObjects) {
@@ -118,19 +118,52 @@
     if ([result conformsToType:kHGSTypeTextInstantMessage]) {
       url = [result url];
     } else {
-      NSString *abID 
+      struct {
+        NSString *property_;
+        NSString *urlFormat_;
+      } addressBookToURLMap[] = {
+        { kABAIMInstantProperty, @"aim:goim?screenname=%@" },
+        { kABJabberInstantProperty, @"xmpp:%@" },
+        { kABYahooInstantProperty, @"ymsgr:sendim?%@" },
+        { kABMSNInstantProperty, @"msn:chat?contact=%@" },
+        { kABICQInstantProperty, @"icq:%@" }
+      };
+      
+      NSString *recordIdentifier 
         = [result valueForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
-      if (abID) {
-        NSString *urlString 
-          = [NSString stringWithFormat:@"iChat:compose?card=%@&style=im", abID];
-        // TODO(alcor): add support for ichat:compose?service=AIM&id=Somebody style 
-        // urls so they don't have to be in your address book (google contacts, etc.)
-        url = [NSURL URLWithString:urlString];
+      if (recordIdentifier) {
+        NSString *urlString = nil;
+        ABAddressBook *addressBook = [ABAddressBook sharedAddressBook];
+        ABRecord *person = [addressBook recordForUniqueId:recordIdentifier];
+        if (person) {
+          for (size_t i = 0; 
+               i < sizeof(addressBookToURLMap) / sizeof(addressBookToURLMap[0]); 
+               ++i) {
+            ABMultiValue *chatAddresses
+              = [person valueForProperty:addressBookToURLMap[i].property_];
+            if ([chatAddresses count]) {
+              NSString *primID = [chatAddresses primaryIdentifier];
+              NSUInteger idx = 0;
+              if (primID) {
+                idx = [chatAddresses indexForIdentifier:primID];
+                if (idx == NSNotFound) idx = 0;
+              }
+              NSString *chatAddress = [chatAddresses valueAtIndex:idx];
+              urlString 
+                = [NSString stringWithFormat:addressBookToURLMap[i].urlFormat_, 
+                   chatAddress];
+              break;
+          }
+          }
+        }
+        if (urlString) {
+          url = [NSURL URLWithString:urlString];
+        }  
       }
     }
     if (url) {
       NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-      isGood |= [ws openURL:url];
+      isGood = [ws openURL:url];
     }
   }
   return isGood;
