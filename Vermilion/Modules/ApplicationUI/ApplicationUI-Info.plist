@@ -62,6 +62,8 @@
 			<string>AXPress</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>appui.item</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -74,6 +76,8 @@
 			<string>appui.item</string>
 			<key>ApplicationUIAXAction</key>
 			<string>AXIncrement</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -86,6 +90,8 @@
 			<string>AXDecrement</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>appui.item</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -98,6 +104,8 @@
 			<string>AXConfirm</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>appui.item</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -110,6 +118,8 @@
 			<string>AXPick</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>appui.item</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -122,6 +132,8 @@
 			<string>AXCancel</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>appui.item</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -134,6 +146,8 @@
 			<string>AXRaise</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>appui.item</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -146,6 +160,8 @@
 			<string>AXShowMenu</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>appui.item</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -158,6 +174,8 @@
 			<string>AXDelete</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>appui.item</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

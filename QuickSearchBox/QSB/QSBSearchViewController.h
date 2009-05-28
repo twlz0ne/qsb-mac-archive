@@ -138,7 +138,9 @@
 
 @end
 
-// Notifications for perform actions.
+// Notification that an action will be performed.
+// If you want to know that an action did get performed, look for the
+// HGSActionDidPerformNotification
 // Object is the action id<HGSAction>
 // UserInfo keys
 //   kQSBNotificationQueryKey - query that found the object that the action is 
@@ -148,9 +150,7 @@
 //   kQSBNotificationIndirectObjectKey - the indirect object the action is 
 //                                       being performed on(HGSResult)
 //   kQSBNotificationSuccessKey - did the action complete successfully (NSNumber)
-// object is the object the action is being performed on (HGSResult)
-// WillPerform has QSBNotificationQueryKey and QSBNotificationActionKey
-// DidPerform has QSBNotificationQueryKey, QSBNotificationActionKey, and 
-// QSBNotificationSuccessKey
-#define kQSBQueryControllerWillPerformActionNotification @"QSBQueryControllerWillPerformActionNotification"
-#define kQSBQueryControllerDidPerformActionNotification @"QSBQueryControllerDidPerformActionNotification"
+// object is the action being performed (HGSAction)
+#define kQSBQueryControllerWillPerformActionNotification \
+  @"QSBQueryControllerWillPerformActionNotification"
+

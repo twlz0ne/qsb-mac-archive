@@ -140,6 +140,8 @@
 			<string>*</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.text.action.largetype</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -152,6 +154,8 @@
 			<string>file.directory.volume</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.filesystem.action.eject</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -164,6 +168,8 @@
 			<string>^Show in Finder</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -178,6 +184,10 @@
 			<string>QuickLook.png</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
+			<key>HGSActionDoesActionCauseUIContextChange</key>
+			<false/>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -190,6 +200,8 @@
 			<string>^Get Info</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file</string>
+			<key>HGSActionMustRunOnMainThread</key>
+			<true/>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

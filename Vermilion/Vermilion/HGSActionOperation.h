@@ -30,12 +30,19 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion HGSActionOperation
+*/
+
 #import <Foundation/Foundation.h>
 
-// HGSActionOperation represents a single task performed by an action
 @class HGSAction;
 @class HGSResultArray;
 
+/*!
+ HGSActionOperation represents a single task performed by an action.
+*/
 @interface HGSActionOperation : NSObject {
  @private
   HGSAction * action_;
@@ -47,24 +54,39 @@
 - (id)initWithAction:(HGSAction *)action 
        directObjects:(HGSResultArray *)directObjects
      indirectObjects:(HGSResultArray *)indirectObjects;
-- (NSDictionary*)performAction;
+- (void)performAction;
 @end
 
-// Notification sent to notification center to announce that
-// an action will be performed.
-// Object is action
-// UserInfo is dictionary with following keys
-//   kHGSActionDirectObjectsKey (reqd)
-//   kHGSActionIndirectObjectsKey (opt)
+/*!
+ Notification sent to notification center to announce that
+ an action will be performed.
+ <ul>
+  <li>Object is action</li>
+  <li>UserInfo is dictionary with following keys
+   <ul>
+    <li>kHGSActionDirectObjectsKey (reqd)</li>
+    <li>kHGSActionIndirectObjectsKey (opt)</li>
+   </ul>
+ </ul>
+*/
 extern NSString *const kHGSActionWillPerformNotification;
 
-// Notification sent to notification center to announce that
-// an action was attempted (not necessarily that it did succeed)
-// Object is action
-// UserInfo is dictionary with following keys
-//   kHGSActionDirectObjectsKey (reqd)
-//   kHGSActionIndirectObjectsKey (opt)
-//   kHGSActionCompletedSuccessfully (reqd)
+/*!
+ Notification sent to notification center to announce that
+ an action was attempted (not necessarily that it did succeed)
+ <ul>
+ <li>Object is action</li>
+ <li>UserInfo is dictionary with following keys
+  <ul>
+    <li>kHGSActionDirectObjectsKey (reqd)</li>
+    <li>kHGSActionIndirectObjectsKey (opt)</li>
+    <li>kHGSActionCompletedSuccessfully (reqd)</li>
+  </ul>
+ </ul>
+*/
 extern NSString *const kHGSActionDidPerformNotification;
 
-extern NSString* const kHGSActionCompletedSuccessfully;  // BOOL as NSNumber
+/*!
+ Key for kHGSAction*Notifications. BOOL as NSNumber.
+*/
+extern NSString* const kHGSActionCompletedSuccessfully;  

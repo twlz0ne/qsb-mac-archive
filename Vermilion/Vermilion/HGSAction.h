@@ -58,6 +58,7 @@
   NSSet *indirectObjectTypes_;
   BOOL indirectObjectOptional_;
   BOOL causesUIContextChange_;
+  BOOL mustRunOnMainThread_;
 }
 
 /*!
@@ -67,22 +68,26 @@
   @result The value of "HGSActionDirectObjectTypes" from config dict.
 */
 @property (readonly, retain) NSSet *directObjectTypes;
+
 /*!
   The types of direct objects that are valid for this action
   @result The value of "HGSActionIndirectObjectTypes" from config dict.
 */
 @property (readonly, retain) NSSet *indirectObjectTypes;
+
 /*!
   Is the indirect object optional for this action.
   @result Defaults to NO or the value of "HGSActionIndirectObjectOptional" from 
           config dict.
 */ 
 @property (readonly) BOOL indirectObjectOptional;
+
 /*!
   Should this action appear in global search results list (ie-no pivot).
   @result Defautls to YES if directObjectTypes is nil.
 */
 @property (readonly) BOOL showInGlobalSearchResults;
+
 /*!
   Does the action cause a UI Context change? In the case of QSB, should we hide
   the QSB before performing the action.
@@ -90,6 +95,13 @@
           config dict.
 */
 @property (readonly) BOOL causesUIContextChange;
+
+/*!
+ Do you have to run this action on the main thread? Most actions should be able
+ to be run in any thread.
+ @result NO or the value of "HGSActionMustRunOnMainThread" from config dict.
+ */
+@property (readonly) BOOL mustRunOnMainThread;
 
 /*!
   Does the action apply to an individual result. The calling code will check

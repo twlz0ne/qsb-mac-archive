@@ -182,16 +182,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   HGSActionOperation *op 
     = [[[HGSActionOperation alloc] initWithAction:action
                                     directObjects:results] autorelease];
-  NSDictionary *resultDict = [op performAction];
-  NSNumber *success = [resultDict objectForKey:kHGSActionCompletedSuccessfully];
-  if (![success boolValue]) {
-    NSBeep();
-    HGSLog(@"Action failed %@", action);
-  }
-  [userInfo setObject:success forKey:kQSBNotificationSuccessKey];
-  [nc postNotificationName:kQSBQueryControllerDidPerformActionNotification
-                    object:action
-                  userInfo:userInfo];  
+  [op performAction]; 
 }
 
 - (BOOL)performDefaultActionOnSelectedRow {

@@ -43,6 +43,8 @@ NSString *const kHGSActionIndirectObjectOptionalKey
   = @"HGSActionIndirectObjectOptional";
 NSString *const kHGSActionDoesActionCauseUIContextChangeKey
   = @"HGSActionDoesActionCauseUIContextChange";
+NSString *const kHGSActionMustRunOnMainThreadKey
+  = @"HGSActionMustRunOnMainThread";
 
 // The result is already retained for you
 static NSSet *CopyStringSetFromId(id value) {  
@@ -65,6 +67,7 @@ static NSSet *CopyStringSetFromId(id value) {
 @synthesize indirectObjectTypes = indirectObjectTypes_;
 @synthesize indirectObjectOptional = indirectObjectOptional_;
 @synthesize causesUIContextChange = causesUIContextChange_;
+@synthesize mustRunOnMainThread = mustRunOnMainThread_;
 
 + (void)initialize {
   if (self == [HGSAction class]) {
@@ -101,6 +104,13 @@ static NSSet *CopyStringSetFromId(id value) {
       causesUIContextChange_ = [value boolValue];
     } else {
       causesUIContextChange_ = YES;
+    }
+    
+    value = [configuration objectForKey:kHGSActionMustRunOnMainThreadKey];
+    if (value) {
+      mustRunOnMainThread_ = [value boolValue];
+    } else {
+      mustRunOnMainThread_ = NO;
     }
   }
   return self;

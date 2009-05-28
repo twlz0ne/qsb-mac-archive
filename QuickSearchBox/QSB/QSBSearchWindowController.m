@@ -1171,6 +1171,9 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification {
+  // If we resigned key because of a quick look panel, then we don't want
+  // to hide ourselves.
+  if ([[NSApp keyWindow] isKindOfClass:[QLPreviewPanel class]]) return;
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   NSTimeInterval resetInterval = [ud floatForKey:kQSBResetQueryTimeoutPrefKey];
   // preset previously in awakeFromNib:
@@ -1186,6 +1189,7 @@ doCommandBySelector:(SEL)commandSelector {
     hideWhenInactive = [hideNumber boolValue];
   }
   if (hideWhenInactive) {
+
     // If we've pivoted and have a token in the search text box we will just
     // blow everything away (http://b/issue?id=1567906), otherwise we will
     // select all of the text, so the next time the user brings us up we will

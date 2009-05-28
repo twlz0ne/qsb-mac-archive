@@ -33,10 +33,14 @@
 #import "HGSActionOperation.h"
 #import "HGSAction.h"
 #import "HGSLog.h"
+#import "HGSOperation.h"
 
-NSString *const kHGSActionWillPerformNotification = @"HSGActionWillPerformNotification";
-NSString *const kHGSActionDidPerformNotification = @"HSGActionDidPerformNotification";
-NSString* const kHGSActionCompletedSuccessfully = @"HGSActionCompletedSuccessfully";
+NSString *const kHGSActionWillPerformNotification 
+  = @"HSGActionWillPerformNotification";
+NSString *const kHGSActionDidPerformNotification 
+  = @"HSGActionDidPerformNotification";
+NSString* const kHGSActionCompletedSuccessfully 
+  = @"HGSActionCompletedSuccessfully";
 
 @implementation HGSActionOperation
 - (id)initWithAction:(HGSAction *)action 
@@ -70,33 +74,46 @@ NSString* const kHGSActionCompletedSuccessfully = @"HGSActionCompletedSuccessful
   [super dealloc];
 }
 
-- (NSDictionary*)performAction {
+- (void)performedAction:(NSNumber *)success {
+  [args_ setObject:success forKey:kHGSActionCompletedSuccessfully];
   NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-  [center postNotificationName:kHGSActionWillPerformNotification
+  [center postNotificationName:kHGSActionDidPerformNotification
                         object:action_
-                      userInfo:args_];
-  // TODO(dmaclach): when we want to revisit results on actions, no only do we
-  // need a result vs. success, we also need to figure out how we want to manage
-  // actions that take a while.  this currently works synchronous to the main
-  // event loop, so we'll need some way to mark actions as "long" so we know to
-  // spawn them in a thread, or pass some context object/observer so the action
-  // can then call back w/ the result when it's done.
+                      userInfo:args_];  
+}
+   
+- (void)performActionOperation:(id)ignored {
   BOOL result = NO;
   @try {
     // Adding exception handler as we are potentially calling out
     // to third party code here that could be nasty to us.
-    result =[action_ performWithInfo:args_];
+    result = [action_ performWithInfo:args_];
   } 
   @catch (NSException *e) {
     result = NO;
     HGSLog(@"Exception thrown performing action: %@ (%@)", action_, e);
   }
   NSNumber *success = [NSNumber numberWithBool:result ? YES : NO];
-  [args_ setObject:success forKey:kHGSActionCompletedSuccessfully];
-  [center postNotificationName:kHGSActionDidPerformNotification
+  [self performSelectorOnMainThread:@selector(performedAction:)
+                         withObject:success   
+                      waitUntilDone:NO];  
+}
+
+- (void)performAction {
+  NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+  [center postNotificationName:kHGSActionWillPerformNotification
                         object:action_
                       userInfo:args_];
-  return args_;
+  SEL selector = @selector(performActionOperation:);
+  if ([action_ mustRunOnMainThread]) {
+    [self performSelector:selector withObject:nil afterDelay:0];
+  } else {
+    NSInvocationOperation *op 
+      = [[[NSInvocationOperation alloc] initWithTarget:self 
+                                              selector:selector
+                                                object:nil] autorelease];
+    [[HGSOperationQueue sharedOperationQueue] addOperation:op];
+  }
 }
 
 @end

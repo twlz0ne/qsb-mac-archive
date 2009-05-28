@@ -59,7 +59,7 @@
         <key name="HGSActionIndirectObjectOptional" class="Boolean" localizedString="Action Account Type Required" use="optional"/>
         <key name="HGSActionShowActionInGlobalSearchResults" class="Boolean" localizedString="Action Account Type Supplied" use="optional"/>
         <key name="HGSActionDoesActionCauseUIContextChange" class="Boolean" localizedString="Action Causes UI Context Change" use="optional"/>
-        <key name="HGSActionSupportsCompoundResults" class="Boolean" localizedString="Action Supports Compound Results" use="optional"/>
+        <key name="HGSActionMustRunOnMainThread" class="Boolean" localizedString="Action Supports Compound Results" use="optional"/>
 
         <!-- Source Keys -->
         <key name="HGSSearchSourcePivotableTypes" class="StringArray" localizedString="Source Pivotable Object Type " use="optional"/>

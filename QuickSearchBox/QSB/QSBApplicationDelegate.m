@@ -52,6 +52,7 @@
 #import "QSBHGSDelegate.h"
 #import "QSBSearchViewController.h"
 #import "GTMNSObject+KeyValueObserving.h"
+#import "QLUIPrivate.h"
 
 // Local pref set once we've been launched. Used to control whether or not we
 // show the help window at startup.
@@ -938,6 +939,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
          selector:@selector(actionWillPerformNotification:)
              name:kQSBQueryControllerWillPerformActionNotification
            object:nil];
+  [nc addObserver:self
+         selector:@selector(actionDidPerformNotification:)
+             name:kHGSActionDidPerformNotification
+           object:nil];
   [nc addObserver:self 
          selector:@selector(pluginOrExtensionDidChangeEnabled:)
              name:kHGSPluginDidChangeEnabledNotification
@@ -967,6 +972,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
   hotModifiersState_ = 0;
+}
+
+- (void)applicationWillResignActive:(NSNotification *)notification {
+  QLPreviewPanel *panel = [QLPreviewPanel sharedPreviewPanel];
+  if ([panel isOpen]) {
+    [panel close];
+  }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
@@ -1041,6 +1053,16 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if ([action causesUIContextChange]) {
     [searchWindowController_ hideSearchWindowBecause:
       kQSBExecutedChangeVisiblityToggle];
+  }
+}
+
+- (void)actionDidPerformNotification:(NSNotification *)notification {
+  NSDictionary *userInfo = [notification userInfo];
+  NSNumber *success = [userInfo objectForKey:kHGSActionCompletedSuccessfully];
+  if (success && ![success boolValue]) {
+    // TODO(dmaclach): Once we are able to add localized strings again
+    // maybe put a growl notification up about the action failing.
+    NSBeep();
   }
 }
 

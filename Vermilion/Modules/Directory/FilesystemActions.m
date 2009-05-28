@@ -36,6 +36,7 @@
 #import "GTMNSAppleScript+Handler.h"
 #import "GTMGarbageCollection.h"
 #import "QLUIPrivate.h"
+#import "GTMSystemVersion.h"
 
 @interface FileSystemOpenAction : HGSAction
 @end
@@ -43,7 +44,10 @@
 @interface FileSystemOpenWithAction : FileSystemOpenAction
 @end
 
-@interface FileSystemQuickLookAction : HGSAction
+@interface FileSystemQuickLookAction : HGSAction {
+ @private
+  NSArray *urls_;
+}
 @end
 
 @interface FileSystemScriptAction : HGSAction
@@ -205,26 +209,58 @@
 @end
 
 @implementation FileSystemQuickLookAction
-  
+
+- (void)dealloc {
+  [urls_ release];
+  [super dealloc];
+}
+
 - (BOOL)causesUIContextChange {
   return NO;
+}
+
+- (NSInteger)numberOfPreviewItemsInPreviewPanel:(QLPreviewPanel *)panel {
+  return [urls_ count];
+}
+
+- (id)previewPanel:(QLPreviewPanel *)panel previewItemAtIndex:(NSInteger)idx {
+  NSURL *url = nil;
+  if (idx < [urls_ count]) {
+    url = [urls_ objectAtIndex:idx];
+  } else {
+    HGSLogDebug(@"%d >= max index %d in -[%@ %@]", 
+                idx, [urls_ count], [self class], NSStringFromSelector(_cmd));
+  }
+  return url;
 }
 
 - (BOOL)performWithInfo:(NSDictionary*)info {
   HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
-  NSArray *urls = [directObjects urls];
+  [urls_ autorelease];
+  urls_ = [[directObjects urls] copy];
   QLPreviewPanel *panel = [QLPreviewPanel sharedPreviewPanel];
   [panel setHidesOnDeactivate:NO];
-  BOOL changed = ![urls isEqualToArray:[panel URLs]];
-  [panel setURLs:urls currentIndex:0 preservingDisplayState:YES];
-  if (![panel isVisible] || changed) {
+  if ([GTMSystemVersion isSnowLeopardOrGreater]) {
+    // SnowLeopard revamped QuickLookUI. This is a bit of a hack to convince
+    // the compiler to look the other way while we call methods it doesn't
+    // know about, so we can compile on Leopard.
+    [(id)panel setDataSource:self];
+    [(id)panel reloadData];
+  } else {
+    [panel setURLs:urls_ currentIndex:0 preservingDisplayState:YES];
+  }
+  if (![panel isVisible]) {
     [NSApp activateIgnoringOtherApps:YES];
     [[panel windowController] setDelegate:self];
+    
+    // This makes sure we are on top of our query window
+    NSWindow *theKeyWindow = [NSApp keyWindow];
+    NSInteger keyLevel = [theKeyWindow level];
+    [panel setLevel:keyLevel + 1];
+    
     [panel makeKeyAndOrderFrontWithEffect:QLZoomEffect];
-  } else {
-    [panel closeWithEffect:QLZoomEffect]; 
-  }
+  } 
   return YES;
 }
 
