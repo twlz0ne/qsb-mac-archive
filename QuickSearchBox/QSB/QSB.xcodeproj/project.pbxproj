@@ -59,8 +59,8 @@
 			buildPhases = (
 			);
 			dependencies = (
-				8BC6E4830FAABEE1005A0F6F /* PBXTargetDependency */,
 				8BC6E47F0FAABEC6005A0F6F /* PBXTargetDependency */,
+				8BC6E4830FAABEE1005A0F6F /* PBXTargetDependency */,
 				8BC6E4810FAABEC9005A0F6F /* PBXTargetDependency */,
 			);
 			name = "Build All";
