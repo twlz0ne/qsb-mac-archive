@@ -79,7 +79,25 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     NSArray *contents = [fm directoryContentsAtPath:path];
     BOOL showInvisibles = ([query flags] & eHGSQueryShowAlternatesFlag) != 0;
     for (NSString *subpath in contents) {
-      if (!showInvisibles && [subpath hasPrefix:@"."]) continue;
+      if (!showInvisibles) {
+        if ([subpath hasPrefix:@"."]) continue;
+        NSString *fullPath = [path stringByAppendingFormat:@"/%@", subpath];
+        FSRef ref;
+        OSStatus osStatus
+          = FSPathMakeRef((const UInt8 *)[fullPath fileSystemRepresentation],
+                          &ref, NULL);
+        // If there's an error we err on the side of disclosure.
+        if (osStatus == noErr) {
+          FSCatalogInfo catalogInfo;
+          OSErr osErr = FSGetCatalogInfo(&ref, kFSCatInfoFinderInfo,
+                                       &catalogInfo, NULL, NULL, NULL);
+          if (osErr == noErr) {
+            FileInfo *fileInfo = (FileInfo *)(catalogInfo.finderInfo);
+            UInt16 finderFlags = (*fileInfo).finderFlags;
+            if (finderFlags & kIsInvisible) continue;
+          }
+        }
+      }
       
       NSString *tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
       float score = HGSScoreForAbbreviation(tokenizedSubpath, 
