@@ -92,7 +92,7 @@ static const int kMinQueryLength = 3;
   NSString *query = [hgsQuery rawQueryString];
   
   BOOL highRelevance = NO;
-  NSString *dictionaryPrefix = HGSLocalizedString(@"define:",
+  NSString *dictionaryPrefix = HGSLocalizedString(@"define ",
                                                   @"prefix for explicit "
                                                   @"dictionary searches of the "
                                                   @"form define: foo");
