@@ -54,6 +54,7 @@ NSString* const kHGSObjectAttributeIconKey = @"kHGSObjectAttributeIcon";
 NSString* const kHGSObjectAttributeImmediateIconKey = @"kHGSObjectAttributeImmediateIconKey";
 NSString* const kHGSObjectAttributeIconPreviewFileKey = @"kHGSObjectAttributeIconPreviewFileKey";
 NSString *const kHGSObjectAttributeCompoundIconPreviewFileKey = @"kHGSObjectAttributeCompoundIconPreviewFileKey";
+NSString* const kHGSObjectAttributeFlagIconNameKey = @"kHGSObjectAttributeFlagIconName";
 NSString* const kHGSObjectAttributeIsSyntheticKey = @"kHGSObjectAttributeIsSynthetic";
 NSString* const kHGSObjectAttributeIsContainerKey = @"kHGSObjectAttributeIsContainer";
 NSString* const kHGSObjectAttributeRankKey = @"kHGSObjectAttributeRank";

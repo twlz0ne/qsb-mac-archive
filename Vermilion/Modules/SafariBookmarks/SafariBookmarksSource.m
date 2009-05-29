@@ -108,12 +108,13 @@ static NSString* const kCachedNameTerms = @"NameTerms";
   }
   NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSUnderHomeRankFlag 
                          | eHGSNameMatchRankFlag];
-  NSImage *icon = [NSImage imageNamed:@"blue-bookmark"];
+  NSImage *icon = [NSImage imageNamed:@"blue-nav"];
   NSDictionary *attributes
     = [NSDictionary dictionaryWithObjectsAndKeys:
        urlString, kHGSObjectAttributeSourceURLKey,
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        icon, kHGSObjectAttributeIconKey,
+       @"star-flag", kHGSObjectAttributeFlagIconNameKey,
        nil];
   HGSResult* result 
     = [HGSResult resultWithURL:url

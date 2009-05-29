@@ -121,12 +121,13 @@ static NSURL* domainURLForURLString(NSString* urlString) {
     return;
   }
   NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSUnderHomeRankFlag];
-  NSImage *icon = [NSImage imageNamed:@"blue-bookmark"];
+  NSImage *icon = [NSImage imageNamed:@"blue-nav"];
   NSMutableDictionary *attributes
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        urlString, kHGSObjectAttributeSourceURLKey, 
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        icon, kHGSObjectAttributeIconKey,
+       @"star-flag", kHGSObjectAttributeFlagIconNameKey,
        nil];
   NSDate* lastVisit = [dict objectForKey:@"LastVisitedDate"];
   if (lastVisit) {

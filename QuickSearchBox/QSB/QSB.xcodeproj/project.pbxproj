@@ -220,7 +220,6 @@
 		33D2C6840DD10B8600C1FBDC /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		33D2CB3C0DD24D8D00C1FBDC /* GoogleBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 33D2CB390DD24D8D00C1FBDC /* GoogleBookmarksSource.m */; };
 		33D2CB430DD24E3200C1FBDC /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E429DF760AC1907A00E747D8 /* Security.framework */; };
-		33D2CB440DD24E3200C1FBDC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		33D2CB450DD24E4D00C1FBDC /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		33D2CBAD0DD2573100C1FBDC /* HGSMemorySearchSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 33D2CBAB0DD2573100C1FBDC /* HGSMemorySearchSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33D2CBAE0DD2573100C1FBDC /* HGSMemorySearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 33D2CBAC0DD2573100C1FBDC /* HGSMemorySearchSource.m */; };
@@ -434,12 +433,23 @@
 		7F3F75950E152BA5001AF34E /* QSBSmallScroller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F75940E152BA5001AF34E /* QSBSmallScroller.m */; };
 		7F3F7EC50F39FCE70054680A /* QSBHGSResult+NSPasteboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F7EC40F39FCE70054680A /* QSBHGSResult+NSPasteboard.m */; };
 		7F4497F20F6895EB00330B67 /* GTMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = F435DAAE0DBE4BBE0069CDE8 /* GTMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7F44B0D00FCDD19000F75764 /* history-flag.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F44B0CE0FCDD19000F75764 /* history-flag.png */; };
+		7F44B0D10FCDD19000F75764 /* star-flag.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F44B0CF0FCDD19000F75764 /* star-flag.png */; };
+		7F44B28E0FCEE0BD00F75764 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		7F495C1D0F24E65E0012A1B9 /* TextActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F495C1C0F24E65E0012A1B9 /* TextActions.m */; };
 		7F495D650F24F56D0012A1B9 /* red-gear.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7F495D640F24F56D0012A1B9 /* red-gear.icns */; };
 		7F4BE5350EA7A9CC0025D57D /* NSColor+Naming.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4BE5330EA7A9CC0025D57D /* NSColor+Naming.m */; };
 		7F5717910DB7C83F00D95EBD /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717900DB7C83F00D95EBD /* AddressBook.framework */; };
 		7F5717A90DB7C84F00D95EBD /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		7F5856E50DF83D85009EDEA5 /* NSArray+HGSCommonPrefixDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F5856E30DF83D85009EDEA5 /* NSArray+HGSCommonPrefixDetection.m */; };
+		7F58A77F0FCD8B9C0019A859 /* mail-flag.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F58A7750FCD8B9C0019A859 /* mail-flag.png */; };
+		7F58A7800FCD8B9C0019A859 /* presence-available.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F58A7760FCD8B9C0019A859 /* presence-available.png */; };
+		7F58A7810FCD8B9C0019A859 /* presence-busy.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F58A7770FCD8B9C0019A859 /* presence-busy.png */; };
+		7F58A7820FCD8B9C0019A859 /* presence-donotdisturb.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F58A7780FCD8B9C0019A859 /* presence-donotdisturb.png */; };
+		7F58A7830FCD8B9C0019A859 /* presence-idle.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F58A7790FCD8B9C0019A859 /* presence-idle.png */; };
+		7F58A7840FCD8B9C0019A859 /* presence-invisible.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F58A77A0FCD8B9C0019A859 /* presence-invisible.png */; };
+		7F58A7850FCD8B9C0019A859 /* presence-offline.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F58A77B0FCD8B9C0019A859 /* presence-offline.png */; };
+		7F58A7860FCD8B9C0019A859 /* presence-offline2.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F58A77C0FCD8B9C0019A859 /* presence-offline2.png */; };
 		7F62102C0EF1970500BBFEE1 /* QSBLargeIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F620ED80EF18DA100BBFEE1 /* QSBLargeIconView.m */; };
 		7F68BCC70D8ADE7E00712459 /* NSColor+Lighting.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F68BCC60D8ADE7E00712459 /* NSColor+Lighting.m */; };
 		7F7357DC0DC93426003DB5C6 /* amazon-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F7357CF0DC93426003DB5C6 /* amazon-icon.png */; };
@@ -1982,6 +1992,8 @@
 		7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSQLiteBackedCacheTest.m; sourceTree = "<group>"; };
 		7F3F7EC30F39FCE70054680A /* QSBHGSResult+NSPasteboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "QSBHGSResult+NSPasteboard.h"; sourceTree = "<group>"; };
 		7F3F7EC40F39FCE70054680A /* QSBHGSResult+NSPasteboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "QSBHGSResult+NSPasteboard.m"; sourceTree = "<group>"; };
+		7F44B0CE0FCDD19000F75764 /* history-flag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "history-flag.png"; sourceTree = "<group>"; };
+		7F44B0CF0FCDD19000F75764 /* star-flag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "star-flag.png"; sourceTree = "<group>"; };
 		7F495C1C0F24E65E0012A1B9 /* TextActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextActions.m; sourceTree = "<group>"; };
 		7F495D640F24F56D0012A1B9 /* red-gear.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "red-gear.icns"; sourceTree = "<group>"; };
 		7F4BE5330EA7A9CC0025D57D /* NSColor+Naming.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSColor+Naming.m"; sourceTree = "<group>"; };
@@ -1992,6 +2004,14 @@
 		7F5717A80DB7C84F00D95EBD /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		7F5856E30DF83D85009EDEA5 /* NSArray+HGSCommonPrefixDetection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+HGSCommonPrefixDetection.m"; sourceTree = "<group>"; };
 		7F5856E40DF83D85009EDEA5 /* NSArray+HGSCommonPrefixDetection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+HGSCommonPrefixDetection.h"; sourceTree = "<group>"; };
+		7F58A7750FCD8B9C0019A859 /* mail-flag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mail-flag.png"; sourceTree = "<group>"; };
+		7F58A7760FCD8B9C0019A859 /* presence-available.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "presence-available.png"; sourceTree = "<group>"; };
+		7F58A7770FCD8B9C0019A859 /* presence-busy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "presence-busy.png"; sourceTree = "<group>"; };
+		7F58A7780FCD8B9C0019A859 /* presence-donotdisturb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "presence-donotdisturb.png"; sourceTree = "<group>"; };
+		7F58A7790FCD8B9C0019A859 /* presence-idle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "presence-idle.png"; sourceTree = "<group>"; };
+		7F58A77A0FCD8B9C0019A859 /* presence-invisible.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "presence-invisible.png"; sourceTree = "<group>"; };
+		7F58A77B0FCD8B9C0019A859 /* presence-offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "presence-offline.png"; sourceTree = "<group>"; };
+		7F58A77C0FCD8B9C0019A859 /* presence-offline2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "presence-offline2.png"; sourceTree = "<group>"; };
 		7F620ED80EF18DA100BBFEE1 /* QSBLargeIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBLargeIconView.m; sourceTree = "<group>"; };
 		7F620ED90EF18DA100BBFEE1 /* QSBLargeIconView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBLargeIconView.h; sourceTree = "<group>"; };
 		7F68BCC50D8ADE7E00712459 /* NSColor+Lighting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSColor+Lighting.h"; sourceTree = "<group>"; };
@@ -2530,8 +2550,8 @@
 			files = (
 				33D2CB450DD24E4D00C1FBDC /* Vermilion.framework in Frameworks */,
 				33D2CB430DD24E3200C1FBDC /* Security.framework in Frameworks */,
-				33D2CB440DD24E3200C1FBDC /* Foundation.framework in Frameworks */,
 				8B93E3A80FC8F7A50077616C /* GTM.framework in Frameworks */,
+				7F44B28E0FCEE0BD00F75764 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3370,6 +3390,23 @@
 				7F34589C0DDE16C00050702F /* GoogleCorporaSource.m */,
 			);
 			path = GoogleCorpora;
+			sourceTree = "<group>";
+		};
+		7F58A7730FCD8B9C0019A859 /* Flags */ = {
+			isa = PBXGroup;
+			children = (
+				7F44B0CE0FCDD19000F75764 /* history-flag.png */,
+				7F44B0CF0FCDD19000F75764 /* star-flag.png */,
+				7F58A7750FCD8B9C0019A859 /* mail-flag.png */,
+				7F58A7760FCD8B9C0019A859 /* presence-available.png */,
+				7F58A7770FCD8B9C0019A859 /* presence-busy.png */,
+				7F58A7780FCD8B9C0019A859 /* presence-donotdisturb.png */,
+				7F58A7790FCD8B9C0019A859 /* presence-idle.png */,
+				7F58A77A0FCD8B9C0019A859 /* presence-invisible.png */,
+				7F58A77B0FCD8B9C0019A859 /* presence-offline.png */,
+				7F58A77C0FCD8B9C0019A859 /* presence-offline2.png */,
+			);
+			path = Flags;
 			sourceTree = "<group>";
 		};
 		7F7357270DC92B53003DB5C6 /* WebSearch */ = {
@@ -4230,6 +4267,7 @@
 				8BC3F43E0F17C7BE00896770 /* Actions */,
 				8BC3F4430F17C7BE00896770 /* CorporaIcons */,
 				8BC3F4510F17C7BE00896770 /* DefaultIcons */,
+				7F58A7730FCD8B9C0019A859 /* Flags */,
 				8BC3F4660F17C7BF00896770 /* Other */,
 				8BC3F4680F17C7BF00896770 /* ProductIcons */,
 				8BC3F4960F17C7C000896770 /* WeatherIcons */,
@@ -5970,6 +6008,16 @@
 				8BC685570F5ED38C003B5C6A /* SetUpAccount.xib in Resources */,
 				62ECB7AA0F86A17100C7B435 /* CategorySingulars.strings in Resources */,
 				8B98A2C80FA96ECF009DC652 /* WelcomeWindow.xib in Resources */,
+				7F58A77F0FCD8B9C0019A859 /* mail-flag.png in Resources */,
+				7F58A7800FCD8B9C0019A859 /* presence-available.png in Resources */,
+				7F58A7810FCD8B9C0019A859 /* presence-busy.png in Resources */,
+				7F58A7820FCD8B9C0019A859 /* presence-donotdisturb.png in Resources */,
+				7F58A7830FCD8B9C0019A859 /* presence-idle.png in Resources */,
+				7F58A7840FCD8B9C0019A859 /* presence-invisible.png in Resources */,
+				7F58A7850FCD8B9C0019A859 /* presence-offline.png in Resources */,
+				7F58A7860FCD8B9C0019A859 /* presence-offline2.png in Resources */,
+				7F44B0D00FCDD19000F75764 /* history-flag.png in Resources */,
+				7F44B0D10FCDD19000F75764 /* star-flag.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

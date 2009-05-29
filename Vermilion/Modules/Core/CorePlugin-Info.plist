@@ -151,7 +151,7 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Eject</string>
 			<key>HGSActionDirectObjectTypes</key>
-			<string>file.directory.volume</string>
+			<string>file.directory</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.filesystem.action.eject</string>
 			<key>HGSActionMustRunOnMainThread</key>

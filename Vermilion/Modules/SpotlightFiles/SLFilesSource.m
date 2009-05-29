@@ -489,6 +489,8 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   SLFilesCreateContext* context = [operation context];
   if (!context) return nil;
   
+  NSString *iconFlagName = nil;
+  
   HGSResult* result = nil;
   NSDictionary *attributes 
     = GTMCFAutorelease(MDItemCopyAttributes(item, (CFArrayRef)attributeArray_));
@@ -529,6 +531,8 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
         if (betterURI) {
           uri = betterURI;
         }
+        // TODO(alcor): are there any items that are not history?
+        iconFlagName = @"history-flag";
         break;
       case SpotlightGroupPDF:
         resultType = kHGSTypeFile;
@@ -671,6 +675,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
        lastUsedDate, kHGSObjectAttributeLastUsedDateKey,
        [NSNumber numberWithUnsignedInteger:rankFlags], kHGSObjectAttributeRankFlagsKey,
        (isURL ? uriPath : nil), kHGSObjectAttributeSourceURLKey,
+       iconFlagName, kHGSObjectAttributeFlagIconNameKey,
        nil];
   
   result = [HGSResult resultWithURL:uri
@@ -775,7 +780,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
     NSURL *url = [result url];
     if (![url isFileURL]) {
-      value = [NSImage imageNamed:@"blue-webhistory"];
+      value = [NSImage imageNamed:@"blue-nav"];
     }
   }
   if ([key isEqualToString:kHGSObjectAttributeEmailAddressesKey] &&

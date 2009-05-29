@@ -64,6 +64,7 @@ extern NSString* const kHGSObjectAttributeIconKey;  // NSImage
 extern NSString* const kHGSObjectAttributeImmediateIconKey;  // NSImage
 extern NSString* const kHGSObjectAttributeIconPreviewFileKey;  // NSURL
 extern NSString* const kHGSObjectAttributeCompoundIconPreviewFileKey;  // NSURL
+extern NSString* const kHGSObjectAttributeFlagIconNameKey;  // NSString
 extern NSString* const kHGSObjectAttributeIsSyntheticKey;  // NSNumber (BOOL)
 extern NSString* const kHGSObjectAttributeIsContainerKey;  // NSNumber (BOOL)
 extern NSString* const kHGSObjectAttributeDefaultActionKey;  // id<HGSAction>
@@ -106,6 +107,8 @@ extern NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey;  // NS
 #define kHGSTypeAction  @"action"
 #define kHGSTypeText    @"text"
 #define kHGSTypeScript  @"script"
+#define kHGSTypeDateTime @"datetime"
+#define kHGSTypeGeolocation @"geolocation"
 #define kHGSTypeSearch           HGS_SUBTYPE(kHGSTypeText, @"search")
 #define kHGSTypeSuggest          HGS_SUBTYPE(kHGSTypeText, @"suggestion")
 #define kHGSTypeDirectory        HGS_SUBTYPE(kHGSTypeFile, @"directory")

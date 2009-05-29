@@ -195,10 +195,10 @@ static NSDictionary *gBaseStringAttributes_ = nil;
                    value:[NSColor grayColor]];
   } else if (itemType == kQSBResultDescriptionSourceURL) {
     [string addAttribute:NSForegroundColorAttributeName 
-                   value:[NSColor colorWithCalibratedRed:0.609375  // 0x9C
-                                                   green:0.671875  // 0xAC
-                                                    blue:0.527344  // 0x87
-                                                   alpha:1.0]];
+                   value:[NSColor colorWithCalibratedRed:(float)0x00/0xFF
+                                                   green:(float)0x4c/0xFF
+                                                    blue:(float)0x00/0xFF
+                                                   alpha:0.5]];
   } else if (itemType == kQSBResultDescriptionTitle) {
     [string addAttribute:NSForegroundColorAttributeName 
                    value:[NSColor blackColor]];
@@ -285,6 +285,10 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   return nil;
 }
 
+- (NSImage *)flagIcon {
+  return nil;
+}
+
 - (NSImage *)displayThumbnail {
   return nil;
 }
@@ -346,9 +350,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     HGSResult *result = [self representedResult];
     if ([result conformsToType:kHGSTypeAction]) {
       [string addAttribute:NSForegroundColorAttributeName
-                     value:[NSColor colorWithCalibratedRed:0.0
-                                                     green:0.0 
-                                                      blue:1.0 
+                     value:[NSColor colorWithCalibratedRed:(float)0x33/0xFF
+                                                     green:(float)0x77/0xFF
+                                                      blue:(float)0xAA/0xFF
                                                      alpha:1.0]];
     }
   }
@@ -408,6 +412,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return [result displayName];
 }
 
+- (NSImage *)flagIcon {
+  HGSResult *result = [self representedResult];
+  NSString *iconName = [result valueForKey:kHGSObjectAttributeFlagIconNameKey]; 
+  NSImage *image = nil;
+  if (iconName) image = [NSImage imageNamed:iconName];
+  return image;
+}
+
 - (NSImage *)displayIcon {
   HGSResult *result = [self representedResult];
   return [result valueForKey:kHGSObjectAttributeIconKey];
@@ -461,7 +473,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (NSAttributedString*)sourceURLString {
-  // SourceURL is rendered as 12 pt with a color of 0x9CAC87.
+  // SourceURL is rendered as 12 pt green.
   NSMutableAttributedString *sourceURLString = nil;
   HGSResult *result = [self representedResult];
   NSString *sourceURL = [result valueForKey:kHGSObjectAttributeSourceURLKey];

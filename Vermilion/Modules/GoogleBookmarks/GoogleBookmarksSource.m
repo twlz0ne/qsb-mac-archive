@@ -184,11 +184,15 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   if (!url) {
     return;
   }
+  
+  NSImage *icon = [NSImage imageNamed:@"blue-nav"];
   NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSUnderHomeRankFlag];
   NSDictionary *attributes 
     = [NSDictionary dictionaryWithObjectsAndKeys:
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        url, kHGSObjectAttributeSourceURLKey,
+       icon, kHGSObjectAttributeIconKey,
+       @"star-flag", kHGSObjectAttributeFlagIconNameKey,
        nil];
   HGSResult* result 
     = [HGSResult resultWithURL:[NSURL URLWithString:url]

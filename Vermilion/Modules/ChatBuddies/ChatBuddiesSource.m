@@ -275,8 +275,42 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       [snippet appendString:statusString];
     }
     value = snippet;
-  }
-  else if ([key isEqualToString:kQSBObjectAttributePathCellsKey]) {
+  } else if ([key isEqualToString:kHGSObjectAttributeFlagIconNameKey]) {
+    NSDictionary *imBuddyInfo 
+      = [result valueForKey:kChatBuddyAttributeInformationKey];
+    
+    // Fetch their current status for up to date info
+    NSString *serviceName = [imBuddyInfo objectForKey:IMPersonServiceNameKey];
+    IMService *service = [IMService serviceWithName:serviceName];
+    NSString *screenName = [imBuddyInfo objectForKey:IMPersonScreenNameKey];
+    NSDictionary *currentBuddyInfo = [service infoForScreenName:screenName];    
+    
+    NSNumber *imStatus = [currentBuddyInfo objectForKey:IMPersonStatusKey];
+  
+    // These are all names of images in the main bundle
+    switch ([imStatus intValue]) {
+      case IMPersonStatusUnknown:
+        value = @"presence-invisible";
+        break;
+      case IMPersonStatusOffline:
+        value = @"presence-offline2";
+        break;
+      case IMPersonStatusIdle:
+        value = @"presence-idle";
+        break;
+      case IMPersonStatusAway:
+        value = @"presence-busy";
+        break;
+      case IMPersonStatusAvailable:
+        value = @"presence-available";
+        break;
+      case IMPersonStatusNoStatus:
+        value = @"presence-offline";
+        break;
+      default:
+        break;
+    }
+  } else if ([key isEqualToString:kQSBObjectAttributePathCellsKey]) {
     // Build three cells, the first with 'iChat', the second with the
     // service name, and the third with the screen name.  Only the
     // third cell will respond to clicks.
@@ -340,7 +374,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   HGSResult *pivot = [query pivotObject];
   if (isValid && [query pivotObject]) {
     NSString *path = [[pivot url] absoluteString];
-    isValid = [path hasSuffix:@"/iChat.app"];
+    isValid = [path hasSuffix:@"/iChat.app/"];
   }
   return isValid;
 }
