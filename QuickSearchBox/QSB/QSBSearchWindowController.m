@@ -1075,7 +1075,7 @@ doCommandBySelector:(SEL)commandSelector {
     // TODO(mrossetti): Make sure that the window moves acceptably, otherwise
     // it might be necessary to not animate.
     if (animating) {
-      [queryWindow setFrame:actualFrame display:YES animate:YES];
+      [queryWindow setFrame:queryFrame display:YES animate:YES];
     } else {
       [queryWindow setFrame:queryFrame display:YES];
     }
