@@ -46,7 +46,7 @@ static NSString* const kHGSPluginBlacklistVersion = @"1";
 static const NSTimeInterval kHGSPluginBlacklistUpdateInterval = 86400; // 1 day
 static const NSTimeInterval kHGSPluginBlacklistJitterRange = 3600; // 1 hour
 static NSString* const kHGSPluginBlacklistURL
-  = @"https://www.google.com/dl/mac/data/qsb/blacklist.xml";
+  = @"https://clients4.google.com/dl/mac/data/qsb/blacklist.xml";
 NSString* kHGSBlacklistUpdatedNotification = @"HGSBlacklistUpdatedNotification";
 
 @interface HGSPluginBlacklist()
