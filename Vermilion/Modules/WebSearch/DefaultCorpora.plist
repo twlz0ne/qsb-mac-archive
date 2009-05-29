@@ -383,5 +383,19 @@
 		<key>kHGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
+  <dict>
+    <key>kHGSCorporaSourceAttributeIconNameKey</key>
+    <string>finance</string>
+    <key>kHGSObjectAttributeName</key>
+    <string>Google Finance</string>
+    <key>kHGSCorporaSourceAttributeURIString</key>
+    <string>http://www.google.com/finance</string>
+    <key>kHGSCorporaSourceAttributeMobileURIString</key>
+    <string>finance:</string>
+    <key>kHGSObjectAttributeWebSearchTemplate</key>
+    <string>http://www.google.com/finance?q={searchterms}</string>
+    <key>kHGSObjectAttributeType</key>
+    <string>webpage.application</string>
+  </dict>
 </array>
 </plist>
