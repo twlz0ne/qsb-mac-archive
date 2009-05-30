@@ -82,7 +82,7 @@
 					</object>
 					<object class="NSMenuItem" id="622923132">
 						<reference key="NSMenu" ref="742172827"/>
-						<string key="NSTitle">^Preferences...</string>
+						<string type="base64-UTF8" key="NSTitle">XlByZWZlcmVuY2Vz4oCmA</string>
 						<string key="NSKeyEquiv">,</string>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
