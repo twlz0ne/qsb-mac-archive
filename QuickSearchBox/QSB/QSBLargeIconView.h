@@ -32,6 +32,11 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class QSBSearchWindowController;
 
-@interface QSBLargeIconView : NSImageView
+@interface QSBLargeIconView : NSImageView {
+ @private
+  IBOutlet QSBSearchWindowController *controller_;
+}
+
 @end

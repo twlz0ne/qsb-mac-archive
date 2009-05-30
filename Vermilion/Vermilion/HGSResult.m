@@ -66,6 +66,7 @@ NSString* const kHGSObjectAttributeWebSearchTemplateKey = @"kHGSObjectAttributeW
 NSString* const kHGSObjectAttributeAllowSiteSearchKey = @"kHGSObjectAttributeAllowSiteSearch";
 NSString* const kHGSObjectAttributeWebSuggestTemplateKey = @"kHGSObjectAttributeWebSuggestTemplate";
 NSString* const kHGSObjectAttributeStringValueKey = @"kHGSObjectAttributeStringValue";
+NSString* const kHGSObjectAttributePasteboardValueKey = @"kHGSObjectAttributePasteboardValue";
 
 // Contact related keys
 NSString* const kHGSObjectAttributeContactEmailKey = @"kHGSObjectAttributeContactEmail";  
@@ -307,7 +308,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     if (!value) {
       // If we haven't provided a value, ask our source for a value.
       value = [[self source] provideValueForKey:key result:self];
-    } 
+    }
     if (!value) {
       // If neither self or source provides a value, ask our HGSDelegate.
       HGSPluginLoader *loader = [HGSPluginLoader sharedPluginLoader];

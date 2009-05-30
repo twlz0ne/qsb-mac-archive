@@ -80,6 +80,8 @@
 // attempt to perform the default action on the item
 - (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller;
 
+// copies the contents of the result to the pasteboard
+- (BOOL)copyToPasteboard:(NSPasteboard *)pb;
 @end
 
 // A result that comes from one of our sources.

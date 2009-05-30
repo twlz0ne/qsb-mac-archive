@@ -79,6 +79,7 @@ extern NSString* const kHGSObjectAttributeWebSearchTemplateKey; // NSString
 extern NSString* const kHGSObjectAttributeAllowSiteSearchKey; // NSNumber BOOL - Allow this item to be tabbed into
 extern NSString* const kHGSObjectAttributeWebSuggestTemplateKey; // NSString - JSON suggest url (in google/opensearch format)
 extern NSString* const kHGSObjectAttributeStringValueKey; // NSString
+extern NSString* const kHGSObjectAttributePasteboardValueKey; // NSDictionary of types(NSString) to NSData
 
 // Keys for attribute dictionaries. Use accesors to get values.
 extern NSString* const kHGSObjectAttributeRankFlagsKey;  // NSNumber of HGSRankFlags

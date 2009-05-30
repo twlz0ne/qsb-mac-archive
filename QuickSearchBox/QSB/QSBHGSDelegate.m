@@ -38,6 +38,8 @@
 // This constant is the name for the app that should be used w/in the a Google
 // folder (for w/in Application Support, etc.)
 static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
+static NSString *const kWebURLsWithTitlesPboardType 
+  = @"WebURLsWithTitlesPboardType";
 
 @interface QSBHGSDelegate () 
 - (NSArray *)pathCellArrayForResult:(HGSResult *)result;
@@ -180,6 +182,29 @@ static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
   } else if ([key isEqualToString:kHGSObjectAttributeDefaultActionKey]) {
     HGSExtensionPoint *actionPt = [HGSExtensionPoint actionsPoint];
     value = [actionPt extensionWithIdentifier:kFileSystemOpenActionIdentifier];
+  } else if ([key isEqualToString:kHGSObjectAttributePasteboardValueKey]) {
+    NSMutableDictionary *pbValues = [NSMutableDictionary dictionary];
+    if ([result conformsToType:kHGSTypeFile]) {
+      HGSResultArray *resultArray = [HGSResultArray arrayWithResult:result];
+      NSArray *filePaths = [resultArray filePaths];
+      [pbValues setObject:filePaths forKey:NSFilenamesPboardType];
+    } else if ([result conformsToType:kHGSTypeWebpage]) {
+      NSString *name = [result displayName];
+      NSURL *url = [result url];
+      NSString *urlString = [url absoluteString];
+      NSArray *urlArray = [NSArray arrayWithObject:urlString];
+      NSArray *titleArray = [NSArray arrayWithObject:name];     
+      NSArray *webUrlsWithTitles 
+        = [NSArray arrayWithObjects:urlArray, titleArray, nil];
+                                    
+      [pbValues setObject:[result url] forKey:NSURLPboardType];
+      [pbValues setObject:webUrlsWithTitles 
+                   forKey:kWebURLsWithTitlesPboardType];
+      [pbValues setObject:name forKey:@"public.url-name"];
+      [pbValues setObject:urlString forKey:(NSString*)kUTTypeURL];
+    }
+    [pbValues setObject:[result displayName] forKey:NSStringPboardType];
+    value = pbValues;
   }
   return value;
 }

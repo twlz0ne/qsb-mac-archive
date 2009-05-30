@@ -36,8 +36,7 @@
 static NSString *kDictionaryUrlFormat = @"qsbdict://%@";
 static NSString *kDictionaryResultType
   = HGS_SUBTYPE(@"dictionary", @"definition");
-NSString *kDictionaryRangeLocationKey = @"DictionaryRangeLocation";
-NSString *kDictionaryRangeLengthKey = @"DictionaryRangeLength";
+NSString *kDictionaryRangeKey = @"DictionaryRange";
 NSString *kDictionaryTermKey = @"DictionaryTerm";
 static NSString *kShowInDictionaryAction
   = @"com.google.qsb.dictionary.action.open";
@@ -111,14 +110,14 @@ static const int kMinQueryLength = 3;
       NSString *urlString 
         = [NSString stringWithFormat:kDictionaryUrlFormat,
            [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+      NSRange nsRange = NSMakeRange(range.location, range.length);
       NSMutableDictionary *attributes
         = [NSMutableDictionary dictionaryWithObjectsAndKeys:
            (NSString *)def, kHGSObjectAttributeSnippetKey,
            dictionaryIcon_, kHGSObjectAttributeIconKey,
            [NSNumber numberWithInt:eHGSSpecialUIRankFlag], 
              kHGSObjectAttributeRankFlagsKey,
-           [NSNumber numberWithInt:range.location], kDictionaryRangeLocationKey,
-           [NSNumber numberWithInt:range.length], kDictionaryRangeLengthKey,
+           [NSValue valueWithRange:nsRange], kDictionaryRangeKey,
            query, kDictionaryTermKey,
            nil];
       
@@ -151,6 +150,16 @@ static const int kMinQueryLength = 3;
     }
   }
   [operation setResults:[results allObjects]];
+}
+
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
+  id value = nil;
+  if ([key isEqualToString:kHGSObjectAttributePasteboardValueKey]) {
+    NSString *snippet = [result valueForKey:kHGSObjectAttributeSnippetKey];
+    value = [NSDictionary dictionaryWithObject:snippet
+                                        forKey:NSStringPboardType];
+  }
+  return value;
 }
 
 @end

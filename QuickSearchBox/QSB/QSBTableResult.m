@@ -292,6 +292,11 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 - (NSImage *)displayThumbnail {
   return nil;
 }
+
+- (BOOL)copyToPasteboard:(NSPasteboard *)pb {
+  return NO;
+}
+
 @end
 
 
@@ -490,6 +495,38 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return [NSString stringWithFormat:@"%@: %p - %@", 
           [self class], self, representedResult_];
 }
+
+- (BOOL)copyToPasteboard:(NSPasteboard *)pb {
+  BOOL didCopy = NO;
+  HGSResult *result = [self representedResult];
+  NSDictionary *values
+    = [result valueForKey:kHGSObjectAttributePasteboardValueKey];
+  if (values) {
+    [pb declareTypes:[values allKeys] owner:nil];
+    for (NSString *type in values) {
+      id value = [values objectForKey:type];
+      BOOL goodWrite = NO;
+      if ([value isKindOfClass:[NSURL class]]) {
+        [value writeToPasteboard:pb];
+        goodWrite = YES;
+      } else if ([value isKindOfClass:[NSArray class]] 
+                 || [value isKindOfClass:[NSDictionary class]]) {
+        goodWrite = [pb setPropertyList:value forType:type];
+      } else if ([value isKindOfClass:[NSString class]]) {
+        goodWrite = [pb setString:value forType:type];
+      } else if ([value isKindOfClass:[NSData class]]) {
+        goodWrite = [pb setData:value forType:type];
+      } 
+      if (!goodWrite) {
+        HGSLogDebug(@"Unable to write class %@ (%@) for type %@ to pasteboard",
+                    [value class], value, type);
+      }
+      didCopy |= goodWrite;
+    }
+  }
+  return didCopy;
+}
+
 @end
  
 

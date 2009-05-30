@@ -38,11 +38,7 @@
 #import "GTMMethodCheck.h"
 #import "GTMNSBezierPath+RoundRect.h"
 #import "GTMNSBezierPath+Shading.h"
-
-
-// TODO(mrossetti): Determine what drag/drop support is required then determine
-// what to do in the code annotated with IS_THIS_NEEDED_FOR_DRAG_SUPPORT.
-
+#import "HGSResult.h"
 
 @interface QSBResultTableView ()
 - (CGFloat)selectionLeftInset;
@@ -111,27 +107,20 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
 - (void)drawGridInClipRect:(NSRect)rect {
 }
 
-
-#if IS_THIS_NEEDED_FOR_DRAG_SUPPORT
-
 - (void)awakeFromNib {
   [self setDraggingSourceOperationMask:NSDragOperationEvery forLocal:NO];
-  [[self enclosingScrollView] setDrawsBackground:NO];
 }
 
 - (BOOL)canDragRowsWithIndexes:(NSIndexSet *)rowIndexes 
                        atPoint:(NSPoint)mouseDownPoint {
-  BOOL canDrag = NO;
-  // TODO(mrossetti): Re-implement this once we've switched over to view tables.
-  unsigned row = [rowIndexes firstIndex];
-  NSCell *cell = [[self delegate] resultCellForRow:row];
-  if ([cell isKindOfClass:[QSBQueryResultCell class]]) {
-    NSInteger resultsIndex = [self columnWithIdentifier:@"QSBResults"];
-    NSRect cellFrame = [self frameOfCellAtColumn:resultsIndex row:row];
-    QSBQueryResultCell *queryResultCell = (QSBQueryResultCell *)cell;
-    NSRect imageFrame = [queryResultCell iconRectForCellFrame:cellFrame];
-    
-    canDrag = NSPointInRect(mouseDownPoint, imageFrame);
+  NSUInteger row = [rowIndexes firstIndex];
+  NSInteger resultsIndex = [self columnWithIdentifier:@"GDResults"];
+  NSRect cellFrame = [self frameOfCellAtColumn:resultsIndex row:row];
+  BOOL canDrag = NSPointInRect(mouseDownPoint, cellFrame);
+  if (canDrag) {
+    id datasource = [self dataSource];
+    QSBTableResult *qsbResult = [datasource tableResultForRow:row];
+    canDrag = [qsbResult isKindOfClass:[QSBSourceTableResult class]];
   }
   return canDrag;
 }
@@ -140,12 +129,19 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
                             tableColumns:(NSArray *)tableColumns 
                                    event:(NSEvent*)dragEvent 
                                   offset:(NSPointPointer)dragImageOffset {
-  unsigned row = [dragRows firstIndex];
-  HGSResult *result = [[self delegate] tableResultForRow:row];
-  return [result displayIconWithLazyLoad:YES];
+  NSUInteger row = [dragRows firstIndex];
+  id datasource = [self dataSource];
+  NSImage *image = nil;
+  QSBTableResult *qsbResult = [datasource tableResultForRow:row];
+  if ([qsbResult isKindOfClass:[QSBSourceTableResult class]]) {
+    HGSResult *hgsResult = [(QSBSourceTableResult*)qsbResult representedResult];
+    image = [hgsResult valueForKey:kHGSObjectAttributeImmediateIconKey];
+    image = [[image copy] autorelease];
+    [image setScalesWhenResized:YES];
+    [image setSize:NSMakeSize(32, 32)];
+  }
+  return image;
 }
-
-#endif  // IS_THIS_NEEDED_FOR_DRAG_SUPPORT
 
 - (BOOL)isOpaque {
   return NO;  

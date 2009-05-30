@@ -140,7 +140,7 @@ static NSURL* IconURLForResult(HGSResult *result) {
 - (BOOL)isEqual:(id)otherObj {
   BOOL isEqual = NO;
   // We call them equal if they reference the same two HGSObjects
-  if ([otherObj isMemberOfClass:[self class]]) {
+  if ([otherObj isKindOfClass:[self class]]) {
     // NOTE: ideally we'd like to @sync to both objects here, but then we could
     // hit deadlock if two threads happen to compare both in reverse order.  If
     // we add an accessor for the result from the other object, then we would
@@ -411,9 +411,11 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
     // Figure out rough size of image
     size_t size = 0;
     for (NSBitmapImageRep *rep in [icon representations]) {
+      // * 4 because we have 4 samples for pixel
+      // / 8 because we have 8 pixels in a byte
       size_t repSize = ([rep pixelsHigh] 
                         * [rep pixelsWide] 
-                        * [rep bitsPerPixel] / 8);
+                        * [rep bitsPerSample] * 4 / 8);
       size += repSize;
     }
     @synchronized(cache_) {
@@ -428,7 +430,6 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   NSImage *formattedImage = [[[NSImage alloc] init] autorelease];
   
   NSSize preferredSize = [self preferredIconSize];
-  
   NSRect borderRect = GTMNSRectOfSize(preferredSize);
   borderRect = NSInsetRect(borderRect, 8.0, 8.0);
   
@@ -438,125 +439,42 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
                                          GTMScaleProportionally,
                                          GTMRectAlignCenter);
   drawRect = NSIntegralRect(drawRect);
-  
-  CGColorSpaceRef cspace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);   
-  if (!cspace) return image;
-  
-  CGSize largeSize = NSSizeToCGSize(preferredSize);
-  CGContextRef largeContext
-    =  CGBitmapContextCreate(NULL,
-                             largeSize.width,
-                             largeSize.height,
-                             8,            // bits per component
-                             largeSize.width * 4, // bytes per pixel
-                             cspace,
-                             kCGBitmapByteOrder32Host
-                             | kCGImageAlphaPremultipliedLast);
-  
-  if (largeContext) {
-    // Draw large icon
-    CGContextSetShadow(largeContext, CGSizeMake(0.0, -1.0), 2.0);
-    CGContextSetInterpolationQuality(largeContext, kCGInterpolationHigh);
-    CGPathRef path
-      = [[NSBezierPath bezierPathWithRoundedRect:NSInsetRect(drawRect, 0.5, 0.5)
-                                     xRadius:2.0
-                                     yRadius:2.0] gtm_CGPath];
-    CGContextBeginTransparencyLayer(largeContext, NULL);
-    if (path) {
-      CGContextAddPath(largeContext, path);
-    }
-    CGContextSaveGState(largeContext);
-    CGContextClip(largeContext);
-    [NSGraphicsContext saveGraphicsState];
-    NSGraphicsContext *context 
-      = [NSGraphicsContext graphicsContextWithGraphicsPort:largeContext 
-                                                   flipped:YES];
-    [NSGraphicsContext setCurrentContext:context];
-    [bestRep drawInRect:drawRect];
-    [NSGraphicsContext restoreGraphicsState];
-    CGContextRestoreGState(largeContext);
-    CGContextSetLineWidth(largeContext, 1.0);
-    if (path) {
-      CGContextAddPath(largeContext, path);  
-    }
-    CGContextSetRGBStrokeColor(largeContext, 0.0, 0.0, 0.0, 0.25);
-    CGContextStrokePath(largeContext);
-    CGContextEndTransparencyLayer(largeContext);
-    
-    CGImageRef largeImage = CGBitmapContextCreateImage(largeContext);
-    if (largeImage) {
-      NSBitmapImageRep *cgRep
-      = [[[NSBitmapImageRep alloc] initWithCGImage:largeImage] autorelease];
-      [formattedImage addRepresentation:cgRep];   
-      [formattedImage setSize:[cgRep size]];
-      CGImageRelease(largeImage);
-    }
-  
-    CGContextRelease(largeContext);
-  }
-  
-  // Draw small icon
-  NSSize smallSize = NSMakeSize(32, 32);
-  NSRect smallDrawRect = GTMNSScaleRectToRect(GTMNSRectOfSize([bestRep size]), 
-                                              GTMNSRectOfSize(smallSize),
-                                              GTMScaleProportionally,
-                                              GTMRectAlignCenter);
-  smallDrawRect = NSIntegralRect(smallDrawRect);
-  CGContextRef smallContext
-    = CGBitmapContextCreate(NULL,
-                            smallSize.width,
-                            smallSize.height,
-                            8,            // bits per component
-                            smallSize.width * 4, // bytes per pixel
-                            cspace,
-                            kCGBitmapByteOrder32Host
-                            | kCGImageAlphaPremultipliedLast);
-  CFRelease(cspace);
-  
-  if (smallContext) {
-    CGContextSetInterpolationQuality(smallContext, kCGInterpolationHigh);
-    CGPathRef path
-      = [[NSBezierPath bezierPathWithRoundedRect:smallDrawRect
-                                         xRadius:2.0
-                                         yRadius:2.0] gtm_CGPath];
-    CGContextBeginTransparencyLayer(smallContext, NULL);
-    if (path) {
-      CGContextAddPath(smallContext, path);
-    }
-    CGContextSaveGState(smallContext);
-    CGContextClip(smallContext);
-    [NSGraphicsContext saveGraphicsState];
-    NSGraphicsContext *context 
-      = [NSGraphicsContext graphicsContextWithGraphicsPort:smallContext 
-                                                   flipped:YES];
-    [NSGraphicsContext setCurrentContext:context];
-    [bestRep drawInRect:smallDrawRect];
-    [NSGraphicsContext restoreGraphicsState];
-    CGContextRestoreGState(smallContext);
-    
-    CGContextSetLineWidth(smallContext, 1.0);
-    NSRect insetRect =  NSInsetRect(smallDrawRect, 0.5, 0.5);
-    path = [[NSBezierPath bezierPathWithRoundedRect:insetRect
-                                            xRadius:2.0
-                                            yRadius:2.0] gtm_CGPath];
-    if (path) {
-      CGContextAddPath(smallContext, path);
-    }
-    CGContextSetRGBStrokeColor(smallContext, 0.0, 0.0, 0.0, 0.10);
-    CGContextStrokePath(smallContext);
-    CGContextEndTransparencyLayer(smallContext);
-    
-    CGImageRef smallImage = CGBitmapContextCreateImage(smallContext);
-    
-    if (smallImage) {
-      NSBitmapImageRep *cgRep 
-        = [[[NSBitmapImageRep alloc] initWithCGImage:smallImage] autorelease];
-      [formattedImage addRepresentation:cgRep];   
-      CGImageRelease(smallImage);
-    } 
-    CGContextRelease(smallContext);
-  }
-  
+  NSBitmapImageRep *imageRep 
+    = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL 
+                                               pixelsWide:preferredSize.width 
+                                               pixelsHigh:preferredSize.height 
+                                            bitsPerSample:8 
+                                          samplesPerPixel:4 
+                                                 hasAlpha:YES 
+                                                 isPlanar:NO 
+                                           colorSpaceName:NSCalibratedRGBColorSpace 
+                                             bitmapFormat:0 
+                                              bytesPerRow:preferredSize.width * 4 
+                                             bitsPerPixel:32] autorelease];
+  [formattedImage setSize:[imageRep size]];
+  [formattedImage addRepresentation:imageRep];
+  [formattedImage lockFocusOnRepresentation:imageRep];
+  NSGraphicsContext *nsContext = [NSGraphicsContext currentContext];
+  NSShadow *aShadow = [[[NSShadow alloc] init] autorelease];
+  [aShadow setShadowOffset:NSMakeSize(0, -1)];
+  [aShadow setShadowBlurRadius:2];
+  [aShadow set];
+  [nsContext setImageInterpolation:NSImageInterpolationHigh];
+  CGContextRef cgContext = [nsContext graphicsPort];
+  CGContextBeginTransparencyLayer(cgContext, NULL);
+  NSRect insetRect = NSInsetRect(drawRect, 0.5, 0.5);
+  NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:insetRect
+                                                           xRadius:2.0
+                                                           yRadius:2.0];
+  [nsContext saveGraphicsState];
+  [path setClip];
+  [bestRep drawInRect:drawRect];
+  [nsContext restoreGraphicsState];
+  [path setLineWidth:1.0];
+  [[NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:0.25] setStroke];
+  [path stroke];
+  CGContextEndTransparencyLayer(cgContext);
+  [formattedImage unlockFocus];
   return formattedImage;
 }
 

@@ -122,43 +122,5 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   return [result topResultsRowViewControllerClass];
 }
 
-#if TO_BE_IMPLEMENTED
-// TODO(mrossetti): Adapt to the view-based scheme.
-- (BOOL)tableView:(NSTableView *)tv
-writeRowsWithIndexes:(NSIndexSet *)rowIndexes 
-     toPasteboard:(NSPasteboard*)pboard {
-  
-  BOOL gotData = NO;
-  unsigned row = [rowIndexes firstIndex];
-  HGSResult *item = [self objectForRow:row];
-  
-  NSURL *url = [item identifier];
-  if (url) {
-    NSString *urlString = [url absoluteString];
-    [pboard declareTypes:[NSArray arrayWithObjects:kWebURLsWithTitlesPboardType, 
-                          kUTTypeURL,
-                          @"public.url-name",
-                          NSURLPboardType,
-                          NSStringPboardType, 
-                          nil] owner:nil];
-    NSArray *urlArray = [NSArray arrayWithObject:urlString];
-    NSString *title = [item valueForKey:kHGSObjectAttributeNameKey];
-    NSArray *titleArray = [NSArray arrayWithObject:title];
-    [pboard setPropertyList:[NSArray arrayWithObjects:urlArray, titleArray, nil]
-                    forType:kWebURLsWithTitlesPboardType];
-    [pboard setString:urlString
-              forType:(NSString*)kUTTypeURL];
-    [pboard setString:title
-              forType:@"public.url-name"];
-    [url writeToPasteboard:pboard];
-    [pboard setString:urlString
-              forType:NSStringPboardType];
-    
-    gotData = YES;
-  }
-  return gotData;
-}
-#endif
-
 @end
 

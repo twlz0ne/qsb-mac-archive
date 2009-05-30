@@ -43,7 +43,18 @@
     = [info objectForKey:kHGSActionDirectObjectsKey];
   BOOL success = NO;
   if (directObjects) {
-    NSString *name = [directObjects displayName];
+    NSString *name = nil;
+    if ([directObjects count] == 1) {
+      HGSResult *directObject = [directObjects objectAtIndex:0];
+      NSDictionary *value 
+        = [directObject valueForKey:kHGSObjectAttributePasteboardValueKey];
+      if (value) {
+        name = [value objectForKey:NSStringPboardType];
+      }
+    }
+    if (!name) {
+      name = [directObjects displayName];
+    }
     GTMLargeTypeWindow *largeTypeWindow
       = [[GTMLargeTypeWindow alloc] initWithString:name];
     [largeTypeWindow setReleasedWhenClosed:YES];

@@ -68,6 +68,28 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [super keyDown:theEvent];
 }
 
+- (void)copy:(id)sender {
+  BOOL handled = NO;
+  if ([self selectedRange].length == 0) {
+    NSResponder *nextResponder = [self nextResponder];
+    handled = [nextResponder tryToPerform:_cmd with:sender];
+  }
+  if (!handled) {
+    [super copy:sender];
+  }
+}
+
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
+  BOOL validated = NO;
+  if ([anItem action] == @selector(copy:)) {
+    NSResponder *nextResponder = [self nextResponder];
+    validated = [nextResponder tryToPerform:_cmd with:anItem];
+  } else {
+    validated = [super validateUserInterfaceItem:anItem];
+  }
+  return validated;
+}
+
 - (void)didChangeText {
   [super didChangeText];
   [self complete:self];

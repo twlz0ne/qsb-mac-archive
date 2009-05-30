@@ -154,7 +154,7 @@ static NSSet *CopyStringSetFromId(id value) {
     NSString *key = kHGSObjectDefaultArchiveKeys[i];
     id value = [result valueForKey:key];
     if (value) {
-      if ([value isMemberOfClass:[NSURL class]]) {
+      if ([value isKindOfClass:[NSURL class]]) {
         value = [value absoluteString];
       }
       [dict setObject:value forKey:key];

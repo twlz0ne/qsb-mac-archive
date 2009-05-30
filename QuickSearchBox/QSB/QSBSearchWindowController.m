@@ -769,6 +769,24 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   return handled;
 }
 
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
+  BOOL validated = NO;
+  if ([anItem action] == @selector(copy:)) {
+    QSBTableResult *qsbTableResult = [activeSearchViewController_ selectedObject];
+    validated = [qsbTableResult isKindOfClass:[QSBSourceTableResult class]];
+  } else {
+    HGSLogDebug(@"Unexpected userItem validation %@ at [%@ %@]", 
+                anItem, [self class], _cmd);
+  }
+  return validated;
+}
+
+- (void)copy:(id)sender {
+  QSBTableResult *qsbTableResult = [activeSearchViewController_ selectedObject];
+  NSPasteboard *pb = [NSPasteboard generalPasteboard];
+  [qsbTableResult copyToPasteboard:pb];
+}
+
 - (void)hitHotKey:(id)sender {
   if ([[self window] isVisible]) {
     [self hideSearchWindowBecause:kQSBHotKeyChangeVisiblityToggle];

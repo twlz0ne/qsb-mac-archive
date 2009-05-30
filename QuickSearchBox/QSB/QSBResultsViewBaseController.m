@@ -313,6 +313,15 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [[self searchWindowController] completeQueryText];    
 }
 
+- (BOOL)tableView:(NSTableView *)tv
+writeRowsWithIndexes:(NSIndexSet *)rowIndexes 
+     toPasteboard:(NSPasteboard*)pb {
+  unsigned row = [rowIndexes firstIndex];
+  QSBTableResult *tableResult = [self tableResultForRow:row];
+  return [tableResult copyToPasteboard:pb];
+}
+
+
 #pragma mark QSBViewTableViewDelegateProtocol methods
 
 - (NSView*)tableView:(NSTableView*)tableView
