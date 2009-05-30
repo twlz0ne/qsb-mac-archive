@@ -136,6 +136,7 @@ static NSString* const kCachedNameTerms = @"NameTerms";
 
 - (void)fileChanged:(GTMFileSystemKQueue *)queue 
               event:(GTMFileSystemKQueueEvents)event {
+  [[self retain] autorelease];
   [self updateIndex];
 }
 

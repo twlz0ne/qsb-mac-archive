@@ -177,6 +177,7 @@ static NSURL* domainURLForURLString(NSString* urlString) {
 
 - (void)fileChanged:(GTMFileSystemKQueue *)queue 
               event:(GTMFileSystemKQueueEvents)event {
+  [[self retain] autorelease];
   [self updateIndex];
 }
 
