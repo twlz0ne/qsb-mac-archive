@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2102"/>
+			<integer value="2101"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -301,7 +301,7 @@
 								<object class="NSTabViewItem" id="168180836">
 									<string key="NSIdentifier">general</string>
 									<object class="NSView" key="NSView" id="1030809264">
-										<nil key="NSNextResponder"/>
+										<reference key="NSNextResponder" ref="1019790971"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -465,7 +465,7 @@
 												<object class="NSButtonCell" key="NSCell" id="357463260">
 													<int key="NSCellFlags">67239424</int>
 													<int key="NSCellFlags2">134348800</int>
-													<string key="NSContents">^Use Default (cmd-cmd)</string>
+													<string type="base64-UTF8" key="NSContents">XlVzZSBEZWZhdWx0ICjijJjijJgpA</string>
 													<object class="NSFont" key="NSSupport" id="26">
 														<string key="NSName">LucidaGrande</string>
 														<double key="NSSize">1.100000e+01</double>
@@ -656,6 +656,7 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {562, 280}}</string>
+										<reference key="NSSuperview" ref="1019790971"/>
 									</object>
 									<string key="NSLabel">^Basics</string>
 									<reference key="NSColor" ref="1072716316"/>
@@ -1192,7 +1193,7 @@
 								<object class="NSTabViewItem" id="748663966">
 									<string key="NSIdentifier">debug</string>
 									<object class="NSView" key="NSView" id="175173399">
-										<reference key="NSNextResponder" ref="1019790971"/>
+										<nil key="NSNextResponder"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2309,12 +2310,12 @@
 													<object class="NSScroller" id="234204585">
 														<reference key="NSNextResponder" ref="501102356"/>
 														<int key="NSvFlags">-2147483392</int>
-														<string key="NSFrame">{{0, 541}, {1101, 15}}</string>
+														<string key="NSFrame">{{0, 545}, {1103, 15}}</string>
 														<reference key="NSSuperview" ref="501102356"/>
 														<int key="NSsFlags">1</int>
 														<reference key="NSTarget" ref="501102356"/>
 														<string key="NSAction">_doScroller:</string>
-														<double key="NSPercent">9.865592e-01</double>
+														<double key="NSPercent">9.865832e-01</double>
 													</object>
 												</object>
 												<string key="NSFrame">{{3, 0}, {559, 280}}</string>
@@ -2327,21 +2328,20 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {562, 280}}</string>
-										<reference key="NSSuperview" ref="1019790971"/>
 									</object>
 									<string key="NSLabel">^Under the Hood</string>
 									<reference key="NSColor" ref="1072716316"/>
 									<reference key="NSTabView" ref="1019790971"/>
 								</object>
 							</object>
-							<reference key="NSSelectedTabViewItem" ref="748663966"/>
+							<reference key="NSSelectedTabViewItem" ref="168180836"/>
 							<reference key="NSFont" ref="26"/>
 							<int key="NSTvFlags">134217728</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
 							<object class="NSMutableArray" key="NSSubviews">
 								<bool key="EncodedWithXMLCoder">YES</bool>
-								<reference ref="175173399"/>
+								<reference ref="1030809264"/>
 							</object>
 						</object>
 					</object>

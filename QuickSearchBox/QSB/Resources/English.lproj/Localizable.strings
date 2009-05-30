@@ -44,7 +44,7 @@
 "About $APPNAME$" = "About $APPNAME$";
 
 /* Application menu item that displays the preferences dialog. */
-"Preferences..." = "Preferences…";
+"Preferences…" = "Preferences…";
 
 /* Application menu item that opens the feedback webpage for sending QSB feedback to Google. */
 "Send Feedback To Google" = "Send Feedback To Google";
@@ -140,7 +140,7 @@
 "Keyboard shortcut:" = "Keyboard shortcut";
 
 /* The button label that resets the keyboard shortcut edit field to cmd-cmd which is the default setting. */
-"Use Default (cmd-cmd)" = "Use Default (⌘⌘)";
+"Use Default (⌘⌘)" = "Use Default (⌘⌘)";
 
 /* A label denoting a group of preferences that affect the color and style of the QSB. */
 "Theme:" = "Theme:";
@@ -306,7 +306,7 @@
 "Search Google for '%@'" = "Search Google for “%@”";
 
 /* A table result label for an item that will show the user all x things where x is %u and the things are %@. */
-"Show all %u %@..." = "Show all %1$u %2$@…";
+"Show all %u %@…" = "Show all %1$u %2$@…";
 
 /* A table result label for an item with no title. */
 "<No Title>" = "<No Title>";

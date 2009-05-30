@@ -699,7 +699,10 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (NSString*)stringValue {
-  NSString *format = NSLocalizedString(@"Show all %u %@...", @"");
+  NSString *format = NSLocalizedString(@"Show all %u %@…", 
+                                       @"A table result label for an item that "
+                                       @"will show the user all x things where "
+                                       @"x is %u and the things are %@.");
   return [NSString stringWithFormat:format, categoryCount_, [self categoryName]];
 }
 
