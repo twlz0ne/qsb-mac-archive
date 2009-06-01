@@ -67,21 +67,9 @@ OSStatus SecCodeSetDetachedSignature(SecStaticCodeRef codeRef,
                                      CFDataRef signature, uint32_t flags);
 
 static NSString *kSignatureDataKey = @"SignatureDataKey";
-static NSString *kCertificateDataKey = @"CertificateDataKey";
 static NSString *kSignatureDateKey = @"SignatureDateKey";
 static NSString *kDetachedSignatureTypeKey = @"DetachedSignatureTypeKey";
-static NSString *kCodeSignatureDirectory = @"QSBCodeSignature";
-static NSString *kCodeSignatureFile = @"QSBCodeSignature.plist";
 static const int kSignatureTypeStandard = 1;
-static const int kSignatureTypeResource = 2;
-
-@interface HGSCodeSignature()
-- (BOOL)digest:(unsigned char *)digest usingKey:(NSData *)key;
-- (BOOL)digestDirectory:(NSString *)path
-             shaContext:(SHA_CTX *)shaCtx
-            hmacContext:(HMAC_CTX *)hmacCtx;
-- (NSDictionary *)embeddedResourceSignature;
-@end
 
 @implementation HGSCodeSignature
 
@@ -139,17 +127,53 @@ static const int kSignatureTypeResource = 2;
     }
   }
   
-  if (!result) {
-    NSDictionary *sigDict = [self embeddedResourceSignature];
-    if (sigDict) {
-      NSData *certificateData = [sigDict objectForKey:kCertificateDataKey];
-      if (certificateData) {
-        CSSM_DATA cssmData;
-        cssmData.Length = [certificateData length];
-        cssmData.Data = (void *)[certificateData bytes];
-        SecCertificateCreateFromData(&cssmData, CSSM_CERT_X_509v3,
-                                     CSSM_CERT_ENCODING_DER, &result);
+  return result;
+}
+
+- (CFArrayRef)copySignerCertificateChain {
+  CFMutableArrayRef result = NULL;
+  
+  CFURLRef url = (CFURLRef)[NSURL fileURLWithPath:[bundle_ bundlePath]];
+  if (url) {
+    SecStaticCodeRef codeRef;
+    if (SecStaticCodeCreateWithPath(url, 0, &codeRef) == noErr) {
+      if (SecStaticCodeCheckValidityWithErrors(codeRef, 0,
+                                               NULL, NULL) == noErr) {
+        CFDictionaryRef signingInfo;
+        if (SecCodeCopySigningInformation(codeRef, kSecCSSigningInformation,
+                                          &signingInfo) == noErr) {
+          CFArrayRef certs = CFDictionaryGetValue(signingInfo,
+                                                  kSecCodeInfoCertificates);
+          if (certs) {
+            for (int i = 0; i < CFArrayGetCount(certs); ++i) {
+              SecCertificateRef cert;
+              cert = (SecCertificateRef)CFArrayGetValueAtIndex(certs, i);
+              if (cert) {
+                // Make a deep copy of the certificate so that callers can
+                // retain it after releasing us (the code signing framework
+                // does not like having its own SecCertificateRef retained
+                // after the info dictionary is released);
+                CSSM_DATA signerDer;
+                if (SecCertificateGetData(cert, &signerDer) == noErr) {
+                  SecCertificateRef copiedRef;
+                  if (SecCertificateCreateFromData(&signerDer, CSSM_CERT_X_509v3,
+                                                   CSSM_CERT_ENCODING_DER,
+                                                   &copiedRef) == noErr) {
+                    if (!result) {
+                      result
+                        = CFArrayCreateMutable(NULL, 0, &kCFTypeArrayCallBacks);
+                    }
+                    CFArrayAppendValue(result, copiedRef);
+                    CFRelease(copiedRef);
+                  }
+                }
+              }
+            }
+          }
+        }
+        CFRelease(signingInfo);
       }
+      CFRelease(codeRef);
     }
   }
   
@@ -175,6 +199,39 @@ static const int kSignatureTypeResource = 2;
     }
   }
   
+  return result;
+}
+
++ (NSString *)certificateSubjectCommonName:(SecCertificateRef)cert {
+  NSString *result = nil;
+  if (cert) {
+    const CSSM_X509_NAME *name;
+    OSStatus err = SecCertificateGetSubject(cert, &name);
+    if (err == noErr) {
+      for (uint32 rdn = 0; rdn < name->numberOfRDNs; ++rdn) {
+        CSSM_X509_RDN rdnRef = name->RelativeDistinguishedName[rdn];
+        for (uint32 pair = 0; pair < rdnRef.numberOfPairs; ++pair) {
+          CSSM_DATA type = rdnRef.AttributeTypeAndValue[pair].type;
+          if (CSSMOID_CommonName.Length == type.Length &&
+              memcmp(CSSMOID_CommonName.Data, type.Data,
+                     CSSMOID_CommonName.Length) == 0) {
+            CSSM_DATA value = rdnRef.AttributeTypeAndValue[pair].value;
+            NSData *certCnData = [NSData dataWithBytes:value.Data
+                                                length:value.Length];
+            NSString *certCnString
+              = [[[NSString alloc] initWithData:certCnData
+                                       encoding:NSUTF8StringEncoding]
+                 autorelease];
+            if (!result) {
+              result = certCnString;
+            } else {
+              result = [result stringByAppendingFormat:@", %@", certCnString];
+            }
+          }
+        }
+      }
+    }
+  }
   return result;
 }
 
@@ -216,80 +273,8 @@ static const int kSignatureTypeResource = 2;
   if (err == noErr) {
     // Standard code signing succeeded
     result = YES;
-  } else if (err == errSecCSBadObjectFormat) {
-    // Code signing failed due to a lack of a Mach executable,
-    // perform our built-in code signing instead.
-    NSData *sigData = nil;
-    // Digest the the files
-    unsigned char digest[kCodeSignatureDigestLength];
-    if ([self digest:digest usingKey:nil]) {
-      SecKeyRef privateKey;
-      // Sign the digest
-      if (SecIdentityCopyPrivateKey(identity, &privateKey) == noErr) {
-        CSSM_CSP_HANDLE csp;
-        if (SecKeyGetCSPHandle(privateKey, &csp) == noErr) {
-          const CSSM_KEY *cssmKey;
-          if (SecKeyGetCSSMKey(privateKey, &cssmKey) == noErr) {
-            const CSSM_ACCESS_CREDENTIALS *cred;
-            if (SecKeyGetCredentials(privateKey, CSSM_ACL_AUTHORIZATION_SIGN,
-                                     kSecCredentialTypeDefault,
-                                     &cred) == noErr) {
-              CSSM_CC_HANDLE sigCtx;
-              if (CSSM_CSP_CreateSignatureContext(csp, CSSM_ALGID_SHA1WithRSA,
-                                                  cred, cssmKey,
-                                                  &sigCtx) == noErr) {
-                CSSM_DATA input, output = { 0, NULL };
-                input.Length = kCodeSignatureDigestLength;
-                input.Data = digest;
-                if (CSSM_SignData(sigCtx, &input, 1, CSSM_ALGID_SHA1,
-                                  &output) == noErr) {
-                  sigData = [NSData dataWithBytes:output.Data
-                                           length:output.Length];
-                }
-                CSSM_DeleteContext(sigCtx);
-              }
-            }
-          }
-        }
-        CFRelease(privateKey);
-      }
-      NSData *certData = nil;
-      if (sigData) {
-        // Copy the certificate
-        SecCertificateRef certificateRef = NULL;
-        if (SecIdentityCopyCertificate(identity, &certificateRef) == noErr) {
-          CSSM_DATA cssmData;
-          if (SecCertificateGetData(certificateRef, &cssmData) == noErr) {
-            certData
-              = [NSData dataWithBytes:cssmData.Data length:cssmData.Length];
-          }
-          CFRelease(certificateRef);
-        }
-      }
-      if (sigData && certData) {
-        // Create and write the dictionary file with the signature,
-        // certificate, and date/time
-        NSDictionary *sigDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 sigData, kSignatureDataKey,
-                                 certData, kCertificateDataKey,
-                                 [NSDate date], kSignatureDateKey,
-                                 nil];
-        NSString *dirPath
-          = [[[bundle_ bundlePath] stringByAppendingPathComponent:@"Contents"]
-             stringByAppendingPathComponent:kCodeSignatureDirectory];
-        NSFileManager *fm = [NSFileManager defaultManager];
-        BOOL isDirectory;
-        if (![fm fileExistsAtPath:dirPath isDirectory:&isDirectory]) {
-          // Create the directory
-          [fm createDirectoryAtPath:dirPath attributes:nil];
-        }
-        NSString *sigPath
-          = [dirPath stringByAppendingPathComponent:kCodeSignatureFile];
-        result = [sigDict writeToFile:sigPath atomically:YES];
-      }
-    }
   }
-  
+    
   return result;
 }
 
@@ -327,56 +312,6 @@ static const int kSignatureTypeResource = 2;
           break;
       }
       CFRelease(codeRef);
-    }
-  }
-  
-  if (err == errSecCSBadObjectFormat) {
-    // There is no Mac OS X code signature, check for a resource code signature 
-    NSDictionary *sigDict = [self embeddedResourceSignature];
-    if (sigDict) {
-      NSData *certificateData = [sigDict objectForKey:kCertificateDataKey];
-      if (certificateData) {
-        SecCertificateRef certificateRef;
-        CSSM_DATA cssmData;
-        cssmData.Length = [certificateData length];
-        cssmData.Data = (void *)[certificateData bytes];
-        if (SecCertificateCreateFromData(&cssmData, CSSM_CERT_X_509v3,
-                                         CSSM_CERT_ENCODING_DER,
-                                         &certificateRef) == noErr) {
-          NSData *sigData = [sigDict objectForKey:kSignatureDataKey];
-          unsigned char digest[kCodeSignatureDigestLength];
-          if (sigData && [self digest:digest usingKey:nil]) {          
-            SecKeyRef publicKey;
-            if (SecCertificateCopyPublicKey(certificateRef,
-                                            &publicKey) == noErr) {
-              CSSM_CSP_HANDLE csp;
-              if (SecKeyGetCSPHandle(publicKey, &csp) == noErr) {
-                const CSSM_KEY *cssmKey;
-                if (SecKeyGetCSSMKey(publicKey, &cssmKey) == noErr) {
-                  CSSM_CC_HANDLE sigCtx;
-                  if (CSSM_CSP_CreateSignatureContext(csp, CSSM_ALGID_SHA1WithRSA,
-                                                      NULL, cssmKey,
-                                                      &sigCtx) == noErr) {
-                    CSSM_DATA cssmDigestData, cssmSigData;
-                    cssmDigestData.Length = kCodeSignatureDigestLength;
-                    cssmDigestData.Data = digest;
-                    cssmSigData.Length = [sigData length];
-                    cssmSigData.Data = (void *)[sigData bytes];
-                    if (CSSM_VerifyData(sigCtx, &cssmDigestData, 1,
-                                        CSSM_ALGID_SHA1,
-                                        &cssmSigData) == noErr) {
-                      result = eSignatureStatusOK;
-                    }
-                    CSSM_DeleteContext(sigCtx);
-                  }
-                }
-              }
-              CFRelease(publicKey);
-            }
-          }
-          CFRelease(certificateRef);
-        }
-      }
     }
   }
   
@@ -433,17 +368,6 @@ static const int kSignatureTypeResource = 2;
     }
   }
   
-  if (err == errSecCSBadObjectFormat) {
-    // No Mach executable available for standard Mac OS X code signing,
-    // generate a resource code signature
-    unsigned char digest[kCodeSignatureDigestLength];
-    if ([self digest:digest usingKey:nil]) {
-      sigData = [NSData dataWithBytes:digest
-                               length:kCodeSignatureDigestLength];
-      sigType = [NSNumber numberWithInt:kSignatureTypeResource];
-    }
-  }
-  
   NSData *result = nil;
   if (sigData && sigType) {
     NSDictionary *sigDict = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -489,127 +413,9 @@ static const int kSignatureTypeResource = 2;
         CFRelease(codeRef);
       }
     }
-  } else if (sigType == kSignatureTypeResource) {
-    unsigned char digest[kCodeSignatureDigestLength];
-    if ([self digest:digest usingKey:nil]) {
-      if ([sigData length] == kCodeSignatureDigestLength &&
-          !memcmp(digest, [sigData bytes], kCodeSignatureDigestLength)) {
-        result = eSignatureStatusOK;
-      }
-    }
   }
   
   return result;
 }
-
-- (NSDictionary *)embeddedResourceSignature {
-  NSDictionary *result = nil;
-  NSString *sigPath
-    = [[[[bundle_ bundlePath] stringByAppendingPathComponent:@"Contents"]
-       stringByAppendingPathComponent:kCodeSignatureDirectory]
-       stringByAppendingPathComponent:kCodeSignatureFile];
-  NSFileManager *fm = [NSFileManager defaultManager];
-  BOOL isDirectory;
-  if ([fm fileExistsAtPath:sigPath isDirectory:&isDirectory]) {
-    result = [NSDictionary dictionaryWithContentsOfFile:sigPath];
-  }
-  return result;
-}
-
-- (BOOL)digest:(unsigned char *)digest usingKey:(NSData *)key {
-  BOOL result = NO;
-  
-  // Hash the Info.plist
-  NSString *plistPath
-    = [[[bundle_ bundlePath] stringByAppendingPathComponent:@"Contents"]
-       stringByAppendingPathComponent:@"Info.plist"];
-  NSData *contents = [NSData dataWithContentsOfFile:plistPath];
-  if ([contents length]) {
-    if (![key length]) {
-      SHA_CTX ctx;
-      if (SHA1_Init(&ctx)) {
-        if (SHA1_Update(&ctx, [contents bytes], [contents length])) {
-          if ([self digestDirectory:[bundle_ resourcePath]
-                         shaContext:&ctx
-                        hmacContext:nil]) {
-            if (SHA1_Final(digest, &ctx)) {
-              result = YES;
-            }
-          }
-        }
-      }
-    } else {
-      HMAC_CTX ctx;
-      HMAC_Init(&ctx, [key bytes], [key length], EVP_sha1());
-      if ([self digestDirectory:[bundle_ resourcePath]
-                     shaContext:nil
-                    hmacContext:&ctx]) {
-        unsigned int length = kCodeSignatureDigestLength;
-        HMAC_Final(&ctx, digest, &length);
-        result = YES;
-      }
-    }
-  }
-  
-  return result;
-}
-
-- (BOOL)digestDirectory:(NSString *)path
-             shaContext:(SHA_CTX *)shaCtx
-            hmacContext:(HMAC_CTX *)hmacCtx {
-  BOOL result = YES;
-  
-  NSFileManager *fm = [NSFileManager defaultManager];
-  NSDirectoryEnumerator *dirEnum = [fm enumeratorAtPath:path];
-  if (!dirEnum) {
-    return NO;
-  }
-  NSString *filePath;
-  while (result && (filePath = [dirEnum nextObject])) {
-    filePath = [path stringByAppendingPathComponent:filePath];
-    BOOL isDirectory, succeeded = NO;
-    // Should always return YES
-    if ([fm fileExistsAtPath:filePath isDirectory:&isDirectory]) {
-      if (!isDirectory) {
-        // Must be digestable
-        if ([fm isReadableFileAtPath:filePath]) {
-          // Must be able to get file attributes
-          NSDictionary *attrs = [fm fileAttributesAtPath:path traverseLink:YES];
-          if (attrs) {
-            NSNumber *size = [attrs objectForKey:NSFileSize];
-            if (size && [size unsignedLongLongValue] <= 0xFFFFFFFFLL) {
-              // SHA1_Update() takes the length as an unsigned long
-              if (result && [size unsignedLongLongValue] > 0) {
-                NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-                NSData *contents = [NSData dataWithContentsOfFile:filePath];
-                if (contents) {
-                  if (shaCtx) {
-                    if (SHA1_Update(shaCtx, [contents bytes],
-                                    [contents length])) {
-                      succeeded = YES;
-                    }
-                  } else if (hmacCtx) {
-                    HMAC_Update(hmacCtx, [contents bytes], [contents length]);
-                    succeeded = YES;
-                  }
-                }
-                [pool release];
-              }
-            }
-          }
-        }
-      } else {
-        // Recurse into the directory
-        succeeded = [self digestDirectory:filePath
-                               shaContext:shaCtx
-                              hmacContext:hmacCtx];
-      }
-    }
-    result = succeeded;
-  }
-  
-  return result;
-}
-
 
 @end

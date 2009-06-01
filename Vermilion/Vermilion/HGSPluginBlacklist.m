@@ -34,6 +34,7 @@
 #import "HGSPluginLoader.h"
 #import "HGSDelegate.h"
 #import "HGSLog.h"
+#import "HGSCodeSignature.h"
 #import "GTMObjectSingleton.h"
 #import <GData/GDataHTTPFetcher.h>
 #import <stdlib.h>
@@ -43,6 +44,9 @@ static NSString* const kHGSPluginBlacklistVersionKey = @"HGSPBVersion";
 static NSString* const kHGSPluginBlacklistEntriesKey = @"HGSPBEntries";
 static NSString* const kHGSPluginBlacklistLastUpdateKey = @"HGSPBLastUpdate";
 static NSString* const kHGSPluginBlacklistVersion = @"1";
+static NSString* const kHGSPluginBlacklistGuidKey = @"HGSPBGuidKey";
+static NSString* const kHGSPluginBlacklistOverridesKey = @"HGSPBOverridesKey";
+static NSString* const kHGSPluginBlacklistCommonNameKey = @"HGSPBCNKey";
 static const NSTimeInterval kHGSPluginBlacklistUpdateInterval = 86400; // 1 day
 static const NSTimeInterval kHGSPluginBlacklistJitterRange = 3600; // 1 hour
 static NSString* const kHGSPluginBlacklistURL
@@ -78,7 +82,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginBlacklist, sharedPluginBlacklist);
           NSString *version
             = [blacklist objectForKey:kHGSPluginBlacklistVersionKey];
           if ([version isEqualToString:kHGSPluginBlacklistVersion]) {
-            blacklistedBundleIDs_
+            blacklistedPlugins_
               = [[blacklist objectForKey:kHGSPluginBlacklistEntriesKey] retain];
             lastUpdate
               = [[blacklist objectForKey:kHGSPluginBlacklistLastUpdateKey]
@@ -113,20 +117,84 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginBlacklist, sharedPluginBlacklist);
     [updateTimer_ invalidate];
   }
   [blacklistPath_ release];
-  [blacklistedBundleIDs_ release];
+  [blacklistedPlugins_ release];
   [super dealloc];
 }
 // COV_NF_END
 
-- (BOOL)bundleIsBlacklisted:(NSBundle *)pluginBundle {
-  return [self bundleIDIsBlacklisted:[pluginBundle bundleIdentifier]];
-}
-
 - (BOOL)bundleIDIsBlacklisted:(NSString *)bundleID {
-  BOOL isBlacklisted;
+  BOOL isBlacklisted = NO;
   bundleID = [bundleID lowercaseString];
   @synchronized(self) {
-    isBlacklisted = [blacklistedBundleIDs_ containsObject:bundleID];
+    for (NSDictionary *entry in blacklistedPlugins_) {
+      if ([[entry objectForKey:kHGSPluginBlacklistGuidKey] isEqual:bundleID]) {
+        isBlacklisted = YES;
+      }
+    }
+  }
+  return isBlacklisted;
+}
+
+- (BOOL)bundleIsBlacklisted:(NSBundle *)pluginBundle {
+  BOOL isBlacklisted = NO;
+  NSString *bundleID = [[pluginBundle bundleIdentifier] lowercaseString];
+  @synchronized(self) {
+    for (NSDictionary *entry in blacklistedPlugins_) {
+      if ([[entry objectForKey:kHGSPluginBlacklistGuidKey] isEqual:bundleID]) {
+        isBlacklisted = YES;
+        if ([[entry objectForKey:kHGSPluginBlacklistOverridesKey] boolValue]) {
+          // This blacklist entry can be overriden if the plugin has a code
+          // signature from a certificate signed by a CA trusted by the
+          // system, such as Verisign
+          HGSCodeSignature *sig
+            = [HGSCodeSignature codeSignatureForBundle:pluginBundle];
+          if ([sig verifySignature] == eSignatureStatusOK) {
+            CFArrayRef certArray = [sig copySignerCertificateChain];
+            if (certArray) {
+              OSStatus err;
+              SecPolicySearchRef searchRef = NULL;
+              err = SecPolicySearchCreate(CSSM_CERT_X_509v3,
+                                          &CSSMOID_APPLE_X509_BASIC, NULL,
+                                          &searchRef);
+              if (err == noErr) {
+                SecPolicyRef policyRef = NULL;
+                err = SecPolicySearchCopyNext(searchRef, &policyRef);
+                if (err == noErr) {
+                  SecTrustRef trustRef = NULL;
+                  err = SecTrustCreateWithCertificates(certArray, policyRef,
+                                                       &trustRef);
+                  if (err == noErr) {
+                    SecTrustResultType trustResult;
+                    err = SecTrustEvaluate(trustRef, &trustResult);
+                    if (err == noErr &&
+                        (trustResult == kSecTrustResultProceed ||
+                         trustResult == kSecTrustResultUnspecified)) {
+                      // Certificate is trusted, match the Common Name
+                      NSString *blacklistCommonName
+                        = [entry objectForKey:kHGSPluginBlacklistCommonNameKey];
+                      if (blacklistCommonName) {
+                        SecCertificateRef cert
+                          = (SecCertificateRef)CFArrayGetValueAtIndex(certArray,
+                                                                      0);
+                        NSString *certificateCommonName
+                          = [HGSCodeSignature certificateSubjectCommonName:cert];
+                        if ([certificateCommonName isEqual:blacklistCommonName]) {
+                          isBlacklisted = NO;
+                        }
+                      }
+                    }
+                    CFRelease(trustRef);
+                  }
+                  CFRelease(policyRef);
+                }
+                CFRelease(searchRef);
+              }
+              CFRelease(certArray);
+            }
+          }
+        }
+      }
+    }
   }
   return isBlacklisted;
 }
@@ -176,18 +244,43 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginBlacklist, sharedPluginBlacklist);
                                       error:&error] autorelease];
   if (doc) {
     NSMutableArray *newBlacklist = [NSMutableArray array];
-    NSArray *guids = [doc nodesForXPath:@"//guid" error:nil];
-    for (NSXMLNode *guid in guids) {
-      [newBlacklist addObject:[[guid stringValue] lowercaseString]];
+    NSArray *plugins = [doc nodesForXPath:@"//plugin" error:nil];
+    for (NSXMLNode *plugin in plugins) {
+      NSString *guid = nil, *cn = @"";
+      NSNumber *overrides = nil;
+      for (NSXMLNode *node in [plugin children]) {
+        if ([[node name] isEqual:@"guid"]) {
+          guid = [[node stringValue] lowercaseString];
+        } else if ([[node name] isEqual:@"overrides"]) {
+          if ([[[node stringValue] lowercaseString] isEqual:@"true"]) {
+            overrides = [NSNumber numberWithBool:YES];
+          }
+        } else if ([[node name] isEqual:@"cn"]) {
+          cn = [node stringValue];
+        }
+      }
+      if (guid) {
+        if (!overrides || ![cn length]) {
+          // Default to not allowing overrides
+          overrides = [NSNumber numberWithBool:NO];
+        }
+        NSDictionary *entry
+          = [NSDictionary dictionaryWithObjectsAndKeys:
+             guid, kHGSPluginBlacklistGuidKey,
+             overrides, kHGSPluginBlacklistOverridesKey,
+             cn, kHGSPluginBlacklistCommonNameKey,
+             nil];
+        [newBlacklist addObject:entry];
+      }
     }
-    [blacklistedBundleIDs_ release];
     @synchronized(self) {
-      blacklistedBundleIDs_ = [newBlacklist retain];
+      [blacklistedPlugins_ release];
+      blacklistedPlugins_ = [newBlacklist retain];
       NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
       NSDictionary *cacheDict =
         [NSDictionary dictionaryWithObjectsAndKeys:
          kHGSPluginBlacklistVersion, kHGSPluginBlacklistVersionKey,
-         blacklistedBundleIDs_, kHGSPluginBlacklistEntriesKey,
+         blacklistedPlugins_, kHGSPluginBlacklistEntriesKey,
          [NSNumber numberWithDouble:now], kHGSPluginBlacklistLastUpdateKey,
          nil];
       if (![cacheDict writeToFile:blacklistPath_ atomically:YES]) {

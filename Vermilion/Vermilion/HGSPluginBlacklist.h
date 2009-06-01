@@ -47,7 +47,7 @@
 @interface HGSPluginBlacklist : NSObject {
  @private
   __weak NSTimer *updateTimer_;
-  NSArray *blacklistedBundleIDs_;
+  NSArray *blacklistedPlugins_;
   NSString *blacklistPath_;
 }
 

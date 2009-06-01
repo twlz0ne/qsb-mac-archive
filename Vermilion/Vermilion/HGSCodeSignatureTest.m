@@ -89,4 +89,25 @@ static NSString *kAppPath = @"/Applications/System Preferences.app";
   CFRelease(cert);
 }
 
+- (void)testCommonName {
+  NSBundle *appBundle
+    = [NSBundle bundleWithPath:kAppPath];
+  STAssertNotNil(appBundle, @"could not find System Preferences.app bundle");
+  
+  HGSCodeSignature *sig = [HGSCodeSignature codeSignatureForBundle:appBundle];
+  STAssertNotNil(sig, @"failed to create code signature object");
+  
+  SecCertificateRef cert = [sig copySignerCertificate];
+  STAssertNotNULL(cert, @"failed to extract certificate");
+  
+  NSString *commonName = [HGSCodeSignature certificateSubjectCommonName:cert];
+  STAssertNotNil(commonName, @"failed to extract common name");
+  
+  // System Preferences.app is signed using Apple's "Software Signing" cert
+  STAssertEqualObjects(commonName, @"Software Signing",
+                       @"unrecognized common name");
+  
+  CFRelease(cert);
+}
+
 @end

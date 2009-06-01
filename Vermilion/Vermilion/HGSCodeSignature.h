@@ -70,6 +70,13 @@ typedef enum {
 + (BOOL)certificate:(SecCertificateRef)cert1
             isEqual:(SecCertificateRef)cert2;
 
+/*! 
+  Returns the common name from the specified certificate ref, or nil
+  if an error occurs. If there are multiple common name entries, they are
+  returned in a comma-separated list.
+*/
++ (NSString *)certificateSubjectCommonName:(SecCertificateRef)cert;
+
 - (id)initWithBundle:(NSBundle *)bundle;
 
 /*! 
@@ -77,6 +84,12 @@ typedef enum {
   has a valid embedded signature. Otherwise, returns NULL.
 */
 - (SecCertificateRef)copySignerCertificate;
+
+/*! 
+  Returns a copy of the certificate chain used to sign the bundle if the bundle
+  has a valid embedded signature. Otherwise, returns NULL.
+*/
+- (CFArrayRef)copySignerCertificateChain;
 
 /*! 
   Embeds a code signature in the bundle. If the bundle contains a Mach
