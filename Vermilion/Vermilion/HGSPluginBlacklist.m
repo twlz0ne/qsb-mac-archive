@@ -47,10 +47,9 @@ static NSString* const kHGSPluginBlacklistVersion = @"1";
 static NSString* const kHGSPluginBlacklistGuidKey = @"HGSPBGuidKey";
 static NSString* const kHGSPluginBlacklistOverridesKey = @"HGSPBOverridesKey";
 static NSString* const kHGSPluginBlacklistCommonNameKey = @"HGSPBCNKey";
+static NSString* const kHGSPluginBlacklistInfoPlistKey = @"HGSPluginBlacklistURL";
 static const NSTimeInterval kHGSPluginBlacklistUpdateInterval = 86400; // 1 day
 static const NSTimeInterval kHGSPluginBlacklistJitterRange = 3600; // 1 hour
-static NSString* const kHGSPluginBlacklistURL
-  = @"https://clients4.google.com/dl/mac/data/qsb/blacklist.xml";
 NSString* kHGSBlacklistUpdatedNotification = @"HGSBlacklistUpdatedNotification";
 
 @interface HGSPluginBlacklist()
@@ -200,26 +199,33 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginBlacklist, sharedPluginBlacklist);
 }
 
 -(void)updateBlacklist:(id)sender {
-  NSURL *url = [NSURL URLWithString:kHGSPluginBlacklistURL];
-  NSURLRequest *request = [NSURLRequest requestWithURL:url];
-  GDataHTTPFetcher *fetcher
-    = [GDataHTTPFetcher httpFetcherWithRequest:request];
-  [fetcher setIsRetryEnabled:YES];
-  [fetcher beginFetchWithDelegate:self
-                didFinishSelector:@selector(blacklistFetcher:
-                                            finishedWithData:)
-                  didFailSelector:@selector(blacklistFetcher:
-                                            failedWithError:)];
-  if ([updateTimer_ isValid]) {
-    [updateTimer_ invalidate];
+  NSBundle *bnd = [NSBundle bundleForClass:[self class]];
+  NSString *urlString
+    = [[bnd infoDictionary] valueForKey:kHGSPluginBlacklistInfoPlistKey];
+  if (urlString) {
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    GDataHTTPFetcher *fetcher
+      = [GDataHTTPFetcher httpFetcherWithRequest:request];
+    [fetcher setIsRetryEnabled:YES];
+    [fetcher beginFetchWithDelegate:self
+                  didFinishSelector:@selector(blacklistFetcher:
+                                              finishedWithData:)
+                    didFailSelector:@selector(blacklistFetcher:
+                                              failedWithError:)];
+    if ([updateTimer_ isValid]) {
+      [updateTimer_ invalidate];
+    }
+    NSTimeInterval interval = kHGSPluginBlacklistUpdateInterval + [self jitter];
+    updateTimer_
+      = [NSTimer scheduledTimerWithTimeInterval:interval
+                                         target:self
+                                       selector:@selector(updateBlacklist:)
+                                       userInfo:nil
+                                        repeats:NO];
+  } else {
+    HGSLog(@"Unable to get blacklist URL for %@ (%i)", self);
   }
-  NSTimeInterval interval = kHGSPluginBlacklistUpdateInterval + [self jitter];
-  updateTimer_
-    = [NSTimer scheduledTimerWithTimeInterval:interval
-                                       target:self
-                                     selector:@selector(updateBlacklist:)
-                                     userInfo:nil
-                                      repeats:NO];
 }
 
 - (NSTimeInterval)jitter {

@@ -16,5 +16,7 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
+	<key>HGSPluginBlacklistURL</key>
+	<string>https://clients4.google.com/dl/mac/data/qsb/blacklist.xml</string>
 </dict>
 </plist>
