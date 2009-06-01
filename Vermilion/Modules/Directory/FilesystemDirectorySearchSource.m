@@ -81,7 +81,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     for (NSString *subpath in contents) {
       if (!showInvisibles) {
         if ([subpath hasPrefix:@"."]) continue;
-        NSString *fullPath = [path stringByAppendingFormat:@"/%@", subpath];
+        NSString *fullPath = [path stringByAppendingPathComponent:subpath];
         FSRef ref;
         OSStatus osStatus
           = FSPathMakeRef((const UInt8 *)[fullPath fileSystemRepresentation],
@@ -90,7 +90,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
         if (osStatus == noErr) {
           FSCatalogInfo catalogInfo;
           OSErr osErr = FSGetCatalogInfo(&ref, kFSCatInfoFinderInfo,
-                                       &catalogInfo, NULL, NULL, NULL);
+                                         &catalogInfo, NULL, NULL, NULL);
           if (osErr == noErr) {
             FileInfo *fileInfo = (FileInfo *)(catalogInfo.finderInfo);
             UInt16 finderFlags = (*fileInfo).finderFlags;
