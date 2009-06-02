@@ -73,13 +73,16 @@
   // as real plugins.
   NSMutableDictionary *extensionMap_;
   
+  // The code signature on this framework
+  HGSCodeSignature *frameworkSignature_;
+  
   // The code signature on the executable hosting this framework
   HGSCodeSignature *executableSignature_;
   
-  // The certificate that was used to sign the executable hosting this
-  // framework, or NULL if the executable is unsigned or has an
+  // The certificate that was used to sign the this
+  // framework, or NULL if the framework is unsigned or has an
   // invalid signature
-  SecCertificateRef executableCertificate_;
+  SecCertificateRef frameworkCertificate_;
   
   // A dictionary containing the whitelist of untrusted-but-OK'd-by-the-user
   // plugins. The whitelist is stored in persistent form in an encrypted file.

@@ -82,12 +82,21 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 - (id)init {
   if ((self = [super init])) {
     extensionMap_ = [[NSMutableDictionary alloc] init];
+    NSBundle *bnd = [NSBundle bundleForClass:[self class]];
+    NSString *currentFrameworkPath
+      = [[bnd bundlePath] stringByAppendingPathComponent:@"Versions/A"];
+    bnd = [NSBundle bundleWithPath:currentFrameworkPath];
+    frameworkSignature_
+      = [[HGSCodeSignature codeSignatureForBundle:bnd] retain];
     executableSignature_
       = [[HGSCodeSignature codeSignatureForBundle:[NSBundle mainBundle]]
          retain];
-    if ([executableSignature_ verifySignature] == eSignatureStatusOK) {
-      executableCertificate_ = [executableSignature_ copySignerCertificate];
+    if ([frameworkSignature_ verifySignature] == eSignatureStatusOK &&
+        [executableSignature_ verifySignature] == eSignatureStatusOK) {
+      frameworkCertificate_ = [frameworkSignature_ copySignerCertificate];
     } else {
+      [frameworkSignature_ release];
+      frameworkSignature_ = nil;
       [executableSignature_ release];
       executableSignature_ = nil;
     }
@@ -100,9 +109,10 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 - (void)dealloc {
   [extensionMap_ release];
   [executableSignature_ release];
+  [frameworkSignature_ release];
   [pluginSignatureInfo_ release];
-  if (executableCertificate_) {
-    CFRelease(executableCertificate_);
+  if (frameworkCertificate_) {
+    CFRelease(frameworkCertificate_);
   }
   [super dealloc];
 }
@@ -186,7 +196,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
     return NO;
   }
   
-  if (!executableSignature_) {
+  if (!executableSignature_ || !frameworkSignature_) {
     // If the host application is not signed, do not perform validation.
     return YES;
   }
@@ -206,7 +216,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
   if (shouldLoad) {
     SecCertificateRef pluginCertificate = [signature copySignerCertificate];
     if (pluginCertificate) {
-      shouldLoad = [HGSCodeSignature certificate:executableCertificate_
+      shouldLoad = [HGSCodeSignature certificate:frameworkCertificate_
                                          isEqual:pluginCertificate];
       CFRelease(pluginCertificate);
     } else {
