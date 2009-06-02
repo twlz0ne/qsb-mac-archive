@@ -34,9 +34,5 @@
 
 @class QSBSearchWindowController;
 
-@interface QSBLargeIconView : NSImageView {
- @private
-  IBOutlet QSBSearchWindowController *controller_;
-}
-
+@interface QSBLargeIconView : NSImageView
 @end

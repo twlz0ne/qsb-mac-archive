@@ -39,21 +39,8 @@
 
 @implementation QSBLargeIconView
 
-- (void)mouseDown:(NSEvent *)e {
-  NSPasteboard *pb = [NSPasteboard pasteboardWithName:NSDragPboard];
-  QSBSearchViewController *viewController = [controller_ activeSearchViewController];
-  QSBTableResult *qsbTableResult = [viewController selectedObject];
-
-  if ([qsbTableResult copyToPasteboard:pb]) {
-    NSImage *image = [self image];
-    NSSize size = [image size];
-    NSPoint location;
-    NSRect bounds = [self bounds];
-    location.x = (NSWidth(bounds) - size.width) / 2;
-    location.y = (NSHeight(bounds) - size.height) / 2;
-    [self dragImage:image at:location offset:NSZeroSize 
-              event:e pasteboard:pb source:self slideBack:YES];
-  }
+- (BOOL)mouseDownCanMoveWindow {
+  return YES;
 }
 
 CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
