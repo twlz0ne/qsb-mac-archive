@@ -310,19 +310,22 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
 // A regular method that's called to clean up cache entries. Expected to be
 // called on the main thread.
 - (void)flush {
-  if (pendingTouches_) {
+  // Do nothing, including removing the old and/or excess entries, unless
+  // the cache has some new entries to process.  Otherwise, we'll prevent
+  // the machine from going to sleep.
+  if ([pendingTouches_ count]) {
     [self commitPendingTouches:pendingTouches_];
-  }
   
-  NSDate *oldestEntryDate 
-    = [NSDate dateWithTimeIntervalSinceNow:(-1 * maximumAge_)];
-  [self invalidateEntriesNotAccessedAfter:oldestEntryDate];
-  
-  // If our size still exceeds our maximum entries, get rid of least recently
-  // accessed entries.
-  NSUInteger count = [self count];
-  if (count > hardMaximumEntries_) {
-    [self invalidateLeastRecentlyUsedFrom:count to:softMaximumEntries_];
+    NSDate *oldestEntryDate 
+      = [NSDate dateWithTimeIntervalSinceNow:(-1 * maximumAge_)];
+    [self invalidateEntriesNotAccessedAfter:oldestEntryDate];
+    
+    // If our size still exceeds our maximum entries, get rid of least recently
+    // accessed entries.
+    NSUInteger count = [self count];
+    if (count > hardMaximumEntries_) {
+      [self invalidateLeastRecentlyUsedFrom:count to:softMaximumEntries_];
+    }
   }
 }
 
