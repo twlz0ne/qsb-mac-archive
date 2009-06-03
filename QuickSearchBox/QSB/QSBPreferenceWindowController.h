@@ -39,6 +39,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class QSBSetUpAccountWindowController;
+@class HGSPlugin;
 
 /*!
  Manage the Quick Search App preferences window.
@@ -79,6 +80,8 @@
 // Choose a color from the drop down
 - (IBAction)setColorFromMenu:(id)sender;
 
+// "Under the Hood" actions
+- (void)doubleClickPluginTable:(NSArray *)selectedPlugins;
 @end
 
 /*!

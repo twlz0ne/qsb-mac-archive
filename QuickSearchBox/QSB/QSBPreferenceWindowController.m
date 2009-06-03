@@ -30,12 +30,14 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#import <SecurityInterface/SFCertificatePanel.h>
 #import "QSBPreferenceWindowController.h"
 #import "GTMGarbageCollection.h"
 #import "GTMHotKeyTextField.h"
 #import "GTMMethodCheck.h"
 #import "HGSAccount.h"
 #import "HGSAccountsExtensionPoint.h"
+#import "HGSCodeSignature.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
 #import "KeychainItem.h"
@@ -575,6 +577,28 @@ void OpenAtLoginItemsChanged(LSSharedFileListRef inList, void *context) {
   if (contextSeedValue != seedValue) {
     [controller willChangeValueForKey:@"openedAtLogin"];
     [controller didChangeValueForKey:@"openedAtLogin"];
+  }
+}
+
+#pragma mark Under the Hood
+
+// TODO(hawk): add useful information in addition to the signer certificate
+- (void)doubleClickPluginTable:(NSArray *)selectedPlugins {
+  if ([selectedPlugins count] == 1) {
+    HGSPlugin *plugin = [selectedPlugins objectAtIndex:0];
+    HGSCodeSignature *codeSig
+      = [HGSCodeSignature codeSignatureForBundle:[plugin bundle]];
+    NSArray *certs
+      = [(NSArray*)[codeSig copySignerCertificateChain] autorelease];
+    if ([certs count]) {
+      [[SFCertificatePanel sharedCertificatePanel]
+       beginSheetForWindow:[self window]
+             modalDelegate:nil
+            didEndSelector:nil
+               contextInfo:nil
+              certificates:certs
+                 showGroup:YES];
+    }
   }
 }
 

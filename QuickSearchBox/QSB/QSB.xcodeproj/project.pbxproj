@@ -232,6 +232,7 @@
 		5A0BB3B20FABB1F500AA4858 /* PubSub.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A0BB3B10FABB1F500AA4858 /* PubSub.framework */; };
 		5A0BB67B0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0BB67A0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m */; };
 		5A11A3020E78414C007F4D67 /* iTunes.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 5A11A2DC0E784051007F4D67 /* iTunes.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
+		5A20A2AF0FD71946009F0A92 /* SecurityInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A20A2AE0FD71946009F0A92 /* SecurityInterface.framework */; };
 		5A2710B90ECA52F200C72257 /* Vermilion.py in Resources */ = {isa = PBXBuildFile; fileRef = 5A2710B20ECA52F200C72257 /* Vermilion.py */; };
 		5A2710BA0ECA52F200C72257 /* HGSPython.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A2710B30ECA52F200C72257 /* HGSPython.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A2710BB0ECA52F200C72257 /* HGSPython.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5A2710B40ECA52F200C72257 /* HGSPython.mm */; };
@@ -1776,6 +1777,7 @@
 		5A0BB3B10FABB1F500AA4858 /* PubSub.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PubSub.framework; path = System/Library/Frameworks/PubSub.framework; sourceTree = SDKROOT; };
 		5A0BB67A0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPluginBlacklistTest.m; sourceTree = "<group>"; };
 		5A11A2DC0E784051007F4D67 /* iTunes.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = iTunes.applescript; sourceTree = "<group>"; };
+		5A20A2AE0FD71946009F0A92 /* SecurityInterface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityInterface.framework; path = System/Library/Frameworks/SecurityInterface.framework; sourceTree = SDKROOT; };
 		5A2710B20ECA52F200C72257 /* Vermilion.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Vermilion.py; sourceTree = "<group>"; };
 		5A2710B30ECA52F200C72257 /* HGSPython.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSPython.h; sourceTree = "<group>"; };
 		5A2710B40ECA52F200C72257 /* HGSPython.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HGSPython.mm; sourceTree = "<group>"; };
@@ -2766,6 +2768,7 @@
 				8BDCCA8A0F18646700CDDA78 /* GoogleBreakpad.framework in Frameworks */,
 				8BD83CAF0F1EC46400098475 /* Quartz.framework in Frameworks */,
 				62E72A7B0F4F4ADE00A68815 /* Growl.framework in Frameworks */,
+				5A20A2AF0FD71946009F0A92 /* SecurityInterface.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2995,6 +2998,7 @@
 				D45B92550A3F6E68003A5A05 /* Libraries */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				5A4D237B0F462D2000F5C05B /* libcrypto.dylib */,
+				5A20A2AE0FD71946009F0A92 /* SecurityInterface.framework */,
 			);
 			name = GoogleDesktop;
 			sourceTree = "<group>";
