@@ -195,7 +195,13 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   [self menuNeedsUpdate:[colorPopUp_ menu]];
   [colorPopUp_ selectItemAtIndex:0];
   [self updateColorPopup];
-  
+
+  // Ensure that the "Under the Hood" view is scrolled to the top
+  NSPoint leftTop = [[advancedScrollView_ contentView]
+                     constrainScrollPoint:NSMakePoint(0, CGFLOAT_MAX)];
+  [[advancedScrollView_ contentView] scrollToPoint:leftTop];
+  [[advancedScrollView_ verticalScroller] setFloatValue:0.0];
+
   [[self window] setHidesOnDeactivate:YES];
 }
 

@@ -48,7 +48,8 @@
  @private
   IBOutlet NSPopUpButton *colorPopUp_;
   IBOutlet NSTabView *settingsTabView_;
-  
+  IBOutlet NSScrollView *advancedScrollView_;
+
   BOOL prefsColorWellWasShowing_;  // YES if color well was showing.
   NSColorList *colors_;
   NSColor *selectedColor_;
