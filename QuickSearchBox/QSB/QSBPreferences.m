@@ -49,8 +49,15 @@
      [NSNumber numberWithBool:kQSBSnippetsDefault],
      kQSBSnippetsKey,
      // QSB hot key
-     kQSBHotKeyDefault,
+     kQSBHotKeyKeyDefault,
      kQSBHotKeyKey,
+     [NSNumber numberWithBool:kQSBHotKeyKeyEnabledDefault],
+     kQSBHotKeyKeyEnabled,
+     // QSB hot key 2
+     kQSBHotKeyKey2Default,
+     kQSBHotKeyKey2,
+     [NSNumber numberWithBool:kQSBHotKeyKey2EnabledDefault],
+     kQSBHotKeyKey2Enabled,
      // QSB Icon In Dock
      [NSNumber numberWithBool:kQSBIconInDockDefault],
      kQSBIconInDockKey,

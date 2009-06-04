@@ -322,12 +322,6 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   return ([[self window] isVisible]);
 }
 
-- (IBAction)resetHotKey:(id)sender {
-  // Just write the pref, KVO and bindings takes care of the rest.
-  [[NSUserDefaults standardUserDefaults] setObject:kQSBHotKeyDefault
-                                            forKey:kQSBHotKeyKey];
-}
-
 #pragma mark Account Management
 
 - (IBAction)setupAccount:(id)sender {

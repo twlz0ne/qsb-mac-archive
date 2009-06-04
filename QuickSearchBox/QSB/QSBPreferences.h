@@ -64,8 +64,20 @@
 
 // Dictionary - Hot key information, see GMHotKeyUtils for keys
 #define kQSBHotKeyKey                         @"QSBHotKey"
-// Default hotkey is Command + Command
-#define kQSBHotKeyDefault                     [NSDictionary dictionaryWithObjectsAndKeys: \
+// Default hotkey is ControlSpace
+#define kQSBHotKeyKeyDefault                  [NSDictionary dictionaryWithObjectsAndKeys: \
+                                                 [NSNumber numberWithUnsignedInt:NSControlKeyMask], \
+                                                 kGTMHotKeyModifierFlagsKey, \
+                                                 [NSNumber numberWithUnsignedInt:49], \
+                                                 kGTMHotKeyKeyCodeKey, \
+                                                 [NSNumber numberWithBool:NO], \
+                                                 kGTMHotKeyDoubledModifierKey, \
+                                                 nil]
+#define kQSBHotKeyKeyEnabled                  @"QSBHotKeyKeyEnabled"
+#define kQSBHotKeyKeyEnabledDefault           YES
+
+#define kQSBHotKeyKey2                         @"QSBHotKey2"
+#define kQSBHotKeyKey2Default                 [NSDictionary dictionaryWithObjectsAndKeys: \
                                                  [NSNumber numberWithUnsignedInt:NSCommandKeyMask], \
                                                  kGTMHotKeyModifierFlagsKey, \
                                                  [NSNumber numberWithUnsignedInt:0], \
@@ -73,6 +85,8 @@
                                                  [NSNumber numberWithBool:YES], \
                                                  kGTMHotKeyDoubledModifierKey, \
                                                  nil]
+#define kQSBHotKeyKey2Enabled                  @"QSBHotKeyKey2Enabled"
+#define kQSBHotKeyKey2EnabledDefault           YES
 
 #define kQSBIconInMenubarKey                  @"QSBIconInMenubar"
 #define kQSBIconInMenubarDefault              NO

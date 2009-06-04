@@ -516,6 +516,7 @@
 		8B02FB070EC9D46B00A6EB85 /* HGSExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B02FB060EC9D46B00A6EB85 /* HGSExtension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B02FB0D0EC9D50C00A6EB85 /* HGSExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B02FB0C0EC9D50C00A6EB85 /* HGSExtension.m */; };
 		8B0E66700FD82C6300461C4A /* GTMHotKeyTextField.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B0E665E0FD82C6300461C4A /* GTMHotKeyTextField.strings */; };
+		8B0E67140FD8643900461C4A /* Command.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 8B0E67130FD8643900461C4A /* Command.pdf */; };
 		8B10A6FD0FA5F5E50087DE20 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B10AB690FA679A60087DE20 /* HGSAppleScriptHandlerTest.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
 		8B1490A80F715781002E05FA /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
@@ -2100,6 +2101,7 @@
 		8B0E666D0FD82C6300461C4A /* sv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/GTMHotKeyTextField.strings; sourceTree = "<group>"; };
 		8B0E666E0FD82C6300461C4A /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/GTMHotKeyTextField.strings; sourceTree = "<group>"; };
 		8B0E666F0FD82C6300461C4A /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/GTMHotKeyTextField.strings; sourceTree = "<group>"; };
+		8B0E67130FD8643900461C4A /* Command.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Command.pdf; sourceTree = "<group>"; };
 		8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = HGSAppleScriptHandlerTest.applescript; sourceTree = "<group>"; };
 		8B148F720F715697002E05FA /* OCMock.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = OCMock.xcodeproj; sourceTree = "<group>"; };
 		8B148F9A0F7156B6002E05FA /* OCMock.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OCMock.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3775,6 +3777,7 @@
 		8B5EC6870CEE61BF00AD3BBD /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8B0E67130FD8643900461C4A /* Command.pdf */,
 				6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */,
 				7F95C81E0E1D72DC00CAB15D /* BlackLargeGoogle.pdf */,
 				62ECB7A90F86A17100C7B435 /* CategorySingulars.strings */,
@@ -6064,6 +6067,7 @@
 				7F44B0D00FCDD19000F75764 /* history-flag.png in Resources */,
 				7F44B0D10FCDD19000F75764 /* star-flag.png in Resources */,
 				62D824BB0FD05D15002429C4 /* finance.icns in Resources */,
+				8B0E67140FD8643900461C4A /* Command.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -276,6 +276,21 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                    userInfo:nil
                     options:0];
   [defaults gtm_addObserver:self
+                 forKeyPath:kQSBHotKeyKeyEnabled
+                   selector:@selector(hotKeyValueChanged:)
+                   userInfo:nil
+                    options:0];
+  [defaults gtm_addObserver:self
+                 forKeyPath:kQSBHotKeyKey2
+                   selector:@selector(hotKeyValueChanged:)
+                   userInfo:nil
+                    options:0];
+  [defaults gtm_addObserver:self
+                 forKeyPath:kQSBHotKeyKey2Enabled
+                   selector:@selector(hotKeyValueChanged:)
+                   userInfo:nil
+                    options:0];
+  [defaults gtm_addObserver:self
              forKeyPath:kQSBIconInMenubarKey
                    selector:@selector(iconInMenubarValueChanged:)
                    userInfo:nil
@@ -490,19 +505,18 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   NSDictionary *newKey = [ud valueForKeyPath:kQSBHotKeyKey];
   NSNumber *value = [newKey objectForKey:kGTMHotKeyDoubledModifierKey];
-  if (!newKey || [value boolValue]) {
+  BOOL hotkey1Enabled = [ud boolForKey:kQSBHotKeyKeyEnabled];
+  BOOL hotkey2Enabled = [ud boolForKey:kQSBHotKeyKey2Enabled];
+  if (!newKey || [value boolValue] || hotkey2Enabled) {
     // set up double tap if appropriate
-    if (newKey) {
-      value = [newKey objectForKey:kGTMHotKeyModifierFlagsKey];
-      hotModifiers_ = [value unsignedIntValue];
-    } else {
-      hotModifiers_ = NSCommandKeyMask;
-    }
+    hotModifiers_ = NSCommandKeyMask;
     statusMenuItemKey = [NSString stringWithUTF8String:"⌘"];
     statusMenuItemModifiers = NSCommandKeyMask;
   } else {
-    // setting hotModifiers_ means we're not looking for a double tap
     hotModifiers_ = 0;
+  }
+  if (hotkey1Enabled) {
+    // setting hotModifiers_ means we're not looking for a double tap
     value = [newKey objectForKey:kGTMHotKeyModifierFlagsKey];
     uint modifiers = [value unsignedIntValue];
     value = [newKey objectForKey:kGTMHotKeyKeyCodeKey];
@@ -515,7 +529,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                                     action:@selector(hitHotKey:)
                                whenPressed:YES];
 
-      NSBundle *bundle = [NSBundle mainBundle];
+      NSBundle *bundle = [NSBundle bundleForClass:[GTMHotKeyTextField class]];
       statusMenuItemKey = [GTMHotKeyTextField stringForKeycode:keycode
                                                       useGlyph:YES
                                                 resourceBundle:bundle];

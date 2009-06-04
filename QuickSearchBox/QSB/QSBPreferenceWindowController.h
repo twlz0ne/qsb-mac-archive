@@ -75,9 +75,6 @@
 - (IBAction)editAccount:(id)sender;
 - (IBAction)removeAccount:(id)sender;
 
-// Reset the hotkey to cmd-cmd.
-- (IBAction)resetHotKey:(id)sender;
-
 // Choose a color from the drop down
 - (IBAction)setColorFromMenu:(id)sender;
 
