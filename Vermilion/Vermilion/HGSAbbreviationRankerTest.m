@@ -115,16 +115,14 @@
     NSString *abbreviation;
     NSString *phrase;
   } tests[] = {
-    { 
-      @"stringWithString", @"Unfortunately, this part of Florida is "
+    { @"stringWithString", @"Unfortunately, this part of Florida is "
       @"wall-to-wall retirement community. Coming back from Corkscrew, we "
       @"spent 45 minutes stopped on I-75 because of a horrible roll-over crash."
       @" The traffic on the island was also pretty bad--it took us about 50 "
       @"minutes to go the 3+ miles to get off the island one evening for "
       @"diner. Pedestrians were lapping us."
     },
-    { 
-      @"stringWithString", @"We landed in a field across the street from an "
+    { @"stringWithString", @"We landed in a field across the street from an "
       @"elementary school. Keith, the pilot, hovered about a foot and his "
       @"ground-crew-side-kick pulled us across the street to the sidewalk and "
       @"a nice, grassy school field. Kids were just arriving for school and "
@@ -143,25 +141,5 @@
     STAssertEquals(score, (CGFloat)0, @"%@ %@", tokenizedPhrase, tokenizedAbbr);  
   }
 }  
-
-- (void)testHighRank {
-  struct {
-    NSString *abbreviation;
-    NSString *phrase;
-  } tests[] = {
-    { @"sA", @"sapientially Animalivora" },
-    { @"SA", @"sapientially Animalivora" },
-    { @"Sa", @"sapientially Animalivora" },
-  };
-  for (size_t i = 0; i < sizeof(tests) / sizeof (tests[0]); ++i) {
-    NSString *tokenizedPhrase = [HGSTokenizer tokenizeString:tests[i].phrase];
-    NSString *tokenizedAbbr 
-    = [HGSTokenizer tokenizeString:tests[i].abbreviation];
-    CGFloat score = HGSScoreForAbbreviation(tokenizedPhrase, 
-                                            tokenizedAbbr, 
-                                            NULL);
-    STAssertGreaterThan(score, (CGFloat)0.5, @"%@ %@", tokenizedPhrase, tokenizedAbbr);  
-  }
-}  
-
+    
 @end
