@@ -515,7 +515,6 @@
 		8B0207C40ECBC40300A6EB85 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B02FB070EC9D46B00A6EB85 /* HGSExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B02FB060EC9D46B00A6EB85 /* HGSExtension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B02FB0D0EC9D50C00A6EB85 /* HGSExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B02FB0C0EC9D50C00A6EB85 /* HGSExtension.m */; };
-		8B0D21600F79660400FD4A12 /* RoundRectAndDropShadow.tiff in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B0D215E0F7965FE00FD4A12 /* RoundRectAndDropShadow.tiff */; };
 		8B10A6FD0FA5F5E50087DE20 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B10AB690FA679A60087DE20 /* HGSAppleScriptHandlerTest.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
 		8B1490A80F715781002E05FA /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
@@ -583,6 +582,8 @@
 		8B55DB030E78832300D39CB0 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B55DB010E78832300D39CB0 /* SenTestingKit.framework */; };
 		8B55DBB00E78919F00D39CB0 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8B58E9EE0E548F8C00A0E02E /* QSBGoogleSuggestURLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B58E9ED0E548F8C00A0E02E /* QSBGoogleSuggestURLHandler.m */; };
+		8B5C86AE0FD1F1BC00A6AA25 /* RoundRectAndDropShadow.10.5.7.tiff in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B5C86840FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.7.tiff */; };
+		8B5C86AF0FD1F1BC00A6AA25 /* RoundRectAndDropShadow.10.5.6.tiff in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B5C86850FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.6.tiff */; };
 		8B5C8D7D0E536E37001DE405 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B5EC6C60CEE61BF00AD3BBD /* QSBBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5EC6490CEE61BE00AD3BBD /* QSBBackgroundView.m */; };
 		8B5EC6C90CEE61BF00AD3BBD /* QSBApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5EC64F0CEE61BE00AD3BBD /* QSBApplication.m */; };
@@ -1665,9 +1666,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
+				8B5C86AE0FD1F1BC00A6AA25 /* RoundRectAndDropShadow.10.5.7.tiff in CopyFiles */,
+				8B5C86AF0FD1F1BC00A6AA25 /* RoundRectAndDropShadow.10.5.6.tiff in CopyFiles */,
 				5A5DF3E80FB3780A0068A25D /* Localizable.strings in CopyFiles */,
 				5AC3E8240F7C2F7300F171EB /* VermilionTest.py in CopyFiles */,
-				8B0D21600F79660400FD4A12 /* RoundRectAndDropShadow.tiff in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2080,7 +2082,6 @@
 		8B07C41D0B69234900827344 /* StripHeaders.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = StripHeaders.sh; sourceTree = "<group>"; };
 		8B0CA2B20E48A6580004BFB2 /* GTMFourCharCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMFourCharCode.m; sourceTree = "<group>"; };
 		8B0CA2B30E48A6580004BFB2 /* GTMFourCharCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMFourCharCode.h; sourceTree = "<group>"; };
-		8B0D215E0F7965FE00FD4A12 /* RoundRectAndDropShadow.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RoundRectAndDropShadow.tiff; sourceTree = "<group>"; };
 		8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = HGSAppleScriptHandlerTest.applescript; sourceTree = "<group>"; };
 		8B148F720F715697002E05FA /* OCMock.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = OCMock.xcodeproj; sourceTree = "<group>"; };
 		8B148F9A0F7156B6002E05FA /* OCMock.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OCMock.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2136,6 +2137,8 @@
 		8B55DB010E78832300D39CB0 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		8B58E9E90E548F1200A0E02E /* GTMGetURLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMGetURLHandler.m; sourceTree = "<group>"; };
 		8B58E9ED0E548F8C00A0E02E /* QSBGoogleSuggestURLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBGoogleSuggestURLHandler.m; sourceTree = "<group>"; };
+		8B5C86840FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.7.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RoundRectAndDropShadow.10.5.7.tiff; sourceTree = "<group>"; };
+		8B5C86850FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.6.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RoundRectAndDropShadow.10.5.6.tiff; sourceTree = "<group>"; };
 		8B5EC6480CEE61BE00AD3BBD /* QSBBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBBackgroundView.h; sourceTree = "<group>"; };
 		8B5EC6490CEE61BE00AD3BBD /* QSBBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBBackgroundView.m; sourceTree = "<group>"; };
 		8B5EC64E0CEE61BE00AD3BBD /* QSBApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBApplication.h; sourceTree = "<group>"; };
@@ -3517,7 +3520,8 @@
 				5A5DF3DB0FB377790068A25D /* English.lproj */,
 				8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */,
 				5AC3E8230F7C2F6200F171EB /* VermilionTest.py */,
-				8B0D215E0F7965FE00FD4A12 /* RoundRectAndDropShadow.tiff */,
+				8B5C86840FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.7.tiff */,
+				8B5C86850FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.6.tiff */,
 			);
 			path = TestData;
 			sourceTree = "<group>";
