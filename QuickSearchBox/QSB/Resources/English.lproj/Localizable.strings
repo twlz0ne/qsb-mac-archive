@@ -65,7 +65,7 @@
 "Show All" = "Show All";
 
 /* Application menu item that quits the application. Do not localize $APPNAME$. */
-"Quit $APPNAME$"= "Quit $APPNAME$";
+"Quit $APPNAME$" = "Quit $APPNAME$";
 
 /* File menu title. */
 "File" = "File";
@@ -350,3 +350,5 @@
 /* A menu item denoting that the user wants to search their computer and the web. */
 "Computer & Web" = "Computer & Web";
 
+/* The title of the preferences dialog. */
+"Preferences" = "Preferences";

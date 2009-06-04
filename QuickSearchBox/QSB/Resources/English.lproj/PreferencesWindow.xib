@@ -118,7 +118,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{196, 158}, {608, 334}}</string>
 				<int key="NSWTFlags">-469761024</int>
-				<string key="NSWindowTitle">Preferences</string>
+				<string key="NSWindowTitle">^Preferences</string>
 				<string key="NSWindowClass">NSPanel</string>
 				<object class="NSToolbar" key="NSViewClass" id="746446603">
 					<object class="NSMutableString" key="NSToolbarIdentifier">
@@ -4662,9 +4662,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{28, 509}, {608, 334}}</string>
+					<string>{{329, 570}, {608, 334}}</string>
 					<boolean value="NO"/>
-					<string>{{28, 509}, {608, 334}}</string>
+					<string>{{329, 570}, {608, 334}}</string>
 					<reference ref="8"/>
 					<string>{3.40282e+38, 3.40282e+38}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
