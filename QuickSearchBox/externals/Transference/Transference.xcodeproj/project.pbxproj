@@ -420,7 +420,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Build Vermilion the way we want into our build folder\n\nset -o errexit\nset -o nounset\nset -o verbose\n\ncd \"${SRCROOT}/../../QSB\"\n/usr/bin/xcodebuild -project QSB.xcodeproj -target \"Vermilion\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GOOGLE_VERSION_BUILDNUMBER=\"${GOOGLE_VERSION_BUILDNUMBER=}\"\n";
+			shellScript = "# Build Vermilion the way we want into our build folder\n\nset -o errexit\nset -o nounset\nset -o verbose\n\ncd \"${SRCROOT}/../../QSB\"\n/usr/bin/xcodebuild -project QSB.xcodeproj -target \"Vermilion\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GOOGLE_VERSION_BUILDNUMBER=\"${GOOGLE_VERSION_BUILDNUMBER}\"\n";
 		};
 		104030840FD5E9CF000FFBEB /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -433,7 +433,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Build GTM the way we want into our build folder\n\nset -o errexit\nset -o nounset\nset -o verbose\n\ncd \"${SRCROOT}/../../QSB\"\n/usr/bin/xcodebuild -project QSB.xcodeproj -target \"GTM\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GOOGLE_VERSION_BUILDNUMBER=\"${GOOGLE_VERSION_BUILDNUMBER=}\"\n";
+			shellScript = "# Build GTM the way we want into our build folder\n\nset -o errexit\nset -o nounset\nset -o verbose\n\ncd \"${SRCROOT}/../../QSB\"\n/usr/bin/xcodebuild -project QSB.xcodeproj -target \"GTM\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GOOGLE_VERSION_BUILDNUMBER=\"${GOOGLE_VERSION_BUILDNUMBER}\"\n";
 		};
 		104031300FD5F1B6000FFBEB /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -615,27 +615,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1040311C0FD5F028000FFBEB /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../Growl\"",
 				);
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				INFOPLIST_FILE = "TransferenceBeacon-Info.plist";
-				INSTALL_PATH = "";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
 				PRODUCT_NAME = TransferenceBeacon;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -645,29 +631,15 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1040311C0FD5F028000FFBEB /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../Growl\"",
 				);
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				INFOPLIST_FILE = "TransferenceBeacon-Info.plist";
-				INSTALL_PATH = "";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
 				PRODUCT_NAME = TransferenceBeacon;
 				WRAPPER_EXTENSION = hgs;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -692,20 +664,113 @@
 			};
 			name = Release;
 		};
-		C01FCF4B08A954540054247B /* Debug */ = {
+		8B0E685A0FD873DC00461C4A /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 104031010FD5EF44000FFBEB /* QSBDebug.xcconfig */;
+			buildSettings = {
+				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
+				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = YES;
+				OTHER_LDFLAGS = "-lgcov";
+			};
+			name = "Debug-gcov";
+		};
+		8B0E685B0FD873DC00461C4A /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "Build All";
+			};
+			name = "Debug-gcov";
+		};
+		8B0E685C0FD873DC00461C4A /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1040311C0FD5F028000FFBEB /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../Growl\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "TransferenceBeacon-Info.plist";
+				PRODUCT_NAME = TransferenceBeacon;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		8B0E685D0FD873DC00461C4A /* Debug-gcov */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 104030BF0FD5EC18000FFBEB /* BreakpadExecutable.xcconfig */;
 			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Transference_Prefix.pch;
+				INFOPLIST_FILE = "TransferenceDemo-Info.plist";
+				PRODUCT_NAME = "Transference Demo";
+			};
+			name = "Debug-gcov";
+		};
+		8B0E685E0FD873DC00461C4A /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = GTM;
+			};
+			name = "Debug-gcov";
+		};
+		8B0E685F0FD873DC00461C4A /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = Vermilion;
+			};
+			name = "Debug-gcov";
+		};
+		C01FCF4B08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 104030BF0FD5EC18000FFBEB /* BreakpadExecutable.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Transference_Prefix.pch;
 				INFOPLIST_FILE = "TransferenceDemo-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = "Transference Demo";
 			};
 			name = Debug;
@@ -714,13 +779,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 104030BF0FD5EC18000FFBEB /* BreakpadExecutable.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Transference_Prefix.pch;
 				INFOPLIST_FILE = "TransferenceDemo-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = "Transference Demo";
 			};
 			name = Release;
@@ -729,14 +790,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 104031010FD5EF44000FFBEB /* QSBDebug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PREBINDING = NO;
-				SDKROOT = macosx10.5;
 			};
 			name = Debug;
 		};
@@ -744,12 +797,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 104031000FD5EF44000FFBEB /* QSBRelease.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				PREBINDING = NO;
-				SDKROOT = macosx10.5;
 			};
 			name = Release;
 		};
@@ -760,6 +807,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1040306F0FD5E935000FFBEB /* Debug */,
+				8B0E685F0FD873DC00461C4A /* Debug-gcov */,
 				104030700FD5E935000FFBEB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -769,6 +817,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				104030800FD5E9C7000FFBEB /* Debug */,
+				8B0E685E0FD873DC00461C4A /* Debug-gcov */,
 				104030810FD5E9C7000FFBEB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -778,6 +827,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				104031150FD5F005000FFBEB /* Debug */,
+				8B0E685C0FD873DC00461C4A /* Debug-gcov */,
 				104031160FD5F005000FFBEB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -787,6 +837,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1040315B0FD5F49A000FFBEB /* Debug */,
+				8B0E685B0FD873DC00461C4A /* Debug-gcov */,
 				1040315C0FD5F49A000FFBEB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -796,6 +847,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4B08A954540054247B /* Debug */,
+				8B0E685D0FD873DC00461C4A /* Debug-gcov */,
 				C01FCF4C08A954540054247B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -805,6 +857,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
+				8B0E685A0FD873DC00461C4A /* Debug-gcov */,
 				C01FCF5008A954540054247B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
