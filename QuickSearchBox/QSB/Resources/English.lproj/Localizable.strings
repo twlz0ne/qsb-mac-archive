@@ -137,7 +137,7 @@
 "Send usage statistics to Google" = "Send usage statistics to Google";
 
 /* A label for an edit field allowing the user to set the keyboard shortcut to show and hide QSB. */
-"Keyboard shortcuts:" = "Keyboard shortcuts:";
+"Keyboard shortcut:" = "Keyboard shortcuts:";
 
 /* The button label that resets the keyboard shortcut edit field to cmd-cmd which is the default setting. */
 "Use Default (⌘⌘)" = "Use Default (⌘⌘)";
