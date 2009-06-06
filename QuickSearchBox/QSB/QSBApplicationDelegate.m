@@ -1096,11 +1096,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)presentMessageToUser:(NSNotification *)notification {
   NSDictionary *messageDict = [notification userInfo];
   if (messageDict) {
-    if ([self useGrowl]) {
-      [self presentUserMessageViaGrowl:messageDict];
-    } else {
-      [self presentUserMessageViaMessenger:messageDict];
-    }
+    SEL selector = [self useGrowl] ? @selector(presentUserMessageViaGrowl:)
+                                   : @selector(presentUserMessageViaMessenger:);
+    [self performSelectorOnMainThread:selector 
+                           withObject:messageDict 
+                        waitUntilDone:NO];
   }
 }
 
