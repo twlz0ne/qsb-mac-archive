@@ -37,6 +37,7 @@ on makeRotater(anAngle)
 		property pAngle : anAngle
 		on perform(anAlias)
 			tell application "Image Events"
+				activate
 				set anImage to open anAlias
 				rotate anImage to angle pAngle
 				save anImage
@@ -52,6 +53,7 @@ on makeScaler(aFactor)
 		property pFactor : aFactor
 		on perform(anAlias)
 			tell application "Image Events"
+				activate
 				set anImage to open anAlias
 				scale anImage by factor pFactor
 				save anImage
@@ -70,6 +72,7 @@ on makeConverter(aFormat, anExtension)
 			set posixPath to POSIX path of anAlias
 			set newPath to removeExtension(posixPath) & "." & anExtension
 			tell application "Image Events"
+				activate
 				set anImage to open anAlias
 				save anImage as pFormat in newPath
 				close anImage
