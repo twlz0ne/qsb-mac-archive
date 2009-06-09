@@ -96,11 +96,13 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
   NSMutableArray *singulars 
     = [NSMutableArray arrayWithCapacity:[results count]];
   for (HGSResult *currentResult in results) {
-    if ([controller cancelled]) break;
     // Check to see if it's a duplicate of any of the confirmed results
     NSUInteger count = [singulars count];
     NSUInteger i;
     for (i = 0; i < count; ++i) {
+      if ([controller cancelled]) {
+        return nil;
+      }
       HGSResult *singular = [singulars objectAtIndex:i];
       if ([currentResult isDuplicate:singular]) {
         // We've got a match; merge this into the existing result and replace
