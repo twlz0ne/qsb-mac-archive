@@ -313,10 +313,11 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 - (NSImage *)provideIconForResult:(HGSResult*)result
                        loadLazily:(BOOL)loadLazily {
   NSImage *icon = nil;
-  
+  BOOL cacheIcon = NO;
   NSURL *url = IconURLForResult(result);
   if (url) {
-    icon = [self cachedIconForKey:[url absoluteString]];
+    NSString *urlString = [url absoluteString];
+    icon = [self cachedIconForKey:urlString];
     if (!icon) {
       if (loadLazily) {
         [self beginLazyLoadForResult:result];
@@ -330,12 +331,13 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
         icon = [source provideValueForKey:kHGSObjectAttributeImmediateIconKey 
                                    result:result];
         if (icon) {
-          [self cacheIcon:icon forKey:[url absoluteString]];
+          cacheIcon = YES;
         } else {
           if ([url isFileURL]) {
             HGSIconOperation *op 
               = [HGSIconOperation iconOperationForResult:result];
             icon = [op performDiskLoad:result];
+            cacheIcon = icon != nil;
           } else {
             NSString *scheme = [url scheme];
             typedef struct {
@@ -363,6 +365,9 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
           }
         }
       }
+    }
+    if (cacheIcon && icon) {
+      [self cacheIcon:icon forKey:urlString];
     }
   }
   return icon;
