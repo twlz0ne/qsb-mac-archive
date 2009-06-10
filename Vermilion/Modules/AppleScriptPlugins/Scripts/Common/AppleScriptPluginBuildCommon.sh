@@ -36,4 +36,4 @@ set -o errexit
 set -o nounset
 set -o verbose
 
-rm -rf ${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}
+rm -rf "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
