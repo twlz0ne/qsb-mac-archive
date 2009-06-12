@@ -481,19 +481,47 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPython, sharedPython);
 
 + (NSString *)lastErrorString {
   NSString *result = nil;
-  PyObject *type, *pvalue, *ptraceback;
-  PyErr_Fetch(&type, &pvalue, &ptraceback);
-  const char *typeString = type ? PyString_AsString(type) : nil;
-  const char *pValueString = pvalue ? PyString_AsString(pvalue) : nil;
-  const char *pTraceBackString 
-    = ptraceback ? PyString_AsString(ptraceback) : nil;
-  if (!typeString) typeString = "Unknown";
-  if (!pValueString) pValueString = "Unknown";
-  if (!pTraceBackString) pTraceBackString = "Unknown";
+  PyObject *ptype, *pvalue, *ptraceback;
+  PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+  PyErr_NormalizeException(&ptype, &pvalue, &ptraceback);
+  const char *pTypeString = ptype ? PyString_AsString(ptype) : "Unknown";
+  const char *pValueString = pvalue ? PyString_AsString(pvalue) : "Unknown";
+  NSString *tracebackString = nil;
+  PyObject *tracebackModule = PyImport_ImportModule("traceback");
+  if (tracebackModule != NULL) {
+    PyObject *tbList= PyObject_CallMethod(tracebackModule,
+                                          (char *)"format_exception",
+                                          (char *)"OOO",
+                                          ptype,
+                                          pvalue == NULL ? Py_None 
+                                                         : pvalue,
+                                          ptraceback == NULL ? Py_None 
+                                                             : ptraceback);
+    if (tbList) {
+     PyObject *emptyString = PyString_FromString("");
+      if (emptyString) {
+        // The "O" is a format string that represents that the item tbList
+        // is a python object.
+        PyObject *strRetval = PyObject_CallMethod(emptyString, (char *)"join",
+                                                  (char *)"O", tbList);
+        if (strRetval) {
+          const char *ptracebackString = PyString_AsString(strRetval);
+          tracebackString = [NSString stringWithUTF8String:ptracebackString];
+          Py_DECREF(strRetval);
+        }
+        Py_DECREF(emptyString);
+      }
+      Py_DECREF(tbList);
+    }
+    Py_DECREF(tracebackModule);
+  }
+  if (!tracebackString) {
+    tracebackString = @"Traceback: Couldn't load traceback module.";
+  }
   result = [NSString stringWithFormat:@"Python Error. Type: %s\n"
-            @"             Value: %s\n         Traceback: %s",
-            typeString, pValueString, pTraceBackString];
-  if (type) Py_DECREF(type);
+            @"             Value: %s\n         %@",
+            pTypeString, pValueString, tracebackString];
+  if (ptype) Py_DECREF(ptype);
   if (pvalue) Py_DECREF(pvalue);
   if (ptraceback) Py_DECREF(ptraceback);
   return result;
