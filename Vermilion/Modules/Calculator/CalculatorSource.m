@@ -99,33 +99,38 @@
   return YES;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation *)operation {
-  NSArray *resultsArray = nil;
-  
+- (void)performSearchOperation:(HGSSearchOperation *)operation {  
   NSString *rawQuery = [[operation query] rawQueryString];
-
-  char answer[1024];
-  int success
-    = CalculatePerformExpression((char *)[rawQuery UTF8String], 10, 1, answer);
-  if (success) {
-    NSString *resultString
-      = [NSString stringWithFormat:@"%@ = %@", rawQuery,
-                                   [NSString stringWithUTF8String:answer]];
-    // Cheat, force this result high in the list.
-    // TODO(dmaclach): figure out a cleaner way to get results like this high
-    // in the results.
-    NSDictionary *attributes
-     = [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSNumber numberWithFloat:2.0f], kHGSObjectAttributeRankKey, nil];
-    HGSResult *hgsObject
-      = [HGSResult resultWithURL:calculatorAppURL_
-                            name:resultString
-                            type:HGS_SUBTYPE(kHGSTypeOnebox, @"calculator")
-                          source:self
-                      attributes:attributes];
-    resultsArray = [NSArray arrayWithObject:hgsObject];
-    [operation setResults:resultsArray];
-  }
+  if ([rawQuery length]) {
+    char answer[1024];
+    answer[0] = '\0';
+    int success
+      = CalculatePerformExpression((char *)[rawQuery UTF8String], 
+                                   10, 1, answer);
+    if (success) {
+      NSString *answerString = [NSString stringWithUTF8String:answer];
+      NSString *resultString
+        = [NSString stringWithFormat:@"%@ = %@", rawQuery, answerString];
+      // Cheat, force this result high in the list.
+      // TODO(dmaclach): figure out a cleaner way to get results like this high
+      // in the results.
+      NSDictionary *pasteboardData 
+        = [NSDictionary dictionaryWithObject:answerString 
+                                      forKey:NSStringPboardType];
+      NSDictionary *attributes
+       = [NSDictionary dictionaryWithObjectsAndKeys:
+          [NSNumber numberWithFloat:2.0f], kHGSObjectAttributeRankKey, 
+          pasteboardData, kHGSObjectAttributePasteboardValueKey, nil];
+      HGSResult *hgsObject
+        = [HGSResult resultWithURL:calculatorAppURL_
+                              name:resultString
+                              type:HGS_SUBTYPE(kHGSTypeOnebox, @"calculator")
+                            source:self
+                        attributes:attributes];
+      NSArray *resultsArray = [NSArray arrayWithObject:hgsObject];
+      [operation setResults:resultsArray];
+    } 
+  }     
   // Since we are concurent, finish the query ourselves.
   [operation finishQuery];
 }
