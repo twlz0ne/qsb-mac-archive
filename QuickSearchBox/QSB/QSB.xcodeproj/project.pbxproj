@@ -6479,7 +6479,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n${SRCROOT}/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/AppleScriptPluginBuildCommon.sh";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/AppleScriptPluginBuildCommon.sh\"";
 		};
 		8B77DF440F284B1400FA2A3C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6900,7 +6900,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n${SRCROOT}/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/AppleScriptPluginBuildCommon.sh";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/AppleScriptPluginBuildCommon.sh\"";
 		};
 		8BCCD2D90EC8F8C200688D64 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6913,7 +6913,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n${SRCROOT}/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/AppleScriptPluginBuildCommon.sh";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/AppleScriptPluginBuildCommon.sh\"";
 		};
 		8BCCD3700EC8F93C00688D64 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6926,7 +6926,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\n${SRCROOT}/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/AppleScriptPluginBuildCommon.sh";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\n\"${SRCROOT}/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/AppleScriptPluginBuildCommon.sh\"";
 		};
 		E4F551310DF73059008A846E /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
