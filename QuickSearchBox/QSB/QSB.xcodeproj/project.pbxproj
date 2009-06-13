@@ -6393,7 +6393,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\nDOC_FOLDER=\"${CONFIGURATION_BUILD_DIR}/Documentation/Vermilion\"\ncd \"${SRCROOT}/../../Vermilion/Documentation\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"./vermilion.hdoc\"\n/usr/bin/headerdoc2html -o $DOC_FOLDER \"${CONFIGURATION_BUILD_DIR}/Vermilion.framework/Versions/A/Headers\"\n/usr/bin/gatherheaderdoc $DOC_FOLDER";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\nDOC_FOLDER=\"${CONFIGURATION_BUILD_DIR}/Documentation/Vermilion\"\ncd \"${SRCROOT}/../../Vermilion/Documentation\"\n/usr/bin/headerdoc2html -o \"$DOC_FOLDER\" \"./vermilion.hdoc\"\n/usr/bin/headerdoc2html -o \"$DOC_FOLDER\" \"${CONFIGURATION_BUILD_DIR}/Vermilion.framework/Versions/A/Headers\"\n/usr/bin/gatherheaderdoc \"$DOC_FOLDER\"";
 		};
 		8B3EED760CEA86A100D933C0 /* Post Build Script */ = {
 			isa = PBXShellScriptBuildPhase;
