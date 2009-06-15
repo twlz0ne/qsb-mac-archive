@@ -57,8 +57,6 @@
   IBOutlet QSBSearchController *searchController_;
   IBOutlet QSBTopResultsViewDelegate *topResultsController_;
   IBOutlet QSBMoreResultsViewDelegate *moreResultsController_;
-  IBOutlet NSSplitView *splitView_;
-  IBOutlet NSProgressIndicator *progressIndicator_;
   IBOutlet NSPathControl *statusBar_;
   QSBSearchWindowController *searchWindowController_;
   QSBResultsViewBaseController *activeResultsViewController_;  // Weak

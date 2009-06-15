@@ -104,12 +104,12 @@
 }
 
 - (BOOL)authenticateWithPassword:(NSString *)password {
-  HGSAssert(@"Must be overridden by subclass", nil);
+  HGSAssert(NO, @"Must be overridden by subclass");
   return NO;
 }
 
 - (BOOL)validateResult:(NSData *)result response:(NSURLResponse *)response {
-  HGSAssert(@"Must be overridden by subclass", nil);
+  HGSAssert(NO, @"Must be overridden by subclass");
   return NO;
 }
 

@@ -93,7 +93,7 @@
   NSArray *urls = [directObjects urls];
   BOOL wasGood = YES;
   for (NSURL *url in urls) {
-    wasGood != [ws openURL:url];
+    wasGood &= [ws openURL:url];
   }
   return wasGood;
 }
@@ -174,14 +174,14 @@
                                      error:&error];
   BOOL isGood = YES;
   if (!answer || error) {
-    HGSLogDebug(@"Unable to execute handler %@: %@", error);
+    HGSLogDebug(@"Unable to execute handler '%@': %@", handlerName, error);
     isGood = NO;
   }
   return isGood;
 }
 
 - (NSString *)handlerName {
-  HGSAssert(@"handlerName must be overridden by subclasses", nil);
+  HGSAssert(NO, @"handlerName must be overridden by subclasses");
   return nil;
 }
 @end

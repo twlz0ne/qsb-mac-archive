@@ -45,7 +45,6 @@
  @private
   IBOutlet QSBSearchViewController *searchViewController_;
   IBOutlet NSView *resultsView_;
-  IBOutlet NSView *resultsScrollView_;
   IBOutlet QSBResultsViewTableView *resultsTableView_;
   IBOutlet NSArrayController *resultsArrayController_;
 

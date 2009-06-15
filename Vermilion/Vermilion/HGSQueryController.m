@@ -517,7 +517,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSourceRanker, sharedSourceRanker);
   @synchronized (self) {
     HGSSourceRankerDataPoint *dp = [rankDictionary_ objectForKey:sourceID];
     if (!dp) {
-      dp = [[HGSSourceRankerDataPoint alloc] init];
+      dp = [[[HGSSourceRankerDataPoint alloc] init] autorelease];
       [rankDictionary_ setObject:dp forKey:sourceID];
     }
     [dp addTimeDataPoint:machTime];

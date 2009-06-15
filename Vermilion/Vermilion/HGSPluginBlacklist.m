@@ -224,7 +224,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginBlacklist, sharedPluginBlacklist);
                                        userInfo:nil
                                         repeats:NO];
   } else {
-    HGSLog(@"Unable to get blacklist URL for %@ (%i)", self);
+    HGSLog(@"Unable to get blacklist URL for %@", self);
   }
 }
 

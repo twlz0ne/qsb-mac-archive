@@ -286,7 +286,8 @@ static const int kSignatureTypeStandard = 1;
   CFURLRef url = (CFURLRef)[NSURL fileURLWithPath:[bundle_ bundlePath]];
   if (url) {
     SecStaticCodeRef codeRef;
-    if ((err = SecStaticCodeCreateWithPath(url, 0, &codeRef)) == noErr) {
+    err = SecStaticCodeCreateWithPath(url, 0, &codeRef);
+    if (err == noErr) {
       err = SecStaticCodeCheckValidityWithErrors(codeRef, 0, NULL, NULL);
       CFDictionaryRef signingInfo;
       switch (err) {
@@ -339,7 +340,8 @@ static const int kSignatureTypeStandard = 1;
   CFURLRef url = (CFURLRef)[NSURL fileURLWithPath:[bundle_ bundlePath]];
   if (url) {
     SecStaticCodeRef codeRef;
-    if ((err = SecStaticCodeCreateWithPath(url, 0, &codeRef)) == noErr) {
+    err = SecStaticCodeCreateWithPath(url, 0, &codeRef);
+    if (err == noErr) {
       SecCodeSignerRef signer;
       if (SecCodeSignerCreate((CFDictionaryRef)parameters, 0,
                               &signer) == noErr) {

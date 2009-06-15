@@ -33,7 +33,7 @@
 #import "HGSAppleScriptAction.h"
 #import "HGSLog.h"
 #import "HGSBundle.h"
-#import "GTMNSAppleScript+Handler.h";
+#import "GTMNSAppleScript+Handler.h"
 #import "HGSResult.h"
 #import "GTMNSWorkspace+Running.h"
 #import "GTMMethodCheck.h"

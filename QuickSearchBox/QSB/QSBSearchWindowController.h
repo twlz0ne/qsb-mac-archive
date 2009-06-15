@@ -49,7 +49,6 @@ extern const NSTimeInterval kQSBAppearDelay;
   IBOutlet NSTextField *searchTextField_;
   IBOutlet QSBLargeIconView *previewImageView_;
   IBOutlet NSImageView *logoView_;
-  IBOutlet NSView *queryBackgroundView_;
   IBOutlet QSBMenuButton *searchMenu_;
   IBOutlet QSBMenuButton *windowMenuButton_;
   IBOutlet QSBCustomPanel *resultsWindow_;

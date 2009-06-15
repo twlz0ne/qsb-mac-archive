@@ -217,9 +217,9 @@ NSString *const kHGSSearchOperationNotificationResultsKey
 }
 
 - (NSOperation *)searchOperation {
-  return [[NSInvocationOperation alloc] initWithTarget:self
-                                              selector:@selector(queryOperation:)
-                                                object:nil];
+  return [[[NSInvocationOperation alloc] initWithTarget:self
+                                               selector:@selector(queryOperation:)
+                                                 object:nil] autorelease];
 }
 
 @end

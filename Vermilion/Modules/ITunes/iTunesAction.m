@@ -208,7 +208,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
 }
 
 - (NSString *)shuffleActionName {
-  HGSAssert(@"Must be overridden by subclass", nil);
+  HGSAssert(NO, @"Must be overridden by subclass");
   return @"";
 }
 

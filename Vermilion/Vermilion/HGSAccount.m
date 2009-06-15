@@ -189,7 +189,7 @@ NSString *const kHGSAccountIdentifierFormat = @"%@.%@";
 }
 
 - (NSString *)type {
-  HGSAssert(@"Must be overridden by subclass", nil);
+  HGSAssert(NO, @"Must be overridden by subclass");
   return nil;
 }
 
