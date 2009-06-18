@@ -62,6 +62,19 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
 @end
 
 
+@interface NilTypeAccount : HGSAccount
+@end
+
+
+@implementation NilTypeAccount
+
+- (NSString *)type {
+  return nil;
+}
+
+@end
+
+
 @interface BaseAccount : HGSAccount
 @end
 
@@ -173,13 +186,13 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   STAssertNil(account, @"|initWithName:nil| should not create new HSGAccount");
   account = [[[HGSAccount alloc] initWithName:@""] autorelease];
   STAssertNil(account, @"|initWithName:@\"\"| should not create new HSGAccount");
-  account = [[[HGSAccount alloc] initWithName:@"USERNAME"] autorelease];
+  account = [[[NilTypeAccount alloc] initWithName:@"USERNAME"] autorelease];
   STAssertNil(account, nil);
 
   // initWithConfiguration:
   NSDictionary *configuration = [NSDictionary dictionary];
   account
-    = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
+    = [[[NilTypeAccount alloc] initWithConfiguration:configuration] autorelease];
   STAssertNil(account, nil);
   NSNumber *versionNumber
     = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
@@ -188,7 +201,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
                    versionNumber, kHGSAccountsPrefVersionKey,
                    nil];
   account
-    = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
+    = [[[NilTypeAccount alloc] initWithConfiguration:configuration] autorelease];
   STAssertNil(account, nil);
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME B", kHGSAccountUserNameKey,
@@ -196,7 +209,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
                    versionNumber, kHGSAccountsPrefVersionKey,
                    nil];
   account
-    = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
+    = [[[NilTypeAccount alloc] initWithConfiguration:configuration] autorelease];
   STAssertNil(account, nil);
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME B", kHGSAccountUserNameKey,
@@ -206,7 +219,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
                    versionNumber, kHGSAccountsPrefVersionKey,
                    nil];
   account
-    = [[[HGSAccount alloc] initWithConfiguration:configuration] autorelease];
+    = [[[NilTypeAccount alloc] initWithConfiguration:configuration] autorelease];
   STAssertNil(account, nil);
   // Initializations with test account type.  This is the only one that
   // should actually succeed in creating an account.

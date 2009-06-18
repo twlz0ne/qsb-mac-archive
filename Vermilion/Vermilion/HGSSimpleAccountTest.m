@@ -61,6 +61,23 @@ static NSString *const kServiceName
   return @"SimpleAccountType";
 }
 
+- (BOOL)authenticateWithPassword:(NSString *)password {
+  return NO;
+}
+
+@end
+
+
+@interface NilTypeSimpleAccount : HGSAccount
+@end
+
+
+@implementation NilTypeSimpleAccount
+
+- (NSString *)type {
+  return nil;
+}
+
 @end
 
 @interface SimpleAccountWithFakeKeychain : SimpleAccount
@@ -153,7 +170,7 @@ static NSString *const kServiceName
   STAssertNil(account, nil);
   account = [[[HGSSimpleAccount alloc] initWithName:@""] autorelease];
   STAssertNil(account, nil);
-  account = [[[HGSSimpleAccount alloc] initWithName:@"HGSSimpleAccount A"] autorelease];
+  account = [[[NilTypeSimpleAccount alloc] initWithName:@"HGSSimpleAccount A"] autorelease];
   STAssertNil(account, nil);
   account = [[[SimpleAccount alloc] initWithName:@"SimpleAccount A"] autorelease];
   STAssertNotNil(account, nil);
@@ -216,6 +233,9 @@ static NSString *const kServiceName
   SimpleAccount *account
     = [[[SimpleAccount alloc] initWithName:@"HGSSimpleAccount E"]
        autorelease];
+  // Clean up any keychain item leftover from a previous run
+  KeychainItem *keychainItem = [account keychainItem];
+  [keychainItem removeFromKeychain];
   NSString *identifier = [account identifier];
   STAssertEqualObjects(identifier, @"SimpleAccountType.HGSSimpleAccount E", nil);
   NSString *userName = [account userName];
