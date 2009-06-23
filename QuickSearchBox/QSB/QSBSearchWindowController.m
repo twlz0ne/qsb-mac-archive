@@ -121,7 +121,7 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 - (void)showResultsWindow;
 
 // Reposition our window on screen as appropriate
-- (void)forceWindowOnScreen;
+- (void)centerWindowOnScreen;
 
 // Sets the currently active search view controller.  Should only be called by
 // push/popQueryController.
@@ -229,10 +229,14 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
                                  floatForKey:kQSBSearchWindowFrameLeftPrefKey],
                                 [[NSUserDefaults standardUserDefaults]
                                  floatForKey:kQSBSearchWindowFrameTopPrefKey]);
-  if (topLeft.x > 20.0 && topLeft.y > 20.0) {
-    [searchWindow setFrameTopLeftPoint:topLeft];
-  }
-  
+  [searchWindow setFrameTopLeftPoint:topLeft];
+  // Now insure that the window's frame is fully visible.
+  NSRect searchFrame = [searchWindow frame];
+  NSRect actualFrame = [self fullyExposedFrameForFrame:searchFrame
+                                        respectingDock:YES
+                                              onScreen:[searchWindow screen]];
+  [searchWindow setFrame:actualFrame display:NO];
+
   // get us so that the IME windows appear above us as necessary.
   // http://b/issue?id=602250
   [searchWindow setLevel:kCGStatusWindowLevel + 2];
@@ -352,7 +356,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
                                                                selector:@selector(checkFindPasteboard:) 
                                                                userInfo:nil
                                                                 repeats:YES];
-  needToUpdatePositionOnActivation_ = YES;
   if ([self firstLaunch]) {
     [searchWindow center];
   }
@@ -1174,7 +1177,7 @@ doCommandBySelector:(SEL)commandSelector {
   
   if ([window isEqual:searchWindow]) {
     if (needToUpdatePositionOnActivation_) {
-      [self forceWindowOnScreen];
+      [self centerWindowOnScreen];
       needToUpdatePositionOnActivation_ = NO;
     }  
     [queryResetTimer_ invalidate];
@@ -1263,7 +1266,7 @@ doCommandBySelector:(SEL)commandSelector {
 - (void)applicationDidChangeScreenParameters:(NSNotification *)notification {
   if ([[self window] isVisible]) {
     // if we are active, do our change immediately.
-    [self forceWindowOnScreen];
+    [self centerWindowOnScreen];
   } else {
     // We don't want to update immediately if we are in the background because
     // we don't want to move unnecessarily if the user doesn't invoke us in
@@ -1427,7 +1430,7 @@ doCommandBySelector:(SEL)commandSelector {
   [NSAnimationContext endGrouping];
 }
 
-- (void)forceWindowOnScreen {
+- (void)centerWindowOnScreen {
   NSWindow *window = [self window];
   [window center];
 }
