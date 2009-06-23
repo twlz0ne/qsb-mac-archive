@@ -41,6 +41,9 @@
 // Determine if the result can be pivoted on.
 - (BOOL)isPivotable;
 
+// Return a string that has the title of the result.
+- (NSAttributedString *)titleString;
+
 // Return a string that has the title of the result on the first line,
 // the snippet (if any) on the next line, and the SourceURL on the following
 // line.

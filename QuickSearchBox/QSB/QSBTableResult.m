@@ -123,6 +123,12 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   return NO;
 }
 
+- (NSAttributedString *)titleString {
+  NSMutableAttributedString *resultString = [self genericTitleLine];
+  [self addAttributes:resultString elementType:kQSBResultDescriptionTitle];
+  return resultString;
+}
+
 - (NSAttributedString *)titleSnippetSourceURLString {
   NSMutableAttributedString *fullString 
     = [[[self titleSnippetString] mutableCopy] autorelease];
@@ -136,8 +142,8 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 }
 
 - (NSAttributedString *)titleSnippetString {
-  NSMutableAttributedString *resultString = [self genericTitleLine];
-  [self addAttributes:resultString elementType:kQSBResultDescriptionTitle];
+  NSMutableAttributedString *resultString
+    = [[[self titleString] mutableCopy] autorelease];
   NSAttributedString *resultSnippet = [self snippetString];
   if (resultSnippet) {
     [resultString appendAttributedString:[[[NSAttributedString alloc]
@@ -148,8 +154,8 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 }
 
 - (NSAttributedString *)titleSourceURLString {
-  NSMutableAttributedString *resultString = [self genericTitleLine];
-  [self addAttributes:resultString elementType:kQSBResultDescriptionTitle];
+  NSMutableAttributedString *resultString
+    = [[[self titleString] mutableCopy] autorelease];
   NSAttributedString *resultSourceURL = [self sourceURLString];
   if (resultSourceURL) {
     [resultString appendAttributedString:[[[NSAttributedString alloc]
@@ -438,6 +444,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if ([snippetString length]) {
     displayString = [displayString stringByAppendingFormat:@" — %@",
                      snippetString];
+  }
+  NSString *resultSourceURL = [[self sourceURLString] string];
+  if ([resultSourceURL length]) {
+    displayString = [displayString stringByAppendingFormat:@" — %@",
+                     resultSourceURL];
   }
   return [NSString stringWithFormat:@"%@ (Rank: %.2f, %d)", 
                                     displayString,
