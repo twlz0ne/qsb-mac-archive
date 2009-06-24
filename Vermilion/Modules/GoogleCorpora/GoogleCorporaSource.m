@@ -128,7 +128,11 @@ GTM_METHOD_CHECK(NSString, readableURLString);
                  forKey:kHGSObjectAttributeURIKey];
   
   NSString *name = [objectDict objectForKey:kHGSObjectAttributeNameKey];
-  [objectDict setObject:[NSString stringWithFormat:name, domain]
+  NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+  NSString *localizedName = [bundle localizedStringForKey:name 
+                                                    value:nil 
+                                                    table:nil];
+  [objectDict setObject:[NSString stringWithFormat:localizedName, domain]
                  forKey:kHGSObjectAttributeNameKey];
   
   

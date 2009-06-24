@@ -86,7 +86,7 @@
 		<key>kHGSObjectAttributeSearchInline</key>
 		<true/>
 		<key>kHGSObjectAttributeName</key>
-		<string>Google Image Search</string>
+		<string>^Google Image Search</string>
 		<key>kHGSObjectAttributeCorpusName</key>
 		<string>Images</string>
 		<key>kHGSCorporaSourceAttributeURIString</key>
@@ -104,7 +104,7 @@
 		<key>kHGSCorporaSourceAttributeIconNameKey</key>
 		<string>gmail</string>
 		<key>kHGSObjectAttributeName</key>
-		<string>Gmail</string>
+		<string>^Gmail</string>
 		<key>kHGSObjectAttributeWebSearchTemplate</key>
 		<string>http://mail.google.com/mail/?view=tl&amp;q={searchterms}&amp;search=query&amp;fs=1</string>
 		<key>kHGSCorporaSourceAttributeURIString</key>
@@ -140,7 +140,7 @@
 		<key>kHGSCorporaSourceAttributeIconNameKey</key>
 		<string>alt-news</string>
 		<key>kHGSObjectAttributeName</key>
-		<string>Google News</string>
+		<string>^Google News</string>
 		<key>kHGSObjectAttributeCorpusName</key>
 		<string>News</string>
 		<key>kHGSObjectAttributeSearchInline</key>
@@ -184,7 +184,7 @@
 		<key>kHGSCorporaSourceAttributeIconNameKey</key>
 		<string>alt-shopping</string>
 		<key>kHGSObjectAttributeName</key>
-		<string>Google Product Search</string>
+		<string>^Google Product Search</string>
 		<key>kHGSObjectAttributeCorpusName</key>
 		<string>Shopping</string>
 		<key>kHGSCorporaSourceAttributeURIString</key>
@@ -226,7 +226,7 @@
 		<key>kHGSCorporaSourceAttributeIconNameKey</key>
 		<string>alt-wikipedia</string>
 		<key>kHGSObjectAttributeName</key>
-		<string>Wikipedia</string>
+		<string>^Wikipedia</string>
 		<key>kHGSCorporaSourceAttributeURIString</key>
 		<string>http://en.wikipedia.org</string>
 		<key>kHGSObjectAttributeType</key>
@@ -313,7 +313,7 @@
 		<key>kHGSCorporaSourceAttributeIconNameKey</key>
 		<string>docs</string>
 		<key>kHGSObjectAttributeName</key>
-		<string>Google Docs</string>
+		<string>^Google Docs</string>
 		<key>kHGSObjectAttributeWebSearchTemplate</key>
 		<string>http://docs.google.com/#search/{searchterms}</string>
 		<key>kHGSCorporaSourceAttributeURIString</key>
@@ -363,7 +363,7 @@
 		<key>kHGSCorporaSourceAttributeIconNameKey</key>
 		<string>youtube</string>
 		<key>kHGSObjectAttributeName</key>
-		<string>YouTube</string>
+		<string>^YouTube</string>
 		<key>kHGSCorporaSourceAttributeURIString</key>
 		<string>http://www.youtube.com/</string>
 		<key>kHGSCorporaSourceAttributeMobileURIString</key>
