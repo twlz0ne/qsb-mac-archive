@@ -369,6 +369,7 @@
 		627FAEC40DF9D73500E3E765 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		627FAEC60DF9D73500E3E765 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		6282B2230DD8985000AC9C3C /* QSBSearchWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6282B2210DD8985000AC9C3C /* QSBSearchWindowController.m */; };
+		628B8C240FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist in Resources */ = {isa = PBXBuildFile; fileRef = 628B8C230FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist */; };
 		6294463E0EDE1921009295EA /* GTMNSArray+Merge.m in Sources */ = {isa = PBXBuildFile; fileRef = 6294463A0EDE190B009295EA /* GTMNSArray+Merge.m */; };
 		62A16A8F0ED484DF0074F41B /* HGSPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 62A16A8D0ED484DF0074F41B /* HGSPlugin.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62A16A900ED484DF0074F41B /* HGSPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A16A8E0ED484DF0074F41B /* HGSPlugin.m */; };
@@ -418,6 +419,10 @@
 		62F150040DD4EE3D00BCAE1A /* ResultsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 62F150020DD4EE3C00BCAE1A /* ResultsWindow.xib */; };
 		62F380F90EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F380F80EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m */; };
 		62F381020EA7FC1900370F6F /* QSBTopSearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F381000EA7FC1900370F6F /* QSBTopSearchController.m */; };
+		62F594B70FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */; };
+		62F594B80FEB06A60076CDDA /* GoogleDocsSaveAsActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */; };
+		62F594BB0FEB06BC0076CDDA /* GoogleDocsSaveAs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 62F594B90FEB06BC0076CDDA /* GoogleDocsSaveAs.xib */; };
+		62F595B10FEB278A0076CDDA /* GoogleDocsConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */; };
 		62FDEA9D0F536A4A00A66631 /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = 62FDEA9C0F536A4A00A66631 /* Growl Registration Ticket.growlRegDict */; };
 		62FF5B860F8D846F00B21B5D /* HGSAccountType.m in Sources */ = {isa = PBXBuildFile; fileRef = 62FF5B840F8D846F00B21B5D /* HGSAccountType.m */; };
 		62FF5B870F8D846F00B21B5D /* HGSAccountType.h in Headers */ = {isa = PBXBuildFile; fileRef = 62FF5B850F8D846F00B21B5D /* HGSAccountType.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1183,6 +1188,13 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
+		62F5951F0FEB164E0076CDDA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 620CB3080FAA827E0029801C;
+			remoteInfo = QSBPluginUI;
+		};
 		7F9417880EEF53CD0049AE06 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1904,6 +1916,7 @@
 		627FAECA0DF9D73500E3E765 /* RecentDocuments.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RecentDocuments.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		6282B2210DD8985000AC9C3C /* QSBSearchWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSearchWindowController.m; sourceTree = "<group>"; };
 		6282B2220DD8985000AC9C3C /* QSBSearchWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSearchWindowController.h; sourceTree = "<group>"; };
+		628B8C230FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = GoogleDocsSaveAsFileTypes.plist; sourceTree = "<group>"; };
 		629446390EDE190B009295EA /* GTMNSArray+Merge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSArray+Merge.h"; sourceTree = "<group>"; };
 		6294463A0EDE190B009295EA /* GTMNSArray+Merge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSArray+Merge.m"; sourceTree = "<group>"; };
 		62977A960FAA8D9700C6CB59 /* QSBPluginUI-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "QSBPluginUI-Info.plist"; sourceTree = "<group>"; };
@@ -1949,6 +1962,13 @@
 		62F380F80EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMoreResultsViewControllers.m; sourceTree = "<group>"; };
 		62F381000EA7FC1900370F6F /* QSBTopSearchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBTopSearchController.m; sourceTree = "<group>"; };
 		62F381010EA7FC1900370F6F /* QSBTopSearchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBTopSearchController.h; sourceTree = "<group>"; };
+		62F594B40FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDocsSaveAsAccessoryController.h; sourceTree = "<group>"; };
+		62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSaveAsAccessoryController.m; sourceTree = "<group>"; };
+		62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSaveAsActions.m; sourceTree = "<group>"; };
+		62F594BA0FEB06BC0076CDDA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/GoogleDocsSaveAs.xib; sourceTree = "<group>"; };
+		62F595090FEB15DF0076CDDA /* QSBActionSaveAsControllerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBActionSaveAsControllerProtocol.h; sourceTree = "<group>"; };
+		62F595AF0FEB278A0076CDDA /* GoogleDocsConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDocsConstants.h; sourceTree = "<group>"; };
+		62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsConstants.m; sourceTree = "<group>"; };
 		62F974C10F8EF33E001C55B6 /* QSBSetUpAccountViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSetUpAccountViewController.h; sourceTree = "<group>"; };
 		62F974C20F8EF33E001C55B6 /* QSBSetUpAccountViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSetUpAccountViewController.m; sourceTree = "<group>"; };
 		62F974C80F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSetUpSimpleAccountViewController.h; sourceTree = "<group>"; };
@@ -3112,7 +3132,14 @@
 				8BC6E5DD0FAAC247005A0F6F /* InfoPlist.strings */,
 				8BC6E1630FAA7474005A0F6F /* Localizable.strings */,
 				33D2C65B0DD1080700C1FBDC /* HGSGoogleDocsSource.m */,
+				62F595AF0FEB278A0076CDDA /* GoogleDocsConstants.h */,
+				62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */,
+				62F594B40FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.h */,
+				62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */,
+				62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */,
+				62F594B90FEB06BC0076CDDA /* GoogleDocsSaveAs.xib */,
 				33D2C65C0DD1080700C1FBDC /* GoogleDocs-Info.plist */,
+				628B8C230FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist */,
 				33D2C6550DD1080700C1FBDC /* gdocdocument.icns */,
 				33D2C6560DD1080700C1FBDC /* gdocpresentation.icns */,
 				33D2C6570DD1080700C1FBDC /* gdocspreadsheet.icns */,
@@ -3256,6 +3283,7 @@
 		620CB5600FAA84970029801C /* QSBPluginUI */ = {
 			isa = PBXGroup;
 			children = (
+				62F595090FEB15DF0076CDDA /* QSBActionSaveAsControllerProtocol.h */,
 				62D9B86C0F94E453005EF9BC /* QSBEditAccountWindowController.h */,
 				62D9B86B0F94E453005EF9BC /* QSBEditAccountWindowController.m */,
 				62D9B78B0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.h */,
@@ -4773,6 +4801,7 @@
 			);
 			dependencies = (
 				33D2C6280DD1074900C1FBDC /* PBXTargetDependency */,
+				62F595200FEB164E0076CDDA /* PBXTargetDependency */,
 			);
 			name = "Google Docs";
 			productName = GoogleDocs;
@@ -5763,6 +5792,8 @@
 				33D2C65F0DD1080700C1FBDC /* gdocspreadsheet.icns in Resources */,
 				8BC6E1640FAA7474005A0F6F /* Localizable.strings in Resources */,
 				8BC6E5DE0FAAC247005A0F6F /* InfoPlist.strings in Resources */,
+				62F594BB0FEB06BC0076CDDA /* GoogleDocsSaveAs.xib in Resources */,
+				628B8C240FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6959,6 +6990,9 @@
 			files = (
 				33D2C6610DD1080700C1FBDC /* HGSGoogleDocsSource.m in Sources */,
 				8B8B130C0EEBADE400E543D0 /* HGSBundle.m in Sources */,
+				62F594B70FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m in Sources */,
+				62F594B80FEB06A60076CDDA /* GoogleDocsSaveAsActions.m in Sources */,
+				62F595B10FEB278A0076CDDA /* GoogleDocsConstants.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7592,6 +7626,11 @@
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 62B7CDE50E63743500299B23 /* PBXContainerItemProxy */;
 		};
+		62F595200FEB164E0076CDDA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 620CB3080FAA827E0029801C /* QSBPluginUI */;
+			targetProxy = 62F5951F0FEB164E0076CDDA /* PBXContainerItemProxy */;
+		};
 		7F9417890EEF53CD0049AE06 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 7F9415C40EEF52930049AE06 /* Shared File List */;
@@ -8046,6 +8085,14 @@
 				62F150030DD4EE3D00BCAE1A /* English */,
 			);
 			name = ResultsWindow.xib;
+			sourceTree = "<group>";
+		};
+		62F594B90FEB06BC0076CDDA /* GoogleDocsSaveAs.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				62F594BA0FEB06BC0076CDDA /* English */,
+			);
+			name = GoogleDocsSaveAs.xib;
 			sourceTree = "<group>";
 		};
 		7F79A24A0F0AA289000D14CB /* TopSearchStatusResultView.xib */ = {

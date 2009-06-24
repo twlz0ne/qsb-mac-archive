@@ -34,11 +34,7 @@
 #import <GData/GData.h>
 #import "KeychainItem.h"
 #import "QSBHGSDelegate.h"
-
-// Google Docs categories
-static NSString* const kDocCategoryDocument = @"document";
-static NSString* const kDocCategorySpreadsheet = @"spreadsheet";
-static NSString* const kDocCategoryPresentation = @"presentation";
+#import "GoogleDocsConstants.h"
 
 static const NSTimeInterval kRefreshSeconds = 3600.0;  // 60 minutes.
 
@@ -311,8 +307,12 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   NSImage* icon = nil;
   NSArray *kindArray = [GDataCategory categoriesWithScheme:kGDataCategoryScheme
                                             fromCategories:[doc categories]];
+  NSString *categoryLabel
+    = HGSLocalizedString(@"Unknown Google Docs Category",
+                         @"Text explaining that the category of the "
+                         @"could not be determined.");
   if (kindArray && [kindArray count]) {
-    NSString *categoryLabel = [[kindArray objectAtIndex:0] label];
+    categoryLabel = [[kindArray objectAtIndex:0] label];
     icon = [docIcons_ objectForKey:categoryLabel];
   }
   if (!icon) {
@@ -370,14 +370,18 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   if (!date) {
     date = [NSDate distantPast];
   }
+  NSString *docID = [doc resourceID];
   NSDictionary *attributes
-   = [NSDictionary dictionaryWithObjectsAndKeys:
-      rankFlags, kHGSObjectAttributeRankFlagsKey,
-      cellArray, kQSBObjectAttributePathCellsKey,
-      date, kHGSObjectAttributeLastUsedDateKey,
-      userName_, kHGSObjectAttributeSnippetKey,
-      icon, kHGSObjectAttributeIconKey,
-      nil];
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       rankFlags, kHGSObjectAttributeRankFlagsKey,
+       cellArray, kQSBObjectAttributePathCellsKey,
+       date, kHGSObjectAttributeLastUsedDateKey,
+       userName_, kHGSObjectAttributeSnippetKey,
+       icon, kHGSObjectAttributeIconKey,
+       categoryLabel, kGoogleDocsDocCategoryKey,
+       docID, kGoogleDocsDocSaveAsIDKey,
+       docService_, kGoogleDocsDocServiceKey,
+       nil];
   HGSResult* result = [HGSResult resultWithURL:docURL
                                           name:docTitle
                                           type:kHGSTypeWebpage

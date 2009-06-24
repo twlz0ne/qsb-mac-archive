@@ -34,6 +34,7 @@
 #import "GTMGarbageCollection.h"
 #import "FilesystemActions.h"
 #import "QSBPluginVerifyWindowController.h"
+#import "QSBActionSaveAsControllerProtocol.h"
 
 // This constant is the name for the app that should be used w/in the a Google
 // folder (for w/in Application Support, etc.)
@@ -207,6 +208,109 @@ static NSString *const kWebURLsWithTitlesPboardType
     value = pbValues;
   }
   return value;
+}
+
+- (NSDictionary *)getActionSaveAsInfoFor:(NSDictionary *)request {
+  // Only current use is to present a user interface to collect some
+  // kind of information for an HGSAction wanting to perform a save-as
+  // of a result.
+  NSDictionary *response = nil;
+  NSString *requestType
+    = [request objectForKey:kHGSSaveAsRequestTypeKey];
+  id requester = [request objectForKey:kHGSSaveAsRequesterKey];
+  if (requestType && requester) {
+    // In order to pose a save-as panel we'll need:
+    //   1) the accessory view controller class name (its File's Owner),
+    //   2) the nib name,
+    //   3) the result.
+    // Optionally, we can also use:
+    //   1) the proposed file name, and
+    //   2) the proposed destination directory.
+    // We compose the controller name using the request type as a prefix
+    // and appending 'AccessoryController'.
+    NSString *accessoryControllerClassName
+      = [requestType stringByAppendingString:@"AccessoryController"];
+    Class accessoryControllerClass
+      = NSClassFromString(accessoryControllerClassName);
+      NSString *accessoryNibName = requestType;
+      NSBundle *accessoryBundle
+        = [NSBundle bundleForClass:accessoryControllerClass];
+      NSViewController<QSBActionSaveAsControllerProtocol> *accessoryViewController
+        = [[[accessoryControllerClass alloc] initWithNibName:accessoryNibName
+                                                      bundle:accessoryBundle]
+           autorelease];
+      if (accessoryViewController) {
+        [accessoryViewController loadView];
+        [accessoryViewController setSaveAsInfo:request];
+        NSView *accessoryView = [accessoryViewController view];
+        NSSavePanel *savePanel = [NSSavePanel savePanel];
+        [savePanel setAccessoryView:accessoryView];
+        
+        // Determine where we are going to save the file.  Here is the current
+        // preference: download directory, desktop directory, home directory.
+        // TOTO(mrossetti): Remember the directory chosen by the user and
+        // restore for the next save as.
+        HGSResult *result = [request objectForKey:kHGSSaveAsHGSResultKey];
+        NSArray *destinationDirs 
+          = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory, 
+                                                NSUserDomainMask,
+                                                YES);
+        if ([destinationDirs count] == 0) {
+          destinationDirs 
+            = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory, 
+                                                  NSUserDomainMask,
+                                                  YES);
+        }
+        if ([destinationDirs count] == 0) {
+          destinationDirs 
+          = NSSearchPathForDirectoriesInDomains(NSUserDirectory, 
+                                                NSUserDomainMask,
+                                                YES);
+        }
+        NSString *path = [destinationDirs objectAtIndex:0];
+        NSString *fileName = [result displayName];
+        
+        // Present the save-as panel.
+        NSInteger answer = [savePanel runModalForDirectory:path
+                                                      file:fileName];
+        if (answer == NSFileHandlingPanelOKButton) {
+          NSDictionary *accessoryDict = [accessoryViewController saveAsInfo];
+          NSURL *saveURL = [savePanel URL];
+          NSMutableDictionary *mutableResponse
+            = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+               [NSNumber numberWithBool:YES], kHGSSaveAsAcceptableKey,
+               saveURL, kHGSSaveAsURLKey,
+               nil];
+          if (accessoryDict) {
+            [mutableResponse addEntriesFromDictionary:accessoryDict];
+          }
+          response = mutableResponse;
+        } else {
+          // The user canceled but we'll still pass back accessory results.
+          NSDictionary *accessoryDict = [accessoryViewController saveAsInfo];
+          NSMutableDictionary *mutableResponse
+            = [NSMutableDictionary dictionaryWithDictionary:accessoryDict];
+          [mutableResponse setObject:[NSNumber numberWithBool:NO]
+                              forKey:kHGSSaveAsAcceptableKey];
+          response = mutableResponse;
+        }
+      } else {
+        HGSLogDebug(@"Failed to load save-as accessory view nib '%@'.",
+                    accessoryNibName);
+      }
+  } else if (!request) {
+    HGSLogDebug(@"No request dictionary provided.");
+  } else {
+    HGSLogDebug(@"No requestType and/or requester provided in request "
+                @"dictionary:", request);
+  }
+  return response;
+}
+
+- (void)dialogDidEnd:(NSWindow *)dialog 
+          returnCode:(NSInteger)returnCode 
+         contextInfo:(void *)contextInfo {
+  [dialog close];
 }
 
 - (NSArray *)pathCellArrayForResult:(HGSResult *)result {
