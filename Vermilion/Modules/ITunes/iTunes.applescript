@@ -30,6 +30,11 @@
 --  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --
 
+on libraryPlaylist()
+	tell application "iTunes"
+		return item 1 of (every source whose kind is library)
+	end tell
+end libraryPlaylist
 
 on isPlaying()
 	tell application "System Events"
@@ -63,8 +68,9 @@ end playTrackIDInPlaylistID
 
 on playArtist(artistName)
 	set googlePlaylist to prepareGooglePlaylist()
+	set libPlaylist to libraryPlaylist()
 	tell application "iTunes"
-		tell playlist "Library"
+		tell libPlaylist
 			duplicate (every track whose enabled = true and artist = artistName) to googlePlaylist
 		end tell
 		play googlePlaylist
@@ -73,8 +79,9 @@ end playArtist
 
 on playAlbum(albumName)
 	set googlePlaylist to prepareGooglePlaylist()
+	set libPlaylist to libraryPlaylist()
 	tell application "iTunes"
-		tell playlist "Library"
+		tell libPlaylist
 			duplicate (every track whose enabled = true and album = albumName) to googlePlaylist
 		end tell
 		play googlePlaylist
@@ -83,8 +90,9 @@ end playAlbum
 
 on playComposer(composerName)
 	set googlePlaylist to prepareGooglePlaylist()
+	set libPlaylist to libraryPlaylist()
 	tell application "iTunes"
-		tell playlist "Library"
+		tell libPlaylist
 			duplicate (every track whose enabled = true and composer = composerName) to googlePlaylist
 		end tell
 		play googlePlaylist
@@ -93,8 +101,9 @@ end playComposer
 
 on playGenre(genreName)
 	set googlePlaylist to prepareGooglePlaylist()
+	set libPlaylist to libraryPlaylist()
 	tell application "iTunes"
-		tell playlist "Library"
+		tell libPlaylist
 			duplicate (every track whose enabled = true and genre = genreName) to googlePlaylist
 		end tell
 		play googlePlaylist
