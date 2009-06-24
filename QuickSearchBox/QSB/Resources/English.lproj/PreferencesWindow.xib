@@ -986,7 +986,7 @@
 													<int key="NSCellFlags2">268436480</int>
 													<string key="NSContents"/>
 													<reference key="NSSupport" ref="298552886"/>
-													<string key="NSPlaceholderString">Search</string>
+													<string key="NSPlaceholderString">^Search</string>
 													<reference key="NSControlView" ref="795816087"/>
 													<bool key="NSDrawsBackground">YES</bool>
 													<int key="NSTextBezelStyle">1</int>
