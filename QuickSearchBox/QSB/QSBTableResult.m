@@ -330,19 +330,31 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return self;
 }
 
-- (void)objectIconChanged:(GTMKeyValueChangeNotification *)notification {
-  [self willChangeValueForKey:@"displayIcon"];
-  [self didChangeValueForKey:@"displayIcon"]; 
-  [self willChangeValueForKey:@"displayThumbnail"];
-  [self didChangeValueForKey:@"displayThumbnail"];
-}
-
 - (void)dealloc {
   [representedResult_ gtm_removeObserver:self 
                               forKeyPath:kHGSObjectAttributeIconKey
                                 selector:@selector(objectIconChanged:)];
   [representedResult_ release];
   [super dealloc];
+}
+
+- (BOOL)isEqual:(id)val {
+  BOOL equal = NO;
+  if ([val isKindOfClass:[self class]]) {
+    equal = [[self representedResult] isEqual:[val representedResult]];
+  }
+  return equal;
+}
+
+- (NSUInteger)hash {
+  return [[self representedResult] hash];
+}
+
+- (void)objectIconChanged:(GTMKeyValueChangeNotification *)notification {
+  [self willChangeValueForKey:@"displayIcon"];
+  [self didChangeValueForKey:@"displayIcon"]; 
+  [self willChangeValueForKey:@"displayThumbnail"];
+  [self didChangeValueForKey:@"displayThumbnail"];
 }
 
 - (BOOL)isPivotable {

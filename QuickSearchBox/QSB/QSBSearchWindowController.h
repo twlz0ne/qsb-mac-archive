@@ -140,6 +140,9 @@ extern const NSTimeInterval kQSBAppearDelay;
 
 // The hot key was hit.
 - (void)hitHotKey:(id)sender;
+
+// Update the image view
+- (void)updateImageView;
 @end
 
 // Notifications for showing and hiding the search window

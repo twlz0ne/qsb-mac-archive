@@ -39,14 +39,17 @@
 @class HGSMixer;
 @class HGSSearchOperation;
 
-//
-// HGSQueryController
-//
-// Handles performing a single query across multiple search sources and ranking
-// the results. The query is complete when |observer| is given the "did finish"
-// notification. Clients can provide their own subclass of HGSMixer to override
-// various aspects of ranking and duplicate detection.
-//
+/*!
+ @header
+ @discussion HGSQueryController
+*/
+
+/*!
+  Handles performing a single query across multiple search sources and ranking
+  the results. The query is complete when |observer| is given the "did finish"
+  notification. Clients can provide their own subclass of HGSMixer to override
+  various aspects of ranking and duplicate detection.
+*/
 @interface HGSQueryController : NSObject {
  @private
   NSMutableArray* queryOperations_;
@@ -66,44 +69,71 @@
 
 - (HGSQuery *)query;
 
-// various ways to walk the results, we may chose all or a subset depending
-// on performance. Each of these pulls the most up to date results from the
-// operation.
+/*!
+  Various ways to walk the results, we may chose all or a subset depending on
+  performance. Each of these pulls the most up to date results from the
+  operation.
+*/
 - (NSArray *)results;
 - (NSArray *)rankedResults;
 - (NSDictionary *)rankedResultsByCategory;
 
-// Returns YES if there is at least one non-suggest result.
+/*!
+  Returns YES if there is at least one non-suggest result.
+*/
 - (BOOL)hasAnyRealResults;
 
-// ask information about the completion status for the queries to each source. 
+/*!
+  Ask information about the completion status for the queries to each source.
+*/
 - (BOOL)queriesFinished;
 - (BOOL)cancelled;
 
-// start the query by creating a HGSSearchOperation for each search source. 
-// These hide whether or not they are threaded.
+/*!
+  Start the query by creating a HGSSearchOperation for each search source.
+  These hide whether or not they are threaded.
+*/
 - (void)startQuery;
   
-// stops the query
+/*!
+  Stops the query
+*/
 - (void)cancel;
 
-// Outstanding searches
-- (NSString *)pendingQueryNames;
+/*!
+  Outstanding searches
+*/
+- (NSArray *)pendingQueries;
 
 @end
 
 #pragma mark Notifications
 
-// Called when the query will start.
-// Object is the QueryController
-GTM_EXTERN NSString *kHGSQueryControllerWillStartNotification;
+/*!
+  Called when the query will start.  Object is the QueryController.
+*/
+GTM_EXTERN NSString *const kHGSQueryControllerWillStartNotification;
 
-// Called when the query has completed. May be called even when there are
-// more results that are possible, but the query has been stopped by the
-// user or by the query reaching a time threshhold. 
-// Object is the QueryController
-GTM_EXTERN NSString *kHGSQueryControllerDidFinishNotification;
+/*!
+  Called when the query has completed. May be called even when there are more
+  results that are possible, but the query has been stopped by the user or by
+  the query reaching a time threshhold.  Object is the QueryController.
+*/
+GTM_EXTERN NSString *const kHGSQueryControllerDidFinishNotification;
 
-// Called when more results are available for the query.
-// Object is the QueryController
-GTM_EXTERN NSString *kHGSQueryControllerDidUpdateResultsNotification;
+/*!
+  Called when more results are available for the query.  Object is the
+  QueryController.  UserInfo contains kHGSQueryControllerOperationsKey.
+*/
+GTM_EXTERN NSString *const kHGSQueryControllerDidUpdateResultsNotification;
+
+/*!
+  The HGSSearchOperations that updated the results. Array of
+  HGSSearchOperation.
+*/
+GTM_EXTERN NSString *const kHGSQueryControllerOperationsKey;
+
+/*!
+  Identifier for the shortcuts source.
+*/
+GTM_EXTERN NSString *const kHGSShortcutsSourceIdentifier;

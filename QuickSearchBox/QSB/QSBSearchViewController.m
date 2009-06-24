@@ -241,7 +241,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   NSRect viewBounds = [[self view] bounds];
   viewBounds.origin.y += NSHeight([statusBar_ bounds]);
   viewBounds.size.height -= NSHeight([statusBar_ bounds]);
-  
+  NSView *hideView = nil;
   NSRect topFrame = [topView frame];
   NSRect moreFrame = viewBounds;
   
@@ -258,9 +258,11 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
     }
     topFrame.origin.y = NSMaxY(viewBounds);   
     [topView setAutoresizingMask:pinToTopMask];
+    hideView = topView;
   } else {
     topFrame = viewBounds;
     moreFrame.origin.y = NSMinY(viewBounds) - NSHeight(moreFrame);
+    hideView = moreView;
   }
   
   topResultsFrame_ = topFrame;
@@ -276,10 +278,17 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
     [topView setFrame:topResultsFrame_];
     [moreView setFrame:moreResultsFrame_];
   }
+  if (hideView == topView) {
+    [topView setHidden:YES];
+    [moreView setHidden:NO];
+  } else {
+    [moreView setHidden:YES];
+    [topView setHidden:NO];
+  }
 }
 
 - (void)setActiveResultsViewController:(QSBResultsViewBaseController *)newController
-                               animate:(BOOL)animate{
+                               animate:(BOOL)animate {
   
   if (activeResultsViewController_ != newController) {
     [newController updateResultsView];

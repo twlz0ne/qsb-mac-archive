@@ -80,6 +80,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)dealloc {
+  [currentlySelectedResult_ release];
   [rowViewControllers_ release];
   [resultsArrayController_ gtm_removeObserver:self
                                    forKeyPath:kQSBArrangedObjectsKVOKey
@@ -310,7 +311,24 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)resultsIndicesChanged:(GTMKeyValueChangeNotification *)notification {
-  [[self searchWindowController] completeQueryText];    
+  QSBSearchWindowController *controller = [self searchWindowController];
+  QSBResultsViewBaseController *activeResultsController 
+    = [[controller activeSearchViewController] activeResultsViewController];
+  if ([activeResultsController isEqual:self]) {
+    NSArray *selectedObjects 
+      = [resultsArrayController_ selectedObjects];
+    QSBTableResult *newSelection = nil;
+    if ([selectedObjects count]) {
+      newSelection = [selectedObjects objectAtIndex:0];
+    }
+    if (newSelection != currentlySelectedResult_ 
+        && ![newSelection isEqual:currentlySelectedResult_]) {
+      [currentlySelectedResult_ autorelease];
+      currentlySelectedResult_ = [newSelection retain];
+      [controller completeQueryText]; 
+      [controller updateImageView];
+    }
+  }
 }
 
 - (BOOL)tableView:(NSTableView *)tv
@@ -411,10 +429,6 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
     selectionSet = [NSIndexSet indexSet];
   }
   [resultsArrayController_ setSelectionIndexes:selectionSet];
-}
-
-- (void)tableViewSelectionDidChange:(NSNotification *)aNotification {
-  [[[self searchViewController] searchWindowController] completeQueryText];    
 }
 
 - (BOOL)tableView:(NSTableView *)aTableView

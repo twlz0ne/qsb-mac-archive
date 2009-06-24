@@ -46,14 +46,18 @@
 #import "GTMObjectSingleton.h"
 #import <mach/mach_time.h>
 
-NSString *kHGSQueryControllerWillStartNotification 
+NSString *const kHGSQueryControllerWillStartNotification 
   = @"HGSQueryControllerWillStartNotification";
-NSString *kHGSQueryControllerDidFinishNotification 
+NSString *const kHGSQueryControllerDidFinishNotification 
   = @"HGSQueryControllerDidFinishNotification";
-NSString *kHGSQueryControllerDidUpdateResultsNotification 
+NSString *const kHGSQueryControllerDidUpdateResultsNotification 
   = @"HGSQueryControllerDidUpdateResultsNotification";
+NSString *const kHGSQueryControllerOperationsKey = 
+  @"HGSQueryControllerOperationsKey";
+NSString *const kHGSShortcutsSourceIdentifier =
+  @"com.google.qsb.shortcuts.source";
 
-NSString* const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
+NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 
 // Key callbacks for our really simple pointer to id based dictionary
 // The keys we pass in don't support "copy" but all we are interested in
@@ -384,8 +388,13 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   [pendingQueryOperations_ removeObject:operation];
   HGSSearchSource *source = [operation source];
   NSString *sourceID = [source identifier];
-  NSNumber *startTime = [operationStartTimes_ objectForKey:sourceID];
-  UInt64 deltaTime = mach_absolute_time() - [startTime unsignedLongLongValue];
+  UInt64 deltaTime = 0;
+  // We always want the shortcut source up front, so it's time will
+  // always be zero.
+  if (![sourceID isEqualToString:kHGSShortcutsSourceIdentifier]) {
+    NSNumber *startTime = [operationStartTimes_ objectForKey:sourceID];
+    deltaTime = mach_absolute_time() - [startTime unsignedLongLongValue];
+  }
   [[HGSSourceRanker sharedSourceRanker] addTimeDataPoint:deltaTime
                                                forSource:source];  
   // If this is the last query operation to complete then report as overall
@@ -415,17 +424,21 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
       if (hasRealResults_) break;
     }
   }
-  CFDictionarySetValue(sourceResults_, [notification object], operationResults);
+  HGSSearchOperation *operation = [notification object];
+  CFDictionarySetValue(sourceResults_, operation, operationResults);
   [rankedResults_ release];
   rankedResults_ = nil;
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  NSDictionary *newUserInfo 
+    = [NSDictionary dictionaryWithObject:[NSArray arrayWithObject:operation]
+                                  forKey:kHGSQueryControllerOperationsKey];
   [nc postNotificationName:kHGSQueryControllerDidUpdateResultsNotification 
-                    object:self];
+                    object:self
+                  userInfo:newUserInfo];
 }
 
-- (NSString *)pendingQueryNames {
-  return [[pendingQueryOperations_ valueForKey:@"displayName"]
-           componentsJoinedByString:@", "];
+- (NSArray *)pendingQueries {
+  return [[pendingQueryOperations_ copy] autorelease];
 }
 @end
 

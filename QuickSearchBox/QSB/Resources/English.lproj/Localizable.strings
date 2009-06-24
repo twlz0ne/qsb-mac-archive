@@ -352,3 +352,6 @@
 
 /* The title of the preferences dialog. */
 "Preferences" = "Preferences";
+
+/* A string shown at launchtime to denote that QSB is starting up and isn't ready for use. */
+"Please wait while we are starting up…" = "Please wait while we are starting up…";

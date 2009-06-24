@@ -63,9 +63,7 @@
   NSTimer *shortcutDisplayTimer_;
   NSTimer *firstTierDisplayTimer_;
   NSTimer *secondTierDisplayTimer_;
-  
-  NSTimeInterval lastMoreUpdateTime_;
-  
+  NSTimer *moreResultsUpdateTimer_;
   BOOL queryIsInProcess_;  // Yes while a query is under way.
   NSUInteger pushModifierFlags_; // NSEvent Modifiers at pivot time
 }

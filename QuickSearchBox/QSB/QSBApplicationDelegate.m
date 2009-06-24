@@ -521,20 +521,17 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     uint modifiers = [value unsignedIntValue];
     value = [newKey objectForKey:kGTMHotKeyKeyCodeKey];
     uint keycode = [value unsignedIntValue];
-    //fix for http://b/issue?id=596931
-    if (modifiers != 0) {
-      hotKey_ = [dispatcher registerHotKey:keycode
-                                 modifiers:modifiers
-                                    target:self
-                                    action:@selector(hitHotKey:)
-                               whenPressed:YES];
+    hotKey_ = [dispatcher registerHotKey:keycode
+                               modifiers:modifiers
+                                  target:self
+                                  action:@selector(hitHotKey:)
+                             whenPressed:YES];
 
-      NSBundle *bundle = [NSBundle bundleForClass:[GTMHotKeyTextField class]];
-      statusMenuItemKey = [GTMHotKeyTextField stringForKeycode:keycode
-                                                      useGlyph:YES
-                                                resourceBundle:bundle];
-      statusMenuItemModifiers = modifiers;
-    }
+    NSBundle *bundle = [NSBundle bundleForClass:[GTMHotKeyTextField class]];
+    statusMenuItemKey = [GTMHotKeyTextField stringForKeycode:keycode
+                                                    useGlyph:YES
+                                              resourceBundle:bundle];
+    statusMenuItemModifiers = modifiers;
   }
   [statusMenuItem setKeyEquivalent:statusMenuItemKey];
   [statusMenuItem setKeyEquivalentModifierMask:statusMenuItemModifiers];
@@ -939,12 +936,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self updateMenuWithAppName:[NSApp mainMenu]];
   [self updateMenuWithAppName:dockMenu_];
   [self updateMenuWithAppName:statusItemMenu_];
-  
-  // Inventory and process all plugins and extensions.
-  [self inventoryPlugins];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
+  // Inventory and process all plugins and extensions.
+  [self inventoryPlugins];
+  
   // Now that all the plugins are loaded, start listening to them. We didn't
   // want to do it earlier as there is a lot of enabled/disabled messages
   // flying around that we don't actually care about.

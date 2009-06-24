@@ -108,7 +108,6 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 @property (nonatomic, retain) QSBWelcomeController *welcomeController;
 
 - (void)updateLogoView;
-- (void)updateImageView;
 - (BOOL)firstLaunch;
 
 // Utility function to update the shadows around our custom table view
@@ -359,6 +358,14 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   if ([self firstLaunch]) {
     [searchWindow center];
   }
+  NSString *startingUp = HGSLocalizedString(@"Please wait while we are starting up…", 
+                                            @"A string shown"
+                                            @"at launchtime to denote that QSB"
+                                            @"is starting up and isn't ready "
+                                            @"for use.");
+  [searchTextField_ setEnabled:NO];
+  [searchTextField_ setStringValue:startingUp];
+  
 }
 
 - (void)dealloc {
@@ -422,7 +429,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     showResults_ = NO;
     [self updateResultsView];
   }
-  [self updateImageView];
 }
 
 - (QSBSearchViewController *)activeSearchViewController {
@@ -611,8 +617,10 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   // Selecting destroys the stack
   [self clearAllViewControllersAndSearchString];
   [searchTextField_ setStringValue:string];
-  [activeSearchViewController_ setQueryString:string];
-  [self showResultsWindow];
+  if ([string length]) {
+    [activeSearchViewController_ setQueryString:string];
+    [self showResultsWindow];
+  }
 }
 
 - (void)selectResults:(HGSResultArray *)results {
@@ -854,9 +862,7 @@ doCommandBySelector:(SEL)commandSelector {
         completion = nil;
       }
     }
-  }
-  [self updateImageView];
-  
+  }  
   return completion ? [NSArray arrayWithObject:completion] : nil;
 }
 
@@ -986,13 +992,18 @@ doCommandBySelector:(SEL)commandSelector {
   [searchWindow makeKeyAndOrderFront:self];
   
   // Start the window partially shown, and animate the rest of the way.
-  [searchWindow setAlphaValue:0.75];
+  if (![toggle isEqualToString:kQSBAppLaunchedChangeVisiblityToggle]) {
+    [searchWindow setAlphaValue:0.75];
 
-  [NSAnimationContext beginGrouping];
-  [[NSAnimationContext currentContext] setDuration:kQSBShowDuration];
-  [[searchWindow animator] setAlphaValue:1.0];
-  [self setWelcomeHidden:NO];
-  [NSAnimationContext endGrouping];
+    [NSAnimationContext beginGrouping];
+    [[NSAnimationContext currentContext] setDuration:kQSBShowDuration];
+    [[searchWindow animator] setAlphaValue:1.0];
+    [self setWelcomeHidden:NO];
+    [NSAnimationContext endGrouping];
+  } else {
+    [searchWindow setAlphaValue:1.0];
+    [self setWelcomeHidden:NO];
+  }
   
   if ([[activeSearchViewController_ queryString] length]) {
     [self performSelector:@selector(displayResults:)
@@ -1304,6 +1315,9 @@ doCommandBySelector:(SEL)commandSelector {
       [self showWelcomeWindow];
     }
   }
+  [searchTextField_ setStringValue:@""];
+  [searchTextField_ setEnabled:YES];
+  [[searchTextField_ window] makeFirstResponder:searchTextField_];
 }
 
 #pragma mark NSControl Delegate Methods (for QSBTextField)

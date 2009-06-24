@@ -283,11 +283,8 @@ static NSString *const kHGSPluginAPIVersionKey
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"<%@:%p displayName='%@', isEnabled=%d, "
-          @"protoExtensions={%@}\nfactorableExtensions={%@}\nbundle=%@>",
-          [self class], self, [self displayName], 
-          [self isEnabled], [self protoExtensions],
-          factorableProtoExtensions_, [self bundle]];
+  return [NSString stringWithFormat:@"<%@:%p %@ enabled=%d>",
+          [self class], self, [self displayName], [self isEnabled]];
 }
 
 - (void)addProtoExtensionForAccount:(NSNotification *)notification {
