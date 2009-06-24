@@ -32,9 +32,13 @@
 
 #import "QSBTextField.h"
 #import "GTMMethodCheck.h"
+#import "GTMNSEnumerator+Filter.h"
 #import "NSString+CaseInsensitive.h"
 
 @implementation QSBTextFieldEditor
+
+GTM_METHOD_CHECK(NSEnumerator,
+                 gtm_enumeratorByMakingEachObjectPerformSelector:withObject:);
 GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
 
 - (void)awakeFromNib {
@@ -195,8 +199,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     // Allow ligatures but then beat them into submission over 
     // the auto-completion.
     if (lastCompletionRange_.location > 0 && lastCompletionRange_.length > 0) {
-      NSUInteger fullLength
-        = lastCompletionRange_.location + lastCompletionRange_.length;
+      NSUInteger fullLength = NSMaxRange(lastCompletionRange_);
       NSRange ligatureRange = NSMakeRange(0, fullLength);
       [storage addAttribute:NSLigatureAttributeName 
                       value:[NSNumber numberWithInt:1] 
@@ -238,27 +241,36 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   return selection;
 }
 
-- (void)setSelectedRanges:(NSArray *)ranges affinity:(NSSelectionAffinity)affinity stillSelecting:(BOOL)stillSelectingFlag {
-  NSArray *outRanges = ranges;
+- (void)setSelectedRanges:(NSArray *)rangeValues
+                 affinity:(NSSelectionAffinity)affinity
+           stillSelecting:(BOOL)stillSelectingFlag {
+  NSArray *outRangeValues = rangeValues;
   if (lastCompletionRange_.length != 0) {
-    NSMutableArray *newRanges =[NSMutableArray arrayWithCapacity:[ranges count]];
-    NSEnumerator *rangeEnum = [ranges objectEnumerator];
-    NSValue *value;
-    while ((value = [rangeEnum nextObject])) {
-      NSRange range = [value rangeValue];
+    NSMutableArray *newRangeValues
+      = [NSMutableArray arrayWithCapacity:[rangeValues count]];
+    for (NSValue *rangeValue in rangeValues) {
+      NSRange range = [rangeValue rangeValue];
       if (lastCompletionRange_.location < NSMaxRange(range)) {
-        if (range.location < lastCompletionRange_.location) {
-          range = NSMakeRange(range.location, lastCompletionRange_.location - range.location);
-        } else {
-          range = NSMakeRange(lastCompletionRange_.location, 0);
+        if (range.location >= lastCompletionRange_.location) {
+          range.location = lastCompletionRange_.location;
         }
-        range = NSMakeRange(range.location, lastCompletionRange_.location - range.location);
+        range.length = lastCompletionRange_.location - range.location;
       }
-      [newRanges addObject:[NSValue valueWithRange:range]];
+      [newRangeValues addObject:[NSValue valueWithRange:range]];
     }
-    outRanges = newRanges;
+    outRangeValues = newRangeValues;
   }
-  [super setSelectedRanges:outRanges affinity:affinity stillSelecting:stillSelectingFlag];
+  // Adjust the selection ranges to prevent mid-glyph selections.
+  NSString *fullString = [self string];
+  NSEnumerator *adjustedRangeValuesEnum
+    = [[outRangeValues objectEnumerator]
+       gtm_enumeratorByMakingEachObjectPerformSelector:
+        @selector(qsb_adjustRangeForComposedCharacterSequence:)
+       withObject:fullString];
+  outRangeValues = [adjustedRangeValuesEnum allObjects];
+  [super setSelectedRanges:outRangeValues
+                  affinity:affinity
+            stillSelecting:stillSelectingFlag];
 }
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender {
@@ -269,6 +281,43 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
 - (void)draggingExited:(id <NSDraggingInfo>)sender {
   [self complete:self];
   [super draggingExited:sender];
+}
+
+@end
+
+@implementation NSValue (qsb_adjustRangeForComposedCharacterSequence)
+
+- (NSValue *)qsb_adjustRangeForComposedCharacterSequence:(NSString *)string {
+  // Insure that the selection range does not start or end in the middle of
+  // a composed character sequence.  If the selection is of zero length then
+  // adjust the selection start forwards, otherwise adjust the selection start
+  // backwards and the selection end forwards.
+  NSValue *adjustedRangeValue = self;
+  NSRange proposedRange = [self rangeValue];
+  if (NSMaxRange(proposedRange) < [string length]) {
+    // Adjust the selection start.
+    NSRange adjustedRange
+      = [string rangeOfComposedCharacterSequenceAtIndex:proposedRange.location];
+    if (proposedRange.length) {
+      // Adjust the selection end forward.
+      NSUInteger selectionEnd = NSMaxRange(proposedRange) - 1;
+      NSRange newEndRange
+        = [string rangeOfComposedCharacterSequenceAtIndex:selectionEnd];
+      NSUInteger adjustedSelectionEnd = NSMaxRange(newEndRange);
+      adjustedRange.length = adjustedSelectionEnd - adjustedRange.location;
+    } else {
+      // When we have an empty selection and the adjusted length
+      // is more than one character and start location has changed then
+      // adjust selection start forward.
+      if (adjustedRange.location != proposedRange.location
+          && adjustedRange.length > 1) {
+        adjustedRange.location += adjustedRange.length;
+      }
+      adjustedRange.length = 0;
+    }
+    adjustedRangeValue = [NSValue valueWithRange:adjustedRange];
+  }
+  return adjustedRangeValue;
 }
 
 @end
