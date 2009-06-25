@@ -70,6 +70,12 @@ static NSString *kSignatureDataKey = @"SignatureDataKey";
 static NSString *kSignatureDateKey = @"SignatureDateKey";
 static NSString *kDetachedSignatureTypeKey = @"DetachedSignatureTypeKey";
 static const int kSignatureTypeStandard = 1;
+static const int kSignatureTypeDigest = 2;
+
+@interface HGSCodeSignature()
+- (BOOL)digest:(unsigned char *)digest;
+- (BOOL)digestDirectory:(NSString *)path shaContext:(SHA_CTX *)shaCtx;
+@end
 
 @implementation HGSCodeSignature
 
@@ -367,6 +373,17 @@ static const int kSignatureTypeStandard = 1;
         CFRelease(signer);
       }
       CFRelease(codeRef);
+    } else if (err == errSecCSBadObjectFormat) {
+      // Not a Mach-o plugin; generate a digest of the scripts, etc. in the
+      // Resources directory instead of a traditional code signature
+      unsigned char digest[kCodeSignatureDigestLength];
+      if ([self digest:digest]) {
+        sigData = [NSData dataWithBytes:digest
+                                 length:kCodeSignatureDigestLength];
+        sigType = [NSNumber numberWithInt:kSignatureTypeDigest];
+      }
+    } else {
+      HGSLog(@"Failed to generate code signature for %@ (%i)", bundle_, err);
     }
   }
   
@@ -415,8 +432,88 @@ static const int kSignatureTypeStandard = 1;
         CFRelease(codeRef);
       }
     }
+  } else if (sigType == kSignatureTypeDigest) {
+    if ([sigData length] == kCodeSignatureDigestLength) {
+      unsigned char digest[kCodeSignatureDigestLength];
+      if ([self digest:digest] &&
+          memcmp(digest, [sigData bytes], kCodeSignatureDigestLength) == 0) {
+        result = eSignatureStatusOK;
+      }
+    }
   }
   
+  return result;
+}
+
+- (BOOL)digest:(unsigned char *)digest {
+  SHA_CTX ctx;
+  if (!SHA1_Init(&ctx)) {
+    HGSLogDebug(@"Could not instantiate a SHA1 context for plugin signing");
+    return NO;
+  }
+  
+  NSString *plistPath
+    = [[[bundle_ bundlePath] stringByAppendingPathComponent:@"Contents"]
+       stringByAppendingPathComponent:@"Info.plist"];
+  NSData *contents = [NSData dataWithContentsOfFile:plistPath];
+  if ([contents length]) {
+    SHA1_Update(&ctx, [contents bytes], [contents length]);
+  } else {
+    HGSLogDebug(@"Could not read Info.plist for plugin signing");
+    return NO;
+  }
+  if (![self digestDirectory:[bundle_ resourcePath] shaContext:&ctx]) {
+    HGSLogDebug(@"Could not read Info.plist for plugin signing");
+    return NO;
+  }
+
+  return (SHA1_Final(digest, &ctx) != 0);
+}
+
+- (BOOL)digestDirectory:(NSString *)path shaContext:(SHA_CTX *)shaCtx {
+  BOOL result = YES;
+
+  NSFileManager *fm = [NSFileManager defaultManager];
+  NSDirectoryEnumerator *dirEnum = [fm enumeratorAtPath:path];
+  if (!dirEnum) {
+    return NO;
+  }
+  NSString *filePath;
+  while (result && (filePath = [dirEnum nextObject])) {
+    filePath = [path stringByAppendingPathComponent:filePath];
+    BOOL isDirectory, succeeded = NO;
+    // Should always return YES
+    if ([fm fileExistsAtPath:filePath isDirectory:&isDirectory]) {
+      if (!isDirectory) {
+        // Must be digestable
+        if ([fm isReadableFileAtPath:filePath]) {
+          // Must be able to get file attributes
+          NSDictionary *attrs = [fm fileAttributesAtPath:path traverseLink:YES];
+          if (attrs) {
+            NSNumber *size = [attrs objectForKey:NSFileSize];
+            if (size && [size unsignedLongLongValue] <= 0xFFFFFFFFLL) {
+              // SHA1_Update() takes the length as an unsigned long
+              if (result && [size unsignedLongLongValue] > 0) {
+                NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+                NSData *contents = [NSData dataWithContentsOfFile:filePath];
+                if (contents) {
+                  if (SHA1_Update(shaCtx, [contents bytes], [contents length])) {
+                      succeeded = YES;
+                  }
+                }
+                [pool release];
+              }
+            }
+          }
+        }
+      } else {
+        // Recurse into the directory
+        succeeded = [self digestDirectory:filePath shaContext:shaCtx];
+      }
+    }
+    result = succeeded;
+  }
+
   return result;
 }
 
