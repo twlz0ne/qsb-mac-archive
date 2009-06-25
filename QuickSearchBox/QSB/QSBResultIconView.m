@@ -34,7 +34,7 @@
 #import "QSBResultIconView.h"
 #import <Vermilion/Vermilion.h>
 #import "QSBTableResult.h"
-#import "QSBDetailedRowViewController.h"
+#import "QSBResultRowViewController.h"
 #import "GTMNSObject+KeyValueObserving.h"
 #import "GTMMethodCheck.h"
 

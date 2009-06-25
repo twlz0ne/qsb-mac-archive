@@ -20,7 +20,7 @@
     </li>
     <li>
         Added GoogleDocsSaveAsActions which allow docs to be save to a local
-        file.  NOTE: Spreadsheets are not supported at this time
+        file.  NOTE: Spreadsheets are not supported at this time.
     </li>
     <li>
       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=52">
@@ -42,8 +42,38 @@
     </li>
     <li>
        <a href="http://code.google.com/p/qsb-mac/issues/detail?id=515">
-        Issue 515</a>: play songs in iTunes in non-English locales should now 
+        Issue 515</a>: Play songs in iTunes in non-English locales should now 
         work. Thanks to Philipp Comans for isolating this issue.
+    </li>
+    <li>
+        A couple of checkboxes in preferences had their scaling turned on
+        which was presenting warnings.  The scaling was unnecessary and was
+        removed.
+    </li>
+    <li>
+       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=483">
+        Issue 483</a>: At startup, the search window was always being
+        re-centered on the screen.  This has been changed to restore the
+        previous position and then perform a sanity check to insure the
+        window is completely visible.
+    </li>
+    <li>
+       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=564">
+        Issue 564</a>: Some garbage could be seen in the descriptive text
+        shown for More results because the descriptive string contained
+        more than one line of text.  This is no longer necessary
+        since only one line of description is now shown,  so we retreive and
+        present only the single line of descriptive text.  Also enhanced the
+        tool tip for More results by presenting a URL when available.
+    </li>
+    <li>
+       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=533">
+        Issue 533</a>: Accented characters and other composed characters
+        are now properly selected during autocompletion.
+    </li>
+    <li>
+       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=570">
+        Issue 570</a>: Eliminated warnings when compiling .xib files.
     </li>
  </ul>
 </body>

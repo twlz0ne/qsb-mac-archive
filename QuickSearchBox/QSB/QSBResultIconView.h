@@ -32,7 +32,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class QSBDetailedRowViewController;
+@class QSBResultRowViewController;
 
 // A QSBResultIconView is an icon view in a result row that updates based on
 // the represented object for the row. It delays actually loading the icon
@@ -40,7 +40,7 @@
 
 @interface QSBResultIconView : NSImageView {
  @private
-  IBOutlet QSBDetailedRowViewController *controller_;
+  IBOutlet QSBResultRowViewController *controller_;
   BOOL iconNeedsUpdating_;
 }
 @end
