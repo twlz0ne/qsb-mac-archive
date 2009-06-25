@@ -201,6 +201,8 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 @synthesize welcomeController = welcomeController_;
 
 GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
+GTM_METHOD_CHECK(NSWorkspace, gtm_wasLaunchedAsLoginItem);
+
 GTM_METHOD_CHECK(NSObject, 
                  gtm_addObserver:forKeyPath:selector:userInfo:options:);
 GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
@@ -1294,12 +1296,16 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
   // If the user launches us hidden we don't want to activate.
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
   NSDictionary *processDict 
-    = [[NSWorkspace sharedWorkspace] gtm_processInfoDictionary];
-  NSNumber *doNotActivateOnStartup 
+    = [ws gtm_processInfoDictionary];
+  NSNumber *nsDoNotActivateOnStartup 
     = [processDict valueForKey:kGTMWorkspaceRunningIsHidden];
-  
-  if (![doNotActivateOnStartup boolValue]) {
+  BOOL doNotActivateOnStartup = [nsDoNotActivateOnStartup boolValue];
+  if (!doNotActivateOnStartup) {
+    doNotActivateOnStartup = [ws gtm_wasLaunchedAsLoginItem];
+  }
+  if (!doNotActivateOnStartup) {
     // During startup we may inadvertently be made inactive, most likely due
     // to keychain access requests, so let's just force ourself to be
     // active.
