@@ -43,7 +43,6 @@
 
 /*!
   @class HGSAction
-  @coclass HGSActionOperation
   @discussion
   The base class for actions. Actions can exist in two different versions.  The
   first version is "noun verb" such as "file open". The second requires two
