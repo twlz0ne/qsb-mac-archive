@@ -303,6 +303,14 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
              name:NSWindowDidBecomeKeyNotification
            object:nil];
 
+  [nc addObserver:self 
+         selector:@selector(pluginWillLoad:) 
+             name:kHGSPluginLoaderWillLoadPluginNotification 
+           object:nil];
+  [nc addObserver:self 
+         selector:@selector(pluginsDidLoad:) 
+             name:kHGSPluginLoaderDidLoadPluginsNotification 
+           object:nil];
   
   // Support spaces on Leopard. 
   // http://b/issue?id=648841
@@ -360,14 +368,13 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   if ([self firstLaunch]) {
     [searchWindow center];
   }
-  NSString *startingUp = HGSLocalizedString(@"Please wait while we are starting up…", 
-                                            @"A string shown"
-                                            @"at launchtime to denote that QSB"
-                                            @"is starting up and isn't ready "
-                                            @"for use.");
-  [searchTextField_ setEnabled:NO];
-  [searchTextField_ setStringValue:startingUp];
+  NSString *startupString = HGSLocalizedString(@"Starting up…", 
+                                               @"A string shown "
+                                               @"at launchtime to denote that QSB " 
+                                               @"is starting up.");
   
+  [searchTextField_ setStringValue:startupString];
+  [searchTextField_ setEnabled:NO];
 }
 
 - (void)dealloc {
@@ -1321,9 +1328,6 @@ doCommandBySelector:(SEL)commandSelector {
       [self showWelcomeWindow];
     }
   }
-  [searchTextField_ setStringValue:@""];
-  [searchTextField_ setEnabled:YES];
-  [[searchTextField_ window] makeFirstResponder:searchTextField_];
 }
 
 #pragma mark NSControl Delegate Methods (for QSBTextField)
@@ -1337,22 +1341,36 @@ doCommandBySelector:(SEL)commandSelector {
   [activeSearchViewController_ setQueryString:queryString];
 }
 
-#if QSB_CAUTIONARY_TALE
-- (void)textDidChange:(NSNotification *)aNotification {
-  // Due to radar 4849532 (NSTextView shrinks insertion point when using unusual 
-  // font size) we can't ever let our query field get empty. If it does
-  // we stuff a zero width no break space in there. Any code that deals with
-  // the edit field must be aware of this. Currently the only thing that does
-  // is setQuery: which is above as the field is bound to query in the NIB.
-  if ([aNotification object] == searchTextFieldEditor_) {
-    NSString *value = [searchTextFieldEditor_ string];
-    if ([value length] == 0) {
-      unichar uchar = kZeroWidthNoBreakSpace;
-      [searchTextFieldEditor_ setString:[NSString stringWithCharacters:&uchar length:1]];
-    }
+#pragma mark Other Notifications
+
+- (void)pluginWillLoad:(NSNotification *)notification {
+  NSDictionary *userInfo = [notification userInfo];
+  NSString *pluginName = [userInfo objectForKey:kHGSPluginLoaderPluginNameKey];
+  NSString *startupString = nil;
+  if (pluginName) {
+    NSString *format = HGSLocalizedString(@"Starting up… Loading %@", 
+                                          @"A string shown "
+                                          @"at launchtime to denote that QSB " 
+                                          @"is starting up and is loading a "
+                                          @"plugin.");
+    startupString = [NSString stringWithFormat:format, pluginName];
+  } else {
+    startupString = HGSLocalizedString(@"Starting up…", 
+                                       @"A string shown "
+                                       @"at launchtime to denote that QSB " 
+                                       @"is starting up.");
+    
   }
+  [searchTextField_ setStringValue:startupString];
+  [searchTextField_ displayIfNeeded];
 }
-#endif
+
+- (void)pluginsDidLoad:(NSNotification *)notification {
+  [searchTextField_ setStringValue:@""];
+  [searchTextField_ displayIfNeeded];
+  [searchTextField_ setEnabled:YES];
+  [[searchTextField_ window] makeFirstResponder:searchTextField_];
+}
 
 #pragma mark Animations
 

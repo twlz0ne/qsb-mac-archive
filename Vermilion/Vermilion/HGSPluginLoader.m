@@ -74,10 +74,26 @@ NSString *const kHGSPluginLoaderPluginFailedInstantiation
   = @"HGSPluginLoaderPluginFailedInstantiation";
 NSString *const kHGSPluginLoaderPluginFailedUnknownPluginType 
   = @"HGSPluginLoaderPluginFailedUnknownPluginType";
+NSString *const kHGSPluginLoaderWillLoadPluginsNotification
+  = @"HGSPluginLoaderWillLoadPluginsNotification";
+NSString *const kHGSPluginLoaderDidLoadPluginsNotification
+  = @"HGSPluginLoaderDidLoadPluginsNotification";
+NSString *const kHGSPluginLoaderWillLoadPluginNotification
+  = @"HGSPluginLoaderWillLoadPluginNotification";
+NSString *const kHGSPluginLoaderDidLoadPluginNotification
+  = @"HGSPluginLoaderDidLoadPluginNotification";
+NSString *const kHGSPluginLoaderPluginKey
+  = @"HGSPluginLoaderPluginKey";
+NSString *const kHGSPluginLoaderPluginNameKey
+  = @"HGSPluginLoaderPluginNameKey";
+NSString *const kHGSPluginLoaderErrorKey
+  = @"HGSPluginLoaderErrorKey";
 
 @implementation HGSPluginLoader
 
 GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
+
+@synthesize delegate = delegate_;
 
 - (id)init {
   if ((self = [super init])) {
@@ -124,17 +140,38 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
     NSDirectoryEnumerator* dirEnum
       = [[NSFileManager defaultManager] enumeratorAtPath:pluginPath];
     HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc postNotificationName:kHGSPluginLoaderWillLoadPluginsNotification 
+                      object:self 
+                    userInfo:nil];
     for (NSString *path in dirEnum) {
       NSString *errorType = nil;
       [dirEnum skipDescendents];
       NSString* fullPath = [pluginPath stringByAppendingPathComponent:path];
       NSString *extension = [fullPath pathExtension];
       Class pluginClass = [extensionMap_ objectForKey:extension];
+      NSString *pluginName = [fullPath lastPathComponent];
+      HGSPlugin *plugin = nil;
       if (pluginClass) {
         NSBundle *pluginBundle = [NSBundle bundleWithPath:fullPath];
+        NSString *betterPluginName 
+          = [pluginBundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+        if (!betterPluginName) {
+          betterPluginName 
+            = [pluginBundle objectForInfoDictionaryKey:@"CFBundleName"];
+        }
+        if (betterPluginName) {
+          pluginName = betterPluginName;
+        }
+        NSDictionary *willLoadUserInfo 
+          = [NSDictionary dictionaryWithObject:pluginName 
+                                        forKey:kHGSPluginLoaderPluginNameKey];
+        [nc postNotificationName:kHGSPluginLoaderWillLoadPluginNotification
+                          object:self 
+                        userInfo:willLoadUserInfo];
         if ([self isPluginBundleCertified:pluginBundle]) {
           if ([pluginClass isPluginBundleValidAPI:pluginBundle]) {
-            HGSPlugin *plugin 
+            plugin 
               = [[[pluginClass alloc] initWithBundle:pluginBundle] autorelease];
             if (plugin) {
               [pluginsPoint extendWithObject:plugin];
@@ -150,15 +187,38 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
       } else {
         errorType = kHGSPluginLoaderPluginFailedUnknownPluginType;
       }
+      NSDictionary *errorDictionary = nil;
       if (errorType) {
-        NSDictionary *errorDictionary
-          = [NSDictionary dictionaryWithObjectsAndKeys:
-             errorType, kHGSPluginLoaderPluginFailureKey,
-             fullPath, kHGSPluginLoaderPluginPathKey,
-             nil];
+        errorDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                           errorType, kHGSPluginLoaderPluginFailureKey,
+                           fullPath, kHGSPluginLoaderPluginPathKey,
+                           nil];
         [ourErrors addObject:errorDictionary];
       }
+      NSMutableDictionary *didLoadUserInfo 
+        = [NSMutableDictionary dictionaryWithObject:pluginName
+                                             forKey:kHGSPluginLoaderPluginNameKey];
+      if (plugin) {
+        [didLoadUserInfo setObject:plugin forKey:kHGSPluginLoaderPluginKey];
+      }
+      if (errorDictionary) {
+        [didLoadUserInfo setObject:errorDictionary 
+                            forKey:kHGSPluginLoaderErrorKey];
+      }
+      [nc postNotificationName:kHGSPluginLoaderDidLoadPluginNotification 
+                        object:self 
+                      userInfo:didLoadUserInfo];
     }
+    NSDictionary *didLoadsUserInfo = nil;
+    if ([ourErrors count]) {
+      didLoadsUserInfo 
+        = [NSDictionary dictionaryWithObject:ourErrors 
+                                      forKey:kHGSPluginLoaderErrorKey];
+    }
+    [nc postNotificationName:kHGSPluginLoaderDidLoadPluginsNotification 
+                      object:self 
+                    userInfo:didLoadsUserInfo];
+    
     if (errors) {
       *errors = [ourErrors count] ? ourErrors : nil;
     }  
@@ -179,14 +239,6 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 }
 
 #pragma mark -
-
-- (id<HGSDelegate>)delegate {
-  return delegate_;
-}
-
-- (void)setDelegate:(id<HGSDelegate>)delegate {
-  delegate_ = delegate;
-}
 
 - (BOOL)isPluginBundleCertified:(NSBundle *)pluginBundle {
   // Blacklisted plugins are never certified

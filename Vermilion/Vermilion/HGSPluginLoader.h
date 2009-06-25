@@ -32,88 +32,156 @@
 
 #import <Foundation/Foundation.h>
 
-//
-// HGSPluginLoader
-//
-// Takes care of loading and registering plugins that extend extensions points
-// Fields requests for iterators and actions for a given type via 
-// the associated protocols.
-
-// Extensions can be defined in two ways:
-// the easy way is to add a 
-// 'HGSExtensions' key to your plist which is an array of dictionaries.
-// Each dictionary contains two keys:
-// 'HGSExtensionClass' which is the class to be instantiated
-// 'HGSExtensionPoint' which is a string naming the point to be extended.
-//
-// Common points are:
-//   HGSActionsExtensionPoint
-//   HGSSourcesExtensionPoint;
-// 
-// <array>
-//   <dict>
-//     <key>HGSExtensionClass</key>
-//     <string>HGSActionSource</string>
-//     <key>HGSExtensionPoint</key>
-//     <string>HGSSourcesExtensionPoint</string>
-//   </dict>
-// </array>
-//
+/*!
+ @header HGSPluginLoader
+ Takes care of loading and registering plugins that extend extensions points
+ Fields requests for iterators and actions for a given type via the associated
+ protocols.
+ 
+ Extensions can be defined in two ways: the easy way is to add a
+ 'HGSExtensions' key to your plist which is an array of dictionaries.  Each
+ dictionary contains two keys: 'HGSExtensionClass' which is the class to be
+ instantiated 'HGSExtensionPoint' which is a string naming the point to be
+ extended.
+ 
+ Common points are: HGSActionsExtensionPoint HGSSourcesExtensionPoint;
+ 
+ <array>
+   <dict> 
+     <key>HGSExtensionClass</key> 
+       <string>HGSActionSource</string>
+     <key>HGSExtensionPoint</key> 
+       <string>HGSSourcesExtensionPoint</string>
+   </dict> 
+ </array>
+*/
 
 @protocol HGSDelegate;
 @class HGSCodeSignature;
 
+/*!
+ HGSPluginLoader
+ Responsible for loading plugins.
+*/
 @interface HGSPluginLoader : NSObject {
  @private
   __weak id<HGSDelegate> delegate_;
   
-  // Extension map maps a particular extension (.hgs) to a type of plugin
-  // to instantiate. This allows us to extend Vermiliion to accept other
-  // types of plugins like (.py) or (.scpt) and have those act
-  // as real plugins.
+  /*!
+   Extension map maps a particular extension (.hgs) to a type of plugin to
+   instantiate. This allows us to extend Vermiliion to accept other types of
+   plugins like (.py) or (.scpt) and have those act as real plugins.
+  */
   NSMutableDictionary *extensionMap_;
   
-  // The code signature on this framework
+  /*!
+    The code signature on this framework.
+  */
   HGSCodeSignature *frameworkSignature_;
   
-  // The code signature on the executable hosting this framework
+  /*!
+    The code signature on the executable hosting this framework.
+  */
   HGSCodeSignature *executableSignature_;
   
-  // The certificate that was used to sign the this
-  // framework, or NULL if the framework is unsigned or has an
-  // invalid signature
+  /*!
+    The certificate that was used to sign the this framework, or NULL if the
+    framework is unsigned or has an invalid signature.
+  */
   SecCertificateRef frameworkCertificate_;
   
-  // A dictionary containing the whitelist of untrusted-but-OK'd-by-the-user
-  // plugins. The whitelist is stored in persistent form in an encrypted file.
+  /*!
+    A dictionary containing the whitelist of untrusted-but-OK'd-by-the-user
+    plugins. The whitelist is stored in persistent form in an encrypted file.
+  */
   NSMutableDictionary *pluginSignatureInfo_;
 }
 
-// Return the shared plugin Loader.
+@property (readwrite, assign) id<HGSDelegate> delegate;
+/*!
+  Return the shared plugin Loader.
+*/
 + (HGSPluginLoader*)sharedPluginLoader;
 
-// Registers a plugin class for a given set of extensions.
+/*!
+  Registers a plugin class for a given set of extensions.
+*/
 - (void)registerClass:(Class)cls forExtensions:(NSArray *)extensions;
 
-// Given a path to a folder where plugins may live, identify all plugins and
-// their sources and actions.
+/*!
+  Given a path to a folder where plugins may live, identify all plugins and
+  their sources and actions.
+*/
 - (void)loadPluginsAtPath:(NSString*)pluginsPath errors:(NSArray **)errors;
-
-- (id<HGSDelegate>)delegate;
-- (void)setDelegate:(id<HGSDelegate>)delegate;
-
 @end
 
-// Keys for the error dictionaries for the loadPluginsAtPath:errors: method
-// Path of the failed plugin (NSString)
+/*!
+  Keys for the error dictionaries for the loadPluginsAtPath:errors: method 
+  Path of the failed plugin (NSString)
+*/
 extern NSString *const kHGSPluginLoaderPluginPathKey;
-// Reason for failure (NSString)
+/*!
+  Reason for failure (NSString)
+*/
 extern NSString *const kHGSPluginLoaderPluginFailureKey;
-// Failed because it wasn't certified
+/*!
+  Failed because it wasn't certified
+*/
 extern NSString *const kHGSPluginLoaderPluginFailedCertification;
-// Failed because it's API version was incorrect
+/*!
+  Failed because it's API version was incorrect
+*/
 extern NSString *const kHGSPluginLoaderPluginFailedAPICheck;
-// Failed because unable to instantiate
+/*!
+  Failed because unable to instantiate
+*/
 extern NSString *const kHGSPluginLoaderPluginFailedInstantiation;
-// Failed because we don't recognize the type of the plugin
+/*!
+  Failed because we don't recognize the type of the plugin
+*/
 extern NSString *const kHGSPluginLoaderPluginFailedUnknownPluginType;
+
+/*!
+ Notification that the loader is starting to load plugins. 
+ Object is the plugin loader.
+*/
+extern NSString *const kHGSPluginLoaderWillLoadPluginsNotification;
+
+/*!
+ Notification that the loader has finished loading plugins. 
+ Object is the plugin loader.
+ Userinfo may contain kHGSPluginLoaderErrorKey which is an array
+ of dictionaries representing errors loading plugins.
+*/
+extern NSString *const kHGSPluginLoaderDidLoadPluginsNotification;
+
+/*!
+ Notification that the loader will load a plugin
+ Object is the plugin loader.
+ Userinfo may contain kHGSPluginLoaderPluginNameKey which is an NSString
+ representing the name of the plugin being loaded.
+*/
+extern NSString *const kHGSPluginLoaderWillLoadPluginNotification;
+/*!
+ Notification that the loader did load a plugin
+ Object is the plugin loader.
+ Userinfo may contain:
+ - kHGSPluginLoaderPluginNameKey which is an NSString
+   representing the name of the plugin being loaded.
+ - kHGSPluginLoaderPluginKey which is an HGSPlugin
+ - kHGSPluginLoaderErrorKey which is a error dictionary
+*/
+extern NSString *const kHGSPluginLoaderDidLoadPluginNotification;
+
+/*!
+  Key representing a plugin (HGSPlugin).
+*/
+extern NSString *const kHGSPluginLoaderPluginKey;
+/*!
+  Key representing a plugin name (NSString *).
+*/
+extern NSString *const kHGSPluginLoaderPluginNameKey;
+/*!
+  Key representing an error loading the plugin.
+*/
+extern NSString *const kHGSPluginLoaderErrorKey;
