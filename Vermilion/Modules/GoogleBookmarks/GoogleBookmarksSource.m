@@ -44,7 +44,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 @interface GoogleBookmarksSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
-  NSTimer *updateTimer_;
+  __weak NSTimer *updateTimer_;
   NSMutableData *bookmarkData_;
   HGSSimpleAccount *account_;
   NSURLConnection *connection_;
@@ -92,10 +92,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  if ([updateTimer_ isValid]) {
-    [updateTimer_ invalidate];
-  }
-  [updateTimer_ release];
+  [updateTimer_ invalidate];
   [bookmarkData_ release];
   [account_ release];
   [super dealloc];
@@ -145,7 +142,9 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (void)refreshBookmarks:(NSTimer *)timer {
+  updateTimer_ = nil;
   [self startAsynchronousBookmarkFetch];
+  [self setUpPeriodicRefresh];
 }
 
 - (void)indexBookmarksFromData:(NSData *)data {
@@ -243,6 +242,7 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
   } else if (++previousFailureCount_ > 3) {
     // Don't keep trying.
     [updateTimer_ invalidate];
+    updateTimer_ = nil;
     NSString *errorFormat
       = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
                            @"password.", 
@@ -344,16 +344,15 @@ didReceiveResponse:(NSURLResponse *)response {
 }
 
 - (void)setUpPeriodicRefresh {
-  // Kick off a timer if one is not already running.
-  if (![updateTimer_ isValid]) {
-    [updateTimer_ release];
-    updateTimer_ 
-      = [[NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds
-                                          target:self
-                                        selector:@selector(refreshBookmarks:)
-                                        userInfo:nil
-                                         repeats:YES] retain];
-  }
+  [updateTimer_ invalidate];
+  // We add 5 minutes worth of random jitter.
+  NSTimeInterval jitter = random() / (LONG_MAX / (NSTimeInterval)300.0);
+  updateTimer_ 
+    = [NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
+                                       target:self
+                                     selector:@selector(refreshBookmarks:)
+                                     userInfo:nil
+                                      repeats:NO];
 }
 
 #pragma mark -
