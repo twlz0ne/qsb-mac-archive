@@ -32,50 +32,71 @@
 
 #import <Foundation/Foundation.h>
 
+/*!
+ @header
+ @discussion HGSSQLiteBackedCache
+*/
+
 @class GTMSQLiteDatabase;
 
-// A limited sized cache backed by SQLite.
+/*!
+  A limited sized cache backed by SQLite.
+*/
 @interface HGSSQLiteBackedCache : NSObject {
  @private
   GTMSQLiteDatabase* db_;
   NSString* dbPath_;
 
-  // Controls on the size of the cache.
-  NSUInteger hardMaximumEntries_;  // Exceeding this triggers a cleanup.
-  NSUInteger softMaximumEntries_;  // When deleting items, cache will be 
-                                   // bought down to this size.
-  NSTimeInterval maximumAge_;  
-  NSTimer *flushTimer_;
+  NSUInteger hardMaximumEntries_;  
+  NSUInteger softMaximumEntries_;
+  NSTimeInterval maximumAge_;
+  __weak NSTimer *flushTimer_;
   
-  // Stores a list of keys that were touched. Since writes are expensive,
-  // we batch all the accesses for a fixed time period and then write them
-  // all in one go.
+  /*!
+    Stores a list of keys that were touched. Since writes are expensive,
+    we batch all the accesses for a fixed time period and then write them all
+    in one go.
+  */
   NSMutableArray *pendingTouches_;
   BOOL useNSArchiver_;
 }
 
-// Initialise the cache with the absolute path for storage.
-// If version != version on disk, the cache will be emptied.
+/*!
+  Exceeding this triggers a cleanup.
+*/
+@property (readwrite, assign, nonatomic) NSUInteger hardMaximumEntries;
+/*!
+  When deleting items, cache will be bought down to this size.
+*/
+@property (readwrite, assign, nonatomic) NSUInteger softMaximumEntries;
+@property (readwrite, assign, nonatomic) NSTimeInterval maximumAge;
+/*!
+  Number of entries
+*/
+@property (readonly, nonatomic) NSUInteger count;
+
+/*!
+  Initialise the cache with the absolute path for storage.  If version !=
+  version on disk, the cache will be emptied.
+*/
 - (id)initWithPath:(NSString *)path version:(NSString *)version;
 
-// This class usually uses property list serialization for its blobs,
-// this switches it to use NSKeyedArchiver
+/*!
+  This class usually uses property list serialization for its blobs, this
+  switches it to use NSKeyedArchiver
+*/
 - (id)initWithPath:(NSString *)path 
            version:(NSString *)version 
        useArchiver:(BOOL)flag;
 
-// Number of entries
-- (NSUInteger)count;
-
-- (void)setHardMaximumEntries:(NSUInteger)entries;
-- (NSUInteger)hardMaximumEntries;
-- (void)setSoftMaximumEntries:(NSUInteger)entries;
-- (NSUInteger)softMaximumEntries;
-
-// Writes any pending writes into the database, and performs cleanup of the
-// database to ensure the size does not exceed the maximumEntries_ size.
+/*!
+  Writes any pending writes into the database, and performs cleanup of the
+  database to ensure the size does not exceed the maximumEntries_ size.
+*/
 - (void)flush;
 
-// Remove all the entries.
+/*!
+  Remove all the entries.
+*/
 - (void)removeAllObjects;
 @end

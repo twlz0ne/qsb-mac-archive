@@ -61,14 +61,17 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
 - (void)invalidateEntriesNotAccessedAfter:(NSDate *)date;
 - (void)invalidateLeastRecentlyUsedFrom:(NSUInteger)currentRows 
                                      to:(NSUInteger)decreasedRows;
-- (void)setFlushInterval:(NSTimeInterval)flushInterval;
 @end
 
 @implementation HGSSQLiteBackedCache
+@synthesize hardMaximumEntries = hardMaximumEntries_;
+@synthesize softMaximumEntries = softMaximumEntries_;
+@synthesize maximumAge = maximumAge_;
 
 - (id)initWithPath:(NSString *)path version:(NSString *)version {
   return [self initWithPath:path version:(NSString *)version useArchiver:NO];
 }
+
 - (id)initWithPath:(NSString *)path 
            version:(NSString *)version 
        useArchiver:(BOOL)flag {
@@ -76,7 +79,12 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
   if (self) {
     dbPath_ = [path retain];
     pendingTouches_ = [[NSMutableArray alloc] init];
-    [self setFlushInterval:kCacheDefaultFlushInterval];
+    flushTimer_ 
+      = [NSTimer scheduledTimerWithTimeInterval:kCacheDefaultFlushInterval
+                                         target:self 
+                                       selector:@selector(flushTimer:) 
+                                       userInfo:nil 
+                                        repeats:YES];
     maximumAge_ = kCacheDefaultMaximumAge;
     hardMaximumEntries_ = kCacheDefaultMaxEntries;
     softMaximumEntries_ = kCacheDefaultSoftMaxEntries;
@@ -94,7 +102,6 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
 - (void)dealloc {
   [self flush];
   [flushTimer_ invalidate];
-  [flushTimer_ release];
   [dbPath_ release];
   [db_ release];
   [pendingTouches_ release];
@@ -307,6 +314,10 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
 
 #pragma mark Flushing
 
+- (void)flushTimer:(NSTimer *)ignored {
+  [self flush];
+}
+
 // A regular method that's called to clean up cache entries. Expected to be
 // called on the main thread.
 - (void)flush {
@@ -443,45 +454,4 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
   [statement stepRow];
   [statement finalizeStatement];
 }
-
-#pragma mark Setters/Getters
-
-- (void)setHardMaximumEntries:(NSUInteger)entries {
-  hardMaximumEntries_ = entries;
-}
-
-- (NSUInteger)hardMaximumEntries {
-  return hardMaximumEntries_;
-}
-- (void)setSoftMaximumEntries:(NSUInteger)entries {
-  softMaximumEntries_ = entries;
-}
-
-- (NSUInteger)softMaximumEntries {
-  return softMaximumEntries_;
-}
-
-
-- (void)setFlushInterval:(NSTimeInterval)flushInterval {
-  [flushTimer_ invalidate];
-  [flushTimer_ release];
-  flushTimer_ = [[NSTimer scheduledTimerWithTimeInterval:flushInterval
-                                                  target:self 
-                                                selector:@selector(flush) 
-                                                userInfo:nil 
-                                                 repeats:YES] retain];
-}
-
-- (NSTimeInterval)flushInterval {
-  return [flushTimer_ timeInterval];
-}
-
-- (void)setMaximumAge:(NSTimeInterval)maximumAge {
-  maximumAge_ = maximumAge;
-}
-
-- (NSTimeInterval)maximumAge {
-  return maximumAge_;
-}  
-
 @end
