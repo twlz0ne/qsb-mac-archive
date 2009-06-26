@@ -130,7 +130,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
 @interface ITunesSource : HGSCallbackSearchSource {
  @private
   GTMSQLiteDatabase *db_;
-  NSTimer *updateTimer_;
+  __weak NSTimer *updateTimer_;
   // TODO(hawk): Should these all go in the icon cache?
   NSImage *albumIcon_;
   NSImage *artistIcon_;
@@ -214,11 +214,11 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
     
     // Periodically update the index
     updateTimer_ 
-      = [[NSTimer scheduledTimerWithTimeInterval:kUpdateTimeInterval
-                                          target:self
-                                        selector:@selector(updateIndexTimerFired:)
-                                        userInfo:nil
-                                         repeats:YES] retain];
+      = [NSTimer scheduledTimerWithTimeInterval:kUpdateTimeInterval
+                                         target:self
+                                       selector:@selector(updateIndexTimerFired:)
+                                       userInfo:nil
+                                        repeats:YES];
     
     genreIconCache_ = [[NSMutableDictionary alloc] init];
 
@@ -241,10 +241,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
 }
 
 - (void)dealloc {
-  if ([updateTimer_ isValid]) {
-    [updateTimer_ invalidate];
-  }
-  [updateTimer_ release];
+  [updateTimer_ invalidate];
   [db_ release];
   [albumIcon_ release];
   [artistIcon_ release];
