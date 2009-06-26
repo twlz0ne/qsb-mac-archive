@@ -54,7 +54,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
  @private
   GDataServiceGooglePhotos *picasawebService_;
   NSMutableSet *activeTickets_;
-  NSTimer *updateTimer_;
+  __weak NSTimer *updateTimer_;
   HGSAccount *account_;
   NSTimeInterval previousErrorReportingTime_;
   NSImage *placeholderIcon_;
@@ -135,10 +135,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   [self cancelAllTickets];
   [activeTickets_ release];
   [picasawebService_ release];
-  if ([updateTimer_ isValid]) {
-    [updateTimer_ invalidate];
-  }
-  [updateTimer_ release];
+  [updateTimer_ invalidate];
   [account_ release];
   [placeholderIcon_ release];
   [super dealloc];
@@ -218,6 +215,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
         [picasawebService_ setIsServiceRetryEnabled:YES];
       } else {
         [updateTimer_ invalidate];
+        updateTimer_ = nil;
         return;
       }
     }
@@ -244,20 +242,21 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 }
 
 - (void)setUpPeriodicRefresh {
-  // Kick off a timer if one is not already running.
-  if (![updateTimer_ isValid]) {
-    [updateTimer_ release];
-    updateTimer_
-      = [[NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds
-                                          target:self
-                                        selector:@selector(refreshAlbums:)
-                                        userInfo:nil
-                                         repeats:YES] retain];
-  }
+  [updateTimer_ invalidate];
+  // We add 5 minutes worth of random jitter.
+  NSTimeInterval jitter = random() / (LONG_MAX / (NSTimeInterval)300.0);
+  updateTimer_
+    = [NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
+                                       target:self
+                                     selector:@selector(refreshAlbums:)
+                                     userInfo:nil
+                                      repeats:NO];
 }
 
 - (void)refreshAlbums:(NSTimer*)timer {
+  updateTimer_ = nil;
   [self startAlbumInfoFetch];
+  [self setUpPeriodicRefresh];
 }
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
@@ -388,6 +387,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     if (errorCode == kGDataBadAuthentication) {
       // If the login credentials are bad, don't keep trying.
       [updateTimer_ invalidate];
+      updateTimer_ = nil;
     }
     NSString *fetchType = HGSLocalizedString(@"album", 
                                              @"A label denoting a Picasaweb "
@@ -524,6 +524,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     if (errorCode == kGDataBadAuthentication) {
       // If the login credentials are bad, don't keep trying.
       [updateTimer_ invalidate];
+      updateTimer_ = nil;
       // Tickle the account so that if the user happens to have the preference
       // window open showing either the account or the search source they
       // will immediately see that the account status has changed.
