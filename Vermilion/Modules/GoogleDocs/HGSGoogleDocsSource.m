@@ -45,7 +45,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
  @private
   GDataServiceGoogleDocs *docService_;
   GDataServiceTicket *serviceTicket_;
-  NSTimer *updateTimer_;
+  __weak NSTimer *updateTimer_;
   NSDictionary *docIcons_;
   BOOL currentlyFetching_;
   HGSAccount *account_;
@@ -113,9 +113,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   [docService_ release];
   [serviceTicket_ release];
   [docIcons_ release];
-  if ([updateTimer_ isValid])
-    [updateTimer_ invalidate];
-  [updateTimer_ release];
+  [updateTimer_ invalidate];
   [account_ release];
   [userName_ release];
   [super dealloc];
@@ -159,6 +157,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
         // Can't do much without a login; invalidate so we stop trying (until
         // we get a notification that the credentials have changed) and bail.
         [updateTimer_ invalidate];
+        updateTimer_ = nil;
         return;
       }
     }
@@ -187,19 +186,21 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 - (void)setUpPeriodicRefresh {
   // Kick off a timer if one is not already running.
-  if (![updateTimer_ isValid]) {
-    [updateTimer_ release];
-    updateTimer_
-      = [[NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds
-                                          target:self
-                                        selector:@selector(refreshDocs:)
-                                        userInfo:nil
-                                         repeats:YES] retain];
-  }
+  [updateTimer_ invalidate];
+  // We add 5 minutes worth of random jitter.
+  NSTimeInterval jitter = random() / (LONG_MAX / (NSTimeInterval)300.0);
+  updateTimer_
+    = [NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
+                                       target:self
+                                     selector:@selector(refreshDocs:)
+                                     userInfo:nil
+                                      repeats:NO];
 }
 
 - (void)refreshDocs:(NSTimer*)timer {
+  updateTimer_ = nil;
   [self startAsynchronousDocsListFetch];
+  [self setUpPeriodicRefresh];
 }
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
@@ -245,6 +246,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   if (errorCode == kGDataBadAuthentication) {
     // If the login credentials are bad, don't keep trying.
     [updateTimer_ invalidate];
+    updateTimer_ = nil;
     // Tickle the account so that if the preferences window is showing
     // the user will see the proper account status.
     [account_ authenticate];
