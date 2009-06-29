@@ -51,6 +51,7 @@
 - (BOOL)generateRandomBytes:(unsigned char *)bytes count:(NSUInteger)count;
 - (void)readPluginSignatureInfo;
 - (void)writePluginSignatureInfo;
+- (void)loadPluginsAtPath:(NSString*)pluginsPath errors:(NSArray **)errors;
 @end
 
 static NSString *kPluginPathKey = @"PluginPathKey";
@@ -88,12 +89,15 @@ NSString *const kHGSPluginLoaderPluginNameKey
   = @"HGSPluginLoaderPluginNameKey";
 NSString *const kHGSPluginLoaderErrorKey
   = @"HGSPluginLoaderErrorKey";
+NSString *const kHGSPluginLoaderDidInitializePluginsNotification
+  = @"HGSPluginLoaderDidInitializePluginsNotification";
 
 @implementation HGSPluginLoader
 
 GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 
 @synthesize delegate = delegate_;
+@synthesize plugins = plugins_;
 
 - (id)init {
   if ((self = [super init])) {
@@ -127,12 +131,141 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
   [executableSignature_ release];
   [frameworkSignature_ release];
   [pluginSignatureInfo_ release];
+  [plugins_ release];
   if (frameworkCertificate_) {
     CFRelease(frameworkCertificate_);
   }
   [super dealloc];
 }
 // COV_NF_END
+
+- (void)loadPluginsWithErrors:(NSArray **)errors {
+  NSArray *pluginPaths = [[self delegate] pluginFolders];
+  NSMutableArray *allErrors = [NSMutableArray array];
+  for (NSString *pluginPath in pluginPaths) {
+    NSArray *pluginErrors = nil;
+    [self loadPluginsAtPath:pluginPath errors:&pluginErrors];
+    if (pluginErrors) {
+      [allErrors addObjectsFromArray:pluginErrors];
+    }
+  }
+  if (errors) {
+    *errors = allErrors;
+  }
+  HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
+  NSArray *factorablePlugins = [pluginsPoint extensions];
+  
+  // Installing extensions is done in this order:
+  //   1. Install account type extensions.
+  //   2. Install previously setup accounts from our preferences.  This 
+  //      step relies on the account types having been installed in Step 1.
+  //      This needs to be done before you call.
+  //      -installAndEnablePluginsBasedOnPluginsState
+  //   3. Factor all factorable extensions.  This step relies on accounts
+  //      having been reconstituted in Step 2.
+  //   4. Install all non-account type extensions.
+  
+  // Step 1: Install the account type extensions.
+  [factorablePlugins makeObjectsPerformSelector:@selector(installAccountTypes)];
+  
+  [self setPlugins:factorablePlugins];
+}
+
+- (void)installAndEnablePluginsBasedOnPluginsState:(NSArray *)state {
+  NSArray *plugins = [self plugins];
+  
+  // Step 3: Factor the new extensions now that we know all available accounts.
+  [plugins makeObjectsPerformSelector:@selector(factorProtoExtensions)];
+  
+  // Step 4: Go through our plugins and set enabled states based on what
+  // the user has saved off in their prefs.
+  for (HGSPlugin *plugin in plugins) {
+    NSString *pluginIdentifier = [plugin identifier];
+    NSDictionary *oldPluginDict = nil;
+    for (oldPluginDict in state) {
+      NSString *oldID = [oldPluginDict objectForKey:kHGSBundleIdentifierKey];
+      if ([oldID isEqualToString:pluginIdentifier]) {
+        break;
+      }
+    }
+    // If a user has turned off a plugin, then all extensions associated
+    // with that plugin are turned off. New plugins are on by default.
+    BOOL pluginEnabled = YES;
+    if (oldPluginDict) {
+      pluginEnabled 
+        = [[oldPluginDict objectForKey:kHGSPluginEnabledKey] boolValue];
+    }
+    [plugin setEnabled:pluginEnabled];
+    
+    // Now run through all the extensions in the plugin. Due to us moving
+    // code around an extension may have moved from one plugin to another.
+    // So even though we found a matching plugin above, we will search
+    // through all the plugins looking for a match.
+    NSArray *protoExtensions = [plugin protoExtensions];
+    for (HGSProtoExtension *protoExtension in protoExtensions) {
+      BOOL protoExtensionEnabled = YES;
+      NSString *protoExtensionID = [protoExtension identifier];
+      NSDictionary *oldExtensionDict = nil;
+      for (oldPluginDict in state) {
+        NSArray *oldExtensionDicts 
+          = [oldPluginDict objectForKey:kHGSPluginExtensionsDicts];
+        for (oldExtensionDict in oldExtensionDicts) {
+          NSString *oldID 
+            = [oldExtensionDict objectForKey:kHGSExtensionIdentifierKey];
+          if ([oldID isEqualToString:protoExtensionID]) {
+            protoExtensionEnabled 
+               = [[oldExtensionDict objectForKey:kHGSExtensionEnabledKey] boolValue];
+            break;
+          }
+        }
+        if (oldExtensionDict) break;
+      }
+      // Due to us moving code around, an extension may have moved from one
+      // plugin to another
+      if (oldExtensionDict) {
+        [protoExtension setEnabled:protoExtensionEnabled];
+      }
+    }
+    if ([plugin isEnabled]) {
+      [plugin install];
+    }
+  }
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:kHGSPluginLoaderDidInitializePluginsNotification 
+                    object:self];
+}
+
+- (NSArray *)pluginsState {
+  // Save these plugins in preferences. All we care about at this point is
+  // the enabled state of the plugin and it's extensions.
+  NSArray *plugins = [self plugins];
+  NSUInteger count = [plugins count];
+  NSMutableArray *archivablePlugins = [NSMutableArray arrayWithCapacity:count];
+  for (HGSPlugin *plugin in plugins) {
+    NSArray *protoExtensions = [plugin protoExtensions];
+    count = [protoExtensions count];
+    NSMutableArray *archivableExtensions = [NSMutableArray arrayWithCapacity:count];
+    for (HGSProtoExtension *protoExtension in protoExtensions) {
+      NSNumber *isEnabled = [NSNumber numberWithBool:[protoExtension isEnabled]];
+      NSString *identifier = [protoExtension identifier];
+      NSDictionary *protoValues = [NSDictionary dictionaryWithObjectsAndKeys:
+                                   identifier, kHGSExtensionIdentifierKey,
+                                   isEnabled, kHGSExtensionEnabledKey,
+                                   nil];
+      [archivableExtensions addObject:protoValues];
+    }
+    NSNumber *isEnabled = [NSNumber numberWithBool:[plugin isEnabled]];
+    NSString *identifier = [plugin identifier];
+    NSDictionary *archiveValues
+      = [NSDictionary dictionaryWithObjectsAndKeys:
+         identifier, kHGSBundleIdentifierKey,
+         isEnabled, kHGSPluginEnabledKey,
+         archivableExtensions, kHGSPluginExtensionsDicts,
+         nil];
+    [archivablePlugins addObject:archiveValues];
+  }
+  return archivablePlugins;
+}
 
 - (void)loadPluginsAtPath:(NSString*)pluginPath errors:(NSArray **)errors {
   if (pluginPath) {

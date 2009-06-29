@@ -114,18 +114,15 @@ static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 - (void)inventoryAccounts;
 
 // Update our preferences with the current account information.
-- (void)updateAccountsPrefs;
+- (void)updateAccountsPreferences;
 
 // Reconcile what we previously knew about plugins and extensions
 // and had saved in our preferences with a new inventory
 // of plugins and extensions, then enable each as appropriate.
 - (void)inventoryPlugins;
 
-// Set the array of plug-ins.
-- (void)setPlugins:(NSArray *)plugins;
-
 // Record all current plugin configuration information.
-- (void)updatePluginPreferences;
+- (void)updatePluginsPreferences;
 
 // Check if the screen saver is running.
 - (BOOL)isScreenSaverActive;
@@ -218,7 +215,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
            selector:@selector(presentMessageToUser:) 
                name:kHGSUserMessageNotification 
              object:nil];
-    
+    [nc addObserver:self 
+           selector:@selector(pluginsDidInitialize:) 
+               name:kHGSPluginLoaderDidInitializePluginsNotification 
+             object:[HGSPluginLoader sharedPluginLoader]];
     [QSBPreferences registerDefaults];
     BOOL iconInDock
       = [[NSUserDefaults standardUserDefaults] boolForKey:kQSBIconInDockKey];
@@ -259,7 +259,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [nc removeObserver:self];
   [prefsWindowController_ release];
   [hgsDelegate_ release];
-  [plugins_ release];
   [searchWindowController_ release];
   [super dealloc];
 }
@@ -688,12 +687,25 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 #pragma mark Plugins & Extensions Management
 
 - (NSArray *)plugins {
-  return [[plugins_ retain] autorelease];
+  return [[HGSPluginLoader sharedPluginLoader] plugins];
 }
 
 - (void)inventoryPlugins {
-  // Retrieve list of and configuration information for previously
-  // inventoried plug-ins and mark as undiscovered.
+  // Load up plugins
+  NSArray *errors;
+  HGSPluginLoader *pluginLoader = [HGSPluginLoader sharedPluginLoader];
+  [pluginLoader loadPluginsWithErrors:&errors];
+  for (NSDictionary *error in errors) {
+    NSString *type = [error objectForKey:kHGSPluginLoaderPluginFailureKey];
+    if (![type isEqualToString:kHGSPluginLoaderPluginFailedUnknownPluginType]) {
+      HGSLogDebug(@"Unable to load %@ (%@)", 
+                  [error objectForKey:kHGSPluginLoaderPluginPathKey], type);
+    }
+  }
+  // Load up and install accounts
+  [self inventoryAccounts];
+  // Retrieve list of configuration information for previously
+  // inventoried plug-ins
   NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
   NSArray *pluginsFromPrefs = nil;
   NSDictionary *pluginPrefs 
@@ -701,150 +713,25 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // Check to make sure our plugin data is valid.
   if ([pluginPrefs isKindOfClass:[NSDictionary class]]) {
     NSNumber *version 
-      = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefVersionKey];
+    = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefVersionKey];
     if ([version integerValue] == kQSBPluginConfigurationPrefCurrentVersion) {
       pluginsFromPrefs 
-        = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefPluginsKey];
+      = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefPluginsKey];
     }
   }
-  // TODO(dmaclach): alert user that their prefs have been ignored.
-  // Rediscover plug-ins by scanning all plugin folders.
-  NSArray *pluginPaths = [hgsDelegate_ pluginFolders];
-  HGSPluginLoader *pluginLoader = [HGSPluginLoader sharedPluginLoader];
-  NSMutableArray *allErrors = [NSMutableArray array];
-  for (NSString *pluginPath in pluginPaths) {
-    NSArray *errors = nil;
-    [pluginLoader loadPluginsAtPath:pluginPath errors:&errors];
-    if (errors) {
-      [allErrors addObjectsFromArray:errors];
-    }
-  }
-  for (NSDictionary *error in allErrors) {
-    NSString *type = [error objectForKey:kHGSPluginLoaderPluginFailureKey];
-    if (![type isEqualToString:kHGSPluginLoaderPluginFailedUnknownPluginType]) {
-      HGSLogDebug(@"Unable to load %@ (%@)", 
-                  [error objectForKey:kHGSPluginLoaderPluginPathKey], type);
-    }
-  }
-  HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
-  NSArray *factorablePlugins = [pluginsPoint extensions];
-
-  // Installing extensions is done in this order:
-  //   1. Install account type extensions.
-  //   2. Install previously setup accounts from our preferences.  This 
-  //      step relies on the account types having been installed in Step 1.
-  //   3. Factor all factorable extensions.  This step relies on accounts
-  //      having been reconstituted in Step 2.
-  //   4. Install all non-account type extensions.
-
-  // Step 1: Install the account type extensions.
-  [factorablePlugins makeObjectsPerformSelector:@selector(installAccountTypes)];
-
-  // Step 2: Reconstitute all previously set up accounts.
-  [self inventoryAccounts];
-  
-  // Step 3: Factor the new extensions now that we know all available accounts.
-  [factorablePlugins makeObjectsPerformSelector:@selector(factorProtoExtensions)];
-
-  // Step 4: Go through our plugins and set enabled states based on what
-  // the user has saved off in their prefs.
-  for (HGSPlugin *plugin in factorablePlugins) {
-    NSString *pluginIdentifier = [plugin identifier];
-    NSDictionary *oldPluginDict = nil;
-    for (oldPluginDict in pluginsFromPrefs) {
-      NSString *oldID = [oldPluginDict objectForKey:kHGSBundleIdentifierKey];
-      if ([oldID isEqualToString:pluginIdentifier]) {
-        break;
-      }
-    }
-    // If a user has turned off a plugin, then all extensions associated
-    // with that plugin are turned off. New plugins are on by default.
-    BOOL pluginEnabled = YES;
-    if (oldPluginDict) {
-      pluginEnabled 
-        = [[oldPluginDict objectForKey:kHGSPluginEnabledKey] boolValue];
-    }
-    [plugin setEnabled:pluginEnabled];
-  
-    // Now run through all the extensions in the plugin. Due to us moving
-    // code around an extension may have moved from one plugin to another.
-    // So even though we found a matching plugin above, we will search
-    // through all the plugins looking for a match.
-    NSArray *protoExtensions = [plugin protoExtensions];
-    for (HGSProtoExtension *protoExtension in protoExtensions) {
-      BOOL protoExtensionEnabled = YES;
-      NSString *protoExtensionID = [protoExtension identifier];
-      NSDictionary *oldExtensionDict = nil;
-      for (oldPluginDict in pluginsFromPrefs) {
-        NSArray *oldExtensionDicts 
-          = [oldPluginDict objectForKey:kHGSPluginExtensionsDicts];
-        for (oldExtensionDict in oldExtensionDicts) {
-          NSString *oldID 
-            = [oldExtensionDict objectForKey:kHGSExtensionIdentifierKey];
-          if ([oldID isEqualToString:protoExtensionID]) {
-            protoExtensionEnabled 
-              = [[oldExtensionDict objectForKey:kHGSExtensionEnabledKey] boolValue];
-            break;
-          }
-        }
-        if (oldExtensionDict) break;
-      }
-      // Due to us moving code around, an extension may have moved from one
-      // plugin to another
-      if (oldExtensionDict) {
-        [protoExtension setEnabled:protoExtensionEnabled];
-      }
-    }
-    if ([plugin isEnabled]) {
-      [plugin install];
-    }
-  }
-  [self setPlugins:factorablePlugins];
+  // Install our plugins and enable them based on our previously stored
+  // configuration.
+  [pluginLoader installAndEnablePluginsBasedOnPluginsState:pluginsFromPrefs];
 }
 
-- (void)setPlugins:(NSArray *)plugins {
-  [self stopObservingProtoExtensions];
-  [plugins_ autorelease];
-  plugins_ = [plugins retain];
-  [self observeProtoExtensions];
-  [self updatePluginPreferences];
-}
-
-- (void)updatePluginPreferences {
-  // Save these plugins in preferences. All we care about at this point is
-  // the enabled state of the plugin and it's extensions.
-  NSArray *plugins = [self plugins];
-  NSUInteger count = [plugins count];
-  NSMutableArray *archivablePlugins = [NSMutableArray arrayWithCapacity:count];
-  for (HGSPlugin *plugin in plugins) {
-    NSArray *protoExtensions = [plugin protoExtensions];
-    count = [protoExtensions count];
-    NSMutableArray *archivableExtensions = [NSMutableArray arrayWithCapacity:count];
-    for (HGSProtoExtension *protoExtension in protoExtensions) {
-      NSNumber *isEnabled = [NSNumber numberWithBool:[protoExtension isEnabled]];
-      NSString *identifier = [protoExtension identifier];
-      NSDictionary *protoValues = [NSDictionary dictionaryWithObjectsAndKeys:
-                                   identifier, kHGSExtensionIdentifierKey,
-                                   isEnabled, kHGSExtensionEnabledKey,
-                                   nil];
-      [archivableExtensions addObject:protoValues];
-    }
-    NSNumber *isEnabled = [NSNumber numberWithBool:[plugin isEnabled]];
-    NSString *identifier = [plugin identifier];
-    NSDictionary *archiveValues
-      = [NSDictionary dictionaryWithObjectsAndKeys:
-         identifier, kHGSBundleIdentifierKey,
-         isEnabled, kHGSPluginEnabledKey,
-         archivableExtensions, kHGSPluginExtensionsDicts,
-         nil];
-    [archivablePlugins addObject:archiveValues];
-  }
+- (void)updatePluginsPreferences {
+  NSArray *pluginState = [[HGSPluginLoader sharedPluginLoader] pluginsState];
   NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
   NSNumber *version 
     = [NSNumber numberWithInteger:kQSBPluginConfigurationPrefCurrentVersion];
   NSDictionary *pluginsDict 
     = [NSDictionary dictionaryWithObjectsAndKeys:
-       archivablePlugins, kQSBPluginConfigurationPrefPluginsKey,
+       pluginState, kQSBPluginConfigurationPrefPluginsKey,
        version, kQSBPluginConfigurationPrefVersionKey,
        nil];
   [standardDefaults setObject:pluginsDict
@@ -886,22 +773,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
 }
 
-- (void)protoExtensionsValueChanged:(GTMKeyValueChangeNotification *)note {
-  [self willChangeValueForKey:kQSBSourceExtensionsKVOKey];
-  [self didChangeValueForKey:kQSBSourceExtensionsKVOKey];
-}
 
 #pragma mark Account Management
 
 - (NSArray *)accounts {
   HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
-  NSArray *accounts = [accountsPoint extensions];
-  // TODO(dmaclach): get rid of this once we separate the concept of accounts
-  // and account types. Right now an account without a "userName" is an
-  // account type that we don't want to show the user.
-  NSPredicate *pred = [NSPredicate predicateWithFormat:@"userName != NULL"];
-  accounts = [accounts filteredArrayUsingPredicate:pred];
-  return accounts;
+  return [accountsPoint extensions];
 }
 
 - (void)inventoryAccounts {
@@ -915,10 +792,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
   HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
   [accountsPoint addAccountsFromArray:accounts];
-  [self updateAccountsPrefs];  // In case any accounts have been updated.
+  [self updateAccountsPreferences];  // In case any accounts have been updated.
 }
 
-- (void)updateAccountsPrefs {
+- (void)updateAccountsPreferences {
   // Update preferences to current account knowledge.
   NSArray *archivableAccounts
     = [[HGSExtensionPoint accountsPoint] accountsAsArray]; 
@@ -1011,7 +888,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                                           forKey:kQSBBeenLaunchedPrefKey];
   
   // Uninstall all extensions.
-  [plugins_ makeObjectsPerformSelector:@selector(uninstall)];
+  [[self plugins] makeObjectsPerformSelector:@selector(uninstall)];
 }
 
 // Reroute certain properties off to our delegate for scripting purposes.
@@ -1079,12 +956,39 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)pluginOrExtensionDidChangeEnabled:(NSNotification*)notification {
   // A plugin or extension has been enabled or disabled.  Update our prefs.
-  [self updatePluginPreferences];
+  [self updatePluginsPreferences];
+}
+
+- (void)pluginsDidInitialize:(NSNotification *)notification {
+  HGSPluginLoader *loader = [notification object];
+  [loader gtm_addObserver:self
+               forKeyPath:@"plugins"
+                 selector:@selector(pluginsValueChanged:)
+                 userInfo:nil
+                  options:(NSKeyValueObservingOptionPrior 
+                           | NSKeyValueObservingOptionInitial)];
+}
+
+- (void)pluginsValueChanged:(GTMKeyValueChangeNotification *)notification {
+  NSNumber *prior = [[notification change]
+                     objectForKey:NSKeyValueChangeNotificationIsPriorKey];
+  
+  if ([prior boolValue]) {
+    [self stopObservingProtoExtensions];
+  } else {
+    [self observeProtoExtensions];
+    [self updatePluginsPreferences];
+  }
+}
+
+- (void)protoExtensionsValueChanged:(GTMKeyValueChangeNotification *)note {
+  [self willChangeValueForKey:kQSBSourceExtensionsKVOKey];
+  [self didChangeValueForKey:kQSBSourceExtensionsKVOKey];
 }
 
 - (void)didAddOrRemoveAccount:(NSNotification *)notification {
   [self willChangeValueForKey:@"accounts"];
-  [self updateAccountsPrefs];
+  [self updateAccountsPreferences];
   [self didChangeValueForKey:@"accounts"];
 }
 

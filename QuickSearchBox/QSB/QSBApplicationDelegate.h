@@ -59,7 +59,6 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
   ProcessSerialNumber otherQSBPSN_;  // The psn of any other qsb that is running
   QSBPreferenceWindowController *prefsWindowController_;
   QSBHGSDelegate *hgsDelegate_;
-  NSArray *plugins_;  // All available plugins, enabled or not.
   QSBUserMessenger *userMessenger_;
 }
 

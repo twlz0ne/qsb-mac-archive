@@ -66,6 +66,7 @@
 @interface HGSPluginLoader : NSObject {
  @private
   __weak id<HGSDelegate> delegate_;
+  NSArray *plugins_;
   
   /*!
    Extension map maps a particular extension (.hgs) to a type of plugin to
@@ -97,7 +98,9 @@
   NSMutableDictionary *pluginSignatureInfo_;
 }
 
-@property (readwrite, assign) id<HGSDelegate> delegate;
+@property (readwrite, assign, nonatomic) id<HGSDelegate> delegate;
+@property (readwrite, retain) NSArray *plugins;
+
 /*!
   Return the shared plugin Loader.
 */
@@ -109,10 +112,21 @@
 - (void)registerClass:(Class)cls forExtensions:(NSArray *)extensions;
 
 /*!
-  Given a path to a folder where plugins may live, identify all plugins and
-  their sources and actions.
+ Identify all plugins and their sources and actions.
 */
-- (void)loadPluginsAtPath:(NSString*)pluginsPath errors:(NSArray **)errors;
+- (void)loadPluginsWithErrors:(NSArray **)errors;
+
+/*! 
+ Install plugins and enable them based on a state stored previously with
+ pluginsState.
+*/
+- (void)installAndEnablePluginsBasedOnPluginsState:(NSArray *)state;
+
+/*! 
+ Get a state for the plugins which can be stored away and used to restore
+ the plugins at a later time using  installAndEnablePluginsBasedOnPluginsState:.
+*/
+- (NSArray*)pluginsState;
 @end
 
 /*!
@@ -154,6 +168,12 @@ extern NSString *const kHGSPluginLoaderWillLoadPluginsNotification;
  of dictionaries representing errors loading plugins.
 */
 extern NSString *const kHGSPluginLoaderDidLoadPluginsNotification;
+
+/*!
+ Notification that the plugins are all initialized and ready.
+ Object is the plugin loader.
+*/
+extern NSString *const kHGSPluginLoaderDidInitializePluginsNotification;
 
 /*!
  Notification that the loader will load a plugin

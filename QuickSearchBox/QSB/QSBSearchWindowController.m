@@ -303,14 +303,20 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
              name:NSWindowDidBecomeKeyNotification
            object:nil];
 
+  HGSPluginLoader *sharedLoader = [HGSPluginLoader sharedPluginLoader];
   [nc addObserver:self 
          selector:@selector(pluginWillLoad:) 
              name:kHGSPluginLoaderWillLoadPluginNotification 
-           object:nil];
+           object:sharedLoader];
   [nc addObserver:self 
          selector:@selector(pluginsDidLoad:) 
              name:kHGSPluginLoaderDidLoadPluginsNotification 
-           object:nil];
+           object:sharedLoader];
+  
+  [nc addObserver:self 
+         selector:@selector(pluginsDidInitialize:) 
+             name:kHGSPluginLoaderDidInitializePluginsNotification 
+           object:sharedLoader];
   
   // Support spaces on Leopard. 
   // http://b/issue?id=648841
@@ -1366,11 +1372,21 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (void)pluginsDidLoad:(NSNotification *)notification {
+  NSString *initializing = HGSLocalizedString(@"Initializing Plugins…",
+                                              @"A string shown at launchtime "
+                                              @"to denote that we are "
+                                              @"initializing the plugins.");
+  [searchTextField_ setStringValue:initializing];
+  [searchTextField_ displayIfNeeded];
+}
+
+- (void)pluginsDidInitialize:(NSNotification *)notification {
   [searchTextField_ setStringValue:@""];
   [searchTextField_ displayIfNeeded];
   [searchTextField_ setEnabled:YES];
   [[searchTextField_ window] makeFirstResponder:searchTextField_];
 }
+
 
 #pragma mark Animations
 

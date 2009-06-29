@@ -359,5 +359,8 @@
 /* A string shown at launchtime to denote that QSB is starting up. */
 "Starting up…" = "Starting up…";
 
+/* A string shown at launchtime to denote that we are initializing the plugins. */
+"Initializing Plugins…" = "Initializing Plugins…";
+
 /* The placeholder text for the search field in the "Searchable Items" tab in the preferences dialog. */
 "Search" = "Search";
