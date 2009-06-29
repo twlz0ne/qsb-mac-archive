@@ -174,12 +174,11 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     }
     NSURL* docURL = [NSURL URLWithString:docURLString];
     serviceTicket_
-      = [[docService_ fetchDocsFeedWithURL:docURL
-                                  delegate:self
-                         didFinishSelector:@selector(serviceTicket:
-                                                     finishedWithObject:)
-                           didFailSelector:@selector(serviceTicket:
-                                                     failedWithError:)]
+      = [[docService_ fetchFeedWithURL:docURL
+                              delegate:self
+                     didFinishSelector:@selector(serviceTicket:
+                                                 finishedWithObject:
+                                                 error:)]
          retain];
   }
 }
@@ -228,73 +227,73 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 }
 
 - (void)serviceTicket:(GDataServiceTicket *)ticket
-   finishedWithObject:(GDataFeedDocList *)docList {
+   finishedWithObject:(GDataFeedDocList *)docList
+                error:(NSError *)error {
   currentlyFetching_ = NO;
-  [self clearResultIndex];
-
-  NSEnumerator* docEnumerator = [[docList entries] objectEnumerator];
-  GDataEntryDocBase* doc;
-  while ((doc = [docEnumerator nextObject])) {
-    [self indexDoc:doc];
-  }
-}
-
-- (void)serviceTicket:(GDataServiceTicket *)ticket
-      failedWithError:(NSError *)error {
-   currentlyFetching_ = NO;
-  NSInteger errorCode = [error code];
-  if (errorCode == kGDataBadAuthentication) {
-    // If the login credentials are bad, don't keep trying.
-    [updateTimer_ invalidate];
-    updateTimer_ = nil;
-    // Tickle the account so that if the preferences window is showing
-    // the user will see the proper account status.
-    [account_ authenticate];
-  }
-  NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
-  NSTimeInterval timeSinceLastErrorReport
-    = currentTime - previousErrorReportingTime_;
-  if (timeSinceLastErrorReport > kErrorReportingInterval) {
-    previousErrorReportingTime_ = currentTime;
-    NSString *errorSummary
-      = HGSLocalizedString(@"Google Docs fetch problem.", 
-                           @"A dialog title for a dialog describing a Google "
-                           @"Docs data fetch problem.");
-    NSString *errorString = nil;
-    if (errorCode == kGDataBadAuthentication) {
-      NSString *errorFormat
-        = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
-                             @"password.", 
-                             @"A dialog lable denoting that authentication for "
-                             @"account with username %@ failed");
-      errorString = [NSString stringWithFormat:errorFormat,
-                     [account_ displayName]];
-      
-    } else {
-      NSString *errorFormat 
-        = HGSLocalizedString(@"Fetch for '%1$@' failed. (%2$d)",
-                             @"A dialog label denoting that an attempt to "
-                             @"fetch data with the account for username $1$@ "
-                             @"failed with errorcode %2$d");
-      errorString = [NSString stringWithFormat:errorFormat,
-                     [account_ displayName], [error code]];
+  if (!error) {
+    [self clearResultIndex];
+    
+    NSEnumerator* docEnumerator = [[docList entries] objectEnumerator];
+    GDataEntryDocBase* doc;
+    while ((doc = [docEnumerator nextObject])) {
+      [self indexDoc:doc];
     }
-    NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    NSDictionary *messageDict
-      = [NSDictionary dictionaryWithObjectsAndKeys:
-         errorSummary, kHGSSummaryMessageKey,
-         errorString, kHGSDescriptionMessageKey,
-         successCode, kHGSSuccessCodeMessageKey,
-         nil];
-    [nc postNotificationName:kHGSUserMessageNotification 
-                      object:self
-                    userInfo:messageDict];
+  } else {
+    NSInteger errorCode = [error code];
+    if (errorCode == kGDataBadAuthentication) {
+      // If the login credentials are bad, don't keep trying.
+      [updateTimer_ invalidate];
+      updateTimer_ = nil;
+      // Tickle the account so that if the preferences window is showing
+      // the user will see the proper account status.
+      [account_ authenticate];
+    }
+    NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
+    NSTimeInterval timeSinceLastErrorReport
+      = currentTime - previousErrorReportingTime_;
+    if (timeSinceLastErrorReport > kErrorReportingInterval) {
+      previousErrorReportingTime_ = currentTime;
+      NSString *errorSummary
+        = HGSLocalizedString(@"Google Docs fetch problem.", 
+                             @"A dialog title for a dialog describing a Google "
+                             @"Docs data fetch problem.");
+      NSString *errorString = nil;
+      if (errorCode == kGDataBadAuthentication) {
+        NSString *errorFormat
+          = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
+                               @"password.", 
+                               @"A dialog lable denoting that authentication "
+                               @"for account with username %@ failed");
+        errorString = [NSString stringWithFormat:errorFormat,
+                       [account_ displayName]];
+        
+      } else {
+        NSString *errorFormat 
+          = HGSLocalizedString(@"Fetch for '%1$@' failed. (%2$d)",
+                               @"A dialog label denoting that an attempt to "
+                               @"fetch data with the account for username $1$@ "
+                               @"failed with errorcode %2$d");
+        errorString = [NSString stringWithFormat:errorFormat,
+                       [account_ displayName], [error code]];
+      }
+      NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
+      NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+      NSDictionary *messageDict
+        = [NSDictionary dictionaryWithObjectsAndKeys:
+           errorSummary, kHGSSummaryMessageKey,
+           errorString, kHGSDescriptionMessageKey,
+           successCode, kHGSSuccessCodeMessageKey,
+           nil];
+      [nc postNotificationName:kHGSUserMessageNotification 
+                        object:self
+                      userInfo:messageDict];
+    }
+    HGSLogDebug(@"HGSGoogleDocSource doc fetcher failed: error=%d, "
+                @"userName=%@.",
+                [error code], [account_ displayName]);    
   }
-  HGSLogDebug(@"HGSGoogleDocSource doc fetcher failed: error=%d, "
-              @"userName=%@.",
-              [error code], [account_ displayName]);
 }
+
 
 #pragma mark -
 #pragma mark Docs Info Extraction

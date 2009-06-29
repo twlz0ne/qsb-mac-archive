@@ -231,12 +231,11 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                                    kind:nil
                                                  access:nil];
     GDataServiceTicket *albumFetchTicket
-      = [picasawebService_ fetchPhotoFeedWithURL:albumFeedURL
-                                        delegate:self
-                               didFinishSelector:@selector(albumInfoFetcher:
-                                                           finishedWithAlbum:)
-                                 didFailSelector:@selector(albumInfoFetcher:
-                                                           failedWithError:)];
+      = [picasawebService_ fetchFeedWithURL:albumFeedURL
+                                   delegate:self
+                          didFinishSelector:@selector(albumInfoFetcher:
+                                                      finishedWithAlbum:
+                                                      error:)];
     [activeTickets_ addObject:albumFetchTicket];
   }
 }
@@ -355,12 +354,11 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     NSURL *photoInfoFeedURL = [[album feedLink] URL];
     if (photoInfoFeedURL) {
       GDataServiceTicket *photoInfoTicket
-        = [picasawebService_ fetchPhotoFeedWithURL:photoInfoFeedURL
-                                          delegate:self
-                                 didFinishSelector:@selector(photoInfoFetcher:
-                                                             finishedWithPhoto:)
-                                   didFailSelector:@selector(photoInfoFetcher:
-                                                             failedWithError:)];
+        = [picasawebService_ fetchFeedWithURL:photoInfoFeedURL
+                                     delegate:self
+                            didFinishSelector:@selector(photoInfoFetcher:
+                                                        finishedWithPhoto:
+                                                        error:)];
       [photoInfoTicket setProperty:album forKey:kPhotosAlbumKey];
       [activeTickets_ addObject:photoInfoTicket];
     }
@@ -368,31 +366,29 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 }
 
 - (void)albumInfoFetcher:(GDataServiceTicket *)ticket
-       finishedWithAlbum:(GDataFeedPhotoUser *)albumList {
+       finishedWithAlbum:(GDataFeedPhotoUser *)albumList
+                   error:(NSError *)error {
   [activeTickets_ removeObject:ticket];
-  [self clearResultIndex];
-  
-  for (GDataEntryPhotoAlbum* album in [albumList entries]) {
-    [self indexAlbum:album];
-  }
-}
-
-- (void)albumInfoFetcher:(GDataServiceTicket *)ticket
-         failedWithError:(NSError *)error {
-  [activeTickets_ removeObject:ticket];
-
-  // If nothing has changed since we last checked then don't have a cow.
-  NSInteger errorCode = [error code];
-  if (errorCode != kGDataHTTPFetcherStatusNotModified) {
-    if (errorCode == kGDataBadAuthentication) {
-      // If the login credentials are bad, don't keep trying.
-      [updateTimer_ invalidate];
-      updateTimer_ = nil;
+  if (!error) {
+    [self clearResultIndex];
+    
+    for (GDataEntryPhotoAlbum* album in [albumList entries]) {
+      [self indexAlbum:album];
     }
-    NSString *fetchType = HGSLocalizedString(@"album", 
-                                             @"A label denoting a Picasaweb "
-                                             @"Photo Album");
-    [self reportErrorForFetchType:fetchType errorCode:errorCode];
+  } else {
+    // If nothing has changed since we last checked then don't have a cow.
+    NSInteger errorCode = [error code];
+    if (errorCode != kGDataHTTPFetcherStatusNotModified) {
+      if (errorCode == kGDataBadAuthentication) {
+        // If the login credentials are bad, don't keep trying.
+        [updateTimer_ invalidate];
+        updateTimer_ = nil;
+      }
+      NSString *fetchType = HGSLocalizedString(@"album", 
+                                               @"A label denoting a Picasaweb "
+                                               @"Photo Album");
+      [self reportErrorForFetchType:fetchType errorCode:errorCode];
+    }
   }
 }
 
@@ -505,36 +501,34 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 }
 
 - (void)photoInfoFetcher:(GDataServiceTicket *)ticket
-       finishedWithPhoto:(GDataFeedPhotoAlbum *)photoFeed {
+       finishedWithPhoto:(GDataFeedPhotoAlbum *)photoFeed
+                   error:(NSError *)error {
   [activeTickets_ removeObject:ticket];
-  
-  NSArray *photoList = [photoFeed entries];
-  for (GDataEntryPhoto *photo in photoList) {
-    GDataEntryPhotoAlbum *album = [ticket propertyForKey:kPhotosAlbumKey];
-    [self indexPhoto:photo withAlbum:album];
-  }
-}
-
-- (void)photoInfoFetcher:(GDataServiceTicket *)ticket
-         failedWithError:(NSError *)error {
-  [activeTickets_ removeObject:ticket];
-  // If nothing has changed since we last checked then don't have a cow.
-  NSInteger errorCode = [error code];
-  if (errorCode != kGDataHTTPFetcherStatusNotModified) {
-    if (errorCode == kGDataBadAuthentication) {
-      // If the login credentials are bad, don't keep trying.
-      [updateTimer_ invalidate];
-      updateTimer_ = nil;
-      // Tickle the account so that if the user happens to have the preference
-      // window open showing either the account or the search source they
-      // will immediately see that the account status has changed.
-      [account_ authenticate];
+  if (!error) {
+    NSArray *photoList = [photoFeed entries];
+    for (GDataEntryPhoto *photo in photoList) {
+      GDataEntryPhotoAlbum *album = [ticket propertyForKey:kPhotosAlbumKey];
+      [self indexPhoto:photo withAlbum:album];
     }
-    NSString *fetchType = HGSLocalizedString(@"photo", 
-                                             @"A label denoting a Picasaweb "
-                                             @"photo");
-    [self reportErrorForFetchType:fetchType errorCode:errorCode];
-  }
+  } else {
+    // If nothing has changed since we last checked then don't have a cow.
+    NSInteger errorCode = [error code];
+    if (errorCode != kGDataHTTPFetcherStatusNotModified) {
+      if (errorCode == kGDataBadAuthentication) {
+        // If the login credentials are bad, don't keep trying.
+        [updateTimer_ invalidate];
+        updateTimer_ = nil;
+        // Tickle the account so that if the user happens to have the preference
+        // window open showing either the account or the search source they
+        // will immediately see that the account status has changed.
+        [account_ authenticate];
+      }
+      NSString *fetchType = HGSLocalizedString(@"photo", 
+                                               @"A label denoting a Picasaweb "
+                                               @"photo");
+      [self reportErrorForFetchType:fetchType errorCode:errorCode];
+    }
+  }    
 }
 
 - (void)reportErrorForFetchType:(NSString *)fetchType
