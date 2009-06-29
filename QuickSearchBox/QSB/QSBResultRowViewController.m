@@ -31,29 +31,46 @@
 //
 
 #import "QSBResultRowViewController.h"
+#import "Vermilion/Vermilion.h"
+#import "GTMMethodCheck.h"
 
 @implementation QSBResultRowViewController
-- (id)initWithNibName:(NSString *)name
-           controller:(QSBSearchViewController *)searchViewController {
-  if ((self = [super initWithNibName:name
+
+// We use a private method here, so let's check and make sure it exists
+GTM_METHOD_CHECK(NSViewController, _setTopLevelObjects:);
+
+@synthesize searchViewController = searchViewController_;
+
+- (id)initWithNib:(NSNib *)nib
+       controller:(QSBSearchViewController *)searchViewController {
+  // Instead of passing a name and bundle into NSViewController, we actually
+  // cache the nib ourselves.
+  if ((self = [super initWithNibName:nil
                               bundle:nil])) {
-    [self setSearchViewController:searchViewController];
+    searchViewController_ = [searchViewController retain];
+    nib_ = [nib retain];
   }
   return self;
 }
 
 - (void)dealloc {
   [searchViewController_ release];
+  [nib_ release];
   [super dealloc];
 }
 
-- (void)setSearchViewController:(QSBSearchViewController *)searchViewController {
-  [searchViewController_ autorelease];
-  searchViewController_ = [searchViewController retain];
-}
-
-- (QSBSearchViewController *)searchViewController {
-  return [[searchViewController_ retain] autorelease];
+-(void)loadView {
+  // Instead of loading the view by name and bundle, we use the nib we already
+  // have cached.
+  NSArray *topLevelObjects;
+  BOOL loaded = [nib_ instantiateNibWithOwner:self 
+                              topLevelObjects:&topLevelObjects];
+  if (!loaded) {
+    HGSLogDebug(@"Unable to instantiate %@ for %@", nib_, [self class]);
+  } else {
+    [self performSelector:NSSelectorFromString(@"_setTopLevelObjects:") 
+               withObject:topLevelObjects];
+  }
 }
 
 @end

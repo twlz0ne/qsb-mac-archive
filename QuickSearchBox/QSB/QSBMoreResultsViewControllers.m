@@ -33,6 +33,15 @@
 #import "QSBMoreResultsViewControllers.h"
 #import "QSBTableResult.h"
 
+#define QSBVIEWCONTROLLER_INIT(name) \
+  static NSNib *nib = nil; \
+  if (!nib) { \
+    nib = [[NSNib alloc] initWithNibNamed:name \
+                                   bundle:nil];\
+  } \
+  return [super initWithNib:nib \
+                 controller:controller];
+
 @implementation QSBMoreDetailedRowViewController
 - (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result {
   return [result titleSourceURLString];
@@ -41,42 +50,36 @@
 
 @implementation QSBMoreStandardRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"MoreStandardResultView" 
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"MoreStandardResultView")
 }
 @end
 
 @implementation QSBMoreCategoryRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"MoreCategoryResultView" 
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"MoreCategoryResultView")
 }
 @end
 
 @implementation QSBMoreSeparatorRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"MoreSeparatorResultView" 
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"MoreSeparatorResultView")
 }
 @end
 
 @implementation QSBMoreFoldRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"MoreFoldResultView" 
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"MoreFoldResultView")
 }
 @end
 
 @implementation QSBMoreShowAllTableRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"MoreShowAllTableResultView" 
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"MoreShowAllTableResultView")
 }
 @end
 
 @implementation QSBMorePlaceHolderRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"MorePlaceHolderResultView" 
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"MorePlaceHolderResultView")
 }
 @end

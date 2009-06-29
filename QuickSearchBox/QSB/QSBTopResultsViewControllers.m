@@ -33,11 +33,19 @@
 #import "QSBTopResultsViewControllers.h"
 #import "QSBTableResult.h"
 
+#define QSBVIEWCONTROLLER_INIT(name) \
+  static NSNib *nib = nil; \
+  if (!nib) { \
+    nib = [[NSNib alloc] initWithNibNamed:name \
+                                   bundle:nil];\
+  } \
+  return [super initWithNib:nib \
+                 controller:controller];
+
 @implementation QSBTopStandardRowViewController
 
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"TopStandardResultView"
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"TopStandardResultView")
 }
 
 - (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result {
@@ -48,41 +56,36 @@
 
 @implementation QSBTopSeparatorRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"TopSeparatorResultView" 
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"TopSeparatorResultView")
 }
 @end
 
 @implementation QSBTopSearchForRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"TopSearchForResultView" 
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"TopSearchForResultView")
 }
 @end
 
 @implementation QSBTopSearchIconViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"TopSearchIconResultView" 
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"TopSearchIconResultView")
 }
 @end
 
 @implementation QSBTopFoldRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"TopFoldResultView" controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"TopFoldResultView")
 }
 @end
 
 @implementation QSBTopSearchStatusRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"TopSearchStatusResultView" 
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"TopSearchStatusResultView")
 }
 @end
 
 @implementation QSBTopMessageRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
-  return [super initWithNibName:@"TopMessageResultView" 
-                     controller:controller];
+  QSBVIEWCONTROLLER_INIT(@"TopMessageResultView")
 }
 @end

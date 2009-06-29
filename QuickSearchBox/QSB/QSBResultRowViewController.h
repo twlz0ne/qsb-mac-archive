@@ -41,19 +41,12 @@
 @interface QSBResultRowViewController : NSViewController {
  @private
   QSBSearchViewController *searchViewController_;
+  NSNib *nib_;
 }
 
+@property (readonly, nonatomic) QSBSearchViewController *searchViewController;
+
 // Designated initializer.
-- (id)initWithNibName:(NSString *)name
-           controller:(QSBSearchViewController *)searchViewController;
-
-// After instantiating and initing this class you need to set its
-// controller (to the query controller) so that the action
-// can be forwarded for handling.  Call this function if you do
-// not use the designated initializer.
-- (void)setSearchViewController:(QSBSearchViewController *)queryController;
-
-// Reeturn our query controller.
-- (QSBSearchViewController *)searchViewController;
-
+- (id)initWithNib:(NSNib *)nib_
+       controller:(QSBSearchViewController *)searchViewController;
 @end
