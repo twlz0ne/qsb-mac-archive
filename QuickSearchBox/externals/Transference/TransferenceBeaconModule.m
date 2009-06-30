@@ -88,10 +88,9 @@
 #pragma mark -- Private Methods --
 - (NSDictionary *)searchSourceDictionaryForObject:(id)searchObject; {
   NSDictionary *dict = nil;
-  if ([searchObject isKindOfClass:[HGSCallbackSearchSource class]]) {
-    searchObject = [searchObject valueForKey:@"callbackSource_"];
-    NSString *searchObjectClass = NSStringFromClass([searchObject class]);
-
+  if ([searchObject isKindOfClass:[HGSSearchOperation class]]) {
+    HGSSearchSource *source = (HGSSearchSource *)[searchObject source];
+    NSString *searchObjectClass = [source valueForKey:@"identifier_"];
     NSDate *date = [NSDate date];
     dict = [NSDictionary dictionaryWithObjectsAndKeys:searchObjectClass,
             kTransferenceModuleName, date, kTransferenceModuleTime, nil];
@@ -180,7 +179,7 @@
     // The server currently runs in the same thread as the BeaconModule, but if
     // we increase the work the server has to do we may want to spin out another
     // thread.
-    // TODO: (krisr) if we have the server run in another thread we will need
+    // TODO: If we have the server run in another thread we will need
     // to make all of the getters and setters thread safe.
     [server_ setDelegate:self];
   }
