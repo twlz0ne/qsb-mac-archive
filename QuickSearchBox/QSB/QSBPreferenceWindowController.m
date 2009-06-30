@@ -72,6 +72,21 @@ static NSString *const kQSBBackgroundPref = @"backgroundColor";
 static NSString *const kQSBBackgroundGlossyPref = @"backgroundIsGlossy";
 static const NSInteger kCustomColorTag = -1;
 
+// Some internal functions that we weakly link against and check before using
+typedef NSInteger CGSConnection;
+typedef NSInteger CGSWindow;
+typedef NSInteger CGSWorkspace;
+
+extern CGSConnection _CGSDefaultConnection(void) WEAK_IMPORT_ATTRIBUTE;
+extern OSStatus CGSGetWorkspace(const CGSConnection cid, 
+                                CGSWorkspace *workspace) WEAK_IMPORT_ATTRIBUTE;
+extern OSStatus CGSGetWindowWorkspace(const CGSConnection cid, 
+                                      const CGSWindow wid, 
+                                      CGSWorkspace *workspace) WEAK_IMPORT_ATTRIBUTE;
+extern OSStatus CGSMoveWorkspaceWindowList(const CGSConnection connection, 
+                                           CGSWindow *wids, 
+                                           NSInteger count,
+                                           CGSWorkspace toWorkspace) WEAK_IMPORT_ATTRIBUTE;
 
 @interface NSColor (QSBColorRendering)
 
@@ -303,8 +318,36 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 }
 
 - (IBAction)showPreferences:(id)sender {
-  [NSApp activateIgnoringOtherApps:YES];
   NSWindow *prefWindow = [self window];
+  // This is a little sketchy as we are using private APIs from Apple, but
+  // AFAIK there is no other way to do this. This makes sure that the 
+  // preferences open up in the current space, and doesn't jump us around
+  // while using QSB. This is a privilege, not a right, so if anything
+  // looks skanky we abort and fall back to the old space switching.
+  if (_CGSDefaultConnection && CGSGetWorkspace 
+      && CGSGetWindowWorkspace && CGSMoveWorkspaceWindowList) { 
+    NSInteger windowNumber = [prefWindow windowNumber];
+    if (windowNumber != -1) {
+      CGSConnection connection = _CGSDefaultConnection();
+      CGSWorkspace currentWorkspace, windowWorkspace;
+      OSStatus status = CGSGetWorkspace(connection, &currentWorkspace);
+      if (status == noErr) {
+        status = CGSGetWindowWorkspace(connection, windowNumber, 
+                                       &windowWorkspace);
+        if (status == noErr && currentWorkspace != windowWorkspace) {
+          status = CGSMoveWorkspaceWindowList(connection, &windowNumber, 
+                                              1, currentWorkspace);
+        }
+      }
+    }
+  } else{
+    HGSLogDebug(@"Unable to access weak symbols _CGSDefaultConnection:%p "
+                @"CGSGetWorkspace:%p CGSGetWindowWorkspace:%p "
+                @"CGSMoveWorkspaceWindowList:%p", 
+                _CGSDefaultConnection, CGSGetWorkspace, 
+                CGSGetWindowWorkspace, CGSMoveWorkspaceWindowList);
+  }
+  [NSApp activateIgnoringOtherApps:YES];
   [prefWindow center];
   [prefWindow makeKeyAndOrderFront:nil];
   if (prefsColorWellWasShowing_) {
