@@ -117,11 +117,11 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
       if (path) {
         placeholderIcon_ = [[NSImage alloc] initByReferencingFile:path];
       } else {
-        HGSLogDebug(@"PicasaPlaceholder.icns missing from PicasawebSource. "
+        HGSLogDebug(@"PicasaPlaceholder.icns missing from . "
                     @"The generic placeholder will be used instead.");
       }
     } else {
-      HGSLogDebug(@"Missing account identifier for HGSGoogleDocsSource '%@'",
+      HGSLogDebug(@"Missing account identifier for PicasawebSource '%@'",
                   [self identifier]);
       [self release];
       self = nil;

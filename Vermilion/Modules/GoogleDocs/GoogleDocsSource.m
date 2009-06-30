@@ -1,5 +1,5 @@
 //
-//  HGSGoogleDocsSource.m
+//  GoogleDocsSource.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,7 +30,7 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSGoogleDocsSource.h"
+#import "GoogleDocsSource.h"
 #import <GData/GData.h>
 #import "KeychainItem.h"
 #import "QSBHGSDelegate.h"
@@ -50,7 +50,7 @@ static NSString *const kGoogleDocsSpreadsheetDocPropertyKey
   = @"GoogleDocsSpreadsheetDocPropertyKey";
 
 
-@interface HGSGoogleDocsSource ()
+@interface GoogleDocsSource ()
 
 // Used to schedule refreshes of the document cache.
 - (void)setUpPeriodicRefresh;
@@ -79,7 +79,7 @@ static NSString *const kGoogleDocsSpreadsheetDocPropertyKey
 @end
 
 
-@implementation HGSGoogleDocsSource
+@implementation GoogleDocsSource
 
 GTM_METHOD_CHECK(NSEnumerator,
                  gtm_enumeratorByMakingEachObjectPerformSelector:withObject:);
@@ -90,13 +90,13 @@ GTM_METHOD_CHECK(NSEnumerator,
     NSBundle* sourceBundle = HGSGetPluginBundle();
     NSString *docPath = [sourceBundle pathForImageResource:@"gdocdocument"];
     HGSAssert(docPath, @"Icons for 'gdocdocument' are missing from the "
-              @"HGSGoogleDocsSource bundle.");
+              @"GoogleDocsSource bundle.");
     NSString *ssPath = [sourceBundle pathForImageResource:@"gdocspreadsheet"];
     HGSAssert(ssPath, @"Icons for 'gdocspreadsheet' are missing from the "
-              @"HGSGoogleDocsSource bundle.");
+              @"GoogleDocsSource bundle.");
     NSString *presPath = [sourceBundle pathForImageResource:@"gdocpresentation"];
     HGSAssert(presPath, @"Icons for 'gdocpresentation' are missing from the "
-              @"HGSGoogleDocsSource bundle.");
+              @"GoogleDocsSource bundle.");
     NSImage *docImage 
       = [[[NSImage alloc] initByReferencingFile:docPath] autorelease];
     NSImage *ssImage
@@ -121,7 +121,7 @@ GTM_METHOD_CHECK(NSEnumerator,
                  name:kHGSAccountDidChangeNotification
                object:account_];
     } else {
-      HGSLogDebug(@"Missing account identifier for HGSGoogleDocsSource '%@'",
+      HGSLogDebug(@"Missing account identifier for GoogleDocsSource '%@'",
                   [self identifier]);
       [self release];
       self = nil;

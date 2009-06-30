@@ -1,5 +1,5 @@
 //
-//  HGSGoogleDocsSource.h
+//  GoogleDocsSource.h
 //
 //  Copyright (c) 2009 Google Inc. All rights reserved.
 //
@@ -32,7 +32,7 @@
 
 /*!
  @header
- @discussion HGSGoogleDocsSource -- Not for external use.  Exposed here
+ @discussion GoogleDocsSource -- Not for external use.  Exposed here
   for access by GoogleDocsSaveAsAction.
  */
 
@@ -46,7 +46,7 @@
 /*!
  A search source which indexes all Google Docs for a Google account.
 */
-@interface HGSGoogleDocsSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
+@interface GoogleDocsSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
   GDataServiceGoogleDocs *docService_;
   GDataServiceTicket *docServiceTicket_;

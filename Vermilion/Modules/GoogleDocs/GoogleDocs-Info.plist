@@ -22,7 +22,7 @@
 	<array>
 		<dict>
 			<key>HGSExtensionClass</key>
-			<string>HGSGoogleDocsSource</string>
+			<string>GoogleDocsSource</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.googledocs.source</string>
 			<key>HGSExtensionPoint</key>

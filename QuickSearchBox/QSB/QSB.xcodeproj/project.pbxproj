@@ -214,7 +214,6 @@
 		33D2C65D0DD1080700C1FBDC /* gdocdocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 33D2C6550DD1080700C1FBDC /* gdocdocument.icns */; };
 		33D2C65E0DD1080700C1FBDC /* gdocpresentation.icns in Resources */ = {isa = PBXBuildFile; fileRef = 33D2C6560DD1080700C1FBDC /* gdocpresentation.icns */; };
 		33D2C65F0DD1080700C1FBDC /* gdocspreadsheet.icns in Resources */ = {isa = PBXBuildFile; fileRef = 33D2C6570DD1080700C1FBDC /* gdocspreadsheet.icns */; };
-		33D2C6610DD1080700C1FBDC /* HGSGoogleDocsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 33D2C65B0DD1080700C1FBDC /* HGSGoogleDocsSource.m */; };
 		33D2C66E0DD10B5400C1FBDC /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E429DF760AC1907A00E747D8 /* Security.framework */; };
 		33D2C6700DD10B5400C1FBDC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		33D2C6840DD10B8600C1FBDC /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -405,6 +404,7 @@
 		62D5B58D0E6491B500C66E15 /* InstantMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629A95630E5F244D005AE855 /* InstantMessage.framework */; };
 		62D5B6A00E64D0DC00C66E15 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62D824BB0FD05D15002429C4 /* finance.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62D824BA0FD05D15002429C4 /* finance.icns */; };
+		62DA51450FFAA86C002B008E /* GoogleDocsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 62DA51440FFAA86C002B008E /* GoogleDocsSource.m */; };
 		62E190960EBA4A570002241B /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62E72A7B0F4F4ADE00A68815 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62E72A7A0F4F4ADE00A68815 /* Growl.framework */; };
 		62E72AB80F4F6E6700A68815 /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 62E72A7A0F4F4ADE00A68815 /* Growl.framework */; };
@@ -1776,7 +1776,6 @@
 		33D2C6550DD1080700C1FBDC /* gdocdocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = gdocdocument.icns; sourceTree = "<group>"; };
 		33D2C6560DD1080700C1FBDC /* gdocpresentation.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = gdocpresentation.icns; sourceTree = "<group>"; };
 		33D2C6570DD1080700C1FBDC /* gdocspreadsheet.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = gdocspreadsheet.icns; sourceTree = "<group>"; };
-		33D2C65B0DD1080700C1FBDC /* HGSGoogleDocsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSGoogleDocsSource.m; sourceTree = "<group>"; };
 		33D2C65C0DD1080700C1FBDC /* GoogleDocs-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleDocs-Info.plist"; sourceTree = "<group>"; };
 		33D2CAE00DD24C2500C1FBDC /* GoogleBookmarks.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleBookmarks.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		33D2CB350DD24D8D00C1FBDC /* GoogleBookmarks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleBookmarks-Info.plist"; sourceTree = "<group>"; };
@@ -1939,7 +1938,6 @@
 		62AD18A40F16B034000D380C /* QSBPathControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPathControl.h; sourceTree = "<group>"; };
 		62AD18A50F16B034000D380C /* QSBPathControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPathControl.m; sourceTree = "<group>"; };
 		62AD99140F33AB190063579F /* google_products.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = google_products.png; sourceTree = "<group>"; };
-		62B5A2980FF42B8D002B8113 /* HGSGoogleDocsSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSGoogleDocsSource.h; sourceTree = "<group>"; };
 		62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PicasaPlaceholder.icns; sourceTree = "<group>"; };
 		62D0E9640EF058950028522C /* HGSAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAccount.h; sourceTree = "<group>"; };
 		62D0E96A0EF059B40028522C /* HGSAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccount.m; sourceTree = "<group>"; };
@@ -1952,6 +1950,8 @@
 		62D9B78C0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBEditSimpleAccountWindowController.m; sourceTree = "<group>"; };
 		62D9B86B0F94E453005EF9BC /* QSBEditAccountWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBEditAccountWindowController.m; sourceTree = "<group>"; };
 		62D9B86C0F94E453005EF9BC /* QSBEditAccountWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBEditAccountWindowController.h; sourceTree = "<group>"; };
+		62DA51430FFAA86C002B008E /* GoogleDocsSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDocsSource.h; sourceTree = "<group>"; };
+		62DA51440FFAA86C002B008E /* GoogleDocsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSource.m; sourceTree = "<group>"; };
 		62E72A7A0F4F4ADE00A68815 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
 		62E72ABE0F4F6EB900A68815 /* growl-bsd-license.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "growl-bsd-license.html"; sourceTree = "<group>"; };
 		62EA8BCD0F2E7DE200C92E0B /* GoogleAccounts.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleAccounts.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3134,8 +3134,8 @@
 				8BC6E5DD0FAAC247005A0F6F /* InfoPlist.strings */,
 				8BC6E1630FAA7474005A0F6F /* Localizable.strings */,
 				62F595AF0FEB278A0076CDDA /* GoogleDocsConstants.h */,
-				62B5A2980FF42B8D002B8113 /* HGSGoogleDocsSource.h */,
-				33D2C65B0DD1080700C1FBDC /* HGSGoogleDocsSource.m */,
+				62DA51430FFAA86C002B008E /* GoogleDocsSource.h */,
+				62DA51440FFAA86C002B008E /* GoogleDocsSource.m */,
 				62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */,
 				62F594B40FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.h */,
 				62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */,
@@ -6991,12 +6991,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				33D2C6610DD1080700C1FBDC /* HGSGoogleDocsSource.m in Sources */,
 				8B8B130C0EEBADE400E543D0 /* HGSBundle.m in Sources */,
 				62F594B70FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m in Sources */,
 				62F594B80FEB06A60076CDDA /* GoogleDocsSaveAsActions.m in Sources */,
 				62F595B10FEB278A0076CDDA /* GoogleDocsConstants.m in Sources */,
 				620EC2E10FF5BFD7008666B3 /* GTMMethodCheck.m in Sources */,
+				62DA51450FFAA86C002B008E /* GoogleDocsSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

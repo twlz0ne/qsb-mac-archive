@@ -32,7 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import <GData/GData.h>
-#import "HGSGoogleDocsSource.h"
+#import "GoogleDocsSource.h"
 #import "GoogleDocsConstants.h"
 
 static NSString *const kDocumentDownloadFormat
@@ -121,8 +121,8 @@ enum {
         }
       }
       docID = [GDataUtilities stringByURLEncodingForURI:docID];
-      HGSGoogleDocsSource *source
-        = (HGSGoogleDocsSource *)[directObject source];
+      GoogleDocsSource *source
+        = (GoogleDocsSource *)[directObject source];
       GDataServiceGoogle *service = [source serviceForDoc:directObject];
       HGSAssert(service, nil);
 
