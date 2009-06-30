@@ -32,6 +32,8 @@
 
 #import "BeaconServer.h"
 
+NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
+
 @interface TransferenceBeaconModule : HGSExtension <BeaconServerProtocol> {
  @private
   NSDate *startSearchDate_;
@@ -91,9 +93,18 @@
   if ([searchObject isKindOfClass:[HGSSearchOperation class]]) {
     HGSSearchSource *source = (HGSSearchSource *)[searchObject source];
     NSString *searchObjectClass = [source valueForKey:@"identifier_"];
-    NSDate *date = [NSDate date];
-    dict = [NSDictionary dictionaryWithObjectsAndKeys:searchObjectClass,
-            kTransferenceModuleName, date, kTransferenceModuleTime, nil];
+    // In order to tabulate the times we need the identifier of the plugin.
+    // Also the plugin names need to be unique.  If a plugin doesn't have an
+    // identifier, there is nothing we can do so we don't process it.
+    if (searchObjectClass) {
+      NSDate *date = [NSDate date];
+      dict = [NSDictionary dictionaryWithObjectsAndKeys:searchObjectClass,
+              kTransferenceModuleName, date, kTransferenceModuleTime, nil];
+    } else {
+      HGSLog(@"TransferenceBeacon: encountered a search source that does not "
+             @"implement identifier_.  Unable to generate performance timing "
+             @"for this source.");
+    }
   }
   return dict;
 }
