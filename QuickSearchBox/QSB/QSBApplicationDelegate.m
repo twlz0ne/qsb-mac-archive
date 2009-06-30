@@ -343,7 +343,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   while(([NSDate timeIntervalSinceReferenceDate] - startDate) 
         < [self doubleClickTime]) {
     QSBKeyMap *currentKeyMap = [QSBKeyMap currentKeyMap];
-    if ([currentKeyMap containsAnyKeyIn:invertedHotMap]) {
+    if ([currentKeyMap containsAnyKeyIn:invertedHotMap] 
+        || GetCurrentButtonState()) {
       return;
     }
     if (![currentKeyMap containsAnyKeyIn:hotMap]) {
@@ -359,7 +360,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   while(([NSDate timeIntervalSinceReferenceDate] - startDate) 
         < [self doubleClickTime]) {
     QSBKeyMap *currentKeyMap = [QSBKeyMap currentKeyMap];
-    if ([currentKeyMap containsAnyKeyIn:invertedHotMap]) {
+    if ([currentKeyMap containsAnyKeyIn:invertedHotMap] 
+        || GetCurrentButtonState()) {
       return;
     }
     if ([currentKeyMap containsAnyKeyIn:hotMap]) {
