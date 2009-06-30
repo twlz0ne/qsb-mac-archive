@@ -38,9 +38,12 @@
 #endif
 
 #import "GTMGeometryUtils.h"
+#import "GTMNSString+URLArguments.h"
 #import "GTMNSImage+Scaling.h"
 #import "GTMNSBezierPath+CGPath.h"
 #import "QSBHGSDelegate.h"
+#import "GTMNSString+URLArguments.h"
+#import "GTMGoogleSearch.h"
 
 static NSString *const kMetaDataFilePath
   = @"~/Library/Application Support/AddressBook/Metadata/%@.abcdp";
@@ -74,8 +77,9 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 - (NSArray *)objectsForMultiValueProperty:(NSString *)property 
                                fromPerson:(ABPerson *)person 
                                      type:(NSString *)type 
+                         valueCleanMethod:(SEL)valueCleaner
                                 urlFormat:(NSString *)urlFormat 
-                              cleanMethod:(SEL)cleaner;
+                           urlCleanMethod:(SEL)urlCleaner;
 
 // Given an HGSResult we "explode" it into it's internal HGSObjects
 // i.e. phone numbers, addressess, email, etc.
@@ -284,8 +288,9 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 - (NSArray *)objectsForMultiValueProperty:(NSString *)property 
                                fromPerson:(ABPerson *)person 
                                      type:(NSString *)type 
+                         valueCleanMethod:(SEL)valueCleaner
                                 urlFormat:(NSString *)urlFormat 
-                              cleanMethod:(SEL)cleaner {
+                           urlCleanMethod:(SEL)urlCleaner {
   NSMutableArray *results = [NSMutableArray array];
   NSString *localizedProperty
     = GTMCFAutorelease(ABCopyLocalizedPropertyOrLabel((CFStringRef)property));
@@ -309,12 +314,21 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
           localizedLabel = label;
         }
         NSString *cleanValue;
-        if (cleaner) {
-          cleanValue = [self performSelector:cleaner withObject:value];
+        if (valueCleaner) {
+          cleanValue = [self performSelector:valueCleaner
+                                  withObject:value];
         } else {
           cleanValue = value;
         }
-        NSString *urlString = [NSString stringWithFormat:urlFormat, cleanValue];
+        NSString *cleanURLValue;
+        if (urlCleaner) {
+          cleanURLValue = [self performSelector:urlCleaner 
+                                     withObject:value];
+        } else {
+          cleanURLValue = value;
+        }
+        NSString *urlString = [NSString stringWithFormat:urlFormat, 
+                               cleanURLValue];
         
         NSURL *url = [NSURL URLWithString:urlString];
         // We rank the primary identifiers higher so they show up better
@@ -329,7 +343,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
                               nsRank, kHGSObjectAttributeRankKey,
                               nil];
         HGSResult *result = [HGSResult resultWithURL:url
-                                                name:value 
+                                                name:cleanValue 
                                                 type:type 
                                               source:self 
                                           attributes:attr];
@@ -345,35 +359,102 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     NSString *property_;
     NSString *type_;
     NSString *urlFormat_;
-    NSString *selName_;
+    NSString *urlCleanerSel_;
+    NSString *valueCleanerSel_;
   };
   
   struct ContactMap contactMap[] = {
-    { kABPhoneProperty, kHGSTypeTextPhoneNumber, @"callto:+%@", @"cleanPhoneNumber:" },
-    { kABEmailProperty, kHGSTypeTextEmailAddress, @"mailto:%@", nil },
-    { kABJabberInstantProperty, kHGSTypeTextInstantMessage, @"xmpp:%@", nil },
-    { kABAIMInstantProperty, kHGSTypeTextInstantMessage, @"aim:goim?screenname=%@", nil },
-    { kABICQInstantProperty, kHGSTypeTextInstantMessage, @"icq:%@", nil },
-    { kABYahooInstantProperty, kHGSTypeTextInstantMessage, @"ymsgr:sendim?%@", nil },
-    { kABMSNInstantProperty, kHGSTypeTextInstantMessage, @"msn:chat?contact=%@", nil },
-    { kABURLsProperty, kHGSTypeWebpage, @"%@", @"cleanURL:" }
+    { 
+      kABAddressProperty, 
+      kHGSTypeTextAddress, 
+      @"http://maps.google.com/maps?q=%@", 
+      @"cleanMapURL:", 
+      @"cleanMapValue:" 
+    },
+    {
+      kABPhoneProperty,
+      kHGSTypeTextPhoneNumber, 
+      @"callto:+%@", 
+      @"cleanPhoneNumber:", 
+      nil 
+    },
+    { 
+      kABEmailProperty, 
+      kHGSTypeTextEmailAddress, 
+      @"mailto:%@", 
+      nil, 
+      nil 
+    },
+    { 
+      kABJabberInstantProperty, 
+      kHGSTypeTextInstantMessage, 
+      @"xmpp:%@", 
+      nil,
+      nil
+    },
+    { 
+      kABAIMInstantProperty, 
+      kHGSTypeTextInstantMessage, 
+      @"aim:goim?screenname=%@", 
+      nil, 
+      nil
+    },
+    { 
+      kABICQInstantProperty, 
+      kHGSTypeTextInstantMessage, 
+      @"icq:%@", 
+      nil, 
+      nil 
+    },
+    { 
+      kABYahooInstantProperty, 
+      kHGSTypeTextInstantMessage, 
+      @"ymsgr:sendim?%@", 
+      nil, 
+      nil 
+    },
+    { 
+      kABMSNInstantProperty, 
+      kHGSTypeTextInstantMessage, 
+      @"msn:chat?contact=%@", 
+      nil, 
+      nil
+    },
+    { 
+      kABURLsProperty, 
+      kHGSTypeWebpage, 
+      @"%@", 
+      @"cleanURL:", 
+      nil 
+    },
   };
-    
+  NSString *tempQuery = [[GTMGoogleSearch sharedInstance] searchURLFor:@"Query" 
+                                                                ofType:@"maps"
+                                                             arguments:nil];
+  contactMap[0].urlFormat_ 
+    = [tempQuery stringByReplacingOccurrencesOfString:@"Query"
+                                           withString:@"%@"];
+  
   NSMutableArray *results = [NSMutableArray array];
   ABPerson *person = (ABPerson *)[self personForResult:contact];
   if (!person) return results;
   
   for (size_t i = 0; i < sizeof(contactMap) / sizeof(contactMap[0]); ++i) {
-    SEL cleaner = NULL;
-    if (contactMap[i].selName_) {
-      cleaner = NSSelectorFromString(contactMap[i].selName_);
+    SEL valueCleaner = NULL;
+    if (contactMap[i].valueCleanerSel_) {
+      valueCleaner = NSSelectorFromString(contactMap[i].valueCleanerSel_);
+    }
+    SEL urlCleaner = NULL;
+    if (contactMap[i].urlCleanerSel_) {
+      urlCleaner = NSSelectorFromString(contactMap[i].urlCleanerSel_);
     }
     NSArray *objectResults 
       = [self objectsForMultiValueProperty:contactMap[i].property_
                                 fromPerson:person 
                                       type:contactMap[i].type_
+                          valueCleanMethod:valueCleaner
                                  urlFormat:contactMap[i].urlFormat_
-                               cleanMethod:cleaner];
+                            urlCleanMethod:urlCleaner];
     [results addObjectsFromArray:objectResults];
   }
   return results;
@@ -645,12 +726,20 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   NSMutableString *cleanPhone = [NSMutableString string];
   NSUInteger length = [dirtyPhone length];
   NSCharacterSet *digits = [NSCharacterSet decimalDigitCharacterSet];
-  
+  BOOL needsAOne = NO;
   for (NSUInteger i = 0; i < length; ++i) {
     unichar digit = [dirtyPhone characterAtIndex:i];
+    if (i == 0 && digit != '+' && digit != '1') {
+      needsAOne = YES;
+    }
     if ([digits characterIsMember:digit]) {
       [cleanPhone appendFormat:@"%C", digit];
     }
+  }
+  // For skype and other dialing programs, they like to have the
+  // country code.
+  if ([cleanPhone length] == 10 && needsAOne) {
+    cleanPhone = [NSString stringWithFormat:@"1%@", cleanPhone];
   }
   return cleanPhone;
 }
@@ -662,5 +751,38 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     cleanURL = [NSString stringWithFormat:@"http://%@", dirtyURL];
   }
   return cleanURL;
+}
+
+- (NSString *)cleanMapURL:(NSDictionary *)dirtyAddress {
+  NSString *keys[] = {
+    kABAddressStreetKey, kABAddressCityKey, kABAddressStateKey, 
+    kABAddressCountryKey, kABAddressZIPKey 
+  };
+  NSMutableArray *array = [NSMutableArray array];
+  for (size_t i =0; i < sizeof(keys) / sizeof(keys[0]); ++i) {
+    NSString *key = keys[i];
+    NSString *value = [dirtyAddress objectForKey:key];
+    if (value) {
+      value = [value gtm_stringByEscapingForURLArgument];
+      [array addObject:value];
+    }
+  }
+  return [array componentsJoinedByString:@"+"];
+}
+
+- (NSString *)cleanMapValue:(NSDictionary *)dirtyAddress {
+  NSString *keys[] = {
+    kABAddressStreetKey, kABAddressCityKey, kABAddressStateKey, 
+    kABAddressCountryKey, kABAddressZIPKey 
+  };
+  NSMutableArray *array = [NSMutableArray array];
+  for (size_t i =0; i < sizeof(keys) / sizeof(keys[0]); ++i) {
+    NSString *key = keys[i];
+    NSString *value = [dirtyAddress objectForKey:key];
+    if (value) {
+      [array addObject:value];
+    }
+  }
+  return [array componentsJoinedByString:@", "];
 }
 @end

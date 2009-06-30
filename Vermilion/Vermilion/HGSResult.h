@@ -138,6 +138,7 @@ extern NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey;  // NS
 #define kHGSTypeTextPhoneNumber  HGS_SUBTYPE(kHGSTypeText, @"phonenumber")
 #define kHGSTypeTextEmailAddress HGS_SUBTYPE(kHGSTypeText, @"emailaddress")
 #define kHGSTypeTextInstantMessage HGS_SUBTYPE(kHGSTypeText, @"instantmessage")
+#define kHGSTypeTextAddress      HGS_SUBTYPE(kHGSTypeText, @"address")
 
 enum {
   eHGSNameMatchRankFlag = 1 << 0,
