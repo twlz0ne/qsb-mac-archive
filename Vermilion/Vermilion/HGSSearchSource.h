@@ -123,14 +123,24 @@
   If the config dict has the boolean "HGSSearchSourceCannotArchive" set to
   YES, this will return nil. (blocking archiving).
  
+  If your source would like to store any source-specific key/value pair then
+  override -[HGSSearchSource archiveKeys] to provide a set of the keys to
+  add to the archive.  See -[HGSSearchSource archiveKeys] for more on this.
+ 
   @result Base implementation archives
           1 kHGSObjectAttributeNameKey,
           2 kHGSObjectAttributeURIKey,
           3 kHGSObjectAttributeTypeKey,
           4 kHGSObjectAttributeSnippetKey,
-          5 kHGSObjectAttributeSourceURLKey,
+          5 kHGSObjectAttributeSourceURLKey
 */
 - (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult *)result;
+
+/*!
+  Provide an array of keys of result attributes to be archived.  The default
+  implementation returns nil.
+*/
+- (NSArray *)archiveKeys;
 
 /*! 
   Reanimate a result based on a dictionary created by

@@ -20,7 +20,9 @@
     </li>
     <li>
         Added GoogleDocsSaveAsActions which allow docs to be save to a local
-        file.  NOTE: Spreadsheets are not supported at this time.
+        file.  Spreadsheets are also supported as of the fix to
+        <a href="http://code.google.com/p/qsb-mac/issues/detail?id=595">
+        Issue 595</a>.
     </li>
     <li>
       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=52">
@@ -74,6 +76,7 @@
     <li>
        <a href="http://code.google.com/p/qsb-mac/issues/detail?id=570">
         Issue 570</a>: Eliminated warnings when compiling .xib files.
+    </li>
     <li>
        <a href="http://code.google.com/p/qsb-mac/issues/detail?id=481">
         Issue 481</a>: We no longer show up at startup if we are a startup item.
@@ -102,6 +105,17 @@
     <li>
        Startup now has a "progress indicator" of sorts. Our window appears 
        much faster at startup so there isn't any "hang" after launch.
+    </li>
+    <li>
+       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=567">
+        Issue 567</a>: Right after launching, some shortcuts could be missing
+        critical information required for performing certain actions, 
+        particularly for sources that may take some time to refresh their
+        results.  To fix this, added -[HGSSearchSource archiveKeys] function
+        which allows sources to provide additional information to be cached
+        for a result.  This information could still become stale if the
+        source changes while QSB is not running, but that's a different
+        problem.
     </li>
  </ul>
 </body>

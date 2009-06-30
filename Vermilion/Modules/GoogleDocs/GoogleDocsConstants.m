@@ -38,4 +38,5 @@ NSString* const kDocCategoryDocument = @"document";
 NSString* const kDocCategorySpreadsheet = @"spreadsheet";
 NSString* const kDocCategoryPresentation = @"presentation";
 
-NSString* const kGoogleDocsDocCategoryKey = @"GoogleDocsDocCategoryKey";  // NSString - Doc category.
+NSString* const kGoogleDocsDocCategoryKey = @"GoogleDocsDocCategoryKey";
+NSString* const kGoogleDocsWorksheetNamesKey = @"GoogleDocsWorksheetNamesKey";

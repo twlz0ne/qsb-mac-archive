@@ -30,37 +30,59 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
+#import "HGSGoogleDocsSource.h"
 #import <GData/GData.h>
 #import "KeychainItem.h"
 #import "QSBHGSDelegate.h"
 #import "GoogleDocsConstants.h"
+#import "GTMNSEnumerator+Filter.h"
+#import "GTMMethodCheck.h"
 
+// Refresh the document cache once an hour.
 static const NSTimeInterval kRefreshSeconds = 3600.0;  // 60 minutes.
 
 // Only report errors to user once an hour.
 static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
-@interface HGSGoogleDocsSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
- @private
-  GDataServiceGoogleDocs *docService_;
-  GDataServiceTicket *serviceTicket_;
-  __weak NSTimer *updateTimer_;
-  NSDictionary *docIcons_;
-  BOOL currentlyFetching_;
-  HGSAccount *account_;
-  NSString *userName_;
-  NSTimeInterval previousErrorReportingTime_;
-}
+static NSString *const kGoogleDocsSpreadsheetDocResultPropertyKey
+  = @"GoogleDocsSpreadsheetDocResultPropertyKey";
+static NSString *const kGoogleDocsSpreadsheetDocPropertyKey
+  = @"GoogleDocsSpreadsheetDocPropertyKey";
 
+
+@interface HGSGoogleDocsSource ()
+
+// Used to schedule refreshes of the document cache.
 - (void)setUpPeriodicRefresh;
-- (void)startAsynchronousDocsListFetch;
+
+// Main indexing function for each document associated with the account.
 - (void)indexDoc:(GDataEntryDocBase*)doc;
+
+// Bottleneck function for kicking off a document fetch or refresh.
+- (void)startAsynchronousDocsListFetch;
+
+// Secondary indexing function used to retrieve worksheet information
+// about a particular spreadsheet.
+- (void)startAsyncSpreadsheetInfoFetchWithDoc:(GDataEntryDocBase*)doc
+                                       result:(HGSResult *)docResult;
+
+// Retrieve the authors information for a list of people associated
+// with a document.
 - (NSArray*)authorArrayForGDataPeople:(NSArray*)people;
+
+// General purpose error reporting bottlenexk.
+- (void)reportError:(NSError *)error;
+
+// Call this function whenever all document fetches should be shut down.
+- (void)resetAllFetches;
 
 @end
 
+
 @implementation HGSGoogleDocsSource
+
+GTM_METHOD_CHECK(NSEnumerator,
+                 gtm_enumeratorByMakingEachObjectPerformSelector:withObject:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -110,8 +132,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [docService_ release];
-  [serviceTicket_ release];
+  [self resetAllFetches];
   [docIcons_ release];
   [updateTimer_ invalidate];
   [account_ release];
@@ -136,51 +157,52 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   return isValid;
 }
 
-#pragma mark -
-#pragma mark Docs Fetching
+- (NSArray *)archiveKeys {
+  NSArray *archiveKeys = [NSArray arrayWithObjects:
+                          kGoogleDocsDocCategoryKey,
+                          kGoogleDocsDocSaveAsIDKey,
+                          kGoogleDocsWorksheetNamesKey,
+                          nil];
+  return archiveKeys;
+}
 
-- (void)startAsynchronousDocsListFetch {
-  if (!currentlyFetching_) {
-    if (!docService_) {
-      KeychainItem* keychainItem 
-        = [KeychainItem keychainItemForService:[account_ identifier]
-                                      username:nil];
-      NSString *userName = [keychainItem username];
-      NSString *password = [keychainItem password];
-      if (userName && password) {
-        docService_ = [[GDataServiceGoogleDocs alloc] init];
-        [docService_ setUserAgent:@"HGSGoogleDocSource"];
-        [docService_ setUserCredentialsWithUsername: userName
-                                           password: password];
-        [docService_ setIsServiceRetryEnabled:YES];
-      } else {
-        // Can't do much without a login; invalidate so we stop trying (until
-        // we get a notification that the credentials have changed) and bail.
-        [updateTimer_ invalidate];
-        updateTimer_ = nil;
-        return;
-      }
-    }
-    // Mark us as in the middle of a fetch so that if credentials change 
-    // during a fetch we don't destroy the service out from under ourselves.
-    currentlyFetching_ = YES;
-    // If the doc feed is attempting an http request then upgrade it to https.
-    NSString *docURLString = kGDataGoogleDocsDefaultPrivateFullFeed;
-    static NSString *const httpScheme = @"http:";
-    static NSString *const httpsScheme = @"https:";
-    if ([docURLString hasPrefix:httpScheme]) {
-      docURLString = [docURLString substringFromIndex:[httpScheme length]];
-      docURLString = [httpsScheme stringByAppendingString:docURLString];
-    }
-    NSURL* docURL = [NSURL URLWithString:docURLString];
-    serviceTicket_
-      = [[docService_ fetchFeedWithURL:docURL
-                              delegate:self
-                     didFinishSelector:@selector(serviceTicket:
-                                                 finishedWithObject:
-                                                 error:)]
-         retain];
+- (GDataServiceGoogle *)serviceForDoc:(HGSResult *)doc {
+  GDataServiceGoogle *service = nil;
+  NSString *category = [doc valueForKey:kGoogleDocsDocCategoryKey];
+  if ([category isEqualToString:kDocCategoryDocument]
+      || [category isEqualToString:kDocCategoryPresentation]) {
+    service = docService_;
+  } else if ([category isEqualToString:kDocCategorySpreadsheet]) {
+    service = spreadsheetService_;
+  } else {
+    HGSLogDebug(@"Unexpected document category '%@'.", category);
   }
+  return service;
+}
+
+- (NSArray*)authorArrayForGDataPeople:(NSArray*)people {
+  NSMutableArray* peopleTerms 
+  = [NSMutableArray arrayWithCapacity:(2 * [people count])];
+  NSCharacterSet *wsSet = [NSCharacterSet whitespaceCharacterSet];
+  NSEnumerator* enumerator = [people objectEnumerator];
+  GDataPerson* person;
+  while ((person = [enumerator nextObject])) {
+    
+    NSString* authorName = [[person name] stringByTrimmingCharactersInSet:wsSet];
+    if ([authorName length] > 0) {
+      [peopleTerms addObject:authorName];
+    }
+    // Grab the author's email username as well
+    NSString* authorEmail = [person email];
+    NSUInteger atSignLocation = [authorEmail rangeOfString:@"@"].location;
+    if (atSignLocation != NSNotFound) {
+      authorEmail = [authorEmail substringToIndex:atSignLocation];
+    }
+    if (authorEmail && ![peopleTerms containsObject:authorEmail]) {
+      [peopleTerms addObject:authorEmail];
+    }
+  }
+  return peopleTerms;
 }
 
 - (void)setUpPeriodicRefresh {
@@ -208,28 +230,149 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   
   // Make sure we aren't in the middle of waiting for results; if we are, try
   // again later instead of changing things in the middle of the fetch.
-  if (currentlyFetching_) {
+  if (currentlyFetchingDocs_ || [activeSpreadsheetFetches_ count] != 0) {
     [self performSelector:@selector(loginCredentialsChanged:)
                withObject:notification
                afterDelay:60.0];
     return;
   }
-  // Clear the service so that we make a new one with the correct credentials.
-  [serviceTicket_ release];
-  serviceTicket_ = nil;
+  // Clear the services so that we make new ones with the correct credentials.
+  [docServiceTicket_ release];
+  docServiceTicket_ = nil;
   [docService_ release];
   docService_ = nil;
-  // If the login changes, we should update immediately, and make sure the
+  
+  [spreadsheetService_ release];
+  spreadsheetService_ = nil;
+  
+  // When the login changes, we should update immediately, and make sure the
   // periodic refresh is enabled (it would have been shut down if the previous
   // credentials were incorrect).
   [self startAsynchronousDocsListFetch];
   [self setUpPeriodicRefresh];
 }
 
-- (void)serviceTicket:(GDataServiceTicket *)ticket
-   finishedWithObject:(GDataFeedDocList *)docList
-                error:(NSError *)error {
-  currentlyFetching_ = NO;
+- (void)reportError:(NSError *)error {
+  NSInteger errorCode = [error code];
+  if (errorCode == kGDataBadAuthentication) {
+    // If the login credentials are bad, don't keep trying.
+    [updateTimer_ invalidate];
+    updateTimer_ = nil;
+    // Tickle the account so that if the preferences window is showing
+    // the user will see the proper account status.
+    [account_ authenticate];
+  }
+  NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
+  NSTimeInterval timeSinceLastErrorReport
+    = currentTime - previousErrorReportingTime_;
+  if (timeSinceLastErrorReport > kErrorReportingInterval) {
+    previousErrorReportingTime_ = currentTime;
+    NSString *errorSummary
+      = HGSLocalizedString(@"Google Docs fetch problem.", 
+                           @"A dialog title for a dialog describing a Google "
+                           @"Docs data fetch problem.");
+    NSString *errorString = nil;
+    if (errorCode == kGDataBadAuthentication) {
+      NSString *errorFormat
+        = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
+                             @"password.", 
+                             @"A dialog lable denoting that authentication "
+                             @"for account with username %@ failed");
+      errorString = [NSString stringWithFormat:errorFormat,
+                     [account_ displayName]];
+      
+    } else {
+      NSString *errorFormat 
+        = HGSLocalizedString(@"Fetch for '%1$@' failed. (%2$d)",
+                             @"A dialog label denoting that an attempt to "
+                             @"fetch data with the account for username $1$@ "
+                             @"failed with errorcode %2$d");
+      errorString = [NSString stringWithFormat:errorFormat,
+                     [account_ displayName], [error code]];
+    }
+    NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    NSDictionary *messageDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 errorSummary, kHGSSummaryMessageKey,
+                                 errorString, kHGSDescriptionMessageKey,
+                                 successCode, kHGSSuccessCodeMessageKey,
+                                 nil];
+    [nc postNotificationName:kHGSUserMessageNotification 
+                      object:self
+                    userInfo:messageDict];
+  }
+  HGSLogDebug(@"HGSGoogleDocSource doc fetcher failed: error=%d, "
+              @"userName=%@.",
+              [error code], [account_ displayName]);
+}
+
+- (void)resetAllFetches {
+  if (currentlyFetchingDocs_) {
+    [docServiceTicket_ cancelTicket];
+  }
+  [docServiceTicket_ release];
+  docServiceTicket_ = nil;
+  [docService_ release];
+  docService_ = nil;
+  for (GDataServiceTicket *ticket in activeSpreadsheetFetches_) {
+    [ticket cancelTicket];
+  }
+  [activeSpreadsheetFetches_ release];
+  activeSpreadsheetFetches_ = nil;
+  [spreadsheetService_ release];
+  spreadsheetService_ = nil;
+}
+
+#pragma mark -
+#pragma mark Docs Fetching
+
+- (void)startAsynchronousDocsListFetch {
+  if (!currentlyFetchingDocs_) {
+    if (!docService_) {
+      KeychainItem* keychainItem 
+        = [KeychainItem keychainItemForService:[account_ identifier]
+                                      username:nil];
+      NSString *userName = [keychainItem username];
+      NSString *password = [keychainItem password];
+      if (userName && password) {
+        docService_ = [[GDataServiceGoogleDocs alloc] init];
+        [docService_ setUserAgent:@"HGSGoogleDocSource"];
+        [docService_ setUserCredentialsWithUsername: userName
+                                           password: password];
+        [docService_ setIsServiceRetryEnabled:YES];
+      } else {
+        // Can't do much without a login; invalidate so we stop trying (until
+        // we get a notification that the credentials have changed) and bail.
+        [updateTimer_ invalidate];
+        return;
+      }
+    }
+    // Mark us as in the middle of a fetch so that if credentials change 
+    // during a fetch we don't destroy the service out from under ourselves.
+    currentlyFetchingDocs_ = YES;
+    // If the doc feed is attempting an http request then upgrade it to https.
+    NSString *urlString
+      = [kGDataGoogleDocsDefaultPrivateFullFeed
+         stringByReplacingOccurrencesOfString:@"http:"
+                                   withString:@"https:"
+                                      options:NSLiteralSearch
+                                              | NSAnchoredSearch
+                                        range:NSMakeRange(0, 5)];
+    NSURL* docURL = [NSURL URLWithString:urlString];
+    docServiceTicket_
+      = [[docService_ fetchFeedWithURL:docURL
+                              delegate:self
+                     didFinishSelector:@selector(docServiceTicket:
+                                                 finishedWithObject:
+                                                 error:)]
+         retain];
+  }
+}
+
+- (void)docServiceTicket:(GDataServiceTicket *)docTicket
+      finishedWithObject:(GDataFeedDocList *)docList
+                   error:(NSError *)error {
+  currentlyFetchingDocs_ = NO;
   if (!error) {
     [self clearResultIndex];
     
@@ -239,64 +382,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
       [self indexDoc:doc];
     }
   } else {
-    NSInteger errorCode = [error code];
-    if (errorCode == kGDataBadAuthentication) {
-      // If the login credentials are bad, don't keep trying.
-      [updateTimer_ invalidate];
-      updateTimer_ = nil;
-      // Tickle the account so that if the preferences window is showing
-      // the user will see the proper account status.
-      [account_ authenticate];
-    }
-    NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
-    NSTimeInterval timeSinceLastErrorReport
-      = currentTime - previousErrorReportingTime_;
-    if (timeSinceLastErrorReport > kErrorReportingInterval) {
-      previousErrorReportingTime_ = currentTime;
-      NSString *errorSummary
-        = HGSLocalizedString(@"Google Docs fetch problem.", 
-                             @"A dialog title for a dialog describing a Google "
-                             @"Docs data fetch problem.");
-      NSString *errorString = nil;
-      if (errorCode == kGDataBadAuthentication) {
-        NSString *errorFormat
-          = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
-                               @"password.", 
-                               @"A dialog lable denoting that authentication "
-                               @"for account with username %@ failed");
-        errorString = [NSString stringWithFormat:errorFormat,
-                       [account_ displayName]];
-        
-      } else {
-        NSString *errorFormat 
-          = HGSLocalizedString(@"Fetch for '%1$@' failed. (%2$d)",
-                               @"A dialog label denoting that an attempt to "
-                               @"fetch data with the account for username $1$@ "
-                               @"failed with errorcode %2$d");
-        errorString = [NSString stringWithFormat:errorFormat,
-                       [account_ displayName], [error code]];
-      }
-      NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
-      NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-      NSDictionary *messageDict
-        = [NSDictionary dictionaryWithObjectsAndKeys:
-           errorSummary, kHGSSummaryMessageKey,
-           errorString, kHGSDescriptionMessageKey,
-           successCode, kHGSSuccessCodeMessageKey,
-           nil];
-      [nc postNotificationName:kHGSUserMessageNotification 
-                        object:self
-                      userInfo:messageDict];
-    }
-    HGSLogDebug(@"HGSGoogleDocSource doc fetcher failed: error=%d, "
-                @"userName=%@.",
-                [error code], [account_ displayName]);    
+    [self reportError:error];
   }
 }
-
-
-#pragma mark -
-#pragma mark Docs Info Extraction
 
 - (void)indexDoc:(GDataEntryDocBase*)doc {
   NSString* docTitle = [[doc title] stringValue];
@@ -319,7 +407,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   if (!icon) {
     icon = [docIcons_ objectForKey:kDocCategoryDocument];
   }
-
+  
   // Compose the contents of the path control.  First cell will be 'Google Docs',
   // last cell will be the document name.  A middle cell may be added if there
   // is a folder, but note that only the immediately containing folder will
@@ -381,45 +469,120 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
        icon, kHGSObjectAttributeIconKey,
        categoryLabel, kGoogleDocsDocCategoryKey,
        docID, kGoogleDocsDocSaveAsIDKey,
-       docService_, kGoogleDocsDocServiceKey,
-       nil];
+     nil];
   HGSResult* result = [HGSResult resultWithURL:docURL
                                           name:docTitle
                                           type:kHGSTypeWebpage
                                         source:self
                                     attributes:attributes];
   
-  // Also get author names and address, and store those as non-title-match data.
-  NSArray* authorArray = [self authorArrayForGDataPeople:[doc authors]];
-
-  [self indexResult:result
-               name:docTitle
-         otherTerms:authorArray];
+  // If this is a spreadsheet then we have to go off and fetch the worksheet
+  // information in a spreadsheet feed.
+  if ([categoryLabel isEqualToString:kDocCategorySpreadsheet]) {
+    [self startAsyncSpreadsheetInfoFetchWithDoc:doc result:result];
+  } else {
+    // Also get author names and address, and store those as non-title-match data.
+    NSArray* authorArray = [self authorArrayForGDataPeople:[doc authors]];
+    
+    [self indexResult:result
+                 name:docTitle
+           otherTerms:authorArray];
+  }
 }
 
-- (NSArray*)authorArrayForGDataPeople:(NSArray*)people {
-  NSMutableArray* peopleTerms 
-    = [NSMutableArray arrayWithCapacity:(2 * [people count])];
-  NSCharacterSet *wsSet = [NSCharacterSet whitespaceCharacterSet];
-  NSEnumerator* enumerator = [people objectEnumerator];
-  GDataPerson* person;
-  while ((person = [enumerator nextObject])) {
-    
-    NSString* authorName = [[person name] stringByTrimmingCharactersInSet:wsSet];
-    if ([authorName length] > 0) {
-      [peopleTerms addObject:authorName];
+#pragma mark -
+#pragma mark Spreadsheet Info Fetching
+
+- (void)startAsyncSpreadsheetInfoFetchWithDoc:(GDataEntryDocBase *)doc
+                                       result:(HGSResult *)docResult {
+  // Set up our service, if necessary.
+  if (!spreadsheetService_) {
+    NSString *userName = nil;
+    NSString *password = nil;
+    // Use the most-likely-already-set-up doc service to get the credentials
+    // to avoid having to go to the keychain and annoy the user.
+    if (docService_) {
+      userName = [docService_ username];
+      password = [docService_ password];
+    } else {
+      KeychainItem* keychainItem 
+        = [KeychainItem keychainItemForService:[account_ identifier]
+                                      username:nil];
+      userName = [keychainItem username];
+      password = [keychainItem password];
     }
-    // Grab the author's email username as well
-    NSString* authorEmail = [person email];
-    NSUInteger atSignLocation = [authorEmail rangeOfString:@"@"].location;
-    if (atSignLocation != NSNotFound) {
-      authorEmail = [authorEmail substringToIndex:atSignLocation];
-    }
-    if (authorEmail && ![peopleTerms containsObject:authorEmail]) {
-      [peopleTerms addObject:authorEmail];
+    if (userName && password) {
+      spreadsheetService_ = [[GDataServiceGoogleSpreadsheet alloc] init];
+      [spreadsheetService_ setUserAgent:@"HGSGoogleDocSource"];
+      [spreadsheetService_ setUserCredentialsWithUsername: userName
+                                                 password: password];
+      [spreadsheetService_ setIsServiceRetryEnabled:YES];
     }
   }
-  return peopleTerms;
+  HGSAssert([doc isKindOfClass:[GDataEntrySpreadsheetDoc class]], nil);
+  GDataEntrySpreadsheetDoc *spreadsheet = (GDataEntrySpreadsheetDoc *)doc;
+  NSURL* spreadsheetFeedURL = [[spreadsheet worksheetsLink] URL];
+  GDataServiceTicket *spreadsheetServiceTicket
+    = [[spreadsheetService_ 
+        fetchFeedWithURL:spreadsheetFeedURL
+                delegate:self
+       didFinishSelector:@selector(spreadsheetServiceTicket:
+                                   finishedWithFeed:
+                                   error:)]
+       retain];
+  [spreadsheetServiceTicket setProperty:docResult
+                                 forKey:kGoogleDocsSpreadsheetDocResultPropertyKey];
+  [spreadsheetServiceTicket setProperty:doc
+                                 forKey:kGoogleDocsSpreadsheetDocPropertyKey];
+  // Remember that we're fetching so that if credentials change 
+  // during a fetch we don't destroy the service out from under ourselves.
+  if (!activeSpreadsheetFetches_) {
+    activeSpreadsheetFetches_ = [[NSMutableArray arrayWithCapacity:1] retain];
+  }
+  [activeSpreadsheetFetches_ addObject:spreadsheetServiceTicket];
+}
+
+- (void)spreadsheetServiceTicket:(GDataServiceTicket *)spreadsheetTicket
+                finishedWithFeed:(GDataFeedWorksheet *)worksheetFeed
+                           error:(NSError *)error {
+  [activeSpreadsheetFetches_ removeObject:spreadsheetTicket];
+  if (!error) {
+    // Extracting the worksheet information.
+    NSArray *worksheets = [worksheetFeed entries];
+    NSEnumerator *worksheetTitleEnum
+      = [[worksheets objectEnumerator]
+         gtm_enumeratorByMakingEachObjectPerformSelector:@selector(title)
+                                              withObject:nil];
+    NSEnumerator *worksheetTitleStringEnum
+      = [worksheetTitleEnum
+         gtm_enumeratorByMakingEachObjectPerformSelector:@selector(stringValue)
+         withObject:nil];
+    NSArray *worksheetNames = [worksheetTitleStringEnum allObjects];
+    HGSResult *docResult
+      = [spreadsheetTicket
+         propertyForKey:kGoogleDocsSpreadsheetDocResultPropertyKey];
+    GDataEntryDocBase *doc
+      = [spreadsheetTicket propertyForKey:kGoogleDocsSpreadsheetDocPropertyKey];
+    HGSAssert(docResult, nil);
+    if ([worksheetNames count]) {
+      NSDictionary *attributes
+        = [NSDictionary dictionaryWithObject:worksheetNames
+                                      forKey:kGoogleDocsWorksheetNamesKey];
+      HGSResult* worksheetResult = [HGSResult resultWithURL:[docResult url]
+                                                       name:@"Ignored"
+                                                       type:kHGSTypeWebpage
+                                                     source:self
+                                                 attributes:attributes];
+      docResult = [docResult mergeWith:worksheetResult];
+    }
+    // Add author names and address as non-title-match data.
+    NSArray* authorArray = [self authorArrayForGDataPeople:[doc authors]];
+    [self indexResult:docResult
+                 name:[[doc title] stringValue]
+           otherTerms:authorArray];
+  } else {
+    [self reportError:error];
+  }
 }
 
 #pragma mark -
@@ -427,13 +590,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 - (BOOL)accountWillBeRemoved:(HGSAccount *)account {
   HGSAssert(account == account_, @"Notification from bad account!");
-  if (currentlyFetching_) {
-    [serviceTicket_ cancelTicket];
-  }
-  [serviceTicket_ release];
-  serviceTicket_ = nil;
-  [docService_ release];
-  docService_ = nil;
+  [self resetAllFetches];
   return YES;
 }
 

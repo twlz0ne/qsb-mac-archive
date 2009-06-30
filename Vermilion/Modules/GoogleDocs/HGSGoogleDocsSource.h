@@ -1,5 +1,5 @@
 //
-//  GoogleDocsConstants.h
+//  HGSGoogleDocsSource.h
 //
 //  Copyright (c) 2009 Google Inc. All rights reserved.
 //
@@ -31,42 +31,43 @@
 //
 
 /*!
-  @header
-  @discussion GoogleDocsConstants
-*/
-
-
-@class NSString;
-
-/*!
- A category which is used to identify the Google Doc as a 'document'.
-*/
-extern NSString* const kDocCategoryDocument;
-
-/*!
- A category which is used to identify the Google Doc as a 'spreadsheet'.
-*/
-extern NSString* const kDocCategorySpreadsheet;
-
-/*!
- A category which is used to identify the Google Doc as a 'presentation'.
-*/
-extern NSString* const kDocCategoryPresentation;
-
-/*!
- The key to the NSString result attribute giving the category of the Google Doc.
-*/
-extern NSString* const kGoogleDocsDocCategoryKey;  // NSString - Doc category.
-
-/*!
- The key to the NSArray result attribute giving the names of all worksheets
- in the Google Doc spreadsheet.
+ @header
+ @discussion HGSGoogleDocsSource -- Not for external use.  Exposed here
+  for access by GoogleDocsSaveAsAction.
  */
-extern NSString* const kGoogleDocsWorksheetNamesKey;  // NSArray.
+
+#import <Vermilion/Vermilion.h>
+
+@class GDataServiceGoogle;
+@class GDataServiceGoogleDocs;
+@class GDataServiceGoogleSpreadsheet;
+@class GDataServiceTicket;
 
 /*!
- Keys to the information carried in the saveAsInfo dictionary.
+ A search source which indexes all Google Docs for a Google account.
 */
-#define kGoogleDocsDocSaveAsExtensionKey @"GoogleDocsDocSaveAsExtensionKey"
-#define kGoogleDocsDocSaveAsWorksheetIndexKey @"GoogleDocsDocSaveAsWorksheetIndexKey"
-#define kGoogleDocsDocSaveAsIDKey @"GoogleDocsDocSaveAsIDKey"
+@interface HGSGoogleDocsSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
+ @private
+  GDataServiceGoogleDocs *docService_;
+  GDataServiceTicket *docServiceTicket_;
+  BOOL currentlyFetchingDocs_;
+  GDataServiceGoogleSpreadsheet *spreadsheetService_;
+  GDataServiceTicket *spreadsheetServiceTicket_;
+  NSMutableArray *activeSpreadsheetFetches_;
+  __weak NSTimer *updateTimer_;
+  NSDictionary *docIcons_;
+  HGSAccount *account_;
+  NSString *userName_;
+  NSTimeInterval previousErrorReportingTime_;
+}
+
+/*!
+ Returns the appropriate GData service for the doc result.
+ 
+ At the current time, there are separate services for accessing spreadsheet.
+ The service for spreadsheets may be merged into the service for docs in
+ general in the future.
+*/
+- (GDataServiceGoogle *)serviceForDoc:(HGSResult *)doc;
+
+@end

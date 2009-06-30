@@ -139,28 +139,32 @@ static NSSet *CopyStringSetFromId(id value) {
   if (cannotArchive_) return nil;
   
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-
-  NSString *kHGSObjectDefaultArchiveKeys[] = {
-    kHGSObjectAttributeNameKey,
-    kHGSObjectAttributeURIKey,
-    kHGSObjectAttributeTypeKey,
-    kHGSObjectAttributeSnippetKey,
-    kHGSObjectAttributeSourceURLKey,
-  };
-  
-  for (size_t i = 0;
-       i < (sizeof(kHGSObjectDefaultArchiveKeys) / sizeof(NSString*));
-       ++i) {
-    NSString *key = kHGSObjectDefaultArchiveKeys[i];
-    id value = [result valueForKey:key];
+  NSMutableSet *defaultArchiveKeys = [NSMutableSet setWithObjects:
+                                      kHGSObjectAttributeNameKey,
+                                      kHGSObjectAttributeURIKey,
+                                      kHGSObjectAttributeTypeKey,
+                                      kHGSObjectAttributeSnippetKey,
+                                      kHGSObjectAttributeSourceURLKey,
+                                      kHGSObjectAttributeIconKey,
+                                      nil];
+  NSArray *sourceArchiveKeys = [self archiveKeys];
+  if ([sourceArchiveKeys count]) {
+    [defaultArchiveKeys addObjectsFromArray:sourceArchiveKeys];
+  }
+  for (NSString *archiveKey in defaultArchiveKeys) {
+    id value = [result valueForKey:archiveKey];
     if (value) {
       if ([value isKindOfClass:[NSURL class]]) {
         value = [value absoluteString];
       }
-      [dict setObject:value forKey:key];
+      [dict setObject:value forKey:archiveKey];
     }
   }
   return dict;
+}
+
+- (NSArray *)archiveKeys {
+  return nil;
 }
 
 - (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {

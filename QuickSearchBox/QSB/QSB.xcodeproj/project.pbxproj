@@ -323,6 +323,7 @@
 		620CB56E0FAA85160029801C /* QSBSetUpAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F974C20F8EF33E001C55B6 /* QSBSetUpAccountViewController.m */; };
 		620CB56F0FAA85160029801C /* QSBSetUpSimpleAccountViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 62F974C80F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		620CB5700FAA85160029801C /* QSBSetUpSimpleAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F974C90F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.m */; };
+		620EC2E10FF5BFD7008666B3 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		62115E670F3226F7007FEA2A /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		6211C51D0F312E7E003A5122 /* HGSSimpleAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */; };
 		6219B5340E8C1DB3008643F4 /* BaseResultsViews.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */; };
@@ -1938,6 +1939,7 @@
 		62AD18A40F16B034000D380C /* QSBPathControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPathControl.h; sourceTree = "<group>"; };
 		62AD18A50F16B034000D380C /* QSBPathControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPathControl.m; sourceTree = "<group>"; };
 		62AD99140F33AB190063579F /* google_products.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = google_products.png; sourceTree = "<group>"; };
+		62B5A2980FF42B8D002B8113 /* HGSGoogleDocsSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSGoogleDocsSource.h; sourceTree = "<group>"; };
 		62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PicasaPlaceholder.icns; sourceTree = "<group>"; };
 		62D0E9640EF058950028522C /* HGSAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAccount.h; sourceTree = "<group>"; };
 		62D0E96A0EF059B40028522C /* HGSAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccount.m; sourceTree = "<group>"; };
@@ -3131,8 +3133,9 @@
 			children = (
 				8BC6E5DD0FAAC247005A0F6F /* InfoPlist.strings */,
 				8BC6E1630FAA7474005A0F6F /* Localizable.strings */,
-				33D2C65B0DD1080700C1FBDC /* HGSGoogleDocsSource.m */,
 				62F595AF0FEB278A0076CDDA /* GoogleDocsConstants.h */,
+				62B5A2980FF42B8D002B8113 /* HGSGoogleDocsSource.h */,
+				33D2C65B0DD1080700C1FBDC /* HGSGoogleDocsSource.m */,
 				62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */,
 				62F594B40FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.h */,
 				62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */,
@@ -6993,6 +6996,7 @@
 				62F594B70FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m in Sources */,
 				62F594B80FEB06A60076CDDA /* GoogleDocsSaveAsActions.m in Sources */,
 				62F595B10FEB278A0076CDDA /* GoogleDocsConstants.m in Sources */,
+				620EC2E10FF5BFD7008666B3 /* GTMMethodCheck.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

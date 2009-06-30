@@ -45,6 +45,8 @@
 
 @synthesize fileTypes = fileTypes_;
 @synthesize fileTypeIndex = fileTypeIndex_;
+@synthesize worksheetNames = worksheetNames_;
+@synthesize worksheetIndex = worksheetIndex_;
 @synthesize descriptionToExtensionMap = descriptionToExtensionMap_;
 
 - (void)dealloc {
@@ -63,6 +65,7 @@
   HGSResult *result = [saveAsInfo objectForKey:kHGSSaveAsHGSResultKey];
   HGSAssert(result, nil);
   NSString *category = [result valueForKey:kGoogleDocsDocCategoryKey];
+  isSpreadsheet_ = [category isEqualToString:kDocCategorySpreadsheet];
   NSBundle *bundle = HGSGetPluginBundle();
   NSString *fileTypesPath
     = [bundle pathForResource:@"GoogleDocsSaveAsFileTypes" ofType:@"plist"];
@@ -102,6 +105,10 @@
     [descriptionList addObject:description];
   }
   [self setFileTypes:descriptionList];
+  
+  // Populate the worksheet array.
+  NSArray *worksheetNames = [result valueForKey:kGoogleDocsWorksheetNamesKey];
+  [self setWorksheetNames:worksheetNames];
 }
 
 - (NSDictionary *)saveAsInfo {
@@ -113,7 +120,33 @@
   NSString *extension
     = [[self descriptionToExtensionMap] objectForKey:description];
   [saveAsInfo setObject:extension forKey:kGoogleDocsDocSaveAsExtensionKey];
+  if (isSpreadsheet_) {
+    NSNumber *worksheetIndex
+      = [NSNumber numberWithUnsignedInt:[self fileTypeIndex]];
+    [saveAsInfo setObject:worksheetIndex
+                   forKey:kGoogleDocsDocSaveAsWorksheetIndexKey];
+  }
   return saveAsInfo;
+}
+
+- (void)setFileTypeIndex:(NSInteger)fileTypeIndex {
+  fileTypeIndex_ = fileTypeIndex;
+  BOOL shouldBeEnabled = NO;
+  if (isSpreadsheet_) {
+    // If they chose TSV or CSV and there is more then one worksheet we want
+    // to show them the worksheet popup.
+    NSString *chosenFileType = [fileTypes_ objectAtIndex:[self fileTypeIndex]];
+    NSString *extension
+      = [[self descriptionToExtensionMap] objectForKey:chosenFileType];
+    if (([extension isEqualToString:@"csv"]
+         || [extension isEqualToString:@"tsv"])
+        && [[self worksheetNames] count] > 1) {
+      shouldBeEnabled = YES;
+    }
+  }
+  [worksheetPopup_ setEnabled:shouldBeEnabled];
+  [worksheetPopup_ setHidden:!shouldBeEnabled];
+  [worksheetLabel_ setHidden:!shouldBeEnabled];
 }
 
 @end

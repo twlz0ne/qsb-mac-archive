@@ -32,6 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import <GData/GData.h>
+#import "HGSGoogleDocsSource.h"
 #import "GoogleDocsConstants.h"
 
 static NSString *const kDocumentDownloadFormat
@@ -42,7 +43,7 @@ static NSString *const kDocumentDownloadFormat
 static NSString *const kSpreadsheetDownloadFormat
   = @"http://spreadsheets.google.com/feeds/download/spreadsheets/Export?"
     @"key=%@&fmcmd=%d";
-static NSString *const kWorksheetPageDownloadFormat = @"&gid=%d";
+static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
 
 // Export values for the 'fmcmd' parameter found at:
 // http://code.google.com/apis/documents/docs/2.0/reference.html#ExportParameters
@@ -57,13 +58,16 @@ enum {
 
 // An action which supports saving a Google Docs as a local file.
 //
+// Note that when exporting a spreadsheet to CSV or TSV only one worksheet
+// can be saved at a time (an API limitation).
+//
 @interface GoogleDocsSaveAsAction : HGSAction
 
 // Common function that receives a download URL, the GData service
 // associated with the download request, and the saveAs information
 // needed by the fetcher handlers for completing the save.
 - (void)downloadDocument:(NSString *)downloadCommand 
-                 service:(GDataServiceGoogleDocs *)service
+                 service:(GDataServiceGoogle *)service
               saveAsInfo:(NSDictionary *)saveAsInfo;
 
 // Send a user notification to the Vermilion client.
@@ -80,9 +84,7 @@ enum {
   NSURL *url = [result url];
   BOOL doesApply = ![url isFileURL];
   NSString *category = [result valueForKey:kGoogleDocsDocCategoryKey];
-  if (!category || [category isEqualToString:kDocCategorySpreadsheet]) {
-    doesApply = NO;
-  }
+  doesApply = (category != nil);
   return doesApply;
 }
 
@@ -119,9 +121,9 @@ enum {
         }
       }
       docID = [GDataUtilities stringByURLEncodingForURI:docID];
-
-      GDataServiceGoogleDocs *service
-        = [directObject valueForKey:kGoogleDocsDocServiceKey];
+      HGSGoogleDocsSource *source
+        = (HGSGoogleDocsSource *)[directObject source];
+      GDataServiceGoogle *service = [source serviceForDoc:directObject];
       HGSAssert(service, nil);
 
       // The method of retrieving the document is different for
@@ -151,12 +153,15 @@ enum {
                    docID, formatNum];
         if (formatNum == eFmcmdCSV || formatNum == eFmcmdTSV) {
           // Only one worksheet can be exported at a time for these formats.
-          // For now we'll only export the first worksheet.
-          // TODO(mrossetti): Iterate through and export all worksheets
-          // as separate documents.  That's why there are separate calls
-          // to downloadDocument:.
+          NSUInteger worksheetIndex = 0;
+          NSNumber *worksheetNumber
+            = [info objectForKey:kGoogleDocsDocSaveAsWorksheetIndexKey];
+          if (worksheetNumber) {
+            worksheetIndex = [worksheetNumber unsignedIntValue];
+          }
           command
-            = [command stringByAppendingFormat:kWorksheetPageDownloadFormat, 0];
+            = [command stringByAppendingFormat:kWorksheetPageDownloadFormat,
+               worksheetIndex];
           [self downloadDocument:command
                          service:service
                       saveAsInfo:responseDict];
@@ -179,7 +184,7 @@ enum {
 }
 
 - (void)downloadDocument:(NSString *)downloadCommand 
-                 service:(GDataServiceGoogleDocs *)service
+                 service:(GDataServiceGoogle *)service
               saveAsInfo:(NSDictionary *)saveAsInfo {
   NSURL *downloadURL = [NSURL URLWithString:downloadCommand];
   NSURLRequest *request = [service requestForURL:downloadURL

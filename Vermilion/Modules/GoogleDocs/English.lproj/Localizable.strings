@@ -16,6 +16,9 @@
 /* A dialog title for a dialog describing a Google Docs data fetch problem. */
 "Google Docs fetch problem." = "Google Docs fetch problem.";
 
+/* Popup title specifying which worksheets of a spreadsheet document are to be saved. */
+"Save worksheet:" = "Save worksheet:";
+
 /* Popup title specifying the format to which a document is to be saved. */
 "Save as document type:" = "Save as document type:";
 

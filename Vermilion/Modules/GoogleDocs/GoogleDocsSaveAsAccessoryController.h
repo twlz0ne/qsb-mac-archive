@@ -46,30 +46,45 @@
 */
 @interface GoogleDocsSaveAsAccessoryController : NSViewController <QSBActionSaveAsControllerProtocol> {
  @private
+  IBOutlet NSTextField *worksheetLabel_;  // Label for worksheet popup.
+  IBOutlet NSPopUpButton *worksheetPopup_;  // Worksheet popup.
   NSArray *fileTypes_;
   NSInteger fileTypeIndex_;
+  NSArray *worksheetNames_;
+  NSInteger worksheetIndex_;
   NSDictionary *saveAsInfo_;
   // Maps from the localized save-as document type description to the
   // extension to be assigned to the exported file.
   NSDictionary *descriptionToExtensionMap_;
+  // YES if we're dealing with a spreadsheet.
+  BOOL isSpreadsheet_;
 }
 
 /*!
- A list of file types set based on the kind (vategory) of Google Doc
- being exported.  This must follow the format of:
- @textblock
-    extension - description
- @/textblock
- where 'extension' is always followed by a space.  This is bound to
- the array controller in the nib.
+ A list of user visible file types set based on the kind (category) of
+ Google Doc being exported.  This is bound to the Possible File Types
+ array controller in the nib.
 */
 @property (nonatomic, retain) NSArray *fileTypes;
 
 /*!
  The index of the file type chosen by the user.  This is bound to
- the popup control in the nib.
+ the Document Type Popup control in the nib.
 */
 @property (nonatomic, assign) NSInteger fileTypeIndex;
+
+/*!
+ A list of worksheets contained in a spreadsheet.  These choices are
+ presented to the user for CSV and TSV files when there is more than one
+ worksheet.  This is bound to the Worksheets array controller in the nib.
+ */
+@property (nonatomic, retain) NSArray *worksheetNames;
+
+/*!
+ The index of the worksheet chosen by the user.  This is bound to
+ the Worksheet Popup control in the nib.
+ */
+@property (nonatomic, assign) NSInteger worksheetIndex;
 
 /*!
  Specifies controller-specific information to be shown in and/or
