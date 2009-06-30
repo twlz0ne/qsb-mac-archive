@@ -47,6 +47,7 @@ static NSString * const kCallbackTypeData = @"kCallbackTypeData";
 static NSString * const kCallbackTypeError = @"kCallbackTypeError";
 static NSString * const kCallbackDataKey = @"kCallbackDataKey";
 static NSString * const kCallbackErrorKey = @"kCallbackErrorKey";
+static NSString * const kHGSOperationQueueLockObject = @"";
 
 static const CFTimeInterval kNetworkOperationTimeout = 60; // seconds
 
@@ -447,7 +448,7 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
 GTMOBJECT_SINGLETON_BOILERPLATE(HGSOperationQueue, sharedOperationQueue);
 
 - (void)addOperation:(NSOperation *)operation {
-  @synchronized(self) {
+  @synchronized(kHGSOperationQueueLockObject) {
     // Make disk operations sequential by making the added disk
     // operation a dependency of the last disk operation in the current
     // queue
