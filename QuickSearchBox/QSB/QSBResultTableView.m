@@ -59,24 +59,10 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
 - (void)highlightSelectionInClipRect:(NSRect)rect {
   NSInteger selectedRow = [self selectedRow];
   if (selectedRow != -1) {
-    NSColor *highlightBottom = nil;
-    NSColor *highlightTop = nil;
-    NSColor *mainColor = nil;
-    // TODO(dmaclach): handle selection correctly
-    if (YES) {
-      NSColor *highlightColor = [NSColor selectedTextBackgroundColor];
-      
-      highlightTop = [highlightColor colorWithAlphaComponent:0.25];
-      highlightBottom = [highlightColor colorWithAlphaComponent:0.5];
-      mainColor = highlightColor;
-    } else {
-      mainColor = [NSColor colorWithCalibratedRed:166.0/255.0 
-                                            green:193/255.0 
-                                             blue:224/255.0
-                                            alpha:1.0];
-      highlightBottom = [mainColor colorWithAlphaComponent:0.75];
-      highlightTop = [mainColor colorWithAlphaComponent:0.25];
-    }
+    NSColor *highlightColor = [NSColor selectedTextBackgroundColor];
+    NSColor *highlightBottom = [highlightColor colorWithAlphaComponent:0.85];
+    NSColor *highlightTop = [highlightColor colorWithAlphaComponent:0.6];
+
     NSRect selectedRect = [self rectOfRow:selectedRow];
     selectedRect = NSInsetRect(selectedRect, 0.5, 0.5);
     selectedRect.origin.x += [self selectionLeftInset];
@@ -95,7 +81,7 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
                     extendingStart:YES 
                       extendingEnd:YES 
                            shading:shading];
-    [mainColor set];
+    [highlightColor set];
     [roundPath stroke];
   }
 }
