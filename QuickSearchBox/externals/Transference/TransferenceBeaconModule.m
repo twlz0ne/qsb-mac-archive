@@ -56,8 +56,8 @@
   if ((self = [super initWithConfiguration:configuration])) {
     NSNotificationCenter *noteCenter = [NSNotificationCenter defaultCenter];
     [noteCenter addObserver:self
-                   selector:@selector(applicationDidFinishLaunching:)
-                       name:NSApplicationDidFinishLaunchingNotification
+                   selector:@selector(pluginsDidLoad:)
+                       name:kHGSPluginLoaderDidInitializePluginsNotification
                      object:nil];
 
     // Allocate for the searchObject array
@@ -134,9 +134,9 @@
   }
 }
 
-#pragma mark -- NSApp notification handlers --
+#pragma mark -- HGSPluginLoader notification handlers --
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+- (void)pluginsDidLoad:(NSNotification *)aNotification {
   // What time did we stop loading
   NSDate *startupTime = [NSDate date];
 
