@@ -270,7 +270,8 @@ static NSString *const kWebURLsWithTitlesPboardType
         NSString *path = [destinationDirs objectAtIndex:0];
         NSString *fileName = [result displayName];
         
-        // Present the save-as panel.
+        // Present the save-as panel, forcing the app to the front.
+        [NSApp activateIgnoringOtherApps:YES];
         NSInteger answer = [savePanel runModalForDirectory:path
                                                       file:fileName];
         if (answer == NSFileHandlingPanelOKButton) {

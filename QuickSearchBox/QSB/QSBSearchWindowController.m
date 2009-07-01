@@ -974,56 +974,63 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (void)showSearchWindowBecause:(NSString *)toggle {
-  // a window must be "visible" for it to be key. This makes it "visible"
-  // but invisible to the user so we can accept keystrokes while we are
-  // busy opening the window. We order it front as a invisible window, and then
-  // slowly fade it in.
-  NSWindow *searchWindow = [self window];
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [visibilityChangedUserInfo_ autorelease];
-  visibilityChangedUserInfo_
-    = [[NSDictionary alloc] initWithObjectsAndKeys:
-       toggle, kQSBSearchWindowChangeVisibilityToggleKey,
-       nil];
-  [nc postNotificationName:kQSBSearchWindowWillShowNotification
-                    object:searchWindow
-                  userInfo:visibilityChangedUserInfo_];
-  
-  if ([[NSUserDefaults standardUserDefaults]
-       boolForKey:kQSBSearchWindowDimBackground]) {
-    NSWindow *shieldWindow = [self shieldWindow];
-    [shieldWindow setFrame:[[NSScreen mainScreen] frame] display:NO];
-    if (![shieldWindow isVisible]) {
-      [shieldWindow setAlphaValue:0.0];
-      [shieldWindow makeKeyAndOrderFront:nil];
-    } 
+  NSWindow *modalWindow = [NSApp modalWindow];
+  if (!modalWindow) {
+    // a window must be "visible" for it to be key. This makes it "visible"
+    // but invisible to the user so we can accept keystrokes while we are
+    // busy opening the window. We order it front as a invisible window, and then
+    // slowly fade it in.
+    NSWindow *searchWindow = [self window];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [visibilityChangedUserInfo_ autorelease];
+    visibilityChangedUserInfo_
+      = [[NSDictionary alloc] initWithObjectsAndKeys:
+         toggle, kQSBSearchWindowChangeVisibilityToggleKey,
+         nil];
+    [nc postNotificationName:kQSBSearchWindowWillShowNotification
+                      object:searchWindow
+                    userInfo:visibilityChangedUserInfo_];
     
-    [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:0.5];
-    [[shieldWindow animator] setAlphaValue:0.1];
-    [NSAnimationContext endGrouping];
-  }
-  
-  [searchWindow makeKeyAndOrderFront:self];
-  
-  // Start the window partially shown, and animate the rest of the way.
-  if (![toggle isEqualToString:kQSBAppLaunchedChangeVisiblityToggle]) {
-    [searchWindow setAlphaValue:0.75];
+    if ([[NSUserDefaults standardUserDefaults]
+         boolForKey:kQSBSearchWindowDimBackground]) {
+      NSWindow *shieldWindow = [self shieldWindow];
+      [shieldWindow setFrame:[[NSScreen mainScreen] frame] display:NO];
+      if (![shieldWindow isVisible]) {
+        [shieldWindow setAlphaValue:0.0];
+        [shieldWindow makeKeyAndOrderFront:nil];
+      } 
+      
+      [NSAnimationContext beginGrouping];
+      [[NSAnimationContext currentContext] setDuration:0.5];
+      [[shieldWindow animator] setAlphaValue:0.1];
+      [NSAnimationContext endGrouping];
+    }
+    
+    [searchWindow makeKeyAndOrderFront:self];
+    
+    // Start the window partially shown, and animate the rest of the way.
+    if (![toggle isEqualToString:kQSBAppLaunchedChangeVisiblityToggle]) {
+      [searchWindow setAlphaValue:0.75];
 
-    [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:kQSBShowDuration];
-    [[searchWindow animator] setAlphaValue:1.0];
-    [self setWelcomeHidden:NO];
-    [NSAnimationContext endGrouping];
+      [NSAnimationContext beginGrouping];
+      [[NSAnimationContext currentContext] setDuration:kQSBShowDuration];
+      [[searchWindow animator] setAlphaValue:1.0];
+      [self setWelcomeHidden:NO];
+      [NSAnimationContext endGrouping];
+    } else {
+      [searchWindow setAlphaValue:1.0];
+      [self setWelcomeHidden:NO];
+    }
+    
+    if ([[activeSearchViewController_ queryString] length]) {
+      [self performSelector:@selector(displayResults:)
+                 withObject:nil 
+                 afterDelay:kQSBReshowResultsDelay];
+    }
   } else {
-    [searchWindow setAlphaValue:1.0];
-    [self setWelcomeHidden:NO];
-  }
-  
-  if ([[activeSearchViewController_ queryString] length]) {
-    [self performSelector:@selector(displayResults:)
-               withObject:nil 
-               afterDelay:kQSBReshowResultsDelay];
+    // Bring whatever modal up front.
+    [NSApp activateIgnoringOtherApps:YES];
+    [modalWindow makeKeyAndOrderFront:self];
   }
 }
 
