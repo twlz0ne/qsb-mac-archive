@@ -110,6 +110,9 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 - (void)updateLogoView;
 - (BOOL)firstLaunch;
 
+// Bottleneck function for registering/deregistering for window changes.
+- (void)setObservingMoveAndResizeNotifications:(BOOL)doRegister;
+
 // Utility function to update the shadows around our custom table view
 - (void)updateShadows;
 
@@ -243,16 +246,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [searchWindow setLevel:kCGStatusWindowLevel + 2];
   
   // Tell the window to tell us when it has changed position on the screen.
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self 
-         selector:@selector(windowPositionChanged:) 
-             name:NSWindowDidMoveNotification 
-           object:searchWindow];
-  
-  [nc addObserver:self 
-         selector:@selector(windowPositionChanged:) 
-             name:NSWindowDidResizeNotification 
-           object:searchWindow];
+  [self setObservingMoveAndResizeNotifications:YES];
   [self hideResultsWindow];
   
   NSUserDefaults *userPrefs = [NSUserDefaults standardUserDefaults];
@@ -269,7 +263,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
                      options:0];
   
   [self updateLogoView];
-
+  
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc addObserver:self 
          selector:@selector(applicationDidBecomeActive:)
              name:NSApplicationDidBecomeActiveNotification
@@ -456,6 +451,28 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [logoView_ setHidden:image != nil];
   [previewImageView_ setImage:image];
   [previewImageView_ display];
+}
+
+- (void)setObservingMoveAndResizeNotifications:(BOOL)doRegister {
+  NSWindow *searchWindow = [self window];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  if (doRegister) {
+    [nc addObserver:self 
+           selector:@selector(windowPositionChanged:) 
+               name:NSWindowDidMoveNotification 
+             object:searchWindow];
+    [nc addObserver:self 
+           selector:@selector(windowPositionChanged:) 
+               name:NSWindowDidResizeNotification 
+             object:searchWindow];
+  } else {
+    [nc removeObserver:self 
+                  name:NSWindowDidMoveNotification 
+                object:searchWindow];
+    [nc removeObserver:self 
+                  name:NSWindowDidResizeNotification 
+                object:searchWindow];
+  }
 }
 
 - (void)updateLogoView {
@@ -1098,12 +1115,13 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (void)setResultsWindowHeight:(CGFloat)newHeight
                      animating:(BOOL)animating {
-  
   // Don't let one of these trigger during our animations, they can cause
-  // view corruption
+  // view corruption.
   [NSObject cancelPreviousPerformRequestsWithTarget:self
                                            selector:@selector(updateResultsViewNow) 
                                              object:nil];
+  // Prevent a recusion since we're quite likely to resize the window.
+  [self setObservingMoveAndResizeNotifications:NO];
   
   NSWindow *queryWindow = [self window];
   
@@ -1118,7 +1136,6 @@ doCommandBySelector:(SEL)commandSelector {
   NSRect actualFrame = [self fullyExposedFrameForFrame:proposedFrame
                                         respectingDock:YES
                                               onScreen:[queryWindow screen]];
-
   if (!NSEqualRects(actualFrame, proposedFrame)) {
     // We need to move the query window as well as the results window.
     NSPoint deltaPoint = NSMakePoint(actualFrame.origin.x - proposedFrame.origin.x,
@@ -1140,6 +1157,9 @@ doCommandBySelector:(SEL)commandSelector {
   } else {
     [resultsWindow_ setFrame:actualFrame display:YES];
   }
+  
+  // Turn back on size/move notifications.
+  [self setObservingMoveAndResizeNotifications:YES];
 }
 
 - (NSImageView *)previewImageView {
@@ -1199,7 +1219,10 @@ doCommandBySelector:(SEL)commandSelector {
                                            forKey:kQSBSearchWindowFrameLeftPrefKey];
   [[NSUserDefaults standardUserDefaults] setFloat:(float)topLeft.y
                                            forKey:kQSBSearchWindowFrameTopPrefKey];
-  CGFloat newWindowHeight = [activeSearchViewController_ windowHeight];
+  CGFloat newWindowHeight = windowFrame.size.height;
+  if ([resultsWindow_ isVisible]) {
+    newWindowHeight = [activeSearchViewController_ windowHeight];
+  }
   [self setResultsWindowHeight:newWindowHeight animating:NO];
 }
 
