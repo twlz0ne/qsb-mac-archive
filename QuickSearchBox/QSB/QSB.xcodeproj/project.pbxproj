@@ -107,6 +107,7 @@
 				5AF0EF3F0F61D33F0041E0B9 /* PBXTargetDependency */,
 				5AF0F53C0F671E750041E0B9 /* PBXTargetDependency */,
 				5A0BB2E30FAB8B3100AA4858 /* PBXTargetDependency */,
+				62370BA50FFC5B5E00C48624 /* PBXTargetDependency */,
 			);
 			name = "QSB Application";
 			productName = "Add Plugins To QSB";
@@ -336,6 +337,12 @@
 		622912150F2E81F6005D34CE /* SetUpGoogleAccountView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 622912130F2E81F6005D34CE /* SetUpGoogleAccountView.xib */; };
 		622912F40F2EAF80005D34CE /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		62365B3E0F3A1919008A760E /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
+		62370A580FFC59B000C48624 /* SharedScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEC5C580FBA283C005608EA /* SharedScript.m */; };
+		62370B380FFC5AD200C48624 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 62370B360FFC5A9900C48624 /* InfoPlist.strings */; };
+		62370B4C0FFC5AF000C48624 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 62370B4A0FFC5AF000C48624 /* Localizable.strings */; };
+		62370B4E0FFC5AFA00C48624 /* StockQuoter.py in Resources */ = {isa = PBXBuildFile; fileRef = 62370B4D0FFC5AFA00C48624 /* StockQuoter.py */; };
+		62370BB40FFC5B7A00C48624 /* StockQuoter.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 62370A5D0FFC59B000C48624 /* StockQuoter.hgs */; };
+		62370E2A0FFD460400C48624 /* StockQuoter.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62370E290FFD460400C48624 /* StockQuoter.icns */; };
 		623A002E0E9BC534002A8401 /* TopStandardResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 623A002C0E9BC534002A8401 /* TopStandardResultView.xib */; };
 		623A00330E9BC5A6002A8401 /* TopSeparatorResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 623A002F0E9BC5A6002A8401 /* TopSeparatorResultView.xib */; };
 		623A00340E9BC5A6002A8401 /* TopFoldResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 623A00310E9BC5A6002A8401 /* TopFoldResultView.xib */; };
@@ -1147,6 +1154,13 @@
 			remoteGlobalIDString = 62EA8BBD0F2E7DE200C92E0B;
 			remoteInfo = GoogleAccounts;
 		};
+		62370BA40FFC5B5E00C48624 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 62370A520FFC59B000C48624;
+			remoteInfo = "Stock Quoter";
+		};
 		623ADD340EC0CC17001651D1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1744,6 +1758,7 @@
 				5AF0EC900F6076000041E0B9 /* Dictionary.hgs in CopyFiles */,
 				5AF0EF330F61D32E0041E0B9 /* Trash.hgs in CopyFiles */,
 				5AF0F5B90F6720B10041E0B9 /* Mount.hgs in CopyFiles */,
+				62370BB40FFC5B7A00C48624 /* StockQuoter.hgs in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1872,6 +1887,12 @@
 		622912100F2E81E7005D34CE /* GoogleAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleAccount.h; sourceTree = "<group>"; };
 		622912110F2E81E7005D34CE /* GoogleAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccount.m; sourceTree = "<group>"; };
 		622912140F2E81F6005D34CE /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/SetUpGoogleAccountView.xib; sourceTree = "<group>"; };
+		62370A5D0FFC59B000C48624 /* StockQuoter.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StockQuoter.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
+		62370B350FFC5A8B00C48624 /* StockQuoter-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "StockQuoter-Info.plist"; sourceTree = "<group>"; };
+		62370B370FFC5A9900C48624 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		62370B4B0FFC5AF000C48624 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		62370B4D0FFC5AFA00C48624 /* StockQuoter.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = StockQuoter.py; sourceTree = "<group>"; };
+		62370E290FFD460400C48624 /* StockQuoter.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = StockQuoter.icns; sourceTree = "<group>"; };
 		623A002D0E9BC534002A8401 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TopStandardResultView.xib; sourceTree = "<group>"; };
 		623A00300E9BC5A6002A8401 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TopSeparatorResultView.xib; sourceTree = "<group>"; };
 		623A00320E9BC5A6002A8401 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TopFoldResultView.xib; sourceTree = "<group>"; };
@@ -3026,6 +3047,7 @@
 				5AF0EB630F60744E0041E0B9 /* Dictionary.hgs */,
 				5AF0EE220F61D0850041E0B9 /* Trash.hgs */,
 				5AF0F4880F671D9C0041E0B9 /* Mount.hgs */,
+				62370A5D0FFC59B000C48624 /* StockQuoter.hgs */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3298,6 +3320,18 @@
 				62977A940FAA8D5000C6CB59 /* Resources */,
 			);
 			path = QSBPluginUI;
+			sourceTree = "<group>";
+		};
+		62370A500FFC57F900C48624 /* StockQuoter */ = {
+			isa = PBXGroup;
+			children = (
+				62370B4D0FFC5AFA00C48624 /* StockQuoter.py */,
+				62370B350FFC5A8B00C48624 /* StockQuoter-Info.plist */,
+				62370B360FFC5A9900C48624 /* InfoPlist.strings */,
+				62370B4A0FFC5AF000C48624 /* Localizable.strings */,
+				62370E290FFD460400C48624 /* StockQuoter.icns */,
+			);
+			path = StockQuoter;
 			sourceTree = "<group>";
 		};
 		623ADD740EC0CC31001651D1 /* EmailActions */ = {
@@ -3971,6 +4005,7 @@
 				5AEC5C550FBA2824005608EA /* SharedScript */,
 				8B3EF7660EF2C7CB0036FFBD /* Shortcuts */,
 				8B6F2D1D0DA2B83F0052CA40 /* SpotlightFiles */,
+				62370A500FFC57F900C48624 /* StockQuoter */,
 				7F9FF9120DD27A530040408E /* Suggest */,
 				7FF01A070EB08A1B001A2C7B /* Terminal */,
 				F47DA7F80EDB00BD00A64007 /* TextInput */,
@@ -4962,6 +4997,22 @@
 			productReference = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		62370A520FFC59B000C48624 /* Stock Quoter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 62370A590FFC59B000C48624 /* Build configuration list for PBXNativeTarget "Stock Quoter" */;
+			buildPhases = (
+				62370A530FFC59B000C48624 /* Resources */,
+				62370A570FFC59B000C48624 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Stock Quoter";
+			productName = StockQuoter;
+			productReference = 62370A5D0FFC59B000C48624 /* StockQuoter.hgs */;
+			productType = "com.apple.product-type.bundle";
+		};
 		623ADD320EC0CC17001651D1 /* Email URL Action */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 623ADD420EC0CC17001651D1 /* Build configuration list for PBXNativeTarget "Email URL Action" */;
@@ -5673,6 +5724,7 @@
 				7F9415C40EEF52930049AE06 /* Shared File List */,
 				8B3EF87F0EF2C8A80036FFBD /* Shortcuts */,
 				8B6F2EF80DA2BA260052CA40 /* Spotlight Files */,
+				62370A520FFC59B000C48624 /* Stock Quoter */,
 				8BCCD2620EC8E5EC00688D64 /* System AppleScript */,
 				7FF019AA0EB089CB001A2C7B /* Terminal */,
 				5AF0EE210F61D0850041E0B9 /* Trash */,
@@ -5871,6 +5923,17 @@
 				8BA61DBB0F0AEF78008182B5 /* AddToPartyShuffle.icns in Resources */,
 				8BA61DBD0F0AEF7E008182B5 /* PlayInPartyShuffle.icns in Resources */,
 				8BC6E5E30FAAC263005A0F6F /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		62370A530FFC59B000C48624 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				62370B380FFC5AD200C48624 /* InfoPlist.strings in Resources */,
+				62370B4C0FFC5AF000C48624 /* Localizable.strings in Resources */,
+				62370B4E0FFC5AFA00C48624 /* StockQuoter.py in Resources */,
+				62370E2A0FFD460400C48624 /* StockQuoter.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7110,6 +7173,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		62370A570FFC59B000C48624 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				62370A580FFC59B000C48624 /* SharedScript.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		623ADD3A0EC0CC17001651D1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -7600,6 +7671,11 @@
 			target = 62EA8BBD0F2E7DE200C92E0B /* GoogleAccounts */;
 			targetProxy = 622911BC0F2E8034005D34CE /* PBXContainerItemProxy */;
 		};
+		62370BA50FFC5B5E00C48624 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 62370A520FFC59B000C48624 /* Stock Quoter */;
+			targetProxy = 62370BA40FFC5B5E00C48624 /* PBXContainerItemProxy */;
+		};
 		623ADD330EC0CC17001651D1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
@@ -7985,6 +8061,22 @@
 				622912140F2E81F6005D34CE /* English */,
 			);
 			name = SetUpGoogleAccountView.xib;
+			sourceTree = "<group>";
+		};
+		62370B360FFC5A9900C48624 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				62370B370FFC5A9900C48624 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		62370B4A0FFC5AF000C48624 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				62370B4B0FFC5AF000C48624 /* English */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		623A002C0E9BC534002A8401 /* TopStandardResultView.xib */ = {
@@ -8831,6 +8923,36 @@
 				INFOPLIST_FILE = "$(SRCROOT)/QSBPluginUI/Resources/QSBPluginUI-Info.plist";
 				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
 				PRODUCT_NAME = QSBPluginUI;
+			};
+			name = Release;
+		};
+		62370A5A0FFC59B000C48624 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/StockQuoter/StockQuoter-Info.plist";
+				PRODUCT_NAME = StockQuoter;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Debug;
+		};
+		62370A5B0FFC59B000C48624 /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/StockQuoter/StockQuoter-Info.plist";
+				PRODUCT_NAME = StockQuoter;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		62370A5C0FFC59B000C48624 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/StockQuoter/StockQuoter-Info.plist";
+				PRODUCT_NAME = StockQuoter;
+				WRAPPER_EXTENSION = hgs;
 			};
 			name = Release;
 		};
@@ -10278,6 +10400,16 @@
 				620CB30B0FAA827E0029801C /* Debug */,
 				620CB30C0FAA827E0029801C /* Debug-gcov */,
 				620CB30D0FAA827E0029801C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		62370A590FFC59B000C48624 /* Build configuration list for PBXNativeTarget "Stock Quoter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				62370A5A0FFC59B000C48624 /* Debug */,
+				62370A5B0FFC59B000C48624 /* Debug-gcov */,
+				62370A5C0FFC59B000C48624 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

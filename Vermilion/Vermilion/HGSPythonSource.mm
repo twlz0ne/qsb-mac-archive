@@ -167,11 +167,6 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
   return instance_;
 }
 
-- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult *)result {
-  // Python sources won't archive
-  return nil;
-}
-
 @end
 
 

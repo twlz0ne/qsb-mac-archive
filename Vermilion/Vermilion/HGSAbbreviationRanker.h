@@ -37,6 +37,10 @@
 
 #import <Foundation/Foundation.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!
  Scores how well a given abbreviation matches to a string.
  @param string the string to match against.
@@ -44,6 +48,10 @@
  @param outHitMask if provided, the mask will be filled with the locations of the
         characters in string that were matched by abbr.
 */
-CGFloat HGSScoreForAbbreviation(NSString *string,
-                                NSString *abbr, 
+CGFloat HGSScoreForAbbreviation(NSString *aString,
+                                NSString *abbr,
                                 NSMutableIndexSet** outHitMask);
+
+#ifdef __cplusplus
+}
+#endif
