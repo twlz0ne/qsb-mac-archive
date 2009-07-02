@@ -33,6 +33,7 @@
 #import "HGSMixer.h"
 #import "HGSQueryController.h"
 #import "HGSResult.h"
+#import "HGSLog.h"
 
 static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
 
@@ -92,30 +93,47 @@ static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
 // merges/removes duplicate results
 //
 - (NSMutableArray *)mergeDuplicates:(NSArray*)results 
-                    queryController:(HGSQueryController*)controller{
-  NSMutableArray *singulars 
-    = [NSMutableArray arrayWithCapacity:[results count]];
-  for (HGSResult *currentResult in results) {
+                    queryController:(HGSQueryController*)controller {
+  NSUInteger resultsCount = [results count];
+  id *singulars = malloc(sizeof(id) * resultsCount);
+  NSUInteger singularIndex = 0;
+  id *resultObjects = malloc(sizeof(id) * resultsCount);
+  if (!singulars || !resultObjects) {
+    free(singulars);
+    free(resultObjects);
+    HGSLogDebug(@"Out of memory at mergeDuplicates");
+    return nil;
+  }
+  [results getObjects:resultObjects];
+  for (NSUInteger i = 0; i < resultsCount; ++i) {
     // Check to see if it's a duplicate of any of the confirmed results
-    NSUInteger count = [singulars count];
-    NSUInteger i;
-    for (i = 0; i < count; ++i) {
-      if ([controller cancelled]) {
-        return nil;
-      }
-      HGSResult *singular = [singulars objectAtIndex:i];
-      if ([currentResult isDuplicate:singular]) {
-        // We've got a match; merge this into the existing result and replace
-        singular = [singular mergeWith:currentResult];
-        [singulars replaceObjectAtIndex:i withObject:singular];
-        break;
+    HGSResult *currentResult = resultObjects[i];
+    NSUInteger currentHash = currentResult->idHash_;
+    NSUInteger j;
+    for (j = 0; j < singularIndex; ++j) {
+      HGSResult *singular = singulars[j];
+      if (currentHash == singular->idHash_) {
+        if ([currentResult isDuplicate:singular]) {
+          // We've got a match; merge this into the existing result and replace
+          singular = [singular mergeWith:currentResult];
+          singulars[j] = singular;
+          break;
+        }
       }
     }
-    if (i == count) {
-      [singulars addObject:currentResult];
+    if ([controller cancelled]) {
+      return nil;
+    }
+    if (j == singularIndex) {
+      singulars[singularIndex] = currentResult;
+      ++singularIndex;
     }
   }
-  return singulars;
+  NSMutableArray *outArray = [NSMutableArray arrayWithObjects:singulars 
+                                                        count:singularIndex];
+  free(singulars);
+  free(resultObjects);
+  return outArray;
 }
 
 #pragma mark -

@@ -87,19 +87,23 @@ extern NSString* const kHGSObjectAttributeRankKey;  // NSNumber 0-10... (estimat
 
 extern NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey;  // NSValue (NSInteger)
 
-// The "type" system used for results is based on string hierarchies (similar to
-// reverse dns names).  The common bases are "contact", "file", "webpage", etc.
-// A source can then refine them to be more specific: "contact.addressbook",
-// "contact.google", "webpage.bookmark".  These strings are meant to be case
-// sensitive (to allow for faster compares).  There are two helpers (isOfType:
-// and conformsToType:) that allow the caller to check to see if a result is of
-// a certain type or refinement of that type.  The HGS_SUBTYPE macro is to be
-// used in the construction of string hierarchies with more than one segment.
-// Types can be made up of multiple segments to refine them as specifically as
-// needed.
+/*!
+  The "type" system used for results is based on string hierarchies (similar to
+  reverse dns names).  The common bases are "contact", "file", "webpage", etc.
+  A source can then refine them to be more specific: "contact.addressbook",
+  "contact.google", "webpage.bookmark".  These strings are meant to be case
+  sensitive (to allow for faster compares).  There are two helpers (isOfType:
+  and conformsToType:) that allow the caller to check to see if a result is of
+  a certain type or refinement of that type.  The HGS_SUBTYPE macro is to be
+  used in the construction of string hierarchies with more than one segment.
+  Types can be made up of multiple segments to refine them as specifically as
+  needed.
+*/
 #define HGS_SUBTYPE(x,y) x @"." y
-// Here are the current bases/common types, that DOES NOT mean that is all the
-// valid base types are.  New sources are free to add new types.
+/*!
+  Here are the current bases/common types. This DOES NOT mean that this is all 
+  the possible valid base types.  New sources are free to add new types.
+*/
 #define kHGSTypeContact @"contact"
 #define kHGSTypeFile    @"file"
 #define kHGSTypeEmail   @"email"
@@ -167,12 +171,19 @@ typedef NSUInteger HGSRankFlags;
   the search).
 */
 @interface HGSResult : NSObject <NSCopying, NSMutableCopying> {
+ @public
+  /*!
+    This is accessed by the mixer for speed.
+  */
+
+  NSUInteger idHash_;  
  @protected
-  // Used for global ranking, set by the Search Source that creates it.
+  /*!
+    Used for global ranking, set by the Search Source that creates it.
+  */
   HGSRankFlags rankFlags_;
   CGFloat rank_;
   NSURL *url_;
-  NSUInteger idHash_;
   NSString *displayName_;
   NSString *type_;
   HGSSearchSource *source_;
@@ -211,7 +222,9 @@ typedef NSUInteger HGSRankFlags;
 */
 @property (readonly) HGSSearchSource *source;
 
-// Convenience methods 
+/*!
+  Convenience methods
+*/
 + (id)resultWithURL:(NSURL *)url
                name:(NSString *)name
                type:(NSString *)typeStr
@@ -222,9 +235,11 @@ typedef NSUInteger HGSRankFlags;
                   source:(HGSSearchSource *)source 
               attributes:(NSDictionary *)attributes;
 
-// Create an result based on a dictionary of keys. Note that even though
-// kHGSObjectAttributeURIKey is documented as being a NSURL, it needs to be
-// an NSString and will be converted internally.
+/*!
+  Create an result based on a dictionary of keys. Note that even though
+  kHGSObjectAttributeURIKey is documented as being a NSURL, it needs to be an
+  NSString and will be converted internally.
+*/
 + (id)resultWithDictionary:(NSDictionary *)dictionary 
                     source:(HGSSearchSource *)source;
 
@@ -237,24 +252,33 @@ typedef NSUInteger HGSRankFlags;
 - (id)initWithDictionary:(NSDictionary*)dict
                   source:(HGSSearchSource *)source;
 
-// get an attribute by name. |-valueForKey:| may return a placeholder value
-// that is to be updated later via KVO.
+/*!
+  Get an attribute by name. |-valueForKey:| may return a placeholder value that
+  is to be updated later via KVO.
+*/
 - (id)valueForKey:(NSString*)key;
 
-// merge the attributes of |result| with this one, and return a new object. 
-// Single values that overlap are lost.
+/*!
+  Merge the attributes of |result| with this one, and return a new object.
+  Single values that overlap are lost.
+*/
 - (HGSResult *)mergeWith:(HGSResult*)result;
 
-// this is result a "duplicate" of |compareTo|? Not using |-isEqual:| because 
-// that impacts how the object gets put into collections.
+/*!
+  Is this result a "duplicate" of |compareTo|? Not using |-isEqual:| because
+  that impacts how the object gets put into collections.
+*/
 - (BOOL)isDuplicate:(HGSResult*)compareTo;
 
-// Some helpers to check if this result is of a given type.  |isOfType| checks
-// for an exact match of the type.  |conformsToType{Set}| checks to see if this
-// object is of the specific type{s} or a refinement of it/them.
+/*!
+  Some helpers to check if this result is of a given type.  |isOfType| checks
+  for an exact match of the type.  |conformsToType{Set}| checks to see if this
+  object is of the specific type{s} or a refinement of it/them.
+*/
 - (BOOL)isOfType:(NSString *)typeStr;
 - (BOOL)conformsToType:(NSString *)typeStr;
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet;
+
 @end
 
 @interface HGSMutableResult : HGSResult
@@ -281,12 +305,16 @@ typedef NSUInteger HGSRankFlags;
 - (NSUInteger)count;
 - (HGSResult *)objectAtIndex:(NSUInteger)ind;
 - (HGSResult *)lastObject;
-// Will return nil if any of the results does not have a valid file path
+/*!
+  Will return nil if any of the results does not have a valid file path
+*/
 - (NSArray *)filePaths;
 - (NSImage *)icon;
-// Some helpers to check if this result is of a given type.  |isOfType| checks
-// for an exact match of the type.  |conformsToType{Set}| checks to see if this
-// object is of the specific type{s} or a refinement of it/them.
+/*!
+  Some helpers to check if this result is of a given type.  |isOfType| checks
+  for an exact match of the type.  |conformsToType{Set}| checks to see if this
+  object is of the specific type{s} or a refinement of it/them.
+*/
 - (BOOL)isOfType:(NSString *)typeStr;
 - (BOOL)conformsToType:(NSString *)typeStr;
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet;
