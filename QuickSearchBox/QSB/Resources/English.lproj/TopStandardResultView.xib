@@ -1,26 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
+<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.02">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">9J61</string>
-		<string key="IBDocument.InterfaceBuilderVersion">677</string>
+		<string key="IBDocument.InterfaceBuilderVersion">670</string>
 		<string key="IBDocument.AppKitVersion">949.46</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-		</object>
-		<object class="NSMutableDictionary" key="IBDocument.Metadata">
-			<bool key="EncodedWithXMLCoder">YES</bool>
-			<object class="NSArray" key="dict.sortedKeys">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
-			<object class="NSMutableArray" key="dict.values">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -34,10 +26,17 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSCustomView" id="776526201">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">258</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<object class="NSCustomView" id="556326980">
+						<reference key="NSNextResponder" ref="776526201"/>
+						<int key="NSvFlags">274</int>
+						<string key="NSFrame">{{115, 3}, {304, 36}}</string>
+						<reference key="NSSuperview" ref="776526201"/>
+						<string key="NSClassName">NSView</string>
+					</object>
 					<object class="NSImageView" id="628807962">
 						<reference key="NSNextResponder" ref="776526201"/>
 						<int key="NSvFlags">268</int>
@@ -133,6 +132,7 @@
 					</object>
 				</object>
 				<string key="NSFrameSize">{422, 42}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 				<string key="NSExtension">NSResponder</string>
 			</object>
@@ -212,6 +212,14 @@
 					</object>
 					<int key="connectionID">59</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customResultView_</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="556326980"/>
+					</object>
+					<int key="connectionID">61</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -250,6 +258,7 @@
 							<reference ref="628807962"/>
 							<reference ref="704439330"/>
 							<reference ref="554823545"/>
+							<reference ref="556326980"/>
 						</object>
 						<reference key="parent" ref="1002"/>
 						<string key="objectName">Standard Results View</string>
@@ -296,6 +305,11 @@
 						<reference key="object" ref="656555317"/>
 						<reference key="parent" ref="554823545"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">60</int>
+						<reference key="object" ref="556326980"/>
+						<reference key="parent" ref="776526201"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -316,19 +330,21 @@
 					<string>5.IBPluginDependency</string>
 					<string>57.IBPluginDependency</string>
 					<string>58.IBPluginDependency</string>
+					<string>60.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{374, 633}, {422, 42}}</string>
+					<string>{{401, 827}, {422, 42}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
+					<integer value="1"/>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>QSBResultIconView</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -355,7 +371,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">59</int>
+			<int key="maxID">61</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -454,7 +470,7 @@
 					<string key="superclassName">NSImageView</string>
 					<object class="NSMutableDictionary" key="outlets">
 						<string key="NS.key.0">controller_</string>
-						<string key="NS.object.0">QSBDetailedRowViewController</string>
+						<string key="NS.object.0">QSBResultRowViewController</string>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -464,6 +480,10 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">QSBResultRowViewController</string>
 					<string key="superclassName">NSViewController</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">customResultView_</string>
+						<string key="NS.object.0">NSView</string>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">QSBResultRowViewController.h</string>
@@ -478,16 +498,21 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">QSBTopStandardRowViewController</string>
+					<string key="className">QSBTopDetailedRowViewController</string>
 					<string key="superclassName">QSBDetailedRowViewController</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="225203541">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">QSBTopResultsViewControllers.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">QSBTopStandardRowViewController</string>
-					<string key="superclassName">QSBDetailedRowViewController</string>
+					<string key="superclassName">QSBTopDetailedRowViewController</string>
+					<reference key="sourceIdentifier" ref="225203541"/>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">QSBTopStandardRowViewController</string>
+					<string key="superclassName">QSBTopDetailedRowViewController</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>

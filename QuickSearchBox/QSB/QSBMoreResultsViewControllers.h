@@ -30,11 +30,11 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBResultRowViewController.h"
+#import "QSBDetailedRowViewController.h"
 
 @class QSBTableResult;
 
-@interface QSBMoreDetailedRowViewController : QSBResultRowViewController
+@interface QSBMoreDetailedRowViewController : QSBDetailedRowViewController
 // return the detail string for a given result.
 - (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result;
 @end

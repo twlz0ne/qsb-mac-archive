@@ -30,23 +30,51 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion QSBResultRowViewController
+*/
+
 #import <Cocoa/Cocoa.h>
 
 @class QSBSearchViewController;
 
-// Serves as the base view controller class for the various nibs used to
-// present a row in a results table.  You may create customized child
-// classes to perform special view initialization and actions.
-//
+/*!
+ The abstract base view controller class for the various nibs used to present
+ a row in a results table.  There are several child classes which support
+ the presentation of results for the Top and the More windows as well as
+ for showing dividers, category summaries, and the Top and More folds.
+ 
+ Support is also provided for result sources that wish to present their own
+ view for drawing in place of the right-hand side detail shown by default.
+ A custom result view will be width constrained but may have a variable
+ height.
+*/
 @interface QSBResultRowViewController : NSViewController {
  @private
+  /*!
+   The custom result view used to present an optional source-provided result
+   view.  The source-provided view will be added as a child to this view and
+   resized to match width while the view of this controller will be resized
+   height-wise to accomodate the custom view.  If this view is not connected
+   in the nib then no source-provided view will be allowed.
+  */
+  IBOutlet NSView* customResultView_;
+  BOOL customResultViewInstalled_;
   QSBSearchViewController *searchViewController_;
   NSNib *nib_;
 }
 
+/*!
+ Returns YES if there is a connected |customResultView| and the result's
+ source has provided a view for rendering the result.
+*/
+@property (readonly, nonatomic, getter=isCustomResultViewInstalled)
+  BOOL customResultViewInstalled;
 @property (readonly, nonatomic) QSBSearchViewController *searchViewController;
 
 // Designated initializer.
 - (id)initWithNib:(NSNib *)nib_
        controller:(QSBSearchViewController *)searchViewController;
+
 @end

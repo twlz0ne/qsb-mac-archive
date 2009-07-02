@@ -31,14 +31,49 @@
 //
 
 #import "QSBResultRowViewController.h"
-#import "Vermilion/Vermilion.h"
+#import "QSBTableResult.h"
+#import <Vermilion/Vermilion.h>
 #import "GTMMethodCheck.h"
+
+// An extension wishing to present a result in a custom view will provide
+// a dictionary in its plist with the following key.  This dictionary
+// will contain one or more dictionaries identified with a key equal to
+// the type of the result for which a custom result view should be used
+// to render the result.
+//
+// Here is an example of what might be found within an extension specification:
+//
+//    <key>QSBCustomResultViewTypes</key>
+//    <dict>
+//      <key>webpage</key>
+//      <dict>
+//        <key>QSBResultViewNibName</key>
+//        <string>FunkyWebPageNib</string>
+//        <key>QSBResultViewControllerClassName</key>
+//        <string>FunkyWebPageNibViewController</string>
+//      </dict>
+//    </dict>
+//
+// The associated extension, when presented with a webpage result, would
+// provide the FunkyWebPageNib nib file, containing a custom view, while
+// identifying the view controller class for that nib file's owner being
+// FunkyWebPageNibViewController.
+static NSString *const kQSBCustomResultViewTypes = @"QSBCustomResultViewTypes";
+
+// Each custom result view dictionary contains two strings: one identifies
+// the nib by name and the other specifies the class of the view controller
+// constituting the nibs owner.
+static NSString *const kQSBResultViewNibName = @"QSBResultViewNibName";
+static NSString *const kQSBResultViewControllerClassName
+  = @"QSBResultViewControllerClassName";
+
 
 @implementation QSBResultRowViewController
 
 // We use a private method here, so let's check and make sure it exists
 GTM_METHOD_CHECK(NSViewController, _setTopLevelObjects:);
 
+@synthesize customResultViewInstalled = customResultViewInstalled_;
 @synthesize searchViewController = searchViewController_;
 
 - (id)initWithNib:(NSNib *)nib
@@ -70,6 +105,92 @@ GTM_METHOD_CHECK(NSViewController, _setTopLevelObjects:);
   } else {
     [self performSelector:NSSelectorFromString(@"_setTopLevelObjects:") 
                withObject:topLevelObjects];
+  }
+}
+
+- (void)setRepresentedObject:(id)object {
+  [super setRepresentedObject:object];
+  
+  if (customResultView_) {
+    // Remove any old custom view.
+    if ([self isCustomResultViewInstalled]) {
+      customResultViewInstalled_ = NO;
+      NSArray *subViews = [customResultView_ subviews];
+      if ([subViews count]) {
+        NSView *subView = [subViews objectAtIndex:0];
+        [subView removeFromSuperview];
+      }
+    }
+    [customResultView_ setHidden:YES]; // Assume it won't be shown.
+    
+    // For now, we only support custom views for HGSResults, but this could
+    // be expanded to support any type of represented object.
+    if ([object isKindOfClass:[QSBSourceTableResult class]]) {
+      QSBSourceTableResult *tableResult = object;
+      HGSResult *result = [tableResult representedResult];
+      HGSSearchSource *source = [result source];
+      NSBundle *sourceBundle = [source bundle];
+      NSString *resultType = [result type];
+      HGSProtoExtension *protoExtension = [source protoExtension];
+      NSDictionary *customResultViewTypes
+        = [protoExtension objectForKey:kQSBCustomResultViewTypes];
+      NSDictionary *customResultViewInfo
+        = [customResultViewTypes objectForKey:resultType];
+      if (customResultViewInfo) {
+        NSString *resultViewNibName
+          = [customResultViewInfo objectForKey:kQSBResultViewNibName];
+        NSString *resultViewControllerClassName
+          = [customResultViewInfo objectForKey:kQSBResultViewControllerClassName];
+        Class resultViewControllerClass
+          = NSClassFromString(resultViewControllerClassName);
+        if ([resultViewNibName length]
+            && [resultViewControllerClassName length]) {
+          NSViewController *resultViewController
+            = [[[resultViewControllerClass alloc] 
+                initWithNibName:resultViewNibName bundle:sourceBundle]
+               autorelease];
+          if (resultViewController) {
+            [resultViewController loadView];
+            // The custom view doesn't _have_ to do anything special
+            // with the result, but it normally should.  There are cases,
+            // however, where the result might not be necessary in order
+            // to properly render the custom view -- a clock, for example.
+            if ([resultViewController respondsToSelector:@selector(setResult:)]) {
+              [resultViewController performSelector:@selector(setResult:)
+                                         withObject:result];
+            }
+            NSView *resultView = [resultViewController view];
+            
+            // Re-width the custom view and re-height the container view.
+            NSRect customFrame = [customResultView_ frame];
+            NSRect resultFrame = [resultView frame];
+            resultFrame.origin = NSZeroPoint;
+            resultFrame.size.width = NSWidth(customFrame);
+            [resultView setFrame:resultFrame];
+            CGFloat deltaHeight = NSHeight(resultFrame) - NSHeight(customFrame);
+            NSView *containerView = [self view];
+            NSSize containerSize = [containerView frame].size;
+            containerSize.height += deltaHeight;
+            [containerView setFrameSize:containerSize];
+            [customResultView_ addSubview:resultView];
+            [customResultView_ setHidden:NO];
+            customResultViewInstalled_ = YES;
+          } else {
+            HGSLogDebug(@"Failed to load custom result view nib '%@' "
+                        @"for extension '%@'.", resultViewNibName,
+                        [source displayName]);
+          }
+          
+        } else {
+          HGSLogDebug(@"Extension '%@' has custom result view entry for '%@' "
+                      @"but fails to provide a nib name and/or a "
+                      @"view controller class.", [source displayName],
+                      resultType);
+        }
+      }
+    }
+  } else {
+    customResultViewInstalled_ = NO;
   }
 }
 

@@ -30,15 +30,46 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion QSBTopResultsViewControllers
+*/
+
 #import "QSBDetailedRowViewController.h"
 
-// A row view controller for standard results showm in the Top results
-// view.  When the result is assigned to the row the view layout is
-// adjusted based on how much text is shown in the description.
-//
-@interface QSBTopStandardRowViewController : QSBDetailedRowViewController
+@class QSBTableResult;
+
+/*!
+ A row view controller for standard results showm in the Top results
+ view.  When the result is assigned to the row the view layout is
+ adjusted based on how much text is shown in the description.
+ */
+@interface QSBTopDetailedRowViewController : QSBDetailedRowViewController {
+ @private
+  /*! Remembers the default height of the main view. */
+  CGFloat defaultViewHeight_;
+  /*! Remembers the initial position of the text. */
+  CGFloat defaultTextYOffset_;
+  /*! Remembers the standard height of the text. */
+  CGFloat defaultTextHeight_;
+}
+
+/*!
+ The adjustments to the view metrics is performed when the results
+ object is assigned to the view controller.
+*/
+- (void)setRepresentedObject:(id)object;
+
+/*!
+ Returns the detail string for a given result.
+ Must be overridden by subclasses.
+*/
+- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result;
+
+@end
+
+@interface QSBTopStandardRowViewController : QSBTopDetailedRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller;
-// return the detail string for a given result.
 - (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result;
 @end
 

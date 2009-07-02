@@ -30,28 +30,29 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion QSBDetailedRowViewController
+*/
+
 #import "QSBResultRowViewController.h"
 
-@class QSBTableResult;
-
-// An abstract row view controller for results that have a detail
-// string. Subclasses must override titleSourceURLStringForResult.
+/*!
+ An abstract row view controller for results that have a detail
+ string. The detail view which presents the detail string will be
+ suppressed (hidden) if the result associated with this row wants
+ to present a custom view of its own.
+*/
 
 @interface QSBDetailedRowViewController : QSBResultRowViewController {
  @private
+  /*! 
+   Connected to the detail view which should be hidden when a custom
+   result view is to be shown.
+  */
   IBOutlet NSTextField *detailView_;
-  
-  CGFloat defaultViewHeight_;  // Remembers the default height of the main view.
-  CGFloat defaultTextYOffset_;  // Remembers the initial position of the text.
-  CGFloat defaultTextHeight_;  // Remembers the standard height of the text.
 }
 
-// The adjustments to the view metrics is performed when the results
-// object is assigned to the view controller.
-- (void)setRepresentedObject:(id)object;
-
-// return the detail string for a given result.
-// Must be overridden by subclasses.
-- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result;
+@property (readonly, nonatomic) NSTextField *detailView;
 
 @end

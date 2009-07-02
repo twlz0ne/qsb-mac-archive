@@ -32,6 +32,7 @@
 
 #import "QSBTopResultsViewControllers.h"
 #import "QSBTableResult.h"
+#import <Vermilion/Vermilion.h>
 
 #define QSBVIEWCONTROLLER_INIT(name) \
   static NSNib *nib = nil; \
@@ -41,6 +42,69 @@
   } \
   return [super initWithNib:nib \
                  controller:controller];
+
+@implementation QSBTopDetailedRowViewController
+
+- (void)awakeFromNib {
+  // Remember our standard view height and text view y offset.
+  defaultViewHeight_ = NSHeight([[self view] frame]);
+  NSView *detailView = [self detailView];
+  defaultTextYOffset_ = [detailView frame].origin.y;
+  defaultTextHeight_ = NSHeight([detailView frame]);
+}
+
+- (void)setRepresentedObject:(id)object {
+  [super setRepresentedObject:object];
+  if (![self isCustomResultViewInstalled]) {
+    BOOL isTableResult = [object isKindOfClass:[QSBTableResult class]];
+    if (isTableResult) {
+      // Reset the defaults.
+      NSView *mainView = [self view];
+      CGFloat mainWidth = NSWidth([mainView frame]);
+      NSSize newViewSize = NSMakeSize(mainWidth, defaultViewHeight_);
+      NSView *detailView = [self detailView];
+      CGFloat originX = [detailView frame].origin.x;
+      NSPoint textOrigin = NSMakePoint(originX, defaultTextYOffset_);
+      CGFloat textWidth = NSWidth([detailView frame]);
+      NSSize textSize = NSMakeSize(textWidth, defaultTextHeight_);
+      
+      // Adjust our view height and text position as necessary to accommodate
+      // the title/snippet/description.
+      QSBTableResult *result = object;
+      NSAttributedString *resultDescription 
+      = [self titleSourceURLStringForResult:result];
+      CGFloat stringHeight = [resultDescription size].height;
+      
+      // If the height is less than the standard then we need to center the text
+      // vertically in the containing view.  If the height is more than the
+      // standard then we need to increase the height of the containing view.
+      if (stringHeight < (defaultTextHeight_ - 0.5)) {
+        CGFloat newOriginY = defaultTextYOffset_
+        + ((defaultTextHeight_ - stringHeight) / 2.0);
+        textOrigin = NSMakePoint(originX, newOriginY);
+        textSize = NSMakeSize(textWidth, stringHeight);
+      } else if (stringHeight > (defaultTextHeight_ + 0.5)) {
+        CGFloat newViewHeight = stringHeight
+        + (defaultViewHeight_ - defaultTextHeight_);
+        newViewSize = NSMakeSize(mainWidth, newViewHeight);
+        textSize = NSMakeSize(textWidth, stringHeight);
+      }
+      [mainView setFrameSize:newViewSize];
+      [detailView setFrameOrigin:textOrigin];
+      [detailView setFrameSize:textSize];
+      
+    } else {
+      HGSLogDebug(@"The represented object must be a QSBTableResult.");
+    }
+  }
+}
+
+- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result {
+  HGSLogDebug(@"titleSourceURLStringForResult should be overridden by subclasses");
+  return nil;
+}
+
+@end
 
 @implementation QSBTopStandardRowViewController
 

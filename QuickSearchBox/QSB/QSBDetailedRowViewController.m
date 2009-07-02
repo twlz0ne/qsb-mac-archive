@@ -36,12 +36,9 @@
 
 @implementation QSBDetailedRowViewController
 
+@synthesize detailView = detailView_;
+
 - (void)awakeFromNib {
-  // Remember our standard view height and text view y offset.
-  defaultViewHeight_ = NSHeight([[self view] frame]);
-  defaultTextYOffset_ = [detailView_ frame].origin.y;
-  defaultTextHeight_ = NSHeight([detailView_ frame]);
-  
   HGSAssert(detailView_, @"Broken connection in nib file '%@'."
             @"   Connect detailView_ to the result description NSTextField.",
             [self nibName]);
@@ -49,49 +46,8 @@
 
 - (void)setRepresentedObject:(id)object {
   [super setRepresentedObject:object];
-  BOOL isTableResult = [object isKindOfClass:[QSBTableResult class]];
-  if (isTableResult) {
-    // Reset the defaults.
-    NSView *mainView = [self view];
-    CGFloat mainWidth = NSWidth([mainView frame]);
-    NSSize newViewSize = NSMakeSize(mainWidth, defaultViewHeight_);
-    CGFloat originX = [detailView_ frame].origin.x;
-    NSPoint textOrigin = NSMakePoint(originX, defaultTextYOffset_);
-    CGFloat textWidth = NSWidth([detailView_ frame]);
-    NSSize textSize = NSMakeSize(textWidth, defaultTextHeight_);
-    
-    // Adjust our view height and text position as necessary to accommodate
-    // the title/snippet/description.
-    QSBTableResult *result = object;
-    NSAttributedString *resultDescription 
-      = [self titleSourceURLStringForResult:result];
-    CGFloat stringHeight = [resultDescription size].height;
-    
-    // If the height is less than the standard then we need to center the text
-    // vertically in the containing view.  If the height is more than the
-    // standard then we need to increase the height of the containing view.
-    if (stringHeight < (defaultTextHeight_ - 0.5)) {
-      CGFloat newOriginY = defaultTextYOffset_
-        + ((defaultTextHeight_ - stringHeight) / 2.0);
-      textOrigin = NSMakePoint(originX, newOriginY);
-      textSize = NSMakeSize(textWidth, stringHeight);
-    } else if (stringHeight > (defaultTextHeight_ + 0.5)) {
-      CGFloat newViewHeight = stringHeight
-        + (defaultViewHeight_ - defaultTextHeight_);
-      newViewSize = NSMakeSize(mainWidth, newViewHeight);
-      textSize = NSMakeSize(textWidth, stringHeight);
-    }
-    [mainView setFrameSize:newViewSize];
-    [detailView_ setFrameOrigin:textOrigin];
-    [detailView_ setFrameSize:textSize];
-    
-  } else {
-    HGSLogDebug(@"The represented object must be a QSBTableResult.");
-  }
+  // The detail view should show when the custom view doesn't, and vice versa.
+  [detailView_ setHidden:[self isCustomResultViewInstalled]];
 }
 
-- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result {
-  HGSLogDebug(@"titleSourceURLStringForResult should be overridden by subclasses");
-  return nil;
-}
 @end
