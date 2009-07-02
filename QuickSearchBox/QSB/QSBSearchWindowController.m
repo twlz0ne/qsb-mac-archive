@@ -339,8 +339,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   
   // Load up the base results views nib and install the subordinate results views.
   QSBSearchViewController *baseResultsController
-    = [[[QSBSearchViewController alloc] initWithNibName:@"BaseResultsViews"
-                                       windowController:self] autorelease];
+    = [[[QSBSearchViewController alloc] initWithWindowController:self]
+       autorelease];
   [self pushViewController:baseResultsController];
 
   [self updateImageView];
@@ -633,8 +633,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     // Load up the pivot results views nib and install
     // the subordinate results views.
     QSBSearchViewController *pivotResultsController
-      = [[[QSBSearchViewController alloc] initWithNibName:@"BaseResultsViews"
-                                         windowController:self] autorelease];
+      = [[[QSBSearchViewController alloc] initWithWindowController:self] 
+         autorelease];
     NSUInteger flags = [[NSApp currentEvent] modifierFlags];
     [[pivotResultsController searchController] setPushModifierFlags:flags];
     [self pushViewController:pivotResultsController];
@@ -663,8 +663,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   // indicated corpus.
   
   QSBSearchViewController *pivotResultsController
-    = [[[QSBSearchViewController alloc] initWithNibName:@"BaseResultsViews"
-                                       windowController:self] autorelease];
+    = [[[QSBSearchViewController alloc] initWithWindowController:self]
+       autorelease];
   [self pushViewController:pivotResultsController];
   
   // Set the existing pivot to the indicated corpus.

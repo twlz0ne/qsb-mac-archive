@@ -72,8 +72,7 @@
 @property(nonatomic, assign) NSRange savedPivotQueryRange;
 
 // Initialize and install into the search results window.  Designated initializer.
-- (id)initWithNibName:(NSString *)nibName
-     windowController:(QSBSearchWindowController *)searchWindowController;
+- (id)initWithWindowController:(QSBSearchWindowController *)searchWindowController;
 
 // Set/get this guy's parent QSBSearchViewController (i.e. the one from which
 // this query was pivoted, if any.

@@ -57,9 +57,8 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 @synthesize savedPivotQueryString = pivotQueryString_;
 @synthesize savedPivotQueryRange = pivotQueryRange_;
 
-- (id)initWithNibName:(NSString *)nibName
-     windowController:(QSBSearchWindowController *)searchWindowController {
-  if ((self = [super initWithNibName:nibName bundle:nil])) {
+- (id)initWithWindowController:(QSBSearchWindowController *)searchWindowController {
+  if ((self = [super initWithNibName:@"BaseResultsViews" bundle:nil])) {
     [self setSearchWindowController:searchWindowController];
     // TODO(alcor): this should be removed, but much of the searchWindow code
     // assumes the nib connections are intact when this method returns
