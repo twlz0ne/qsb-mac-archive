@@ -278,7 +278,11 @@ typedef NSUInteger HGSRankFlags;
 - (BOOL)isOfType:(NSString *)typeStr;
 - (BOOL)conformsToType:(NSString *)typeStr;
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet;
-
+/*!
+ Mark this result as having been of interest to the user.
+ Base implementation sends a promoteResult message to the result's source.
+ */
+- (void)promote;
 @end
 
 @interface HGSMutableResult : HGSResult
@@ -318,4 +322,10 @@ typedef NSUInteger HGSRankFlags;
 - (BOOL)isOfType:(NSString *)typeStr;
 - (BOOL)conformsToType:(NSString *)typeStr;
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet;
+/*!
+ Mark these results as having been of interest to the user.
+ Base implementation sends a promoteResult message to the result's source.
+*/
+- (void)promote;
+
 @end

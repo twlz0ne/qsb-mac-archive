@@ -148,6 +148,13 @@
 */
 - (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation;
 
+/*!
+  Called when interest is expressed in "result".
+  Allows the source to refine it's future searches.
+  Base implementation does nothing.
+*/ 
+- (void)promoteResult:(HGSResult *)result;
+
 @end
 
 

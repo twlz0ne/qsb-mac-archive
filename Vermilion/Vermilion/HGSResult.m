@@ -428,6 +428,10 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   return intersects;
 }
 
+- (void)promote {
+  [[self source] promoteResult:self];
+}
+
 + (NSString *)hgsTypeForPath:(NSString*)path {
   // TODO(dmaclach): probably need some way for third parties to muscle their
   // way in here and improve this map for their types.
@@ -588,6 +592,10 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
     if (!isOfType) break;
   }
   return isOfType;
+}
+
+- (void)promote {
+  [results_ makeObjectsPerformSelector:@selector(promote)];
 }
 
 - (NSArray *)urls {

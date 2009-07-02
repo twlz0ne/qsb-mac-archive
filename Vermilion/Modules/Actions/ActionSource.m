@@ -261,6 +261,10 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 }
 
 - (BOOL)performWithInfo:(NSDictionary*)info {
+  // We promote the actions to let the action source know they were of interest.
+  HGSResultArray *actions = [info objectForKey:kHGSActionDirectObjectsKey];
+  [actions promote];
+  
   // We sub in the pivot object as the primary object, ignoring whatever
   // info we got from above.
   HGSResultArray *directObjects = [query_ results];

@@ -123,6 +123,10 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   return NO;
 }
 
+- (void)willPivot {
+  HGSLogDebug(@"Tried to pivot on result %@ that doesn't pivot", self);
+}
+  
 - (NSAttributedString *)titleString {
   NSMutableAttributedString *resultString = [self genericTitleLine];
   [self addAttributes:resultString elementType:kQSBResultDescriptionTitle];
@@ -364,6 +368,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if ([result conformsToType:kHGSTypeGoogleSuggest]) pivotable = YES;
   if ([result conformsToType:kHGSTypeAction]) pivotable = NO;
   return pivotable;
+}
+
+- (void)willPivot {
+  // Let the result know that we were interested in it.
+  HGSResult *result = [self representedResult];
+  [result promote];
 }
 
 - (void)addAttributes:(NSMutableAttributedString*)string

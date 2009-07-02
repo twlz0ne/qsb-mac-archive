@@ -616,7 +616,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [googleResult performDefaultActionWithSearchViewController:activeSearchViewController_];
 }
 
-- (void)pivotOnObject:(id)pivotObject {
+- (void)pivotOnObject:(QSBTableResult *)pivotObject {
   // Use the currently selected results item as a pivot and clear the search 
   // text by setting up a new query by instantiating a pivot view and creating
   // a query on the pivot.
@@ -635,6 +635,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     QSBSearchViewController *pivotResultsController
       = [[[QSBSearchViewController alloc] initWithWindowController:self] 
          autorelease];
+    [pivotObject willPivot];
     NSUInteger flags = [[NSApp currentEvent] modifierFlags];
     [[pivotResultsController searchController] setPushModifierFlags:flags];
     [self pushViewController:pivotResultsController];

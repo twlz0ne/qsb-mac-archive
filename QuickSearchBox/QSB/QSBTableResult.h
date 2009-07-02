@@ -32,62 +32,103 @@
 
 #import <Foundation/Foundation.h>
 
+/*!
+ @header
+ @discussion QSBTableResult
+ */
+
 @class HGSResult;
 @class QSBSearchViewController;
 
-// Abstract base class for showing results in our tables
+/*!
+  Abstract base class for showing results in our tables
+*/
 @interface QSBTableResult : NSObject
 
-// Determine if the result can be pivoted on.
+/*!
+  Determine if the result can be pivoted on.
+*/
 - (BOOL)isPivotable;
 
-// Return a string that has the title of the result.
+/*!
+ Tell the result we are pivoting on it.
+*/
+- (void)willPivot;
+
+/*!
+  Return a string that has the title of the result.
+*/
 - (NSAttributedString *)titleString;
 
-// Return a string that has the title of the result on the first line,
-// the snippet (if any) on the next line, and the SourceURL on the following
-// line.
+/*!
+  Return a string that has the title of the result on the first line, the
+  snippet (if any) on the next line, and the SourceURL on the following line.
+*/
 - (NSAttributedString *)titleSnippetSourceURLString;
 
-// Return a string that has the title of the result on the first line
-// with the snippet (if any) on the second line.
+/*!
+  Return a string that has the title of the result on the first line with the
+  snippet (if any) on the second line.
+*/
 - (NSAttributedString *)titleSnippetString;
 
-// Return a string that has the title of the result on the first line
-// with the SourceURL (if any) on the second line.
+/*!
+  Return a string that has the title of the result on the first line with the
+  SourceURL (if any) on the second line.
+*/
 - (NSAttributedString *)titleSourceURLString;
 
-// return the completion string
+/*!
+  Returns the display name for the result.
+*/
 - (NSString *)displayName;
 
-// return the path as an array of dictionaries for display in the UI
+/*!
+  Return the path as an array of dictionaries for display in the UI.
+*/
 - (NSArray *)displayPath;
 
-// return an icon
+/*!
+  Return an icon.
+*/
 - (NSImage *)displayIcon;
 
-// return a thumbnail
+/*!
+  Return a thumbnail.
+*/
 - (NSImage *)displayThumbnail;
 
-// return the rank of the result
+/*!
+  Return the rank of the result.
+*/
 - (CGFloat)rank;
 
-// return the class of the view controller used to display the result at 
-// the top level
+/*!
+  Return the class of the view controller used to display the result at the top
+  level.
+*/
 - (Class)topResultsRowViewControllerClass;
 
-// return the class of the view controller used to display the result at 
-// the more level
+/*!
+  Return the class of the view controller used to display the result at the
+  more level.
+*/
 - (Class)moreResultsRowViewControllerClass;
 
-// attempt to perform the default action on the item
+/*!
+  Attempt to perform the default action on the item.
+*/
 - (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller;
 
-// copies the contents of the result to the pasteboard
+/*!
+  Copies the contents of the result to the pasteboard.
+*/
 - (BOOL)copyToPasteboard:(NSPasteboard *)pb;
 @end
 
-// A result that comes from one of our sources.
+/*!
+  A result that comes from one of our sources.
+*/
 @interface QSBSourceTableResult : QSBTableResult {
  @private
   HGSResult *representedResult_;
@@ -102,7 +143,9 @@
 
 @end
 
-// A "search google" result
+/*!
+  A "search google" result.
+*/
 @interface QSBGoogleTableResult : QSBSourceTableResult
 
 + (id)tableResultForQuery:(NSString*)query;
@@ -110,28 +153,36 @@
 
 @end
 
-// A separator (horizontal rule)
+/*!
+  A separator (horizontal rule).
+*/
 @interface QSBSeparatorTableResult : QSBTableResult
 
 + (id)tableResult;
 
 @end
 
-// A fold (eg Show more results or Show Top Results)
+/*!
+  A fold (eg Show more results or Show Top Results).
+*/
 @interface QSBFoldTableResult : QSBTableResult
 
 + (id)tableResult;
 
 @end
 
-// A search status row "Searching Spotlight, Ganesh, etc..."
+/*!
+  A search status row "Searching Spotlight, Ganesh, etc...".
+*/
 @interface QSBSearchStatusTableResult : QSBTableResult
 
 + (id)tableResult;
 
 @end
 
-// A message from the UI
+/*!
+  A message from the UI.
+*/
 @interface QSBMessageTableResult : QSBTableResult {
  @private
   NSString *message_;
@@ -141,10 +192,11 @@
 
 @end
 
-
-// Show a line in the 'More' results presenting the total number of possible
-// results for a category and allowing the user to cause those results to be
-// listed in the table.
+/*!
+  Show a line in the 'More' results presenting the total number of possible
+  results for a category and allowing the user to cause those results to be
+  listed in the table.
+*/
 @interface QSBShowAllTableResult : QSBTableResult {
  @private
   NSString *categoryName_;

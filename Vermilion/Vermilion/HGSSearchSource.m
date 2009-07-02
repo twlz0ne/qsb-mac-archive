@@ -176,4 +176,8 @@ static NSSet *CopyStringSetFromId(id value) {
   return result;
 }
 
+- (void)promoteResult:(HGSResult *)result {
+  // Base implementation does nothing.
+}
+
 @end
