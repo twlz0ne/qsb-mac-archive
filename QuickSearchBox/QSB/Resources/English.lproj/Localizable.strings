@@ -364,3 +364,6 @@
 
 /* The placeholder text for the search field in the "Searchable Items" tab in the preferences dialog. */
 "Search" = "Search";
+
+/* Menu item that performs an "update check" operation. */
+"Check for Updates…" = "Check for Updates…";
