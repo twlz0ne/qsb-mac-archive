@@ -183,7 +183,7 @@ NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
 }
 
 - (NSString *)defaultIconName {
-  return @"NSApplicationIcon";
+  return @"QSBPlugin";
 }
 
 // Return an icon that can be displayed 128x128.

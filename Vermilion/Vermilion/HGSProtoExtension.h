@@ -85,6 +85,11 @@
 @property (nonatomic, copy, readonly) NSString *displayName;
 
 /*!
+  Returns an icon for the protoextension.
+*/
+@property (nonatomic, retain, readonly) NSImage *icon;
+
+/*!
   Returns the identifier of extension point that the extension represented 
   by this protoextension will extend when installed.
 */

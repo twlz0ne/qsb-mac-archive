@@ -422,6 +422,27 @@
   return [configuration_ objectForKey:kHGSExtensionUserVisibleNameKey];
 }
 
+- (NSImage *)icon {
+  NSImage *icon = nil;
+  NSString *iconPath 
+    = [configuration_ objectForKey:kHGSExtensionIconImagePathKey];
+  if ([iconPath length]) {
+    if (![iconPath isAbsolutePath]) {
+      NSBundle *bundle = [configuration_ objectForKey:kHGSExtensionBundleKey];
+      iconPath = [bundle pathForImageResource:iconPath];
+    }
+    icon = [[[NSImage alloc] initByReferencingFile:iconPath] autorelease];
+    if (!icon) {
+      HGSLogDebug(@"Unable to get image %@", iconPath);
+    }
+  }
+  if (!icon) {
+    icon = [NSImage imageNamed:@"QSBPlugin"];
+  }
+  return icon;
+}
+
+  
 - (NSArray *)desiredAccountTypes {
   NSArray *desiredAccountTypes
     = [configuration_ objectForKey:kHGSExtensionDesiredAccountTypes];
