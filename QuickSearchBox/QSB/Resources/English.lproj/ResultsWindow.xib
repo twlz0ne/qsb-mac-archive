@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.02">
+<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">9J61</string>
-		<string key="IBDocument.InterfaceBuilderVersion">670</string>
+		<string key="IBDocument.InterfaceBuilderVersion">677</string>
 		<string key="IBDocument.AppKitVersion">949.46</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+		</object>
+		<object class="NSMutableDictionary" key="IBDocument.Metadata">
+			<bool key="EncodedWithXMLCoder">YES</bool>
+			<object class="NSArray" key="dict.sortedKeys">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
+			<object class="NSMutableArray" key="dict.values">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="282733407">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -103,7 +113,7 @@
 				</object>
 				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<object class="NSView" key="NSWindowView" id="1053078706">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">292</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -308,6 +318,7 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{450, 128}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{3.40282e+38, 3.40282e+38}</string>
@@ -401,14 +412,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">queryBackgroundView_</string>
-						<reference key="source" ref="11512819"/>
-						<reference key="destination" ref="427055929"/>
-					</object>
-					<int key="connectionID">2137</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">resultsWindow_</string>
 						<reference key="source" ref="11512819"/>
 						<reference key="destination" ref="195429014"/>
@@ -497,14 +500,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">previewImageView_</string>
-						<reference key="source" ref="11512819"/>
-						<reference key="destination" ref="14668177"/>
-					</object>
-					<int key="connectionID">2563</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">logoView_</string>
 						<reference key="source" ref="11512819"/>
 						<reference key="destination" ref="847055969"/>
@@ -526,6 +521,70 @@
 						<reference key="destination" ref="11512819"/>
 					</object>
 					<int key="connectionID">2654</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: selectedResult.displayThumbnail</string>
+						<reference key="source" ref="14668177"/>
+						<reference key="destination" ref="11512819"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="14668177"/>
+							<reference key="NSDestination" ref="11512819"/>
+							<string key="NSLabel">value: selectedResult.displayThumbnail</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">selectedResult.displayThumbnail</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">2660</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">hidden: selectedResult.displayThumbnail</string>
+						<reference key="source" ref="14668177"/>
+						<reference key="destination" ref="11512819"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="14668177"/>
+							<reference key="NSDestination" ref="11512819"/>
+							<string key="NSLabel">hidden: selectedResult.displayThumbnail</string>
+							<string key="NSBinding">hidden</string>
+							<string key="NSKeyPath">selectedResult.displayThumbnail</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSValueTransformerName</string>
+								<string key="NS.object.0">NSIsNil</string>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">2662</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">hidden: selectedResult.displayThumbnail</string>
+						<reference key="source" ref="847055969"/>
+						<reference key="destination" ref="11512819"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="847055969"/>
+							<reference key="NSDestination" ref="11512819"/>
+							<string key="NSLabel">hidden: selectedResult.displayThumbnail</string>
+							<string key="NSBinding">hidden</string>
+							<string key="NSKeyPath">selectedResult.displayThumbnail</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSValueTransformerName</string>
+								<string key="NS.object.0">NSIsNotNil</string>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">2666</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">windowController_</string>
+						<reference key="source" ref="851009292"/>
+						<reference key="destination" ref="11512819"/>
+					</object>
+					<int key="connectionID">2667</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -874,11 +933,11 @@
 					<string>{{280, -110}, {480, 385}}</string>
 					<reference ref="8"/>
 					<string>{3.40282e+38, 3.40282e+38}</string>
-					<string>{{100, 431}, {450, 128}}</string>
-					<integer value="1"/>
-					<string>{{100, 431}, {450, 128}}</string>
+					<string>{{270, 891}, {450, 128}}</string>
 					<reference ref="9"/>
-					<integer value="0"/>
+					<string>{{270, 891}, {450, 128}}</string>
+					<reference ref="9"/>
+					<reference ref="8"/>
 					<string>{{12, 668}, {552, 480}}</string>
 					<reference ref="8"/>
 					<reference ref="8"/>
@@ -962,7 +1021,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">2655</int>
+			<int key="maxID">2667</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1132,10 +1191,6 @@
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
 					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSTabView</string>
-					<reference key="sourceIdentifier" ref="73551370"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSTextField</string>
@@ -1332,14 +1387,12 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>editAccount:</string>
 							<string>removeAccount:</string>
-							<string>resetHotKey:</string>
 							<string>setColorFromMenu:</string>
 							<string>setupAccount:</string>
 							<string>showPreferences:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -1352,14 +1405,14 @@
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>accountsListController_</string>
+							<string>advancedScrollView_</string>
 							<string>colorPopUp_</string>
-							<string>settingsTabView_</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSArrayController</string>
+							<string>NSScrollView</string>
 							<string>NSPopUpButton</string>
-							<string>NSTabView</string>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -1428,8 +1481,6 @@
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>logoView_</string>
-							<string>previewImageView_</string>
-							<string>queryBackgroundView_</string>
 							<string>resultsOffsetterView_</string>
 							<string>resultsWindow_</string>
 							<string>searchMenu_</string>
@@ -1441,8 +1492,6 @@
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSImageView</string>
-							<string>QSBLargeIconView</string>
-							<string>NSView</string>
 							<string>NSView</string>
 							<string>QSBCustomPanel</string>
 							<string>QSBMenuButton</string>
@@ -1468,6 +1517,10 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">QSBTextFieldEditor</string>
 					<string key="superclassName">NSTextView</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">windowController_</string>
+						<string key="NS.object.0">QSBSearchWindowController</string>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">QSBTextField.h</string>

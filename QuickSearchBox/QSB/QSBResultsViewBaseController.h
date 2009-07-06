@@ -56,7 +56,6 @@
   BOOL resultsNeedUpdating_;
   CGFloat lastWindowHeight_;  // Remember last calculated window height.
   NSInteger rowCount_;  // Cached count of result rows.
-  QSBTableResult *currentlySelectedResult_;
 }
 
 // Returns the query controller.

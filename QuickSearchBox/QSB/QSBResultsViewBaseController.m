@@ -52,7 +52,6 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 // Return our main search window controller.
 - (QSBSearchWindowController *)searchWindowController;
 - (void)resultsObjectsChanged:(GTMKeyValueChangeNotification *)notification;
-- (void)resultsIndicesChanged:(GTMKeyValueChangeNotification *)notification;
 @end
 
 
@@ -67,11 +66,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                                   selector:@selector(resultsObjectsChanged:)
                                   userInfo:nil
                                    options:0];
-  [resultsArrayController_ gtm_addObserver:self
-                                forKeyPath:NSSelectionIndexesBinding
-                                  selector:@selector(resultsIndicesChanged:)
-                                  userInfo:nil
-                                   options:0];
 
   resultsNeedUpdating_ = YES;
   [resultsTableView_ setDoubleAction:@selector(openResultsTableItem:)];
@@ -80,14 +74,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)dealloc {
-  [currentlySelectedResult_ release];
   [rowViewControllers_ release];
   [resultsArrayController_ gtm_removeObserver:self
                                    forKeyPath:kQSBArrangedObjectsKVOKey
                                      selector:@selector(resultsObjectsChanged:)];
-  [resultsArrayController_ gtm_removeObserver:self
-                                   forKeyPath:NSSelectionIndexesBinding
-                                     selector:@selector(resultsIndicesChanged:)];
   [queryString_ release];
   [super dealloc];
 }
@@ -308,27 +298,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   rowCount_ = [newArrangedObjects count];
   [[self resultsTableView] reloadData];
   [searchViewController_ updateResultsView];
-}
-
-- (void)resultsIndicesChanged:(GTMKeyValueChangeNotification *)notification {
-  QSBSearchWindowController *controller = [self searchWindowController];
-  QSBResultsViewBaseController *activeResultsController 
-    = [[controller activeSearchViewController] activeResultsViewController];
-  if ([activeResultsController isEqual:self]) {
-    NSArray *selectedObjects 
-      = [resultsArrayController_ selectedObjects];
-    QSBTableResult *newSelection = nil;
-    if ([selectedObjects count]) {
-      newSelection = [selectedObjects objectAtIndex:0];
-    }
-    if (newSelection != currentlySelectedResult_ 
-        && ![newSelection isEqual:currentlySelectedResult_]) {
-      [currentlySelectedResult_ autorelease];
-      currentlySelectedResult_ = [newSelection retain];
-      [controller completeQueryText]; 
-      [controller updateImageView];
-    }
-  }
 }
 
 - (BOOL)tableView:(NSTableView *)tv

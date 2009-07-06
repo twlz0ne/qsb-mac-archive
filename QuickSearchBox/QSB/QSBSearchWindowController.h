@@ -40,14 +40,18 @@
 @class QSBCustomPanel;
 @class QSBSearchViewController;
 @class QSBWelcomeController;
+@class QSBTableResult;
 
 extern const NSTimeInterval kQSBAppearDelay;
+
+// QSBSearchWindowController has objects observing it's selected result
+// via this key.
+extern NSString *const kQSBSelectedResultKey;
 
 @interface QSBSearchWindowController : NSWindowController {
  @private
   IBOutlet QSBTextFieldEditor *searchTextFieldEditor_;
   IBOutlet NSTextField *searchTextField_;
-  IBOutlet QSBLargeIconView *previewImageView_;
   IBOutlet NSImageView *logoView_;
   IBOutlet QSBMenuButton *searchMenu_;
   IBOutlet QSBMenuButton *windowMenuButton_;
@@ -71,14 +75,17 @@ extern const NSTimeInterval kQSBAppearDelay;
   NSDictionary *visibilityChangedUserInfo_;
   // The welcome window controller.
   QSBWelcomeController *welcomeController_;
+  
+  // The currently selected result
+  QSBTableResult *selectedResult_;
+
 }
 
-@property(nonatomic, retain) QSBSearchViewController *activeSearchViewController;
+@property (nonatomic, retain) QSBSearchViewController *activeSearchViewController;
+@property (nonatomic, readonly, retain) QSBTableResult *selectedResult;
 
 // Designated initializer
 - (id)init;
-
-- (NSImageView *)previewImageView;
 
 // Return the current search view controller.
 - (QSBSearchViewController *)activeSearchViewController;
@@ -111,9 +118,6 @@ extern const NSTimeInterval kQSBAppearDelay;
 // Resizes our window, and reloads our tableview.
 - (void)updateResultsView;
 
-// Call to signal that the query string should show best autocomplete match.
-- (void)completeQueryText;
-
 // Return our main results window.
 - (NSWindow *)resultsWindow;
 
@@ -141,8 +145,6 @@ extern const NSTimeInterval kQSBAppearDelay;
 // The hot key was hit.
 - (void)hitHotKey:(id)sender;
 
-// Update the image view
-- (void)updateImageView;
 @end
 
 // Notifications for showing and hiding the search window

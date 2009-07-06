@@ -32,12 +32,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class QSBSearchWindowController;
+
 // Handles the text field in the QSB. Is responsible for rerouting all
 // key commands that come to the QSB.
-
 @interface QSBTextFieldEditor : NSTextView {
  @private
   NSRange lastCompletionRange_;
+  IBOutlet QSBSearchWindowController *windowController_;
 }
 - (NSRange)removeCompletionIfNecessaryFromSelection:(NSRange)selection;
 - (BOOL)isAtBeginning;

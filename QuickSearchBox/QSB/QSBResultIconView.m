@@ -70,7 +70,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self setNeedsDisplay:YES];
 }
 
-- (void)viewDidMoveToWindow{
+- (void)viewDidMoveToWindow {
   if (iconNeedsUpdating_ && [self window]) {
     // We can't just call setNeedsDisplay here because we are currently in the
     // middle of an update loop and it will be ignored.

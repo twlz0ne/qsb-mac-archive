@@ -103,9 +103,12 @@ static const unichar kZeroWidthNoBreakSpace = 0xFEFF;
 // This is a tag value for corpora in the corpora menu.
 static const NSInteger kBaseCorporaTagValue = 10000;
   
+NSString *const kQSBSelectedResultKey = @"selectedResult";
+
 @interface QSBSearchWindowController ()
 
 @property (nonatomic, retain) QSBWelcomeController *welcomeController;
+@property (nonatomic, readwrite, retain) QSBTableResult *selectedResult;
 
 - (void)updateLogoView;
 - (BOOL)firstLaunch;
@@ -147,9 +150,6 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 - (void)checkFindPasteboard:(NSTimer *)timer;
 
 - (void)displayResults:(NSTimer *)timer;
-
-// Returns the currently selected result from the active results controller.
-- (QSBTableResult *)selection;
 
 // Returns YES if the screen that our search window is on is captured.
 // NOTE: Frontrow in Tiger DOES NOT capture the screen, so this is not a valid
@@ -202,6 +202,7 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 
 @synthesize activeSearchViewController = activeSearchViewController_;
 @synthesize welcomeController = welcomeController_;
+@synthesize selectedResult = selectedResult_;
 
 GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
 GTM_METHOD_CHECK(NSWorkspace, gtm_wasLaunchedAsLoginItem);
@@ -342,8 +343,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     = [[[QSBSearchViewController alloc] initWithWindowController:self]
        autorelease];
   [self pushViewController:baseResultsController];
-
-  [self updateImageView];
   
   // get the pasteboard count and make sure we change it to something different
   // so that when the user first brings up the QSB its query is correct.
@@ -386,12 +385,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [ud gtm_removeObserver:self 
               forKeyPath:kQSBUserPrefBackgroundColorKey
                 selector:@selector(backgroundColorChanged:)];
-  
-  QSBSearchController *searchController
-    = [activeSearchViewController_ searchController];
-  [searchController gtm_removeObserver:self
-                            forKeyPath:kQSBQueryStringKey
-                              selector:@selector(queryStringChanged:)];
+  [self setActiveSearchViewController:nil];
   [queryResetTimer_ invalidate];
   [findPasteBoardChangedTimer_ invalidate];
   [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -399,6 +393,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [corpora_ release];
   [visibilityChangedUserInfo_ release];
   [welcomeController_ release];
+  [selectedResult_ release];
+
   [super dealloc];
 }
 
@@ -429,7 +425,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     // Dispose of the welcome window if it is being shown.
     [self closeWelcomeWindow];
 
-    BOOL likelyResult = [[self selection] rank] > 1.0;
+    BOOL likelyResult = [[self selectedResult] rank] > 1.0;
     NSTimeInterval delay 
       = likelyResult ? kQSBLongerAppearDelay : kQSBAppearDelay;
     [self performSelector:@selector(displayResults:)
@@ -441,16 +437,25 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   }
 }
 
-- (QSBSearchViewController *)activeSearchViewController {
-  return activeSearchViewController_;
+- (void)resultsIndicesChanged:(GTMKeyValueChangeNotification *)notification {
+  QSBSearchViewController *viewController = [notification object];
+  QSBResultsViewBaseController *resultsController 
+    = [viewController activeResultsViewController];
+  NSArrayController *resultsArray = [resultsController arrayController];
+  NSArray *selectedObjects 
+    = [resultsArray selectedObjects];
+  QSBTableResult *newSelection = nil;
+  if ([selectedObjects count]) {
+    newSelection = [selectedObjects objectAtIndex:0];
+  }
+  if (newSelection != selectedResult_ 
+      && ![newSelection isEqual:selectedResult_]) {
+    [self setSelectedResult:newSelection];
+  }
 }
 
-- (void)updateImageView {
-  id selection = [self selection];
-  NSImage *image = [selection displayThumbnail];
-  [logoView_ setHidden:image != nil];
-  [previewImageView_ setImage:image];
-  [previewImageView_ display];
+- (QSBSearchViewController *)activeSearchViewController {
+  return activeSearchViewController_;
 }
 
 - (void)setObservingMoveAndResizeNotifications:(BOOL)doRegister {
@@ -627,6 +632,9 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     NSDictionary *userInfo 
       = [NSDictionary dictionaryWithObject:searchController
                                     forKey:kQSBNotificationSearchControllerKey];
+    // We have to retain/autorelease here because once we've pivoted
+    // our pivot object get released and we will lose it.
+    [[pivotObject retain] autorelease];
     [nc postNotificationName:kQSBWillPivotNotification
                       object:pivotObject 
                     userInfo:userInfo];
@@ -706,7 +714,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
 }
 
 - (void)pivotOnSelection {
-  QSBTableResult *pivotObject = [self selection];
+  QSBTableResult *pivotObject = [self selectedResult];
   [self pivotOnObject:pivotObject];
 }
 
@@ -883,7 +891,7 @@ doCommandBySelector:(SEL)commandSelector {
   // text.
   NSString *queryString = [[textView textStorage] string];
   if ([queryString length]) {
-    id result = [self selection];
+    id result = [self selectedResult];
     if (result && [result respondsToSelector:@selector(displayName)]) {
       completion = [result displayName];
       // If the query string is not a prefix of the completion then
@@ -938,10 +946,6 @@ doCommandBySelector:(SEL)commandSelector {
   } else {
     [self updateResultsViewNow];
   }
-}
-
-- (void)completeQueryText {
-  [searchTextFieldEditor_ complete:self];
 }
 
 - (NSWindow *)shieldWindow {
@@ -1161,10 +1165,6 @@ doCommandBySelector:(SEL)commandSelector {
   
   // Turn back on size/move notifications.
   [self setObservingMoveAndResizeNotifications:YES];
-}
-
-- (NSImageView *)previewImageView {
-  return previewImageView_;
 }
 
 - (CGFloat)resultsViewOffsetFromTop {
@@ -1556,11 +1556,16 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (void)setActiveSearchViewController:(QSBSearchViewController *)searchViewController {
+  NSString *selectionIndexesKeyPath 
+    = @"activeResultsViewController.arrayController.selectionIndexes";
   QSBSearchController *searchController
     = [activeSearchViewController_ searchController];
   [searchController gtm_removeObserver:self
                             forKeyPath:kQSBQueryStringKey
                               selector:@selector(queryStringChanged:)];
+  [activeSearchViewController_ gtm_removeObserver:self
+                                       forKeyPath:selectionIndexesKeyPath
+                                         selector:@selector(resultsIndicesChanged:)];
   // We are no longer interested in the current controller producing results.
   [activeSearchViewController_ stopQuery];
   [activeSearchViewController_ autorelease];
@@ -1571,6 +1576,11 @@ doCommandBySelector:(SEL)commandSelector {
                            selector:@selector(queryStringChanged:)
                            userInfo:nil
                             options:0];
+  [activeSearchViewController_ gtm_addObserver:self
+                                    forKeyPath:selectionIndexesKeyPath
+                                      selector:@selector(resultsIndicesChanged:)
+                                      userInfo:nil
+                                       options:NSKeyValueObservingOptionInitial];
   [self updatePivotToken];
 }
 
@@ -1684,8 +1694,6 @@ doCommandBySelector:(SEL)commandSelector {
     
     [activeSearchViewController_ setParentSearchViewController:nil];
     [self setActiveSearchViewController:parentSearchViewController];
-
-    [self completeQueryText];
   }
   return parentSearchViewController;
 }

@@ -295,7 +295,6 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
     // Swap out the old view while swapping in the top results view.
     [newController setSwapSelection];
     
-    [searchWindowController_ completeQueryText];
     [self willChangeValueForKey:@"activeResultsViewController"];
     activeResultsViewController_ = newController;
     [self didChangeValueForKey:@"activeResultsViewController"];
