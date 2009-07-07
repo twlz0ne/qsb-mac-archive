@@ -12,38 +12,40 @@ retrieves stock quotes for companies matching the query.
 The Google Finance feed can return some or all of the following
 keys:
 
-  avvo    Average volume (float with multiplier, like '3.54M')
-  beta    (unknown) (float)
-  c       Last change (float)
-  ccol    (unknown) (chars)
-  cl      Last perc. change
-  cp      Change perc. (float)
-  e       Exchange (text, like 'NASDAQ')
-  ec      Ext. hours last change (float)
-  eccol   (unknown) (chars)
-  ecp     Ext. hours last chage perc. (float)
-  el      Ext. hours last quote (float)
-  el_cur  (unknown) (float)
-  elt     Ext. hours last quote time (unknown)
-  eo      Exchange Open (0 or 1)
-  eps     Earnings per share (float)
-  fwpe    Forward PE ratio (float)
-  hi      Price high (float)
-  hi52    52 weeks high (float)
-  id      Company id (identifying number)
-  l       Last Quote (float)
-  l_cur   (unknown) (like 'l')
-  lo      Price low (float)
-  lo52    52 weeks low (float)
-  lt      Last Quote DateTime
-  ltt     Last Trade Time (Same as "lt" without the data)
-  mc      Market Cap. (float with multiplier, like '123.45B')
-  name    Company name (text)
-  op      Open price (float)
-  pe      PE Ratio (float)
-  t       Ticker (text)
-  type    Type (i.e. 'Company')
-  vo      Volume (float with multiplier, like '3.54M')
+  avvo    * Average volume (float with multiplier, like '3.54M')
+  beta    * Beta (float)
+  c       * Amount of change while open (float)
+  ccol    * (unknown) (chars)
+  cl        Last perc. change
+  cp      * Change perc. while open (float)
+  e       * Exchange (text, like 'NASDAQ')
+  ec      * After hours last change from close (float)
+  eccol   * (unknown) (chars)
+  ecp     * After hours last chage perc. from close (float)
+  el      * After. hours last quote (float)
+  el_cur  * (unknown) (float)
+  elt       After hours last quote time (unknown)
+  eo      * Exchange Open (0 or 1)
+  eps     * Earnings per share (float)
+  fwpe      Forward PE ratio (float)
+  hi      * Price high (float)
+  hi52    * 52 weeks high (float)
+  id      * Company id (identifying number)
+  l       * Last value while open (float)
+  l_cur   * Last value at close (like 'l')
+  lo      * Price low (float)
+  lo52    * 52 weeks low (float)
+  lt        Last value date/time
+  ltt       Last trade time (Same as "lt" without the data)
+  mc      * Market cap. (float with multiplier, like '123.45B')
+  name    * Company name (text)
+  op      * Open price (float)
+  pe      * PE ratio (float)
+  t       * Ticker (text)
+  type    * Type (i.e. 'Company')
+  vo      * Volume (float with multiplier, like '3.54M')
+  
+  * - Provided in the feed.
 """
 
 __author__ = 'mrossetti@google.com (Mike Rossetti)'
@@ -204,6 +206,8 @@ class StockQuoter(object):
           value = value.strip('" ')
           if key and value:
             quote_dict[key] = value
+      if self.debugging_enabled:
+        print "Raw results dict: %s." % quote_dict
       # See if all of the required dictionary entries are available.
       required_keys = frozenset(['t', 'l', 'c', 'cp', 'name', 'e', 'hi',
                                  'lo', 'vo'])

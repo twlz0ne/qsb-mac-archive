@@ -21,6 +21,16 @@
 	<key>HGSExtensions</key>
 	<array>
 		<dict>
+			<key>QSBCustomResultViewTypes</key>
+			<dict>
+				<key>script.python.stockquote</key>
+				<dict>
+					<key>QSBResultViewNibName</key>
+					<string>StockQuoter</string>
+					<key>QSBResultViewControllerClassName</key>
+					<string>StockQuoterViewController</string>
+				</dict>
+			</dict>
 			<key>HGSExtensionClass</key>
 			<string>HGSPythonSource</string>
 			<key>HGSExtensionIdentifier</key>

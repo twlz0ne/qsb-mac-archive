@@ -317,8 +317,17 @@
 		6200F99D0E785FE700F046EC /* MoreShowAllTableResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200F99B0E785FE700F046EC /* MoreShowAllTableResultView.xib */; };
 		6200F9E00E78623500F046EC /* MoreFoldResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200F9DE0E78623500F046EC /* MoreFoldResultView.xib */; };
 		6200FC100E78896A00F046EC /* MoreCategoryResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200FC0E0E78896A00F046EC /* MoreCategoryResultView.xib */; };
+		620357850FFD72DB008CAFB2 /* StockQuoter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 620357840FFD72DB008CAFB2 /* StockQuoter.xib */; };
+		620357890FFD730E008CAFB2 /* StockQuoterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 620357880FFD730E008CAFB2 /* StockQuoterViewController.m */; };
+		6203586C100277CA008CAFB2 /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
+		6203586D100277D0008CAFB2 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
+		6203587410027821008CAFB2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
+		6203587D1002785A008CAFB2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
+		620358FB10027867008CAFB2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
+		62035A1410029E9C008CAFB2 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		62035A7E1002A5DA008CAFB2 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A2711020ECA567B00C72257 /* Python.framework */; };
+		62035AC11002B555008CAFB2 /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		620CB3790FAA83D40029801C /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
-		620CB37A0FAA83DB0029801C /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
 		620CB3870FAA84060029801C /* QSBPluginUI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
 		620CB3920FAA84260029801C /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
 		620CB39E0FAA844D0029801C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
@@ -362,6 +371,10 @@
 		623ADD790EC0CC31001651D1 /* emailURL.icns in Resources */ = {isa = PBXBuildFile; fileRef = 623ADD750EC0CC31001651D1 /* emailURL.icns */; };
 		623ADD7B0EC0CC31001651D1 /* EmailURLAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 623ADD780EC0CC31001651D1 /* EmailURLAction.m */; };
 		623AFDBE0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 623AFDBC0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.m */; };
+		623B18D21003DD8F009B702D /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
+		623B19251003E19C009B702D /* GTMNSScanner+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 623B19231003E19C009B702D /* GTMNSScanner+JSON.m */; };
+		623B19261003E19C009B702D /* GTMNSScanner+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 623B19241003E19C009B702D /* GTMNSScanner+JSON.h */; };
+		623B19841003EA38009B702D /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		623BC8E00EFABC560004FAB7 /* NSAttributedString+Attributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 623BC8DE0EFABC560004FAB7 /* NSAttributedString+Attributes.m */; };
 		623CC13A0E79B94E00D32B75 /* MoreStandardResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 623CC1380E79B94E00D32B75 /* MoreStandardResultView.xib */; };
 		623CC13D0E79B97C00D32B75 /* MorePlaceHolderResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 623CC13B0E79B97C00D32B75 /* MorePlaceHolderResultView.xib */; };
@@ -423,6 +436,7 @@
 		62D824BB0FD05D15002429C4 /* finance.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62D824BA0FD05D15002429C4 /* finance.icns */; };
 		62DA51450FFAA86C002B008E /* GoogleDocsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 62DA51440FFAA86C002B008E /* GoogleDocsSource.m */; };
 		62E190960EBA4A570002241B /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
+		62E19AB11002EB8C009DA5C1 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
 		62E72A7B0F4F4ADE00A68815 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62E72A7A0F4F4ADE00A68815 /* Growl.framework */; };
 		62E72AB80F4F6E6700A68815 /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 62E72A7A0F4F4ADE00A68815 /* Growl.framework */; };
 		62E72ABF0F4F6EB900A68815 /* growl-bsd-license.html in Resources */ = {isa = PBXBuildFile; fileRef = 62E72ABE0F4F6EB900A68815 /* growl-bsd-license.html */; };
@@ -984,7 +998,6 @@
 		8BE84A790E94575000C611B0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		8BF442D30FC74ED500C29AA1 /* GTMGoogleSearch.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BF442D10FC74ED500C29AA1 /* GTMGoogleSearch.h */; };
 		8BF442D40FC74ED500C29AA1 /* GTMGoogleSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BF442D20FC74ED500C29AA1 /* GTMGoogleSearch.m */; };
-		8BF4444E0FC7780800C29AA1 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8BF517910EDBC11000D981A0 /* QSBHGSDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BF517900EDBC11000D981A0 /* QSBHGSDelegate.m */; };
 		8BF52D900EDFD52D00D981A0 /* HGSActionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA74AA0DA416B60052F620 /* HGSActionOperation.m */; };
 		8BF52D910EDFD53500D981A0 /* HGSActionOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FEA74A90DA416B60052F620 /* HGSActionOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1150,14 +1163,21 @@
 			remoteGlobalIDString = 03BF2D3708F1C69500978C59;
 			remoteInfo = Test;
 		};
-		620CB3620FAA838F0029801C /* PBXContainerItemProxy */ = {
+		620357EE100277C2008CAFB2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 620CB3080FAA827E0029801C;
 			remoteInfo = QSBPluginUI;
 		};
-		620CB36D0FAA83A40029801C /* PBXContainerItemProxy */ = {
+		62035A1710029EB0008CAFB2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
+			remoteInfo = Vermilion;
+		};
+		620CB3620FAA838F0029801C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
@@ -1191,6 +1211,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
+		};
+		623B18D41003DDA9009B702D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BD97D090E636D8C00F5C83B /* GTM */;
+			remoteInfo = GTM;
 		};
 		6263CAEA0EB79F3600FF03A1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1226,6 +1253,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
+		};
+		62E19AAF1002EB86009DA5C1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B61289E0F4641BF00E29B40;
+			remoteInfo = JSON;
 		};
 		62F5951F0FEB164E0076CDDA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1901,6 +1935,9 @@
 		6200F99C0E785FE700F046EC /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MoreShowAllTableResultView.xib; sourceTree = "<group>"; };
 		6200F9DF0E78623500F046EC /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MoreFoldResultView.xib; sourceTree = "<group>"; };
 		6200FC0F0E78896A00F046EC /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MoreCategoryResultView.xib; sourceTree = "<group>"; };
+		620357840FFD72DB008CAFB2 /* StockQuoter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StockQuoter.xib; sourceTree = "<group>"; };
+		620357870FFD730E008CAFB2 /* StockQuoterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StockQuoterViewController.h; sourceTree = "<group>"; };
+		620357880FFD730E008CAFB2 /* StockQuoterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StockQuoterViewController.m; sourceTree = "<group>"; };
 		620CB3090FAA827E0029801C /* QSBPluginUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = QSBPluginUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSimpleAccount.h; sourceTree = "<group>"; };
 		6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleAccount.m; sourceTree = "<group>"; };
@@ -1934,6 +1971,8 @@
 		623ADD780EC0CC31001651D1 /* EmailURLAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmailURLAction.m; sourceTree = "<group>"; };
 		623AFDBC0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBTopResultsViewDelegate.m; sourceTree = "<group>"; };
 		623AFDBD0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBTopResultsViewDelegate.h; sourceTree = "<group>"; };
+		623B19231003E19C009B702D /* GTMNSScanner+JSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSScanner+JSON.m"; sourceTree = "<group>"; };
+		623B19241003E19C009B702D /* GTMNSScanner+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSScanner+JSON.h"; sourceTree = "<group>"; };
 		623BC8DE0EFABC560004FAB7 /* NSAttributedString+Attributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+Attributes.m"; sourceTree = "<group>"; };
 		623BC8DF0EFABC560004FAB7 /* NSAttributedString+Attributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+Attributes.h"; sourceTree = "<group>"; };
 		623CC1390E79B94E00D32B75 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MoreStandardResultView.xib; sourceTree = "<group>"; };
@@ -2721,6 +2760,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6203587A10027845008CAFB2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6203587D1002785A008CAFB2 /* Foundation.framework in Frameworks */,
+				620358FB10027867008CAFB2 /* Cocoa.framework in Frameworks */,
+				62035A1410029E9C008CAFB2 /* Vermilion.framework in Frameworks */,
+				62035A7E1002A5DA008CAFB2 /* Python.framework in Frameworks */,
+				62035AC11002B555008CAFB2 /* GData.framework in Frameworks */,
+				62E19AB11002EB8C009DA5C1 /* JSON.framework in Frameworks */,
+				623B18D21003DD8F009B702D /* GTM.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		620CB3070FAA827E0029801C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2793,11 +2846,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				620CB37A0FAA83DB0029801C /* QSBPluginUI.framework in Frameworks */,
 				62EA8BC50F2E7DE200C92E0B /* Foundation.framework in Frameworks */,
 				62EA8BC60F2E7DE200C92E0B /* Vermilion.framework in Frameworks */,
 				62EA8BC80F2E7DE200C92E0B /* Cocoa.framework in Frameworks */,
-				8BF4444E0FC7780800C29AA1 /* GTM.framework in Frameworks */,
+				6203586C100277CA008CAFB2 /* QSBPluginUI.framework in Frameworks */,
+				6203586D100277D0008CAFB2 /* GTM.framework in Frameworks */,
+				6203587410027821008CAFB2 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3382,9 +3436,12 @@
 			children = (
 				62370B4D0FFC5AFA00C48624 /* StockQuoter.py */,
 				62370B350FFC5A8B00C48624 /* StockQuoter-Info.plist */,
+				620357840FFD72DB008CAFB2 /* StockQuoter.xib */,
 				62370B360FFC5A9900C48624 /* InfoPlist.strings */,
 				62370B4A0FFC5AF000C48624 /* Localizable.strings */,
 				62370E290FFD460400C48624 /* StockQuoter.icns */,
+				620357870FFD730E008CAFB2 /* StockQuoterViewController.h */,
+				620357880FFD730E008CAFB2 /* StockQuoterViewController.m */,
 			);
 			path = StockQuoter;
 			sourceTree = "<group>";
@@ -4698,6 +4755,8 @@
 				8B8EC8A00EF17D7D0044D13F /* GTMNSFileManager+Carbon.m */,
 				8B6C172E0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h */,
 				8B6C172F0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m */,
+				623B19241003E19C009B702D /* GTMNSScanner+JSON.h */,
+				623B19231003E19C009B702D /* GTMNSScanner+JSON.m */,
 				7F220B6A0DDB403800737C26 /* GTMNSString+HTML.h */,
 				7F220B6B0DDB403800737C26 /* GTMNSString+HTML.m */,
 				7F220C530DDB4B3200737C26 /* GTMNSString+URLArguments.h */,
@@ -4857,6 +4916,7 @@
 				8B834B590FBCD00000862FF5 /* GTMTransientRootProxy.h in Headers */,
 				8B834B5A0FBCD00000862FF5 /* GTMTransientRootPortProxy.h in Headers */,
 				8BF442D30FC74ED500C29AA1 /* GTMGoogleSearch.h in Headers */,
+				623B19261003E19C009B702D /* GTMNSScanner+JSON.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5077,10 +5137,14 @@
 			buildPhases = (
 				62370A530FFC59B000C48624 /* Resources */,
 				62370A570FFC59B000C48624 /* Sources */,
+				6203587A10027845008CAFB2 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				62035A1810029EB0008CAFB2 /* PBXTargetDependency */,
+				62E19AB01002EB86009DA5C1 /* PBXTargetDependency */,
+				623B18D51003DDA9009B702D /* PBXTargetDependency */,
 			);
 			name = "Stock Quoter";
 			productName = StockQuoter;
@@ -5194,7 +5258,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				620CB36E0FAA83A40029801C /* PBXTargetDependency */,
+				620357EF100277C2008CAFB2 /* PBXTargetDependency */,
 			);
 			name = GoogleAccounts;
 			productName = Files;
@@ -6018,6 +6082,7 @@
 				62370B4C0FFC5AF000C48624 /* Localizable.strings in Resources */,
 				62370B4E0FFC5AFA00C48624 /* StockQuoter.py in Resources */,
 				62370E2A0FFD460400C48624 /* StockQuoter.icns in Resources */,
+				620357850FFD72DB008CAFB2 /* StockQuoter.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7271,6 +7336,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				62370A580FFC59B000C48624 /* SharedScript.m in Sources */,
+				620357890FFD730E008CAFB2 /* StockQuoterViewController.m in Sources */,
+				623B19841003EA38009B702D /* GTMMethodCheck.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7598,6 +7665,7 @@
 				8B834B020FBCCFE200862FF5 /* GTMTransientRootProxy.m in Sources */,
 				8B834B030FBCCFE200862FF5 /* GTMTransientRootPortProxy.m in Sources */,
 				8BF442D40FC74ED500C29AA1 /* GTMGoogleSearch.m in Sources */,
+				623B19251003E19C009B702D /* GTMNSScanner+JSON.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7754,15 +7822,20 @@
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 5AF2C47A0E5E19A400F4D546 /* PBXContainerItemProxy */;
 		};
+		620357EF100277C2008CAFB2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 620CB3080FAA827E0029801C /* QSBPluginUI */;
+			targetProxy = 620357EE100277C2008CAFB2 /* PBXContainerItemProxy */;
+		};
+		62035A1810029EB0008CAFB2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
+			targetProxy = 62035A1710029EB0008CAFB2 /* PBXContainerItemProxy */;
+		};
 		620CB3630FAA838F0029801C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 620CB3080FAA827E0029801C /* QSBPluginUI */;
 			targetProxy = 620CB3620FAA838F0029801C /* PBXContainerItemProxy */;
-		};
-		620CB36E0FAA83A40029801C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 620CB3080FAA827E0029801C /* QSBPluginUI */;
-			targetProxy = 620CB36D0FAA83A40029801C /* PBXContainerItemProxy */;
 		};
 		620CB3700FAA83AA0029801C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7783,6 +7856,11 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 623ADD340EC0CC17001651D1 /* PBXContainerItemProxy */;
+		};
+		623B18D51003DDA9009B702D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BD97D090E636D8C00F5C83B /* GTM */;
+			targetProxy = 623B18D41003DDA9009B702D /* PBXContainerItemProxy */;
 		};
 		6263CAE90EB79F3600FF03A1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7808,6 +7886,11 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 62B7CDE50E63743500299B23 /* PBXContainerItemProxy */;
+		};
+		62E19AB01002EB86009DA5C1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B61289E0F4641BF00E29B40 /* JSON */;
+			targetProxy = 62E19AAF1002EB86009DA5C1 /* PBXContainerItemProxy */;
 		};
 		62F595200FEB164E0076CDDA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

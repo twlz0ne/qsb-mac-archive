@@ -130,62 +130,79 @@ GTM_METHOD_CHECK(NSViewController, _setTopLevelObjects:);
       HGSResult *result = [tableResult representedResult];
       HGSSearchSource *source = [result source];
       NSBundle *sourceBundle = [source bundle];
-      NSString *resultType = [result type];
-      HGSProtoExtension *protoExtension = [source protoExtension];
-      NSDictionary *customResultViewTypes
-        = [protoExtension objectForKey:kQSBCustomResultViewTypes];
-      NSDictionary *customResultViewInfo
-        = [customResultViewTypes objectForKey:resultType];
-      if (customResultViewInfo) {
-        NSString *resultViewNibName
-          = [customResultViewInfo objectForKey:kQSBResultViewNibName];
-        NSString *resultViewControllerClassName
-          = [customResultViewInfo objectForKey:kQSBResultViewControllerClassName];
-        Class resultViewControllerClass
-          = NSClassFromString(resultViewControllerClassName);
-        if ([resultViewNibName length]
-            && [resultViewControllerClassName length]) {
-          NSViewController *resultViewController
-            = [[[resultViewControllerClass alloc] 
-                initWithNibName:resultViewNibName bundle:sourceBundle]
-               autorelease];
-          if (resultViewController) {
-            [resultViewController loadView];
-            // The custom view doesn't _have_ to do anything special
-            // with the result, but it normally should.  There are cases,
-            // however, where the result might not be necessary in order
-            // to properly render the custom view -- a clock, for example.
-            if ([resultViewController respondsToSelector:@selector(setResult:)]) {
-              [resultViewController performSelector:@selector(setResult:)
-                                         withObject:result];
+      if (sourceBundle) {
+        // Force the bundle to load.  It may not be loaded, for instance, in the
+        // case of a Python-based source.
+        BOOL bundleLoaded = [sourceBundle load];
+        if (!bundleLoaded) {
+          HGSLogDebug(@"Failed to load bundle '%@'.", sourceBundle);
+        }
+        NSString *resultType = [result type];
+        HGSProtoExtension *protoExtension = [source protoExtension];
+        NSDictionary *customResultViewTypes
+          = [protoExtension objectForKey:kQSBCustomResultViewTypes];
+        NSDictionary *customResultViewInfo
+          = [customResultViewTypes objectForKey:resultType];
+        if (customResultViewInfo) {
+          NSString *resultViewNibName
+            = [customResultViewInfo objectForKey:kQSBResultViewNibName];
+          NSString *resultViewControllerClassName
+            = [customResultViewInfo objectForKey:kQSBResultViewControllerClassName];
+          Class resultViewControllerClass
+            = NSClassFromString(resultViewControllerClassName);
+          if ([resultViewNibName length] && resultViewControllerClass) {
+            NSViewController *resultViewController
+              = [[[resultViewControllerClass alloc] 
+                  initWithNibName:resultViewNibName bundle:sourceBundle]
+                 autorelease];
+            if (resultViewController) {
+              // The custom view doesn't _have_ to do anything special
+              // with the result, but it normally should.  There are cases,
+              // however, where the result might not be necessary in order
+              // to properly render the custom view -- a clock, for example.
+              // If the source determines that it cannot or does not want to
+              // use its custom view then it should return NO (as an NSNumber)
+              // from the call to -[setResult:].
+              BOOL useCustomView = YES;
+              if ([resultViewController respondsToSelector:@selector(setResult:)]) {
+                NSNumber *useView = [resultViewController
+                                     performSelector:@selector(setResult:)
+                                          withObject:result];
+                if (useView) {
+                  useCustomView = [useView boolValue];
+                }
+              }
+              if (useCustomView) {
+                NSView *resultView = [resultViewController view];
+                
+                // Re-width the custom view and re-height the container view.
+                NSRect customFrame = [customResultView_ frame];
+                NSRect resultFrame = [resultView frame];
+                resultFrame.origin = NSZeroPoint;
+                resultFrame.size.width = NSWidth(customFrame);
+                [resultView setFrame:resultFrame];
+                CGFloat deltaHeight
+                  = NSHeight(resultFrame) - NSHeight(customFrame);
+                NSView *containerView = [self view];
+                NSSize containerSize = [containerView frame].size;
+                containerSize.height += deltaHeight;
+                [containerView setFrameSize:containerSize];
+                [customResultView_ addSubview:resultView];
+                [customResultView_ setHidden:NO];
+                customResultViewInstalled_ = YES;
+              }
+            } else {
+              HGSLogDebug(@"Failed to load custom result view nib '%@' "
+                          @"for extension '%@'.", resultViewNibName,
+                          [source displayName]);
             }
-            NSView *resultView = [resultViewController view];
             
-            // Re-width the custom view and re-height the container view.
-            NSRect customFrame = [customResultView_ frame];
-            NSRect resultFrame = [resultView frame];
-            resultFrame.origin = NSZeroPoint;
-            resultFrame.size.width = NSWidth(customFrame);
-            [resultView setFrame:resultFrame];
-            CGFloat deltaHeight = NSHeight(resultFrame) - NSHeight(customFrame);
-            NSView *containerView = [self view];
-            NSSize containerSize = [containerView frame].size;
-            containerSize.height += deltaHeight;
-            [containerView setFrameSize:containerSize];
-            [customResultView_ addSubview:resultView];
-            [customResultView_ setHidden:NO];
-            customResultViewInstalled_ = YES;
           } else {
-            HGSLogDebug(@"Failed to load custom result view nib '%@' "
-                        @"for extension '%@'.", resultViewNibName,
-                        [source displayName]);
+            HGSLogDebug(@"Extension '%@' has custom result view entry for '%@' "
+                        @"but fails to provide a nib name and/or a "
+                        @"view controller class.", [source displayName],
+                        resultType);
           }
-          
-        } else {
-          HGSLogDebug(@"Extension '%@' has custom result view entry for '%@' "
-                      @"but fails to provide a nib name and/or a "
-                      @"view controller class.", [source displayName],
-                      resultType);
         }
       }
     }
