@@ -1130,39 +1130,49 @@ doCommandBySelector:(SEL)commandSelector {
   
   NSWindow *queryWindow = [self window];
   
-  // First, start with the baseFrame and enlarge it to fit the height
+  BOOL resultsVisible = [resultsWindow_ isVisible];
   NSRect baseFrame = [resultsOffsetterView_ frame];
   baseFrame.origin = [queryWindow convertBaseToScreen:baseFrame.origin];
+  // Always start with the baseFrame and enlarge it to fit the height
   NSRect proposedFrame = baseFrame;
   proposedFrame.origin.y -= newHeight; // one more for borders
   proposedFrame.size.height += newHeight;
+  if (resultsVisible) {
+    // If the results panel is visible then we first size and position it
+    // and then reposition the search box.
   
-  // second, determine a frame that actually fits within the screen.
-  NSRect actualFrame = [self fullyExposedFrameForFrame:proposedFrame
-                                        respectingDock:YES
-                                              onScreen:[queryWindow screen]];
-  if (!NSEqualRects(actualFrame, proposedFrame)) {
-    // We need to move the query window as well as the results window.
-    NSPoint deltaPoint = NSMakePoint(actualFrame.origin.x - proposedFrame.origin.x,
-                                     actualFrame.origin.y - proposedFrame.origin.y);
-    
-    NSRect queryFrame = NSOffsetRect([queryWindow frame],
-                              deltaPoint.x, deltaPoint.y);
-    // TODO(mrossetti): Make sure that the window moves acceptably, otherwise
-    // it might be necessary to not animate.
-    if (animating) {
-      [queryWindow setFrame:queryFrame display:YES animate:YES];
-    } else {
-      [queryWindow setFrame:queryFrame display:YES];
+    // second, determine a frame that actually fits within the screen.
+    NSRect actualFrame = [self fullyExposedFrameForFrame:proposedFrame
+                                          respectingDock:YES
+                                                onScreen:[queryWindow screen]];
+    if (!NSEqualRects(actualFrame, proposedFrame)) {
+      // We need to move the query window as well as the results window.
+      NSPoint deltaPoint = NSMakePoint(actualFrame.origin.x - proposedFrame.origin.x,
+                                       actualFrame.origin.y - proposedFrame.origin.y);
+      
+      NSRect queryFrame = NSOffsetRect([queryWindow frame],
+                                deltaPoint.x, deltaPoint.y);
+      [queryWindow setFrame:queryFrame display:YES animate:animating];
     }
-  }
-  
-  if (animating) {
-    [resultsWindow_ setFrame:actualFrame display:YES animate:YES];
+    
+    [resultsWindow_ setFrame:actualFrame display:YES animate:animating];
   } else {
-    [resultsWindow_ setFrame:actualFrame display:YES];
+    // If the results panel is not visible then we insure the search box is
+    // on-screen and then pre-position the results panel in case it becomes
+    // visible soon.
+    NSRect proposedQueryFrame = [queryWindow frame];
+    NSRect actualQueryFrame
+      = [self fullyExposedFrameForFrame:proposedQueryFrame
+                         respectingDock:YES
+                               onScreen:[queryWindow screen]];
+    if (!NSEqualRects(actualQueryFrame, proposedQueryFrame)) {
+      [queryWindow setFrame:actualQueryFrame display:YES animate:animating];
+      CGFloat deltaY = actualQueryFrame.origin.y - proposedQueryFrame.origin.y;
+      proposedFrame.origin.y += deltaY;
+    }
+    [resultsWindow_ setFrame:proposedFrame display:NO];
   }
-  
+
   // Turn back on size/move notifications.
   [self setObservingMoveAndResizeNotifications:YES];
 }
