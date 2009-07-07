@@ -206,6 +206,10 @@ NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
       @synchronized([self class]) {
         if (!defaultIcon) {
           defaultIcon = [[NSImage imageNamed:[self defaultIconName]] copy];
+          // As a last resort, use a system icon.
+          if (!defaultIcon) {
+            defaultIcon = [[NSImage imageNamed:@"NSApplicationIcon"] copy];
+          }
           [defaultIcon setSize:NSMakeSize(128,128)];
         }
       }
