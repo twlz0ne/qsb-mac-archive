@@ -1,0 +1,2 @@
+﻿/* A label denoting the name of the Directory Services Source. It is a source that allows the user to search OpenDirectory/ActiveDirectory/LDAP directories. Do not include ^ in localization.*/
+"^Directory Services" = "Directory Services";
