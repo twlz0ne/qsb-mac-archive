@@ -36,6 +36,7 @@
 #import "GTMMethodCheck.h"
 #import "GTMNSDictionary+URLArguments.h"
 #import "GTMNSString+HTML.h"
+#import "GTMNSString+URLArguments.h"
 #import "NSArray+HGSCommonPrefixDetection.h"
 #import "NSString+ReadableURL.h"
 
@@ -97,9 +98,10 @@ NSString *const kJSONQueryURL = @"http://ajax.googleapis.com/ajax/services/searc
 
 
 @implementation HGSGoogleWebSearchOperation
+
 GTM_METHOD_CHECK(NSArray, commonPrefixForStringsWithOptions:);
 GTM_METHOD_CHECK(NSString, readableURLString);
-
+GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
 
 - (void)dealloc {
   [fetcher_ release];
@@ -222,6 +224,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     NSString *content = [[resultDict objectForKey:@"content"] gtm_stringByUnescapingFromHTML];
     NSString *urlString = [[resultDict objectForKey:@"url"] gtm_stringByUnescapingFromHTML];
     if (!urlString) continue;
+    urlString = [urlString gtm_stringByUnescapingFromURLArgument];
     NSURL *url = [NSURL URLWithString:urlString];
     NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
     if ([resultClass isEqualToString:@"GlocalSearch"]) {
