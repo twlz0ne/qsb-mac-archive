@@ -130,6 +130,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     NSData *result = [NSURLConnection sendSynchronousRequest:authRequest
                                            returningResponse:&accountResponse
                                                        error:&error];
+    if (error) {
+      HGSLog(@"Error %d occurred during authentication of account '%@'. "
+             @"Reason: %@.", [error code], [self displayName],
+             [error localizedFailureReason]);
+    }
     authenticated = [self validateResult:result];
   }
   return authenticated;
@@ -233,11 +238,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
              autorelease];
         [self setCaptchaToken:captchaToken];
         [self setCaptchaImage:captchaImage];
-        HGSLogDebug(@"Authentication for account <%p>:'%@' requires captcha.",
-                    self, [self displayName]);
+        HGSLog(@"Authentication for account '%@' requires captcha.",
+               [self displayName]);
       } else {
-        HGSLogDebug(@"Authentication for account <%p>:'%@' failed with an "
-                    @"error=%@.", self, [self displayName], answer);
+        HGSLog(@"Authentication for account '%@' failed with a "
+               @"response of '%@'.", [self displayName], answer);
       }
     }
   }
@@ -314,8 +319,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (void)connection:(NSURLConnection *)connection 
 didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
   HGSAssert(connection == authenticationConnection_, nil);
+  [[challenge sender] cancelAuthenticationChallenge:challenge];
   [self resetAuthenticationTemporaries];
   [self setAuthenticated:NO];
+  NSError *error = [challenge error];
+  HGSLog(@"Authentication of account '%@' was challenged with error %d. "
+         @"Reason: %@.", [self displayName], [error code],
+         [error localizedFailureReason]);
 }
 
 - (void)connection:(NSURLConnection *)connection
@@ -323,6 +333,9 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
   HGSAssert(connection == authenticationConnection_, nil);
   [self resetAuthenticationTemporaries];
   [self setAuthenticated:NO];
+  HGSLog(@"Authentication of account '%@' failed with error %d. "
+         @"Reason: %@.", [self displayName], [error code],
+         [error localizedFailureReason]);
 }
 
 - (void)connection:(NSURLConnection *)connection 
