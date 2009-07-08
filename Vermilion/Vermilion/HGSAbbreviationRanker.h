@@ -43,7 +43,7 @@ extern "C" {
 
 /*!
  Scores how well a given abbreviation matches to a string.
- @param string the string to match against.
+ @param aString the string to match against.
  @param abbr the abbreviation to compare to the string.
  @param outHitMask if provided, the mask will be filled with the locations of the
         characters in string that were matched by abbr.

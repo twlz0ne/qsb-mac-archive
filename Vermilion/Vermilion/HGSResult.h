@@ -292,6 +292,9 @@ typedef NSUInteger HGSRankFlags;
 - (void)setRank:(CGFloat)rank;
 @end
 
+/*!
+ A collection of HGSResults that acts very similar to NSArray.
+*/
 @interface HGSResultArray : NSObject <NSFastEnumeration> {
   NSArray *results_;
 }
