@@ -187,6 +187,8 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     NSUserDefaults *sd = [NSUserDefaults standardUserDefaults];
     NSTimeInterval slowSourceTimeout
       = [sd doubleForKey:kQuerySlowSourceTimeoutSecondsPrefKey];
+    HGSAssert(!slowSourceTimer_, 
+              @"We shouldn't start a timer without it having been invalidated");
     slowSourceTimer_
       = [NSTimer scheduledTimerWithTimeInterval:slowSourceTimeout
                                          target:self
@@ -197,6 +199,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
 }
 
 - (void)cancelPendingSearchOperations:(NSTimer*)timer {
+  [slowSourceTimer_ invalidate];
   slowSourceTimer_ = nil;
   if ([self queriesFinished]) return;
 
@@ -345,6 +348,8 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     [nc removeObserver:self name:nil object:operation];
     [operation cancel];
   }
+  [slowSourceTimer_ invalidate];
+  slowSourceTimer_ = nil;
   cancelled_ = YES;
 }
 
