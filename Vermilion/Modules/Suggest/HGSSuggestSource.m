@@ -50,6 +50,8 @@
 #import "QSBPreferences.h"
 #endif
 
+#import "HGSAbbreviationRanker.h"
+
 #if ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
 #import "HGSSQLiteBackedCache.h"
 #endif  // ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
@@ -617,10 +619,17 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       }
       urlString = suggestionString;
       NSNumber *yesValue = [NSNumber numberWithBool:YES];
+      NSString *normalizedQuery = [query normalizedQueryString];
+      CGFloat rank1 = HGSScoreForAbbreviation(urlString, normalizedQuery, NULL);
+      NSString *urlPath = [urlString substringFromIndex:[@"http://" length]];
+      CGFloat rank2 = HGSScoreForAbbreviation(urlPath, normalizedQuery, NULL);
+      CGFloat rank = MAX(rank1, rank2);
+      NSNumber *nsRank = [NSNumber numberWithFloat:rank];
       attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                     yesValue, kHGSObjectAttributeAllowSiteSearchKey,
                     yesValue, kHGSObjectAttributeIsSyntheticKey,
                     urlString, kHGSObjectAttributeSourceURLKey,
+                    nsRank, kHGSObjectAttributeRankKey,
                     nil];
       type = kHGSTypeGoogleNavSuggest;
     }
