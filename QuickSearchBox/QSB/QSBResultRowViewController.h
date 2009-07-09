@@ -63,6 +63,7 @@
   BOOL customResultViewInstalled_;
   QSBSearchViewController *searchViewController_;
   NSNib *nib_;
+  NSArray *topLevelObjects_;
 }
 
 /*!

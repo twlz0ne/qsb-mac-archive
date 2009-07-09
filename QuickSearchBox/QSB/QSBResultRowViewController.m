@@ -70,9 +70,6 @@ static NSString *const kQSBResultViewControllerClassName
 
 @implementation QSBResultRowViewController
 
-// We use a private method here, so let's check and make sure it exists
-GTM_METHOD_CHECK(NSViewController, _setTopLevelObjects:);
-
 @synthesize customResultViewInstalled = customResultViewInstalled_;
 @synthesize searchViewController = searchViewController_;
 
@@ -90,6 +87,7 @@ GTM_METHOD_CHECK(NSViewController, _setTopLevelObjects:);
 
 - (void)dealloc {
   [searchViewController_ release];
+  [topLevelObjects_ release];
   [nib_ release];
   [super dealloc];
 }
@@ -97,14 +95,12 @@ GTM_METHOD_CHECK(NSViewController, _setTopLevelObjects:);
 -(void)loadView {
   // Instead of loading the view by name and bundle, we use the nib we already
   // have cached.
-  NSArray *topLevelObjects;
   BOOL loaded = [nib_ instantiateNibWithOwner:self 
-                              topLevelObjects:&topLevelObjects];
+                              topLevelObjects:&topLevelObjects_];
   if (!loaded) {
     HGSLogDebug(@"Unable to instantiate %@ for %@", nib_, [self class]);
   } else {
-    [self performSelector:NSSelectorFromString(@"_setTopLevelObjects:") 
-               withObject:topLevelObjects];
+    [[topLevelObjects_ retain] makeObjectsPerformSelector:@selector(release)];
   }
 }
 
