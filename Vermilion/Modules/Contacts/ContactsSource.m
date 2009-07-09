@@ -532,36 +532,18 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   return person;
 }
 
-- (NSImage *)loadImageForObject:(HGSResult *)result 
-                    immediately:(BOOL)immediately {
-  NSImage *image = [[HGSIconProvider sharedIconProvider] 
-                    cachedIconForKey:[[result url] absoluteString]];
-  
-  if (!image) {
-    ABPerson *person = (ABPerson *)[self personForResult:result];
-    if (!immediately) {
-      NSInteger tag = [person beginLoadingImageDataForClient:self];
-      NSNumber *tagNumber = [NSNumber numberWithInteger:tag];
-      @synchronized(imageLoadingTags_) {
-        [imageLoadingTags_ setObject:result forKey:tagNumber];
-      }
-      image = [self genericContactImage];
-    } else {
-      NSData *data = [person imageData];
-      if (data) {
-        HGSIconProvider *iconProvider = [HGSIconProvider sharedIconProvider];
-        image = [[[NSImage alloc] initWithData:data] autorelease];
-        image = [iconProvider imageWithRoundRectAndDropShadow:image];
-        if (image) {
-          NSString *idString = [[result url] absoluteString];
-          [iconProvider cacheIcon:image forKey:idString];
-        }
-      } else {
-        image = [self genericContactImage];
-      }
-    }
+- (NSImage *)loadImageForObject:(HGSResult *)result {
+  ABPerson *person = (ABPerson *)[self personForResult:result];
+  NSInteger tag = [person beginLoadingImageDataForClient:self];
+  NSNumber *tagNumber = [NSNumber numberWithInteger:tag];
+  @synchronized(imageLoadingTags_) {
+    [imageLoadingTags_ setObject:result forKey:tagNumber];
   }
-  return image;    
+  return  [self genericContactImage];   
+}
+
+- (BOOL)providesIconsForResults {
+  return YES;
 }
 
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
@@ -578,9 +560,9 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
       value = [emails valueAtIndex:primaryIndex];
     }
   } else if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
-    value = [self loadImageForObject:result immediately:NO];
+    value = [self loadImageForObject:result];
   } else if ([key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
-    value = [self loadImageForObject:result immediately:YES];
+    value = [self genericContactImage];
   } else if ([key isEqualToString:kHGSObjectAttributeSnippetKey]) {
     ABRecord *person = [self personForResult:result];
     

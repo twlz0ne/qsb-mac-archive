@@ -32,9 +32,17 @@
 
 #import <Cocoa/Cocoa.h>
 
+/*!
+ @header
+ @discussion HGSIconProvider
+ */
+
 @class HGSLRUCache;
 @class HGSResult;
 
+/*!
+ A icon caching/retrieval system that will get icons lazily for HGSResults.
+*/
 @interface HGSIconProvider : NSObject {
  @private
   NSMutableSet *iconOperations_;
@@ -43,48 +51,72 @@
   NSImage *compoundPlaceHolderIcon_;
 }
 
-// Returns the singleton instance of HGSIconProvider
+/*!
+  Returns the singleton instance of HGSIconProvider
+*/
 + (HGSIconProvider *)sharedIconProvider;
 
-// Returns our default placeHolderIcon. Do not change this icon. Make a copy
-// and change it.
+/*!
+  Returns our default placeHolderIcon. Do not change this icon. Make a copy and
+  change it.
+*/
 - (NSImage *)placeHolderIcon;
 
-// Returns our default compound placeHolderIcon. Do not change this icon. 
-// Make a copy and change it.
+/*!
+  Returns our default compound placeHolderIcon. Do not change this icon.  Make
+  a copy and change it.
+*/
 - (NSImage *)compoundPlaceHolderIcon;
 
-// Returns an NSImage value for a HGSResult.
-// Returns the image if the was immediately set (if the cache was able to 
-// provide the icon), or the placeHolder image if it wasn't in the cache.
-//
-// If loadLazily is YES, an asynchronous load of the icon will be started.
-//
-// The result argument is not retained; it's very important that for lazy icon
-// retrievals cancelOperationsForResult be called whenever a result is going
-// away.
+/*!
+  Returns an NSImage value for a HGSResult.
+  Checks our cache to see if we have an icon, otherwise goes through a
+  "waterfall" model to get icons.
+  By default the first image returned is a placeholder image.  
+  We will then start up an operation to return a default filesystem image.
+  Finally we will then start up an operation to return a high quality image if
+  one is available.
+  If skipPlaceholder is YES then we will immediately go for the default 
+  filesystem image. Note that this can be slow, so should not be used unless 
+  we really want a "medium" quality icon immediately.
+  
+  The icon retreived by this method will be cached.
+  
+  The result argument is not retained; it's very important that for icon
+  retrievals cancelOperationsForResult be called whenever a result is going
+  away.
+*/
 - (NSImage *)provideIconForResult:(HGSResult *)result
-                       loadLazily:(BOOL)loadLazily;
+                  skipPlaceholder:(BOOL)skip;
 
-// If provideIconForResult has been called with loadLazily:YES, then the
-// the call to provideIconForResult may be followed by a subsequent call
-// to cancelOperationsForResult if the icon is no longer needed. Calling
-// this method on a result that does not have a pending lazy load is
-// harmless.
+/*!
+  If provideIconForResult has been called with loadLazily:YES, then the the
+  call to provideIconForResult may be followed by a subsequent call to
+  cancelOperationsForResult if the icon is no longer needed. Calling this
+  method on a result that does not have a pending lazy load is harmless.
+*/
 - (void)cancelOperationsForResult:(HGSResult*)result;
 
-// Anyone can request that an icon be cached and then retrieve it later
+/*!
+  Anyone can request that an icon be cached and then retrieve it later.
+*/
 - (NSImage *)cachedIconForKey:(NSString *)key;
 - (void)cacheIcon:(NSImage *)icon forKey:(NSString *)key;
 
-// Updates the icon for a given result and caches the image for the future.
-// This can be called from any thread. The actual setting happens on the main
-// thread.
+/*!
+  Updates the icon for a given result and caches the image for the future.
+  This can be called from any thread. The actual setting happens on the main
+  thread.
+*/
 - (void)setIcon:(NSImage *)icon
       forResult:(HGSResult *)result 
         withURI:(NSString *)uri;
 
 - (NSImage *)imageWithRoundRectAndDropShadow:(NSImage *)image;
-- (NSSize)preferredIconSize; // Size of the largest icon used in the UI
+
+/*!
+  Size of the largest icon used in the UI
+*/
+- (NSSize)preferredIconSize; 
 
 @end

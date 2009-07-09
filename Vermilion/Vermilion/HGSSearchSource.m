@@ -145,7 +145,6 @@ static NSSet *CopyStringSetFromId(id value) {
                                       kHGSObjectAttributeTypeKey,
                                       kHGSObjectAttributeSnippetKey,
                                       kHGSObjectAttributeSourceURLKey,
-                                      kHGSObjectAttributeIconKey,
                                       nil];
   NSArray *sourceArchiveKeys = [self archiveKeys];
   if ([sourceArchiveKeys count]) {
@@ -178,6 +177,10 @@ static NSSet *CopyStringSetFromId(id value) {
 
 - (void)promoteResult:(HGSResult *)result {
   // Base implementation does nothing.
+}
+
+- (BOOL)providesIconsForResults {
+  return NO;
 }
 
 @end

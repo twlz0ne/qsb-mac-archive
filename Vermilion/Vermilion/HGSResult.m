@@ -299,11 +299,16 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     } else if ([key isEqualToString:kHGSObjectAttributeTypeKey]) {
       value = [self type];
     } else if ([key isEqualToString:kHGSObjectAttributeIconKey]
-        || [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {  
-      HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
-      BOOL lazily = ![key isEqualToString:kHGSObjectAttributeImmediateIconKey];
-      value = [provider provideIconForResult:self
-                                  loadLazily:lazily];
+        || [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
+      HGSSearchSource *source = [self source];
+      if ([source providesIconsForResults]) {
+        value = [source provideValueForKey:key result:self];
+      } else {
+        HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
+        BOOL skip = [key isEqualToString:kHGSObjectAttributeImmediateIconKey];
+        value = [provider provideIconForResult:self
+                               skipPlaceholder:skip];
+      }
     }  
     if (!value) {
       // If we haven't provided a value, ask our source for a value.

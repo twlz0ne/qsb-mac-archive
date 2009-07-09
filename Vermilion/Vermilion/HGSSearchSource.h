@@ -88,10 +88,19 @@
      2 this can be called on any thread, so keep that in mind for a sources
        implementation.
  
-  Defaults to nil of the value of "HGSSearchSourceUTIsToExcludeFromDiskSources"
+  Defaults to nil or the value of "HGSSearchSourceUTIsToExcludeFromDiskSources"
   from the config dict.
 */
 @property (readonly) NSSet *utisToExcludeFromDiskSources;
+
+/*! 
+  If YES this source returns icons for it's results so we will use it to get
+  kHGSObjectAttributeImmediateIconKey and kHGSObjectAttributeIconKey instead
+  of using HGSIconProvider. 
+ 
+  Defaults to NO.
+*/
+@property (readonly) BOOL providesIconsForResults;
 
 /*!
   Returns whether this source is valid for the query string/terms.
