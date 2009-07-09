@@ -44,24 +44,27 @@ keys:
   t       * Ticker (text)
   type    * Type (i.e. 'Company')
   vo      * Volume (float with multiplier, like '3.54M')
-  
+
   * - Provided in the feed.
 """
 
 __author__ = 'mrossetti@google.com (Mike Rossetti)'
 
-import string
+import re
 import sys
+import thread
 import time
+import traceback
 import urllib
 
 try:
   import Vermilion
   import VermilionLocalize
 except ImportError:
+
   class Vermilion(object):
     """Stub class used when running from the command line.
-    
+
     Required when this script is run outside of the Quick Search Box.  This
     class is not needed when Vermilion is provided in native code by the
     Quick Search runtime.
@@ -74,11 +77,12 @@ except ImportError:
 
     class Query(object):
       """Stub for the query class used when running from the command line.
-      
+
       Required when this script is run outside of the Quick Search Box.  This
       class is not needed when Query is provided in native code by the Quick
       Search runtime.
       """
+
       def __init__(self, phrase):
         """Stub the required data members."""
         self.raw_query = phrase
@@ -122,7 +126,7 @@ class StockQuoter(object):
 
   def __init__(self):
     """Sets defaults for debugging and running from the command line.
-    
+
     Modify the setting of debugging_is_enabled directly here if you
     want to see debugging information while running within another
     application, such as QSB under Mac OS X.
@@ -148,8 +152,8 @@ class StockQuoter(object):
 
   invoked_by_command_line = property(__GetInvokedByCommandLine,
                                      __SetInvokedByCommandLine,
-                                     doc = """Gets or sets if we were invoked
-                                              by command line.""")
+                                     doc="""Gets or sets if we were invoked
+                                            by command line.""")
 
   def _GetDebuggingEnabled(self):
     """Returns True if we want debugging output."""
@@ -169,10 +173,18 @@ class StockQuoter(object):
 
   debugging_enabled = property(__GetDebuggingEnabled,
                                __SetDebuggingEnabled,
-                               doc = """Gets or sets if we should output
-                                        debugging information.""")
+                               doc="""Gets or sets if we should output
+                                      debugging information.""")
 
   def PerformSearch(self, query):
+    """Kicks off a search for a stock quote.
+
+    Args:
+      query: A Vermilion.Query object containing the user's search query.
+    """
+    thread.start_new_thread(self.PerformSearchThread, (query,))
+
+  def PerformSearchThread(self, query):
     """Searches for a stock quote.
 
     Args:
@@ -192,10 +204,14 @@ class StockQuoter(object):
       # Perform a fetch from the finance server using the term as the
       # stock symbol.
       quote_url = QUOTE_URL % term
+      if self.debugging_enabled:
+        print "Requesting quote with URL: %s" % quote_url
       quote_connection = urllib.urlopen(quote_url)
       quote_raw_data = quote_connection.readlines()
       quote_connection.close()
       quote_dict = {}
+      if self.debugging_enabled:
+        print "Raw data returned from finance feed: %s" % quote_raw_data
       # It's JSON but this is a simple extraction.
       for line in quote_raw_data:
         line = line.rstrip('\n')
@@ -221,16 +237,17 @@ class StockQuoter(object):
       elif self.debugging_enabled:
         print "'%s' is not a valid stock symbol: " % term, quote_dict
       query.SetResults(results)
-    except:
+    except Exception, exception:
       # Catch everything to make sure that we never pass up the
       # call to query.Finish()
       if self.debugging_enabled:
-        print "An exception was thrown."
+        print "An exception was thrown. %s" % exception
+        traceback.print_exc()
     query.Finish()
 
   def IsValidSourceForQuery(self, query):
     """Determines if the stock quote search source will handle the query.
-    
+
     We reject any term that is comprosed of more than one word.
 
     Args:
@@ -301,7 +318,7 @@ def main(argv=None):
     argv = sys.argv[1:]
 
   if len(argv) < 1:
-    print 'Usage: StockQuoter <query>'
+    print "Usage: StockQuoter <query>"
     return 1
 
   query = Vermilion.Query(argv[0])
@@ -309,7 +326,7 @@ def main(argv=None):
   search.invoked_by_command_line = True
   search.debugging_enabled = True
   if not search.IsValidSourceForQuery(query):
-    print 'Not a valid query'
+    print "Not a valid query"
     return 1
   search.PerformSearch(query)
 
