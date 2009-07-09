@@ -67,7 +67,7 @@
     andReturn:nil]
    provideValueForKey:kHGSObjectAttributeImmediateIconKey result:result];
   NSImage *icon = [provider provideIconForResult:result 
-                                      loadLazily:NO];
+                                 skipPlaceholder:YES];
   // Not using GTMAssertObjectImageEqualToImageNamed because it appears there
   // is an issue with the OS returning icons to us that aren't really
   // of generic color space. 
