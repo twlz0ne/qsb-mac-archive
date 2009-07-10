@@ -203,7 +203,7 @@ class StockQuoter(object):
       term = terms[0]
       # Perform a fetch from the finance server using the term as the
       # stock symbol.
-      quote_url = QUOTE_URL % term
+      quote_url = QUOTE_URL % urllib.quote(term)
       if self.debugging_enabled:
         print "Requesting quote with URL: %s" % quote_url
       quote_connection = urllib.urlopen(quote_url)
@@ -232,6 +232,8 @@ class StockQuoter(object):
         result = self.CreateResult(quote_dict)
         if result is not None:
           results.append(result)
+          if self.debugging_enabled:
+            print "Results for '%s' were added: %s" % (term, result)
         elif self.debugging_enabled:
           print "Failed to create a result for '%s'." % term
       elif self.debugging_enabled:

@@ -71,6 +71,10 @@ static NSString *const kGoogleFinanceAfterHoursChangePercentageKey = @"ecp";
 // Return YES if there is a character at |index| and it is not multi-byte.
 - (BOOL)isSingleByteCharacterAtIndex:(NSUInteger)index;
 
+// Return a float value for a string which may contain currency symbols
+// and commas.
+- (CGFloat)currencyStringFloatValue;
+
 @end
 
 // Given a character |c|, check to see if it is [0-9a-zA-Z] and, if so,
@@ -218,8 +222,8 @@ GTM_METHOD_CHECK(NSScanner, gtm_scanJSONObjectString:);
                            value:lineBreakStyle
                            range:fullRange];
     [self setCompanyNameAndSymbol:nameAttrString];
-    
-    CGFloat openMarketPrice = [openMarketPriceString floatValue];
+
+    CGFloat openMarketPrice = [openMarketPriceString currencyStringFloatValue];
     [self setOpenMarketPrice:openMarketPrice];
     
     openMarketChangeString
@@ -227,16 +231,16 @@ GTM_METHOD_CHECK(NSScanner, gtm_scanJSONObjectString:);
          openMarketChangePercentageString];
     [self setOpenMarketChangeAndPercent:openMarketChangeString];
     // Set the color red if the change is negative.
-    CGFloat openMarketChange = [openMarketChangeString floatValue];
+    CGFloat openMarketChange = [openMarketChangeString currencyStringFloatValue];
     if (openMarketChange < 0.0) {
       [self setOpenMarketChangeColor:[NSColor redColor]];
     } else {
       [self setOpenMarketChangeColor:[NSColor blackColor]];
     }
     
-    CGFloat highPrice = [highPriceString floatValue];
+    CGFloat highPrice = [highPriceString currencyStringFloatValue];
     [self setHighPrice:highPrice];
-    CGFloat lowPrice = [lowPriceString floatValue];
+    CGFloat lowPrice = [lowPriceString currencyStringFloatValue];
     [self setLowPrice:lowPrice];
     
     if (afterHours) {
@@ -246,7 +250,7 @@ GTM_METHOD_CHECK(NSScanner, gtm_scanJSONObjectString:);
         = [stockData objectForKey:kGoogleFinanceAfterHoursChangeKey];
       NSString *afterHoursChangePercentageString
         = [stockData objectForKey:kGoogleFinanceAfterHoursChangePercentageKey];
-      CGFloat afterHoursPrice = [afterHoursPriceString floatValue];
+      CGFloat afterHoursPrice = [afterHoursPriceString currencyStringFloatValue];
       [self setAfterHoursPrice:afterHoursPrice];
       
       if ([afterHoursChangeString length]
@@ -256,7 +260,7 @@ GTM_METHOD_CHECK(NSScanner, gtm_scanJSONObjectString:);
              afterHoursChangePercentageString];
         [self setAfterHoursChangeAndPercent:afterHoursChangeString];
         // Set the color red if the change is negative.
-        CGFloat afterHoursChange = [afterHoursChangeString floatValue];
+        CGFloat afterHoursChange = [afterHoursChangeString currencyStringFloatValue];
         if (afterHoursChange < 0.0) {
           [self setAfterHoursChangeColor:[NSColor redColor]];
         } else {
@@ -464,6 +468,14 @@ GTM_METHOD_CHECK(NSScanner, gtm_scanJSONObjectString:);
     result = charRange.length == 1;
   }
   return result;
+}
+
+- (CGFloat)currencyStringFloatValue {
+  NSNumberFormatter *formatter = [[[NSNumberFormatter alloc] init] autorelease];
+  [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+  NSNumber *number = [formatter numberFromString:self];
+  CGFloat floatValue = [number floatValue];
+  return floatValue;
 }
 
 @end
