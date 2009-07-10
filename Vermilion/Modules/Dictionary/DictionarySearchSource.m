@@ -105,6 +105,7 @@ static const int kMinQueryLength = 3;
   }
   CFRange range = DCSGetTermRangeInString(NULL, (CFStringRef)query, 0);
   if (range.location != kCFNotFound && range.length != kCFNotFound) {
+    HGSLog(@"Dictionary Query for %@ range: %@", query, NSStringFromRange(*((NSRange *)&range)));
     CFStringRef def = DCSCopyTextDefinition(NULL, (CFStringRef)query, range);
     if (def) {
       NSString *urlString 
