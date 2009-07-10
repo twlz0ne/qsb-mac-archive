@@ -792,12 +792,17 @@ static PyObject *LocalizeString(PyObject *self, PyObject *args) {
     HGSLogDebug(@"VermilionLocalize.String() requires an argument");
     return PyString_FromString("");
   }
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSBundle *bundle = [[[NSThread currentThread] threadDictionary]
                       valueForKey:kHGSPythonThreadBundleKey];
   NSString *key = [NSString stringWithUTF8String:str];
   NSString *localized = [bundle localizedStringForKey:key value:@"" table:nil];
+  PyObject *resultString = nil;
   if (localized) {
-    return PyString_FromString([localized UTF8String]);
+    resultString = PyString_FromString([localized UTF8String]);
+  } else {
+    resultString = PyString_FromString(str);
   }
-  return PyString_FromString(str);
+  [pool release];
+  return resultString;
 }
