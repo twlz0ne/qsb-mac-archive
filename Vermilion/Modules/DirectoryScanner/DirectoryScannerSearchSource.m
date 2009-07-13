@@ -65,7 +65,7 @@
   return self;
 }
 
-- (void) dealloc {
+- (void)dealloc {
   [kQueue_ release];
   kQueue_ = nil;
   [path_ release];
@@ -73,8 +73,11 @@
   [super dealloc];
 }
 
-- (void) directoryChanged:(GTMFileSystemKQueue *)queue
+- (void)directoryChanged:(GTMFileSystemKQueue *)queue
                eventFlags:(GTMFileSystemKQueueEvents)flags {
+  // Retain ourself long enough to avoid a race condition in dealloc
+  // See http://code.google.com/p/qsb-mac/issues/detail?id=575
+  [[self retain] autorelease];
   [self recacheContents];
 }
 
