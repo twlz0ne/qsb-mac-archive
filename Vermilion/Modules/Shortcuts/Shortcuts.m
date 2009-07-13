@@ -91,6 +91,11 @@ static const unsigned int kMaxEntriesPerShortcut = 3;
 
 - (NSArray *)rankedIdentifiersForNormalizedShortcut:(NSString *)shortcut;
 - (NSArray *)rankedObjectsForShortcut:(NSString *)shortcut;
+
+// Remove the given identifier for the shortcut.
+- (void)removeIdentifier:(NSString *)identifier
+             forShortcut:(NSString *)shortcut;
+
 @end
 
 static inline int KeyLength(NSString *a, NSString *b, void *c) {
@@ -171,7 +176,7 @@ static inline int KeyLength(NSString *a, NSString *b, void *c) {
     if ([archivedRep isKindOfClass:[NSDictionary class]]) {
       HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
       HGSSearchSource *source 
-       = [sourcesPoint extensionWithIdentifier:sourceName];
+        = [sourcesPoint extensionWithIdentifier:sourceName];
       result = [source resultWithArchivedRepresentation:archivedRep];
     } else {
       HGSLogDebug(@"didn't have a dictionary for the hgsobject's archived rep");
@@ -273,7 +278,28 @@ static inline int KeyLength(NSString *a, NSString *b, void *c) {
     HGSLogDebug(@"Shortcut recorded: %@ = %@", shortcut, result);
   }
   return YES;
-}  // updateShortcutFromController:withObject:
+}
+
+- (void)removeIdentifier:(NSString *)identifier
+             forShortcut:(NSString *)shortcut {
+  NSString *normalizeShortcut
+    = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:shortcut];
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  @synchronized ([self class]) {
+    NSMutableDictionary *shortcutData = [self readShortcutData];
+    NSMutableArray *shortcutArray
+      = [[[shortcutData objectForKey:normalizeShortcut] mutableCopy]
+         autorelease];
+    [shortcutArray removeObject:identifier];
+    if ([shortcutArray count]) {
+      [shortcutData setObject:shortcutArray forKey:normalizeShortcut];
+    } else {
+      [shortcutData removeObjectForKey:normalizeShortcut];
+    }
+    [defaults setObject:shortcutData forKey:kHGSShortcutsKey];
+    [defaults synchronize];
+  }
+}
 
 - (void)performSearchOperation:(HGSSearchOperation*)operation {
   // shortcuts start w/ the raw query so anything can get remembered.
@@ -323,6 +349,10 @@ static inline int KeyLength(NSString *a, NSString *b, void *c) {
     HGSResult *result = [self unarchiveResultForIdentifier:identifier];
     if (result) {
       [results addObject:result];
+    } else {
+      // If the result comes back nil then the references item is no
+      // longer available.  Remove it from the shortcut database.
+      [self removeIdentifier:identifier forShortcut:shortcut];
     }
   }
   return results;
