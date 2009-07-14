@@ -35,6 +35,7 @@
 #import "HGSDelegate.h"
 #import "HGSCodeSignature.h"
 #import "HGSPluginBlacklist.h"
+#import "KeychainItem.h"
 #import <openssl/aes.h>
 #import <openssl/evp.h>
 #import <openssl/x509.h>
@@ -486,34 +487,37 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 
   UInt32 keyMaterialLengthFromKeychain;
   void *keyMaterialFromKeychain;
-  if (SecKeychainFindGenericPassword(NULL,
-                                     [appName length],
-                                     [appName UTF8String],
-                                     [kKeychainName length],
-                                     [kKeychainName UTF8String],
-                                     &keyMaterialLengthFromKeychain,
-                                     &keyMaterialFromKeychain,
-                                     NULL) == noErr) {
+  OSStatus status = SecKeychainFindGenericPassword(NULL,
+                                                   [appName length],
+                                                   [appName UTF8String],
+                                                   [kKeychainName length],
+                                                   [kKeychainName UTF8String],
+                                                   &keyMaterialLengthFromKeychain,
+                                                   &keyMaterialFromKeychain,
+                                                   NULL);
+  if (!reportIfKeychainError(status)) {
     if (keyMaterialLengthFromKeychain == kEncryptionKeyLength) {
       // Keychain has an existing key, return that
       memcpy(key, keyMaterialFromKeychain, kEncryptionKeyLength);
       gotKey = YES;
     }
-    SecKeychainItemFreeContent(NULL, keyMaterialFromKeychain);
+    reportIfKeychainError(SecKeychainItemFreeContent(NULL,
+                                                     keyMaterialFromKeychain));
   }
   
   if (!gotKey) {
     // Key material unavailable, create a new keychain item
     [self deleteEncryptionKey];
     if ([self generateRandomBytes:key count:kEncryptionKeyLength]) {
-      if (SecKeychainAddGenericPassword(NULL,
-                                       [appName length],
-                                       [appName UTF8String],
-                                       [kKeychainName length],
-                                       [kKeychainName UTF8String],
-                                       kEncryptionKeyLength,
-                                       key,
-                                       NULL) == noErr) {
+      status = SecKeychainAddGenericPassword(NULL,
+                                             [appName length],
+                                             [appName UTF8String],
+                                             [kKeychainName length],
+                                             [kKeychainName UTF8String],
+                                             kEncryptionKeyLength,
+                                             key,
+                                             NULL);
+      if (!reportIfKeychainError(status)) {
         gotKey = YES;
       }
     }
@@ -528,20 +532,22 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
   SecKeychainItemRef itemRef;
   UInt32 keyMaterialLengthFromKeychain;
   void *keyMaterialFromKeychain;
-  if (SecKeychainFindGenericPassword(NULL,
-                                     [appName length],
-                                     [appName UTF8String],
-                                     [kKeychainName length],
-                                     [kKeychainName UTF8String],
-                                     &keyMaterialLengthFromKeychain,
-                                     &keyMaterialFromKeychain,
-                                     &itemRef) == noErr) {
-    SecKeychainItemFreeContent(NULL, keyMaterialFromKeychain);
-    SecKeychainItemDelete(itemRef);
+  OSStatus status = SecKeychainFindGenericPassword(NULL,
+                                                   [appName length],
+                                                   [appName UTF8String],
+                                                   [kKeychainName length],
+                                                   [kKeychainName UTF8String],
+                                                   &keyMaterialLengthFromKeychain,
+                                                   &keyMaterialFromKeychain,
+                                                   &itemRef);
+  if (!reportIfKeychainError(status)) {
+    reportIfKeychainError(SecKeychainItemFreeContent(NULL,
+                                                     keyMaterialFromKeychain));
+    reportIfKeychainError(SecKeychainItemDelete(itemRef));
     CFRelease(itemRef);
   }
 }
-
+   
 - (BOOL)generateRandomBytes:(unsigned char *)bytes count:(NSUInteger)count {
   NSUInteger pos = 0;
   

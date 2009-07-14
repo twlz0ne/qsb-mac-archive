@@ -30,11 +30,18 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion KeychainItem
+*/
+
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
 
-// Temporary shim code for accessing the keychain. The real product should use
-// something along the lines of GMAuthCredential instead of this class.
+/*!
+ Temporary shim code for accessing the keychain. The real product should use
+ something along the lines of GMAuthCredential instead of this class.
+*/
 @interface KeychainItem : NSObject
 {
  @private
@@ -44,24 +51,44 @@
   NSString* mPassword;
 }
 
-// Returns the first keychain item matching the given criteria.
-// If the username can be anything, pass nil for |username|
+/*!
+ Returns the first keychain item matching the service.
+ If the username can be anything, pass nil for |username|.
+*/
 + (KeychainItem*)keychainItemForService:(NSString*)serviceName
                                username:(NSString*)username;
+/*!
+ Returns the first keychain item for the given host.
+ If the username can be anything, pass nil for |username|.
+ */
 + (KeychainItem*)keychainItemForHost:(NSString*)host
                             username:(NSString*)username;
-// Returns all keychain items for the given service.
+
+/*! Returns all keychain items for the given service. */
 + (NSArray*)allKeychainItemsForService:(NSString*)serviceName;
-// Adds a new keychain item for |service|
+
+/*! Adds a new keychain item for |service|. */
 + (KeychainItem*)addKeychainItemForService:(NSString*)serviceName
                               withUsername:(NSString*)username
                                   password:(NSString*)password;
 
+/*! Returns the username associated with a keychain item. */
 - (NSString*)username;
+
+/*! Returns the password associated with a keychain item. */
 - (NSString*)password;
+
+/*! Updates the username and password associated with a keychain item. */
 - (void)setUsername:(NSString*)username password:(NSString*)password;
 
-// Delete ourself from the keychain.
+/*! Delete the keychain item from its keychain. */
 - (void)removeFromKeychain;
 
 @end
+
+/*!
+ Check |status| and if not noErr then always log wrPermErr's otherwise
+ only log other errors for debug builds.  The wrPermErr could indicate
+ a corrupted keychain.
+*/
+BOOL reportIfKeychainError(OSStatus status);

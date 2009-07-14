@@ -39,7 +39,6 @@
 @end
 
 @implementation KeychainItem
-
 + (KeychainItem*)keychainItemForService:(NSString*)serviceName
                                username:(NSString*)username {
   SecKeychainItemRef itemRef;
@@ -52,8 +51,9 @@
                                                    accountLength, accountCString,
                                                    0, NULL,
                                                    &itemRef);
-  if (result != noErr)
+  if (reportIfKeychainError(result)) {
       return nil;
+  }
 
   return [[[KeychainItem alloc] initWithRef:itemRef] autorelease];
 }
@@ -69,8 +69,9 @@
                                                     0, NULL, accountLength, accountCString,
                                                     0, NULL, kAnyPort, 0, 0,
                                                     NULL, NULL, &itemRef);
-  if (result != noErr)
+  if (reportIfKeychainError(result)) {
     return nil;
+  }
 
   return [[[KeychainItem alloc] initWithRef:itemRef] autorelease];
 }
@@ -93,8 +94,7 @@
                                                           kSecGenericPasswordItemClass,
                                                           &searchCriteria,
                                                           &searchRef);
-  if (result != noErr) {
-    HGSLog(@"Keychain search for host '%@' failed (error %d)", serviceName, result);
+  if (reportIfKeychainError(result)) {
     return nil;
   }
   
@@ -122,8 +122,7 @@
   OSStatus result = SecKeychainAddGenericPassword(NULL, serviceLength, serviceCString,
                                                   accountLength, accountCString,
                                                   passwordLength, passwordData, &keychainItemRef);
-  if (result != noErr) {
-    HGSLog(@"Couldn't add keychain item for %@ (error %d)", serviceName, result);
+  if (reportIfKeychainError(result)) {
     return nil;
   }
 
@@ -171,7 +170,7 @@
   [mPassword autorelease];
   mPassword = nil;
 
-  if (result != noErr) {
+  if (reportIfKeychainError(result)) {
     HGSLog(@"Couldn't load keychain data (error %d)", result);
     mUsername = [[NSString alloc] init];
     mPassword = [[NSString alloc] init];
@@ -189,7 +188,8 @@
   mPassword = [[NSString alloc] initWithBytes:passwordData
                                        length:passwordLength
                                      encoding:NSUTF8StringEncoding];
-  SecKeychainItemFreeAttributesAndData(attrList, (void*)passwordData);
+  reportIfKeychainError(SecKeychainItemFreeAttributesAndData(attrList,
+                                                             (void*)passwordData));
   mDataLoaded = YES;
 }
 
@@ -216,12 +216,11 @@
   attrList.attr = &user;
   const char* passwordData = [password UTF8String];
   UInt32 passwordLength = passwordData ? (UInt32)strlen(passwordData) : 0;
-  if (SecKeychainItemModifyAttributesAndData(mKeychainItemRef,
-                                             &attrList,
-                                             passwordLength,
-                                             passwordData) != noErr) {
-    HGSLog(@"Couldn't update keychain item user and password for %@", username);
-  } else {
+  if (!reportIfKeychainError(
+       SecKeychainItemModifyAttributesAndData(mKeychainItemRef,
+                                              &attrList,
+                                              passwordLength,
+                                              passwordData))) {
     [mUsername autorelease];
     mUsername = [username copy];
     [mPassword autorelease];
@@ -230,11 +229,25 @@
 }
 
 - (void)removeFromKeychain {
-  if (SecKeychainItemDelete(mKeychainItemRef) == noErr) {
+  if (!reportIfKeychainError(SecKeychainItemDelete(mKeychainItemRef))) {
     mKeychainItemRef = nil;
-  } else {
-    HGSLog(@"Could not delete keychain item for %@", mUsername);
   }
 }
 
 @end
+
+BOOL reportIfKeychainError(OSStatus status) {
+  BOOL wasError = NO;
+  if (status != noErr) {
+    if (status == wrPermErr) {
+      HGSLog(@"A problem was detected while accessing the keychain (%d). "
+             @"You may need to run Keychain First Aid to repair your "
+             @"keychain.", status);
+    } else {
+      HGSLogDebug(@"A error occurred while accessing the keychain (%d).",
+                  status);
+    }
+    wasError = YES;
+  }
+  return wasError;
+}
