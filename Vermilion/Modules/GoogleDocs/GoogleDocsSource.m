@@ -56,15 +56,15 @@ static NSString *const kGoogleDocsSpreadsheetDocPropertyKey
 - (void)setUpPeriodicRefresh;
 
 // Main indexing function for each document associated with the account.
-- (void)indexDoc:(GDataEntryDocBase*)doc;
+- (void)indexDoc:(GDataEntryBase *)doc;
 
 // Bottleneck function for kicking off a document fetch or refresh.
 - (void)startAsynchronousDocsListFetch;
 
 // Secondary indexing function used to retrieve worksheet information
-// about a particular spreadsheet.
-- (void)startAsyncSpreadsheetInfoFetchWithDoc:(GDataEntryDocBase*)doc
-                                       result:(HGSResult *)docResult;
+// for a particular spreadsheet.
+- (void)startAsyncWorksheetFetchForSpreadsheet:(GDataEntrySpreadsheet *)spreadsheet
+                                        result:(HGSResult *)spreadsheetResult;
 
 // Retrieve the authors information for a list of people associated
 // with a document.
@@ -230,7 +230,9 @@ GTM_METHOD_CHECK(NSEnumerator,
   
   // Make sure we aren't in the middle of waiting for results; if we are, try
   // again later instead of changing things in the middle of the fetch.
-  if (currentlyFetchingDocs_ || [activeSpreadsheetFetches_ count] != 0) {
+  if (currentlyFetchingDocs_
+      || currentlyFetchingSpreadsheets_
+      || [activeSpreadsheetFetches_ count] != 0) {
     [self performSelector:@selector(loginCredentialsChanged:)
                withObject:notification
                afterDelay:60.0];
@@ -241,7 +243,8 @@ GTM_METHOD_CHECK(NSEnumerator,
   docServiceTicket_ = nil;
   [docService_ release];
   docService_ = nil;
-  
+  [spreadsheetServiceTicket_ release];
+  spreadsheetServiceTicket_ = nil;
   [spreadsheetService_ release];
   spreadsheetService_ = nil;
   
@@ -307,6 +310,7 @@ GTM_METHOD_CHECK(NSEnumerator,
 }
 
 - (void)resetAllFetches {
+  // Stop doc fetches.
   if (currentlyFetchingDocs_) {
     [docServiceTicket_ cancelTicket];
   }
@@ -314,6 +318,12 @@ GTM_METHOD_CHECK(NSEnumerator,
   docServiceTicket_ = nil;
   [docService_ release];
   docService_ = nil;
+  // Stop spreadsheet fetches.
+  if (currentlyFetchingSpreadsheets_) {
+    [spreadsheetServiceTicket_ cancelTicket];
+  }
+  [spreadsheetServiceTicket_ release];
+  spreadsheetServiceTicket_ = nil;
   for (GDataServiceTicket *ticket in activeSpreadsheetFetches_) {
     [ticket cancelTicket];
   }
@@ -327,16 +337,19 @@ GTM_METHOD_CHECK(NSEnumerator,
 #pragma mark Docs Fetching
 
 - (void)startAsynchronousDocsListFetch {
+  [self clearResultIndex];
+  KeychainItem* keychainItem = nil;
+  NSString *userName = nil;
+  NSString *password = nil;
   if (!currentlyFetchingDocs_) {
     if (!docService_) {
-      KeychainItem* keychainItem 
-        = [KeychainItem keychainItemForService:[account_ identifier]
-                                      username:nil];
-      NSString *userName = [keychainItem username];
-      NSString *password = [keychainItem password];
+      keychainItem = [KeychainItem keychainItemForService:[account_ identifier]
+                                                 username:nil];
+      userName = [keychainItem username];
+      password = [keychainItem password];
       if (userName && password) {
         docService_ = [[GDataServiceGoogleDocs alloc] init];
-        [docService_ setUserAgent:@"HGSGoogleDocSource"];
+        [docService_ setUserAgent:@"QuickSearchBox-GoogleDocsSource.Docs-1.0"];
         [docService_ setUserCredentialsWithUsername: userName
                                            password: password];
         [docService_ setIsServiceRetryEnabled:YES];
@@ -351,34 +364,77 @@ GTM_METHOD_CHECK(NSEnumerator,
     // during a fetch we don't destroy the service out from under ourselves.
     currentlyFetchingDocs_ = YES;
     // If the doc feed is attempting an http request then upgrade it to https.
-    NSString *urlString
+    NSString *docURLString
       = [kGDataGoogleDocsDefaultPrivateFullFeed
          stringByReplacingOccurrencesOfString:@"http:"
                                    withString:@"https:"
                                       options:NSLiteralSearch
                                               | NSAnchoredSearch
                                         range:NSMakeRange(0, 5)];
-    NSURL* docURL = [NSURL URLWithString:urlString];
+    NSURL* docURL = [NSURL URLWithString:docURLString];
     docServiceTicket_
       = [[docService_ fetchFeedWithURL:docURL
                               delegate:self
-                     didFinishSelector:@selector(docServiceTicket:
-                                                 finishedWithObject:
+                     didFinishSelector:@selector(docFeedTicket:
+                                                 finishedWithFeed:
                                                  error:)]
+         retain];
+  }
+  if (!currentlyFetchingSpreadsheets_) {
+    if (!spreadsheetService_) {
+      if (!keychainItem) {
+        keychainItem = [KeychainItem keychainItemForService:[account_ identifier]
+                                                   username:nil];
+        userName = [keychainItem username];
+        password = [keychainItem password];
+      }
+      if (userName && password) {
+        spreadsheetService_ = [[GDataServiceGoogleDocs alloc] init];
+        [spreadsheetService_ setUserAgent:
+         @"QuickSearchBox-GoogleDocsSource.Spreadsheets-1.0"];
+        [spreadsheetService_ setUserCredentialsWithUsername: userName
+                                           password: password];
+        [spreadsheetService_ setIsServiceRetryEnabled:YES];
+      } else {
+        // Don't keep trying.
+        [updateTimer_ invalidate];
+        return;
+      }
+    }
+    // Mark us as in the middle of a fetch so that if credentials change 
+    // during a fetch we don't destroy the service out from under ourselves.
+    currentlyFetchingSpreadsheets_ = YES;
+    // If the spreadsheet feed is attempting an http request then upgrade
+    // it to https.
+    NSString *spreadsheetURLString
+      = [kGDataGoogleDocsDefaultPrivateFullFeed
+         stringByReplacingOccurrencesOfString:@"http:"
+                                   withString:@"https:"
+                                      options:NSLiteralSearch
+                                              | NSAnchoredSearch
+                                        range:NSMakeRange(0, 5)];
+    NSURL* spreadsheetURL = [NSURL URLWithString:spreadsheetURLString];
+    spreadsheetServiceTicket_
+      = [[spreadsheetService_ fetchFeedWithURL:spreadsheetURL
+                                      delegate:self
+                             didFinishSelector:@selector(docFeedTicket:
+                                                         finishedWithFeed:
+                                                         error:)]
          retain];
   }
 }
 
-- (void)docServiceTicket:(GDataServiceTicket *)docTicket
-      finishedWithObject:(GDataFeedDocList *)docList
-                   error:(NSError *)error {
-  currentlyFetchingDocs_ = NO;
+- (void)docFeedTicket:(GDataServiceTicket *)docTicket
+     finishedWithFeed:(GDataFeedBase *)docFeed
+                error:(NSError *)error {
+  if ([docFeed isKindOfClass:[GDataFeedDocList class]]) {
+    currentlyFetchingDocs_ = NO;
+  } else {
+    currentlyFetchingSpreadsheets_ = NO;
+  }
   if (!error) {
-    [self clearResultIndex];
-    
-    NSEnumerator* docEnumerator = [[docList entries] objectEnumerator];
-    GDataEntryDocBase* doc;
-    while ((doc = [docEnumerator nextObject])) {
+    NSArray *docs = [docFeed entries];
+    for (GDataEntryBase *doc in docs) {
       [self indexDoc:doc];
     }
   } else {
@@ -386,7 +442,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   }
 }
 
-- (void)indexDoc:(GDataEntryDocBase*)doc {
+- (void)indexDoc:(GDataEntryBase *)doc {
   NSString* docTitle = [[doc title] stringValue];
   NSURL* docURL = [[doc HTMLLink] URL];
   if (!docURL) {
@@ -460,16 +516,15 @@ GTM_METHOD_CHECK(NSEnumerator,
     date = [NSDate distantPast];
   }
   NSString *docID = [doc resourceID];
-  NSDictionary *attributes
-    = [NSDictionary dictionaryWithObjectsAndKeys:
-       rankFlags, kHGSObjectAttributeRankFlagsKey,
-       cellArray, kQSBObjectAttributePathCellsKey,
-       date, kHGSObjectAttributeLastUsedDateKey,
-       userName_, kHGSObjectAttributeSnippetKey,
-       icon, kHGSObjectAttributeIconKey,
-       categoryLabel, kGoogleDocsDocCategoryKey,
-       docID, kGoogleDocsDocSaveAsIDKey,
-     nil];
+  NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                              rankFlags, kHGSObjectAttributeRankFlagsKey,
+                              cellArray, kQSBObjectAttributePathCellsKey,
+                              date, kHGSObjectAttributeLastUsedDateKey,
+                              userName_, kHGSObjectAttributeSnippetKey,
+                              icon, kHGSObjectAttributeIconKey,
+                              categoryLabel, kGoogleDocsDocCategoryKey,
+                              docID, kGoogleDocsDocSaveAsIDKey,
+                              nil];
   HGSResult* result = [HGSResult resultWithURL:docURL
                                           name:docTitle
                                           type:kHGSTypeWebpage
@@ -478,8 +533,9 @@ GTM_METHOD_CHECK(NSEnumerator,
   
   // If this is a spreadsheet then we have to go off and fetch the worksheet
   // information in a spreadsheet feed.
-  if ([categoryLabel isEqualToString:kDocCategorySpreadsheet]) {
-    [self startAsyncSpreadsheetInfoFetchWithDoc:doc result:result];
+  if ([doc isKindOfClass:[GDataEntrySpreadsheet class]]) {
+    GDataEntrySpreadsheet *spreadsheet = (GDataEntrySpreadsheet *)doc;
+    [self startAsyncWorksheetFetchForSpreadsheet:spreadsheet result:result];
   } else {
     // Also get author names and address, and store those as non-title-match data.
     NSArray* authorArray = [self authorArrayForGDataPeople:[doc authors]];
@@ -493,59 +549,34 @@ GTM_METHOD_CHECK(NSEnumerator,
 #pragma mark -
 #pragma mark Spreadsheet Info Fetching
 
-- (void)startAsyncSpreadsheetInfoFetchWithDoc:(GDataEntryDocBase *)doc
-                                       result:(HGSResult *)docResult {
-  // Set up our service, if necessary.
-  if (!spreadsheetService_) {
-    NSString *userName = nil;
-    NSString *password = nil;
-    // Use the most-likely-already-set-up doc service to get the credentials
-    // to avoid having to go to the keychain and annoy the user.
-    if (docService_) {
-      userName = [docService_ username];
-      password = [docService_ password];
-    } else {
-      KeychainItem* keychainItem 
-        = [KeychainItem keychainItemForService:[account_ identifier]
-                                      username:nil];
-      userName = [keychainItem username];
-      password = [keychainItem password];
-    }
-    if (userName && password) {
-      spreadsheetService_ = [[GDataServiceGoogleSpreadsheet alloc] init];
-      [spreadsheetService_ setUserAgent:@"HGSGoogleDocSource"];
-      [spreadsheetService_ setUserCredentialsWithUsername: userName
-                                                 password: password];
-      [spreadsheetService_ setIsServiceRetryEnabled:YES];
-    }
-  }
-  HGSAssert([doc isKindOfClass:[GDataEntrySpreadsheetDoc class]], nil);
-  GDataEntrySpreadsheetDoc *spreadsheet = (GDataEntrySpreadsheetDoc *)doc;
-  NSURL* spreadsheetFeedURL = [[spreadsheet worksheetsLink] URL];
-  GDataServiceTicket *spreadsheetServiceTicket
+- (void)startAsyncWorksheetFetchForSpreadsheet:(GDataEntrySpreadsheet *)spreadsheet
+                                        result:(HGSResult *)spreadsheetResult {
+  HGSAssert([spreadsheet isKindOfClass:[GDataEntrySpreadsheet class]], nil);
+  NSURL* spreadsheetFeedURL = [spreadsheet worksheetsFeedURL];
+  GDataServiceTicket *worksheetServiceTicket
     = [[spreadsheetService_ 
         fetchFeedWithURL:spreadsheetFeedURL
                 delegate:self
-       didFinishSelector:@selector(spreadsheetServiceTicket:
+       didFinishSelector:@selector(worksheetServiceTicket:
                                    finishedWithFeed:
                                    error:)]
        retain];
-  [spreadsheetServiceTicket setProperty:docResult
-                                 forKey:kGoogleDocsSpreadsheetDocResultPropertyKey];
-  [spreadsheetServiceTicket setProperty:doc
-                                 forKey:kGoogleDocsSpreadsheetDocPropertyKey];
+  [worksheetServiceTicket setProperty:spreadsheetResult
+                               forKey:kGoogleDocsSpreadsheetDocResultPropertyKey];
+  [worksheetServiceTicket setProperty:spreadsheet
+                               forKey:kGoogleDocsSpreadsheetDocPropertyKey];
   // Remember that we're fetching so that if credentials change 
   // during a fetch we don't destroy the service out from under ourselves.
   if (!activeSpreadsheetFetches_) {
     activeSpreadsheetFetches_ = [[NSMutableArray arrayWithCapacity:1] retain];
   }
-  [activeSpreadsheetFetches_ addObject:spreadsheetServiceTicket];
+  [activeSpreadsheetFetches_ addObject:worksheetServiceTicket];
 }
 
-- (void)spreadsheetServiceTicket:(GDataServiceTicket *)spreadsheetTicket
-                finishedWithFeed:(GDataFeedWorksheet *)worksheetFeed
-                           error:(NSError *)error {
-  [activeSpreadsheetFetches_ removeObject:spreadsheetTicket];
+- (void)worksheetServiceTicket:(GDataServiceTicket *)worksheetTicket
+              finishedWithFeed:(GDataFeedWorksheet *)worksheetFeed
+                         error:(NSError *)error {
+  [activeSpreadsheetFetches_ removeObject:worksheetTicket];
   if (!error) {
     // Extracting the worksheet information.
     NSArray *worksheets = [worksheetFeed entries];
@@ -559,10 +590,10 @@ GTM_METHOD_CHECK(NSEnumerator,
          withObject:nil];
     NSArray *worksheetNames = [worksheetTitleStringEnum allObjects];
     HGSResult *docResult
-      = [spreadsheetTicket
+      = [worksheetTicket
          propertyForKey:kGoogleDocsSpreadsheetDocResultPropertyKey];
     GDataEntryDocBase *doc
-      = [spreadsheetTicket propertyForKey:kGoogleDocsSpreadsheetDocPropertyKey];
+      = [worksheetTicket propertyForKey:kGoogleDocsSpreadsheetDocPropertyKey];
     HGSAssert(docResult, nil);
     if ([worksheetNames count]) {
       NSDictionary *attributes

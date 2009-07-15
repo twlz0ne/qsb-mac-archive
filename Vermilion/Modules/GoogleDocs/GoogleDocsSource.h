@@ -53,6 +53,7 @@
   BOOL currentlyFetchingDocs_;
   GDataServiceGoogleSpreadsheet *spreadsheetService_;
   GDataServiceTicket *spreadsheetServiceTicket_;
+  BOOL currentlyFetchingSpreadsheets_;
   NSMutableArray *activeSpreadsheetFetches_;
   __weak NSTimer *updateTimer_;
   NSDictionary *docIcons_;
