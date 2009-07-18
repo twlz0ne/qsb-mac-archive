@@ -150,6 +150,14 @@ static const int kMinQueryLength = 3;
     }
   }
   [operation setResults:[results allObjects]];
+  
+  // Since we are concurent, finish the query ourselves.
+  // TODO(hawk): if we go back to being non-concurrent, remove this
+  [operation finishQuery];
+}
+
+- (BOOL)isSearchConcurrent {
+  return YES;
 }
 
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
