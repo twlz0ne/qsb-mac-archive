@@ -34,7 +34,9 @@
 #import "NSString+CaseInsensitive.h"
 #import "HGSAbbreviationRanker.h"
 #import "HGSTokenizer.h"
+#import "HGSLog.h"
 #import "GTMMethodCheck.h"
+#import "GTMNSFileManager+Carbon.h"
 
 // This source provides results for directory restricted searches:
 // If a pivot object is a folder, it will find direct children with a prefix
@@ -76,6 +78,29 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     NSURL *url = [pivotObject url];
     NSString *path = [url path];
     NSMutableArray *results = [NSMutableArray array];
+    
+    LSItemInfoRecord infoRec;
+    CFURLRef cfurl = (CFURLRef) [NSURL fileURLWithPath:path];
+    OSStatus err = LSCopyItemInfoForURL(cfurl, kLSRequestAllInfo, &infoRec);
+    
+    // If the path is an alias, we resolve before continuing
+    if (err == noErr && (infoRec.flags & kLSItemInfoIsAliasFile)) {
+        FSRef aliasRef;
+        
+      if (CFURLGetFSRef(cfurl, &aliasRef)) {
+        Boolean targetIsFolder;
+        Boolean wasAliased;
+        err = FSResolveAliasFileWithMountFlags(&aliasRef, 
+                                               true, 
+                                               &targetIsFolder,
+                                               &wasAliased,
+                                               0);
+        if (err == noErr) {
+          path = [fm gtm_pathFromFSRef:&aliasRef];
+        }
+      }
+    }
+    
     NSArray *contents = [fm directoryContentsAtPath:path];
     BOOL showInvisibles = ([query flags] & eHGSQueryShowAlternatesFlag) != 0;
     for (NSString *subpath in contents) {
@@ -115,7 +140,16 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
       }
       [attributes setObject:[NSNumber numberWithFloat:score] 
                      forKey:kHGSObjectAttributeRankKey];
-
+                     
+      NSError *error = nil;               
+      NSDate *modDate = [[fm attributesOfItemAtPath:subpath error:&error]
+                            fileModificationDate];
+                              
+      if (error) HGSLogDebug(@"Error fetching mod date %@", error);
+      
+      [attributes setObject:modDate
+                     forKey:kHGSObjectAttributeLastUsedDateKey];
+                     
       HGSResult *result = [HGSResult resultWithFilePath:subpath 
                                                  source:self 
                                              attributes:attributes];

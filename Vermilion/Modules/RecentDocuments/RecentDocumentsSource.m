@@ -65,6 +65,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
   HGSQuery *query = [operation query];
   HGSResult *pivotObject = [query pivotObject];
   NSString *normalizedQuery = [query normalizedQueryString];
+  if (![normalizedQuery length]) normalizedQuery = nil;
   if (pivotObject) {
     NSURL *url = [pivotObject url];
     NSString *appPath = [url path];
@@ -104,9 +105,10 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
           // NSRecentDocumentRecords to the two different keys above
           // for files/projects between 2.5 & 3.1.
           if (recentXCodeProjects) {
-            HGSAssert(!recentDocuments,
-                      @"found XCode files in both NSRecentDocumentRecords"
-                      @" and NSRecentXCProjectDocuments");
+            if (recentDocuments) {
+              HGSLogDebug(@"found XCode files in both NSRecentDocumentRecords"
+                          @" and NSRecentXCProjectDocuments");
+            }
             recentDocuments = recentXCodeProjects;
           }
 
@@ -121,22 +123,34 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
                                            [recentDocuments count]];
 
         NSFileManager *manager = [NSFileManager defaultManager];
-
+        int count = [recentDocuments count];
         for (id recentDocumentItem in recentDocuments) {
           NSData *aliasData = [[recentDocumentItem objectForKey:@"_NSLocator"]
                                 objectForKey:@"_NSAlias"];
-          NSString *recentPath = [manager gtm_pathFromAliasData:aliasData];
+          NSString *recentPath = [manager gtm_pathFromAliasData:aliasData
+                                                        resolve:NO
+                                                         withUI:NO];
 
           if (recentPath && [manager fileExistsAtPath:recentPath]) {
             NSString *basename = [recentPath lastPathComponent];
             NSString *tokenizedName = [HGSTokenizer tokenizeString:basename];
-            CGFloat rank = HGSScoreForAbbreviation(tokenizedName,
-                                                   normalizedQuery, 
-                                                   NULL);
+            CGFloat rank = 0;
+            
+            // Sort by abbreviation if a query exists, else preserve ordering
+            // which is usually by date modified
+            if (normalizedQuery) {
+              rank = HGSScoreForAbbreviation(tokenizedName,
+                                             normalizedQuery, 
+                                             NULL);
+            } else {
+              rank = count;
+            }
+            
             if (rank > 0) {
               NSNumber *nsRank = [NSNumber numberWithFloat:rank];
               NSDictionary *attributes 
                 = [NSDictionary dictionaryWithObjectsAndKeys:
+                   aliasData, kHGSObjectAttributeAliasDataKey,
                    nsRank, kHGSObjectAttributeRankKey, nil];
               HGSResult *result = [HGSResult resultWithFilePath:recentPath
                                                          source:self
@@ -144,6 +158,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
               [finalResults addObject:result];
             }
           }
+          --count;
         }
         [operation setResults:finalResults];
       }
