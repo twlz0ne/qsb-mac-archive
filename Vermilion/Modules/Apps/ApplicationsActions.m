@@ -33,12 +33,30 @@
 #import <Vermilion/Vermilion.h>
 #import "GTMNSWorkspace+Running.h"
 #import "GTMMethodCheck.h"
+#import "HGSLog.h"
+#import <Carbon/Carbon.h>
 
-@interface ApplicationsQuitAction : HGSAction
+@interface ApplicationsAction : HGSAction
 - (BOOL)performWithInfo:(NSDictionary*)info;
 @end
 
-@implementation ApplicationsQuitAction
+@interface ApplicationsQuitAction : ApplicationsAction
+@end
+
+@interface ApplicationsForceQuitAction : ApplicationsAction
+@end
+
+@interface ApplicationsQuitOthersAction : ApplicationsAction
+@end
+
+@interface ApplicationsHideAction : ApplicationsAction
+@end
+
+@interface ApplicationsHideOthersAction : ApplicationsAction
+@end
+
+
+@implementation ApplicationsAction
 GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
 
 - (BOOL)appliesToResult:(HGSResult *)result {
@@ -54,10 +72,158 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
 }
 
 - (BOOL)performWithInfo:(NSDictionary *)info {
+  return NO; 
+}
+
+- (NSArray *)appDictionariesForPaths:(NSArray *)paths {
+  NSArray *apps = [[NSWorkspace sharedWorkspace] gtm_launchedApplications];
+  NSArray *appsPaths = [apps valueForKey:@"NSApplicationPath"];
+  NSDictionary *pathMap = [NSDictionary dictionaryWithObjects:apps 
+                                                      forKeys:appsPaths];
+  return [pathMap objectsForKeys:paths notFoundMarker:[NSNull null]];
+}
+
+- (BOOL)PSN:(ProcessSerialNumber *)psn forApplication:(NSDictionary *)theApp {
+  if (!theApp) return NO;
+  psn->highLongOfPSN
+    = [[theApp objectForKey:@"NSApplicationProcessSerialNumberHigh"] longValue];
+  psn->lowLongOfPSN
+    = [[theApp objectForKey:@"NSApplicationProcessSerialNumberLow"] longValue];
+  return (psn->lowLongOfPSN != 0 || psn->highLongOfPSN != 0);
+}
+
+- (BOOL)quitPSN:(ProcessSerialNumber)psn {
+  AppleEvent event = {typeNull, 0};
+  AEBuildError error;
+  
+  OSStatus err = AEBuildAppleEvent(kCoreEventClass, kAEQuitApplication, 
+                                   typeProcessSerialNumber,
+                                   &psn, sizeof(ProcessSerialNumber), 
+                                   kAutoGenerateReturnID, 
+                                   kAnyTransactionID,
+                                   &event, &error, "");
+  if (err == noErr) {
+    err = AESend(&event, NULL,
+                 kAENoReply, kAENormalPriority, kAEDefaultTimeout,
+                 NULL, NULL);
+  }
+
+  if (err) {
+    HGSLogDebug(@"Error quitting process %d", err);  
+  }
+
+  return err == noErr;
+}
+
+- (BOOL)hideApplications:(NSArray *)theApps {    
+  for (NSDictionary *theApp in theApps) {
+    ProcessSerialNumber psn;
+    if ([self PSN:&psn forApplication:theApp])
+      ShowHideProcess(&psn, FALSE);
+  }
+  return YES;
+}
+
+- (BOOL)hideOtherApplications:(NSArray *)theApps { 
+  int count = [theApps count];
+  int i;
+  ProcessSerialNumber *psn = calloc(sizeof(ProcessSerialNumber), count);
+  if (!psn) return NO;
+  for (i = 0; i < count; i++)
+    [self PSN:psn+i forApplication:[theApps objectAtIndex:i]];
+  // TODO(alcor): first open the primary app (to avoid constant switching)
+  //[self switchToApplication:theApp frontWindowOnly:YES];
+  
+  ProcessSerialNumber thisPSN;
+  thisPSN.highLongOfPSN = kNoProcess;
+  thisPSN.lowLongOfPSN = 0;
+  Boolean show;
+  while(GetNextProcess ( &thisPSN ) == noErr) {
+    for (i = 0; i < [theApps count]; i++) {
+      OSStatus err = SameProcess(&thisPSN, psn+i, &show);
+      if (err != noErr) continue;
+      if (show) break;
+    }
+    OSStatus err = ShowHideProcess(&thisPSN, show);  
+    HGSLogDebug(@"unable to hide process %d", err);
+  } 
+  free(psn);
+  return YES;
+}
+
+- (BOOL)quitApplication:(NSDictionary *)theApp {
+  ProcessSerialNumber psn;
+  if (![self PSN:&psn forApplication:theApp]) return NO;
+  return [self quitPSN:psn];
+}
+
+- (BOOL)quitOtherApplications:(NSArray *)theApps { 
+  int count = [theApps count];
+  int i;
+  ProcessSerialNumber *psn = calloc(sizeof(ProcessSerialNumber), count);
+  if (!psn) return NO;
+  for (i = 0; i < count; i++) {
+    [self PSN:psn+i forApplication:[theApps objectAtIndex:i]];
+  }
+  // TODO(alcor): first open the primary app (to avoid constant switching)
+  //[self reopenApplication:theApp];
+  ProcessSerialNumber thisPSN;
+  thisPSN.highLongOfPSN = kNoProcess;
+  thisPSN.lowLongOfPSN = 0;
+  Boolean show = NO;
+  ProcessSerialNumber myPSN;
+  MacGetCurrentProcess(&myPSN);
+  
+  
+  while(GetNextProcess(&thisPSN) == noErr) {
+    NSDictionary *dict
+      = (NSDictionary *)ProcessInformationCopyDictionary(&thisPSN,
+            kProcessDictionaryIncludeAllInformationMask);
+    [dict autorelease];
+    BOOL background = [[dict objectForKey:@"LSUIElement"] boolValue]
+      || [[dict objectForKey:@"LSBackgroundOnly"] boolValue];
+    [dict autorelease];
+    if (background) continue;
+    NSString *name;
+    OSStatus err = CopyProcessName(&thisPSN, (CFStringRef *)&name);
+    
+    if (err != noErr) HGSLogDebug(@"Unable to get process name %d", err);
+    if ([[name autorelease] isEqualToString:@"Finder"]) continue;
+    
+    SameProcess(&thisPSN, &myPSN, &show);
+    if (show) continue;
+    
+    for (i = 0; i<[theApps count]; i++) {
+      err = SameProcess(&thisPSN, psn+i, &show);
+      if (err) continue;
+      if (show) break;
+    }
+    if (!show)
+      [self quitPSN:thisPSN];
+  }
+  free(psn);
+  return YES;
+}
+
+- (BOOL)forceQuitApplications:(NSArray *)theApps {
+  for (NSDictionary *theApp in theApps) {
+    pid_t pid
+      = [[theApp objectForKey:@"NSApplicationProcessIdentifier"] intValue];
+    OSStatus err = kill(pid, SIGKILL);
+    
+    if (err != noErr) HGSLogDebug(@"Unable to kill app %d %d", pid, err);
+  }
+  return YES;
+}
+
+@end
+
+@implementation ApplicationsQuitAction
+- (BOOL)performWithInfo:(NSDictionary *)info {
   BOOL quit = NO;
   
   HGSResultArray *directObjects
-    = [info objectForKey:kHGSActionDirectObjectsKey];
+  = [info objectForKey:kHGSActionDirectObjectsKey];
   for (HGSResult *result in directObjects) {
     NSString *path = [[result url] path];
     NSString *bundleID = [[NSBundle bundleWithPath:path] bundleIdentifier];
@@ -80,5 +246,42 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
   
   return quit;
 }
-
 @end
+
+@implementation ApplicationsForceQuitAction
+- (BOOL)performWithInfo:(NSDictionary *)info {
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];  
+  NSArray *paths = [directObjects filePaths];  
+  return [self forceQuitApplications:[self appDictionariesForPaths:paths]];  
+}
+@end
+
+@implementation ApplicationsQuitOthersAction
+- (BOOL)performWithInfo:(NSDictionary *)info {
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];  
+  NSArray *paths = [directObjects filePaths];  
+  return [self quitOtherApplications:[self appDictionariesForPaths:paths]];  
+}
+@end
+
+@implementation ApplicationsHideAction
+- (BOOL)performWithInfo:(NSDictionary *)info {
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];  
+  NSArray *paths = [directObjects filePaths];  
+  return [self hideApplications:[self appDictionariesForPaths:paths]];  
+}
+@end
+
+@implementation ApplicationsHideOthersAction
+- (BOOL)performWithInfo:(NSDictionary *)info {
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];  
+  NSArray *paths = [directObjects filePaths];  
+  return [self hideOtherApplications:[self appDictionariesForPaths:paths]];  
+}
+@end
+
+

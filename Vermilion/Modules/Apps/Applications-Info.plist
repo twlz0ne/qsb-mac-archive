@@ -46,6 +46,62 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Quit</string>
 		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>ApplicationsForceQuitAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.applications.action.forcequit</string>
+			<key>HGSExtensionBeta</key>
+			<true/>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file.application</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Force Quit</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>ApplicationsHideAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionBeta</key>
+			<true/>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.applications.action.hide</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file.application</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Hide</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>ApplicationsQuitOthersAction</string>
+			<key>HGSExtensionBeta</key>
+			<true/>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.applications.action.quitothers</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file.application</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Quit Others</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>ApplicationsHideOthersAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionBeta</key>
+			<true/>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.applications.action.hideothers</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file.application</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Hide Others</string>
+		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>
 	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
