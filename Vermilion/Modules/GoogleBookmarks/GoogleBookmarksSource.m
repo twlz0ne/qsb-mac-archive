@@ -194,7 +194,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
        @"star-flag", kHGSObjectAttributeFlagIconNameKey,
        nil];
   HGSResult* result 
-    = [HGSResult resultWithURL:[NSURL URLWithString:url]
+    = [HGSResult resultWithURI:url
                           name:([title length] > 0 ? title : url)
                           type:HGS_SUBTYPE(kHGSTypeWebBookmark,
                                            @"googlebookmarks")

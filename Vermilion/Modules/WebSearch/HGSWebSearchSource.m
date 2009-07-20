@@ -41,7 +41,8 @@
 #define kHGSTypeSearchCorpus @"searchcorpus"
 
 @interface HGSWebSearchSource : HGSCallbackSearchSource
-+ (NSURL *)urlForQuery:(NSString *)queryString onSiteResult:(HGSResult *)result;
++ (NSString *)urlStringForQuery:(NSString *)queryString 
+                   onSiteResult:(HGSResult *)result;
 @end
 
 #if TARGET_OS_IPHONE
@@ -69,8 +70,8 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
   return isValid;
 }
 
-+ (NSURL *)urlForQuery:(NSString *)queryString onSiteResult:(HGSResult *)result {
-  NSURL *url = nil;
++ (NSString *)urlStringForQuery:(NSString *)queryString 
+                   onSiteResult:(HGSResult *)result {
   NSString *template
     = [result valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
   
@@ -97,10 +98,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
       }
     }
   }
-  if ([urlString length]) {
-    url = [NSURL URLWithString:urlString];
-  }
-  return url;
+  return urlString;
 }
 
 - (BOOL)isSearchConcurrent {
@@ -122,7 +120,8 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
       searchName = [NSString stringWithFormat:searchLabel,
                     [[pivotObject url] host]];
     }
-    NSURL *url = [[self class] urlForQuery:queryString onSiteResult:pivotObject];
+    NSString *url = [[self class] urlStringForQuery:queryString 
+                                       onSiteResult:pivotObject];
     if ([queryString length] && url) {
       BOOL searchInline = NO;
 #if TARGET_OS_IPHONE
@@ -143,7 +142,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
              details, kHGSObjectAttributeSnippetKey,
              nil];
         HGSResult *placeholderItem 
-          = [HGSResult resultWithURL:url
+          = [HGSResult resultWithURI:url
                                 name:searchName
                                 type:kHGSTypeSearchCorpus
                               source:nil
@@ -151,14 +150,14 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
         [operation setResults:[NSArray arrayWithObject:placeholderItem]];
       }
     } else {
-      NSURL *identifier = [pivotObject url];
+      NSString *identifier = [pivotObject uri];
       NSString *openLabel
         = HGSLocalizedString(@"Open %@",
                              @"Open <website> (eg. Wikipedia) (30 chars "
                              @"excluding <website>)");
       NSString *name = [NSString stringWithFormat:openLabel,
                         [pivotObject displayName]];
-      HGSResult *placeholderItem = [HGSResult resultWithURL:identifier
+      HGSResult *placeholderItem = [HGSResult resultWithURI:identifier
                                                        name:name 
                                                        type:kHGSTypeWebpage 
                                                      source:nil 

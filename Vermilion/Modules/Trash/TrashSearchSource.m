@@ -148,7 +148,7 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
          nil];
     
     HGSResult *result 
-      = [HGSResult resultWithURL:[NSURL URLWithString:kTrashResultUrl]
+      = [HGSResult resultWithURI:kTrashResultUrl
                             name:trashName_
                             type:kTrashResultType
                           source:self

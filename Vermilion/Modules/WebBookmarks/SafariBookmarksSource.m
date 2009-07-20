@@ -90,11 +90,7 @@
   if (!title || !urlString) {
     return;
   }
-  NSURL* url = [NSURL URLWithString:urlString];
-  if (!url) {
-    return;
-  }
-  [self indexResultNamed:title URL:url otherAttributes:nil];
+  [self indexResultNamed:title URL:urlString otherAttributes:nil];
 }
 
 - (void)updateIndexForPath:(NSString *)path; {

@@ -117,7 +117,7 @@
   id searchSourceMock = [OCMockObject mockForClass:[HGSSearchSource class]];
 
   NSMutableDictionary* infoA = [NSMutableDictionary dictionary];
-  NSString* pathA = @"file://etc/";
+  NSString* pathA = @"file:///etc/";
   [infoA setObject:pathA forKey:kHGSObjectAttributeURIKey];
   [infoA setObject:@"fooA" forKey:kHGSObjectAttributeNameKey];
   [infoA setObject:@"barA" forKey:kHGSObjectAttributeTypeKey];
@@ -131,7 +131,7 @@
   STAssertEquals(expectedHashA, hashA, nil);
 
   NSMutableDictionary* infoB = [NSMutableDictionary dictionary];
-  NSString* pathB = @"file://bin/";
+  NSString* pathB = @"file:///bin/";
   [infoB setObject:pathB forKey:kHGSObjectAttributeURIKey];
   [infoB setObject:@"fooB" forKey:kHGSObjectAttributeNameKey];
   [infoB setObject:@"barB" forKey:kHGSObjectAttributeTypeKey];

@@ -103,7 +103,7 @@ static NSString *const kDateTimeMarker = @"[DTS]";
        largeTypeAction, kHGSObjectAttributeDefaultActionKey,
        nil];
   HGSResult *hgsObject
-    = [HGSResult resultWithURL:[NSURL URLWithString:@"userinput:text"]
+    = [HGSResult resultWithURI:@"userinput:text"
                           name:userText
                           type:kHGSTypeTextUserInput
                         source:self
@@ -156,8 +156,7 @@ static NSString *const kDateTimeMarker = @"[DTS]";
                   image, kHGSObjectAttributeIconKey,
                   largeTypeAction, kHGSObjectAttributeDefaultActionKey,
                   nil];
-    NSURL *url = [NSURL URLWithString:@"userinput:text/stamped"];
-    hgsObject2 = [HGSResult resultWithURL:url
+    hgsObject2 = [HGSResult resultWithURI:@"userinput:text/stamped"
                                      name:worker
                                      type:kHGSTypeTextUserInput
                                    source:self

@@ -117,15 +117,13 @@
     = [[[HGSAppleScriptAction alloc] initWithConfiguration:config] autorelease];
   STAssertNotNil(action, nil);
   
-  NSURL *url = [NSURL URLWithString:@"applescript://test"];
-  HGSResult *result1 = [HGSResult resultWithURL:url 
+  HGSResult *result1 = [HGSResult resultWithURI:@"applescript://test" 
                                            name:@"test1" 
                                            type:kHGSTypeScript 
                                          source:nil 
                                      attributes:nil];
   STAssertNotNil(result1, nil);
-  url = [NSURL URLWithString:@"applescript://test2"];
-  HGSResult *result2 = [HGSResult resultWithURL:url 
+  HGSResult *result2 = [HGSResult resultWithURI:@"applescript://test2" 
                                            name:@"test2" 
                                            type:kHGSTypeScript 
                                          source:nil 
@@ -182,19 +180,17 @@
     = [[[HGSAppleScriptAction alloc] initWithConfiguration:config] autorelease];
   STAssertNotNil(action, nil);
   
-  NSURL *url = [NSURL URLWithString:@"applescript://test"];
-  HGSResult *result1 = [HGSResult resultWithURL:url 
+  HGSResult *result1 = [HGSResult resultWithURI:@"applescript://test" 
                                            name:@"test1" 
                                            type:kHGSTypeScript
                                          source:nil 
                                      attributes:nil];
   STAssertNotNil(result1, nil);
-  url = [NSURL URLWithString:@"applescript://test2"];
   NSDictionary *attributes 
     = [NSDictionary dictionaryWithObjectsAndKeys:
        @"com.apple.finder", kHGSObjectAttributeBundleIDKey,
        nil];
-  HGSResult *result2 = [HGSResult resultWithURL:url 
+  HGSResult *result2 = [HGSResult resultWithURI:@"applescript://test2"
                                            name:@"test2" 
                                            type:kHGSTypeScript 
                                          source:nil 

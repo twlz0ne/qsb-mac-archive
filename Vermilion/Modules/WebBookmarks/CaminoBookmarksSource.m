@@ -79,13 +79,12 @@
     return;
   }
   
-  NSURL* url = [NSURL URLWithString:urlString];
-  if (!url && [urlString rangeOfString:@"%s"].location != NSNotFound) {
+  if ([urlString rangeOfString:@"%s"].location != NSNotFound) {
     // If it couldn't make a URL because it choked on a search template
     // marker, just use the domain as a best-gues raw URL.
-    url = [self domainURLForURLString:urlString];
+    urlString = [self domainURLForURLString:urlString];
   }
-  if (!url) {
+  if (!urlString) {
     return;
   }
   
@@ -115,7 +114,7 @@
                      forKey:kHGSObjectAttributeWebSearchTemplateKey];
     }
   }
-  [self indexResultNamed:title URL:url otherAttributes:attributes];
+  [self indexResultNamed:title URL:urlString otherAttributes:attributes];
 }
 
 

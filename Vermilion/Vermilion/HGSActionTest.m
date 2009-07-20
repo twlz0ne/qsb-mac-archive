@@ -47,12 +47,12 @@
 @end
 
 @interface MyObject : HGSResult
-- (id)initWithIdentifier:(NSURL*)identifier;
+- (id)initWithIdentifier:(NSString*)identifier;
 @end
 
 @implementation MyObject
-- (id)initWithIdentifier:(NSURL*)identifier {
-  return [super initWithURL:identifier
+- (id)initWithIdentifier:(NSString*)identifier {
+  return [super initWithURI:identifier
                        name:@"MyObject" 
                        type:@"test" 
                      source:nil
@@ -146,7 +146,7 @@
 }
 
 - (void)testDisplayName {
-  NSURL* path = [NSURL URLWithString:@"file:///path/to/file"];
+  NSString* path = @"file:///path/to/file";
   MyObject* obj = [[[MyObject alloc] initWithIdentifier:path] autorelease];
   STAssertNotNil(obj, @"couldn't create object");
   NSDictionary *configuration
@@ -173,7 +173,7 @@
 
 - (void)testDisplayIcon {
 #if !TARGET_OS_IPHONE
-  NSURL* path = [NSURL URLWithString:@"file:///path/to/file"];
+  NSString* path = @"file:///path/to/file";
   MyObject* obj = [[[MyObject alloc] initWithIdentifier:path] autorelease];
   STAssertNotNil(obj, @"couldn't create object");
   NSImage* image = [[[NSImage alloc] initWithSize:NSMakeSize(128, 128)] autorelease];
@@ -207,10 +207,10 @@
 }
 
 - (void)testPerformingAction {
-  NSURL* path = [NSURL URLWithString:@"file:///path/to/file"];
+  NSString* path = @"file:///path/to/file";
   MyObject* obj = [[[MyObject alloc] initWithIdentifier:path] autorelease];
   STAssertNotNil(obj, @"couldn't create object");
-  NSURL* path2 = [NSURL URLWithString:@"file:///path/to/file2"];
+  NSString* path2 = @"file:///path/to/file2";
   MyObject* obj2 = [[[MyObject alloc] initWithIdentifier:path2] autorelease];
   STAssertNotNil(obj2, @"couldn't create object");
   

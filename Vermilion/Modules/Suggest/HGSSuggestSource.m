@@ -634,13 +634,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       type = kHGSTypeGoogleNavSuggest;
     }
     if (urlString) {
-      NSURL *url = [NSURL URLWithString:urlString];
-      if (!url) {
-        HGSLog(@"Bad suggestion %@ for suggestion: %@ from response: %@ "
-               @"for query: %@", urlString, suggestionItem, response, query);
-        continue;
-      }
-      HGSResult *navsuggestion = [HGSResult resultWithURL:url
+      HGSResult *navsuggestion = [HGSResult resultWithURI:urlString
                                                      name:name
                                                      type:type
                                                    source:self
@@ -648,8 +642,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       if (navsuggestion) {
         [suggestionResults addObject:navsuggestion];
       } else {
-        HGSLog(@"Unable to create result with url: %@ name: %@ attributes: %@",
-               url, name, attributes);
+        HGSLog(@"Unable to create result with uri: %@ name: %@ attributes: %@",
+               urlString, name, attributes);
       }
     }
   }

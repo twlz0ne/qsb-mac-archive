@@ -225,7 +225,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
     NSString *urlString = [[resultDict objectForKey:@"url"] gtm_stringByUnescapingFromHTML];
     if (!urlString) continue;
     urlString = [urlString gtm_stringByUnescapingFromURLArgument];
-    NSURL *url = [NSURL URLWithString:urlString];
     NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
     if ([resultClass isEqualToString:@"GlocalSearch"]) {
       NSString *address = [resultDict objectForKey:@"streetAddress"];
@@ -279,7 +278,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
       name = [name substringToIndex:[name length] - [commonSuffix length]];
     }
     
-    HGSResult *result = [HGSResult resultWithURL:url
+    HGSResult *result = [HGSResult resultWithURI:urlString
                                             name:name
                                             type:kHGSTypeWebpage // TODO: more complete type?
                                           source:[self source]

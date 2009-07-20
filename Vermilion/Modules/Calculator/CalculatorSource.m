@@ -37,7 +37,7 @@
  @private
   NSCharacterSet *mathSet_;
   NSCharacterSet *nonAlphanumericSet_;
-  NSURL *calculatorAppURL_;
+  NSString *calculatorAppPath_;
 }
 @end
 
@@ -56,9 +56,9 @@
       = [[NSWorkspace sharedWorkspace]
          absolutePathForAppBundleWithIdentifier:@"com.apple.calculator"];
     if ([calcPath length]) {
-      calculatorAppURL_ = [[NSURL fileURLWithPath:calcPath] retain];
+      calculatorAppPath_ = [calcPath retain];
     }
-    if (!mathSet_ || !nonAlphanumericSet_ || !calculatorAppURL_) {
+    if (!mathSet_ || !nonAlphanumericSet_ || !calculatorAppPath_) {
       [self release];
       self = nil;
     }
@@ -69,7 +69,7 @@
 - (void)dealloc {
   [mathSet_ release];
   [nonAlphanumericSet_ release];
-  [calculatorAppURL_ release];
+  [calculatorAppPath_ release];
   [super dealloc];
 }
 
@@ -122,7 +122,7 @@
           [NSNumber numberWithFloat:2.0f], kHGSObjectAttributeRankKey, 
           pasteboardData, kHGSObjectAttributePasteboardValueKey, nil];
       HGSResult *hgsObject
-        = [HGSResult resultWithURL:calculatorAppURL_
+        = [HGSResult resultWithURI:calculatorAppPath_
                               name:resultString
                               type:HGS_SUBTYPE(kHGSTypeOnebox, @"calculator")
                             source:self

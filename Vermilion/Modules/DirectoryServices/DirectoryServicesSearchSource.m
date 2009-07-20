@@ -110,8 +110,7 @@ static NSString *const kHGSDSHomeNumberKey = @"HGSDSHomeNumberKey";
   }
   NSString *urlString = [NSString stringWithFormat:@"%@:%@", scheme,
                          [detail gtm_stringByEscapingForURLArgument]];
-  NSURL *url = [NSURL URLWithString:urlString];
-  return [HGSResult resultWithURL:url
+  return [HGSResult resultWithURI:urlString
                              name:detail 
                              type:type 
                            source:self 
@@ -456,7 +455,7 @@ static NSString *const kHGSDSHomeNumberKey = @"HGSDSHomeNumberKey";
     if (homeNumber) {
       [attributes setValue:homeNumber forKey:kHGSDSHomeNumberKey];
     }
-    result = [HGSResult resultWithURL:[NSURL URLWithString:urlString]
+    result = [HGSResult resultWithURI:urlString
                                  name:displayName
                                  type:kTypeDirectoryServices
                                source:self

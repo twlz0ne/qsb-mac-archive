@@ -60,8 +60,7 @@
     = [[[HGSPythonAction alloc] initWithConfiguration:config] autorelease];
   STAssertNotNil(action, nil);
   
-  NSURL *url = [NSURL URLWithString:@"http://www.google.com/"];
-  HGSResult *result = [HGSResult resultWithURL:url
+  HGSResult *result = [HGSResult resultWithURI:@"http://www.google.com/"
                                           name:@"Google"
                                           type:kHGSTypeWebBookmark
                                         source:nil

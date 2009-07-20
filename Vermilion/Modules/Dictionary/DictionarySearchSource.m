@@ -140,7 +140,7 @@ static const int kMinQueryLength = 3;
         = [NSString stringWithFormat:definitionFormat,
            [query substringWithRange:NSMakeRange(range.location, range.length)]];
       HGSResult *result 
-        = [HGSResult resultWithURL:[NSURL URLWithString:urlString]
+        = [HGSResult resultWithURI:urlString
                               name:name
                               type:kDictionaryResultType
                             source:self

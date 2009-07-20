@@ -49,7 +49,7 @@ typedef UIImage NSImage;
 
 // public value keys
 extern NSString* const kHGSObjectAttributeNameKey;  // NSString
-extern NSString* const kHGSObjectAttributeURIKey;  // NSURL
+extern NSString* const kHGSObjectAttributeURIKey;  // NSString
 extern NSString* const kHGSObjectAttributeUniqueIdentifiersKey; // NSArray (of NSStrings)
 extern NSString* const kHGSObjectAttributeTypeKey;  // NSString
 
@@ -184,7 +184,7 @@ typedef NSUInteger HGSRankFlags;
   */
   HGSRankFlags rankFlags_;
   CGFloat rank_;
-  NSURL *url_;
+  NSString *uri_;
   NSString *displayName_;
   NSString *type_;
   HGSSearchSource *source_;
@@ -199,7 +199,19 @@ typedef NSUInteger HGSRankFlags;
  */
 @property (readonly) NSString *displayName;
 /*!
-  URL for the result.
+ URI for the result.
+ */
+@property (readonly) NSString *uri;
+/*!
+ Is it a local file
+*/
+@property (readonly) BOOL localFile;
+/*!
+ Filepath for the result
+*/
+@property (readonly) NSString *filePath;
+/*!
+ URL for the result.
 */
 @property (readonly) NSURL *url;
 /*!
@@ -236,15 +248,19 @@ typedef NSUInteger HGSRankFlags;
                   source:(HGSSearchSource *)source 
               attributes:(NSDictionary *)attributes;
 
++ (id)resultWithURI:(NSString *)uri
+               name:(NSString *)name
+               type:(NSString *)type
+             source:(HGSSearchSource *)source
+         attributes:(NSDictionary *)attributes;
+
 /*!
-  Create an result based on a dictionary of keys. Note that even though
-  kHGSObjectAttributeURIKey is documented as being a NSURL, it needs to be an
-  NSString and will be converted internally.
+  Create an result based on a dictionary of keys. 
 */
 + (id)resultWithDictionary:(NSDictionary *)dictionary 
                     source:(HGSSearchSource *)source;
 
-- (id)initWithURL:(NSURL *)url
+- (id)initWithURI:(NSString *)uri
              name:(NSString *)name
              type:(NSString *)typeStr
            source:(HGSSearchSource *)source
@@ -287,7 +303,6 @@ typedef NSUInteger HGSRankFlags;
 @end
 
 @interface HGSMutableResult : HGSResult
-- (void)setRankFlags:(HGSRankFlags)flags;
 - (void)addRankFlags:(HGSRankFlags)flags;
 - (void)removeRankFlags:(HGSRankFlags)flags;
 - (void)setRank:(CGFloat)rank;

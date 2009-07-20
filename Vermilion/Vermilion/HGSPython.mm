@@ -704,7 +704,6 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                      dictionaryWithObject:[NSNumber numberWithFloat:rank]
                                    forKey:kHGSObjectAttributeRankKey];
                 NSString *urlString = [NSString stringWithUTF8String:identifier];
-                NSURL *url = [NSURL URLWithString:urlString];
                 if (snippet && strlen(snippet) > 0) {
                   [attributes setObject:[NSString stringWithUTF8String:snippet]
                                  forKey:kHGSObjectAttributeSnippetKey];
@@ -754,7 +753,7 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                 [attributes setObject:privateValues 
                              forKey:kHGSPythonPrivateValuesKey];
                 HGSResult *result 
-                  = [HGSResult resultWithURL:url
+                  = [HGSResult resultWithURI:urlString
                                         name:displayNameString
                                         type:type
                                       source:[self->operation_ source]

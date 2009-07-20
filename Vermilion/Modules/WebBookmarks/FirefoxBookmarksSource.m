@@ -115,8 +115,7 @@
   for(NSDictionary *plugin in plugins) {
     NSString *name = [plugin objectForKey:kHGSObjectAttributeNameKey];
     NSString *urlString = [plugin objectForKey:kHGSObjectAttributeURIKey];
-    NSURL *url = [NSURL URLWithString:urlString];
-    [self indexResultNamed:name URL:url otherAttributes:nil];
+    [self indexResultNamed:name URL:urlString otherAttributes:nil];
   }
   NSFileManager *fm = [NSFileManager defaultManager];
   NSString *bookmarksFile = [fm mostRecentFileInDirectory:bookmarksPath];
@@ -125,13 +124,12 @@
   for (NSDictionary *bookmark in bookmarks) {
     NSString *name = [bookmark objectForKey:kHGSObjectAttributeNameKey];
     NSString *urlString = [bookmark objectForKey:kHGSObjectAttributeURIKey];
-    NSURL *url = [NSURL URLWithString:urlString];
     NSDate *date = [bookmark objectForKey:kHGSObjectAttributeLastUsedDateKey];
     NSDictionary *otherAttributes
       = [NSDictionary dictionaryWithObject:date 
                                     forKey:kHGSObjectAttributeLastUsedDateKey];
     [self indexResultNamed:name 
-                       URL:url 
+                       URL:urlString 
            otherAttributes:otherAttributes];
   }
 }

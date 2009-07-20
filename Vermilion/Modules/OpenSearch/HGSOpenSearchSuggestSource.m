@@ -93,7 +93,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                            [suggestion gtm_stringByEscapingForURLArgument]];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                 image, kHGSObjectAttributeIconKey, nil];
-    HGSResult *result = [HGSResult resultWithURL:[NSURL URLWithString:urlString]
+    HGSResult *result = [HGSResult resultWithURI:urlString
                                             name:suggestion
                                             type:HGS_SUBTYPE(kHGSTypeWebpage, @"opensearch") // TODO(alcor): more complete/better type
                                           source:self

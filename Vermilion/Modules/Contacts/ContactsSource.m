@@ -191,7 +191,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
            rank, kHGSObjectAttributeRankKey,
            nil];
       HGSResult* hgsResult 
-        = [HGSResult resultWithURL:[NSURL fileURLWithPath:urlString]
+        = [HGSResult resultWithURI:urlString
                               name:name
                               type:kTypeContactAddressBook
                             source:self
@@ -330,7 +330,6 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
         NSString *urlString = [NSString stringWithFormat:urlFormat, 
                                cleanURLValue];
         
-        NSURL *url = [NSURL URLWithString:urlString];
         // We rank the primary identifiers higher so they show up better
         CGFloat rank = [identifier isEqualToString:primary] ? 1.0 : 0.0;
         NSNumber *nsRank = [NSNumber numberWithFloat:rank];
@@ -342,7 +341,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
                               snippet, kHGSObjectAttributeSnippetKey,
                               nsRank, kHGSObjectAttributeRankKey,
                               nil];
-        HGSResult *result = [HGSResult resultWithURL:url
+        HGSResult *result = [HGSResult resultWithURI:urlString
                                                 name:cleanValue 
                                                 type:type 
                                               source:self 

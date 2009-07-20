@@ -183,11 +183,10 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
                                     urlString,
                                     kHGSObjectAttributeSourceURLKey,
                                     nil];
-        NSURL *url = [NSURL URLWithString:urlString];
         NSString *name = [service name];
         NSString *displayName = [NSString stringWithFormat:@"%@ (%@)", 
                                  name, scheme];
-        HGSResult *hgsResult = [HGSResult resultWithURL:url
+        HGSResult *hgsResult = [HGSResult resultWithURI:urlString
                                                    name:displayName
                                                    type:type
                                                  source:self

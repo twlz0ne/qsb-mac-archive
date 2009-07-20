@@ -849,7 +849,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
     [attributes setObject:playListID forKey:kITunesAttributePlaylistIdKey];
   }
   
-  return [HGSResult resultWithURL:[NSURL URLWithString:location]
+  return [HGSResult resultWithURI:location
                              name:track
                              type:kTypeITunesTrack
                            source:self
@@ -887,7 +887,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
     [attributes setObject:genre forKey:kITunesAttributeGenreKey];
   }
   
-  return [HGSResult resultWithURL:[NSURL URLWithString:albumUrlString]
+  return [HGSResult resultWithURI:albumUrlString
                              name:album
                              type:kTypeITunesAlbum
                            source:self
@@ -908,7 +908,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
        action, kHGSObjectAttributeDefaultActionKey,
        [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
        nil];
-  return [HGSResult resultWithURL:[NSURL URLWithString:artistUrlString]
+  return [HGSResult resultWithURI:artistUrlString
                              name:artist
                              type:kTypeITunesArtist
                            source:self
@@ -929,7 +929,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
        action, kHGSObjectAttributeDefaultActionKey,
        [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
        nil];
-  return [HGSResult resultWithURL:[NSURL URLWithString:composerUrlString]
+  return [HGSResult resultWithURI:composerUrlString
                              name:composer
                              type:kTypeITunesComposer
                            source:self
@@ -978,7 +978,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
        nil];
-  return [HGSResult resultWithURL:[NSURL URLWithString:genreUrlString]
+  return [HGSResult resultWithURI:genreUrlString
                              name:genre
                              type:kTypeITunesGenre
                            source:self
@@ -1000,7 +1000,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
        nil];
-  return [HGSResult resultWithURL:[NSURL URLWithString:playlistUrlString]
+  return [HGSResult resultWithURI:playlistUrlString
                              name:playlist
                              type:kTypeITunesPlaylist
                            source:self

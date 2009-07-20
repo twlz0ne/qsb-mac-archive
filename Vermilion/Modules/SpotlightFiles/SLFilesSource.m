@@ -319,14 +319,10 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
              object:sourcesPoint];
     
     attributeArray_ = [[NSArray alloc] initWithObjects:
-                       (NSString *)kMDItemTitle,
-                       (NSString *)kMDItemDisplayName,
                        (NSString *)kMDItemPath,
+                       (NSString *)kMDItemTitle,
                        (NSString *)kMDItemLastUsedDate,
-                       (NSString *)kMDItemContentType,
                        (NSString *)kSpotlightGroupIdAttribute,
-                       (NSString *)kMDItemURL,
-                       (NSString *)kMDItemFSName,
                        nil];
   }
   return self;
@@ -496,12 +492,12 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
     = GTMCFAutorelease(MDItemCopyAttributes(item, (CFArrayRef)attributeArray_));
   // Path is used a lot but can't be obtained from the query
   NSString *path = [attributes objectForKey:(NSString *)kMDItemPath];
-  NSUInteger pathLength = [path length];
   // Don't use fileURLWithPath here because it hits the disk.
   NSString *uriPath = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-  NSURL *uri = nil;
-  if (uriPath)
-    uri = [NSURL URLWithString:[@"file://" stringByAppendingString:uriPath]];
+  NSString *uri = nil;
+  if (uriPath) {
+    uri = [@"file://" stringByAppendingString:uriPath];
+  }
   BOOL isURL = NO;
   NSString *contentType
     = [attributes objectForKey:(NSString *)kMDItemContentType];
@@ -526,10 +522,9 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
       case SpotlightGroupWeb:
         resultType = HGS_SUBTYPE(kHGSTypeWebpage, @"fileloc");
         isURL = YES;
-        uriPath = [attributes objectForKey:(NSString *)kMDItemURL];
-        NSURL *betterURI = [NSURL URLWithString:uriPath];
-        if (betterURI) {
-          uri = betterURI;
+        uriPath = GTMCFAutorelease(MDItemCopyAttribute(item, kMDItemURL));
+        if (uriPath) {
+          uri = uriPath;
         }
         // TODO(alcor): are there any items that are not history?
         iconFlagName = @"history-flag";
@@ -577,108 +572,27 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   if (!lastUsedDate) {
     lastUsedDate = [NSDate distantPast];
   }
-  NSString *title 
+  NSString *name 
     = [attributes objectForKey:(NSString *)kMDItemTitle]; 
-
-  NSString *name = title;
-  NSString *displayName 
-    = [attributes objectForKey:(NSString *)kMDItemDisplayName]; 
-                                                      
   if (!name) {
-    name = displayName;
-  }
-  
-  NSString *fsName 
-    = [attributes objectForKey:(NSString *)kMDItemFSName];
-
-  if (!name) {
-    name = fsName;
+    name = GTMCFAutorelease(MDItemCopyAttribute(item, kMDItemDisplayName));
     if (!name) {
-      name = @"";
+      name = GTMCFAutorelease(MDItemCopyAttribute(item, kMDItemFSName));
     }
-  }
-  
-  HGSRankFlags rankFlags = 0;
-  
-  //  if (fsName) [result setValue:fsName forKey:(NSString *)kMDItemFSName];
-  // check for a name match
-  NSString *normalizedString = [context->query_ normalizedQueryString];
-  CGFloat rank = HGSScoreForAbbreviation(displayName, normalizedString, NULL);
-  if (!(rank > 0)) {
-    rank = HGSScoreForAbbreviation(fsName, normalizedString, NULL);
-    if (!(rank > 0)) {
-      rank = HGSScoreForAbbreviation(title, normalizedString, NULL);
-    }
-  }
-  if (rank > 0) {
-    rankFlags |= eHGSNameMatchRankFlag;
-  }
-  
-  // Persistent user paths (Dock, Finder sidebar, etc.)
-  if ([context->userPersistentItemPaths_ containsObject:path]) {
-    rankFlags |= eHGSUserPersistentPathRankFlag;
-  }
-  
-  // Special UI objects (Home, disks, printers etc.)
-  // String comparison safe here because we've already standardized or
-  // normalized all paths.
-  // Printer proxies are apps and therefore will already have hit the launchable
-  // test
-  if ([path isEqualToString:context->userHomePath_] ||
-      UTTypeEqual((CFStringRef)contentType, kUTTypeVolume)) {
-    rankFlags |= eHGSSpecialUIRankFlag;
-  }
-  
-  // Under home directory, again string comparisons safe because we've pre-normalized
-  BOOL underHome = [path hasPrefix:context->userHomePath_] 
-    // Direct equality test here to make sure range check doesn't
-    // walk off string end
-    && ![path isEqualToString:context->userHomePath_] 
-    && ([path characterAtIndex:context->userHomePathLength_] == '/');
-  // Other home special paths
-  if (underHome) {
-    rankFlags |= eHGSUnderHomeRankFlag;
-    // Direct child of home?
-    if ([path rangeOfString:@"/"
-                    options:NSLiteralSearch
-                      range:GTMNSMakeRange(context->userHomePathLength_ + 1,
-                                           pathLength - context->userHomePathLength_ - 1)].location == NSNotFound) {
-      rankFlags |= eHGSHomeChildRankFlag;
-    }
-    // Direct child of downloads or desktop
-    if ([path hasPrefix:context->userDownloadsPath_] &&
-        [path rangeOfString:@"/"
-                    options:NSLiteralSearch
-                      range:GTMNSMakeRange(context->userDownloadsPathLength_ + 1,
-                                           pathLength - context->userDownloadsPathLength_ - 1)].location == NSNotFound) {
-      rankFlags |= eHGSUnderDownloadsRankFlag;
-    }
-    if ([path hasPrefix:context->userDesktopPath_] &&
-        [path rangeOfString:@"/"
-                    options:NSLiteralSearch
-                      range:GTMNSMakeRange(context->userDesktopPathLength_ + 1,
-                                           pathLength - context->userDesktopPathLength_ - 1)].location == NSNotFound) {
-      rankFlags |= eHGSUnderDesktopRankFlag;
-    }
-  }
-  
-  // Spam
-  if (UTTypeEqual((CFStringRef)contentType, CFSTR("com.apple.mail.emlx")) &&
-      (([path rangeOfString:@"/Spam.imapmbox/"].location != NSNotFound) ||
-       ([path rangeOfString:@"/Junk.imapmbox/"].location != NSNotFound))) {
-    // TODO(aharper): What about POP spam?
-    rankFlags |= eHGSSpamRankFlag;
   }
     
+  NSString *normalizedString = [context->query_ normalizedQueryString];
+  CGFloat rank = HGSScoreForAbbreviation(name, normalizedString, NULL);
+
   NSDictionary *hgsAttributes 
     = [NSDictionary dictionaryWithObjectsAndKeys:
        lastUsedDate, kHGSObjectAttributeLastUsedDateKey,
-       [NSNumber numberWithUnsignedInteger:rankFlags], kHGSObjectAttributeRankFlagsKey,
-       (isURL ? uriPath : nil), kHGSObjectAttributeSourceURLKey,
+       (isURL ? uri : nil), kHGSObjectAttributeSourceURLKey,
        iconFlagName, kHGSObjectAttributeFlagIconNameKey,
+       rank, kHGSObjectAttributeRankKey,
        nil];
   
-  result = [HGSResult resultWithURL:uri
+  result = [HGSResult resultWithURI:uri
                                name:name
                                type:resultType
                              source:self

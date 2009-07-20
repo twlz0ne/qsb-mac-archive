@@ -25,8 +25,7 @@
   // The pivot object (if any)
   // HGSResult *pivotObject = [query pivotObject];
   // NSArray *words = [query uniqueWords];
-  NSURL *url = [NSURL URLWithString:@"http://localhost"];
-  HGSResult *result = [HGSResult resultWithURL:url
+  HGSResult *result = [HGSResult resultWithURI:@"http://localhost"
                                           name:NSStringFromClass([self class])
                                           type:kHGSTypeWebpage
                                         source:self

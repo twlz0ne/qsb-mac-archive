@@ -42,16 +42,16 @@
 @implementation HGSResultTest
 
 - (void)testStaticInit {
-  NSURL* path = [NSURL URLWithString:@"file://url/to/path"];
+  NSString* path = @"file://url/to/path";
   // create an object with the full gamut and check the values
-  HGSResult* obj1 = [HGSResult resultWithURL:path 
+  HGSResult* obj1 = [HGSResult resultWithURI:path 
                                         name:@"everything"
                                         type:@"text"
                                       source:nil
                                   attributes:nil];
   STAssertNotNil(obj1, @"can't create object");
   STAssertEqualObjects(path, 
-                       [obj1 url], 
+                       [obj1 uri], 
                        @"invalid uri");
   STAssertEqualStrings(@"everything", 
                        [obj1 valueForKey:kHGSObjectAttributeNameKey], 
@@ -61,7 +61,7 @@
                        @"invalid type");
 
   // create an object with everything nil
-  HGSResult* obj3 = [HGSResult resultWithURL:nil 
+  HGSResult* obj3 = [HGSResult resultWithURI:nil 
                                         name:nil
                                         type:NULL
                                       source:nil
@@ -70,7 +70,7 @@
 }
 
 - (void)testStaticInitFromDictionary {
-  NSString* path = @"file://bin/";
+  NSString* path = @"file:///bin/";
 
   // create an object from a dictionary and validate the keys are present. Since
   // we're setting the source, values we don't set should return non-nil.
@@ -116,7 +116,7 @@
 }
 
 - (void)testTypeCalls {
-  NSURL* url = [NSURL URLWithString:@"http://someplace/"];
+  NSString* url = @"http://someplace/";
   STAssertNotNil(url, nil);
   
   typedef struct {
@@ -136,7 +136,7 @@
   for (size_t i = 0; i < sizeof(data) / sizeof(TestData); i++) {
 
     // Create an object
-    HGSResult* obj = [HGSResult resultWithURL:url 
+    HGSResult* obj = [HGSResult resultWithURI:url 
                                          name:@"name"
                                          type:data[i].theType
                                        source:nil

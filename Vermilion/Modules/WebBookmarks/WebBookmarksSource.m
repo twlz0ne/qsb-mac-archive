@@ -74,18 +74,18 @@
 // COV_NF_END
 
 - (void)indexResultNamed:(NSString *)name 
-                     URL:(NSURL *)url
+                     URL:(NSString *)urlString
          otherAttributes:(NSDictionary *)otherAttributes {
-  if (!name || !url) {
+  if (!name || !urlString) {
     HGSLogDebug(@"Missing name (%@) or url (%@) for bookmark. Source %@",
-                name, url, self);
+                name, urlString, self);
     return;
   }
   NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSUnderHomeRankFlag 
                          | eHGSNameMatchRankFlag];
   NSMutableDictionary *attributes
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-       [url absoluteString], kHGSObjectAttributeSourceURLKey,
+       urlString, kHGSObjectAttributeSourceURLKey,
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        @"star-flag", kHGSObjectAttributeFlagIconNameKey,
        nil];
@@ -96,7 +96,7 @@
   NSString* type = [NSString stringWithFormat:@"%@.%@", 
                     kHGSTypeWebBookmark, browserTypeName_];
   HGSResult* result 
-    = [HGSResult resultWithURL:url
+    = [HGSResult resultWithURI:urlString
                           name:name
                           type:type
                         source:self
@@ -111,10 +111,10 @@
   [self updateIndexForPath:[queue path]];
 }
 
-- (NSURL *)domainURLForURLString:(NSString *)urlString {
+- (NSString *)domainURLForURLString:(NSString *)urlString {
   // This is parsed manually rather than round-tripped through NSURL so that
   // we can get domains from invalid URLs (like Camino search bookmarks).
-  NSURL *url = nil;
+  NSString *domainString = nil;
   NSRange schemeEndRange = [urlString rangeOfString:@"://"];
   if (schemeEndRange.location != NSNotFound) {
     NSUInteger domainStartIndex = NSMaxRange(schemeEndRange);
@@ -123,15 +123,13 @@
     NSRange pathStartRange = [urlString rangeOfString:@"/"
                                             options:0
                                               range:domainRange];
-    NSString* domainString;
     if (pathStartRange.location == NSNotFound) {
       domainString = urlString;
     } else {
       domainString = [urlString substringToIndex:pathStartRange.location];
     }
-    url = [NSURL URLWithString:domainString];
   }
-  return url;
+  return domainString;
 }
 
 // COV_NF_START

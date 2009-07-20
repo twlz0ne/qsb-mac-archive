@@ -52,7 +52,7 @@
                 fileToWatch:(NSString *)path;
 - (void)updateIndexForPath:(NSString *)path;
 - (void)indexResultNamed:(NSString *)name 
-                     URL:(NSURL *)url 
+                     URL:(NSString *)url 
          otherAttributes:(NSDictionary *)otherAttributes;
-- (NSURL *)domainURLForURLString:(NSString *)urlString;
+- (NSString *)domainURLForURLString:(NSString *)urlString;
 @end

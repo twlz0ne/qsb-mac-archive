@@ -593,8 +593,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                               [self displayIcon], kHGSObjectAttributeIconKey, 
                               nil];
-  NSURL *url = [NSURL URLWithString:urlString];
-  HGSResult *result = [HGSResult resultWithURL:url 
+  HGSResult *result = [HGSResult resultWithURI:urlString 
                                           name:name 
                                           type:kHGSTypeGoogleSearch
                                         source:nil

@@ -205,7 +205,6 @@ static NSString *const kWeatherResultURL
         NSString *resultURLStr = [gsearch searchURLFor:searchStr
                                                 ofType:GTMGoogleSearchWeb
                                              arguments:nil];
-        NSURL *resultURL = [NSURL URLWithString:resultURLStr];
         // Cheat, force this result high in the list.
         // TODO(dmaclach): figure out a cleaner way to get results like this 
         // high in the results.
@@ -228,7 +227,7 @@ static NSString *const kWeatherResultURL
           }
         }
         HGSResult *hgsObject
-          = [HGSResult resultWithURL:resultURL
+          = [HGSResult resultWithURI:resultURLStr
                                 name:title
                                 type:HGS_SUBTYPE(kHGSTypeOnebox, @"weather")
                               source:self

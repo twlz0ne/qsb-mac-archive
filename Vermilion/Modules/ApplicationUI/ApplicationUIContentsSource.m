@@ -103,7 +103,6 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
         NSString *uriString 
           = [NSString stringWithFormat:@"AppUISource://%@/%p", 
              nameString, window];
-        NSURL *uri = [NSURL URLWithString:uriString];
         NSNumber *nsRank = [NSNumber numberWithFloat:rank];
         NSDictionary *attributes
           = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -112,7 +111,7 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
              nsRank, kHGSObjectAttributeRankKey,
              nil];
         HGSResult *result 
-          = [HGSResult resultWithURL:uri
+          = [HGSResult resultWithURI:uriString
                                 name:name
                                 type:kHGSTypeAppUIItem
                               source:self

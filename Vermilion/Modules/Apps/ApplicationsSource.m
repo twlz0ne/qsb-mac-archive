@@ -241,13 +241,12 @@ static NSString *const kApplicationSourcePredicateString
     NSString *name 
       = [networkBundle objectForInfoDictionaryKey:@"NSPrefPaneIconLabel"];
     name = [name stringByAppendingFormat:@" %@", prefPaneString];
-    NSURL *networkURL = [NSURL fileURLWithPath:networkPath];
     // Unfortunately last used date is hidden from us.
     [attributes removeObjectForKey:kHGSObjectAttributeLastUsedDateKey];
     [attributes setObject:@"com.apple.preference.network"
                    forKey:kHGSObjectAttributeBundleIDKey];
     HGSResult *hgsResult 
-      = [HGSResult resultWithURL:networkURL
+      = [HGSResult resultWithURI:networkPath
                             name:name
                             type:kHGSTypeFileApplication
                           source:self

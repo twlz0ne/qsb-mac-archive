@@ -566,7 +566,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     = [NSString stringWithFormat:@"ichat:compose?service=%@&id=%@&style=im",
        [serviceName gtm_stringByEscapingForURLArgument],
        [screenName gtm_stringByEscapingForURLArgument]];
-  NSURL *url = [NSURL URLWithString:identifier];
   NSMutableString *displayName = [NSMutableString string];
   
   // NOTE: It's possible that the IMBuddy will provide an NSNull for the
@@ -614,7 +613,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
        uniqueIdentifiers, kHGSObjectAttributeUniqueIdentifiersKey,
        imBuddyInfo, kChatBuddyAttributeInformationKey,
        nil];
-  return [HGSResult resultWithURL:url
+  return [HGSResult resultWithURI:identifier
                              name:displayName
                              type:HGS_SUBTYPE(kHGSTypeContact, @"ichat")
                            source:source

@@ -149,7 +149,6 @@ NSString *const kAppUISourceAttributeElementKey
         NSString *uriString 
           = [NSString stringWithFormat:@"AppUISource://%@/%p", 
              nameString, child];
-        NSURL *uri = [NSURL URLWithString:uriString];
         NSImage *icon = nil;
         if ([role isEqualToString:NSAccessibilityWindowRole]) {
           icon = windowIcon_;
@@ -176,7 +175,7 @@ NSString *const kAppUISourceAttributeElementKey
         }
         // TODO(dmaclach): Build up the path cells for the element
         HGSResult *result 
-          = [HGSResult resultWithURL:uri
+          = [HGSResult resultWithURI:uriString
                                 name:name
                                 type:kHGSTypeAppUIItem
                               source:self

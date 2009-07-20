@@ -118,7 +118,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   NSString *urlStr = [NSString stringWithFormat:@"action:%@", extensionIdentifier];
   
   HGSResult *actionObject
-    = [HGSResult resultWithURL:[NSURL URLWithString:urlStr]
+    = [HGSResult resultWithURI:urlStr
                           name:name
                           type:kHGSTypeAction
                         source:self
