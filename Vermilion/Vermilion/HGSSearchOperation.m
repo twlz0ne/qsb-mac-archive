@@ -34,6 +34,7 @@
 #import "HGSSearchSource.h"
 #import "HGSOperation.h"
 #import "HGSLog.h"
+#import "NSNotificationCenter+MainThread.h"
 
 NSString *const kHGSSearchOperationDidQueueNotification
   = @"HGSSearchOperationDidQueueNotification";
@@ -47,13 +48,6 @@ NSString *const kHGSSearchOperationWasCancelledNotification
   = @"HGSSearchOperationWasCancelledNotification";
 NSString *const kHGSSearchOperationNotificationResultsKey
    = @"HGSSearchOperationNotificationResultsKey";
-
-@interface NSNotificationCenter (HGSSearchOperation)
-- (void)hgs_postOnMainThreadNotificationName:(NSString *)name object:(id)object;
-- (void)hgs_postOnMainThreadNotificationName:(NSString *)name 
-                                      object:(id)object
-                                    userInfo:(NSDictionary *)info;
-@end
 
 @interface HGSSearchOperation ()
 @property (assign, getter=isFinished) BOOL finished;
@@ -220,26 +214,6 @@ NSString *const kHGSSearchOperationNotificationResultsKey
   return [[[NSInvocationOperation alloc] initWithTarget:self
                                                selector:@selector(queryOperation:)
                                                  object:nil] autorelease];
-}
-
-@end
-
-@implementation NSNotificationCenter (HGSSearchOperation)
-
-- (void)hgs_postOnMainThreadNotificationName:(NSString *)name 
-                                      object:(id)object {
-  [self hgs_postOnMainThreadNotificationName:name object:object userInfo:nil];
-}
-
-- (void)hgs_postOnMainThreadNotificationName:(NSString *)name 
-                                      object:(id)object
-                                    userInfo:(NSDictionary *)info {
-  NSNotification *notification = [NSNotification notificationWithName:name 
-                                                               object:object
-                                                             userInfo:info];
-  [self performSelectorOnMainThread:@selector(postNotification:)
-                         withObject:notification
-                      waitUntilDone:NO];
 }
 
 @end

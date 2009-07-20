@@ -396,6 +396,7 @@
 		627FAEC60DF9D73500E3E765 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		6282B2230DD8985000AC9C3C /* QSBSearchWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6282B2210DD8985000AC9C3C /* QSBSearchWindowController.m */; };
 		628B8C240FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist in Resources */ = {isa = PBXBuildFile; fileRef = 628B8C230FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist */; };
+		62906DAD100D046400A09A0E /* PicasaWebUploadImageAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 62906DAC100D046400A09A0E /* PicasaWebUploadImageAction.m */; };
 		6294463E0EDE1921009295EA /* GTMNSArray+Merge.m in Sources */ = {isa = PBXBuildFile; fileRef = 6294463A0EDE190B009295EA /* GTMNSArray+Merge.m */; };
 		62A16A8F0ED484DF0074F41B /* HGSPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 62A16A8D0ED484DF0074F41B /* HGSPlugin.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62A16A900ED484DF0074F41B /* HGSPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A16A8E0ED484DF0074F41B /* HGSPlugin.m */; };
@@ -433,6 +434,10 @@
 		62DA51450FFAA86C002B008E /* GoogleDocsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 62DA51440FFAA86C002B008E /* GoogleDocsSource.m */; };
 		62E190960EBA4A570002241B /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62E19AB11002EB8C009DA5C1 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
+		62E3FE571010D9A7005D77F2 /* PicasaWeb.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62E3FE561010D9A7005D77F2 /* PicasaWeb.icns */; };
+		62E3FF4010112F5D005D77F2 /* NSNotificationCenter+MainThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 62E3FF3F10112F5D005D77F2 /* NSNotificationCenter+MainThread.m */; };
+		62E3FF4110112F5D005D77F2 /* NSNotificationCenter+MainThread.h in Headers */ = {isa = PBXBuildFile; fileRef = 62E3FF3E10112F5D005D77F2 /* NSNotificationCenter+MainThread.h */; };
+		62E3FF4210112F5D005D77F2 /* NSNotificationCenter+MainThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 62E3FF3F10112F5D005D77F2 /* NSNotificationCenter+MainThread.m */; };
 		62E72A7B0F4F4ADE00A68815 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62E72A7A0F4F4ADE00A68815 /* Growl.framework */; };
 		62E72AB80F4F6E6700A68815 /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 62E72A7A0F4F4ADE00A68815 /* Growl.framework */; };
 		62E72ABF0F4F6EB900A68815 /* growl-bsd-license.html in Resources */ = {isa = PBXBuildFile; fileRef = 62E72ABE0F4F6EB900A68815 /* growl-bsd-license.html */; };
@@ -1072,7 +1077,7 @@
 		F4EF90D50ECB4529008DD6DA /* ApplicationUI.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B3D2A380EAFDA66004EA504 /* ApplicationUI.hgs */; };
 		F4EF90D60ECB4529008DD6DA /* Calculator.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4E3B5890EB6573300CB713D /* Calculator.hgs */; };
 		F4EF90D70ECB4529008DD6DA /* Weather.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4E3B70B0EB66AA900CB713D /* Weather.hgs */; };
-		F4EF90D80ECB4529008DD6DA /* Picasaweb.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6263CAFB0EB79F3600FF03A1 /* Picasaweb.hgs */; };
+		F4EF90D80ECB4529008DD6DA /* PicasaWeb.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6263CAFB0EB79F3600FF03A1 /* PicasaWeb.hgs */; };
 		F4EF90D90ECB4529008DD6DA /* EmailURLAction.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 623ADD450EC0CC17001651D1 /* EmailURLAction.hgs */; };
 		F4EF90DA0ECB4529008DD6DA /* CorePlugin.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F4FEECDA0EC4BF99000758EC /* CorePlugin.hgs */; };
 		F4EF90DC0ECB4529008DD6DA /* System.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8BCCD26D0EC8E5EC00688D64 /* System.hgs */; };
@@ -1274,6 +1279,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 620CB3080FAA827E0029801C;
 			remoteInfo = QSBPluginUI;
+		};
+		62FD6C17100EB942004A3BF9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B77E0DB0F28FC3B00FA2A3C;
+			remoteInfo = GData;
 		};
 		7F9417880EEF53CD0049AE06 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1853,7 +1865,7 @@
 				F4EF90D50ECB4529008DD6DA /* ApplicationUI.hgs in CopyFiles */,
 				F4EF90D60ECB4529008DD6DA /* Calculator.hgs in CopyFiles */,
 				F4EF90D70ECB4529008DD6DA /* Weather.hgs in CopyFiles */,
-				F4EF90D80ECB4529008DD6DA /* Picasaweb.hgs in CopyFiles */,
+				F4EF90D80ECB4529008DD6DA /* PicasaWeb.hgs in CopyFiles */,
 				F4EF90D90ECB4529008DD6DA /* EmailURLAction.hgs in CopyFiles */,
 				F4EF90DA0ECB4529008DD6DA /* CorePlugin.hgs in CopyFiles */,
 				622911E60F2E805B005D34CE /* GoogleAccounts.hgs in CopyFiles */,
@@ -2038,7 +2050,7 @@
 		62521AB60EFAC30000A6E647 /* QSBViewTableViewDelegateProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBViewTableViewDelegateProtocol.h; sourceTree = "<group>"; };
 		625A2C960E5614F3008CA9BF /* QSBPreferenceWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPreferenceWindowController.h; sourceTree = "<group>"; };
 		625A2C970E5614F3008CA9BF /* QSBPreferenceWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPreferenceWindowController.m; sourceTree = "<group>"; };
-		6263CAFB0EB79F3600FF03A1 /* Picasaweb.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Picasaweb.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
+		6263CAFB0EB79F3600FF03A1 /* PicasaWeb.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PicasaWeb.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		6263CB070EB79FB300FF03A1 /* Picasaweb-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Picasaweb-Info.plist"; sourceTree = "<group>"; };
 		6263CB0A0EB79FB300FF03A1 /* PicasawebSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicasawebSource.m; sourceTree = "<group>"; };
 		626585210F43BD4C008A94B2 /* QSBUserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBUserMessenger.h; sourceTree = "<group>"; };
@@ -2051,6 +2063,7 @@
 		6282B2210DD8985000AC9C3C /* QSBSearchWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSearchWindowController.m; sourceTree = "<group>"; };
 		6282B2220DD8985000AC9C3C /* QSBSearchWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSearchWindowController.h; sourceTree = "<group>"; };
 		628B8C230FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = GoogleDocsSaveAsFileTypes.plist; sourceTree = "<group>"; };
+		62906DAC100D046400A09A0E /* PicasaWebUploadImageAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicasaWebUploadImageAction.m; sourceTree = "<group>"; };
 		629446390EDE190B009295EA /* GTMNSArray+Merge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSArray+Merge.h"; sourceTree = "<group>"; };
 		6294463A0EDE190B009295EA /* GTMNSArray+Merge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSArray+Merge.m"; sourceTree = "<group>"; };
 		62977A960FAA8D9700C6CB59 /* QSBPluginUI-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "QSBPluginUI-Info.plist"; sourceTree = "<group>"; };
@@ -2086,6 +2099,9 @@
 		62D9B86C0F94E453005EF9BC /* QSBEditAccountWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBEditAccountWindowController.h; sourceTree = "<group>"; };
 		62DA51430FFAA86C002B008E /* GoogleDocsSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDocsSource.h; sourceTree = "<group>"; };
 		62DA51440FFAA86C002B008E /* GoogleDocsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSource.m; sourceTree = "<group>"; };
+		62E3FE561010D9A7005D77F2 /* PicasaWeb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PicasaWeb.icns; sourceTree = "<group>"; };
+		62E3FF3E10112F5D005D77F2 /* NSNotificationCenter+MainThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNotificationCenter+MainThread.h"; sourceTree = "<group>"; };
+		62E3FF3F10112F5D005D77F2 /* NSNotificationCenter+MainThread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNotificationCenter+MainThread.m"; sourceTree = "<group>"; };
 		62E72A7A0F4F4ADE00A68815 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
 		62E72ABE0F4F6EB900A68815 /* growl-bsd-license.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "growl-bsd-license.html"; sourceTree = "<group>"; };
 		62EA8BCD0F2E7DE200C92E0B /* GoogleAccounts.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleAccounts.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3192,7 +3208,7 @@
 				8B735FA80EC905E900E74421 /* Images.hgs */,
 				5AF2C4860E5E19A400F4D546 /* iTunes.hgs */,
 				8BCCD3740EC8F93C00688D64 /* Networking.hgs */,
-				6263CAFB0EB79F3600FF03A1 /* Picasaweb.hgs */,
+				6263CAFB0EB79F3600FF03A1 /* PicasaWeb.hgs */,
 				627FAECA0DF9D73500E3E765 /* RecentDocuments.hgs */,
 				5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */,
 				7F9415CC0EEF52930049AE06 /* SharedFileList.hgs */,
@@ -3268,6 +3284,8 @@
 				644161ED0DE362CC00AC646D /* NSString+ReadableURL.h */,
 				644161EE0DE362CC00AC646D /* NSString+ReadableURL.m */,
 				F4D1491B0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m */,
+				62E3FF3E10112F5D005D77F2 /* NSNotificationCenter+MainThread.h */,
+				62E3FF3F10112F5D005D77F2 /* NSNotificationCenter+MainThread.m */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -3518,7 +3536,9 @@
 				8BC6DC660FAA5C76005A0F6F /* Localizable.strings */,
 				6263CB070EB79FB300FF03A1 /* Picasaweb-Info.plist */,
 				6263CB0A0EB79FB300FF03A1 /* PicasawebSource.m */,
+				62906DAC100D046400A09A0E /* PicasaWebUploadImageAction.m */,
 				62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */,
+				62E3FE561010D9A7005D77F2 /* PicasaWeb.icns */,
 			);
 			path = Picasaweb;
 			sourceTree = "<group>";
@@ -4957,6 +4977,7 @@
 				627B43C00FA0E3D9006BE269 /* HGSGoogleAccountTypes.h in Headers */,
 				8B791D860FA1FC24006BFE1E /* HGSAppleScriptAction.h in Headers */,
 				5A0BB3750FAB9CDA00AA4858 /* HGSPluginBlacklist.h in Headers */,
+				62E3FF4110112F5D005D77F2 /* NSNotificationCenter+MainThread.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5264,9 +5285,9 @@
 			productReference = 623FA35F0E5C8D97003630C1 /* ChatBuddies.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
-		6263CAE80EB79F3600FF03A1 /* Picasaweb */ = {
+		6263CAE80EB79F3600FF03A1 /* PicasaWeb */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6263CAF80EB79F3600FF03A1 /* Build configuration list for PBXNativeTarget "Picasaweb" */;
+			buildConfigurationList = 6263CAF80EB79F3600FF03A1 /* Build configuration list for PBXNativeTarget "PicasaWeb" */;
 			buildPhases = (
 				6263CAED0EB79F3600FF03A1 /* Resources */,
 				6263CAF10EB79F3600FF03A1 /* Sources */,
@@ -5277,10 +5298,11 @@
 			);
 			dependencies = (
 				6263CAE90EB79F3600FF03A1 /* PBXTargetDependency */,
+				62FD6C18100EB942004A3BF9 /* PBXTargetDependency */,
 			);
-			name = Picasaweb;
+			name = PicasaWeb;
 			productName = GoogleDocs;
-			productReference = 6263CAFB0EB79F3600FF03A1 /* Picasaweb.hgs */;
+			productReference = 6263CAFB0EB79F3600FF03A1 /* PicasaWeb.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
 		627FAEBA0DF9D73500E3E765 /* Recent Documents */ = {
@@ -5890,16 +5912,16 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 8B989F150FA7B93C009DC652 /* Products */;
-					ProjectRef = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+					ProductGroup = 8B989F360FA7B93C009DC652 /* Products */;
+					ProjectRef = 8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
 					ProductGroup = 8B989F2B0FA7B93C009DC652 /* Products */;
 					ProjectRef = 8B989F2A0FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
-					ProductGroup = 8B989F360FA7B93C009DC652 /* Products */;
-					ProjectRef = 8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+					ProductGroup = 8B989F150FA7B93C009DC652 /* Products */;
+					ProjectRef = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
 					ProductGroup = 8B637B4D0F2777C300997738 /* Products */;
@@ -5951,7 +5973,7 @@
 				5AF2C4780E5E19A400F4D546 /* iTunes */,
 				5AF0F4870F671D9C0041E0B9 /* Mount */,
 				8BCCD3590EC8F93C00688D64 /* Networking AppleScript */,
-				6263CAE80EB79F3600FF03A1 /* Picasaweb */,
+				6263CAE80EB79F3600FF03A1 /* PicasaWeb */,
 				627FAEBA0DF9D73500E3E765 /* Recent Documents */,
 				5A0BB1670FAB8A6300AA4858 /* Screensaver */,
 				7F9415C40EEF52930049AE06 /* Shared File List */,
@@ -6199,6 +6221,7 @@
 				62C25E270F8BF17500DA57E7 /* PicasaPlaceholder.icns in Resources */,
 				8BC6DC670FAA5C76005A0F6F /* Localizable.strings in Resources */,
 				8BC6E5F70FAAC29A005A0F6F /* InfoPlist.strings in Resources */,
+				62E3FE571010D9A7005D77F2 /* PicasaWeb.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7445,6 +7468,8 @@
 			files = (
 				6263CB0E0EB79FB300FF03A1 /* PicasawebSource.m in Sources */,
 				8B8B131A0EEBADE400E543D0 /* HGSBundle.m in Sources */,
+				62906DAD100D046400A09A0E /* PicasaWebUploadImageAction.m in Sources */,
+				62E3FF4010112F5D005D77F2 /* NSNotificationCenter+MainThread.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7668,6 +7693,7 @@
 				62FF5B860F8D846F00B21B5D /* HGSAccountType.m in Sources */,
 				8B791D850FA1FC24006BFE1E /* HGSAppleScriptAction.m in Sources */,
 				5A0BB3760FAB9CDA00AA4858 /* HGSPluginBlacklist.m in Sources */,
+				62E3FF4210112F5D005D77F2 /* NSNotificationCenter+MainThread.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7983,6 +8009,11 @@
 			target = 620CB3080FAA827E0029801C /* QSBPluginUI */;
 			targetProxy = 62F5951F0FEB164E0076CDDA /* PBXContainerItemProxy */;
 		};
+		62FD6C18100EB942004A3BF9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B77E0DB0F28FC3B00FA2A3C /* GData */;
+			targetProxy = 62FD6C17100EB942004A3BF9 /* PBXContainerItemProxy */;
+		};
 		7F9417890EEF53CD0049AE06 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 7F9415C40EEF52930049AE06 /* Shared File List */;
@@ -8240,7 +8271,7 @@
 		};
 		F4EF8FA10ECB3F85008DD6DA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 6263CAE80EB79F3600FF03A1 /* Picasaweb */;
+			target = 6263CAE80EB79F3600FF03A1 /* PicasaWeb */;
 			targetProxy = F4EF8FA00ECB3F85008DD6DA /* PBXContainerItemProxy */;
 		};
 		F4EF8FA30ECB3F85008DD6DA /* PBXTargetDependency */ = {
@@ -9303,7 +9334,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Picasaweb/Picasaweb-Info.plist";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
 				INFOPLIST_PREPROCESS = YES;
-				PRODUCT_NAME = Picasaweb;
+				PRODUCT_NAME = PicasaWeb;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = Debug;
@@ -9315,7 +9346,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Picasaweb/Picasaweb-Info.plist";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
 				INFOPLIST_PREPROCESS = YES;
-				PRODUCT_NAME = Picasaweb;
+				PRODUCT_NAME = PicasaWeb;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = Release;
@@ -10209,7 +10240,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Picasaweb/Picasaweb-Info.plist";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
 				INFOPLIST_PREPROCESS = YES;
-				PRODUCT_NAME = Picasaweb;
+				PRODUCT_NAME = PicasaWeb;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = "Debug-gcov";
@@ -10763,7 +10794,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6263CAF80EB79F3600FF03A1 /* Build configuration list for PBXNativeTarget "Picasaweb" */ = {
+		6263CAF80EB79F3600FF03A1 /* Build configuration list for PBXNativeTarget "PicasaWeb" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6263CAF90EB79F3600FF03A1 /* Debug */,
