@@ -142,11 +142,14 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 
 - (void)loadPluginsWithErrors:(NSArray **)errors {
   NSArray *pluginPaths = [[self delegate] pluginFolders];
-  NSMutableArray *allErrors = [NSMutableArray array];
+  NSMutableArray *allErrors = nil;
   for (NSString *pluginPath in pluginPaths) {
     NSArray *pluginErrors = nil;
     [self loadPluginsAtPath:pluginPath errors:&pluginErrors];
     if (pluginErrors) {
+      if (!allErrors) {
+        allErrors = [NSMutableArray array];
+      }
       [allErrors addObjectsFromArray:pluginErrors];
     }
   }
@@ -223,7 +226,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
       }
       // Due to us moving code around, an extension may have moved from one
       // plugin to another
-      if (oldExtensionDict) {
+      if (!state || oldExtensionDict) {
         [protoExtension setEnabled:protoExtensionEnabled];
       }
     }
@@ -269,19 +272,34 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 }
 
 - (void)loadPluginsAtPath:(NSString*)pluginPath errors:(NSArray **)errors {
-  if (pluginPath) {
+  BOOL isDirectory;
+  NSFileManager *fm = [NSFileManager defaultManager];
+  if ([fm fileExistsAtPath:pluginPath isDirectory:&isDirectory]) {
+    BOOL isPackage = NO;
+    if (isDirectory) {
+      isPackage = [[NSWorkspace sharedWorkspace] isFilePackageAtPath:pluginPath];
+    }
     NSMutableArray *ourErrors = [NSMutableArray array];
-    NSDirectoryEnumerator* dirEnum
-      = [[NSFileManager defaultManager] enumeratorAtPath:pluginPath];
+    id fileEnum;
+    if (isDirectory && !isPackage) {
+      fileEnum = [[NSFileManager defaultManager] enumeratorAtPath:pluginPath];
+    } else {
+      fileEnum = [NSArray arrayWithObject:pluginPath];
+    }
     HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:kHGSPluginLoaderWillLoadPluginsNotification 
                       object:self 
                     userInfo:nil];
-    for (NSString *path in dirEnum) {
+    for (NSString *path in fileEnum) {
       NSString *errorType = nil;
-      [dirEnum skipDescendents];
-      NSString* fullPath = [pluginPath stringByAppendingPathComponent:path];
+      NSString* fullPath = nil;
+      if (isDirectory && !isPackage) {
+        [fileEnum skipDescendents];
+        fullPath = [pluginPath stringByAppendingPathComponent:path];
+      } else {
+        fullPath = path;
+      }
       NSString *extension = [fullPath pathExtension];
       Class pluginClass = [extensionMap_ objectForKey:extension];
       NSString *pluginName = [fullPath lastPathComponent];

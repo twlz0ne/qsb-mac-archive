@@ -30,25 +30,14 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
-#import "GTMFileSystemKQueue.h"
-
-NSString *const kSafariBookmarksPath = @"~/Library/Safari/Bookmarks.plist";
-
-// In-memory storage keys
-static NSString* const kCachedHGSResultObject = @"ResultObject";
-static NSString* const kCachedNameTerms = @"NameTerms";
+#import "WebBookmarksSource.h"
 
 //
 // HGSSafariBookmarksSource
 //
 // Implements a Search Source for finding Safari Bookmarks.
 //
-@interface HGSSafariBookmarksSource : HGSMemorySearchSource {
- @private
-  GTMFileSystemKQueue* fileKQueue_;
-}
-- (void)updateIndex;
+@interface HGSSafariBookmarksSource : WebBookmarksSource 
 - (void)indexSafariBookmarksForDict:(NSDictionary *)dict;
 - (void)indexBookmark:(NSDictionary*)dict;
 @end
@@ -56,25 +45,24 @@ static NSString* const kCachedNameTerms = @"NameTerms";
 @implementation HGSSafariBookmarksSource
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
-  if ((self = [super initWithConfiguration:configuration])) {
-    NSString *path = [kSafariBookmarksPath stringByStandardizingPath];
-    GTMFileSystemKQueueEvents safariEvents = (kGTMFileSystemKQueueDeleteEvent 
-                                              | kGTMFileSystemKQueueWriteEvent);
-
-    fileKQueue_ 
-      = [[GTMFileSystemKQueue alloc] initWithPath:path
-                                        forEvents:safariEvents
-                                    acrossReplace:YES
-                                           target:self
-                                           action:@selector(fileChanged:event:)];
-    [self updateIndex];
+  NSArray *libraryDirArray
+    = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, 
+                                          NSUserDomainMask,
+                                          YES);
+  if (![libraryDirArray count]) {
+    // COV_NF_START
+    // Library is always there
+    HGSLog(@"Unable to find ~/Library");
+    [self release];
+    return nil;
+    // COV_NF_END
   }
-  return self;  
-}
-
-- (void)dealloc {
-  [fileKQueue_ release];
-  [super dealloc];
+  NSString *libraryDir = [libraryDirArray objectAtIndex:0];
+  NSString *fileToWatch = [libraryDir stringByAppendingPathComponent:@"Safari"];
+  fileToWatch = [fileToWatch stringByAppendingPathComponent:@"Bookmarks.plist"];
+  return [super initWithConfiguration:configuration
+                      browserTypeName:@"safari"
+                          fileToWatch:fileToWatch];
 }
 
 #pragma mark -
@@ -106,39 +94,14 @@ static NSString* const kCachedNameTerms = @"NameTerms";
   if (!url) {
     return;
   }
-  NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSUnderHomeRankFlag 
-                         | eHGSNameMatchRankFlag];
-  NSImage *icon = [NSImage imageNamed:@"blue-nav"];
-  NSDictionary *attributes
-    = [NSDictionary dictionaryWithObjectsAndKeys:
-       urlString, kHGSObjectAttributeSourceURLKey,
-       rankFlags, kHGSObjectAttributeRankFlagsKey,
-       icon, kHGSObjectAttributeIconKey,
-       @"star-flag", kHGSObjectAttributeFlagIconNameKey,
-       nil];
-  HGSResult* result 
-    = [HGSResult resultWithURL:url
-                          name:title
-                          type:HGS_SUBTYPE(kHGSTypeWebBookmark, @"safari")
-                        source:self
-                    attributes:attributes];
-  [self indexResult:result];
+  [self indexResultNamed:title URL:url otherAttributes:nil];
 }
 
-- (void)updateIndex {
-  [self clearResultIndex];
-  NSString *path = [kSafariBookmarksPath stringByStandardizingPath];
+- (void)updateIndexForPath:(NSString *)path; {
   NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
   if (dict) {
     [self indexSafariBookmarksForDict:dict];
   }
 }
 
-- (void)fileChanged:(GTMFileSystemKQueue *)queue 
-              event:(GTMFileSystemKQueueEvents)event {
-  [[self retain] autorelease];
-  [self updateIndex];
-}
-
 @end
-

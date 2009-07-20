@@ -77,8 +77,6 @@
 				F4EF8F7B0ECB3F85008DD6DA /* PBXTargetDependency */,
 				F4EF8F7D0ECB3F85008DD6DA /* PBXTargetDependency */,
 				F4EF8F7F0ECB3F85008DD6DA /* PBXTargetDependency */,
-				F4EF8F810ECB3F85008DD6DA /* PBXTargetDependency */,
-				F4EF8F830ECB3F85008DD6DA /* PBXTargetDependency */,
 				F4EF8F850ECB3F85008DD6DA /* PBXTargetDependency */,
 				F4EF8F870ECB3F85008DD6DA /* PBXTargetDependency */,
 				F4EF8F890ECB3F85008DD6DA /* PBXTargetDependency */,
@@ -109,6 +107,7 @@
 				5A0BB2E30FAB8B3100AA4858 /* PBXTargetDependency */,
 				62370BA50FFC5B5E00C48624 /* PBXTargetDependency */,
 				5AB441590FFC312A00001976 /* PBXTargetDependency */,
+				F4EF8F830ECB3F85008DD6DA /* PBXTargetDependency */,
 			);
 			name = "QSB Application";
 			productName = "Add Plugins To QSB";
@@ -211,8 +210,6 @@
 /* Begin PBXBuildFile section */
 		337C2C890DCFDA9B00897EB3 /* KeychainItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 337C2C870DCFDA9B00897EB3 /* KeychainItem.m */; };
 		33A015BC0DD38E1900578DE5 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
-		33D2C4480DD0E8F200C1FBDC /* SafariBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 33D2C4450DD0E8F200C1FBDC /* SafariBookmarksSource.m */; };
-		33D2C46C0DD0ECBB00C1FBDC /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		33D2C65D0DD1080700C1FBDC /* gdocdocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 33D2C6550DD1080700C1FBDC /* gdocdocument.icns */; };
 		33D2C65E0DD1080700C1FBDC /* gdocpresentation.icns in Resources */ = {isa = PBXBuildFile; fileRef = 33D2C6560DD1080700C1FBDC /* gdocpresentation.icns */; };
 		33D2C65F0DD1080700C1FBDC /* gdocspreadsheet.icns in Resources */ = {isa = PBXBuildFile; fileRef = 33D2C6570DD1080700C1FBDC /* gdocspreadsheet.icns */; };
@@ -224,7 +221,6 @@
 		33D2CB450DD24E4D00C1FBDC /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		33D2CBAD0DD2573100C1FBDC /* HGSMemorySearchSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 33D2CBAB0DD2573100C1FBDC /* HGSMemorySearchSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33D2CBAE0DD2573100C1FBDC /* HGSMemorySearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 33D2CBAC0DD2573100C1FBDC /* HGSMemorySearchSource.m */; };
-		33EEA6BF0DD0DBAB005766AB /* CaminoBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 33EEA60F0DD0CC49005766AB /* CaminoBookmarksSource.m */; };
 		33EEA6E70DD0DBEC005766AB /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		5A0BB19E0FAB8A7D00AA4858 /* Screensaver.py in Resources */ = {isa = PBXBuildFile; fileRef = 5A0BB19C0FAB8A7D00AA4858 /* Screensaver.py */; };
 		5A0BB2EB0FAB8B4400AA4858 /* Screensaver.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */; };
@@ -676,6 +672,14 @@
 		8B637A440F27706A00997738 /* GTMTestTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BCB416D0E82E879007F8FD6 /* GTMTestTimer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B63DD910D9458E500395A2B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		8B63DD980D9458E500395A2B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
+		8B64A6B60FF419770000D893 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B64A6B20FF419630000D893 /* InfoPlist.strings */; };
+		8B64A6C30FF419A90000D893 /* CaminoBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B64A6B10FF419630000D893 /* CaminoBookmarksSource.m */; };
+		8B64A6C40FF419A90000D893 /* SafariBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B64A6B40FF419630000D893 /* SafariBookmarksSource.m */; };
+		8B64B1150FF98FE90000D893 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
+		8B6857EF100CCC0D00ADEA67 /* bookmarks.json.xml in Copy Firefox Test Data */ = {isa = PBXBuildFile; fileRef = 8B6857EE100CCC0400ADEA67 /* bookmarks.json.xml */; };
+		8B68589D100CFE6C00ADEA67 /* imdb.xml in Copy Firefox SearchPlugins Test Data */ = {isa = PBXBuildFile; fileRef = 8B68589B100CFE4100ADEA67 /* imdb.xml */; };
+		8B6858D9100D014000ADEA67 /* searchPluginsMaster.xml in Copy Firefox Test Data */ = {isa = PBXBuildFile; fileRef = 8B6858D4100D013700ADEA67 /* searchPluginsMaster.xml */; };
+		8B685A02100E1F2300ADEA67 /* bookmarksMaster.xml in Copy Firefox Test Data */ = {isa = PBXBuildFile; fileRef = 8B685A01100E1F1700ADEA67 /* bookmarksMaster.xml */; };
 		8B6C0D060F32C86100E51E5D /* GData.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		8B6C0D3C0F32C8E500E51E5D /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		8B6C0D430F32C90200E51E5D /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
@@ -757,11 +761,27 @@
 		8B834B580FBCD00000862FF5 /* GTMLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B834B540FBCD00000862FF5 /* GTMLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B834B590FBCD00000862FF5 /* GTMTransientRootProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B834B550FBCD00000862FF5 /* GTMTransientRootProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B834B5A0FBCD00000862FF5 /* GTMTransientRootPortProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B834B560FBCD00000862FF5 /* GTMTransientRootPortProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B8516C9100278CC00880329 /* QSBResultIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8516C6100278CC00880329 /* QSBResultIconView.m */; };
+		8B85296E1006931E00880329 /* WebBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B85296D1006931E00880329 /* WebBookmarksSource.m */; };
+		8B852A381006AC7900880329 /* FirefoxBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B852A371006AC7900880329 /* FirefoxBookmarksSource.m */; };
+		8B852B9E1007AD1B00880329 /* GTMSenTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */; };
+		8B852B9F1007AD1B00880329 /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
+		8B852BA01007AD1B00880329 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
+		8B852BD11007AD1B00880329 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
+		8B852BD21007AD1B00880329 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
+		8B852BD31007AD1B00880329 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		8B852BD41007AD1B00880329 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
+		8B852BD61007AD1B00880329 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B55DB010E78832300D39CB0 /* SenTestingKit.framework */; };
+		8B852DDB1007AF3B00880329 /* FirefoxBookmarksSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B852B311007AC3A00880329 /* FirefoxBookmarksSourceTest.m */; };
+		8B852E411007B1DE00880329 /* HGSUnitTestingUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B852E401007B1DE00880329 /* HGSUnitTestingUtilities.m */; };
+		8B8530531007E3DD00880329 /* profiles.ini in Copy Firefox Test Data */ = {isa = PBXBuildFile; fileRef = 8B852EEC1007D93300880329 /* profiles.ini */; };
+		8B8530DD1007E7CD00880329 /* profiles.ini.xml in Copy Firefox Test Data */ = {isa = PBXBuildFile; fileRef = 8B8530C71007E74B00880329 /* profiles.ini.xml */; };
+		8B85325A100B909D00880329 /* profilesWith2Profiles.ini in Copy Firefox Test Data */ = {isa = PBXBuildFile; fileRef = 8B853259100B909500880329 /* profilesWith2Profiles.ini */; };
+		8B8532F2100B927100880329 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
+		8B85330D100B939A00880329 /* bookmarks.json in Copy Firefox Test Data */ = {isa = PBXBuildFile; fileRef = 8B85330C100B939000880329 /* bookmarks.json */; };
 		8B8B13060EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B8B13070EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B8B13080EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
-		8B8B13090EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
-		8B8B130A0EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B8B130B0EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B8B130C0EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B8B130D0EEBADE400E543D0 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
@@ -825,7 +845,6 @@
 		8BB658F40F73035000E20B99 /* GTMAppKit+UnitTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55DAE40E78829300D39CB0 /* GTMAppKit+UnitTesting.m */; };
 		8BB6594B0F73036600E20B99 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8BB912C80E1D23F30018636A /* RecentDocumentsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 627FAEB50DF9D71D00E3E765 /* RecentDocumentsSource.m */; };
-		8BC350BB0F2BD7D3001ADD5B /* QSBResultIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC350BA0F2BD7D3001ADD5B /* QSBResultIconView.m */; };
 		8BC3F4A50F17C7C000896770 /* action-share-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4410F17C7BE00896770 /* action-share-icon.png */; };
 		8BC3F4A80F17C7C000896770 /* alt-finance.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4450F17C7BE00896770 /* alt-finance.png */; };
 		8BC3F4AB0F17C7C000896770 /* alt-images.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4480F17C7BE00896770 /* alt-images.png */; };
@@ -899,7 +918,6 @@
 		8BC6E1640FAA7474005A0F6F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E1630FAA7474005A0F6F /* Localizable.strings */; };
 		8BC6E16A0FAA74D7005A0F6F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E1690FAA74D7005A0F6F /* Localizable.strings */; };
 		8BC6E16E0FAA7555005A0F6F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E16D0FAA7555005A0F6F /* InfoPlist.strings */; };
-		8BC6E1720FAA759E005A0F6F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E1710FAA759E005A0F6F /* InfoPlist.strings */; };
 		8BC6E3490FAAA2AB005A0F6F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E3480FAAA2AB005A0F6F /* Localizable.strings */; };
 		8BC6E53A0FAAC0B5005A0F6F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E5390FAAC0B5005A0F6F /* InfoPlist.strings */; };
 		8BC6E58B0FAAC117005A0F6F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E58A0FAAC117005A0F6F /* InfoPlist.strings */; };
@@ -916,7 +934,6 @@
 		8BC6E5F20FAAC279005A0F6F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E5F10FAAC279005A0F6F /* InfoPlist.strings */; };
 		8BC6E5F70FAAC29A005A0F6F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E5F50FAAC28B005A0F6F /* InfoPlist.strings */; };
 		8BC6E5FC0FAAC2A6005A0F6F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E5FB0FAAC2A6005A0F6F /* InfoPlist.strings */; };
-		8BC6E6010FAAC3B2005A0F6F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E5FF0FAAC3A3005A0F6F /* InfoPlist.strings */; };
 		8BC6E60B0FAAC3DF005A0F6F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E6090FAAC3D2005A0F6F /* InfoPlist.strings */; };
 		8BC6E6100FAAC3F7005A0F6F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E60F0FAAC3F7005A0F6F /* InfoPlist.strings */; };
 		8BC6E6150FAAC40B005A0F6F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BC6E6130FAAC403005A0F6F /* InfoPlist.strings */; };
@@ -982,7 +999,6 @@
 		8BD988420E64613200F5C83B /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8BD988570E64616700F5C83B /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8BD988580E64616700F5C83B /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
-		8BD98F060DF84DEF0068565A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		8BD98F070DF84DF00068565A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		8BD98FFD0DF84E330068565A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		8BD990060DF84ECC0068565A /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
@@ -1023,7 +1039,6 @@
 		F487E3A90E59D4D0005B47E6 /* QSBPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = F487E3A80E59D4D0005B47E6 /* QSBPreferences.m */; };
 		F49FBAE20EF02B440059DDFC /* GTMFileSystemKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = F49FBAE00EF02B440059DDFC /* GTMFileSystemKQueue.m */; };
 		F4CC19680ED1B91800D6976A /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
-		F4CC19690ED1B91900D6976A /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		F4D1494B0E9A438B00C0EAA9 /* NSString+ReadableURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 644161EE0DE362CC00AC646D /* NSString+ReadableURL.m */; };
 		F4D14F120E9BE9A200C0EAA9 /* HGSDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = F4D14F110E9BE9A200C0EAA9 /* HGSDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F4D153380E9F9C5400C0EAA9 /* HGSStringUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = F4D153350E9F9C5400C0EAA9 /* HGSStringUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1046,8 +1061,7 @@
 		F4EF90C40ECB4529008DD6DA /* SpotlightFiles.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B6F2EF90DA2BA260052CA40 /* SpotlightFiles.hgs */; };
 		F4EF90C50ECB4529008DD6DA /* Contacts.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B6F2F2E0DA2BB660052CA40 /* Contacts.hgs */; };
 		F4EF90C60ECB4529008DD6DA /* Applications.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B6F2F4E0DA2C37C0052CA40 /* Applications.hgs */; };
-		F4EF90C80ECB4529008DD6DA /* CaminoBookmarks.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33EEA68B0DD0D9C0005766AB /* CaminoBookmarks.hgs */; };
-		F4EF90C90ECB4529008DD6DA /* SafariBookmarks.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33D2C40D0DD0E6C500C1FBDC /* SafariBookmarks.hgs */; };
+		F4EF90C80ECB4529008DD6DA /* WebBookmarks.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33EEA68B0DD0D9C0005766AB /* WebBookmarks.hgs */; };
 		F4EF90CA0ECB4529008DD6DA /* GoogleDocs.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33D2C5F30DD1068000C1FBDC /* GoogleDocs.hgs */; };
 		F4EF90CB0ECB4529008DD6DA /* GoogleBookmarks.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33D2CAE00DD24C2500C1FBDC /* GoogleBookmarks.hgs */; };
 		F4EF90CC0ECB4529008DD6DA /* Actions.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = E46933050DDB7A0200C5A64A /* Actions.hgs */; };
@@ -1072,13 +1086,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		33D2C46F0DD0ECC600C1FBDC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
-			remoteInfo = Vermilion;
-		};
 		33D2C6270DD1074900C1FBDC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1216,7 +1223,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8BD97D090E636D8C00F5C83B /* GTM */;
+			remoteGlobalIDString = 8BD97D090E636D8C00F5C83B;
 			remoteInfo = GTM;
 		};
 		6263CAEA0EB79F3600FF03A1 /* PBXContainerItemProxy */ = {
@@ -1464,6 +1471,27 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
+		8B852B9A1007AD1B00880329 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
+			remoteInfo = Vermilion;
+		};
+		8B852FE71007E32D00880329 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 33EEA68A0DD0D9C0005766AB;
+			remoteInfo = "Web Bookmarks";
+		};
+		8B8532F0100B926A00880329 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B61289E0F4641BF00E29B40;
+			remoteInfo = JSON;
+		};
 		8B93E3B20FC8F81F0077616C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1603,13 +1631,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2F200DA2BB660052CA40;
 			remoteInfo = Contacts;
-		};
-		F4EF8F800ECB3F85008DD6DA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 33D2C40C0DD0E6C500C1FBDC;
-			remoteInfo = SafariBookmarks;
 		};
 		F4EF8F820ECB3F85008DD6DA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1777,6 +1798,34 @@
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8B6858B7100CFE8100ADEA67 /* Copy Firefox SearchPlugins Test Data */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Firefox/searchplugins;
+			dstSubfolderSpec = 7;
+			files = (
+				8B68589D100CFE6C00ADEA67 /* imdb.xml in Copy Firefox SearchPlugins Test Data */,
+			);
+			name = "Copy Firefox SearchPlugins Test Data";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8B8530661007E3E400880329 /* Copy Firefox Test Data */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Firefox;
+			dstSubfolderSpec = 7;
+			files = (
+				8B685A02100E1F2300ADEA67 /* bookmarksMaster.xml in Copy Firefox Test Data */,
+				8B6858D9100D014000ADEA67 /* searchPluginsMaster.xml in Copy Firefox Test Data */,
+				8B6857EF100CCC0D00ADEA67 /* bookmarks.json.xml in Copy Firefox Test Data */,
+				8B85330D100B939A00880329 /* bookmarks.json in Copy Firefox Test Data */,
+				8B8530DD1007E7CD00880329 /* profiles.ini.xml in Copy Firefox Test Data */,
+				8B8530531007E3DD00880329 /* profiles.ini in Copy Firefox Test Data */,
+				8B85325A100B909D00880329 /* profilesWith2Profiles.ini in Copy Firefox Test Data */,
+			);
+			name = "Copy Firefox Test Data";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F4EF8F730ECB3EFF008DD6DA /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1793,8 +1842,7 @@
 				F4EF90C40ECB4529008DD6DA /* SpotlightFiles.hgs in CopyFiles */,
 				F4EF90C50ECB4529008DD6DA /* Contacts.hgs in CopyFiles */,
 				F4EF90C60ECB4529008DD6DA /* Applications.hgs in CopyFiles */,
-				F4EF90C80ECB4529008DD6DA /* CaminoBookmarks.hgs in CopyFiles */,
-				F4EF90C90ECB4529008DD6DA /* SafariBookmarks.hgs in CopyFiles */,
+				F4EF90C80ECB4529008DD6DA /* WebBookmarks.hgs in CopyFiles */,
 				F4EF90CA0ECB4529008DD6DA /* GoogleDocs.hgs in CopyFiles */,
 				F4EF90CB0ECB4529008DD6DA /* GoogleBookmarks.hgs in CopyFiles */,
 				F4EF90CC0ECB4529008DD6DA /* Actions.hgs in CopyFiles */,
@@ -1843,9 +1891,6 @@
 		337C2C860DCFDA9B00897EB3 /* KeychainItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeychainItem.h; sourceTree = "<group>"; };
 		337C2C870DCFDA9B00897EB3 /* KeychainItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeychainItem.m; sourceTree = "<group>"; };
 		33A016DD0DD3D00A00578DE5 /* GTMGarbageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMGarbageCollection.h; sourceTree = "<group>"; };
-		33D2C40D0DD0E6C500C1FBDC /* SafariBookmarks.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SafariBookmarks.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
-		33D2C4450DD0E8F200C1FBDC /* SafariBookmarksSource.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 4; path = SafariBookmarksSource.m; sourceTree = "<group>"; };
-		33D2C4460DD0E8F200C1FBDC /* SafariBookmarks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SafariBookmarks-Info.plist"; sourceTree = "<group>"; };
 		33D2C5F30DD1068000C1FBDC /* GoogleDocs.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleDocs.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		33D2C6550DD1080700C1FBDC /* gdocdocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = gdocdocument.icns; sourceTree = "<group>"; };
 		33D2C6560DD1080700C1FBDC /* gdocpresentation.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = gdocpresentation.icns; sourceTree = "<group>"; };
@@ -1856,9 +1901,7 @@
 		33D2CB390DD24D8D00C1FBDC /* GoogleBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleBookmarksSource.m; sourceTree = "<group>"; };
 		33D2CBAB0DD2573100C1FBDC /* HGSMemorySearchSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSMemorySearchSource.h; sourceTree = "<group>"; };
 		33D2CBAC0DD2573100C1FBDC /* HGSMemorySearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSMemorySearchSource.m; sourceTree = "<group>"; };
-		33EEA60B0DD0CC49005766AB /* CaminoBookmarks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "CaminoBookmarks-Info.plist"; sourceTree = "<group>"; };
-		33EEA60F0DD0CC49005766AB /* CaminoBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaminoBookmarksSource.m; sourceTree = "<group>"; };
-		33EEA68B0DD0D9C0005766AB /* CaminoBookmarks.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaminoBookmarks.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
+		33EEA68B0DD0D9C0005766AB /* WebBookmarks.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WebBookmarks.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Screensaver.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A0BB19B0FAB8A7D00AA4858 /* Screensaver-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Screensaver-Info.plist"; sourceTree = "<group>"; };
 		5A0BB19C0FAB8A7D00AA4858 /* Screensaver.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Screensaver.py; sourceTree = "<group>"; };
@@ -2307,6 +2350,15 @@
 		8B6128A30F4641BF00E29B40 /* JSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B637B4C0F2777C300997738 /* GData.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = GData.xcodeproj; sourceTree = "<group>"; };
 		8B63DD9F0D9458E500395A2B /* QSBTest.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QSBTest.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B64A6B10FF419630000D893 /* CaminoBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaminoBookmarksSource.m; sourceTree = "<group>"; };
+		8B64A6B30FF419630000D893 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		8B64A6B40FF419630000D893 /* SafariBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafariBookmarksSource.m; sourceTree = "<group>"; };
+		8B64A6B50FF419630000D893 /* WebBookmarks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "WebBookmarks-Info.plist"; sourceTree = "<group>"; };
+		8B6857EE100CCC0400ADEA67 /* bookmarks.json.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = bookmarks.json.xml; sourceTree = "<group>"; };
+		8B68589B100CFE4100ADEA67 /* imdb.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = imdb.xml; sourceTree = "<group>"; };
+		8B6858D4100D013700ADEA67 /* searchPluginsMaster.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = searchPluginsMaster.xml; sourceTree = "<group>"; };
+		8B6858F2100D033A00ADEA67 /* FirefoxBookmarksSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FirefoxBookmarksSource.h; sourceTree = "<group>"; };
+		8B685A01100E1F1700ADEA67 /* bookmarksMaster.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = bookmarksMaster.xml; sourceTree = "<group>"; };
 		8B6C172E0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSObject+KeyValueObserving.h"; sourceTree = "<group>"; };
 		8B6C172F0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSObject+KeyValueObserving.m"; sourceTree = "<group>"; };
 		8B6ECB620E154F08006A815D /* QuickLook.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = QuickLook.png; sourceTree = "<group>"; };
@@ -2356,6 +2408,19 @@
 		8B834B540FBCD00000862FF5 /* GTMLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMLogger.h; sourceTree = "<group>"; };
 		8B834B550FBCD00000862FF5 /* GTMTransientRootProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMTransientRootProxy.h; sourceTree = "<group>"; };
 		8B834B560FBCD00000862FF5 /* GTMTransientRootPortProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMTransientRootPortProxy.h; sourceTree = "<group>"; };
+		8B8516C5100278CC00880329 /* QSBResultIconView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBResultIconView.h; sourceTree = "<group>"; };
+		8B8516C6100278CC00880329 /* QSBResultIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBResultIconView.m; sourceTree = "<group>"; };
+		8B85296D1006931E00880329 /* WebBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebBookmarksSource.m; sourceTree = "<group>"; };
+		8B852972100695B200880329 /* WebBookmarksSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebBookmarksSource.h; sourceTree = "<group>"; };
+		8B852A371006AC7900880329 /* FirefoxBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FirefoxBookmarksSource.m; sourceTree = "<group>"; };
+		8B852B311007AC3A00880329 /* FirefoxBookmarksSourceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FirefoxBookmarksSourceTest.m; sourceTree = "<group>"; };
+		8B852BDE1007AD1B00880329 /* WebBookmarksTest.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WebBookmarksTest.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B852E3F1007B1DE00880329 /* HGSUnitTestingUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSUnitTestingUtilities.h; sourceTree = "<group>"; };
+		8B852E401007B1DE00880329 /* HGSUnitTestingUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSUnitTestingUtilities.m; sourceTree = "<group>"; };
+		8B852EEC1007D93300880329 /* profiles.ini */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = profiles.ini; sourceTree = "<group>"; };
+		8B8530C71007E74B00880329 /* profiles.ini.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = profiles.ini.xml; sourceTree = "<group>"; };
+		8B853259100B909500880329 /* profilesWith2Profiles.ini */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = profilesWith2Profiles.ini; sourceTree = "<group>"; };
+		8B85330C100B939000880329 /* bookmarks.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bookmarks.json; sourceTree = "<group>"; };
 		8B8B13040EEBADE400E543D0 /* HGSBundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSBundle.h; sourceTree = "<group>"; };
 		8B8B13050EEBADE400E543D0 /* HGSBundle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSBundle.m; sourceTree = "<group>"; };
 		8B8B18630EEEEAAC00E543D0 /* GTMCarbonEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMCarbonEvent.h; sourceTree = "<group>"; };
@@ -2452,8 +2517,6 @@
 		8BAAA8610F813E2A00DF4F12 /* HGSCoreExtensionPointsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCoreExtensionPointsTest.m; sourceTree = "<group>"; };
 		8BAAA8620F813E2A00DF4F12 /* HGSCoreExtensionPoints.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSCoreExtensionPoints.h; sourceTree = "<group>"; };
 		8BB275AB0D6F81EA008DC1CA /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
-		8BC350B90F2BD7D3001ADD5B /* QSBResultIconView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBResultIconView.h; sourceTree = "<group>"; };
-		8BC350BA0F2BD7D3001ADD5B /* QSBResultIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBResultIconView.m; sourceTree = "<group>"; };
 		8BC3F4410F17C7BE00896770 /* action-share-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "action-share-icon.png"; sourceTree = "<group>"; };
 		8BC3F4450F17C7BE00896770 /* alt-finance.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "alt-finance.png"; sourceTree = "<group>"; };
 		8BC3F4480F17C7BE00896770 /* alt-images.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "alt-images.png"; sourceTree = "<group>"; };
@@ -2526,7 +2589,6 @@
 		8BC6E1600FAA7469005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8BC6E1670FAA74D1005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8BC6E16B0FAA754D005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8BC6E16F0FAA758F005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8BC6E3450FAAA29E005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8BC6E5360FAAC0A1005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8BC6E5880FAAC107005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -2543,7 +2605,6 @@
 		8BC6E5EE0FAAC272005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8BC6E5F30FAAC288005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8BC6E5F80FAAC29E005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8BC6E5FD0FAAC3A0005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8BC6E6070FAAC3CF005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8BC6E60C0FAAC3ED005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8BC6E6110FAAC400005A0F6F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -2663,16 +2724,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		33D2C40B0DD0E6C500C1FBDC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				33D2C46C0DD0ECBB00C1FBDC /* Vermilion.framework in Frameworks */,
-				8BD98F060DF84DEF0068565A /* Cocoa.framework in Frameworks */,
-				F4CC19690ED1B91900D6976A /* GTM.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		33D2C5F10DD1068000C1FBDC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2702,6 +2753,7 @@
 				33EEA6E70DD0DBEC005766AB /* Vermilion.framework in Frameworks */,
 				8BD98F070DF84DF00068565A /* Cocoa.framework in Frameworks */,
 				F4CC19680ED1B91800D6976A /* GTM.framework in Frameworks */,
+				8B8532F2100B927100880329 /* JSON.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3020,6 +3072,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8B852BCF1007AD1B00880329 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B852BD11007AD1B00880329 /* GTM.framework in Frameworks */,
+				8B852BD21007AD1B00880329 /* AppKit.framework in Frameworks */,
+				8B852BD31007AD1B00880329 /* Vermilion.framework in Frameworks */,
+				8B852BD41007AD1B00880329 /* Foundation.framework in Frameworks */,
+				8B852BD61007AD1B00880329 /* SenTestingKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8BD97D080E636D8C00F5C83B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -3114,7 +3178,7 @@
 				8B6F2F4E0DA2C37C0052CA40 /* Applications.hgs */,
 				8B3D2A380EAFDA66004EA504 /* ApplicationUI.hgs */,
 				F4E3B5890EB6573300CB713D /* Calculator.hgs */,
-				33EEA68B0DD0D9C0005766AB /* CaminoBookmarks.hgs */,
+				33EEA68B0DD0D9C0005766AB /* WebBookmarks.hgs */,
 				623FA35F0E5C8D97003630C1 /* ChatBuddies.hgs */,
 				8B6F2F2E0DA2BB660052CA40 /* Contacts.hgs */,
 				F4FEECDA0EC4BF99000758EC /* CorePlugin.hgs */,
@@ -3130,7 +3194,6 @@
 				8BCCD3740EC8F93C00688D64 /* Networking.hgs */,
 				6263CAFB0EB79F3600FF03A1 /* Picasaweb.hgs */,
 				627FAECA0DF9D73500E3E765 /* RecentDocuments.hgs */,
-				33D2C40D0DD0E6C500C1FBDC /* SafariBookmarks.hgs */,
 				5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */,
 				7F9415CC0EEF52930049AE06 /* SharedFileList.hgs */,
 				7F5626110EF31C060030E922 /* Shortcuts.hgs */,
@@ -3145,6 +3208,7 @@
 				5AF0F4880F671D9C0041E0B9 /* Mount.hgs */,
 				62370A5D0FFC59B000C48624 /* StockQuoter.hgs */,
 				5AB440F50FFC2F1F00001976 /* DirectoryServices.hgs */,
+				8B852BDE1007AD1B00880329 /* WebBookmarksTest.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3238,16 +3302,6 @@
 			path = AppKit;
 			sourceTree = "<group>";
 		};
-		33D2C4400DD0E8A600C1FBDC /* SafariBookmarks */ = {
-			isa = PBXGroup;
-			children = (
-				8BC6E5FF0FAAC3A3005A0F6F /* InfoPlist.strings */,
-				33D2C4460DD0E8F200C1FBDC /* SafariBookmarks-Info.plist */,
-				33D2C4450DD0E8F200C1FBDC /* SafariBookmarksSource.m */,
-			);
-			path = SafariBookmarks;
-			sourceTree = "<group>";
-		};
 		33D2C6630DD1080C00C1FBDC /* GoogleDocs */ = {
 			isa = PBXGroup;
 			children = (
@@ -3279,16 +3333,6 @@
 				33D2CB390DD24D8D00C1FBDC /* GoogleBookmarksSource.m */,
 			);
 			path = GoogleBookmarks;
-			sourceTree = "<group>";
-		};
-		33EEA60A0DD0CC33005766AB /* CaminoBookmarks */ = {
-			isa = PBXGroup;
-			children = (
-				8BC6E1710FAA759E005A0F6F /* InfoPlist.strings */,
-				33EEA60B0DD0CC49005766AB /* CaminoBookmarks-Info.plist */,
-				33EEA60F0DD0CC49005766AB /* CaminoBookmarksSource.m */,
-			);
-			path = CaminoBookmarks;
 			sourceTree = "<group>";
 		};
 		5A0BB19A0FAB8A7D00AA4858 /* Screensaver */ = {
@@ -3900,8 +3944,8 @@
 				625A2C970E5614F3008CA9BF /* QSBPreferenceWindowController.m */,
 				8B5EC6680CEE61BF00AD3BBD /* QSBQueryBoundingView.h */,
 				8B5EC6690CEE61BF00AD3BBD /* QSBQueryBoundingView.m */,
-				8BC350B90F2BD7D3001ADD5B /* QSBResultIconView.h */,
-				8BC350BA0F2BD7D3001ADD5B /* QSBResultIconView.m */,
+				8B8516C5100278CC00880329 /* QSBResultIconView.h */,
+				8B8516C6100278CC00880329 /* QSBResultIconView.m */,
 				624DD9EB0E9EA5D90029EF72 /* QSBResultRowViewController.h */,
 				624DD9EC0E9EA5D90029EF72 /* QSBResultRowViewController.m */,
 				6223CBB20E761AEB00F61030 /* QSBResultsViewBaseController.h */,
@@ -4072,6 +4116,46 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		8B64A6B00FF419630000D893 /* WebBookmarks */ = {
+			isa = PBXGroup;
+			children = (
+				8B852EEB1007D93300880329 /* TestData */,
+				8B852A371006AC7900880329 /* FirefoxBookmarksSource.m */,
+				8B6858F2100D033A00ADEA67 /* FirefoxBookmarksSource.h */,
+				8B852B311007AC3A00880329 /* FirefoxBookmarksSourceTest.m */,
+				8B85296D1006931E00880329 /* WebBookmarksSource.m */,
+				8B852972100695B200880329 /* WebBookmarksSource.h */,
+				8B64A6B10FF419630000D893 /* CaminoBookmarksSource.m */,
+				8B64A6B20FF419630000D893 /* InfoPlist.strings */,
+				8B64A6B40FF419630000D893 /* SafariBookmarksSource.m */,
+				8B64A6B50FF419630000D893 /* WebBookmarks-Info.plist */,
+			);
+			path = WebBookmarks;
+			sourceTree = "<group>";
+		};
+		8B68589A100CFE4100ADEA67 /* searchplugins */ = {
+			isa = PBXGroup;
+			children = (
+				8B68589B100CFE4100ADEA67 /* imdb.xml */,
+			);
+			path = searchplugins;
+			sourceTree = "<group>";
+		};
+		8B685D431010DAE300ADEA67 /* Firefox */ = {
+			isa = PBXGroup;
+			children = (
+				8B685A01100E1F1700ADEA67 /* bookmarksMaster.xml */,
+				8B6858D4100D013700ADEA67 /* searchPluginsMaster.xml */,
+				8B68589A100CFE4100ADEA67 /* searchplugins */,
+				8B6857EE100CCC0400ADEA67 /* bookmarks.json.xml */,
+				8B85330C100B939000880329 /* bookmarks.json */,
+				8B8530C71007E74B00880329 /* profiles.ini.xml */,
+				8B853259100B909500880329 /* profilesWith2Profiles.ini */,
+				8B852EEC1007D93300880329 /* profiles.ini */,
+			);
+			path = Firefox;
+			sourceTree = "<group>";
+		};
 		8B6F2CE50DA2B83F0052CA40 /* Vermilion */ = {
 			isa = PBXGroup;
 			children = (
@@ -4092,7 +4176,6 @@
 				8B3D2A4A0EAFDAC3004EA504 /* ApplicationUI */,
 				8B6F2D110DA2B83F0052CA40 /* Apps */,
 				F4E3B5B90EB657E300CB713D /* Calculator */,
-				33EEA60A0DD0CC33005766AB /* CaminoBookmarks */,
 				623FA33A0E5C8C8C003630C1 /* ChatBuddies */,
 				8B6F2D170DA2B83F0052CA40 /* Contacts */,
 				7F8DF7200DAD3E270007B812 /* Core */,
@@ -4112,7 +4195,6 @@
 				7F22054F0DD9E2C400737C26 /* OpenSearch */,
 				6263CB060EB79FB300FF03A1 /* Picasaweb */,
 				627FAEB10DF9D71D00E3E765 /* RecentDocuments */,
-				33D2C4400DD0E8A600C1FBDC /* SafariBookmarks */,
 				5A0BB19A0FAB8A7D00AA4858 /* Screensaver */,
 				7F9417340EEF533B0049AE06 /* SharedFileList */,
 				5AEC5C550FBA2824005608EA /* SharedScript */,
@@ -4126,6 +4208,7 @@
 				62A4AD0C0F2FCE0E0007CD99 /* Twitter */,
 				7FD8F1A50E252CDE00E7E6A5 /* URLDetection */,
 				F4E3B6F60EB66A7100CB713D /* Weather */,
+				8B64A6B00FF419630000D893 /* WebBookmarks */,
 				7F7357270DC92B53003DB5C6 /* WebSearch */,
 			);
 			path = Modules;
@@ -4274,6 +4357,8 @@
 				F4D153580E9F9E2900C0EAA9 /* HGSTokenizer.h */,
 				F4D153590E9F9E2900C0EAA9 /* HGSTokenizer.m */,
 				F4D1535A0E9F9E2900C0EAA9 /* HGSTokenizerTest.m */,
+				8B852E3F1007B1DE00880329 /* HGSUnitTestingUtilities.h */,
+				8B852E401007B1DE00880329 /* HGSUnitTestingUtilities.m */,
 				8B6F2D5E0DA2B88E0052CA40 /* Vermilion-Info.plist */,
 				8B6F2D5F0DA2B88E0052CA40 /* Vermilion.h */,
 				5A2710B20ECA52F200C72257 /* Vermilion.py */,
@@ -4292,6 +4377,14 @@
 				8B735FF50EC9066500E74421 /* main.applescript */,
 			);
 			path = Images;
+			sourceTree = "<group>";
+		};
+		8B852EEB1007D93300880329 /* TestData */ = {
+			isa = PBXGroup;
+			children = (
+				8B685D431010DAE300ADEA67 /* Firefox */,
+			);
+			path = TestData;
 			sourceTree = "<group>";
 		};
 		8B8EC5980EF0A0440044D13F /* Resources */ = {
@@ -4923,25 +5016,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		33D2C40C0DD0E6C500C1FBDC /* Safari Bookmarks */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 33D2C4110DD0E6C600C1FBDC /* Build configuration list for PBXNativeTarget "Safari Bookmarks" */;
-			buildPhases = (
-				33D2C4090DD0E6C500C1FBDC /* Resources */,
-				33D2C40A0DD0E6C500C1FBDC /* Sources */,
-				33D2C40B0DD0E6C500C1FBDC /* Frameworks */,
-				8BA016980F13D28F00926923 /* ShellScript */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				33D2C4700DD0ECC600C1FBDC /* PBXTargetDependency */,
-			);
-			name = "Safari Bookmarks";
-			productName = SafariBookmarks;
-			productReference = 33D2C40D0DD0E6C500C1FBDC /* SafariBookmarks.hgs */;
-			productType = "com.apple.product-type.bundle";
-		};
 		33D2C5F20DD1068000C1FBDC /* Google Docs */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 33D2C5F70DD1068100C1FBDC /* Build configuration list for PBXNativeTarget "Google Docs" */;
@@ -4981,9 +5055,9 @@
 			productReference = 33D2CAE00DD24C2500C1FBDC /* GoogleBookmarks.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
-		33EEA68A0DD0D9C0005766AB /* Camino Bookmarks */ = {
+		33EEA68A0DD0D9C0005766AB /* Web Bookmarks */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 33EEA68F0DD0D9C1005766AB /* Build configuration list for PBXNativeTarget "Camino Bookmarks" */;
+			buildConfigurationList = 33EEA68F0DD0D9C1005766AB /* Build configuration list for PBXNativeTarget "Web Bookmarks" */;
 			buildPhases = (
 				33EEA6870DD0D9C0005766AB /* Resources */,
 				33EEA6880DD0D9C0005766AB /* Sources */,
@@ -4993,11 +5067,12 @@
 			buildRules = (
 			);
 			dependencies = (
+				8B8532F1100B926A00880329 /* PBXTargetDependency */,
 				33EEA6BD0DD0DA12005766AB /* PBXTargetDependency */,
 			);
-			name = "Camino Bookmarks";
+			name = "Web Bookmarks";
 			productName = CaminoBookmarks;
-			productReference = 33EEA68B0DD0D9C0005766AB /* CaminoBookmarks.hgs */;
+			productReference = 33EEA68B0DD0D9C0005766AB /* WebBookmarks.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
 		5A0BB1670FAB8A6300AA4858 /* Screensaver */ = {
@@ -5581,6 +5656,27 @@
 			productReference = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		8B852B981007AD1B00880329 /* Web Bookmarks Test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8B852BDA1007AD1B00880329 /* Build configuration list for PBXNativeTarget "Web Bookmarks Test" */;
+			buildPhases = (
+				8B8530661007E3E400880329 /* Copy Firefox Test Data */,
+				8B6858B7100CFE8100ADEA67 /* Copy Firefox SearchPlugins Test Data */,
+				8B852B9D1007AD1B00880329 /* Sources */,
+				8B852BCF1007AD1B00880329 /* Frameworks */,
+				8B852BD91007AD1B00880329 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8B852B991007AD1B00880329 /* PBXTargetDependency */,
+				8B852FE81007E32D00880329 /* PBXTargetDependency */,
+			);
+			name = "Web Bookmarks Test";
+			productName = VermilionTest;
+			productReference = 8B852BDE1007AD1B00880329 /* WebBookmarksTest.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
 		8BCCD2620EC8E5EC00688D64 /* System AppleScript */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8BCCD26A0EC8E5EC00688D64 /* Build configuration list for PBXNativeTarget "System AppleScript" */;
@@ -5839,7 +5935,6 @@
 				8B3D2A2A0EAFDA66004EA504 /* Application UI */,
 				8B6F2F400DA2C37C0052CA40 /* Applications */,
 				F4E3B57B0EB6573300CB713D /* Calculator */,
-				33EEA68A0DD0D9C0005766AB /* Camino Bookmarks */,
 				623FA35E0E5C8D97003630C1 /* ChatBuddies */,
 				8B6F2F200DA2BB660052CA40 /* Contacts */,
 				F4FEECCC0EC4BF99000758EC /* CorePlugin */,
@@ -5858,7 +5953,6 @@
 				8BCCD3590EC8F93C00688D64 /* Networking AppleScript */,
 				6263CAE80EB79F3600FF03A1 /* Picasaweb */,
 				627FAEBA0DF9D73500E3E765 /* Recent Documents */,
-				33D2C40C0DD0E6C500C1FBDC /* Safari Bookmarks */,
 				5A0BB1670FAB8A6300AA4858 /* Screensaver */,
 				7F9415C40EEF52930049AE06 /* Shared File List */,
 				8B3EF87F0EF2C8A80036FFBD /* Shortcuts */,
@@ -5869,7 +5963,9 @@
 				5AF0EE210F61D0850041E0B9 /* Trash */,
 				62A4AC790F2FCD950007CD99 /* Twitter */,
 				8BCCD2C70EC8F8C200688D64 /* Volume AppleScript */,
+				33EEA68A0DD0D9C0005766AB /* Web Bookmarks */,
 				F4E3B6FC0EB66AA900CB713D /* Weather */,
+				8B852B981007AD1B00880329 /* Web Bookmarks Test */,
 			);
 		};
 /* End PBXProject section */
@@ -5969,14 +6065,6 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
-		33D2C4090DD0E6C500C1FBDC /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8BC6E6010FAAC3B2005A0F6F /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		33D2C5EF0DD1068000C1FBDC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -6004,7 +6092,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8BC6E1720FAA759E005A0F6F /* InfoPlist.strings in Resources */,
+				8B64A6B60FF419770000D893 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6754,23 +6842,20 @@
 			shellPath = /bin/sh;
 			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/GData.build/${CONFIGURATION}/GDataFramework.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
 		};
-		8BA016650F13CF6800926923 /* ShellScript */ = {
+		8B852BD91007AD1B00880329 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh\"";
+			shellScript = "# Run the unit tests in this test bundle.\n\nset -o errexit\nset -o nounset\nset -o verbose\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
 		};
-		8BA016980F13D28F00926923 /* ShellScript */ = {
+		8BA016650F13CF6800926923 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -7133,7 +7218,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Build all of our unit tests\n# We do it this way instead of using dependencies in the standard xcode model, \n# so we can pass the GTM_DO_NOT_REMOVE_GCOV_DATA flag in and we can unify our\n# code coverage numbers.\n\nset -o errexit\nset -o nounset\nset -o verbose\n\necho \"Test All:${LINENO}: note: Removing gcov data files from ${CONFIGURATION_TEMP_DIR}\"\n( cd \"${CONFIGURATION_TEMP_DIR}\" &&  find . -type f -name \"*.gcda\" -print0 | xargs -0 rm -f )\n\nxcodebuild -project \"QSB.xcodeproj\" -target \"Vermilion Test\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GTM_DO_NOT_REMOVE_GCOV_DATA=1\nxcodebuild -project \"QSB.xcodeproj\" -target \"QSB Core Test\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GTM_DO_NOT_REMOVE_GCOV_DATA=1\n";
+			shellScript = "# Build all of our unit tests\n# We do it this way instead of using dependencies in the standard xcode model, \n# so we can pass the GTM_DO_NOT_REMOVE_GCOV_DATA flag in and we can unify our\n# code coverage numbers.\n\nset -o errexit\nset -o nounset\nset -o verbose\n\necho \"Test All:${LINENO}: note: Removing gcov data files from ${CONFIGURATION_TEMP_DIR}\"\n( cd \"${CONFIGURATION_TEMP_DIR}\" &&  find . -type f -name \"*.gcda\" -print0 | xargs -0 rm -f )\n\nxcodebuild -project \"QSB.xcodeproj\" -target \"Vermilion Test\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GTM_DO_NOT_REMOVE_GCOV_DATA=1\nxcodebuild -project \"QSB.xcodeproj\" -target \"QSB Core Test\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GTM_DO_NOT_REMOVE_GCOV_DATA=1\nxcodebuild -project \"QSB.xcodeproj\" -target \"Web Bookmarks Test\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GTM_DO_NOT_REMOVE_GCOV_DATA=1\n";
 		};
 		8BCCD2690EC8E5EC00688D64 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -7190,15 +7275,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		33D2C40A0DD0E6C500C1FBDC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				33D2C4480DD0E8F200C1FBDC /* SafariBookmarksSource.m in Sources */,
-				8B8B13090EEBADE400E543D0 /* HGSBundle.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		33D2C5F00DD1068000C1FBDC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -7226,8 +7302,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				33EEA6BF0DD0DBAB005766AB /* CaminoBookmarksSource.m in Sources */,
-				8B8B130A0EEBADE400E543D0 /* HGSBundle.m in Sources */,
+				8B64A6C30FF419A90000D893 /* CaminoBookmarksSource.m in Sources */,
+				8B64A6C40FF419A90000D893 /* SafariBookmarksSource.m in Sources */,
+				8B85296E1006931E00880329 /* WebBookmarksSource.m in Sources */,
+				8B852A381006AC7900880329 /* FirefoxBookmarksSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7507,12 +7585,12 @@
 				8B488A490F15DE9400786C1E /* NSString+CaseInsensitive.m in Sources */,
 				62AD18A60F16B034000D380C /* QSBPathControl.m in Sources */,
 				624137530F2A657B009229E6 /* QSBSetUpAccountWindowController.m in Sources */,
-				8BC350BB0F2BD7D3001ADD5B /* QSBResultIconView.m in Sources */,
 				7F3F7EC50F39FCE70054680A /* QSBHGSResult+NSPasteboard.m in Sources */,
 				5ACEF2B80F40EAF5007EA38B /* QSBPluginVerifyWindowController.m in Sources */,
 				626585230F43BD4C008A94B2 /* QSBUserMessenger.m in Sources */,
 				8B611BFC0F43949600E29B40 /* QSBPathForFileURLCommand.m in Sources */,
 				8B453B390FB9EFA900C0E951 /* QSBWelcomeController.m in Sources */,
+				8B8516C9100278CC00880329 /* QSBResultIconView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7610,6 +7688,7 @@
 				8B8B13080EEBADE400E543D0 /* HGSBundle.m in Sources */,
 				7F7BA5040EF1A3B6008BA054 /* ContactsSource.m in Sources */,
 				8B3E039D0EF39D7C0036FFBD /* ContactsActions.m in Sources */,
+				8B64B1150FF98FE90000D893 /* GTMMethodCheck.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7621,6 +7700,18 @@
 				8B8B13060EEBADE400E543D0 /* HGSBundle.m in Sources */,
 				5A61D1CF0F71CEAE007B9111 /* ApplicationsActions.m in Sources */,
 				8B10A6FD0FA5F5E50087DE20 /* GTMMethodCheck.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8B852B9D1007AD1B00880329 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B852B9E1007AD1B00880329 /* GTMSenTestCase.m in Sources */,
+				8B852B9F1007AD1B00880329 /* GTMUnitTestDevLog.m in Sources */,
+				8B852BA01007AD1B00880329 /* HGSBundle.m in Sources */,
+				8B852DDB1007AF3B00880329 /* FirefoxBookmarksSourceTest.m in Sources */,
+				8B852E411007B1DE00880329 /* HGSUnitTestingUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7767,11 +7858,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		33D2C4700DD0ECC600C1FBDC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
-			targetProxy = 33D2C46F0DD0ECC600C1FBDC /* PBXContainerItemProxy */;
-		};
 		33D2C6280DD1074900C1FBDC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
@@ -7997,6 +8083,21 @@
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 8B6F2F420DA2C37C0052CA40 /* PBXContainerItemProxy */;
 		};
+		8B852B991007AD1B00880329 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
+			targetProxy = 8B852B9A1007AD1B00880329 /* PBXContainerItemProxy */;
+		};
+		8B852FE81007E32D00880329 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 33EEA68A0DD0D9C0005766AB /* Web Bookmarks */;
+			targetProxy = 8B852FE71007E32D00880329 /* PBXContainerItemProxy */;
+		};
+		8B8532F1100B926A00880329 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B61289E0F4641BF00E29B40 /* JSON */;
+			targetProxy = 8B8532F0100B926A00880329 /* PBXContainerItemProxy */;
+		};
 		8B93E3B30FC8F81F0077616C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
@@ -8082,14 +8183,9 @@
 			target = 8B6F2F200DA2BB660052CA40 /* Contacts */;
 			targetProxy = F4EF8F7E0ECB3F85008DD6DA /* PBXContainerItemProxy */;
 		};
-		F4EF8F810ECB3F85008DD6DA /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 33D2C40C0DD0E6C500C1FBDC /* Safari Bookmarks */;
-			targetProxy = F4EF8F800ECB3F85008DD6DA /* PBXContainerItemProxy */;
-		};
 		F4EF8F830ECB3F85008DD6DA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 33EEA68A0DD0D9C0005766AB /* Camino Bookmarks */;
+			target = 33EEA68A0DD0D9C0005766AB /* Web Bookmarks */;
 			targetProxy = F4EF8F820ECB3F85008DD6DA /* PBXContainerItemProxy */;
 		};
 		F4EF8F850ECB3F85008DD6DA /* PBXTargetDependency */ = {
@@ -8457,6 +8553,14 @@
 			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
+		8B64A6B20FF419630000D893 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8B64A6B30FF419630000D893 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		8B8EC5990EF0A0440044D13F /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -8641,14 +8745,6 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		8BC6E1710FAA759E005A0F6F /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8BC6E16F0FAA758F005A0F6F /* English */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		8BC6E3480FAAA2AB005A0F6F /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -8777,14 +8873,6 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		8BC6E5FF0FAAC3A3005A0F6F /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8BC6E5FD0FAAC3A0005A0F6F /* English */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		8BC6E6090FAAC3D2005A0F6F /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -8900,26 +8988,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		33D2C40F0DD0E6C600C1FBDC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
-			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/SafariBookmarks/SafariBookmarks-Info.plist";
-				PRODUCT_NAME = SafariBookmarks;
-				WRAPPER_EXTENSION = hgs;
-			};
-			name = Debug;
-		};
-		33D2C4100DD0E6C600C1FBDC /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
-			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/SafariBookmarks/SafariBookmarks-Info.plist";
-				PRODUCT_NAME = SafariBookmarks;
-				WRAPPER_EXTENSION = hgs;
-			};
-			name = Release;
-		};
 		33D2C5F50DD1068100C1FBDC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
@@ -8972,8 +9040,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/CaminoBookmarks/CaminoBookmarks-Info.plist";
-				PRODUCT_NAME = CaminoBookmarks;
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/WebBookmarks/WebBookmarks-Info.plist";
+				PRODUCT_NAME = WebBookmarks;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = Debug;
@@ -8982,8 +9050,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/CaminoBookmarks/CaminoBookmarks-Info.plist";
-				PRODUCT_NAME = CaminoBookmarks;
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/WebBookmarks/WebBookmarks-Info.plist";
+				PRODUCT_NAME = WebBookmarks;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = Release;
@@ -9779,6 +9847,45 @@
 			};
 			name = Release;
 		};
+		8B852BDB1007AD1B00880329 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				PRODUCT_NAME = WebBookmarksTest;
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		8B852BDC1007AD1B00880329 /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				PRODUCT_NAME = WebBookmarksTest;
+				WRAPPER_EXTENSION = octest;
+			};
+			name = "Debug-gcov";
+		};
+		8B852BDD1007AD1B00880329 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238D0F12B97E008182B5 /* ReleaseUnittest.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				PRODUCT_NAME = WebBookmarksTest;
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
 		8B95CBB10F6B1DEE003BDBDD /* Debug-gcov */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624C00F12C79E008182B5 /* QSBDebug.xcconfig */;
@@ -9956,8 +10063,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/CaminoBookmarks/CaminoBookmarks-Info.plist";
-				PRODUCT_NAME = CaminoBookmarks;
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/WebBookmarks/WebBookmarks-Info.plist";
+				PRODUCT_NAME = WebBookmarks;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = "Debug-gcov";
@@ -10113,16 +10220,6 @@
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/RecentDocuments/RecentDocuments-Info.plist";
 				PRODUCT_NAME = RecentDocuments;
-				WRAPPER_EXTENSION = hgs;
-			};
-			name = "Debug-gcov";
-		};
-		8B95CBD10F6B1DEE003BDBDD /* Debug-gcov */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
-			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/SafariBookmarks/SafariBookmarks-Info.plist";
-				PRODUCT_NAME = SafariBookmarks;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = "Debug-gcov";
@@ -10536,16 +10633,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		33D2C4110DD0E6C600C1FBDC /* Build configuration list for PBXNativeTarget "Safari Bookmarks" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				33D2C40F0DD0E6C600C1FBDC /* Debug */,
-				8B95CBD10F6B1DEE003BDBDD /* Debug-gcov */,
-				33D2C4100DD0E6C600C1FBDC /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		33D2C5F70DD1068100C1FBDC /* Build configuration list for PBXNativeTarget "Google Docs" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -10566,7 +10653,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		33EEA68F0DD0D9C1005766AB /* Build configuration list for PBXNativeTarget "Camino Bookmarks" */ = {
+		33EEA68F0DD0D9C1005766AB /* Build configuration list for PBXNativeTarget "Web Bookmarks" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33EEA68D0DD0D9C1005766AB /* Debug */,
@@ -10922,6 +11009,16 @@
 				8B77E0DE0F28FC3D00FA2A3C /* Debug */,
 				8B95CBB80F6B1DEE003BDBDD /* Debug-gcov */,
 				8B77E0DF0F28FC3D00FA2A3C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8B852BDA1007AD1B00880329 /* Build configuration list for PBXNativeTarget "Web Bookmarks Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B852BDB1007AD1B00880329 /* Debug */,
+				8B852BDC1007AD1B00880329 /* Debug-gcov */,
+				8B852BDD1007AD1B00880329 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

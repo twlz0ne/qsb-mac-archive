@@ -30,40 +30,9 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
-#import "GTMFileSystemKQueue.h"
+#import "WebBookmarksSource.h"
 
-NSString *const kCaminoBookmarksPath 
-  = @"~/Library/Application Support/Camino/Bookmarks.plist";
-
-static NSURL* domainURLForURLString(NSString* urlString) {
-  // This is parsed manually rather than round-tripped through NSURL so that
-  // we can get domains from invalid URLs (like Camino search bookmarks).
-  NSRange schemeEndRange = [urlString rangeOfString:@"://"];
-  NSUInteger domainStartIndex = 0;
-  if (schemeEndRange.location != NSNotFound)
-    domainStartIndex = schemeEndRange.location + schemeEndRange.length;
-  if (domainStartIndex >= [urlString length])
-    return nil;
-
-  NSRange domainRange = NSMakeRange(domainStartIndex,
-                                    [urlString length] - domainStartIndex);
-  NSRange pathStartRange = [urlString rangeOfString:@"/"
-                                            options:0
-                                              range:domainRange];
-  NSString* domainString;
-  if (pathStartRange.location == NSNotFound)
-    domainString = urlString;
-  else
-    domainString = [urlString substringToIndex:pathStartRange.location];
-  return [NSURL URLWithString:domainString];
-}
-
-@interface HGSCaminoBookmarksSource : HGSMemorySearchSource {
- @private
-  GTMFileSystemKQueue *fileKQueue_;
-}
-- (void)updateIndex;
+@interface HGSCaminoBookmarksSource : WebBookmarksSource
 - (void)indexCaminoBookmarksForDict:(NSDictionary *)dict;
 - (void)indexBookmark:(NSDictionary*)dict;
 @end
@@ -71,27 +40,26 @@ static NSURL* domainURLForURLString(NSString* urlString) {
 @implementation HGSCaminoBookmarksSource
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
-  if ((self = [super initWithConfiguration:configuration])) {
-    NSString *path = [kCaminoBookmarksPath stringByStandardizingPath];
-    GTMFileSystemKQueueEvents caminoEvents = (kGTMFileSystemKQueueDeleteEvent 
-                                              | kGTMFileSystemKQueueWriteEvent);
-    fileKQueue_
-      = [[GTMFileSystemKQueue alloc] initWithPath:path
-                                        forEvents:caminoEvents
-                                    acrossReplace:YES
-                                           target:self
-                                           action:@selector(fileChanged:event:)];
-    [self updateIndex];
+  NSArray *appSupportDirArray
+    = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, 
+                                          NSUserDomainMask,
+                                          YES);
+  if (![appSupportDirArray count]) {
+    // COV_NF_START
+    // App support is always there
+    HGSLog(@"Unable to find ~/Library/Application Support/");
+    [self release];
+    return nil;
+    // COV_NF_END
   }
-  return self;
+  NSString *appSupportDir = [appSupportDirArray objectAtIndex:0];
+  NSString *fileToWatch = [appSupportDir stringByAppendingPathComponent:@"Camino"];
+  fileToWatch = [fileToWatch stringByAppendingPathComponent:@"Bookmarks.plist"];
+  
+  return [super initWithConfiguration:configuration
+                      browserTypeName:@"camino"
+                          fileToWatch:fileToWatch];
 }
-
-- (void)dealloc {
-  [fileKQueue_ release];
-  [super dealloc];
-}
-
-#pragma mark -
 
 - (void)indexCaminoBookmarksForDict:(NSDictionary *)dict {
   NSArray *children = [dict objectForKey:@"Children"];
@@ -115,20 +83,13 @@ static NSURL* domainURLForURLString(NSString* urlString) {
   if (!url && [urlString rangeOfString:@"%s"].location != NSNotFound) {
     // If it couldn't make a URL because it choked on a search template
     // marker, just use the domain as a best-gues raw URL.
-    url = domainURLForURLString(urlString);
+    url = [self domainURLForURLString:urlString];
   }
   if (!url) {
     return;
   }
-  NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSUnderHomeRankFlag];
-  NSImage *icon = [NSImage imageNamed:@"blue-nav"];
-  NSMutableDictionary *attributes
-    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-       urlString, kHGSObjectAttributeSourceURLKey, 
-       rankFlags, kHGSObjectAttributeRankFlagsKey,
-       icon, kHGSObjectAttributeIconKey,
-       @"star-flag", kHGSObjectAttributeFlagIconNameKey,
-       nil];
+  
+  NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
   NSDate* lastVisit = [dict objectForKey:@"LastVisitedDate"];
   if (lastVisit) {
     [attributes setObject:lastVisit forKey:kHGSObjectAttributeLastUsedDateKey];
@@ -154,32 +115,15 @@ static NSURL* domainURLForURLString(NSString* urlString) {
                      forKey:kHGSObjectAttributeWebSearchTemplateKey];
     }
   }
-  HGSResult* result 
-    = [HGSResult resultWithURL:url
-                          name:title
-                          type:HGS_SUBTYPE(kHGSTypeWebBookmark, @"camino")
-                        source:self
-                    attributes:attributes];
-  // Get description terms, and store those as non-title-match data.
-  [self indexResult:result
-               name:nameString
-          otherTerm:[dict objectForKey:@"Description"]];
+  [self indexResultNamed:title URL:url otherAttributes:attributes];
 }
 
-- (void)updateIndex {
-  [self clearResultIndex];
-  NSString *path = [kCaminoBookmarksPath stringByStandardizingPath];
+
+- (void)updateIndexForPath:(NSString *)path {
   NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
   if (dict) {
     [self indexCaminoBookmarksForDict:dict];
   }
 }
 
-- (void)fileChanged:(GTMFileSystemKQueue *)queue 
-              event:(GTMFileSystemKQueueEvents)event {
-  [[self retain] autorelease];
-  [self updateIndex];
-}
-
 @end
-
