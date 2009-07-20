@@ -349,7 +349,7 @@ GTM_METHOD_CHECK(NSEnumerator,
       password = [keychainItem password];
       if (userName && password) {
         docService_ = [[GDataServiceGoogleDocs alloc] init];
-        [docService_ setUserAgent:@"QuickSearchBox-GoogleDocsSource.Docs-1.0"];
+        [docService_ setUserAgent:@"google-qsb-1.0"];
         [docService_ setUserCredentialsWithUsername: userName
                                            password: password];
         [docService_ setIsServiceRetryEnabled:YES];
@@ -390,8 +390,7 @@ GTM_METHOD_CHECK(NSEnumerator,
       }
       if (userName && password) {
         spreadsheetService_ = [[GDataServiceGoogleDocs alloc] init];
-        [spreadsheetService_ setUserAgent:
-         @"QuickSearchBox-GoogleDocsSource.Spreadsheets-1.0"];
+        [spreadsheetService_ setUserAgent:@"google-qsb-1.0"];
         [spreadsheetService_ setUserCredentialsWithUsername: userName
                                            password: password];
         [spreadsheetService_ setIsServiceRetryEnabled:YES];

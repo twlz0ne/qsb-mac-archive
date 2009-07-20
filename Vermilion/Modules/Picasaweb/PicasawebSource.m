@@ -205,7 +205,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
       NSString *password = [keychainItem password];
       if ([username length]) {
         picasawebService_ = [[GDataServiceGooglePhotos alloc] init];
-        [picasawebService_ setUserAgent:@"PicasawebSource"];
+        [picasawebService_ setUserAgent:@"google-qsb-1.0"];
         // If there is no password then we will only fetch public albums.
         if ([password length]) {
           [picasawebService_ setUserCredentialsWithUsername:username
