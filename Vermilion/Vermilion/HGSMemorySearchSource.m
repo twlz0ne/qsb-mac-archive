@@ -136,7 +136,7 @@ static NSString* const kHGSMemorySourceVersion = @"1";
         // Copy the result so any attributes looked up and cached don't stick.
         // Also take care of any dup folding not leaving set attributes on other
         // objects.
-        HGSResult *resultCopy = [[result copy] autorelease];
+        HGSMutableResult *resultCopy = [[result mutableCopy] autorelease];
         [results addObject:resultCopy];
       }
         

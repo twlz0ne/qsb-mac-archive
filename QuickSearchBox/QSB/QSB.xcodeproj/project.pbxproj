@@ -108,6 +108,7 @@
 				62370BA50FFC5B5E00C48624 /* PBXTargetDependency */,
 				5AB441590FFC312A00001976 /* PBXTargetDependency */,
 				F4EF8F830ECB3F85008DD6DA /* PBXTargetDependency */,
+				5A5832C0100BFD5E00EC32CF /* PBXTargetDependency */,
 			);
 			name = "QSB Application";
 			productName = "Add Plugins To QSB";
@@ -243,6 +244,17 @@
 		5A4D23FD0F4CD22B00F5C05B /* HGSCodeSignature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */; };
 		5A582F921002A9DA00EC32CF /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		5A582F991002AA4E00EC32CF /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
+		5A583243100BFC4D00EC32CF /* ClipboardSearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A58323D100BFC4D00EC32CF /* ClipboardSearchSource.m */; };
+		5A583244100BFC4D00EC32CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5A58323E100BFC4D00EC32CF /* InfoPlist.strings */; };
+		5A583245100BFC4D00EC32CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5A583240100BFC4D00EC32CF /* Localizable.strings */; };
+		5A58326A100BFD2100EC32CF /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
+		5A5832C2100BFD7100EC32CF /* Clipboard.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */; };
+		5A58332E100C006600EC32CF /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		5A58332F100C006D00EC32CF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
+		5A5833A1100D117200EC32CF /* ClipboardActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A5833A0100D117100EC32CF /* ClipboardActions.m */; };
+		5A5834A1100D523E00EC32CF /* ClipboardSearchSource.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A5834A0100D523E00EC32CF /* ClipboardSearchSource.h */; };
+		5A583542100D636000EC32CF /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
+		5A583728101120D300EC32CF /* clipboard.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5A583727101120D300EC32CF /* clipboard.icns */; };
 		5A5DF3E80FB3780A0068A25D /* Localizable.strings in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A5DF3DC0FB377790068A25D /* Localizable.strings */; };
 		5A61D1CF0F71CEAE007B9111 /* ApplicationsActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A61D1CE0F71CEAE007B9111 /* ApplicationsActions.m */; };
 		5A8A3B120E71BCBB00A0DB4F /* iTunesAlbumBrowserIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B090E71BCBB00A0DB4F /* iTunesAlbumBrowserIcon.png */; };
@@ -1126,6 +1138,27 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
+		5A5832BF100BFD5E00EC32CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A5831D9100BFBBB00EC32CF;
+			remoteInfo = Clipboard;
+		};
+		5A583545100D636400EC32CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BD97D090E636D8C00F5C83B;
+			remoteInfo = GTM;
+		};
+		5A583547100D636600EC32CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
+			remoteInfo = Vermilion;
+		};
 		5AB441580FFC312A00001976 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1844,6 +1877,7 @@
 			dstPath = "Quick Search Box.app/Contents/PlugIns";
 			dstSubfolderSpec = 16;
 			files = (
+				5A5832C2100BFD7100EC32CF /* Clipboard.hgs in CopyFiles */,
 				5AB441F80FFC31F100001976 /* DirectoryServices.hgs in CopyFiles */,
 				5A0BB2EB0FAB8B4400AA4858 /* Screensaver.hgs in CopyFiles */,
 				8B3E03CD0EF39E350036FFBD /* Shortcuts.hgs in CopyFiles */,
@@ -1878,6 +1912,7 @@
 				5AF0EF330F61D32E0041E0B9 /* Trash.hgs in CopyFiles */,
 				5AF0F5B90F6720B10041E0B9 /* Mount.hgs in CopyFiles */,
 				62370BB40FFC5B7A00C48624 /* StockQuoter.hgs in CopyFiles */,
+				5A5834A1100D523E00EC32CF /* ClipboardSearchSource.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1934,6 +1969,15 @@
 		5A4D237B0F462D2000F5C05B /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSCodeSignature.h; sourceTree = "<group>"; };
 		5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCodeSignature.m; sourceTree = "<group>"; };
+		5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Clipboard.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A5831DB100BFBBB00EC32CF /* Clipboard-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Clipboard-Info.plist"; sourceTree = "<group>"; };
+		5A58323C100BFC4D00EC32CF /* Clipboard-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Clipboard-Info.plist"; sourceTree = "<group>"; };
+		5A58323D100BFC4D00EC32CF /* ClipboardSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClipboardSearchSource.m; sourceTree = "<group>"; };
+		5A58323F100BFC4D00EC32CF /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5A583241100BFC4D00EC32CF /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		5A5833A0100D117100EC32CF /* ClipboardActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClipboardActions.m; sourceTree = "<group>"; };
+		5A5834A0100D523E00EC32CF /* ClipboardSearchSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClipboardSearchSource.h; sourceTree = "<group>"; };
+		5A583727101120D300EC32CF /* clipboard.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = clipboard.icns; sourceTree = "<group>"; };
 		5A5DF3DD0FB377790068A25D /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = Localizable.strings; sourceTree = "<group>"; };
 		5A61D1CE0F71CEAE007B9111 /* ApplicationsActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationsActions.m; sourceTree = "<group>"; };
 		5A8A3B090E71BCBB00A0DB4F /* iTunesAlbumBrowserIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesAlbumBrowserIcon.png; sourceTree = "<group>"; };
@@ -2773,6 +2817,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5A5831D8100BFBBB00EC32CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A58332E100C006600EC32CF /* Vermilion.framework in Frameworks */,
+				5A58332F100C006D00EC32CF /* Cocoa.framework in Frameworks */,
+				5A583542100D636000EC32CF /* GTM.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AB440F30FFC2F1F00001976 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -3225,6 +3279,7 @@
 				62370A5D0FFC59B000C48624 /* StockQuoter.hgs */,
 				5AB440F50FFC2F1F00001976 /* DirectoryServices.hgs */,
 				8B852BDE1007AD1B00880329 /* WebBookmarksTest.octest */,
+				5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3244,6 +3299,7 @@
 				5A4D237B0F462D2000F5C05B /* libcrypto.dylib */,
 				5A20A2AE0FD71946009F0A92 /* SecurityInterface.framework */,
 				5AB442230FFC36E800001976 /* DirectoryService.framework */,
+				5A5831DB100BFBBB00EC32CF /* Clipboard-Info.plist */,
 			);
 			name = GoogleDesktop;
 			sourceTree = "<group>";
@@ -3362,6 +3418,20 @@
 				5A0BB19C0FAB8A7D00AA4858 /* Screensaver.py */,
 			);
 			path = Screensaver;
+			sourceTree = "<group>";
+		};
+		5A58323B100BFC4D00EC32CF /* Clipboard */ = {
+			isa = PBXGroup;
+			children = (
+				5A583727101120D300EC32CF /* clipboard.icns */,
+				5A5833A0100D117100EC32CF /* ClipboardActions.m */,
+				5A5834A0100D523E00EC32CF /* ClipboardSearchSource.h */,
+				5A58323D100BFC4D00EC32CF /* ClipboardSearchSource.m */,
+				5A58323C100BFC4D00EC32CF /* Clipboard-Info.plist */,
+				5A58323E100BFC4D00EC32CF /* InfoPlist.strings */,
+				5A583240100BFC4D00EC32CF /* Localizable.strings */,
+			);
+			path = Clipboard;
 			sourceTree = "<group>";
 		};
 		5A5DF3DB0FB377790068A25D /* English.lproj */ = {
@@ -4197,6 +4267,7 @@
 				8B6F2D110DA2B83F0052CA40 /* Apps */,
 				F4E3B5B90EB657E300CB713D /* Calculator */,
 				623FA33A0E5C8C8C003630C1 /* ChatBuddies */,
+				5A58323B100BFC4D00EC32CF /* Clipboard */,
 				8B6F2D170DA2B83F0052CA40 /* Contacts */,
 				7F8DF7200DAD3E270007B812 /* Core */,
 				8B3D26680EAE8E73004EA504 /* DeveloperDocumentation */,
@@ -5112,6 +5183,25 @@
 			productReference = 5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
+		5A5831D9100BFBBB00EC32CF /* Clipboard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A58323A100BFC3C00EC32CF /* Build configuration list for PBXNativeTarget "Clipboard" */;
+			buildPhases = (
+				5A5831D6100BFBBB00EC32CF /* Resources */,
+				5A5831D7100BFBBB00EC32CF /* Sources */,
+				5A5831D8100BFBBB00EC32CF /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5A583546100D636400EC32CF /* PBXTargetDependency */,
+				5A583548100D636600EC32CF /* PBXTargetDependency */,
+			);
+			name = Clipboard;
+			productName = Clipboard;
+			productReference = 5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */;
+			productType = "com.apple.product-type.bundle";
+		};
 		5AB440F40FFC2F1F00001976 /* Directory Services */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5AB440FA0FFC2F2200001976 /* Build configuration list for PBXNativeTarget "Directory Services" */;
@@ -5912,16 +6002,16 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 8B989F360FA7B93C009DC652 /* Products */;
-					ProjectRef = 8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+					ProductGroup = 8B989F150FA7B93C009DC652 /* Products */;
+					ProjectRef = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
 					ProductGroup = 8B989F2B0FA7B93C009DC652 /* Products */;
 					ProjectRef = 8B989F2A0FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
-					ProductGroup = 8B989F150FA7B93C009DC652 /* Products */;
-					ProjectRef = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+					ProductGroup = 8B989F360FA7B93C009DC652 /* Products */;
+					ProjectRef = 8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
 					ProductGroup = 8B637B4D0F2777C300997738 /* Products */;
@@ -5958,6 +6048,7 @@
 				8B6F2F400DA2C37C0052CA40 /* Applications */,
 				F4E3B57B0EB6573300CB713D /* Calculator */,
 				623FA35E0E5C8D97003630C1 /* ChatBuddies */,
+				5A5831D9100BFBBB00EC32CF /* Clipboard */,
 				8B6F2F200DA2BB660052CA40 /* Contacts */,
 				F4FEECCC0EC4BF99000758EC /* CorePlugin */,
 				8B3D266E0EAE8E7A004EA504 /* Developer Documentation */,
@@ -6125,6 +6216,16 @@
 				5A0BB19E0FAB8A7D00AA4858 /* Screensaver.py in Resources */,
 				8BDF419D0FABCE5A00A7BF86 /* Localizable.strings in Resources */,
 				8BDF458B0FAEAEC500A7BF86 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A5831D6100BFBBB00EC32CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A583244100BFC4D00EC32CF /* InfoPlist.strings in Resources */,
+				5A583245100BFC4D00EC32CF /* Localizable.strings in Resources */,
+				5A583728101120D300EC32CF /* clipboard.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7332,6 +7433,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5A5831D7100BFBBB00EC32CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A583243100BFC4D00EC32CF /* ClipboardSearchSource.m in Sources */,
+				5A58326A100BFD2100EC32CF /* HGSBundle.m in Sources */,
+				5A5833A1100D117200EC32CF /* ClipboardActions.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AB440F20FFC2F1F00001976 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -7909,6 +8020,21 @@
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 5A582F961002AA1000EC32CF /* PBXContainerItemProxy */;
 		};
+		5A5832C0100BFD5E00EC32CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A5831D9100BFBBB00EC32CF /* Clipboard */;
+			targetProxy = 5A5832BF100BFD5E00EC32CF /* PBXContainerItemProxy */;
+		};
+		5A583546100D636400EC32CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BD97D090E636D8C00F5C83B /* GTM */;
+			targetProxy = 5A583545100D636400EC32CF /* PBXContainerItemProxy */;
+		};
+		5A583548100D636600EC32CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
+			targetProxy = 5A583547100D636600EC32CF /* PBXContainerItemProxy */;
+		};
 		5AB441590FFC312A00001976 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5AB440F40FFC2F1F00001976 /* Directory Services */;
@@ -8312,6 +8438,22 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		5A58323E100BFC4D00EC32CF /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5A58323F100BFC4D00EC32CF /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		5A583240100BFC4D00EC32CF /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5A583241100BFC4D00EC32CF /* English */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		5A5DF3DC0FB377790068A25D /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -9113,6 +9255,36 @@
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Screensaver/Screensaver-Info.plist";
 				PRODUCT_NAME = Screensaver;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Release;
+		};
+		5A5831DC100BFBBC00EC32CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Clipboard/Clipboard-Info.plist";
+				PRODUCT_NAME = Clipboard;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Debug;
+		};
+		5A5831DD100BFBBC00EC32CF /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Clipboard/Clipboard-Info.plist";
+				PRODUCT_NAME = Clipboard;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		5A5831DE100BFBBC00EC32CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Clipboard/Clipboard-Info.plist";
+				PRODUCT_NAME = Clipboard;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = Release;
@@ -10700,6 +10872,16 @@
 				5A0BB16A0FAB8A6500AA4858 /* Debug */,
 				5A0BB16B0FAB8A6500AA4858 /* Debug-gcov */,
 				5A0BB16C0FAB8A6500AA4858 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A58323A100BFC3C00EC32CF /* Build configuration list for PBXNativeTarget "Clipboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A5831DC100BFBBC00EC32CF /* Debug */,
+				5A5831DD100BFBBC00EC32CF /* Debug-gcov */,
+				5A5831DE100BFBBC00EC32CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
