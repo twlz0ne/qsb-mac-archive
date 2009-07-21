@@ -52,6 +52,9 @@ typedef enum {
   kQSBResultDescriptionSourceURL
 } QSBResultDescriptionItemType;
 
+static NSString *const kClipboardCopyActionIdentifier
+  = @"com.google.qsb.clipboard.action.copy";
+
 @interface QSBTableResult ()
 
 - (void)addAttributes:(NSMutableAttributedString*)string
@@ -532,30 +535,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (BOOL)copyToPasteboard:(NSPasteboard *)pb {
   BOOL didCopy = NO;
   HGSResult *result = [self representedResult];
-  NSDictionary *values
-    = [result valueForKey:kHGSObjectAttributePasteboardValueKey];
-  if (values) {
-    [pb declareTypes:[values allKeys] owner:nil];
-    for (NSString *type in values) {
-      id value = [values objectForKey:type];
-      BOOL goodWrite = NO;
-      if ([value isKindOfClass:[NSURL class]]) {
-        [value writeToPasteboard:pb];
-        goodWrite = YES;
-      } else if ([value isKindOfClass:[NSArray class]] 
-                 || [value isKindOfClass:[NSDictionary class]]) {
-        goodWrite = [pb setPropertyList:value forType:type];
-      } else if ([value isKindOfClass:[NSString class]]) {
-        goodWrite = [pb setString:value forType:type];
-      } else if ([value isKindOfClass:[NSData class]]) {
-        goodWrite = [pb setData:value forType:type];
-      } 
-      if (!goodWrite) {
-        HGSLogDebug(@"Unable to write class %@ (%@) for type %@ to pasteboard",
-                    [value class], value, type);
-      }
-      didCopy |= goodWrite;
-    }
+  HGSAction *action = [[HGSExtensionPoint actionsPoint]
+                       extensionWithIdentifier:kClipboardCopyActionIdentifier];
+  if (result && action) {
+    HGSResultArray *resultArray = [HGSResultArray arrayWithResult:result];
+    NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+                          resultArray, kHGSActionDirectObjectsKey,
+                          nil];
+    didCopy = [action performWithInfo:info];
   }
   return didCopy;
 }
