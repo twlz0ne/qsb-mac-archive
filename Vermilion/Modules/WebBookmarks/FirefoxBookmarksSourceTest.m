@@ -43,6 +43,16 @@
 @implementation FirefoxBookmarksSourceTest
 - (void)setUp {
   NSBundle *hgsBundle = HGSGetPluginBundle();
+  NSString *firefoxSupportDir
+    = [@"~/Library/Application Support/Firefox" stringByExpandingTildeInPath];
+  NSFileManager *fm = [NSFileManager defaultManager];
+  if (![fm fileExistsAtPath:firefoxSupportDir]) {
+    NSString *firefoxResourceDir
+      = [[hgsBundle resourcePath] stringByAppendingPathComponent:@"Firefox"];
+    STAssertTrue([fm copyPath:firefoxResourceDir
+                       toPath:firefoxSupportDir
+                      handler:nil], @"Could not copy Firefox app support");
+  }
   NSString *bundlePath = [hgsBundle bundlePath];
   NSString *workingDir = [bundlePath stringByDeletingLastPathComponent];
   NSString *path 
