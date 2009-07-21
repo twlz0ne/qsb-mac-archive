@@ -77,12 +77,16 @@ static NSURL* IconURLForResult(HGSResult *result) {
     if ([[url scheme] isEqualToString:@"http"]) {
       NSString *thumbnailURL = [[NSUserDefaults standardUserDefaults]
                                stringForKey:kHGSIconProviderThumbnailURLFormat]; 
+      NSURL *newURL = nil;
       if (thumbnailURL) {
         thumbnailURL
           = [NSString stringWithFormat:thumbnailURL,[url absoluteString]];
-        url = [NSURL URLWithString:thumbnailURL];
+        newURL = [NSURL URLWithString:thumbnailURL];
       } else {
-        url = [NSURL URLWithString:@"/favicon.ico" relativeToURL:url];
+        newURL = [NSURL URLWithString:@"/favicon.ico" relativeToURL:url];
+      }
+      if (newURL) {
+        url = newURL;
       }
     }
   }
@@ -250,8 +254,7 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
   if (icon) {
     HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
     [sharedIconProvider setIcon:icon 
-                      forResult:result 
-                        withURI:[url absoluteString]];
+                      forResult:result];
   }
   return icon;
 }
@@ -291,8 +294,7 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
     }
     if (icon) {
       [sharedIconProvider setIcon:icon 
-                        forResult:result 
-                          withURI:[url absoluteString]];
+                        forResult:result];
     }
   }
   [sharedIconProvider removeOperation:self];
@@ -373,8 +375,7 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
   [NSGraphicsContext restoreGraphicsState];
   [icon addRepresentation:imageRep];
   if (icon) {
-    NSString *uri = [url absoluteString];
-    [sharedIconProvider setIcon:icon forResult:result_ withURI:uri];
+    [sharedIconProvider setIcon:icon forResult:result_];
   }
   [sharedIconProvider removeOperation:self];
 }
@@ -437,26 +438,32 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   return compoundPlaceHolderIcon_;
 }
 
-- (NSImage *)provideIconForResult:(HGSResult*)result
-                  skipPlaceholder:(BOOL)skipPlaceholder {
+- (NSImage *)cachedIconForResult:(HGSResult *)result {
   NSImage *icon = nil;
   NSURL *url = IconURLForResult(result);
   if (url) {
     NSString *urlString = [url absoluteString];
     icon = [self cachedIconForKey:urlString];
-    if (!icon) { 
-      HGSIconOperation *operation = [HGSIconOperation iconOperationForResult:result];
-      if (skipPlaceholder) {
-        icon = [operation basicDiskLoad:result];
-      } else {
-        icon = [self placeHolderIcon];
-      }
-      @synchronized(self) {
-        // Don't add if we're already doing a load for this object
-        if (![iconOperations_ member:operation]) {
-          [iconOperations_ addObject:operation];
-          [operation beginLoading];
-        }
+  }
+  return icon;
+}
+
+- (NSImage *)provideIconForResult:(HGSResult*)result
+                  skipPlaceholder:(BOOL)skipPlaceholder {
+  NSImage *icon = [self cachedIconForResult:result];
+  if (!icon) { 
+    HGSIconOperation *operation 
+      = [HGSIconOperation iconOperationForResult:result];
+    if (skipPlaceholder) {
+      icon = [operation basicDiskLoad:result];
+    } else {
+      icon = [self placeHolderIcon];
+    }
+    @synchronized(self) {
+      // Don't add if we're already doing a load for this object
+      if (![iconOperations_ member:operation]) {
+        [iconOperations_ addObject:operation];
+        [operation beginLoading];
       }
     }
   }
@@ -579,13 +586,13 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 }
 
 - (void)setIcon:(NSImage *)icon 
-      forResult:(HGSResult *)result 
-        withURI:(NSString *)uri {
+      forResult:(HGSResult *)result {
+  NSURL *url = IconURLForResult(result);
   NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
                         result, kHGSIconProviderResultKey,
                         icon, kHGSIconProviderValueKey,
                         kHGSObjectAttributeIconKey, kHGSIconProviderAttrKey,
-                        uri, kHGSIconProviderURIKey,
+                        [url absoluteString], kHGSIconProviderURIKey,
                         nil];
   [self performSelectorOnMainThread:@selector(setValueOnMainThread:)
                          withObject:args

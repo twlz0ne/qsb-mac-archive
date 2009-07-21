@@ -205,7 +205,7 @@ typedef NSUInteger HGSRankFlags;
 /*!
  Is it a local file
 */
-@property (readonly) BOOL localFile;
+@property (readonly, getter=isFileResult) BOOL fileResult;
 /*!
  Filepath for the result
 */

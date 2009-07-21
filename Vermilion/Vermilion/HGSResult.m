@@ -41,6 +41,7 @@
 #import "HGSPluginLoader.h"
 #import "HGSDelegate.h"
 #import "HGSBundle.h"
+#import "GTMNSString+URLArguments.h"
 
 // storage and initialization for value names
 NSString* const kHGSObjectAttributeNameKey = @"kHGSObjectAttributeName";
@@ -76,7 +77,7 @@ NSString* const kHGSObjectAttributeContactsKey = @"kHGSObjectAttributeContactsKe
 NSString* const kHGSObjectAttributeAlternateActionURIKey = @"kHGSObjectAttributeAlternateActionURI";
 NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey = @"kHGSObjectAttributeAddressBookRecordIdentifier";
 
-static NSString* const kHGSResultFileSchemePrefix = @"file://";
+static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
 
 @interface HGSResult ()
 @property (readonly) NSDictionary *attributes;
@@ -128,6 +129,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   if (!type) {
     type = kHGSTypeFile;
   }
+  path = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
   NSString *uri 
     = [NSString stringWithFormat:@"%@%@", kHGSResultFileSchemePrefix, path];
   return [self resultWithURI:uri
@@ -155,6 +157,16 @@ GTM_METHOD_CHECK(NSString, readableURLString);
       [self release];
       return nil;
     }
+#if DEBUG
+    // This is a debug runtime check to make sure our URIs are valid URLs.
+    // We do allow "some" invalid URLS. search urls with %s in them for example.
+    BOOL validURL =  [NSURL URLWithString:uri] != nil;
+    validURL |= [uri rangeOfString:@"%s"].location == NSNotFound;
+    validURL |= [uri hasPrefix:@"javascript:"];
+    if (!validURL) {
+      HGSLog(@"Bad URI - %@ from Source %@", uri, source);
+    }
+#endif
     NSMutableDictionary *abridgedAttrs 
       = [NSMutableDictionary dictionaryWithDictionary:attributes];
     [abridgedAttrs removeObjectsForKeys:[NSArray arrayWithObjects:
@@ -287,7 +299,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
       &&[object isKindOfClass:[HGSResult class]]) {
     HGSResult *hgsResult = (HGSResult*)object;
     equal = [object isOfType:[self type]]
-      && [[hgsResult url] isEqual:[self url]];
+      && [hgsResult->uri_ isEqual:uri_];
   }
   return equal;
 }
@@ -354,14 +366,15 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   return result;
 }
 
-- (BOOL)localFile {
+- (BOOL)isFileResult {
   return [uri_ hasPrefix:kHGSResultFileSchemePrefix];
 }
 
 - (NSString *)filePath {
   NSString *path = nil;
-  if ([self localFile]) {
+  if ([self isFileResult]) {
     path = [uri_ substringFromIndex:[kHGSResultFileSchemePrefix length]];
+    path = [path stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
   }
   return path;
 }

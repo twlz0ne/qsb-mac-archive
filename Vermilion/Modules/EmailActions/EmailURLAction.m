@@ -102,8 +102,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (BOOL)appliesToResult:(HGSResult *)result {
   // We don't want to send fileURLs
-  NSURL *url = [result url];
-  BOOL doesApply = ![url isFileURL];
+  BOOL doesApply = ![result isFileResult];
   return doesApply;
 }
 

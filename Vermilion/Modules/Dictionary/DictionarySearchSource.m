@@ -74,8 +74,8 @@ static const int kMinQueryLength = 3;
     if (pivotObject) {
       isValid = NO;
       if ([[pivotObject type] isEqual:kHGSTypeFileApplication]) {
-        NSURL *url = [pivotObject url];
-        NSBundle *bnd = [NSBundle bundleWithPath:[url path]];
+        NSString *path = [pivotObject filePath];
+        NSBundle *bnd = [NSBundle bundleWithPath:path];
         if ([[bnd bundleIdentifier] isEqual:kDictionaryAppBundleId]) {
           isValid = ([[query rawQueryString] length] > 0);
         }

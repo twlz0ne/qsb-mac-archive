@@ -224,7 +224,7 @@ static inline int KeyLength(NSString *a, NSString *b, void *c) {
     return NO;
   }
   
-  NSURL *identifier = [result url];
+  NSString *identifier = [result uri];
   if (!identifier) {
     HGSLogDebug(@"HGSResult had no identifier (%@)", result);
     return NO;
@@ -236,15 +236,13 @@ static inline int KeyLength(NSString *a, NSString *b, void *c) {
   if (!archiveDict || [archiveDict count] == 0) {
     return NO;
   }
-  
-  NSString *idString = [identifier absoluteString];
-  
+    
   @synchronized ([self class]) {
     NSMutableArray *valueArray 
       = [[[self arrayForShortcut:normalizeShortcut] mutableCopy] autorelease];
     // see if we have an array for the given shortcut
     
-    int currentIndex = [valueArray indexOfObject:idString];
+    int currentIndex = [valueArray indexOfObject:identifier];
     
     // The only way to be inserted at 0 is if you are in 2nd place, 
     // otherwise insert at 1
@@ -257,9 +255,9 @@ static inline int KeyLength(NSString *a, NSString *b, void *c) {
       if (!valueArray) {
         valueArray = [NSMutableArray array]; 
       } else {
-        [valueArray removeObject:idString];
+        [valueArray removeObject:identifier];
       }
-      [valueArray insertObject:idString atIndex:newIndex];
+      [valueArray insertObject:identifier atIndex:newIndex];
     }
     
     // Clamp the number of shortcuts to kMaxEntriesPerShortcut.
@@ -274,7 +272,7 @@ static inline int KeyLength(NSString *a, NSString *b, void *c) {
     NSString *srcId = [source identifier];
     NSDictionary *archiveData = [NSDictionary dictionaryWithObject:archiveDict 
                                                             forKey:srcId];
-    [[self cache] setValue:archiveData forKey:idString];
+    [[self cache] setValue:archiveData forKey:identifier];
     HGSLogDebug(@"Shortcut recorded: %@ = %@", shortcut, result);
   }
   return YES;

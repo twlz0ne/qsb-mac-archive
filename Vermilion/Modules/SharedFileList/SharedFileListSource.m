@@ -187,25 +187,12 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
     [path autorelease];
     DisposeHandle((Handle)alias);
     if (err) continue;
-    NSURL *url = [NSURL fileURLWithPath:path];
-    
-    /*
-     CFURLRef cfURL = NULL;
-     err = LSSharedFileListItemResolve(itemRef, 
-                                      kLSSharedFileListNoUserInteraction
-                                      | kLSSharedFileListDoNotMountVolumes, 
-                                      &cfURL, NULL);
-    
-    
-    if (err) continue;
-    NSURL *url = GTMCFAutorelease(cfURL);*/
-    
     
     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                 item, kObjectAttributeSharedFileListItem,
                                 nil];
     
-    HGSResult *result = [HGSResult resultWithFilePath:[url path]
+    HGSResult *result = [HGSResult resultWithFilePath:path
                                                source:self
                                            attributes:attributes];
     [results addObject:result];
@@ -247,8 +234,8 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
   NSMutableArray *goodFiles = [NSMutableArray arrayWithCapacity:[results count]];
   NSFileManager *fm = [NSFileManager defaultManager];
   for (HGSResult *fileResult in results) {
-    NSURL *url = [fileResult url];
-    if ([url isFileURL] && [fm fileExistsAtPath:[url path] isDirectory:NULL]) {
+    NSString *path = [fileResult filePath];
+    if (path && [fm fileExistsAtPath:path isDirectory:NULL]) {
       [goodFiles addObject:fileResult];
     }
   }

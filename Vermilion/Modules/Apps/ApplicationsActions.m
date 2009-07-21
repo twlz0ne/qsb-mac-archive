@@ -61,10 +61,10 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
 
 - (BOOL)appliesToResult:(HGSResult *)result {
   NSArray *apps = [[NSWorkspace sharedWorkspace] gtm_launchedApplications];
+  NSString *resultPath = [result filePath];
   for (NSDictionary *app in apps) {
     NSString *path = [app objectForKey:@"NSApplicationPath"];
-    NSURL *url = [result url];
-    if (path && [url isFileURL] && [path isEqual:[url path]]) {
+    if ([resultPath isEqual:path]) {
       return YES;
     }
   }
@@ -223,9 +223,9 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
   BOOL quit = NO;
   
   HGSResultArray *directObjects
-  = [info objectForKey:kHGSActionDirectObjectsKey];
+    = [info objectForKey:kHGSActionDirectObjectsKey];
   for (HGSResult *result in directObjects) {
-    NSString *path = [[result url] path];
+    NSString *path = [result filePath];
     NSString *bundleID = [[NSBundle bundleWithPath:path] bundleIdentifier];
     const char *bundleIDUTF8 = [bundleID UTF8String];
     if (bundleIDUTF8) {

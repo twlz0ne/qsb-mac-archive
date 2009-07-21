@@ -373,7 +373,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   BOOL isValid = [super isValidSourceForQuery:query];
   HGSResult *pivot = [query pivotObject];
   if (isValid && [query pivotObject]) {
-    NSString *path = [[pivot url] absoluteString];
+    NSString *path = [pivot filePath];
     isValid = [path hasSuffix:@"/iChat.app/"];
   }
   return isValid;

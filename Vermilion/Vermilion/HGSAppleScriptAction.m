@@ -199,8 +199,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
         NSMutableArray *params 
           = [NSMutableArray arrayWithCapacity:[directObjects count]];
         for (HGSResult *hgsResult in directObjects) {
-          NSURL *url = [hgsResult url];
-          NSString *urlString = [url absoluteString];
+          NSString *urlString = [hgsResult uri];
           NSString *title = [hgsResult displayName];
           NSAppleEventDescriptor *record 
             = [NSAppleEventDescriptor recordDescriptor];

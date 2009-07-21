@@ -32,6 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import <arpa/inet.h>
+#import "GTMGarbageCollection.h"
 
 static const NSTimeInterval kServiceResolutionTimeout = 5.0;
 
@@ -216,6 +217,7 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
       // TODO(alcor): badge this with the bonjour icon
       // NSImage *bonjour = [NSImage imageNamed:NSImageNameBonjour];
       value = [[NSWorkspace sharedWorkspace] iconForFile:[appURL path]];
+      GTMCFAutorelease(appURL);
     }
   
   }

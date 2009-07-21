@@ -94,7 +94,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
                                      arguments:arguments];
       } else {
         urlString = [NSString stringWithFormat:searchFormat,
-                     escapedString, [[result url] host]];
+                     escapedString, host];
       }
     }
   }

@@ -108,9 +108,13 @@
   This can be called from any thread. The actual setting happens on the main
   thread.
 */
-- (void)setIcon:(NSImage *)icon
-      forResult:(HGSResult *)result 
-        withURI:(NSString *)uri;
+- (void)setIcon:(NSImage *)icon forResult:(HGSResult *)result;
+
+/*!
+ Returns an NSImage * for a result if we have one cached, otherwise
+ returns nil.
+*/
+- (NSImage *)cachedIconForResult:(HGSResult *)result;
 
 - (NSImage *)imageWithRoundRectAndDropShadow:(NSImage *)image;
 

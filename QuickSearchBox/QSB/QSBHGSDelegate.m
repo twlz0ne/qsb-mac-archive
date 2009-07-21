@@ -198,7 +198,7 @@ static NSString *const kWebURLsWithTitlesPboardType
       NSArray *webUrlsWithTitles 
         = [NSArray arrayWithObjects:urlArray, titleArray, nil];
                                     
-      [pbValues setObject:[result url] forKey:NSURLPboardType];
+      [pbValues setObject:url forKey:NSURLPboardType];
       [pbValues setObject:webUrlsWithTitles 
                    forKey:kWebURLsWithTitlesPboardType];
       [pbValues setObject:name forKey:@"public.url-name"];

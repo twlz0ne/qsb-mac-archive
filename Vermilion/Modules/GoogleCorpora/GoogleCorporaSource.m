@@ -253,15 +253,15 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
 - (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
   return [NSMutableDictionary
-            dictionaryWithObject:[result url]
+            dictionaryWithObject:[result uri]
                           forKey:kHGSObjectAttributeURIKey];
 }
 
 - (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
   NSString *identifier = [representation objectForKey:kHGSObjectAttributeURIKey];
   for (HGSResult *corpus in searchableCorpora_) {
-    NSURL *url = [corpus url];
-    if ([url isEqual:identifier])
+    NSString *uri = [corpus uri];
+    if ([uri isEqual:identifier])
       return corpus;
   }
   

@@ -61,8 +61,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   BOOL isValid = YES;
   HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
-    NSURL *url = [pivotObject url];
-    isValid = [url isFileURL];
+    isValid = [pivotObject isFileResult];
   } 
   return isValid;
 }
@@ -80,14 +79,14 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     NSMutableArray *results = [NSMutableArray array];
     
     LSItemInfoRecord infoRec;
-    CFURLRef cfurl = (CFURLRef) [NSURL fileURLWithPath:path];
-    OSStatus err = LSCopyItemInfoForURL(cfurl, kLSRequestAllInfo, &infoRec);
+    OSStatus err = LSCopyItemInfoForURL((CFURLRef)url, 
+                                        kLSRequestAllInfo, &infoRec);
     
     // If the path is an alias, we resolve before continuing
     if (err == noErr && (infoRec.flags & kLSItemInfoIsAliasFile)) {
         FSRef aliasRef;
         
-      if (CFURLGetFSRef(cfurl, &aliasRef)) {
+      if (CFURLGetFSRef((CFURLRef)url, &aliasRef)) {
         Boolean targetIsFolder;
         Boolean wasAliased;
         err = FSResolveAliasFileWithMountFlags(&aliasRef, 

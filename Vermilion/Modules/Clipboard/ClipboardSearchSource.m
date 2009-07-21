@@ -74,7 +74,7 @@ static NSString *const kClipboardCopyAction
          clipboardIcon_, kHGSObjectAttributeIconKey,
          nil];
     HGSResult *result
-      = [HGSResult resultWithURL:[NSURL URLWithString:urlString]
+      = [HGSResult resultWithURI:urlString
                             name:name
                             type:kTypeClipboardGeneric
                           source:self

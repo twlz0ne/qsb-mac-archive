@@ -125,14 +125,15 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
   HGSResult *pivotObject = [query pivotObject];
   
   NSURL *identifier = [pivotObject url];
+  NSString *host = [identifier host];
   NSString *site = nil;
 
   
-  if ([[identifier host] isEqualToString:@"www.google.com"]
-      || [[identifier host] isEqualToString:@"google.com"]) {
+  if ([host isEqualToString:@"www.google.com"]
+      || [host isEqualToString:@"google.com"]) {
     site = nil; 
-  } else if ([[identifier host] isEqualToString:@"www.wikipedia.com"]
-      || [[identifier host] isEqualToString:@"wikipedia.com"]) {
+  } else if ([host isEqualToString:@"www.wikipedia.com"]
+      || [host isEqualToString:@"wikipedia.com"]) {
     // We hardcode www to en for wikipedia alone
     // TODO(alcor): figure a nicer way to do this, allowing localized urls
     site = @"en.wikipedia.org";

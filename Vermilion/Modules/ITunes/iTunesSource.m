@@ -444,8 +444,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   }
   
   if ([album length]) {
-    NSURL *url = [pivotObject url];
-    NSString *path = [url absoluteString];
+    NSString *path = [pivotObject filePath];
     HGSResult *newAlbum = [self albumResult:album
                                    byArtist:artist
                                  byComposer:composer
@@ -869,7 +868,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   NSMutableDictionary *attributes 
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
-       [NSURL URLWithString:iconFilePath], kHGSObjectAttributeIconPreviewFileKey,
+       [NSURL fileURLWithPath:iconFilePath], kHGSObjectAttributeIconPreviewFileKey,
        [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
        albumIcon_, kHGSObjectAttributeIconKey,
        nil];

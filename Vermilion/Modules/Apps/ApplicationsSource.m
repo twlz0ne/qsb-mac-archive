@@ -287,8 +287,7 @@ static NSString *const kApplicationSourcePredicateString
   if (isValid) {
     HGSResult *pivotObject = [query pivotObject];
     if (pivotObject) {
-      NSURL *url = [pivotObject url];
-      NSString *appName = [[url absoluteString] lastPathComponent];
+      NSString *appName = [[pivotObject filePath] lastPathComponent];
       isValid = [appName isEqualToString:@"System%20Preferences.app"];
     }
   }
@@ -314,8 +313,7 @@ static NSString *const kApplicationSourcePredicateString
     NSMutableIndexSet *itemsToRemove = [NSMutableIndexSet indexSet];
     NSUInteger indexToRemove = 0;
     for (HGSResult *result in results) {
-      NSURL *url = [result url];
-      NSString *absolutePath = [url absoluteString];
+      NSString *absolutePath = [result filePath];
         // TODO(alcor): ignore invalid preference panes
       if (![self pathIsPrefPane:absolutePath]) {
         [itemsToRemove addIndex:indexToRemove];

@@ -210,11 +210,10 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
   // or to the file's creation date.
   [imageEntry setTimestamp:[GDataPhotoTimestamp
                             timestampWithDate:[NSDate date]]];
-  NSURL *imageURL = [imageResult url];
-  NSData *imageData = [NSData dataWithContentsOfURL:imageURL];
+  NSString *imagePath = [imageResult filePath];
+  NSData *imageData = [NSData dataWithContentsOfFile:imagePath];
   if (imageData) {
     [imageEntry setPhotoData:imageData];
-    NSString *imagePath = [imageURL absoluteString];
     // TODO(mrossetti): Simplify the following if/when MIMETypeForFileAtPath:
     // is more reliable.
     NSString *mimeType = [GDataUtilities MIMETypeForFileAtPath:imagePath
@@ -275,12 +274,12 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
         errorString = [NSString stringWithFormat:errorString, imageName];
         [self informUserWithDescription:errorString
                             successCode:kHGSSuccessCodeError];
-        HGSLogDebug(@"Upload of '%@' timed out.", imageURL);
+        HGSLogDebug(@"Upload of '%@' timed out.", imagePath);
       }
     } while ([activeTickets_ containsObject:uploadImageTicket]);
     [uploadImageTicket release];
   } else {
-    HGSLogDebug(@"Failed to load imageData for '%@'.", imageURL);
+    HGSLogDebug(@"Failed to load imageData for '%@'.", imagePath);
   }
 }
 

@@ -40,10 +40,10 @@
 
 - (BOOL)appliesToResult:(HGSResult *)result {
   BOOL applies = NO;
-  NSURL *url = [result url];
-  if ([url isFileURL]) {
+  NSString *filePath = [result filePath];
+  if (filePath) {
     applies = YES;
-    NSArray *pathComponents = [[url path] pathComponents];
+    NSArray *pathComponents = [filePath pathComponents];
     for (NSString *part in pathComponents) {
       // Don't offer "Move to Trash" for an item
       // already in one of the trashes.

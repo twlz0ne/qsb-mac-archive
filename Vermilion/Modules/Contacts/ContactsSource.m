@@ -150,8 +150,12 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
       name = [person valueForProperty:kABOrganizationProperty];
     }
     if (name) {
-      NSString *urlString = [NSString stringWithFormat:kMetaDataFilePath, [person uniqueId]];
+      NSString *urlString = [NSString stringWithFormat:kMetaDataFilePath, 
+                             [person uniqueId]];
       urlString = [urlString stringByExpandingTildeInPath];
+      urlString 
+        = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+      urlString = [@"file://localhost" stringByAppendingString:urlString];
       NSString *multiValueKeys[] = {
         kABEmailProperty,
         kABAIMInstantProperty,
@@ -510,10 +514,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
     HGSIconProvider *iconProvider = [HGSIconProvider sharedIconProvider];
     image = [iconProvider imageWithRoundRectAndDropShadow:image];
     if (image) {
-      NSString *uri = [[result url] absoluteString];
-      [iconProvider setIcon:image
-                  forResult:result 
-                    withURI:uri];
+      [iconProvider setIcon:image forResult:result];
     }
   }
 }
@@ -521,7 +522,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 - (ABRecord *)personForResult:(HGSResult *)result {
   ABRecord *person = nil;
   if ([result conformsToType:kTypeContactAddressBook]) {
-    NSString *uid = [[result url] path];
+    NSString *uid = [result filePath];
     uid = [uid lastPathComponent];
     uid = [uid stringByDeletingPathExtension];
     if (uid) {
@@ -532,13 +533,19 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 }
 
 - (NSImage *)loadImageForObject:(HGSResult *)result {
-  ABPerson *person = (ABPerson *)[self personForResult:result];
-  NSInteger tag = [person beginLoadingImageDataForClient:self];
-  NSNumber *tagNumber = [NSNumber numberWithInteger:tag];
-  @synchronized(imageLoadingTags_) {
-    [imageLoadingTags_ setObject:result forKey:tagNumber];
+  NSImage *image 
+    = [[HGSIconProvider sharedIconProvider] cachedIconForResult:result];
+  if (!image) {
+    ABPerson *person = (ABPerson *)[self personForResult:result];
+    NSInteger tag = [person beginLoadingImageDataForClient:self];
+    NSNumber *tagNumber = [NSNumber numberWithInteger:tag];
+
+    @synchronized(imageLoadingTags_) {
+      [imageLoadingTags_ setObject:result forKey:tagNumber];
+    }
+    image = [self genericContactImage];
   }
-  return  [self genericContactImage];   
+  return image;
 }
 
 - (BOOL)providesIconsForResults {
@@ -561,7 +568,10 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
   } else if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
     value = [self loadImageForObject:result];
   } else if ([key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
-    value = [self genericContactImage];
+    value = [[HGSIconProvider sharedIconProvider] cachedIconForResult:result];
+    if (!value) {
+      value = [self genericContactImage];
+    }
   } else if ([key isEqualToString:kHGSObjectAttributeSnippetKey]) {
     ABRecord *person = [self personForResult:result];
     

@@ -81,8 +81,7 @@ enum {
 
 - (BOOL)appliesToResult:(HGSResult *)result {
   // TODO(mrossetti: Only accept webpage results created by the GoogleDocsSource.
-  NSURL *url = [result url];
-  BOOL doesApply = ![url isFileURL];
+  BOOL doesApply = ![result isFileResult];
   NSString *category = [result valueForKey:kGoogleDocsDocCategoryKey];
   doesApply = (category != nil);
   return doesApply;

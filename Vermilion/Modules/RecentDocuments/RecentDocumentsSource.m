@@ -67,8 +67,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
   NSString *normalizedQuery = [query normalizedQueryString];
   if (![normalizedQuery length]) normalizedQuery = nil;
   if (pivotObject) {
-    NSURL *url = [pivotObject url];
-    NSString *appPath = [url path];
+    NSString *appPath = [pivotObject filePath];
     if (appPath) {
       NSBundle *appBundle = [[[NSBundle alloc]
                                initWithPath:appPath] autorelease];
