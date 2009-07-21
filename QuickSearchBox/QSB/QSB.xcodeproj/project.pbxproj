@@ -1970,7 +1970,6 @@
 		5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSCodeSignature.h; sourceTree = "<group>"; };
 		5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCodeSignature.m; sourceTree = "<group>"; };
 		5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Clipboard.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
-		5A5831DB100BFBBB00EC32CF /* Clipboard-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Clipboard-Info.plist"; sourceTree = "<group>"; };
 		5A58323C100BFC4D00EC32CF /* Clipboard-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Clipboard-Info.plist"; sourceTree = "<group>"; };
 		5A58323D100BFC4D00EC32CF /* ClipboardSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClipboardSearchSource.m; sourceTree = "<group>"; };
 		5A58323F100BFC4D00EC32CF /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -3296,10 +3295,6 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				D45B92550A3F6E68003A5A05 /* Libraries */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				5A4D237B0F462D2000F5C05B /* libcrypto.dylib */,
-				5A20A2AE0FD71946009F0A92 /* SecurityInterface.framework */,
-				5AB442230FFC36E800001976 /* DirectoryService.framework */,
-				5A5831DB100BFBBB00EC32CF /* Clipboard-Info.plist */,
 			);
 			name = GoogleDesktop;
 			sourceTree = "<group>";
@@ -4874,6 +4869,9 @@
 			isa = PBXGroup;
 			children = (
 				8BB275AB0D6F81EA008DC1CA /* libsqlite3.dylib */,
+				5A4D237B0F462D2000F5C05B /* libcrypto.dylib */,
+				5A20A2AE0FD71946009F0A92 /* SecurityInterface.framework */,
+				5AB442230FFC36E800001976 /* DirectoryService.framework */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
