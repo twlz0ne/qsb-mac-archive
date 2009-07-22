@@ -514,13 +514,15 @@ GTM_METHOD_CHECK(NSEnumerator,
   if (!date) {
     date = [NSDate distantPast];
   }
+  
+  BOOL isStarred = [(GDataEntryDocBase *)doc isStarred];
+  NSString *flagName = isStarred ? @"star-flag" : nil;
   NSString *docID = [doc resourceID];
   NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                               rankFlags, kHGSObjectAttributeRankFlagsKey,
                               cellArray, kQSBObjectAttributePathCellsKey,
                               date, kHGSObjectAttributeLastUsedDateKey,
-                              userName_, kHGSObjectAttributeSnippetKey,
-                              icon, kHGSObjectAttributeIconKey,
+                              flagName, kHGSObjectAttributeFlagIconNameKey,                              icon, kHGSObjectAttributeIconKey,
                               categoryLabel, kGoogleDocsDocCategoryKey,
                               docID, kGoogleDocsDocSaveAsIDKey,
                               nil];
