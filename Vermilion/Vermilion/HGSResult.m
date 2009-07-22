@@ -129,9 +129,10 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   if (!type) {
     type = kHGSTypeFile;
   }
-  path = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+  NSString *uriPath 
+    = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
   NSString *uri 
-    = [NSString stringWithFormat:@"%@%@", kHGSResultFileSchemePrefix, path];
+    = [NSString stringWithFormat:@"%@%@", kHGSResultFileSchemePrefix, uriPath];
   return [self resultWithURI:uri
                         name:[fm displayNameAtPath:path]
                         type:type
