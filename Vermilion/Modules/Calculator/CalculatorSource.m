@@ -56,7 +56,8 @@
       = [[NSWorkspace sharedWorkspace]
          absolutePathForAppBundleWithIdentifier:@"com.apple.calculator"];
     if ([calcPath length]) {
-      calculatorAppPath_ = [calcPath retain];
+      NSURL *fileURL = [NSURL fileURLWithPath:calcPath];
+      calculatorAppPath_ = [[fileURL absoluteString] retain];
     }
     if (!mathSet_ || !nonAlphanumericSet_ || !calculatorAppPath_) {
       [self release];
