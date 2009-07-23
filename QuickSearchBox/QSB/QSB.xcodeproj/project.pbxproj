@@ -459,6 +459,7 @@
 		62ED068B0EC261F0001A838E /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62ED06910EC265AF001A838E /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		62ED5EE50E8AADB200C9C2C3 /* QSBSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62ED5EE40E8AADB200C9C2C3 /* QSBSearchViewController.m */; };
+		62EFB4C71018F35500F984C7 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62F150040DD4EE3D00BCAE1A /* ResultsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 62F150020DD4EE3C00BCAE1A /* ResultsWindow.xib */; };
 		62F380F90EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F380F80EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m */; };
 		62F381020EA7FC1900370F6F /* QSBTopSearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F381000EA7FC1900370F6F /* QSBTopSearchController.m */; };
@@ -2753,6 +2754,7 @@
 				33D2C6700DD10B5400C1FBDC /* Cocoa.framework in Frameworks */,
 				33D2C6840DD10B8600C1FBDC /* Vermilion.framework in Frameworks */,
 				33D2C66E0DD10B5400C1FBDC /* Security.framework in Frameworks */,
+				62EFB4C71018F35500F984C7 /* GTM.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

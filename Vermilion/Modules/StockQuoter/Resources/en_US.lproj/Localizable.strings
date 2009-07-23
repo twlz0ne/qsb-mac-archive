@@ -9,3 +9,15 @@
 
 /* A formatting string which composes the snippet shown in the stock quote result.  Each %s is replaced by an element of the quote and cannot be rearranged.  The 'Vol:' is the volume of stock trading that is current occurring. 'Hi:' and 'Lo:' are the daily highs and lows of the stock price. */
 "%s Hi:%s/Lo:%s Vol:%s" = "%s Hi:%s/Lo:%s Vol:%s";
+
+/* Text shown in the stock quote result that indicates that the market which carries the stock is currently open.  Either this text or '^After Hours' is shown in the same place. */
+"Market Open" = "Market Open";
+
+/* Text shown in the stock quote result that indicates that the market which carries the stock is currently closed.  Either this text or '^Market Open' is shown in the same place. */
+"After Hours" = "After Hours";
+
+/* A label placed next to the daily high price of a stock. */
+"High" = "High";
+
+/* A label placed next to the daily low price of a stock. */
+"Low" = "Low";
