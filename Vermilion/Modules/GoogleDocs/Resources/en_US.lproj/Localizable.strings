@@ -41,3 +41,21 @@
 "Text (TXT)" = "Text (TXT)";
 "Microsoft Excel Document (XLS)" = "Microsoft Excel Document (XLS)";
 "ZIP Archive (with images) (ZIP)" = "ZIP Archive (with images) (ZIP)";
+
+/* A message title for a dialog describing that one or more worksheets for a spreadsheet could not be accessed. */
+"Worksheet access limited." = "Worksheet access limited.";
+
+/* A dialog message explaining that one or more worksheets for the spreadsheet named by %1$@ in the Google account %2$@ may not be accessible. */
+"Some worksheets for spreadsheet '%1$@' at account '%2$@' are unavailable due to access limitations." = "Some worksheets for spreadsheet '%1$@' at account '%2$@' are unavailable due to access limitations.";
+
+/* A keyword used when searching to detect items which have been starred by the user in Google Docs. */
+"starred" = "starred";
+
+/* A keyword used when searching to detect a Google Doc that is a word processing document. */
+"document" = "document";
+
+/* A keyword used when searching to detect a Google Doc that is a spreadsheet. */
+"spreadsheet" = "spreadsheet";
+
+/* A keyword used when searching to detect a Google Doc that is a presentation. */
+"presentation" = "presentation";

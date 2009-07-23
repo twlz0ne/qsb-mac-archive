@@ -39,22 +39,17 @@ static NSString *const kDocumentDownloadFormat
   = @"http://docs.google.com/feeds/download/documents/Export?"
     @"docID=%@&exportFormat=%@";
 
-// TODO(mrossetti): Spreadsheet exporting is not yet implemented.
+static NSString *const kPresentationDownloadFormat
+  = @"http://docs.google.com/feeds/download/presentations/Export?"
+    @"docID=%@&exportFormat=%@";
+
 static NSString *const kSpreadsheetDownloadFormat
   = @"http://spreadsheets.google.com/feeds/download/spreadsheets/Export?"
-    @"key=%@&fmcmd=%d";
+    @"key=%@&exportFormat=%@";
 static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
 
-// Export values for the 'fmcmd' parameter found at:
-// http://code.google.com/apis/documents/docs/2.0/reference.html#ExportParameters
-enum {
-  eFmcmdXLS = 4,    // Excel spreadsheet
-  eFmcmdCSV = 5,    // Comma-spearated text file
-  eFmcmdPDF = 12,   // PDF file
-  eFmcmdODS = 13,   // OpenDocument spreadsheet
-  eFmcmdTSV = 23,   // Tab-separated text file
-  eFmcmdHTML = 102  // HTML file
-};
+// Information on exporting documents and spreadsheets can be found at:
+// http://code.google.com/apis/documents/docs/2.0/developers_guide_protocol.html#DownloadingDocs
 
 // An action which supports saving a Google Docs as a local file.
 //
@@ -80,7 +75,7 @@ enum {
 @implementation GoogleDocsSaveAsAction
 
 - (BOOL)appliesToResult:(HGSResult *)result {
-  // TODO(mrossetti: Only accept webpage results created by the GoogleDocsSource.
+  // TODO(mrossetti): Only accept webpage results created by the GoogleDocsSource.
   BOOL doesApply = ![result isFileResult];
   NSString *category = [result valueForKey:kGoogleDocsDocCategoryKey];
   doesApply = (category != nil);
@@ -104,6 +99,7 @@ enum {
       NSString *extension
         = [responseDict objectForKey:kGoogleDocsDocSaveAsExtensionKey];
       NSString *docID = [directObject valueForKey:kGoogleDocsDocSaveAsIDKey];
+
       // Strip the document type prefix.
       NSSet *typePrefixes = [NSSet setWithObjects:
                              @"document:",
@@ -119,6 +115,7 @@ enum {
                    + colonRange.length];
         }
       }
+
       docID = [GDataUtilities stringByURLEncodingForURI:docID];
       GoogleDocsSource *source
         = (GoogleDocsSource *)[directObject source];
@@ -129,54 +126,35 @@ enum {
       // docs/presentation and spreadsheets.
       NSString *category = [directObject valueForKey:kGoogleDocsDocCategoryKey];
       NSString *command = nil;
-      if ([category isEqualToString:kDocCategorySpreadsheet]) {
-        // Must use the fmcmd parameter and translate the extension into
-        // a number: xls: 4, csv: 5, pdf: 12, ods: 13, tsv: 23, html:102.
-        NSInteger formatNum = eFmcmdXLS;
-        if ([extension isEqualToString:@"xls"]) {
-          formatNum = eFmcmdXLS;
-        } else if ([extension isEqualToString:@"csv"]) {
-          formatNum = eFmcmdCSV;
-        } else if ([extension isEqualToString:@"pdf"]) {
-          formatNum = eFmcmdPDF;
-        } else if ([extension isEqualToString:@"ods"]) {
-          formatNum = eFmcmdODS;
-        } else if ([extension isEqualToString:@"tsv"]) {
-          formatNum = eFmcmdTSV;
-        } else if ([extension isEqualToString:@"html"]) {
-          formatNum = eFmcmdHTML;
-        } else {
-          HGSLogDebug(@"Unexpected extension type '%@'.", extension);
-        }
-        command = [NSString stringWithFormat:kSpreadsheetDownloadFormat,
-                   docID, formatNum];
-        if (formatNum == eFmcmdCSV || formatNum == eFmcmdTSV) {
-          // Only one worksheet can be exported at a time for these formats.
-          NSUInteger worksheetIndex = 0;
-          NSNumber *worksheetNumber
-            = [info objectForKey:kGoogleDocsDocSaveAsWorksheetIndexKey];
-          if (worksheetNumber) {
-            worksheetIndex = [worksheetNumber unsignedIntValue];
-          }
-          command
-            = [command stringByAppendingFormat:kWorksheetPageDownloadFormat,
-               worksheetIndex];
-          [self downloadDocument:command
-                         service:service
-                      saveAsInfo:responseDict];
-        } else {
-          [self downloadDocument:command
-                         service:service
-                      saveAsInfo:responseDict];
-        }
-      } else {
-        // Must use the exportFormat parameter.
-        command = [NSString stringWithFormat:kDocumentDownloadFormat,
-                   docID, extension];
-        [self downloadDocument:command
-                       service:service
-                    saveAsInfo:responseDict];
+      // Set up the basic download URL with the document ID based on category.
+      NSString *downloadFormat = kDocumentDownloadFormat;
+      if ([category isEqualToString:kDocCategoryPresentation]) {
+        downloadFormat = kPresentationDownloadFormat;
+      } else if ([category isEqualToString:kDocCategorySpreadsheet]) {
+        downloadFormat = kSpreadsheetDownloadFormat;
+      } else if (![category isEqualToString:kDocCategoryDocument]) {
+        HGSLogDebug(@"Unexpected document category '%@'.", category);
       }
+      command = [NSString stringWithFormat:downloadFormat, docID, extension];
+      // For spreadsheets being downloaded as CSV or TSV we may need
+      // a worksheet index.
+      if ([extension isEqualToString:@"csv"]
+          || [extension isEqualToString:@"tsv"]) {
+        // Only one worksheet can be exported at a time for these formats.
+        NSUInteger worksheetIndex = 0;
+        NSNumber *worksheetNumber
+          = [info objectForKey:kGoogleDocsDocSaveAsWorksheetIndexKey];
+        if (worksheetNumber) {
+          worksheetIndex = [worksheetNumber unsignedIntValue];
+        }
+        command
+          = [command stringByAppendingFormat:kWorksheetPageDownloadFormat,
+             worksheetIndex];
+      }
+
+      [self downloadDocument:command
+                     service:service
+                  saveAsInfo:responseDict];
     }
   }
   return YES;

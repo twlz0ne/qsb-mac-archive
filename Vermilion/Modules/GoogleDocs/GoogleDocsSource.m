@@ -389,7 +389,7 @@ GTM_METHOD_CHECK(NSEnumerator,
         password = [keychainItem password];
       }
       if (userName && password) {
-        spreadsheetService_ = [[GDataServiceGoogleDocs alloc] init];
+        spreadsheetService_ = [[GDataServiceGoogleSpreadsheet alloc] init];
         [spreadsheetService_ setUserAgent:@"google-qsb-1.0"];
         [spreadsheetService_ setUserCredentialsWithUsername: userName
                                            password: password];
@@ -406,7 +406,7 @@ GTM_METHOD_CHECK(NSEnumerator,
     // If the spreadsheet feed is attempting an http request then upgrade
     // it to https.
     NSString *spreadsheetURLString
-      = [kGDataGoogleDocsDefaultPrivateFullFeed
+      = [kGDataGoogleSpreadsheetsPrivateFullFeed
          stringByReplacingOccurrencesOfString:@"http:"
                                    withString:@"https:"
                                       options:NSLiteralSearch
@@ -434,7 +434,10 @@ GTM_METHOD_CHECK(NSEnumerator,
   if (!error) {
     NSArray *docs = [docFeed entries];
     for (GDataEntryBase *doc in docs) {
-      [self indexDoc:doc];
+      // Ignore spreadsheets.  We'll get them in a separate feed.
+      if (![doc isKindOfClass:[GDataEntrySpreadsheetDoc class]]) {
+        [self indexDoc:doc];
+      }
     }
   } else {
     [self reportError:error];
@@ -447,17 +450,33 @@ GTM_METHOD_CHECK(NSEnumerator,
   if (!docURL) {
     return;
   }
-  // Set the icon by category
+  // Because spreadsheets are somewhat different from other doc types we'll
+  // determine that we have one here and save trouble down the line.
+  // In the future, when docs takes a unified approach, we can use gd:kind.
+  // TODO(mrossetti): Use gd:kind when available.
+  BOOL isSpreadsheet = [doc isKindOfClass:[GDataEntrySpreadsheet class]];
+  NSArray *categories = [doc categories];
+  BOOL isStarred = [GDataCategory categories:categories
+                    containsCategoryWithLabel:kGDataCategoryLabelStarred];
   NSImage* icon = nil;
-  NSArray *kindArray = [GDataCategory categoriesWithScheme:kGDataCategoryScheme
-                                            fromCategories:[doc categories]];
-  NSString *categoryLabel
-    = HGSLocalizedString(@"Unknown Google Docs Category",
-                         @"Text explaining that the category of the "
-                         @"could not be determined.");
-  if (kindArray && [kindArray count]) {
-    categoryLabel = [[kindArray objectAtIndex:0] label];
+  NSString *categoryLabel = nil;
+  if (isSpreadsheet) {
+    categoryLabel = kDocCategorySpreadsheet;
+  } else {
+    // This doesn't work for spreadsheets because they have a different scheme.
+    NSArray *kindArray = [GDataCategory categoriesWithScheme:kGDataCategoryScheme
+                                              fromCategories:categories];
+    if ([kindArray count]) {
+      GDataCategory *category = [kindArray objectAtIndex:0];
+      categoryLabel = [category label];
+    }
+  }
+  if (categoryLabel) {
     icon = [docIcons_ objectForKey:categoryLabel];
+  } else {
+    categoryLabel = HGSLocalizedString(@"Unknown Google Docs Category",
+                                       @"Text explaining that the category of "
+                                       @"the could not be determined.");
   }
   if (!icon) {
     icon = [docIcons_ objectForKey:kDocCategoryDocument];
@@ -487,7 +506,7 @@ GTM_METHOD_CHECK(NSEnumerator,
                             stringByAppendingFormat:@"/folders/%@",
                             userName];
   NSArray *folders = [GDataCategory categoriesWithScheme:folderScheme
-                                          fromCategories:[doc categories]];
+                                          fromCategories:categories];
   if (folders && [folders count]) {
     NSString *label = [[folders objectAtIndex:0] label];
     NSDictionary *folderCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -515,17 +534,23 @@ GTM_METHOD_CHECK(NSEnumerator,
     date = [NSDate distantPast];
   }
   
-  BOOL isStarred = [(GDataEntryDocBase *)doc isStarred];
   NSString *flagName = isStarred ? @"star-flag" : nil;
-  NSString *docID = [doc resourceID];
-  NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                              rankFlags, kHGSObjectAttributeRankFlagsKey,
-                              cellArray, kQSBObjectAttributePathCellsKey,
-                              date, kHGSObjectAttributeLastUsedDateKey,
-                              flagName, kHGSObjectAttributeFlagIconNameKey,                              icon, kHGSObjectAttributeIconKey,
-                              categoryLabel, kGoogleDocsDocCategoryKey,
-                              docID, kGoogleDocsDocSaveAsIDKey,
-                              nil];
+  NSString *docID = [doc identifier];
+  docID = [docID lastPathComponent];
+  HGSAssert(rankFlags && cellArray && date && icon && categoryLabel && docID,
+            @"Something essential is missing.");
+  NSMutableDictionary *attributes
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       rankFlags, kHGSObjectAttributeRankFlagsKey,
+       cellArray, kQSBObjectAttributePathCellsKey,
+       date, kHGSObjectAttributeLastUsedDateKey,
+       icon, kHGSObjectAttributeIconKey,
+       categoryLabel, kGoogleDocsDocCategoryKey,
+       docID, kGoogleDocsDocSaveAsIDKey,
+       nil];
+  if (flagName) {
+    [attributes setObject:flagName forKey:kHGSObjectAttributeFlagIconNameKey];
+  }
   HGSResult* result = [HGSResult resultWithURL:docURL
                                           name:docTitle
                                           type:kHGSTypeWebpage
@@ -534,16 +559,40 @@ GTM_METHOD_CHECK(NSEnumerator,
   
   // If this is a spreadsheet then we have to go off and fetch the worksheet
   // information in a spreadsheet feed.
-  if ([doc isKindOfClass:[GDataEntrySpreadsheet class]]) {
+  if (isSpreadsheet) {
     GDataEntrySpreadsheet *spreadsheet = (GDataEntrySpreadsheet *)doc;
     [self startAsyncWorksheetFetchForSpreadsheet:spreadsheet result:result];
   } else {
-    // Also get author names and address, and store those as non-title-match data.
-    NSArray* authorArray = [self authorArrayForGDataPeople:[doc authors]];
+    // Add other search term helpers such as the type of the document,
+    // the authors, and if the document was starred.
+    NSString *localizedCategory = nil;
+    if ([categoryLabel isEqualToString:kDocCategoryPresentation]) {
+      localizedCategory
+        = HGSLocalizedString(@"presentation",
+                             @"A search term indicating that this document "
+                             @"is a presentation.");
+    } else {
+      localizedCategory
+        = HGSLocalizedString(@"document",
+                             @"A search term indicating that this document "
+                             @"is a word processing document.");
+    }
+    NSMutableArray* otherTerms
+      = [NSMutableArray arrayWithObject:localizedCategory];
+    [otherTerms addObjectsFromArray:[self authorArrayForGDataPeople:
+                                     [doc authors]]];
+    if (isStarred) {
+      NSString *starredTerm
+        = HGSLocalizedString(@"starred",
+                             @"A keyword used when searching to detect items "
+                             @"which have been starred by the user in "
+                             @"Google Docs.");
+      [otherTerms addObject:starredTerm];
+    }
     
     [self indexResult:result
                  name:docTitle
-           otherTerms:authorArray];
+           otherTerms:otherTerms];
   }
 }
 
@@ -578,6 +627,8 @@ GTM_METHOD_CHECK(NSEnumerator,
               finishedWithFeed:(GDataFeedWorksheet *)worksheetFeed
                          error:(NSError *)error {
   [activeSpreadsheetFetches_ removeObject:worksheetTicket];
+  HGSResult *docResult
+    = [worksheetTicket propertyForKey:kGoogleDocsSpreadsheetDocResultPropertyKey];
   if (!error) {
     // Extracting the worksheet information.
     NSArray *worksheets = [worksheetFeed entries];
@@ -590,10 +641,7 @@ GTM_METHOD_CHECK(NSEnumerator,
          gtm_enumeratorByMakingEachObjectPerformSelector:@selector(stringValue)
          withObject:nil];
     NSArray *worksheetNames = [worksheetTitleStringEnum allObjects];
-    HGSResult *docResult
-      = [worksheetTicket
-         propertyForKey:kGoogleDocsSpreadsheetDocResultPropertyKey];
-    GDataEntryDocBase *doc
+    GDataEntryBase *doc
       = [worksheetTicket propertyForKey:kGoogleDocsSpreadsheetDocPropertyKey];
     HGSAssert(docResult, nil);
     if ([worksheetNames count]) {
@@ -607,13 +655,44 @@ GTM_METHOD_CHECK(NSEnumerator,
                                                  attributes:attributes];
       docResult = [docResult mergeWith:worksheetResult];
     }
-    // Add author names and address as non-title-match data.
-    NSArray* authorArray = [self authorArrayForGDataPeople:[doc authors]];
+    // Add other search term helpers such as the type of the document,
+    // the authors.
+    // TODO(mrossetti): Add 'starred' when we can get that from the feed.
+    NSString *localizedCategory
+      = HGSLocalizedString(@"spreadsheet",
+                           @"A search term indicating that this document "
+                           @"is a spreadsheet.");
+    NSMutableArray* otherTerms
+      = [NSMutableArray arrayWithObject:localizedCategory];
+    [otherTerms addObjectsFromArray:[self authorArrayForGDataPeople:
+                                     [doc authors]]];
     [self indexResult:docResult
                  name:[[doc title] stringValue]
-           otherTerms:authorArray];
+           otherTerms:otherTerms];
   } else {
-    [self reportError:error];
+    NSString *errorSummary
+      = HGSLocalizedString(@"Worksheet access limited.", 
+                           @"A message title for a dialog describing that "
+                           @"worksheets could not be accessed.");
+    NSString *errorFormat 
+      = HGSLocalizedString(@"Some worksheets for spreadsheet '%1$@' at "
+                           @"account '%2$@' are unavailable due to "
+                           @"access limitations.",
+                           @"A dialog message explaining that one or more "
+                           @"worksheets for the spreadsheet named by %1$@ in "
+                           @"the Google account %2$@ may not be accessible.");
+    NSString *errorString = [NSString stringWithFormat:errorFormat,
+                             [docResult displayName], [account_ displayName]];
+    NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    NSDictionary *messageDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 errorSummary, kHGSSummaryMessageKey,
+                                 errorString, kHGSDescriptionMessageKey,
+                                 successCode, kHGSSuccessCodeMessageKey,
+                                 nil];
+    [nc postNotificationName:kHGSUserMessageNotification 
+                      object:self
+                    userInfo:messageDict];
   }
 }
 

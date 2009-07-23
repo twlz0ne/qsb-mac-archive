@@ -109,6 +109,9 @@
   // Populate the worksheet array.
   NSArray *worksheetNames = [result valueForKey:kGoogleDocsWorksheetNamesKey];
   [self setWorksheetNames:worksheetNames];
+  
+  // Initialize the file type.
+  [self setFileTypeIndex:0];
 }
 
 - (NSDictionary *)saveAsInfo {
@@ -116,13 +119,20 @@
   NSMutableDictionary *saveAsInfo
     = (saveAsInfo_) ? [[saveAsInfo_ mutableCopy] autorelease]
                     : [NSMutableDictionary dictionaryWithCapacity:1];
-  NSString *description = [[self fileTypes] objectAtIndex:[self fileTypeIndex]];
-  NSString *extension
-    = [[self descriptionToExtensionMap] objectForKey:description];
-  [saveAsInfo setObject:extension forKey:kGoogleDocsDocSaveAsExtensionKey];
+  NSArray *fileTypes = [self fileTypes];
+  NSInteger fileTypeIndex = [self fileTypeIndex];
+  if (fileTypeIndex < [fileTypes count]) {
+    NSString *description = [fileTypes objectAtIndex:fileTypeIndex];
+    NSString *extension
+      = [[self descriptionToExtensionMap] objectForKey:description];
+    [saveAsInfo setObject:extension forKey:kGoogleDocsDocSaveAsExtensionKey];
+  } else {
+    HGSLogDebug(@"Attempt to access item %d from fileTypes with %d elements.",
+                fileTypeIndex, [fileTypes count]);
+  }
   if (isSpreadsheet_) {
     NSNumber *worksheetIndex
-      = [NSNumber numberWithUnsignedInt:[self fileTypeIndex]];
+      = [NSNumber numberWithUnsignedInt:fileTypeIndex];
     [saveAsInfo setObject:worksheetIndex
                    forKey:kGoogleDocsDocSaveAsWorksheetIndexKey];
   }
@@ -133,13 +143,16 @@
   fileTypeIndex_ = fileTypeIndex;
   BOOL shouldBeEnabled = NO;
   if (isSpreadsheet_) {
-    // If they chose TSV or CSV and there is more then one worksheet we want
-    // to show them the worksheet popup.
+    // If they chose TSV, CSV or HTML and there is more then one worksheet
+    // we want to show them the worksheet popup.
+    // TODO(mrossetti): Also accommodate PDF which, being a bit different from
+    // CSV/TSV/HTML, allows either all worksheets or a single worksheet.
     NSString *chosenFileType = [fileTypes_ objectAtIndex:[self fileTypeIndex]];
     NSString *extension
       = [[self descriptionToExtensionMap] objectForKey:chosenFileType];
-    if (([extension isEqualToString:@"csv"]
-         || [extension isEqualToString:@"tsv"])
+    NSSet *singleWorksheetSet
+      = [NSSet setWithObjects:@"csv", @"tsv", @"html", nil];
+    if ([singleWorksheetSet containsObject:extension]
         && [[self worksheetNames] count] > 1) {
       shouldBeEnabled = YES;
     }
