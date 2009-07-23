@@ -58,8 +58,8 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
   if ((self = [super initWithConfiguration:configuration])) {
     NSNotificationCenter *noteCenter = [NSNotificationCenter defaultCenter];
     [noteCenter addObserver:self
-                   selector:@selector(pluginsDidLoad:)
-                       name:kHGSPluginLoaderDidInitializePluginsNotification
+                   selector:@selector(pluginsDidInstall:)
+                       name:kHGSPluginLoaderDidInstallPluginsNotification
                      object:nil];
 
     // Allocate for the searchObject array
@@ -146,7 +146,7 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
 
 #pragma mark -- HGSPluginLoader notification handlers --
 
-- (void)pluginsDidLoad:(NSNotification *)aNotification {
+- (void)pluginsDidInstall:(NSNotification *)aNotification {
   // What time did we stop loading
   NSDate *startupTime = [NSDate date];
 

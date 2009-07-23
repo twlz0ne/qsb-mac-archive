@@ -216,8 +216,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                name:kHGSUserMessageNotification 
              object:nil];
     [nc addObserver:self 
-           selector:@selector(pluginsDidInitialize:) 
-               name:kHGSPluginLoaderDidInitializePluginsNotification 
+           selector:@selector(pluginsDidInstall:) 
+               name:kHGSPluginLoaderDidInstallPluginsNotification 
              object:[HGSPluginLoader sharedPluginLoader]];
     [QSBPreferences registerDefaults];
     BOOL iconInDock
@@ -961,7 +961,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self updatePluginsPreferences];
 }
 
-- (void)pluginsDidInitialize:(NSNotification *)notification {
+- (void)pluginsDidInstall:(NSNotification *)notification {
   HGSPluginLoader *loader = [notification object];
   [loader gtm_addObserver:self
                forKeyPath:@"plugins"

@@ -305,13 +305,12 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
              name:kHGSPluginLoaderWillLoadPluginNotification 
            object:sharedLoader];
   [nc addObserver:self 
-         selector:@selector(pluginsDidLoad:) 
-             name:kHGSPluginLoaderDidLoadPluginsNotification 
+         selector:@selector(pluginWillInstall:) 
+             name:kHGSPluginLoaderWillInstallPluginNotification 
            object:sharedLoader];
-  
   [nc addObserver:self 
-         selector:@selector(pluginsDidInitialize:) 
-             name:kHGSPluginLoaderDidInitializePluginsNotification 
+         selector:@selector(pluginsDidInstall:) 
+             name:kHGSPluginLoaderDidInstallPluginsNotification 
            object:sharedLoader];
   
   // Support spaces on Leopard. 
@@ -1412,20 +1411,35 @@ doCommandBySelector:(SEL)commandSelector {
   [searchTextField_ displayIfNeeded];
 }
 
-- (void)pluginsDidLoad:(NSNotification *)notification {
-  NSString *initializing = HGSLocalizedString(@"Initializing Plugins…",
+- (void)pluginWillInstall:(NSNotification *)notification {
+  NSString *initializing = HGSLocalizedString(@"Initializing %@",
                                               @"A string shown at launchtime "
                                               @"to denote that we are "
-                                              @"initializing the plugins.");
+                                              @"initializing a plugin.");
+  NSDictionary *userInfo = [notification userInfo];
+  HGSPlugin *plugin = [userInfo objectForKey:kHGSPluginLoaderPluginKey];
+  NSString *name = [plugin displayName];
+  initializing = [NSString stringWithFormat:initializing, name];
   [searchTextField_ setStringValue:initializing];
   [searchTextField_ displayIfNeeded];
 }
 
-- (void)pluginsDidInitialize:(NSNotification *)notification {
+- (void)pluginsDidInstall:(NSNotification *)notification {
   [searchTextField_ setStringValue:@""];
   [searchTextField_ displayIfNeeded];
   [searchTextField_ setEnabled:YES];
   [[searchTextField_ window] makeFirstResponder:searchTextField_];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  HGSPluginLoader *sharedLoader = [HGSPluginLoader sharedPluginLoader];
+  [nc removeObserver:self 
+                name:kHGSPluginLoaderWillLoadPluginNotification 
+              object:sharedLoader];
+  [nc removeObserver:self 
+                name:kHGSPluginLoaderWillInstallPluginNotification 
+              object:sharedLoader];
+  [nc removeObserver:self 
+                name:kHGSPluginLoaderDidInstallPluginsNotification 
+              object:sharedLoader];
 }
 
 

@@ -173,7 +173,7 @@ extern NSString *const kHGSPluginLoaderDidLoadPluginsNotification;
  Notification that the plugins are all initialized and ready.
  Object is the plugin loader.
 */
-extern NSString *const kHGSPluginLoaderDidInitializePluginsNotification;
+extern NSString *const kHGSPluginLoaderDidInstallPluginsNotification;
 
 /*!
  Notification that the loader will load a plugin
@@ -182,6 +182,24 @@ extern NSString *const kHGSPluginLoaderDidInitializePluginsNotification;
  representing the name of the plugin being loaded.
 */
 extern NSString *const kHGSPluginLoaderWillLoadPluginNotification;
+
+/*!
+ Notification that the loader will install a plugin
+ Object is the plugin loader.
+ Userinfo may contain kHGSPluginLoaderPluginKey which is the plugin being 
+ installed.
+*/
+extern NSString *const kHGSPluginLoaderWillInstallPluginNotification;
+
+/*!
+ Notification that the loader did install a plugin
+ Object is the plugin loader.
+ Userinfo may contain kHGSPluginLoaderPluginKey which is the plugin that was 
+ installed.
+ */
+extern NSString *const kHGSPluginLoaderDidInstallPluginNotification;
+
+
 /*!
  Notification that the loader did load a plugin
  Object is the plugin loader.

@@ -90,8 +90,12 @@ NSString *const kHGSPluginLoaderPluginNameKey
   = @"HGSPluginLoaderPluginNameKey";
 NSString *const kHGSPluginLoaderErrorKey
   = @"HGSPluginLoaderErrorKey";
-NSString *const kHGSPluginLoaderDidInitializePluginsNotification
-  = @"HGSPluginLoaderDidInitializePluginsNotification";
+NSString *const kHGSPluginLoaderDidInstallPluginsNotification
+  = @"HGSPluginLoaderDidInstallPluginsNotification";
+NSString *const kHGSPluginLoaderDidInstallPluginNotification
+  = @"HGSPluginLoaderDidInstallPluginNotification";
+NSString *const kHGSPluginLoaderWillInstallPluginNotification
+  = @"HGSPluginLoaderWillInstallPluginNotification";
 
 @implementation HGSPluginLoader
 
@@ -177,7 +181,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 
 - (void)installAndEnablePluginsBasedOnPluginsState:(NSArray *)state {
   NSArray *plugins = [self plugins];
-  
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+
   // Step 3: Factor the new extensions now that we know all available accounts.
   [plugins makeObjectsPerformSelector:@selector(factorProtoExtensions)];
   
@@ -231,11 +236,20 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
       }
     }
     if ([plugin isEnabled]) {
+      NSDictionary *userInfo 
+        = [NSDictionary dictionaryWithObject:plugin 
+                                      forKey:kHGSPluginLoaderPluginKey];
+      [nc postNotificationName:kHGSPluginLoaderWillInstallPluginNotification
+                        object:self
+                      userInfo:userInfo];
       [plugin install];
+      [nc postNotificationName:kHGSPluginLoaderDidInstallPluginNotification
+                        object:self
+                      userInfo:userInfo];
+      
     }
   }
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc postNotificationName:kHGSPluginLoaderDidInitializePluginsNotification 
+  [nc postNotificationName:kHGSPluginLoaderDidInstallPluginsNotification 
                     object:self];
 }
 
