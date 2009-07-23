@@ -115,6 +115,9 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     NSURLConnection *connection
       = [NSURLConnection connectionWithRequest:authRequest delegate:self];
     [self setAuthenticationConnection:connection];
+  } else {
+    // Failed to authenticate because we could not compose an authRequest.
+    [self setAuthenticated:NO];
   }
 }
 
@@ -150,49 +153,54 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
                                       password:(NSString *)password {
-  NSString *encodedAccountName = [userName gtm_stringByEscapingForURLArgument];
-  NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
-  BOOL hosted = [self isKindOfClass:[GoogleAppsAccount class]];
-  NSString *accountType = kHostedAccountType;
-  if (!hosted) {
-    accountType = kGoogleAccountType;
-    NSRange atRange = [userName rangeOfString:@"@"];
-    if (atRange.location != NSNotFound) {
-      NSString *domainString = [userName substringFromIndex:atRange.location];
-      if ([GoogleAccount isMatchToGoogleDomain:domainString]) {
-        accountType = kGoogleCorpAccountType;
+  NSURLRequest *accountRequest = nil;
+  // We don't support public access at this time, so a userName and password
+  // are required.
+  if ([userName length] && [password length]) {
+    NSString *encodedAccountName = [userName gtm_stringByEscapingForURLArgument];
+    NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
+    BOOL hosted = [self isKindOfClass:[GoogleAppsAccount class]];
+    NSString *accountType = kHostedAccountType;
+    if (!hosted) {
+      accountType = kGoogleAccountType;
+      NSRange atRange = [userName rangeOfString:@"@"];
+      if (atRange.location != NSNotFound) {
+        NSString *domainString = [userName substringFromIndex:atRange.location];
+        if ([GoogleAccount isMatchToGoogleDomain:domainString]) {
+          accountType = kGoogleCorpAccountType;
+        }
       }
     }
-  }
-  GTMGoogleSearch *gsearch = [GTMGoogleSearch sharedInstance];
-  NSMutableDictionary *args = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                               encodedAccountName, @"Email",
-                               encodedPassword, @"Passwd",
-                               accountType, @"accountType",
-                               nil];
-  NSString *captchaText = [self captchaText];
-  if ([captchaText length]) {
-    NSString *captchaToken = [self captchaToken];
-    [args setObject:captchaToken forKey:@"logintoken"];
-    [args setObject:captchaText forKey:@"logincaptcha"];
+    GTMGoogleSearch *gsearch = [GTMGoogleSearch sharedInstance];
+    NSMutableDictionary *args = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                 encodedAccountName, @"Email",
+                                 encodedPassword, @"Passwd",
+                                 accountType, @"accountType",
+                                 nil];
+    NSString *captchaText = [self captchaText];
+    if ([captchaText length]) {
+      NSString *captchaToken = [self captchaToken];
+      [args setObject:captchaToken forKey:@"logintoken"];
+      [args setObject:captchaText forKey:@"logincaptcha"];
+      
+      // Clear for next time.
+      [self setCaptchaImage:nil];
+      [self setCaptchaText:nil];
+      [self setCaptchaToken:nil];
+    }
     
-    // Clear for next time.
-    [self setCaptchaImage:nil];
-    [self setCaptchaText:nil];
-    [self setCaptchaToken:nil];
+    NSString *searchURL = [gsearch searchURLFor:nil 
+                                         ofType:@"accounts/ClientLogin" 
+                                      arguments:args];
+    NSString *accountTestString 
+      = [searchURL stringByReplacingCharactersInRange:NSMakeRange(0, 4)
+                                           withString:@"https"];
+    NSURL *accountTestURL = [NSURL URLWithString:accountTestString];
+    accountRequest
+      = [NSURLRequest requestWithURL:accountTestURL
+                         cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
+                     timeoutInterval:15.0];
   }
-  
-  NSString *searchURL = [gsearch searchURLFor:nil 
-                                       ofType:@"accounts/ClientLogin" 
-                                    arguments:args];
-  NSString *accountTestString 
-    = [searchURL stringByReplacingCharactersInRange:NSMakeRange(0, 4)
-                                         withString:@"https"];
-  NSURL *accountTestURL = [NSURL URLWithString:accountTestString];
-  NSURLRequest *accountRequest
-    = [NSURLRequest requestWithURL:accountTestURL
-                       cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
-                   timeoutInterval:15.0];
   return accountRequest;
 }
 

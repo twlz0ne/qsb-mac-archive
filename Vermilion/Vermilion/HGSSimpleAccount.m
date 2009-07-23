@@ -60,17 +60,6 @@
   return self;
 }
 
-- (BOOL)isEditable {
-  BOOL isEditable = NO;
-  NSString *keychainServiceName = [self identifier];
-  if ([keychainServiceName length]) {
-    KeychainItem *item = [KeychainItem keychainItemForService:keychainServiceName 
-                                                     username:nil];
-    isEditable = (item != nil);
-  }
-  return isEditable;
-}
-
 - (void)remove {
   KeychainItem *keychainItem = [self keychainItem];
   [keychainItem removeFromKeychain];

@@ -244,7 +244,7 @@ BOOL reportIfKeychainError(OSStatus status) {
              @"You may need to run Keychain First Aid to repair your "
              @"keychain.", status);
     } else {
-      HGSLogDebug(@"A error occurred while accessing the keychain (%d).",
+      HGSLogDebug(@"An error occurred while accessing the keychain (%d).",
                   status);
     }
     wasError = YES;
