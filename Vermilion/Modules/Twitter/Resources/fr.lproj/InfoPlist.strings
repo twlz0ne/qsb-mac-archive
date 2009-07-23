@@ -1,0 +1,5 @@
+﻿/* Name of action that sends text to Twitter. Do not include ^ in localization. */
+"^Send Twitter Status" = "État de l'envoi du message à Twitter";
+
+/* A label denoting the name of the Twitter account type which allows people to access their Twitter accounts. Do not include ^ in localization.*/
+"^Twitter" = "Twitter";

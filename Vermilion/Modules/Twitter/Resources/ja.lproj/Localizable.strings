@@ -1,0 +1,42 @@
+﻿//
+//  Localized strings (en)
+//  
+//  Copyright Google Inc., 2008-2009. All rights reserved.
+//
+
+/* A dialog label explaining to the user that we could not tweet. %d is an error code. */
+"Could not tweet! (%d)" = "Twitter に送信できませんでした（%d）。";
+
+/* A dialog label explaining that the user could not send their Twitter data due to a bad password for account. %@ */
+"Could not tweet. Please check the password for account %@" = "Twitter に送信できません。アカウント %@ のパスワードを確認してください。";
+
+/* A dialog label explaining that their Twitter message was too long and was truncated. */
+"Message too long - truncated." = "メッセージは長すぎるため、切り詰められました。";
+
+/* A dialog label explaning that the user's message has been successfully sent to Twitter. */
+"Message tweeted!" = "メッセージを Twitter に送信しました。";
+
+/* A dialog title. Twitter is a product name. */
+"Twitter" = "Twitter";
+
+/* A dialog label telling you to set up a Twitter account. */
+"Set up your Twitter account." = "Twitter アカウントを設定します。";
+
+/* A dialog label telling you to update a Twitter account password. */
+"Update your Twitter password." = "Twitter パスワードを更新してください。";
+
+/* A dialog label denoting a text field that contains an account name. */
+"Account Name:" = "アカウント名:";
+
+/* A dialog label denoting a text field that contains a password. */
+"Password:" = "パスワード:";
+
+/* A button label for cancel */
+"Cancel" = "キャンセル";
+
+/* A button label denoting that you are going to update your password. */
+"Update" = "更新";
+
+/* A button label denoting that you are going to setup your account. */
+"Setup" = "設定";
+

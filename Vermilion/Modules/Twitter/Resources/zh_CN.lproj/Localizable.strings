@@ -1,0 +1,42 @@
+﻿//
+//  Localized strings (en)
+//  
+//  Copyright Google Inc., 2008-2009. All rights reserved.
+//
+
+/* A dialog label explaining to the user that we could not tweet. %d is an error code. */
+"Could not tweet! (%d)" = "无法发送 Twitter 数据！(%d)";
+
+/* A dialog label explaining that the user could not send their Twitter data due to a bad password for account. %@ */
+"Could not tweet. Please check the password for account %@" = "无法发送 Twitter 数据。请检查帐户“%@”的密码。";
+
+/* A dialog label explaining that their Twitter message was too long and was truncated. */
+"Message too long - truncated." = "讯息太长，已被截断。";
+
+/* A dialog label explaning that the user's message has been successfully sent to Twitter. */
+"Message tweeted!" = "讯息已发送至 Twitter！";
+
+/* A dialog title. Twitter is a product name. */
+"Twitter" = "Twitter";
+
+/* A dialog label telling you to set up a Twitter account. */
+"Set up your Twitter account." = "设定您的 Twitter 帐户。";
+
+/* A dialog label telling you to update a Twitter account password. */
+"Update your Twitter password." = "更新您的 Twitter 帐户密码。";
+
+/* A dialog label denoting a text field that contains an account name. */
+"Account Name:" = "帐户名称：";
+
+/* A dialog label denoting a text field that contains a password. */
+"Password:" = "密码：";
+
+/* A button label for cancel */
+"Cancel" = "取消";
+
+/* A button label denoting that you are going to update your password. */
+"Update" = "更新";
+
+/* A button label denoting that you are going to setup your account. */
+"Setup" = "设定";
+

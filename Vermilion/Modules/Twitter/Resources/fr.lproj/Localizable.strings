@@ -1,0 +1,42 @@
+﻿//
+//  Localized strings (en)
+//  
+//  Copyright Google Inc., 2008-2009. All rights reserved.
+//
+
+/* A dialog label explaining to the user that we could not tweet. %d is an error code. */
+"Could not tweet! (%d)" = "Impossible d'envoyer le message à Twitter. (%d)";
+
+/* A dialog label explaining that the user could not send their Twitter data due to a bad password for account. %@ */
+"Could not tweet. Please check the password for account %@" = "Impossible d'envoyer le message à Twitter. Vérifiez le mot de passe du compte %@.";
+
+/* A dialog label explaining that their Twitter message was too long and was truncated. */
+"Message too long - truncated." = "Le message a été tronqué, car il était trop long.";
+
+/* A dialog label explaning that the user's message has been successfully sent to Twitter. */
+"Message tweeted!" = "Votre message a bien été envoyé à Twitter.";
+
+/* A dialog title. Twitter is a product name. */
+"Twitter" = "Twitter";
+
+/* A dialog label telling you to set up a Twitter account. */
+"Set up your Twitter account." = "Configurez votre compte Twitter.";
+
+/* A dialog label telling you to update a Twitter account password. */
+"Update your Twitter password." = "Mettez à jour votre mot de passe Twitter.";
+
+/* A dialog label denoting a text field that contains an account name. */
+"Account Name:" = "Nom du compte :";
+
+/* A dialog label denoting a text field that contains a password. */
+"Password:" = "Mot de passe :";
+
+/* A button label for cancel */
+"Cancel" = "Annuler";
+
+/* A button label denoting that you are going to update your password. */
+"Update" = "Mettre à jour";
+
+/* A button label denoting that you are going to setup your account. */
+"Setup" = "Configurer";
+
