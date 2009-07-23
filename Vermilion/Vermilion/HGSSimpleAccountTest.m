@@ -244,7 +244,7 @@ static NSString *const kServiceName
   NSString *accountType = [account type];
   STAssertEqualObjects(accountType, @"SimpleAccountType", nil);
   BOOL isEditable = [account isEditable];
-  STAssertFalse(isEditable, nil);
+  STAssertTrue(isEditable, nil);
   NSString *description = [account description];
   STAssertNotNil(description, nil);
   
