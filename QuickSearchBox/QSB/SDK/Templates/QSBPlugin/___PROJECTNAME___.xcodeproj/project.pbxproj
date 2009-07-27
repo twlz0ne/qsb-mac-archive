@@ -13,7 +13,7 @@
 		7F38DE690F688CC20051B7E3 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F38DE680F688CC20051B7E3 /* GTM.framework */; };
 		7F80FC720F696C5B00228142 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F80FC710F696C5B00228142 /* Cocoa.framework */; };
 		8B0D217E0F796E1C00FD4A12 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B0D217D0F796E1C00FD4A12 /* HGSBundle.m */; };
-		8B6870C110181C3900ADEA67 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6870BF10181C3900ADEA67 /* InfoPlist.strings */; };
+		8B3F7232101AD938004FACA9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B3F7230101AD938004FACA9 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 		7F8450F50F6B1F7B000CD5C1 /* QSBRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = QSBRelease.xcconfig; path = QSB/xcconfig/QSBRelease.xcconfig; sourceTree = QSBSRCROOT; };
 		8B0D217D0F796E1C00FD4A12 /* HGSBundle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HGSBundle.m; path = ../Vermilion/Vermilion/HGSBundle.m; sourceTree = QSBSRCROOT; };
 		8B0D21FB0F7970DE00FD4A12 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
-		8B6870C010181C3900ADEA67 /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = en_US.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		8B3F7231101AD938004FACA9 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = InfoPlist.strings; sourceTree = "<group>"; };
 		8BAA94490F7A6EBC00DF4F12 /* LoadableBundle.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = LoadableBundle.xcconfig; path = "externals/google-toolbox-for-mac/XcodeConfig/Target/LoadableBundle.xcconfig"; sourceTree = QSBSRCROOT; };
 		8D5B49B6048680CD000E48DA /* ___PROJECTNAME___.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "___PROJECTNAME___.hgs"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -71,8 +71,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				8D5B49B7048680CD000E48DA /* Info.plist */,
-				8B6870BF10181C3900ADEA67 /* InfoPlist.strings */,
+				8B3F722F101AD938004FACA9 /* English.lproj */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -112,8 +111,17 @@
 				7F8450F50F6B1F7B000CD5C1 /* QSBRelease.xcconfig */,
 				8BAA94490F7A6EBC00DF4F12 /* LoadableBundle.xcconfig */,
 				7F38DCE90F6865290051B7E3 /* ___PROJECTNAMEASIDENTIFIER____Prefix.pch */,
+				8D5B49B7048680CD000E48DA /* Info.plist */,
 			);
 			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		8B3F722F101AD938004FACA9 /* English.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				8B3F7230101AD938004FACA9 /* InfoPlist.strings */,
+			);
+			path = English.lproj;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -166,7 +174,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B6870C110181C3900ADEA67 /* InfoPlist.strings in Resources */,
+				8B3F7232101AD938004FACA9 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -186,10 +194,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		8B6870BF10181C3900ADEA67 /* InfoPlist.strings */ = {
+		8B3F7230101AD938004FACA9 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				8B6870C010181C3900ADEA67 /* en_US */,
+				8B3F7231101AD938004FACA9 /* English */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";

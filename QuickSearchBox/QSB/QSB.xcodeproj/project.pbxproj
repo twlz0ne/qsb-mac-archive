@@ -754,7 +754,6 @@
 		8B6EB655101A0D18006CFF7A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB648101A0D18006CFF7A /* Localizable.strings */; };
 		8B6EB656101A0D18006CFF7A /* TypeCategories.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB64C101A0D18006CFF7A /* TypeCategories.plist */; };
 		8B6EB664101A0D47006CFF7A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB658101A0D47006CFF7A /* Localizable.strings */; };
-		8B6EB665101A0D47006CFF7A /* QSBPluginUI-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB661101A0D47006CFF7A /* QSBPluginUI-Info.plist */; };
 		8B6F2D740DA2B8AF0052CA40 /* HGSAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D600DA2B88E0052CA40 /* HGSAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6F2D780DA2B8AF0052CA40 /* HGSResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D640DA2B88E0052CA40 /* HGSResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6F2D7B0DA2B8AF0052CA40 /* HGSQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D680DA2B88E0052CA40 /* HGSQuery.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2292,6 +2291,8 @@
 		8B3EF7680EF2C7ED0036FFBD /* GoogleCorpora-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleCorpora-Info.plist"; sourceTree = "<group>"; };
 		8B3EFAD50EF2D84A0036FFBD /* ContactsActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContactsActions.m; sourceTree = "<group>"; };
 		8B3EFFA40EF31BC70036FFBD /* Shortcuts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Shortcuts.m; sourceTree = "<group>"; };
+		8B3F6F73101A5C4C004FACA9 /* Localization.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = Localization.sh; sourceTree = "<group>"; };
+		8B3F7236101AD955004FACA9 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8B4099FD0F93DC0100DF540E /* GTMUILocalizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMUILocalizer.h; sourceTree = "<group>"; };
 		8B4099FE0F93DC0100DF540E /* GTMUILocalizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMUILocalizer.m; sourceTree = "<group>"; };
 		8B488A460F15DE6A00786C1E /* QSBMenuButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMenuButton.m; sourceTree = "<group>"; };
@@ -3033,7 +3034,6 @@
 		8B989F2D0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER____Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "___PROJECTNAMEASIDENTIFIER____Prefix.pch"; sourceTree = "<group>"; };
 		8B989F2E0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___Action.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "___PROJECTNAMEASIDENTIFIER___Action.m"; sourceTree = "<group>"; };
 		8B989F2F0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___Source.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "___PROJECTNAMEASIDENTIFIER___Source.m"; sourceTree = "<group>"; };
-		8B989F310FA7B93C009DC652 /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = Resources/en_US.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8B989F320FA7B93C009DC652 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8B989F330FA7B93C009DC652 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "___PROJECTNAME___.xcodeproj"; sourceTree = "<group>"; };
@@ -4249,6 +4249,7 @@
 		8B07C41B0B69234900827344 /* BuildScripts */ = {
 			isa = PBXGroup;
 			children = (
+				8B3F6F73101A5C4C004FACA9 /* Localization.sh */,
 				8B6870871017DF6600ADEA67 /* PostBuild.sh */,
 				8B07C41C0B69234900827344 /* GenerateBreakpadSymbols.sh */,
 				8B07C41D0B69234900827344 /* StripHeaders.sh */,
@@ -4335,6 +4336,14 @@
 				8B3EF7670EF2C7CB0036FFBD /* Shortcuts-Info.plist */,
 			);
 			path = Shortcuts;
+			sourceTree = "<group>";
+		};
+		8B3F7234101AD955004FACA9 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8B3F7235101AD955004FACA9 /* InfoPlist.strings */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		8B488EAA0F16842500786C1E /* UndocumentedGoodness */ = {
@@ -5282,9 +5291,9 @@
 				8B989F2D0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER____Prefix.pch */,
 				8B989F2E0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___Action.m */,
 				8B989F2F0FA7B93C009DC652 /* ___PROJECTNAMEASIDENTIFIER___Source.m */,
-				8B989F300FA7B93C009DC652 /* InfoPlist.strings */,
 				8B989F320FA7B93C009DC652 /* Info.plist */,
 				8B989F330FA7B93C009DC652 /* README.txt */,
+				8B3F7234101AD955004FACA9 /* Resources */,
 			);
 			path = QSBPlugin;
 			sourceTree = "<group>";
@@ -6706,6 +6715,7 @@
 				pt,
 				ru,
 				sv,
+				English,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* GoogleDesktop */;
 			projectDirPath = "";
@@ -7351,7 +7361,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B6EB664101A0D47006CFF7A /* Localizable.strings in Resources */,
-				8B6EB665101A0D47006CFF7A /* QSBPluginUI-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8129,7 +8138,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\nset -o errexit\nset -o nounset\nset -o verbose\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
+			shellScript = "# Run the unit tests in this test bundle.\n\nset -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/Localization.sh\"\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -9329,6 +9338,14 @@
 			name = GTMHotKeyTextField.strings;
 			sourceTree = "<group>";
 		};
+		8B3F7235101AD955004FACA9 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8B3F7236101AD955004FACA9 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		8B6871CE1018208A00ADEA67 /* CategorySingulars.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -10324,14 +10341,6 @@
 				8B6EB663101A0D47006CFF7A /* zh_TW */,
 			);
 			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-		8B989F300FA7B93C009DC652 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8B989F310FA7B93C009DC652 /* en_US */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 		8B98A2C70FA96ECF009DC652 /* WelcomeWindow.xib */ = {

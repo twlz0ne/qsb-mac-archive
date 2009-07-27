@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# AppleScriptPluginBuildCommon.sh
+# Localization.sh
 #
-# Copyright (c) 2008 Google Inc. All rights reserved.
+# Copyright 2009 Google Inc. All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -30,11 +30,18 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Get rid of unneeded executable
-
 set -o errexit
 set -o nounset
 set -o verbose
 
-rm -rf "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
-"${SRCROOT}/BuildScripts/Localization.sh"
+# We create a softlink from English.lproj to en_US.lproj here so we don't have
+# to duplicate resources. Google's internal localization scripts want the folder
+# to be named en_US, and Apple wants it to be English. The softlink keeps both
+# parties happy. The pushd, popd makes the softlink relative to the local
+# directory.
+
+if [ -d "${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/en_US.lproj" ]; then
+  pushd "${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/"
+  ln -f -s "en_US.lproj" "English.lproj"
+  popd
+fi
