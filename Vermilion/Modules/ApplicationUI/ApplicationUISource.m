@@ -90,9 +90,8 @@ NSString *const kAppUISourceAttributeElementKey
 - (NSDictionary*)getAppInfoFromResult:(HGSResult *)result {
   NSDictionary *appInfo = nil;
   if (result && [result isOfType:kHGSTypeFileApplication]) {
-    NSURL *appURL = [result valueForKey:kHGSObjectAttributeURIKey];
-    if ([appURL isFileURL]) {
-      NSString *path = [appURL path];
+    NSString *path = [result filePath];
+    if (path) {
       NSWorkspace *ws = [NSWorkspace sharedWorkspace];
       NSArray *runningApps = [ws gtm_launchedApplications];
       NSPredicate *pred 
