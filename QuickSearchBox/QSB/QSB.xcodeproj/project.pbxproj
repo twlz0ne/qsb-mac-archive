@@ -5894,6 +5894,7 @@
 			buildPhases = (
 				5A0BB1640FAB8A6300AA4858 /* Resources */,
 				5AEC5C7A0FBA2A4C005608EA /* Sources */,
+				8BB905BA101F9C3B00B93AD9 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -6044,6 +6045,7 @@
 				62370A530FFC59B000C48624 /* Resources */,
 				62370A570FFC59B000C48624 /* Sources */,
 				6203587A10027845008CAFB2 /* Frameworks */,
+				8BB905C4101F9C8C00B93AD9 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -8087,6 +8089,32 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Build all of our unit tests\n# We do it this way instead of using dependencies in the standard xcode model, \n# so we can pass the GTM_DO_NOT_REMOVE_GCOV_DATA flag in and we can unify our\n# code coverage numbers.\n\nset -o errexit\nset -o nounset\nset -o verbose\n\necho \"Test All:${LINENO}: note: Removing gcov data files from ${CONFIGURATION_TEMP_DIR}\"\n( cd \"${CONFIGURATION_TEMP_DIR}\" &&  find . -type f -name \"*.gcda\" -print0 | xargs -0 rm -f )\n\nxcodebuild -project \"QSB.xcodeproj\" -target \"Vermilion Test\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GTM_DO_NOT_REMOVE_GCOV_DATA=1\nxcodebuild -project \"QSB.xcodeproj\" -target \"QSB Core Test\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GTM_DO_NOT_REMOVE_GCOV_DATA=1\nxcodebuild -project \"QSB.xcodeproj\" -target \"Web Bookmarks Test\" -configuration \"${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" GTM_DO_NOT_REMOVE_GCOV_DATA=1\n";
+		};
+		8BB905BA101F9C3B00B93AD9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/Localization.sh\"";
+		};
+		8BB905C4101F9C8C00B93AD9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/Localization.sh\"";
 		};
 		8BCCD2690EC8E5EC00688D64 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
