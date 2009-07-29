@@ -118,7 +118,7 @@ static const int kMinQueryLength = 3;
            [NSNumber numberWithInt:eHGSSpecialUIRankFlag], 
              kHGSObjectAttributeRankFlagsKey,
            [NSValue valueWithRange:nsRange], kDictionaryRangeKey,
-           query, kDictionaryTermKey,
+           [query substringWithRange:nsRange], kDictionaryTermKey,
            nil];
       
       if (highRelevance) {
