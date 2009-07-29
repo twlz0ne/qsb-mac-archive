@@ -108,9 +108,6 @@
       [clientSocket release];
       int serverProtocolVersion = [[proxy_ serverVersionNumber] intValue];
       if (serverProtocolVersion != kProtocolVersion) {
-        NSLog(@"Unable to connect to the server because the protocol versions "
-              @"do not match.  Client: %d Server: %d", kProtocolVersion,
-              serverProtocolVersion);
         [self release];
         self = nil;
       }
