@@ -235,6 +235,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   }
   if ([uri hasPrefix:kHGSResultFileSchemePrefix]) {
     NSString *path = [uri substringFromIndex:[kHGSResultFileSchemePrefix length]];
+    path = [path stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSFileManager *fm = [NSFileManager defaultManager];
     if (![fm fileExistsAtPath:path]) {
       [self release];
