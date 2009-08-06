@@ -234,6 +234,16 @@ static NSString *const kClipboardCopyAction
       HGSResult *result = [HGSResult resultWithDictionary:dictionary 
                                                    source:self];
       if (result) {
+        // If the new pasteboard value is already in the list of results,
+        // remove it so the new result replaces it at the top of the list
+        for (HGSResult *recentResult in recentResults_) {
+          NSDictionary *recentPasteboardValue
+            = [recentResult valueForKey:kHGSObjectAttributePasteboardValueKey];
+          if ([recentPasteboardValue isEqualToDictionary:pasteboardValue]) {
+            [recentResults_ removeObject:recentResult];
+            break;
+          }
+        }
         if ([recentResults_ count] > kMaxHistoryItems) {
           // Zero-index item in the array is the persistent clipboard result
           [recentResults_ removeObjectAtIndex:1];
