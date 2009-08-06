@@ -52,6 +52,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<array>
 				<string>script.python.screensaver</string>
+				<string>file</string>
 			</array>
 		</dict>
 	</array>

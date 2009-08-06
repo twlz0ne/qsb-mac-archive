@@ -46,19 +46,14 @@ except ImportError:
 
 
 MIN_QUERY_LENGTH = 3
-SCREEN_SAVER_NAME_KEY = "SCREEN_SAVER_NAME_KEY"
 DEFAULT_ACTION = "com.google.qsb.screensavers.action.set"
-SCREEN_SAVER_NAME_KEY = "SCREEN_SAVER_NAME_KEY"
-SCREEN_SAVER_PATH_KEY = "SCREEN_SAVER_PATH_KEY"
 SCREEN_SAVER_TYPE = "script.python.screensaver"
 
+class ScreensaverBase(object):
+  """Shared base class for the screensaver source and action.
 
-class Screensaver(object):
-  """The screen saver search source.
-
-  This class conforms to the search source protocol by
-  providing the mandatory PerformSearch method and the optional
-  IsValidSourceForQuery method.
+  This class simply maintains a list of screensavers from known
+  locations in the filesystem, indexing them at startup.
   """
 
   def __init__(self):
@@ -79,26 +74,60 @@ class Screensaver(object):
     converted to lower-case so that we can do quick case-insensitive
     matching when we receive queries.
     """
-    folders = [
+    self.folders = [
       "/System/Library/Screen Savers",
       "/Library/Screen Savers",
       "%s/Library/Screen Savers" % os.environ["HOME"]
     ]
-    extensions = [
+    self.extensions = [
       ".slideSaver",
       ".saver",
       ".qtz"
     ]
     self._savers = {}
-    for folder in folders:
+    for folder in self.folders:
       if os.path.isdir(folder):
         bundles = os.listdir(folder)
         for bundle in bundles:
-          for extension in extensions:
+          for extension in self.extensions:
             if bundle.endswith(extension) and len(bundle) > len(extension):
               name = bundle[0:len(bundle) - len(extension)]
               self._savers[name.lower()] = "%s/%s" % (folder, bundle), name
-              
+
+  def SaverForPath(self, path):
+    """Returns a tuple of (path, name) of the indexed screensaver, or
+    None if the screensaver cannot be found. The input path may be either
+    an absolute path or a file:// URL, but the returned path is always the
+    absolute path the screensaver"""
+    if path.startswith("file://localhost"):
+      path = urllib.unquote(path[16:])
+    if path.startswith("file://"):
+      path = urllib.unquote(path[7:])
+    name = os.path.basename(path)
+    for extension in self.extensions:
+      if name.endswith(extension) and len(name) > len(extension):
+        name = name[0:len(name) - len(extension)]
+        key = name.lower()
+        if self._savers.has_key(key):
+          return self._savers[key]
+    return None
+
+  def IsScreensaver(self, path):
+    """Returns a boolean value indicating whether or not the given
+    path points to one of our indexed screensavers."""
+    return self.SaverForPath(path) != None
+
+
+class Screensaver(ScreensaverBase):
+  """The screen saver search source.
+
+  This class conforms to the search source protocol by
+  providing the mandatory PerformSearch method and the optional
+  IsValidSourceForQuery method.
+  """
+
+  def __init__(self):
+    super(Screensaver, self).__init__()
 
   def PerformSearch(self, query):
     """Searches for screensavers
@@ -163,9 +192,7 @@ class Screensaver(object):
     pivot_object = query.pivot_object
     # Can we pivot?
     if pivot_object is not None:
-      if SCREEN_SAVER_NAME_KEY in pivot_object:
-        return True
-      return False
+      return self.IsScreensaver(pivot_object[Vermilion.IDENTIFIER])
     # Does the non-pivot query meet our minimum length standard?
     return len(query.normalized_query) >= MIN_QUERY_LENGTH
 
@@ -176,45 +203,44 @@ class Screensaver(object):
     format = VermilionLocalize.String("%s Screen Saver")
     result[Vermilion.DISPLAY_NAME] = format % name
     result[Vermilion.TYPE] = SCREEN_SAVER_TYPE
-    result[SCREEN_SAVER_NAME_KEY] = name
-    result[SCREEN_SAVER_PATH_KEY] = path
     return result
 
-class SetScreensaverAction(object):
+class SetScreensaverAction(ScreensaverBase):
   """QSB action class that sets the screensaver.
 
   This class conforms to the QSB search action protocol by
   providing the mandatory AppliesToResults and Perform methods.
-
   """
 
   def __init__(self):
-    pass
+    super(SetScreensaverAction, self).__init__()
     
   def AppliesToResults(self, results):  
     """Determines if the result is one returned by our search source by
-    verifying that our search result type is set in the result
-    dictionary."""
+    verifying that our search result identifier points to one of our
+    indexed screen savers."""
     for result in results:
-      if result[Vermilion.TYPE] == SCREEN_SAVER_TYPE:
-        return True
+      return self.IsScreensaver(result[Vermilion.IDENTIFIER])
     return False
 
   def Perform(self, results, pivot_objects=None):
     """Sets the selected screen saver as the user's current screen saver
     by using the "defaults" command line tool."""
-    result = results[0]
-    cmd = ('defaults -currentHost write com.apple.screensaver moduleName '
-           '-string "%s"') % result[SCREEN_SAVER_NAME_KEY]
-    if os.system(cmd):
-      print 'screensaver action (%s) failed' % cmd
-      return False
-    cmd = ('defaults -currentHost write com.apple.screensaver modulePath '
-           '-string "%s"') % result[SCREEN_SAVER_PATH_KEY]
-    if os.system(cmd):
-      print 'screensaver action (%s) failed' % cmd
-      return False
-    return True
+    for result in results:
+      path, name = self.SaverForPath(result[Vermilion.IDENTIFIER])
+      if path and name:
+        cmd = ('defaults -currentHost write com.apple.screensaver moduleName '
+               '-string "%s"') % name
+        if os.system(cmd):
+          print 'screensaver action (%s) failed' % cmd
+          return False
+        cmd = ('defaults -currentHost write com.apple.screensaver modulePath '
+               '-string "%s"') % path
+        if os.system(cmd):
+          print 'screensaver action (%s) failed' % cmd
+          return False
+        return True
+    return False
 
 
 def main(argv=None):
