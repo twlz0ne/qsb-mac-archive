@@ -54,10 +54,12 @@
 
 // Returns an array of the last search results
 //
-// Returns:
-//  An array of all of the search results from the last search
+// Args:
+//  client - reference to the client object.  The command returns immediatley,
+//           rankedResults:(in bycopy NSArray *)results is called when the
+//           results are ready.
 //
-- (in bycopy NSArray *)lastSearchResults;
+- (oneway void)lastSearchResults:(in byref id <TransferenceClientProtocol>)client;
 
 // Returns an array of the last search results after they have been ranked
 //

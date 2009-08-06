@@ -71,6 +71,10 @@ const NSTimeInterval kProcessingTimeout = 240.0;
 // Take the results from the server and converts them into an array of
 // QSBResult objects.
 - (NSArray *)generateQSBResults:(NSArray *)originalResults;
+
+// Spins and waits for resultsProcessed_ to be returned as YES or for a limit of
+// kProcessingTimeout.
+- (BOOL)waitForResultProcessing;
 @end
 
 @implementation TransferenceClient
@@ -184,6 +188,17 @@ const NSTimeInterval kProcessingTimeout = 240.0;
   }
   return returnArray;
 }
+
+- (BOOL)waitForResultProcessing {
+  NSDate *timeout = [NSDate dateWithTimeIntervalSinceNow:kProcessingTimeout];
+  while (!resultsProcessed_ &&
+         ([timeout compare:[NSDate date]] == NSOrderedDescending)) {
+    NSDate *spinTime = [NSDate dateWithTimeIntervalSinceNow:2.0];
+    [[NSRunLoop currentRunLoop] runUntilDate:spinTime];
+  }
+  return resultsProcessed_;
+}
+
 #pragma mark -- Public Methods (TransferenceClientProtocol) --
 
 - (oneway void)searchCompleted {
@@ -219,20 +234,22 @@ const NSTimeInterval kProcessingTimeout = 240.0;
 }
 
 - (NSArray *)lastSearchResults {
-  return [self generateQSBResults:[proxy_ lastSearchResults]];
+  resultsProcessed_ = NO;
+  [proxy_ lastSearchResults:self];
+  BOOL success = [self waitForResultProcessing];
+  NSArray *results = nil;
+  if (success) {
+    results = [self generateQSBResults:results_];
+  }
+  return results;
 }
 
 - (NSArray *)lastSearchResultsRanked {
   resultsProcessed_ = NO;
   [proxy_ lastSearchResultsRanked:self];
-  NSDate *timeout = [NSDate dateWithTimeIntervalSinceNow:kProcessingTimeout];
-  while (!resultsProcessed_ &&
-         ([timeout compare:[NSDate date]] == NSOrderedDescending)) {
-    NSDate *spinTime = [NSDate dateWithTimeIntervalSinceNow:2.0];
-    [[NSRunLoop currentRunLoop] runUntilDate:spinTime];
-  }
+  BOOL success = [self waitForResultProcessing];
   NSArray *results = nil;
-  if (resultsProcessed_) {
+  if (success) {
     results = [self generateQSBResults:results_];
   }
   return results;
@@ -243,7 +260,14 @@ const NSTimeInterval kProcessingTimeout = 240.0;
 }
 
 - (int)numberOfSearchResults {
-  return [[proxy_ lastSearchResults] count];
+  resultsProcessed_ = NO;
+  [proxy_ lastSearchResults:self];
+  BOOL success = [self waitForResultProcessing];
+  int count = 0;
+  if (success) {
+    count = [results_ count];
+  }
+  return count;
 }
 
 - (void)performAsynchronousSearch:(NSString *)query {
