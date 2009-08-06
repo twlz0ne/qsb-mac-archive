@@ -322,6 +322,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
                        (NSString *)kMDItemPath,
                        (NSString *)kMDItemTitle,
                        (NSString *)kMDItemLastUsedDate,
+                       (NSString *)kMDItemContentType,
                        (NSString *)kSpotlightGroupIdAttribute,
                        nil];
   }
