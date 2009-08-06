@@ -32,6 +32,8 @@
 
 #import "TransferenceClient.h"
 
+const NSTimeInterval kProcessingTimeout = 240.0;
+
 @interface QSBPlugin ()
 // Designated initializer.  Creates a QSBPlugin object with the corresponding
 // dictionary and client reference.
@@ -188,6 +190,12 @@
   [delegate_ performSelector:@selector(searchDidComplete)];
 }
 
+- (oneway void)rankedResults:(in bycopy NSArray *)results {
+  [results_ release];
+  results_ = [results retain];
+  resultsProcessed_ = YES;
+}
+
 #pragma mark  -- Public Methods --
 
 - (NSDate *)startupTime {
@@ -215,7 +223,19 @@
 }
 
 - (NSArray *)lastSearchResultsRanked {
-  return [self generateQSBResults:[proxy_ lastSearchResultsRanked]];
+  resultsProcessed_ = NO;
+  [self generateQSBResults:[proxy_ lastSearchResultsRanked]];
+  NSDate *timeout = [NSDate dateWithTimeIntervalSinceNow:kProcessingTimeout];
+  while (!resultsProcessed_ ||
+         ([[NSDate date] compare:timeout] == NSOrderedDescending)) {
+    NSDate *spinTime = [NSDate dateWithTimeIntervalSinceNow:2.0];
+    [[NSRunLoop currentRunLoop] runUntilDate:spinTime];
+  }
+  NSArray *results = nil;
+  if (resultsProcessed_) {
+    results = results_;
+  }
+  return results;
 }
 
 - (NSArray *)moduleSearchTimes {

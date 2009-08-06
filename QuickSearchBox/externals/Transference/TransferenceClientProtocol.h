@@ -38,4 +38,7 @@
 //
 - (oneway void)searchCompleted;
 
+// Called by the server when the ranked results are ready
+//
+- (oneway void)rankedResults:(in bycopy NSArray *)results;
 @end

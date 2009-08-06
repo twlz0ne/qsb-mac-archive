@@ -56,6 +56,11 @@
   NSArray *QSBPlugins_; // List of QSBPlugin objects
 
   NSString *query_;     // Query term from the last time a search was performed
+
+  NSArray *results_;    // Storage for the results returned from the server
+
+  // Flag if we are still waiting for results to be processed from the server
+  BOOL resultsProcessed_; 
 }
 
 // Designated initializer. This creates the object and establishes a connection

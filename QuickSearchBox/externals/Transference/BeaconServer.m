@@ -354,13 +354,13 @@ static NSString *const kResultActionKey = @"ResultAction";
   return returnArray;
 }
 
-- (in bycopy NSArray *)lastSearchResultsRanked {
+- (oneway void)lastSearchResultsRanked:(in byref id <TransferenceClientProtocol>)client {
   NSArray *returnArray = nil;
   if ([lastSearchResultsRanked_ count] > 0) {
     returnArray =
       [self convertResultsToTransferenceResults:lastSearchResultsRanked_];
   }
-  return returnArray;
+  [client rankedResults:returnArray];
 }
 
 - (in bycopy NSNumber *)performAction:(NSString *)actionName
