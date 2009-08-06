@@ -32,7 +32,7 @@
 
 const unsigned short kTransferencePort = 62000;
 const NSTimeInterval kMaxTimeout = 5.0;
-const int kProtocolVersion = 1;
+const int kProtocolVersion = 2;
 
 NSString *const kQSBVersionKey = @"QSBVersion";
 NSString *const kMacOSXVersionKey = @"MacOSXVersion";

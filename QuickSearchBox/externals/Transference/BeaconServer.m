@@ -360,6 +360,7 @@ static NSString *const kResultActionKey = @"ResultAction";
     returnArray =
       [self convertResultsToTransferenceResults:lastSearchResultsRanked_];
   }
+
   [client rankedResults:returnArray];
 }
 

@@ -224,16 +224,16 @@ const NSTimeInterval kProcessingTimeout = 240.0;
 
 - (NSArray *)lastSearchResultsRanked {
   resultsProcessed_ = NO;
-  [self generateQSBResults:[proxy_ lastSearchResultsRanked]];
+  [proxy_ lastSearchResultsRanked:self];
   NSDate *timeout = [NSDate dateWithTimeIntervalSinceNow:kProcessingTimeout];
-  while (!resultsProcessed_ ||
-         ([[NSDate date] compare:timeout] == NSOrderedDescending)) {
+  while (!resultsProcessed_ &&
+         ([timeout compare:[NSDate date]] == NSOrderedDescending)) {
     NSDate *spinTime = [NSDate dateWithTimeIntervalSinceNow:2.0];
     [[NSRunLoop currentRunLoop] runUntilDate:spinTime];
   }
   NSArray *results = nil;
   if (resultsProcessed_) {
-    results = results_;
+    results = [self generateQSBResults:results_];
   }
   return results;
 }
