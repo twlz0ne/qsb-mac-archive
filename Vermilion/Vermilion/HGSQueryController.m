@@ -40,6 +40,7 @@
 #import "HGSMixer.h"
 #import "HGSLog.h"
 #import "HGSBundle.h"
+#import "HGSDTrace.h"
 #import "GTMDebugThreadValidation.h"
 #import "HGSOperation.h"
 #import "HGSMemorySearchSource.h"
@@ -374,6 +375,14 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   NSNumber *nsStartTime = [NSNumber numberWithUnsignedLongLong:startTime];
   [operationStartTimes_ setObject:nsStartTime
                            forKey:[[operation source] identifier]];
+  if (VERMILION_SEARCH_START_ENABLED()) {
+    HGSSearchSource *source = [operation source];
+    HGSQuery *query = [operation query];
+    NSString *ptr = [NSString stringWithFormat:@"%p", operation];
+    VERMILION_SEARCH_START((char *)[[source identifier] UTF8String],
+                           (char *)[[query rawQueryString] UTF8String],
+                           (char *)[ptr UTF8String])
+  }
 }
 
 //
@@ -411,6 +420,13 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:kHGSQueryControllerDidFinishNotification 
                       object:self];
+  }
+  if (VERMILION_SEARCH_FINISH_ENABLED()) {
+    HGSQuery *query = [operation query];
+    NSString *ptr = [NSString stringWithFormat:@"%p", operation];
+    VERMILION_SEARCH_FINISH((char *)[[source identifier] UTF8String],
+                            (char *)[[query rawQueryString] UTF8String],
+                            (char *)[ptr UTF8String])
   }
 }
 

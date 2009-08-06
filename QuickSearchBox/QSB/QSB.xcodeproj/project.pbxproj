@@ -6381,6 +6381,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8B6F30840DA2C81E0052CA40 /* Build configuration list for PBXNativeTarget "Vermilion" */;
 			buildPhases = (
+				5A4018A91020FEDA00253CCF /* DTrace */,
 				8B6F2CDC0DA2B7F50052CA40 /* Headers */,
 				8B6F2CDD0DA2B7F50052CA40 /* Resources */,
 				8B6F2CDE0DA2B7F50052CA40 /* Sources */,
@@ -7445,6 +7446,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5A4018A91020FEDA00253CCF /* DTrace */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = DTrace;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "dtrace -h -s \"${SRCROOT}/../../Vermilion/Vermilion/HGSDTrace.d\" -o \"${DERIVED_FILE_DIR}/HGSDTrace.h\"\n";
+		};
 		5AC3EE0D0F8408E000F171EB /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
