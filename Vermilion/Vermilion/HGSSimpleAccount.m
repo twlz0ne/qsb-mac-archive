@@ -51,8 +51,8 @@
       [self setAuthenticated:YES];
     } else {
       NSString *keychainServiceName = [self identifier];
-      HGSLogDebug(@"No keychain item found for service name '%@'", 
-                  keychainServiceName);
+      HGSLog(@"No keychain item found for service name '%@'", 
+             keychainServiceName);
       [self release];
       self = nil;
     }
