@@ -120,7 +120,7 @@
     } else {
       CFURLRef appURL = NULL;
       if (url && noErr == LSGetApplicationForURL((CFURLRef)url,
-                                                 kLSRolesViewer,
+                                                 kLSRolesViewer | kLSRolesEditor,
                                                  NULL, &appURL)) {
         GTMCFAutorelease(appURL);
         icon =  [[NSWorkspace sharedWorkspace] iconForFile:[(NSURL *)appURL path]];
