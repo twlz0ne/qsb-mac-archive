@@ -588,9 +588,9 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   NSDictionary *hgsAttributes 
     = [NSDictionary dictionaryWithObjectsAndKeys:
        lastUsedDate, kHGSObjectAttributeLastUsedDateKey,
-       (isURL ? uri : nil), kHGSObjectAttributeSourceURLKey,
        iconFlagName, kHGSObjectAttributeFlagIconNameKey,
        rank, kHGSObjectAttributeRankKey,
+       (isURL ? uri : nil), kHGSObjectAttributeSourceURLKey,
        nil];
   
   result = [HGSResult resultWithURI:uri
