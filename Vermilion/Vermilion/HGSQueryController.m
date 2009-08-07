@@ -381,7 +381,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     NSString *ptr = [NSString stringWithFormat:@"%p", operation];
     VERMILION_SEARCH_START((char *)[[source identifier] UTF8String],
                            (char *)[[query rawQueryString] UTF8String],
-                           (char *)[ptr UTF8String])
+                           (char *)[ptr UTF8String]);
   }
 }
 
@@ -426,7 +426,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     NSString *ptr = [NSString stringWithFormat:@"%p", operation];
     VERMILION_SEARCH_FINISH((char *)[[source identifier] UTF8String],
                             (char *)[[query rawQueryString] UTF8String],
-                            (char *)[ptr UTF8String])
+                            (char *)[ptr UTF8String]);
   }
 }
 
