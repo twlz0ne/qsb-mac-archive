@@ -585,13 +585,15 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   NSString *normalizedString = [context->query_ normalizedQueryString];
   CGFloat rank = HGSScoreForAbbreviation(name, normalizedString, NULL);
 
-  NSDictionary *hgsAttributes 
-    = [NSDictionary dictionaryWithObjectsAndKeys:
+  NSMutableDictionary *hgsAttributes 
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        lastUsedDate, kHGSObjectAttributeLastUsedDateKey,
        iconFlagName, kHGSObjectAttributeFlagIconNameKey,
-       rank, kHGSObjectAttributeRankKey,
-       (isURL ? uri : nil), kHGSObjectAttributeSourceURLKey,
+       [NSNumber numberWithFloat:rank], kHGSObjectAttributeRankKey,
        nil];
+  if (isURL) {
+    [hgsAttributes setObject:uri forKey:kHGSObjectAttributeSourceURLKey];
+  }
   
   result = [HGSResult resultWithURI:uri
                                name:name
