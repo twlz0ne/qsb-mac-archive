@@ -13,6 +13,9 @@
 /* A label denoting the picasaweb service. */
 "Picasaweb" = "Picasaweb";
 
+/* A string describing an action that the user can choose that will be cause the selected item(s) to be uploaded to a Picasa Web Albums account. */
+"Upload to Picasa Web Albums" = "Upload to Picasa Web Albums";
+
 /* A dialog label explaining that the fetch for the item denoted by %1$@ from the account with the username %2$@ failed. %3$d is an error code returned from Picasaweb */
 "Picasaweb %1$@ fetch for account '%2$@' failed. (%3$d)" = "Picasaweb %1$@ fetch for account '%2$@' failed. (%3$d)";
 
