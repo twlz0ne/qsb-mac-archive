@@ -99,13 +99,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (CGFloat)minimumTableHeight {
-  return 280.0;
+  return 42.0;
 }
 
 - (CGFloat)maximumTableHeight {
-  // TODO(mrossetti): We probably want to calculate the following based
-  // on the screen geometry.
-  return 650.0;
+  return 1024.0;
 }
 
 - (BOOL)isTransitionDirectionUp {
@@ -201,12 +199,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                                                               row:lastCellRow];
     newTableHeight = fabs(NSMinY(firstCellFrame) - NSMaxY(lastCellFrame));
   }
-  
   CGFloat minTableHeight = [self minimumTableHeight];
   CGFloat maxTableHeight = [self maximumTableHeight];
   newTableHeight = MAX(newTableHeight, minTableHeight);
   newTableHeight = MIN(newTableHeight, maxTableHeight);
-  
   lastWindowHeight_ = newTableHeight;
   
   return lastWindowHeight_;
