@@ -55,5 +55,3 @@ QSB_RELEASE_NOTE_PATH = ${BUILT_PRODUCTS_DIR}/QuickSearchBoxReleaseNotes_${GOOGL
 VERMILLION_PLUGIN_API_VERSION = 2
 
 GCC_WARN_SHADOW = YES
-
-GTM_HOST_OTHER_CFLAGS = -fstack-protector -fstack-protector-all
