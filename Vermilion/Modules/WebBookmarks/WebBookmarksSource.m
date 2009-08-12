@@ -40,7 +40,8 @@
                 fileToWatch:(NSString *)path {
   if ((self = [super initWithConfiguration:configuration])) {
     GTMFileSystemKQueueEvents queueEvents = (kGTMFileSystemKQueueDeleteEvent 
-                                              | kGTMFileSystemKQueueWriteEvent);
+                                             | kGTMFileSystemKQueueWriteEvent
+                                             | kGTMFileSystemKQueueRenameEvent);
     fileKQueue_ 
       = [[GTMFileSystemKQueue alloc] initWithPath:path
                                         forEvents:queueEvents
