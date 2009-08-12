@@ -133,8 +133,9 @@ extern NSString *const kQSBSelectedResultKey;
 // Drop the selection from the Finder on the current selection
 - (IBAction)dropSelection:(id)sender;
 
-// Clears out the last pivot from the text box
-- (IBAction)clearTextOrLastPivot:(id)sender;
+// Reset the current query by unrolling all pivots, if any, and hiding the
+// results window.  If no results are showing then hide the query window.
+- (IBAction)resetSearchOrHideQuery:(id)sender;
 
 // Search for a string in the UI
 - (void)searchForString:(NSString *)string;

@@ -569,25 +569,16 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   }
 }
 
-- (IBAction)clearTextOrLastPivot:(id)sender {
-  NSString *savedQueryString = [searchTextFieldEditor_ string];
-  if ([savedQueryString length]) {
-    // If there is any freestanding text clear that text.
-    [searchTextField_ setStringValue:@""];
+- (IBAction)resetSearchOrHideQuery:(id)sender {
+  // Hide the results window if it's showing.
+  if ([resultsWindow_ isVisible]) {
+    while ([self popViewControllerAnimate:NO]) { }
     [activeSearchViewController_ setQueryString:nil];
-  } else if ([activeSearchViewController_ results]) {
-    // Otherwise, if there's a pivot then pop that pivot.
-    [self popViewControllerAnimate:NO];
+    [searchTextField_ setStringValue:@""];
+    [self hideResultsWindow];
   } else {
-    // Else hide the results window if it's showing.
-    if ([resultsWindow_ isVisible]) {
-      [activeSearchViewController_ setQueryString:nil];
-      [searchTextField_ setStringValue:@""];
-      [self hideResultsWindow];
-    } else {
-      // Or if none of the above hide the query window.
-      [self hideSearchWindow:self];
-    }
+    // Otherwise hide the query window.
+    [self hideSearchWindow:self];
   }
 }
 
