@@ -669,20 +669,28 @@ GTM_METHOD_CHECK(NSEnumerator,
     [self indexResult:docResult
                  name:[[doc title] stringValue]
            otherTerms:otherTerms];
-  } else {
+  } else if ([error code] != 403) {
+    // Ignore access privilege errors.
+    HGSLog(@"HGSGoogleDocSource worksheet fetcher failed: error = %d, "
+           @"userName = %@, spreadsheet = %@.",
+           [error code], [account_ displayName], [docResult displayName]);
     NSString *errorSummary
-      = HGSLocalizedString(@"Worksheet access limited.", 
+      = HGSLocalizedString(@"Error retrieving worksheet.", 
                            @"A message title for a dialog describing that "
-                           @"worksheets could not be accessed.");
+                           @"worksheets could not be retrieved.");
     NSString *errorFormat 
-      = HGSLocalizedString(@"Some worksheets for spreadsheet '%1$@' at "
-                           @"account '%2$@' are unavailable due to "
-                           @"access limitations.",
-                           @"A dialog message explaining that one or more "
-                           @"worksheets for the spreadsheet named by %1$@ in "
-                           @"the Google account %2$@ may not be accessible.");
+      = HGSLocalizedString(@"Error %1$d occurred for spreadsheet '%2$@' at "
+                           @"account '%3$@' (%4$@).",
+                           @"A dialog message explaining that an error "
+                           @"occurred retrieving worksheets for the "
+                           @"spreadsheet named by %2$@ in the Google "
+                           @"account %3$@ may not be accessible.  The "
+                           @"error code is given by %1$d and the error "
+                           @"description by %4$@.");
     NSString *errorString = [NSString stringWithFormat:errorFormat,
-                             [docResult displayName], [account_ displayName]];
+                             [error code], [docResult displayName],
+                             [account_ displayName],
+                             [error localizedDescription]];
     NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     NSDictionary *messageDict = [NSDictionary dictionaryWithObjectsAndKeys:

@@ -42,11 +42,11 @@
 "Microsoft Excel Document (XLS)" = "Microsoft Excel Document (XLS)";
 "ZIP Archive (with images) (ZIP)" = "ZIP Archive (with images) (ZIP)";
 
-/* A message title for a dialog describing that one or more worksheets for a spreadsheet could not be accessed. */
-"Worksheet access limited." = "Worksheet access limited.";
+/* A message title for a dialog describing that one or more worksheets for a spreadsheet could not be retrieved. */
+"Error retrieving worksheet." = "Error retrieving worksheet.";
 
-/* A dialog message explaining that one or more worksheets for the spreadsheet named by %1$@ in the Google account %2$@ may not be accessible. */
-"Some worksheets for spreadsheet '%1$@' at account '%2$@' are unavailable due to access limitations." = "Some worksheets for spreadsheet '%1$@' at account '%2$@' are unavailable due to access limitations.";
+/* A dialog message explaining that an error occurred retrieving worksheets for the spreadsheet named by %2$@ in the Google account %3$@ may not be accessible.  The error code is given by %1$d and the error description by %4$@. */
+"Error %1$d occurred for spreadsheet '%2$@' at account '%3$@' (%4$@)." = "Error %1$d occurred for spreadsheet '%2$@' at account '%3$@' (%4$@).";
 
 /* A keyword used when searching to detect items which have been starred by the user in Google Docs. */
 "starred" = "starred";
