@@ -43,6 +43,7 @@
 #import <GData/GDataHTTPFetcher.h>
 #import "HGSLog.h"
 #import "GTMDebugThreadValidation.h"
+#import "GTMGarbageCollection.h"
 
 static const void *LRURetain(CFAllocatorRef allocator, const void *value);
 static void LRURelease(CFAllocatorRef allocator, const void *value);
@@ -65,7 +66,8 @@ static NSString *const kHGSIconProviderResultKey = @"HGSIconProviderResultKey";
 static NSString *const kHGSIconProviderValueKey = @"HGSIconProviderValueKey";
 static NSString *const kHGSIconProviderAttrKey = @"HGSIconProviderAttrKey";
 static NSString *const kHGSIconProviderURIKey = @"HGSIconProviderURIKey";
-static NSString *const kHGSIconProviderThumbnailURLFormat = @"HGSIconProviderThumbnailURLFormat";
+static NSString *const kHGSIconProviderThumbnailURLFormat 
+  = @"HGSIconProviderThumbnailURLFormat";
 
 static NSURL* IconURLForResult(HGSResult *result) {
   NSURL *url = [result valueForKey:kHGSObjectAttributeIconPreviewFileKey];
@@ -328,7 +330,8 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
                                              bitmapFormat:0 
                                               bytesPerRow:0
                                              bitsPerPixel:0] autorelease];
-  NSGraphicsContext *gc = [NSGraphicsContext graphicsContextWithBitmapImageRep:imageRep];
+  NSGraphicsContext *gc 
+    = [NSGraphicsContext graphicsContextWithBitmapImageRep:imageRep];
   [NSGraphicsContext saveGraphicsState];
   [NSGraphicsContext setCurrentContext:gc];
   [baseImage drawInRect:GTMNSRectOfSize(baseImageSize)
@@ -517,12 +520,10 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 // Return an image that has a round rectangle frame and a drop shadow
 - (NSImage *)imageWithRoundRectAndDropShadow:(NSImage *)image {
   if (!image) return nil;
-  NSImage *formattedImage = [[[NSImage alloc] init] autorelease];
   
   NSSize preferredSize = [self preferredIconSize];
   NSRect borderRect = GTMNSRectOfSize(preferredSize);
   borderRect = NSInsetRect(borderRect, 8.0, 8.0);
-  
   NSImageRep *bestRep = [image gtm_bestRepresentationForSize:borderRect.size];
   NSRect bestRepRect = GTMNSRectOfSize([bestRep size]);
   NSRect drawRect = GTMNSScaleRectToRect(bestRepRect, 
@@ -530,33 +531,35 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
                                          GTMScaleProportionally,
                                          GTMRectAlignCenter);
   drawRect = NSIntegralRect(drawRect);
-  NSBitmapImageRep *imageRep 
-    = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL 
-                                               pixelsWide:preferredSize.width 
-                                               pixelsHigh:preferredSize.height 
-                                            bitsPerSample:8 
-                                          samplesPerPixel:4 
-                                                 hasAlpha:YES 
-                                                 isPlanar:NO 
-                                           colorSpaceName:NSCalibratedRGBColorSpace 
-                                             bitmapFormat:0 
-                                              bytesPerRow:preferredSize.width * 4 
-                                             bitsPerPixel:32] autorelease];
-  [formattedImage setSize:[imageRep size]];
-  [formattedImage addRepresentation:imageRep];
-  [formattedImage lockFocusOnRepresentation:imageRep];
-  NSGraphicsContext *nsContext = [NSGraphicsContext currentContext];
+  NSRect insetRect = NSInsetRect(drawRect, 0.5, 0.5);
+  
+  CGColorSpaceRef cspace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
+  GTMCFAutorelease(cspace);
+  CGContextRef cgContext 
+    = CGBitmapContextCreate(NULL, 
+                            preferredSize.width, 
+                            preferredSize.height, 
+                            8, 
+                            32 * preferredSize.width, 
+                            cspace, 
+                            kCGBitmapByteOrder32Host 
+                            | kCGImageAlphaPremultipliedLast);
+  GTMCFAutorelease(cgContext);
+  
+  NSGraphicsContext *nsContext 
+    = [NSGraphicsContext graphicsContextWithGraphicsPort:cgContext
+                                                 flipped:NO];
+  [NSGraphicsContext saveGraphicsState];
+  [NSGraphicsContext setCurrentContext:nsContext];
   NSShadow *aShadow = [[[NSShadow alloc] init] autorelease];
   [aShadow setShadowOffset:NSMakeSize(0, -1)];
   [aShadow setShadowBlurRadius:2];
   [aShadow set];
   [nsContext setImageInterpolation:NSImageInterpolationHigh];
-  CGContextRef cgContext = [nsContext graphicsPort];
   CGContextBeginTransparencyLayer(cgContext, NULL);
-  NSRect insetRect = NSInsetRect(drawRect, 0.5, 0.5);
   NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:insetRect
-                                                           xRadius:2.0
-                                                           yRadius:2.0];
+                                                       xRadius:2.0
+                                                       yRadius:2.0];
   [nsContext saveGraphicsState];
   [path setClip];
   [bestRep drawInRect:drawRect];
@@ -565,7 +568,15 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   [[NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:0.25] setStroke];
   [path stroke];
   CGContextEndTransparencyLayer(cgContext);
-  [formattedImage unlockFocus];
+  [NSGraphicsContext restoreGraphicsState];
+  
+  NSImage *formattedImage 
+    = [[[NSImage alloc] initWithSize:preferredSize] autorelease];
+  CGImageRef cgImage = CGBitmapContextCreateImage(cgContext);
+  GTMCFAutorelease(cgImage);
+  NSBitmapImageRep *imageRep 
+    = [[[NSBitmapImageRep alloc] initWithCGImage:cgImage] autorelease];
+  [formattedImage addRepresentation:imageRep];
   return formattedImage;
 }
 

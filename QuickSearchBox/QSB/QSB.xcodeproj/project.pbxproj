@@ -617,8 +617,7 @@
 		8B55DB030E78832300D39CB0 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B55DB010E78832300D39CB0 /* SenTestingKit.framework */; };
 		8B55DBB00E78919F00D39CB0 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8B58E9EE0E548F8C00A0E02E /* QSBGoogleSuggestURLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B58E9ED0E548F8C00A0E02E /* QSBGoogleSuggestURLHandler.m */; };
-		8B5C86AE0FD1F1BC00A6AA25 /* RoundRectAndDropShadow.10.5.7.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 8B5C86840FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.7.tiff */; };
-		8B5C86AF0FD1F1BC00A6AA25 /* RoundRectAndDropShadow.10.5.6.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 8B5C86850FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.6.tiff */; };
+		8B5C86AE0FD1F1BC00A6AA25 /* RoundRectAndDropShadow.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 8B5C86840FD1F0E400A6AA25 /* RoundRectAndDropShadow.tiff */; };
 		8B5C8D7D0E536E37001DE405 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B5EC6C60CEE61BF00AD3BBD /* QSBBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5EC6490CEE61BE00AD3BBD /* QSBBackgroundView.m */; };
 		8B5EC6C90CEE61BF00AD3BBD /* QSBApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5EC64F0CEE61BE00AD3BBD /* QSBApplication.m */; };
@@ -1588,6 +1587,13 @@
 			remoteGlobalIDString = 8B77DEFE0F284A4C00FA2A3C;
 			remoteInfo = "Release Notes";
 		};
+		8BCCB03B10348ABE0051B567 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B637B4C0F2777C300997738 /* GData.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4F1C6E0F1027B3CE00B46459;
+			remoteInfo = GDataTouchStaticLib;
+		};
 		8BD988250E645EFF00F5C83B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -2315,8 +2321,7 @@
 		8B55DB010E78832300D39CB0 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		8B58E9E90E548F1200A0E02E /* GTMGetURLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMGetURLHandler.m; sourceTree = "<group>"; };
 		8B58E9ED0E548F8C00A0E02E /* QSBGoogleSuggestURLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBGoogleSuggestURLHandler.m; sourceTree = "<group>"; };
-		8B5C86840FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.7.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RoundRectAndDropShadow.10.5.7.tiff; sourceTree = "<group>"; };
-		8B5C86850FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.6.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RoundRectAndDropShadow.10.5.6.tiff; sourceTree = "<group>"; };
+		8B5C86840FD1F0E400A6AA25 /* RoundRectAndDropShadow.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RoundRectAndDropShadow.tiff; sourceTree = "<group>"; };
 		8B5EC6480CEE61BE00AD3BBD /* QSBBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBBackgroundView.h; sourceTree = "<group>"; };
 		8B5EC6490CEE61BE00AD3BBD /* QSBBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBBackgroundView.m; sourceTree = "<group>"; };
 		8B5EC64E0CEE61BE00AD3BBD /* QSBApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBApplication.h; sourceTree = "<group>"; };
@@ -4263,8 +4268,7 @@
 				8B6872D01018232400ADEA67 /* Resources */,
 				8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */,
 				5AC3E8230F7C2F6200F171EB /* VermilionTest.py */,
-				8B5C86840FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.7.tiff */,
-				8B5C86850FD1F0E400A6AA25 /* RoundRectAndDropShadow.10.5.6.tiff */,
+				8B5C86840FD1F0E400A6AA25 /* RoundRectAndDropShadow.tiff */,
 			);
 			path = TestData;
 			sourceTree = "<group>";
@@ -4614,6 +4618,7 @@
 			isa = PBXGroup;
 			children = (
 				8B637B570F2777C300997738 /* GData.framework */,
+				8BCCB03C10348ABE0051B567 /* libGDataTouchStaticLib.a */,
 				8B637B590F2777C300997738 /* GDataUnitTests.octest */,
 				8B637B5B0F2777C300997738 /* DevelopmentTestTool */,
 			);
@@ -6390,6 +6395,7 @@
 			);
 			buildRules = (
 			);
+			comments = "We set FRAMEWORK_SEARCH_PATHS to /System/Library/Frameworks intentionally because some internal Google Tools install Python 2.4 in /Library/Frameworks, and we don't want to link with that one on Google machines because it will cause Vermilion built on Google machines to not load on non-Google machines.";
 			dependencies = (
 				8BC6744E0F58B097003B5C6A /* PBXTargetDependency */,
 				8BD988260E645EFF00F5C83B /* PBXTargetDependency */,
@@ -6897,6 +6903,13 @@
 			remoteRef = 8B989F4C0FA7B93C009DC652 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		8BCCB03C10348ABE0051B567 /* libGDataTouchStaticLib.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libGDataTouchStaticLib.a;
+			remoteRef = 8BCCB03B10348ABE0051B567 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -7266,8 +7279,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B5C86AE0FD1F1BC00A6AA25 /* RoundRectAndDropShadow.10.5.7.tiff in Resources */,
-				8B5C86AF0FD1F1BC00A6AA25 /* RoundRectAndDropShadow.10.5.6.tiff in Resources */,
+				8B5C86AE0FD1F1BC00A6AA25 /* RoundRectAndDropShadow.tiff in Resources */,
 				5AC3E8240F7C2F7300F171EB /* VermilionTest.py in Resources */,
 				8B687490101836C700ADEA67 /* Localizable.strings in Resources */,
 			);
@@ -11178,6 +11190,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					/System/Library/Frameworks,
+					"$(FRAMEWORK_SEARCH_PATHS)",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/Vermilion-Info.plist";
 				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
 				PRODUCT_NAME = Vermilion;
@@ -11188,6 +11204,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					/System/Library/Frameworks,
+					"$(FRAMEWORK_SEARCH_PATHS)",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/Vermilion-Info.plist";
 				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
 				PRODUCT_NAME = Vermilion;
@@ -11428,6 +11448,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					/System/Library/Frameworks,
+					"$(FRAMEWORK_SEARCH_PATHS)",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/Vermilion-Info.plist";
 				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
 				PRODUCT_NAME = Vermilion;
@@ -11471,6 +11495,7 @@
 			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
+					/System/Library/Frameworks,
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
 				);
@@ -11973,6 +11998,7 @@
 			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
+					/System/Library/Frameworks,
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
 				);
@@ -11986,6 +12012,7 @@
 			baseConfigurationReference = 8BA6238D0F12B97E008182B5 /* ReleaseUnittest.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
+					/System/Library/Frameworks,
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
 				);
