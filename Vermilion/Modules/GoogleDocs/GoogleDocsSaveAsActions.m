@@ -76,9 +76,8 @@ static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
 
 - (BOOL)appliesToResult:(HGSResult *)result {
   // TODO(mrossetti): Only accept webpage results created by the GoogleDocsSource.
-  BOOL doesApply = ![result isFileResult];
   NSString *category = [result valueForKey:kGoogleDocsDocCategoryKey];
-  doesApply = (category != nil);
+  BOOL doesApply = (category != nil);
   return doesApply;
 }
 

@@ -604,13 +604,12 @@ GTM_METHOD_CHECK(NSEnumerator,
   HGSAssert([spreadsheet isKindOfClass:[GDataEntrySpreadsheet class]], nil);
   NSURL* spreadsheetFeedURL = [spreadsheet worksheetsFeedURL];
   GDataServiceTicket *worksheetServiceTicket
-    = [[spreadsheetService_ 
-        fetchFeedWithURL:spreadsheetFeedURL
-                delegate:self
-       didFinishSelector:@selector(worksheetServiceTicket:
+    = [spreadsheetService_
+       fetchFeedWithURL:spreadsheetFeedURL
+               delegate:self
+      didFinishSelector:@selector(worksheetServiceTicket:
                                    finishedWithFeed:
-                                   error:)]
-       retain];
+                                   error:)];
   [worksheetServiceTicket setProperty:spreadsheetResult
                                forKey:kGoogleDocsSpreadsheetDocResultPropertyKey];
   [worksheetServiceTicket setProperty:spreadsheet

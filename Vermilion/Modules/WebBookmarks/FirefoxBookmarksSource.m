@@ -225,7 +225,7 @@
 - (id)removeNullsFromJSONObject:(id)object {
   id newObject = nil;
   if ([object isKindOfClass:[NSArray class]]) {
-    newObject = [[NSMutableArray alloc] initWithCapacity:[object count]];
+    newObject = [NSMutableArray arrayWithCapacity:[object count]];
     for (id element in object) {
       id newElement = [self removeNullsFromJSONObject:element];
       if (newElement) {
@@ -233,7 +233,7 @@
       }
     }
   } else if ([object isKindOfClass:[NSDictionary class]]) {
-    newObject = [[NSMutableDictionary alloc] initWithCapacity:[object count]];
+    newObject = [NSMutableDictionary dictionaryWithCapacity:[object count]];
     for (id key in object) {
       id element = [object valueForKey:key];
       id newElement = [self removeNullsFromJSONObject:element];
@@ -385,7 +385,7 @@
       }
     }
   }
-  return fullPath;
+  return recentPath;
 }
 
 @end

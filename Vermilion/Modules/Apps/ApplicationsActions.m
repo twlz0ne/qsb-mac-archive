@@ -33,6 +33,7 @@
 #import <Vermilion/Vermilion.h>
 #import "GTMNSWorkspace+Running.h"
 #import "GTMMethodCheck.h"
+#import "GTMGarbageCollection.h"
 #import "HGSLog.h"
 #import <Carbon/Carbon.h>
 
@@ -137,15 +138,17 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
   ProcessSerialNumber thisPSN;
   thisPSN.highLongOfPSN = kNoProcess;
   thisPSN.lowLongOfPSN = 0;
-  Boolean show;
+  Boolean show = NO;  // Initialize with default so CLANG is happy
   while(GetNextProcess ( &thisPSN ) == noErr) {
     for (i = 0; i < [theApps count]; i++) {
       OSStatus err = SameProcess(&thisPSN, psn+i, &show);
       if (err != noErr) continue;
       if (show) break;
     }
-    OSStatus err = ShowHideProcess(&thisPSN, show);  
-    HGSLogDebug(@"unable to hide process %d", err);
+    OSStatus err = ShowHideProcess(&thisPSN, show);
+    if(err != noErr) {
+      HGSLogDebug(@"Unable to hide process %d", err);
+    }
   } 
   free(psn);
   return YES;
@@ -177,12 +180,10 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
   
   while(GetNextProcess(&thisPSN) == noErr) {
     NSDictionary *dict
-      = (NSDictionary *)ProcessInformationCopyDictionary(&thisPSN,
-            kProcessDictionaryIncludeAllInformationMask);
-    [dict autorelease];
+      = GTMCFAutorelease(ProcessInformationCopyDictionary(&thisPSN,
+                           kProcessDictionaryIncludeAllInformationMask));
     BOOL background = [[dict objectForKey:@"LSUIElement"] boolValue]
       || [[dict objectForKey:@"LSBackgroundOnly"] boolValue];
-    [dict autorelease];
     if (background) continue;
     NSString *name;
     OSStatus err = CopyProcessName(&thisPSN, (CFStringRef *)&name);

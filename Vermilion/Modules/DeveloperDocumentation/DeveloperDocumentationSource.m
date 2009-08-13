@@ -121,9 +121,7 @@ static NSString *const kiPhoneReferenceDocSetPath
   // on the nodes themselves.
   NSAutoreleasePool *outerPool = [[NSAutoreleasePool alloc] init];
   id docSet 
-    = [[[dsaDocSetClass alloc] performSelector:@selector(initWithDocRootDirectory:) 
-                                    withObject:docsURL] 
-       autorelease];
+    = [[[dsaDocSetClass alloc] initWithDocRootDirectory: docsURL] autorelease];
   
   NSArray *nodes 
     = [docSet valueForKeyPath: @"rootNode.searchableNodesInHierarchy"];
@@ -138,7 +136,7 @@ static NSString *const kiPhoneReferenceDocSetPath
     if (!path) {
       NSString *urlString = [node valueForKey:@"URL"];
       if (urlString) {
-        url = [NSURL URLWithString:urlString];
+        url = [[NSURL alloc] initWithString:urlString];
       }
     } else {
       url = [[NSURL alloc] initWithString:path relativeToURL:rootDirURL];
@@ -161,6 +159,7 @@ static NSString *const kiPhoneReferenceDocSetPath
                             source:self
                         attributes:attributes];  
       [self indexResult:result];
+      [url autorelease];
     }
     [innerPool release];
   }

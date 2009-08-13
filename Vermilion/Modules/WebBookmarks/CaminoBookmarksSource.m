@@ -114,7 +114,7 @@
                      forKey:kHGSObjectAttributeWebSearchTemplateKey];
     }
   }
-  [self indexResultNamed:title URL:urlString otherAttributes:attributes];
+  [self indexResultNamed:nameString URL:urlString otherAttributes:attributes];
 }
 
 

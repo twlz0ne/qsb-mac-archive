@@ -339,8 +339,12 @@ GTM_METHOD_CHECK(NSColor, crayonName);
                                               1, currentWorkspace);
         }
       }
+      if (status != noErr) {
+        HGSLogDebug(@"A private CoreGraphics function returrned an error in"
+                    @"[QSBPreferenceWindowController -showPreferences:]");
+      }
     }
-  } else{
+  } else {
     HGSLogDebug(@"Unable to access weak symbols _CGSDefaultConnection:%p "
                 @"CGSGetWorkspace:%p CGSGetWindowWorkspace:%p "
                 @"CGSMoveWorkspaceWindowList:%p", 

@@ -168,7 +168,7 @@ static NSString *const kClipboardCopyAction
       // RTF data
       NSData *data = [pb dataForType:NSRTFPboardType];
       NSAttributedString *attributedString
-        = [[NSAttributedString alloc] initWithRTF:data documentAttributes:NULL];
+        = [[[NSAttributedString alloc] initWithRTF:data documentAttributes:NULL] autorelease];
       NSString *value = [attributedString string];
       NSString *name = [self nameFromStringValue:value];
       NSURL *url

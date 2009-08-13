@@ -58,8 +58,7 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
   NSURL *imagePostURL_;
   NSMutableSet *activeTickets_;
   BOOL userWasNoticed_;
-  NSUInteger uploadsCompleted_;
-  unsigned long long bytesSent_;
+  UInt64 bytesSent_;
 }
 
 @property (nonatomic, retain) GDataServiceGooglePhotos *picasaWebService;
@@ -448,7 +447,7 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
 // -[GDataUtilities MIMETypeForFileAtPath:...] fails to properly
 // identify the type.
 + (NSString *)staticMIMETypeForPath:(NSString *)path {
-  NSDictionary *dict =  [[NSDictionary alloc] initWithObjectsAndKeys:
+  NSDictionary *dict =  [NSDictionary dictionaryWithObjectsAndKeys:
                          @"image/jpeg",      @"jpg",
                          @"image/jpeg",      @"jpe",
                          @"image/jpeg",      @"jpeg",
