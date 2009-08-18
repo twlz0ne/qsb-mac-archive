@@ -33,6 +33,7 @@
 #import <Vermilion/Vermilion.h>
 #import "ClipboardSearchSource.h"
 #import "GTMNSString+URLArguments.h"
+#import "QSBHGSDelegate.h"
 
 static const NSTimeInterval kPasteboardPollInterval = 1.0;
 static const NSInteger kMaxDisplayNameLength = 256;
@@ -126,14 +127,14 @@ static NSString *const kClipboardCopyAction
     NSArray *types = [pb types];
     for (NSString *type in types) {
       if ([type isEqualToString:NSStringPboardType]) {
-        [pasteboardValue setValue:[pb stringForType:NSStringPboardType]
-                           forKey:type];
+        [pasteboardValue setObject:[pb stringForType:NSStringPboardType]
+                            forKey:type];
       } else if ([type isEqualToString:NSURLPboardType]) {
-        [pasteboardValue setValue:[NSURL URLFromPasteboard:pb]
-                           forKey:type];
+        [pasteboardValue setObject:[NSURL URLFromPasteboard:pb]
+                            forKey:type];
       } else {
-        [pasteboardValue setValue:[pb dataForType:type]
-                           forKey:type];
+        [pasteboardValue setObject:[pb dataForType:type]
+                            forKey:type];
       }
     }
     
@@ -149,6 +150,7 @@ static NSString *const kClipboardCopyAction
     // for the name, snippet, icon, etc.
     NSMutableDictionary *dictionary = nil;
     NSString *type = [pb availableTypeFromArray:types_];
+    OSType iconType = kClippingUnknownType;
     if ([type isEqualToString:NSStringPboardType]) {
       // Plain text string
       NSString *value = [pb stringForType:NSStringPboardType];
@@ -164,11 +166,13 @@ static NSString *const kClipboardCopyAction
       if (![value isEqualToString:name]) {
         snippet = [self snippetFromStringValue:value];
       }
+      iconType = kClippingTextType;
     } else if ([type isEqualToString:NSRTFPboardType]) {
       // RTF data
       NSData *data = [pb dataForType:NSRTFPboardType];
       NSAttributedString *attributedString
-        = [[[NSAttributedString alloc] initWithRTF:data documentAttributes:NULL] autorelease];
+        = [[[NSAttributedString alloc] 
+            initWithRTF:data documentAttributes:NULL] autorelease];
       NSString *value = [attributedString string];
       NSString *name = [self nameFromStringValue:value];
       NSURL *url
@@ -182,6 +186,7 @@ static NSString *const kClipboardCopyAction
       if (![value isEqualToString:name]) {
         snippet = [self snippetFromStringValue:value];
       }
+      iconType = kClippingTextType;
     } else if ([type isEqualToString:NSURLPboardType]) {
       // URL
       NSURL *url = [NSURL URLFromPasteboard:pb];
@@ -190,6 +195,7 @@ static NSString *const kClipboardCopyAction
                     kTypeClipboardURL, kHGSObjectAttributeTypeKey,
                     url, kHGSObjectAttributeURIKey,
                     nil];
+      iconType = kClippingUnknownType;
     } else if ([type isEqualToString:NSTIFFPboardType] ||
                [type isEqualToString:NSPDFPboardType] ||
                [type isEqualToString:NSPICTPboardType]) {
@@ -209,14 +215,15 @@ static NSString *const kClipboardCopyAction
                       url, kHGSObjectAttributeURIKey,
                       nil];
       }
+      iconType = kClippingPictureType;
     }
     // TODO(hawk): more specializations, such as files
     
     if (dictionary && pasteboardValue) {
-      [dictionary setValue:pasteboardValue
-                    forKey:kHGSObjectAttributePasteboardValueKey];
-      [dictionary setValue:[NSDate date]
-                    forKey:kHGSObjectAttributeLastUsedDateKey];
+      [dictionary setObject:pasteboardValue
+                     forKey:kHGSObjectAttributePasteboardValueKey];
+      [dictionary setObject:[NSDate date]
+                     forKey:kHGSObjectAttributeLastUsedDateKey];
       HGSAction *action 
         = [[HGSExtensionPoint actionsPoint]
            extensionWithIdentifier:kClipboardCopyAction];
@@ -225,12 +232,37 @@ static NSString *const kClipboardCopyAction
                        forKey:kHGSObjectAttributeDefaultActionKey];
       }
       if (snippet) {
-        [dictionary setValue:snippet forKey:kHGSObjectAttributeSnippetKey];
+        [dictionary setObject:snippet forKey:kHGSObjectAttributeSnippetKey];
       }
       if (icon) {
-        [dictionary setValue:icon forKey:kHGSObjectAttributeIconKey];
+        [dictionary setObject:icon forKey:kHGSObjectAttributeIconKey];
       }
       
+      NSMutableArray *cellArray = [NSMutableArray array];
+      NSString *clipboard = HGSLocalizedString(@"Clipboard", 
+                                               @"The generic search term used "
+                                               @"to bring up clipboard "
+                                               @"contents and history");
+      NSDictionary *clipboardCell 
+        = [NSDictionary dictionaryWithObject:clipboard
+                                      forKey:kQSBPathCellDisplayTitleKey];
+      [cellArray addObject:clipboardCell];
+      
+      NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
+      [formatter setDateStyle:NSDateFormatterShortStyle];
+      [formatter setTimeStyle:NSDateFormatterShortStyle];
+      NSString *date = [formatter stringFromDate:[NSDate date]];
+      NSDictionary *userCell 
+        = [NSDictionary dictionaryWithObject:date 
+                                      forKey:kQSBPathCellDisplayTitleKey];
+      [cellArray addObject:userCell];
+      
+      [dictionary setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
+      
+      NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+      NSString *nsIconType = NSFileTypeForHFSTypeCode(iconType);
+      NSImage *image = [ws iconForFileType:nsIconType];
+      [dictionary setObject:image forKey:kHGSObjectAttributeIconKey];
       HGSResult *result = [HGSResult resultWithDictionary:dictionary 
                                                    source:self];
       if (result) {
