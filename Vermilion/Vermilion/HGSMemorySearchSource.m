@@ -38,7 +38,20 @@
 #import "HGSDelegate.h"
 #import "HGSPluginLoader.h"
 #import "HGSLog.h"
+// TODO(mrossetti): REMOVE THE FOLLOWING INCLUDE AND FILES FROM THE PROJECT
+// WHEN WE SETTLE DOWN ON THE SCORING.
 #import "HGSAbbreviationRanker.h"
+#import "HGSSearchTermScorer.h"
+
+// TODO(mrossetti): DEFAULTS KEY FOR ARRAY CONTAINING VALUES TO ALLOW SWITCHING
+// BACK TO THE OLD SCORING TECHNIQUE OR TO OVERRIDE THE SCORING DEFAULTS.
+// http://code.google.com/p/qsb-mac/issues/detail?id=702
+static NSString* const kHGSTermScoringSettingsKey = @"HGSTermScoringSettingsKey";
+// Factor applied to the value of a match score from an 'other term'.
+// TODO(mrossetti): CONVERT THIS TO A CONSTANT WHEN WE SETTLE DOWN ON THE
+// SCORING.  THIS CAN BE OVERRIDDEN BY THE TEMPORARY DEFAULTS, BELOW.
+static CGFloat gOtherTermMultiplier_ = 0.5;
+static CGFloat gMinimumSignificantScore_ = 0.1;
 
 static NSString* const kHGSMemorySourceResultKey = @"HGSMSResultObject";
 static NSString* const kHGSMemorySourceNameKey = @"HGSMSName";
@@ -46,6 +59,11 @@ static NSString* const kHGSMemorySourceOtherTermsKey = @"HGSMSOtherTerms";
 static NSString* const kHGSMemorySourceVersionKey = @"HGSMSVersion";
 static NSString* const kHGSMemorySourceEntriesKey = @"HGSMSEntries";
 static NSString* const kHGSMemorySourceVersion = @"1";
+
+// Key for result attribute that contains the word ranges with the test
+// to be searched.
+NSString* const kHGSObjectAttributeWordRangesKey
+  = @"HGSObjectAttributeWordRangesKey";
 
 // HGSMemorySearchSourceObject is our internal storage for caching
 // results with the terms that match for them. We used to use an
@@ -141,46 +159,131 @@ static NSString* const kHGSMemorySourceVersion = @"1";
       }
         
     } else if (normalizedLength > 0) {
+      // TODO(mrossetti): TEMPORARY CODE TO ALLOW SWITCHING BACK TO THE OLD
+      // SCORING TECHNIQUE OR TO OVERRIDE THE SCORING DEFAULTS.
+      // http://code.google.com/p/qsb-mac/issues/detail?id=702
+      NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+      NSArray *scoreSettings = [ud arrayForKey:kHGSTermScoringSettingsKey];
+      BOOL useOldScorer = NO;
+      if (scoreSettings) {
+        if ([scoreSettings count]) {
+          useOldScorer = [[scoreSettings objectAtIndex:0] boolValue];
+        }
+        if (!useOldScorer) {
+          HGSAssert([scoreSettings count] == 10, nil);
+          CGFloat characterMatchFactor
+            = [[scoreSettings objectAtIndex:1] floatValue];
+          CGFloat firstCharacterInWordFactor
+            = [[scoreSettings objectAtIndex:2] floatValue];
+          CGFloat adjacencyFactor
+            = [[scoreSettings objectAtIndex:3] floatValue];
+          CGFloat startDistanceFactor
+            = [[scoreSettings objectAtIndex:4] floatValue];
+          CGFloat wordPortionFactor
+            = [[scoreSettings objectAtIndex:5] floatValue];
+          CGFloat itemPortionFactor
+            = [[scoreSettings objectAtIndex:6] floatValue];
+          NSUInteger maximumCharacterDistance
+            = [[scoreSettings objectAtIndex:7] unsignedIntValue];
+          NSUInteger maximumItemCharactersScanned
+             = [[scoreSettings objectAtIndex:8] unsignedIntValue];
+          HGSSetSearchTermScoringFactors(characterMatchFactor,
+                                         firstCharacterInWordFactor,
+                                         adjacencyFactor,
+                                         startDistanceFactor,
+                                         wordPortionFactor,
+                                         itemPortionFactor,
+                                         maximumCharacterDistance,
+                                         maximumItemCharactersScanned);
+          gOtherTermMultiplier_
+            = [[scoreSettings objectAtIndex:9] floatValue];
+          }
+      }
 
       // Match the terms
       for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
         if ([operation isCancelled]) break;
         HGSResult* result = [indexObject result];
         NSString* name = [indexObject name];
-        
-
-        CGFloat rank = HGSScoreForAbbreviation(name,
-                                               normalizedQuery, 
-                                               NULL);
-        BOOL hasNameMatch = rank > 0;
-        if (!(rank > 0)) {
-          NSArray* otherTerms = [indexObject otherTerms];
-          for (NSString *otherTerm in otherTerms) {
-            CGFloat otherRank = HGSScoreForAbbreviation(otherTerm,
-                                                        normalizedQuery, 
-                                                        NULL);
-            if (otherRank > rank) {
-              // TODO(dmaclach): do we want to blend these somehow instead
-              // of a strict replacement policy?
-              rank = otherRank;
+        if (!useOldScorer) {
+          NSArray *wordRanges
+            = [result valueForKey:kHGSObjectAttributeWordRangesKey];
+          BOOL addWordRanges = (wordRanges) ? NO : YES;
+          NSArray *queryTerms
+            = [normalizedQuery componentsSeparatedByString:@" "];
+          CGFloat rank = 0.0;
+          for (NSString *queryTerm in queryTerms) {
+            CGFloat itemScore
+              = HGSScoreTermForItem(queryTerm, name, &wordRanges);
+            // Check |otherTerms| only for better matches than the main
+            // search item.
+            NSArray* otherItems = [indexObject otherTerms];
+            for (NSString *otherItem in otherItems) {
+              itemScore = MAX(itemScore,
+                              HGSScoreTermForItem(queryTerm, otherItem, nil)
+                              * gOtherTermMultiplier_);
             }
-            if (rank > 0.9) {
+            if (itemScore < gMinimumSignificantScore_) {
+              // Short-circuit this item since at least one search term
+              // was not adequately matched.
+              rank = 0.0;
               break;
             }
+            rank += itemScore;
           }
-        } 
-          
-        if (rank > 0) {
-          // Copy the result so we can apply rank to it
-          HGSMutableResult *resultCopy = [[result mutableCopy] autorelease];
-          if (hasNameMatch) {
+
+          if (rank > 0.0) {
+            // Copy the result so we can apply rank to it
+            HGSMutableResult *resultCopy = [[result mutableCopy] autorelease];
             [resultCopy addRankFlags:eHGSNameMatchRankFlag];
-          } else {
-            rank *= 0.5;
-            [resultCopy removeRankFlags:eHGSNameMatchRankFlag];
+            [resultCopy setRank:rank];
+
+            // Add the word metrics to the result.
+            if (addWordRanges && [wordRanges count]) {
+                NSDictionary *wordRangesAttributes
+                  = [NSDictionary dictionaryWithObject:wordRanges
+                                                forKey:kHGSObjectAttributeWordRangesKey];
+                [resultCopy resultByAddingAttributes:wordRangesAttributes];
+            }
+            [results addObject:resultCopy];
           }
-          [resultCopy setRank:rank];
-          [results addObject:resultCopy];
+        } else {
+          // TODO(mrossetti): REMOVE THE FOLLOWING CODE ONCE NEW SCORER HAS
+          // STABILIZED.
+          // http://code.google.com/p/qsb-mac/issues/detail?id=702
+          CGFloat rank = HGSScoreForAbbreviation(name,
+                                                 normalizedQuery, 
+                                                 NULL);
+          BOOL hasNameMatch = rank > 0;
+          if (!(rank > 0)) {
+            NSArray* otherTerms = [indexObject otherTerms];
+            for (NSString *otherTerm in otherTerms) {
+              CGFloat otherRank = HGSScoreForAbbreviation(otherTerm,
+                                                          normalizedQuery, 
+                                                          NULL);
+              if (otherRank > rank) {
+                // TODO(dmaclach): do we want to blend these somehow instead
+                // of a strict replacement policy?
+                rank = otherRank;
+              }
+              if (rank > 0.9) {
+                break;
+              }
+            }
+          } 
+            
+          if (rank > 0) {
+            // Copy the result so we can apply rank to it
+            HGSMutableResult *resultCopy = [[result mutableCopy] autorelease];
+            if (hasNameMatch) {
+              [resultCopy addRankFlags:eHGSNameMatchRankFlag];
+            } else {
+              rank *= 0.5;
+              [resultCopy removeRankFlags:eHGSNameMatchRankFlag];
+            }
+            [resultCopy setRank:rank];
+            [results addObject:resultCopy];
+          }
         }
       }
     }

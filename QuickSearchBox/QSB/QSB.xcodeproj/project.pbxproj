@@ -386,6 +386,8 @@
 		624DD9F90E9EAA150029EF72 /* QSBTopResultsViewControllers.m in Sources */ = {isa = PBXBuildFile; fileRef = 624DD9F80E9EAA150029EF72 /* QSBTopResultsViewControllers.m */; };
 		62521AB70EFAC30000A6E647 /* QSBViewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 62521AB30EFAC30000A6E647 /* QSBViewTableViewCell.m */; };
 		62521AB80EFAC30000A6E647 /* QSBViewTableViewColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = 62521AB50EFAC30000A6E647 /* QSBViewTableViewColumn.m */; };
+		62541753102C904A00808254 /* HGSSearchTermScorer.h in Headers */ = {isa = PBXBuildFile; fileRef = 62541751102C904A00808254 /* HGSSearchTermScorer.h */; };
+		62541754102C904A00808254 /* HGSSearchTermScorer.m in Sources */ = {isa = PBXBuildFile; fileRef = 62541752102C904A00808254 /* HGSSearchTermScorer.m */; };
 		625A2C980E5614F3008CA9BF /* QSBPreferenceWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 625A2C970E5614F3008CA9BF /* QSBPreferenceWindowController.m */; };
 		6263CAF40EB79F3600FF03A1 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		6263CAF50EB79F3600FF03A1 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -433,6 +435,7 @@
 		62D5B6A00E64D0DC00C66E15 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62D824BB0FD05D15002429C4 /* finance.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62D824BA0FD05D15002429C4 /* finance.icns */; };
 		62DA51450FFAA86C002B008E /* GoogleDocsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 62DA51440FFAA86C002B008E /* GoogleDocsSource.m */; };
+		62DDD6DA1035D7BF00C0EABD /* HGSSearchTermScorerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 62DDD6D51035D53400C0EABD /* HGSSearchTermScorerTest.m */; };
 		62E190960EBA4A570002241B /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62E19AB11002EB8C009DA5C1 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
 		62E3FE571010D9A7005D77F2 /* PicasaWeb.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62E3FE561010D9A7005D77F2 /* PicasaWeb.icns */; };
@@ -2049,6 +2052,8 @@
 		62521AB40EFAC30000A6E647 /* QSBViewTableViewColumn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBViewTableViewColumn.h; sourceTree = "<group>"; };
 		62521AB50EFAC30000A6E647 /* QSBViewTableViewColumn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBViewTableViewColumn.m; sourceTree = "<group>"; };
 		62521AB60EFAC30000A6E647 /* QSBViewTableViewDelegateProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBViewTableViewDelegateProtocol.h; sourceTree = "<group>"; };
+		62541751102C904A00808254 /* HGSSearchTermScorer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSearchTermScorer.h; sourceTree = "<group>"; };
+		62541752102C904A00808254 /* HGSSearchTermScorer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSearchTermScorer.m; sourceTree = "<group>"; };
 		625A2C960E5614F3008CA9BF /* QSBPreferenceWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPreferenceWindowController.h; sourceTree = "<group>"; };
 		625A2C970E5614F3008CA9BF /* QSBPreferenceWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPreferenceWindowController.m; sourceTree = "<group>"; };
 		6263CAFB0EB79F3600FF03A1 /* PicasaWeb.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PicasaWeb.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2096,6 +2101,7 @@
 		62D9B86C0F94E453005EF9BC /* QSBEditAccountWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBEditAccountWindowController.h; sourceTree = "<group>"; };
 		62DA51430FFAA86C002B008E /* GoogleDocsSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDocsSource.h; sourceTree = "<group>"; };
 		62DA51440FFAA86C002B008E /* GoogleDocsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSource.m; sourceTree = "<group>"; };
+		62DDD6D51035D53400C0EABD /* HGSSearchTermScorerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSearchTermScorerTest.m; sourceTree = "<group>"; };
 		62E3FE561010D9A7005D77F2 /* PicasaWeb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PicasaWeb.icns; sourceTree = "<group>"; };
 		62E3FF3E10112F5D005D77F2 /* NSNotificationCenter+MainThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNotificationCenter+MainThread.h"; sourceTree = "<group>"; };
 		62E3FF3F10112F5D005D77F2 /* NSNotificationCenter+MainThread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNotificationCenter+MainThread.m"; sourceTree = "<group>"; };
@@ -5173,6 +5179,9 @@
 				8B6F2D640DA2B88E0052CA40 /* HGSResult.h */,
 				8B6F2D650DA2B88E0052CA40 /* HGSResult.m */,
 				E4D28DDD0DF9C11300FC6C31 /* HGSResultTest.m */,
+				62541751102C904A00808254 /* HGSSearchTermScorer.h */,
+				62541752102C904A00808254 /* HGSSearchTermScorer.m */,
+				62DDD6D51035D53400C0EABD /* HGSSearchTermScorerTest.m */,
 				8B6F2D6C0DA2B88E0052CA40 /* HGSSearchOperation.h */,
 				8B6F2D6D0DA2B88E0052CA40 /* HGSSearchOperation.m */,
 				8B95CA9C0F6B09FE003BDBDD /* HGSSearchOperationTest.m */,
@@ -5776,6 +5785,7 @@
 				8B791D860FA1FC24006BFE1E /* HGSAppleScriptAction.h in Headers */,
 				5A0BB3750FAB9CDA00AA4858 /* HGSPluginBlacklist.h in Headers */,
 				62E3FF4110112F5D005D77F2 /* NSNotificationCenter+MainThread.h in Headers */,
+				62541753102C904A00808254 /* HGSSearchTermScorer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8604,6 +8614,7 @@
 				8B791D850FA1FC24006BFE1E /* HGSAppleScriptAction.m in Sources */,
 				5A0BB3760FAB9CDA00AA4858 /* HGSPluginBlacklist.m in Sources */,
 				62E3FF4210112F5D005D77F2 /* NSNotificationCenter+MainThread.m in Sources */,
+				62541754102C904A00808254 /* HGSSearchTermScorer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8752,6 +8763,7 @@
 				8B7911210F9FCAD3006BFE1E /* NSString+ReadableURLTest.m in Sources */,
 				8B791D890FA1FC35006BFE1E /* HGSAppleScriptActionTest.m in Sources */,
 				5A0BB67B0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m in Sources */,
+				62DDD6DA1035D7BF00C0EABD /* HGSSearchTermScorerTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

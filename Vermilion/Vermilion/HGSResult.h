@@ -270,6 +270,11 @@ typedef NSUInteger HGSRankFlags;
                   source:(HGSSearchSource *)source;
 
 /*!
+  Return a new result by adding attributes to an old result.
+*/
+- (HGSResult *)resultByAddingAttributes:(NSDictionary *)attributes;
+
+/*!
   Get an attribute by name. |-valueForKey:| may return a placeholder value that
   is to be updated later via KVO.
 */

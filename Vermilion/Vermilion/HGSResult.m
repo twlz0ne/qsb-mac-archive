@@ -306,6 +306,12 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   return equal;
 }
 
+- (HGSResult *)resultByAddingAttributes:(NSDictionary *)attributes {
+  Class cls = [self class];
+  HGSResult *newResult = [self copyOfClass:cls mergingAttributes:attributes];
+  return [newResult autorelease];
+}
+
 - (id)valueForUndefinedKey:(NSString *)key {
   return nil;
 }
@@ -415,18 +421,17 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
 }
 
 - (NSString*)description {
-  return [NSString stringWithFormat:@"<%@:%p> [%@ - %@ (%@ from %@)]", 
-          [self class], self, [self displayName], [self type], [self class],
-          source_];
+  return [NSString stringWithFormat:@"<%@:%p> [%@ - %@ rank: %f (%@ from %@)]", 
+          [self class], self, [self displayName], [self type], [self rank],
+          [self class], source_];
 }
 
 // merge the attributes of |result| into this one. Single values that overlap
 // are lost.
 - (HGSResult *)mergeWith:(HGSResult*)result {
-  Class cls = [self class];
   NSDictionary *attributes = [result attributes];
-  HGSResult *newResult = [self copyOfClass:cls mergingAttributes:attributes];
-  return [newResult autorelease];
+  HGSResult *newResult = [self resultByAddingAttributes:attributes];
+  return newResult;
 }
 
 // this is result a "duplicate" of |compareTo|? The default implementation 

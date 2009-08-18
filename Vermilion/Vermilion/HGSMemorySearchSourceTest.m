@@ -120,6 +120,9 @@
                                              source:searchSourceMock
                                          attributes:nil];
   STAssertNotNil(result, nil);
+  [[[searchSourceMock stub] 
+    andReturn:nil] 
+   provideValueForKey:@"HGSObjectAttributeWordRangesKey" result:result];
   [memSource indexResult:result
                     name:@"testName"
               otherTerms:[NSArray arrayWithObjects:@"foo", @"bar", @"bam", nil]];
