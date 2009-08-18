@@ -245,8 +245,9 @@ static NSString *const kApplicationSourcePredicateString
     [attributes removeObjectForKey:kHGSObjectAttributeLastUsedDateKey];
     [attributes setObject:@"com.apple.preference.network"
                    forKey:kHGSObjectAttributeBundleIDKey];
+    NSURL *url = [NSURL fileURLWithPath:networkPath];
     HGSResult *hgsResult 
-      = [HGSResult resultWithURI:networkPath
+      = [HGSResult resultWithURI:[url absoluteString]
                             name:name
                             type:kHGSTypeFileApplication
                           source:self
