@@ -85,7 +85,7 @@ static const CGFloat kHGSTestPerfectScore = 100.0;
   CGFloat wordPortionFactor = 5.0;
   CGFloat itemPortionFactor = 0.8;
   NSUInteger maximumCharacterDistance = 22;
-  n maximumItemCharactersScanned = 250;
+  NSUInteger maximumItemCharactersScanned = 250;
   
   HGSSetSearchTermScoringFactors(characterMatchFactor,
                                  firstCharacterInWordFactor,
@@ -95,10 +95,6 @@ static const CGFloat kHGSTestPerfectScore = 100.0;
                                  itemPortionFactor,
                                  maximumCharacterDistance,
                                  maximumItemCharactersScanned);
-  
-/*
-  STAssertEqualObjects(userName, @"HGSSimpleAccount D", nil);
-*/
 }
 
 - (void)testBasicTermScoring {
