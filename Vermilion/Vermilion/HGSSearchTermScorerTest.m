@@ -42,7 +42,7 @@ static const CGFloat kHGSTestNotAMatchScore = 0.0;
 static const CGFloat kHGSTestReasonableScore = 5.0;
 static const CGFloat kHGSTestGoodScore = 10.0;
 static const CGFloat kHGSTestExcellentScore = 15.0;
-static const CGFloat kHGSTestPerfectScore = 100.0;
+static const CGFloat kHGSTestPerfectScore = 10000.0;
 
 @interface HGSSearchTermScorerTest : GTMTestCase
 
