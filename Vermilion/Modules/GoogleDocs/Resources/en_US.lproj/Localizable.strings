@@ -1,10 +1,4 @@
-﻿/* A dialog lable denoting that authentication for account with username %@ failed */
-"Authentication for '%@' failed. Check your password." = "Authentication for '%@' failed. Check your password.";
-
-/* A dialog label denoting that an attempt to fetch data with the account for username $1$@ failed with errorcode %2$d */
-"Fetch for '%1$@' failed. (%2$d)" = "Fetch for '%1$@' failed. (%2$d)";
-
-/* A dialog label explaining to the user that the Google Doc could not be saved to a local file. %@ is the name of the document and %d is an error code. */
+﻿/* A dialog label explaining to the user that the Google Doc could not be saved to a local file. %@ is the name of the document and %d is an error code. */
 "Could not save Google Doc ‘%@’! (%d)" = "Could not save Google Doc ‘%@’! (%d)";
 
 /* A dialog label explaining to the user that the Google Doc could not be fetched from the server. %d is an error code.*/
@@ -12,9 +6,6 @@
 
 /* A label denoting a Google Docs result */
 "Google Docs" = "Google Docs";
-
-/* A dialog title for a dialog describing a Google Docs data fetch problem. */
-"Google Docs fetch problem." = "Google Docs fetch problem.";
 
 /* Popup title specifying which worksheets of a spreadsheet document are to be saved. */
 "Save worksheet:" = "Save worksheet:";
@@ -41,12 +32,6 @@
 "Text (TXT)" = "Text (TXT)";
 "Microsoft Excel Document (XLS)" = "Microsoft Excel Document (XLS)";
 "ZIP Archive (with images) (ZIP)" = "ZIP Archive (with images) (ZIP)";
-
-/* A message title for a dialog describing that one or more worksheets for a spreadsheet could not be retrieved. */
-"Error retrieving worksheet." = "Error retrieving worksheet.";
-
-/* A dialog message explaining that an error occurred retrieving worksheets for the spreadsheet named by %2$@ in the Google account %3$@ may not be accessible.  The error code is given by %1$d and the error description by %4$@. */
-"Error %1$d occurred for spreadsheet '%2$@' at account '%3$@' (%4$@)." = "Error %1$d occurred for spreadsheet '%2$@' at account '%3$@' (%4$@).";
 
 /* A keyword used when searching to detect items which have been starred by the user in Google Docs. */
 "starred" = "starred";

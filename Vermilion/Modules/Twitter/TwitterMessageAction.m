@@ -173,8 +173,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       errorString = [NSString stringWithFormat:errorString, username];
       [self informUserWithDescription:errorString
                           successCode:kHGSSuccessCodeError];
-      HGSLog(@"Cannot send Twitter status message due to missing keychain "
-             @"item for '%@'.", account_);
+      HGSLog(@"TwitterMessageAction failed due to missing keychain item "
+             @"for account '%@'.", [account_ displayName]);
     }
   }
 }
@@ -197,7 +197,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     NSString *errorString = [NSString stringWithFormat:errorFormat, statusCode];
     [self informUserWithDescription:errorString
                         successCode:kHGSSuccessCodeBadError];
-    HGSLog(@"Twitter status message failed due to status %d.", statusCode);
+    HGSLog(@"TwitterMessageAction failed to tweet for account '%@': "
+           @"status=%d.", [account_ displayName], statusCode);
   }
 }
 
@@ -211,8 +212,9 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                            [error code]];
   [self informUserWithDescription:errorString
                       successCode:kHGSSuccessCodeBadError];
-  HGSLog(@"Twitter status message failed due to error %d: '%@'.",
-         [error code], [error localizedDescription]);
+  HGSLog(@"TwitterMessageAction failed to tweet for account '%@': "
+         @"error=%d '%@'.",
+         [account_ displayName], [error code], [error localizedDescription]);
 }
 
 - (void)informUserWithDescription:(NSString *)description

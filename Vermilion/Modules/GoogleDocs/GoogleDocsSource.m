@@ -270,43 +270,16 @@ GTM_METHOD_CHECK(NSEnumerator,
     = currentTime - previousErrorReportingTime_;
   if (timeSinceLastErrorReport > kErrorReportingInterval) {
     previousErrorReportingTime_ = currentTime;
-    NSString *errorSummary
-      = HGSLocalizedString(@"Google Docs fetch problem.", 
-                           @"A dialog title for a dialog describing a Google "
-                           @"Docs data fetch problem.");
     NSString *errorString = nil;
     if (errorCode == kGDataBadAuthentication) {
-      NSString *errorFormat
-        = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
-                             @"password.", 
-                             @"A dialog lable denoting that authentication "
-                             @"for account with username %@ failed");
-      errorString = [NSString stringWithFormat:errorFormat,
-                     [account_ displayName]];
-      
+      errorString = @"authentication failed (possible bad password)";
     } else {
-      NSString *errorFormat 
-        = HGSLocalizedString(@"Fetch for '%1$@' failed. (%2$d)",
-                             @"A dialog label denoting that an attempt to "
-                             @"fetch data with the account for username $1$@ "
-                             @"failed with errorcode %2$d");
-      errorString = [NSString stringWithFormat:errorFormat,
-                     [account_ displayName], [error code]];
+      errorString = @"fetch failed";
     }
-    NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    NSDictionary *messageDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 errorSummary, kHGSSummaryMessageKey,
-                                 errorString, kHGSDescriptionMessageKey,
-                                 successCode, kHGSSuccessCodeMessageKey,
-                                 nil];
-    [nc postNotificationName:kHGSUserMessageNotification 
-                      object:self
-                    userInfo:messageDict];
+    HGSLog(@"GoogleDocSource %@ for account '%@': error=%d '%@'.",
+           errorString, [account_ displayName], [error code],
+           [error localizedDescription]);
   }
-  HGSLogDebug(@"HGSGoogleDocSource doc fetcher failed: error=%d, "
-              @"userName=%@.",
-              [error code], [account_ displayName]);
 }
 
 - (void)resetAllFetches {
@@ -670,36 +643,10 @@ GTM_METHOD_CHECK(NSEnumerator,
            otherTerms:otherTerms];
   } else if ([error code] != 403) {
     // Ignore access privilege errors.
-    HGSLog(@"HGSGoogleDocSource worksheet fetcher failed: error = %d, "
-           @"userName = %@, spreadsheet = %@.",
-           [error code], [account_ displayName], [docResult displayName]);
-    NSString *errorSummary
-      = HGSLocalizedString(@"Error retrieving worksheet.", 
-                           @"A message title for a dialog describing that "
-                           @"worksheets could not be retrieved.");
-    NSString *errorFormat 
-      = HGSLocalizedString(@"Error %1$d occurred for spreadsheet '%2$@' at "
-                           @"account '%3$@' (%4$@).",
-                           @"A dialog message explaining that an error "
-                           @"occurred retrieving worksheets for the "
-                           @"spreadsheet named by %2$@ in the Google "
-                           @"account %3$@ may not be accessible.  The "
-                           @"error code is given by %1$d and the error "
-                           @"description by %4$@.");
-    NSString *errorString = [NSString stringWithFormat:errorFormat,
-                             [error code], [docResult displayName],
-                             [account_ displayName],
-                             [error localizedDescription]];
-    NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    NSDictionary *messageDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 errorSummary, kHGSSummaryMessageKey,
-                                 errorString, kHGSDescriptionMessageKey,
-                                 successCode, kHGSSuccessCodeMessageKey,
-                                 nil];
-    [nc postNotificationName:kHGSUserMessageNotification 
-                      object:self
-                    userInfo:messageDict];
+    HGSLog(@"GoogleDocSource worksheet fetch failed for account '%@', "
+           @"spreadsheet '%@': error=%d '%@'.",
+           [account_ displayName], [docResult displayName], [error code],
+           [error localizedDescription]);
   }
 }
 

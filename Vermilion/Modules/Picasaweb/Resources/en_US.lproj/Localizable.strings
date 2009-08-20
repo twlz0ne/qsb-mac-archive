@@ -4,9 +4,6 @@
 /* A label denoting a Picasaweb Photo Album */
 "album" = "album";
 
-/* A dialog label asking if the user has enabled their Picasa account for the username %1$@. %2$d is an error code returned from Picasaweb */
-"Have you enabled Picasa for your '%1$@' account? (%2$d)" = "Have you enabled Picasa for your '%1$@' account? (%2$d)";
-
 /* A label denoting a Picasaweb photo */
 "photo" = "photo";
 
@@ -15,9 +12,6 @@
 
 /* A string describing an action that the user can choose that will be cause the selected item(s) to be uploaded to a Picasa Web Albums account. */
 "Upload to Picasa Web Albums" = "Upload to Picasa Web Albums";
-
-/* A dialog label explaining that the fetch for the item denoted by %1$@ from the account with the username %2$@ failed. %3$d is an error code returned from Picasaweb */
-"Picasaweb %1$@ fetch for account '%2$@' failed. (%3$d)" = "Picasaweb %1$@ fetch for account '%2$@' failed. (%3$d)";
 
 /* A dialog title denoting that we have encountered an error fetching data from Picasaweb. */
 "Picasaweb fetch problem." = "Picasaweb fetch problem.";

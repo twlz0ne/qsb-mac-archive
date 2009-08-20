@@ -60,10 +60,6 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 - (void)indexBookmarksFromData:(NSData*)data;
 - (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode;
 
-// Post user notification about a connection failure.
-- (void)reportConnectionFailure:(NSString *)explanation
-                    successCode:(NSInteger)successCode;
-
 @end
 
 @implementation GoogleBookmarksSource
@@ -243,17 +239,8 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
     // Don't keep trying.
     [updateTimer_ invalidate];
     updateTimer_ = nil;
-    NSString *errorFormat
-      = HGSLocalizedString(@"Authentication for '%@' failed. Check your "
-                           @"password.", 
-                           @"A label in a dialog denoting that authentication "
-                           @"for the account with username %@ failed due to a "
-                           @"validation error");
-    NSString *errorString = [NSString stringWithFormat:errorFormat,
-                             [account_ displayName]];
-    [self reportConnectionFailure:errorString successCode:kHGSSuccessCodeError];
-    HGSLogDebug(@"GoogleBookmarkSource authentication failure for account '%@'.",
-                [account_ displayName]);
+    HGSLog(@"GoogleBookmarksSource authentication failed (possible bad "
+           @"password) for account '%@'.", [account_ displayName]);
   }
 }
 
@@ -286,16 +273,9 @@ didReceiveResponse:(NSURLResponse *)response {
   currentlyFetching_ = NO;
   [bookmarkData_ release];
   bookmarkData_ = nil;
-  NSString *errorFormat
-    = HGSLocalizedString(@"Fetch for '%1$@' failed. (%2$d)", 
-                         @"A dialog label denoting that an attempt to fetch "
-                         @"data with the account for username $1$@ failed with "
-                         @"errorcode %2$d");
-  NSString *errorString = [NSString stringWithFormat:errorFormat,
-                           [account_ displayName], [error code]];
-  [self reportConnectionFailure:errorString successCode:kHGSSuccessCodeBadError];
-  HGSLogDebug(@"GoogleBookmarkSource connection failure (%d) '%@'.",
-              [error code], [error localizedDescription]);
+  HGSLog(@"GoogleBookmarksSource fetch failed for account '%@': "
+         @"error=%d '%@'.", [account_ displayName], [error code],
+         [error localizedDescription]);
 }
 
 #pragma mark Authentication & Refresh
@@ -316,31 +296,6 @@ didReceiveResponse:(NSURLResponse *)response {
   // credentials were incorrect).
   [self startAsynchronousBookmarkFetch];
   [self setUpPeriodicRefresh];
-}
-
-- (void)reportConnectionFailure:(NSString *)explanation
-                    successCode:(NSInteger)successCode {
-  NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
-  NSTimeInterval timeSinceLastErrorReport
-    = currentTime - previousErrorReportingTime_;
-  if (timeSinceLastErrorReport > kErrorReportingInterval) {
-    previousErrorReportingTime_ = currentTime;
-    NSString *errorSummary = HGSLocalizedString(@"Google Bookmarks", 
-                                                @"A dialog title denoting that "
-                                                @"this dialog has to do with "
-                                                @"Google Bookmarks");
-    NSNumber *successNumber = [NSNumber numberWithInt:successCode];
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    NSDictionary *messageDict
-      = [NSDictionary dictionaryWithObjectsAndKeys:
-         errorSummary, kHGSSummaryMessageKey,
-         explanation, kHGSDescriptionMessageKey,
-         successNumber, kHGSSuccessCodeMessageKey,
-         nil];
-    [nc postNotificationName:kHGSUserMessageNotification 
-                      object:self
-                    userInfo:messageDict];
-  }
 }
 
 - (void)setUpPeriodicRefresh {

@@ -194,7 +194,8 @@ static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
     [self informUserWithDescription:errorString
                         successCode:kHGSSuccessCodeBadError
                             fetcher:fetcher];
-    HGSLog(@"Error: %@ saving file: %@", error, savePath);
+    HGSLog(@"GoogleDocsSaveAsActions failed to save file '%@': error=%d '%@'.",
+           savePath, [error code], [error localizedDescription]);
   }
 }
 
@@ -208,7 +209,7 @@ static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
   [self informUserWithDescription:errorString
                       successCode:kHGSSuccessCodeBadError
                           fetcher:fetcher];
-  HGSLog(@"Google Doc fetch failed due to error %d: '%@'.",
+  HGSLog(@"GoogleDocsSaveAsActions download of file failed: error=%d '%@'.",
          [error code], [error localizedDescription]);
 }
 

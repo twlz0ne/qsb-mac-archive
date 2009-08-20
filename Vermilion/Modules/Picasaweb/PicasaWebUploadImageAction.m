@@ -195,8 +195,8 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
                      [account_ identifier]];
       [self informUserWithDescription:errorString
                           successCode:kHGSSuccessCodeError];
-      HGSLog(@"Cannot upload images to Picasa Web due to missing keychain "
-             @"item for '%@'.", account_);
+      HGSLog(@"PicasaWebUploadAction upload to account '%@' failed due "
+             @"to missing keychain item.", [account_ displayName]);
     }
   }
 }
@@ -273,7 +273,8 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
         errorString = [NSString stringWithFormat:errorString, imageName];
         [self informUserWithDescription:errorString
                             successCode:kHGSSuccessCodeError];
-        HGSLogDebug(@"Upload of '%@' timed out.", imagePath);
+        HGSLog(@"PicasaWebUploadAction timed out uploading image '%@' to "
+               @"account '%@'.", imagePath, [account_ displayName]);
       }
     } while ([activeTickets_ containsObject:uploadImageTicket]);
     [uploadImageTicket release];
@@ -395,8 +396,10 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
                                [error localizedDescription], [error code]];
       [self informUserWithDescription:errorString
                           successCode:kHGSSuccessCodeBadError];
-      HGSLog(@"Upload of image '%@' failed due to '%@' (%d).",
-             [imageEntry title], [error localizedDescription], [error code]);
+      HGSLog(@"PicasaWebUploadAction upload of image '%@' to account '%@' "
+             @"failed: error=%d '%@'.",
+             [imageEntry title], [account_ displayName], [error code],
+             [error localizedDescription]);
     }
   }
 }

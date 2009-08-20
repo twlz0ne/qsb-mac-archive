@@ -71,7 +71,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 // Utility function for reporting fetch errors.
 - (void)reportErrorForFetchType:(NSString *)fetchType
-                      errorCode:(NSInteger)errorCode;
+                          error:(NSError *)error;
 
 + (void)setBestFitThumbnailFromMediaGroup:(GDataMediaGroup *)mediaGroup
                              inAttributes:(NSMutableDictionary *)attributes;
@@ -260,7 +260,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
   HGSAccount *account = [notification object];
-  HGSAssert(account == account_, @"Notification from bad account!");
+  HGSAssert(account == account_, @"Notification from unexpected account!");
   // If we're in the middle of a fetch then cancel it first.
   [self cancelAllTickets];
   
@@ -387,7 +387,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
       NSString *fetchType = HGSLocalizedString(@"album", 
                                                @"A label denoting a Picasaweb "
                                                @"Photo Album");
-      [self reportErrorForFetchType:fetchType errorCode:errorCode];
+      [self reportErrorForFetchType:fetchType error:error];
     }
   }
 }
@@ -526,61 +526,29 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
       NSString *fetchType = HGSLocalizedString(@"photo", 
                                                @"A label denoting a Picasaweb "
                                                @"photo");
-      [self reportErrorForFetchType:fetchType errorCode:errorCode];
+      [self reportErrorForFetchType:fetchType error:error];
     }
   }    
 }
 
 - (void)reportErrorForFetchType:(NSString *)fetchType
-                      errorCode:(NSInteger)errorCode {
-  NSString *username = [picasawebService_ username];
+                          error:(NSError *)error {
+  NSInteger errorCode = [error code];
   NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
   NSTimeInterval timeSinceLastErrorReport
     = currentTime - previousErrorReportingTime_;
   if (timeSinceLastErrorReport > kErrorReportingInterval) {
     previousErrorReportingTime_ = currentTime;
-    NSString *errorSummary
-      = HGSLocalizedString(@"Picasaweb fetch problem.", 
-                           @"A dialog title denoting that we have encountered "
-                           @"an error fetching data from Picasaweb.");
     NSString *errorString = nil;
-    // A 404 from Picasa usually means that Picasa has not been enabled for
-    // this account.  For additional information see:
-    // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5
     if (errorCode == 404) {
-      NSString *errorFormat
-        = HGSLocalizedString(@"Have you enabled Picasa for your '%1$@' account? "
-                             @"(%2$d)", 
-                             @"A dialog label asking if the user has enabled "
-                             @"their Picasa account for the username %1$@. "
-                             @"%2$d is an error code returned from Picasaweb");
-      errorString = [NSString stringWithFormat:errorFormat,
-                     username, errorCode];
+      errorString = @"might not be enabled";
     } else {
-      NSString *errorFormat
-        = HGSLocalizedString(@"Picasaweb %1$@ fetch for account '%2$@' failed. "
-                             @"(%3$d)", 
-                             @"A dialog label explaining that the fetch for "
-                             @"the item denoted by %1$@ from the account with "
-                             @"the username %2$@ failed. %3$d is an error code "
-                             @"returned from Picasaweb");
-      errorString = [NSString stringWithFormat:errorFormat,
-                     fetchType, username, errorCode];
+      errorString = @"fetch failed";
     }
-    NSNumber *successCode = [NSNumber numberWithInt:kHGSSuccessCodeError];
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    NSDictionary *messageDict
-      = [NSDictionary dictionaryWithObjectsAndKeys:
-         errorSummary, kHGSSummaryMessageKey,
-         errorString, kHGSDescriptionMessageKey,
-         successCode, kHGSSuccessCodeMessageKey,
-         nil];
-    [nc postNotificationName:kHGSUserMessageNotification 
-                      object:self
-                    userInfo:messageDict];
+    HGSLog(@"PicasawebSource (%@InfoFetcher) %@ for account '%@': "
+           @"error=%d '%@'.", fetchType, errorString, [account_ displayName],
+           errorCode, [error localizedDescription]);
   }
-  HGSLogDebug(@"PicasawebSource %@InfoFetcher failed: error=%d, username=%@.",
-              fetchType, errorCode, username);       
 }
 
 
