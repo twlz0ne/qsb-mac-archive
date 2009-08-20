@@ -577,8 +577,15 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     [searchTextField_ setStringValue:@""];
     [self hideResultsWindow];
   } else {
-    // Otherwise hide the query window.
-    [self hideSearchWindow:self];
+    NSString *queryString = [activeSearchViewController_ queryString];
+    if ([queryString length]) {
+      // Clear the text in the search box.
+      [activeSearchViewController_ setQueryString:nil];
+      [searchTextField_ setStringValue:@""];
+    } else {
+      // Otherwise hide the query window.
+      [self hideSearchWindow:self];
+    }
   }
 }
 
@@ -591,15 +598,13 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   
   NSInteger tag = [sender tag] - kBaseCorporaTagValue;
   HGSResult *corpus = [[self corpora] objectAtIndex:tag];
-  HGSResultArray *results 
-    = [HGSResultArray arrayWithResult:corpus];
+  HGSResultArray *results = [HGSResultArray arrayWithResult:corpus];
   [self selectResults:results];
   
   // Restore the query string. The following also triggers a query refresh.
   [activeSearchViewController_ setQueryString:queryString];
   if (!queryString) queryString = @"";
   [searchTextField_ setStringValue:queryString];
-  
 }
 
 - (IBAction)performSearch:(id)sender {
@@ -1637,11 +1642,9 @@ doCommandBySelector:(SEL)commandSelector {
     [activeSearchViewController_ setSavedPivotQueryString:savedQueryString];
     [searchTextFieldEditor_ resetCompletion];
     
-    [[viewController view] setFrame:[self rightOffscreenViewRect]];
-    
-    NSView *resultsView = [self resultsView];
     NSView *viewControllerView = [viewController view];
     [viewControllerView setFrame:[self rightOffscreenViewRect]];
+    NSView *resultsView = [self resultsView];
     [resultsView addSubview:viewControllerView];
     
     NSView *activeSearchView = [activeSearchViewController_ view];
@@ -1768,7 +1771,8 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (NSRect)rightOffscreenViewRect {
   NSRect bounds = [self mainViewRect];
-  return NSOffsetRect(bounds, NSWidth(bounds), 0);
+  bounds = NSOffsetRect(bounds, NSWidth(bounds), 0);
+  return bounds;
 }
 
 - (NSRect)mainViewRect {
@@ -1779,7 +1783,8 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (NSRect)leftOffscreenViewRect {
   NSRect bounds = [self mainViewRect];
-  return NSOffsetRect(bounds, -NSWidth(bounds), 0);
+  bounds = NSOffsetRect(bounds, -NSWidth(bounds), 0);
+  return bounds;
 }
 
 - (NSRect)fullyExposedFrameForFrame:(NSRect)proposedFrame

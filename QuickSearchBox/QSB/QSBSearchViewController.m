@@ -220,8 +220,12 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 }
 
 - (void)updateViewsWithAnimation:(BOOL)animate {
-  
-  CGFloat newHeight = [[self activeResultsViewController] windowHeight];
+  QSBSearchWindowController *searchWindowController
+    = [self searchWindowController];
+  QSBResultsViewBaseController *activeResultsViewController
+    = [self activeResultsViewController];
+  CGFloat newHeight = [activeResultsViewController windowHeight];
+  newHeight += [searchWindowController resultsViewOffsetFromTop];
   
   int resizingMask = NSViewWidthSizable | NSViewHeightSizable;
   int pinToTopMask = NSViewWidthSizable | NSViewMinYMargin;
@@ -231,9 +235,9 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   
   [topView setAutoresizingMask:pinToTopMask];
   [moreView setAutoresizingMask:pinToTopMask];
-  [searchWindowController_ setResultsWindowHeight:(newHeight
-                                                   + NSHeight([statusBar_ bounds]))
-                                        animating:NO];
+  [searchWindowController setResultsWindowHeight:(newHeight
+                                                  + NSHeight([statusBar_ bounds]))
+                                       animating:NO];
   [topView setAutoresizingMask:resizingMask];
   [moreView setAutoresizingMask:resizingMask];
   
@@ -244,7 +248,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   NSRect topFrame = [topView frame];
   NSRect moreFrame = viewBounds;
   
-  if ([self activeResultsViewController] == moreResultsController_) { 
+  if (activeResultsViewController == moreResultsController_) { 
     [moreView setHidden:NO];
     
     if (![moreView superview]) {
@@ -291,7 +295,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   
   if (activeResultsViewController_ != newController) {
     [newController updateResultsView];
-    
+     
     // Swap out the old view while swapping in the top results view.
     [newController setSwapSelection];
     
