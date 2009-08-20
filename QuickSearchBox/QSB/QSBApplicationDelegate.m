@@ -245,13 +245,22 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self stopObservingProtoExtensions];
   [userMessenger_ release];
   [statusItem_ release];
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_removeObserver:self 
-                 forKeyPath:kQSBHotKeyKey
-                   selector:@selector(hotKeyValueChanged:)];
-  [prefs gtm_removeObserver:self 
-                 forKeyPath:kQSBIconInMenubarKey
-                   selector:@selector(iconInMenubarValueChanged:)];
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  [defaults gtm_removeObserver:self 
+                    forKeyPath:kQSBHotKeyKey
+                      selector:@selector(hotKeyValueChanged:)];
+  [defaults gtm_removeObserver:self 
+                    forKeyPath:kQSBHotKeyKeyEnabled
+                      selector:@selector(hotKeyValueChanged:)];
+  [defaults gtm_removeObserver:self 
+                    forKeyPath:kQSBHotKeyKey2
+                      selector:@selector(hotKeyValueChanged:)];
+  [defaults gtm_removeObserver:self 
+                    forKeyPath:kQSBHotKeyKey2Enabled
+                      selector:@selector(hotKeyValueChanged:)];
+  [defaults gtm_removeObserver:self 
+                    forKeyPath:kQSBIconInMenubarKey
+                      selector:@selector(iconInMenubarValueChanged:)];
   NSNotificationCenter *workspaceNC 
     = [[NSWorkspace sharedWorkspace] notificationCenter];
   [workspaceNC removeObserver:self];
@@ -506,9 +515,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   NSDictionary *newKey = [ud valueForKeyPath:kQSBHotKeyKey];
   NSNumber *value = [newKey objectForKey:kGTMHotKeyDoubledModifierKey];
+  BOOL hotKey1UseDoubleModifier = [value boolValue];
   BOOL hotkey1Enabled = [ud boolForKey:kQSBHotKeyKeyEnabled];
   BOOL hotkey2Enabled = [ud boolForKey:kQSBHotKeyKey2Enabled];
-  if (!newKey || [value boolValue] || hotkey2Enabled) {
+  if (!newKey || hotKey1UseDoubleModifier || hotkey2Enabled) {
     // set up double tap if appropriate
     hotModifiers_ = NSCommandKeyMask;
     statusMenuItemKey = [NSString stringWithUTF8String:"⌘"];
@@ -516,7 +526,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   } else {
     hotModifiers_ = 0;
   }
-  if (hotkey1Enabled) {
+  if (hotkey1Enabled && !hotKey1UseDoubleModifier) {
     // setting hotModifiers_ means we're not looking for a double tap
     value = [newKey objectForKey:kGTMHotKeyModifierFlagsKey];
     uint modifiers = [value unsignedIntValue];
