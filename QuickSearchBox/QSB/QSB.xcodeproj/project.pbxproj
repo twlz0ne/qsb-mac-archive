@@ -421,6 +421,7 @@
 		62B7CDE70E63746E00299B23 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		62B7CE0E0E63747300299B23 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		62B7CE9F0E6375AA00299B23 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		62BFDDEA103CE02F00421C85 /* HGSSearchTermScorerTestData.plist in Resources */ = {isa = PBXBuildFile; fileRef = 62BFDDE9103CE02F00421C85 /* HGSSearchTermScorerTestData.plist */; };
 		62C051BA0F31307100DFBB1B /* HGSSimpleAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62C25E270F8BF17500DA57E7 /* PicasaPlaceholder.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */; };
 		62C5CAD60FA13197000896CD /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
@@ -1282,6 +1283,13 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
+		62BD15D8103DB32A00C85BC3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B637B4C0F2777C300997738 /* GData.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4F85E018103B83B700B4C418;
+			remoteInfo = GDataIPhoneUnitTests;
+		};
 		62E19AAF1002EB86009DA5C1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -2087,6 +2095,7 @@
 		62AD18A40F16B034000D380C /* QSBPathControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPathControl.h; sourceTree = "<group>"; };
 		62AD18A50F16B034000D380C /* QSBPathControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPathControl.m; sourceTree = "<group>"; };
 		62AD99140F33AB190063579F /* google_products.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = google_products.png; sourceTree = "<group>"; };
+		62BFDDE9103CE02F00421C85 /* HGSSearchTermScorerTestData.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = HGSSearchTermScorerTestData.plist; path = ../../Vermilion/Vermilion/HGSSearchTermScorerTestData.plist; sourceTree = SOURCE_ROOT; };
 		62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PicasaPlaceholder.icns; sourceTree = "<group>"; };
 		62D0E9640EF058950028522C /* HGSAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAccount.h; sourceTree = "<group>"; };
 		62D0E96A0EF059B40028522C /* HGSAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccount.m; sourceTree = "<group>"; };
@@ -4626,6 +4635,7 @@
 				8B637B570F2777C300997738 /* GData.framework */,
 				8BCCB03C10348ABE0051B567 /* libGDataTouchStaticLib.a */,
 				8B637B590F2777C300997738 /* GDataUnitTests.octest */,
+				62BD15D9103DB32A00C85BC3 /* GDataIPhoneUnitTests.octest */,
 				8B637B5B0F2777C300997738 /* DevelopmentTestTool */,
 			);
 			name = Products;
@@ -4674,6 +4684,7 @@
 		8B6872D01018232400ADEA67 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				62BFDDE9103CE02F00421C85 /* HGSSearchTermScorerTestData.plist */,
 				8B6872D11018232400ADEA67 /* Localizable.strings */,
 			);
 			path = Resources;
@@ -6836,6 +6847,13 @@
 			remoteRef = 620054580F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		62BD15D9103DB32A00C85BC3 /* GDataIPhoneUnitTests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = GDataIPhoneUnitTests.octest;
+			remoteRef = 62BD15D8103DB32A00C85BC3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		8B6128370F46347B00E29B40 /* JSON.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -7292,6 +7310,7 @@
 				8B5C86AE0FD1F1BC00A6AA25 /* RoundRectAndDropShadow.tiff in Resources */,
 				5AC3E8240F7C2F7300F171EB /* VermilionTest.py in Resources */,
 				8B687490101836C700ADEA67 /* Localizable.strings in Resources */,
+				62BFDDEA103CE02F00421C85 /* HGSSearchTermScorerTestData.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

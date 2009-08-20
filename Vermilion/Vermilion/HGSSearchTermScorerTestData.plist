@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>search terms</key>
+		<string>can</string>
+		<key>search items</key>
+		<array>
+			<string>can</string>
+			<string>celebrate armalite noogies</string>
+			<string>canada</string>
+			<string>cancel my order</string>
+			<string>candlelight dinner</string>
+			<string>american candles</string>
+			<string>catfish food in cans</string>
+			<string>armenian candles</string>
+			<string>fabulicious</string>
+			<string>spaghetti and noodles</string>
+			<string>unfinished melody</string>
+			<string>nac</string>
+			<string>not a character</string>
+		</array>
+	</dict>
+	<dict>
+		<key>search terms</key>
+		<string>abc</string>
+		<key>search items</key>
+		<array>
+			<string>abc</string>
+			<string>am i a bad cook</string>
+			<string>american broadcast center</string>
+		</array>
+	</dict>
+	<dict>
+		<key>search terms</key>
+		<string>abc def</string>
+		<key>search items</key>
+		<array>
+			<string>army brats can defend every friend</string>
+			<string>abc defend every fiendish person</string>
+			<string>abc def</string>
+			<string>army brats can def</string>
+			<string>abcdef</string>
+			<string>abc</string>
+			<string>def</string>
+		</array>
+	</dict>
+</array>
+</plist>
