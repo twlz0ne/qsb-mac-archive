@@ -260,14 +260,7 @@ const NSTimeInterval kProcessingTimeout = 240.0;
 }
 
 - (int)numberOfSearchResults {
-  resultsProcessed_ = NO;
-  [proxy_ lastSearchResults:self];
-  BOOL success = [self waitForResultProcessing];
-  int count = 0;
-  if (success) {
-    count = [results_ count];
-  }
-  return count;
+  return [[proxy_ numberOfResults] intValue];
 }
 
 - (void)performAsynchronousSearch:(NSString *)query {

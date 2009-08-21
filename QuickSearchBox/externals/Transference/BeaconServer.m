@@ -346,6 +346,15 @@ static NSString *const kResultActionKey = @"ResultAction";
   return lastSearchStats_;
 }
 
+- (in bycopy NSNumber *)numberOfResults {
+  int results = 0;
+  if ([lastSearchResults_ count] > 0) {
+    results = [lastSearchResults_ count];
+  }
+
+  return [NSNumber numberWithInt:results];
+}
+
 - (oneway void)lastSearchResults:(in byref id <TransferenceClientProtocol>)client {
   NSArray *returnArray = nil;
   if ([lastSearchResults_ count] > 0) {

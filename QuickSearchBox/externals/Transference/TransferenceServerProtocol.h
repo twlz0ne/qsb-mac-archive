@@ -70,6 +70,16 @@
 //
 - (oneway void)lastSearchResultsRanked:(in byref id <TransferenceClientProtocol>)client;
 
+// Returns the number of the results for the previous search
+//
+// Args:
+//  None
+//
+// Returns:
+//  A NSNumber object with the number of results we got for the previous query
+//
+- (in bycopy NSNumber *)numberOfResults;
+
 // Performs the passed action on the passed result.
 //
 // Args:
