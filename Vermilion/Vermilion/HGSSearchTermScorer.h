@@ -104,7 +104,8 @@ void HGSSetSearchTermScoringFactors(CGFloat characterMatchFactor,
                                     CGFloat wordPortionFactor,
                                     CGFloat itemPortionFactor,
                                     NSUInteger maximumCharacterDistance,
-                                    NSUInteger maximumItemCharactersScanned);
+                                    NSUInteger maximumItemCharactersScanned,
+                                    BOOL enableBestWordScoring);
   
 /*!
  Scores how well a given term comprised of a singe word matches to a

@@ -30,6 +30,12 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+// TODO(mrossetti): ALLOW SWITCHING BACK TO THE OLD SCORING TECHNIQUE
+// OR TO OVERRIDE THE SCORING DEFAULTS.  REMOVE EVERYTHING ENABLED BY
+// THIS SYMBOL ONCE OVERRIDE IS NO LONGER NEEDED.
+// http://code.google.com/p/qsb-mac/issues/detail?id=702
+#define HGS_TEMPORARY_SCORER_CONTROLS 1
+
 #import "HGSMemorySearchSource.h"
 #import "HGSResult.h"
 #import "HGSQuery.h"
@@ -38,20 +44,24 @@
 #import "HGSDelegate.h"
 #import "HGSPluginLoader.h"
 #import "HGSLog.h"
-// TODO(mrossetti): REMOVE THE FOLLOWING INCLUDE AND FILES FROM THE PROJECT
-// WHEN WE SETTLE DOWN ON THE SCORING.
-#import "HGSAbbreviationRanker.h"
 #import "HGSSearchTermScorer.h"
+#if HGS_TEMPORARY_SCORER_CONTROLS
+#import "HGSAbbreviationRanker.h"
+#endif
 
-// TODO(mrossetti): DEFAULTS KEY FOR ARRAY CONTAINING VALUES TO ALLOW SWITCHING
-// BACK TO THE OLD SCORING TECHNIQUE OR TO OVERRIDE THE SCORING DEFAULTS.
-// http://code.google.com/p/qsb-mac/issues/detail?id=702
+#if HGS_TEMPORARY_SCORER_CONTROLS
+// User defaults key for controlling the use of the old scorer or for
+// fine-tuning the factors for the new scorer.
 static NSString* const kHGSTermScoringSettingsKey = @"HGSTermScoringSettingsKey";
 // Factor applied to the value of a match score from an 'other term'.
-// TODO(mrossetti): CONVERT THIS TO A CONSTANT WHEN WE SETTLE DOWN ON THE
-// SCORING.  THIS CAN BE OVERRIDDEN BY THE TEMPORARY DEFAULTS, BELOW.
-static CGFloat gOtherTermMultiplier_ = 0.5;
-static CGFloat gMinimumSignificantScore_ = 0.1;
+static CGFloat gHGSOtherTermMultiplier = 0.5;
+static CGFloat gHGSMinimumSignificantScore = 0.1;
+#else
+// Factor applied to the value of a match score from an 'other term'.
+static CGFloat const gHGSOtherTermMultiplier = 0.5;
+// Any score less than this is considered as a zero score.
+static CGFloat const gHGSMinimumSignificantScore = 0.1;
+#endif
 
 static NSString* const kHGSMemorySourceResultKey = @"HGSMSResultObject";
 static NSString* const kHGSMemorySourceNameKey = @"HGSMSName";
@@ -159,9 +169,7 @@ NSString* const kHGSObjectAttributeWordRangesKey
       }
         
     } else if (normalizedLength > 0) {
-      // TODO(mrossetti): TEMPORARY CODE TO ALLOW SWITCHING BACK TO THE OLD
-      // SCORING TECHNIQUE OR TO OVERRIDE THE SCORING DEFAULTS.
-      // http://code.google.com/p/qsb-mac/issues/detail?id=702
+#if HGS_TEMPORARY_SCORER_CONTROLS
       NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
       NSArray *scoreSettings = [ud arrayForKey:kHGSTermScoringSettingsKey];
       BOOL useOldScorer = NO;
@@ -187,6 +195,8 @@ NSString* const kHGSObjectAttributeWordRangesKey
             = [[scoreSettings objectAtIndex:7] unsignedIntValue];
           NSUInteger maximumItemCharactersScanned
              = [[scoreSettings objectAtIndex:8] unsignedIntValue];
+          NSUInteger enableBestWordScoring
+            = [[scoreSettings objectAtIndex:9] boolValue];
           HGSSetSearchTermScoringFactors(characterMatchFactor,
                                          firstCharacterInWordFactor,
                                          adjacencyFactor,
@@ -194,11 +204,13 @@ NSString* const kHGSObjectAttributeWordRangesKey
                                          wordPortionFactor,
                                          itemPortionFactor,
                                          maximumCharacterDistance,
-                                         maximumItemCharactersScanned);
-          gOtherTermMultiplier_
-            = [[scoreSettings objectAtIndex:9] floatValue];
+                                         maximumItemCharactersScanned,
+                                         enableBestWordScoring);
+          gHGSOtherTermMultiplier
+            = [[scoreSettings objectAtIndex:10] floatValue];
           }
       }
+#endif
 
       // Match the terms
       for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
@@ -221,9 +233,9 @@ NSString* const kHGSObjectAttributeWordRangesKey
             for (NSString *otherItem in otherItems) {
               itemScore = MAX(itemScore,
                               HGSScoreTermForItem(queryTerm, otherItem, nil)
-                              * gOtherTermMultiplier_);
+                              * gHGSOtherTermMultiplier);
             }
-            if (itemScore < gMinimumSignificantScore_) {
+            if (itemScore < gHGSMinimumSignificantScore) {
               // Short-circuit this item since at least one search term
               // was not adequately matched.
               rank = 0.0;
@@ -247,10 +259,9 @@ NSString* const kHGSObjectAttributeWordRangesKey
             }
             [results addObject:resultCopy];
           }
-        } else {
-          // TODO(mrossetti): REMOVE THE FOLLOWING CODE ONCE NEW SCORER HAS
-          // STABILIZED.
-          // http://code.google.com/p/qsb-mac/issues/detail?id=702
+        }
+#if HGS_TEMPORARY_SCORER_CONTROLS
+        else {
           CGFloat rank = HGSScoreForAbbreviation(name,
                                                  normalizedQuery, 
                                                  NULL);
@@ -285,6 +296,7 @@ NSString* const kHGSObjectAttributeWordRangesKey
             [results addObject:resultCopy];
           }
         }
+#endif
       }
     }
   }
