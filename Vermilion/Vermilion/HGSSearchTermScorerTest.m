@@ -78,6 +78,7 @@ static const CGFloat kHGSTestPerfectScore = 10000.0;
   CGFloat itemPortionFactor = 0.8;
   NSUInteger maximumCharacterDistance = 22;
   NSUInteger maximumItemCharactersScanned = 250;
+  BOOL enableBestWordScoring = YES;
   
   HGSSetSearchTermScoringFactors(characterMatchFactor,
                                  firstCharacterInWordFactor,
@@ -86,7 +87,8 @@ static const CGFloat kHGSTestPerfectScore = 10000.0;
                                  wordPortionFactor,
                                  itemPortionFactor,
                                  maximumCharacterDistance,
-                                 maximumItemCharactersScanned);
+                                 maximumItemCharactersScanned,
+                                 enableBestWordScoring);
 }
 
 #pragma mark Tests
@@ -100,6 +102,7 @@ static const CGFloat kHGSTestPerfectScore = 10000.0;
   CGFloat itemPortionFactor = 0.8;
   NSUInteger maximumCharacterDistance = 22;
   NSUInteger maximumItemCharactersScanned = 250;
+  BOOL enableBestWordScoring = YES;
   
   HGSSetSearchTermScoringFactors(characterMatchFactor,
                                  firstCharacterInWordFactor,
@@ -108,7 +111,8 @@ static const CGFloat kHGSTestPerfectScore = 10000.0;
                                  wordPortionFactor,
                                  itemPortionFactor,
                                  maximumCharacterDistance,
-                                 maximumItemCharactersScanned);
+                                 maximumItemCharactersScanned,
+                                 enableBestWordScoring);
 }
 
 - (void)testBasicTermScoring {
