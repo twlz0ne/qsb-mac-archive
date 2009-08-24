@@ -337,14 +337,7 @@ GTM_METHOD_CHECK(NSEnumerator,
     // during a fetch we don't destroy the service out from under ourselves.
     currentlyFetchingDocs_ = YES;
     // If the doc feed is attempting an http request then upgrade it to https.
-    NSString *docURLString
-      = [kGDataGoogleDocsDefaultPrivateFullFeed
-         stringByReplacingOccurrencesOfString:@"http:"
-                                   withString:@"https:"
-                                      options:NSLiteralSearch
-                                              | NSAnchoredSearch
-                                        range:NSMakeRange(0, 5)];
-    NSURL* docURL = [NSURL URLWithString:docURLString];
+    NSURL* docURL = [GDataServiceGoogleDocs docsFeedURLUsingHTTPS:YES];
     docServiceTicket_
       = [[docService_ fetchFeedWithURL:docURL
                               delegate:self
