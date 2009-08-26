@@ -50,6 +50,12 @@ static NSUInteger gHGSMaximumCharacterDistance = 22;
 // Maximum distance we will scan into the search item for matches.
 static NSUInteger gHGSMaximumItemCharactersScanned = 250;
 static BOOL gHGSEnableBestWordScoring = YES;  // Perform best word match scoring.
+// The amount by which an other item score is multiplied in order to determine
+// its final score.
+static CGFloat gHGSOtherItemMultiplier = 0.5;
+
+// Any score less than this is considered as a zero score.
+static CGFloat const gHGSMinimumSignificantScore = 0.1;
 
 // Keys to search term detail dictionary items.
 NSString *const kHGSScoreTermWordKey = @"searchTerm";
@@ -109,7 +115,8 @@ void HGSSetSearchTermScoringFactors(CGFloat characterMatchFactor,
                                     CGFloat itemPortionFactor,
                                     NSUInteger maximumCharacterDistance,
                                     NSUInteger maximumItemCharactersScanned,
-                                    BOOL enableBestWordScoring) {
+                                    BOOL enableBestWordScoring,
+                                    CGFloat otherItemMultiplier) {
   gHGSCharacterMatchFactor = characterMatchFactor;
   gHGSFirstCharacterInWordFactor = firstCharacterInWordFactor;
   gHGSAdjacencyFactor = adjacencyFactor;
@@ -119,6 +126,7 @@ void HGSSetSearchTermScoringFactors(CGFloat characterMatchFactor,
   gHGSMaximumCharacterDistance = maximumCharacterDistance;
   gHGSMaximumItemCharactersScanned = maximumItemCharactersScanned;
   gHGSEnableBestWordScoring = enableBestWordScoring;
+  gHGSOtherItemMultiplier = otherItemMultiplier;
 }
 
 #pragma mark Internal Scoring Functions
@@ -293,10 +301,38 @@ CGFloat HGSScoreTermForItem(NSString *term,
   return HGSScoreTermAndDetailsForItem(term, item, pWordRanges, NULL);
 }
 
-NSArray *HGSScoreTermsForItem(NSArray *searchTerms,
-                              NSString *item, 
-                              NSArray **pWordRanges) {
-  return HGSScoreTermsAndDetailsForItem(searchTerms, item, pWordRanges, NULL);
+CGFloat HGSScoreTermsForMainAndOtherItems(NSArray *searchTerms,
+                                          NSString *mainItem,
+                                          NSArray *otherItems,
+                                          NSArray **pWordRanges) {
+  // If the caller has not provided a wordRanges then we create and return
+  // a new one.
+  NSArray **pTempWordRanges = pWordRanges;
+  NSArray *tempWordRanges = nil;
+  if (!pWordRanges) {
+    pTempWordRanges = &tempWordRanges;
+  }
+  CGFloat score = 0.0;
+  for (NSString *searchTerm in searchTerms) {
+    CGFloat itemScore
+      = HGSScoreTermForItem(searchTerm, mainItem, pTempWordRanges);
+    // Check |otherItems| only for better matches than the main
+    // search item.
+    for (NSString *otherItem in otherItems) {
+      itemScore = MAX(itemScore,
+                      HGSScoreTermForItem(searchTerm, otherItem,
+                                          pTempWordRanges)
+                      * gHGSOtherItemMultiplier);
+    }
+    if (itemScore < gHGSMinimumSignificantScore) {
+      // Short-circuit this item since at least one search term
+      // was not adequately matched.
+      score = 0.0;
+      break;
+    }
+    score += itemScore;
+  }
+  return score;
 }
 
 NSArray *HGSScoreTermsAndDetailsForItem(NSArray *searchTerms,

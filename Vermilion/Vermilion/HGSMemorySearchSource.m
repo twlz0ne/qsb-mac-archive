@@ -53,14 +53,6 @@
 // User defaults key for controlling the use of the old scorer or for
 // fine-tuning the factors for the new scorer.
 static NSString* const kHGSTermScoringSettingsKey = @"HGSTermScoringSettingsKey";
-// Factor applied to the value of a match score from an 'other term'.
-static CGFloat gHGSOtherTermMultiplier = 0.5;
-static CGFloat gHGSMinimumSignificantScore = 0.1;
-#else
-// Factor applied to the value of a match score from an 'other term'.
-static CGFloat const gHGSOtherTermMultiplier = 0.5;
-// Any score less than this is considered as a zero score.
-static CGFloat const gHGSMinimumSignificantScore = 0.1;
 #endif
 
 static NSString* const kHGSMemorySourceResultKey = @"HGSMSResultObject";
@@ -197,6 +189,8 @@ NSString* const kHGSObjectAttributeWordRangesKey
              = [[scoreSettings objectAtIndex:8] unsignedIntValue];
           NSUInteger enableBestWordScoring
             = [[scoreSettings objectAtIndex:9] boolValue];
+          CGFloat otherItemsMultiplier
+            = [[scoreSettings objectAtIndex:10] floatValue];
           HGSSetSearchTermScoringFactors(characterMatchFactor,
                                          firstCharacterInWordFactor,
                                          adjacencyFactor,
@@ -205,9 +199,8 @@ NSString* const kHGSObjectAttributeWordRangesKey
                                          itemPortionFactor,
                                          maximumCharacterDistance,
                                          maximumItemCharactersScanned,
-                                         enableBestWordScoring);
-          gHGSOtherTermMultiplier
-            = [[scoreSettings objectAtIndex:10] floatValue];
+                                         enableBestWordScoring,
+                                         otherItemsMultiplier);
           }
       }
 #endif
@@ -223,27 +216,11 @@ NSString* const kHGSObjectAttributeWordRangesKey
           BOOL addWordRanges = (wordRanges) ? NO : YES;
           NSArray *queryTerms
             = [normalizedQuery componentsSeparatedByString:@" "];
-          CGFloat rank = 0.0;
-          for (NSString *queryTerm in queryTerms) {
-            CGFloat itemScore
-              = HGSScoreTermForItem(queryTerm, name, &wordRanges);
-            // Check |otherTerms| only for better matches than the main
-            // search item.
-            NSArray* otherItems = [indexObject otherTerms];
-            for (NSString *otherItem in otherItems) {
-              itemScore = MAX(itemScore,
-                              HGSScoreTermForItem(queryTerm, otherItem, nil)
-                              * gHGSOtherTermMultiplier);
-            }
-            if (itemScore < gHGSMinimumSignificantScore) {
-              // Short-circuit this item since at least one search term
-              // was not adequately matched.
-              rank = 0.0;
-              break;
-            }
-            rank += itemScore;
-          }
-
+          NSArray* otherItems = [indexObject otherTerms];
+          CGFloat rank = HGSScoreTermsForMainAndOtherItems(queryTerms,
+                                                           name,
+                                                           otherItems,
+                                                           &wordRanges);
           if (rank > 0.0) {
             // Copy the result so we can apply rank to it
             HGSMutableResult *resultCopy = [[result mutableCopy] autorelease];

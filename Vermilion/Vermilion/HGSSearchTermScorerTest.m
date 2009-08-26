@@ -79,6 +79,7 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
   NSUInteger maximumCharacterDistance = 22;
   NSUInteger maximumItemCharactersScanned = 250;
   BOOL enableBestWordScoring = YES;
+  CGFloat otherTermMultiplier = 0.5;
   
   HGSSetSearchTermScoringFactors(characterMatchFactor,
                                  firstCharacterInWordFactor,
@@ -88,32 +89,11 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
                                  itemPortionFactor,
                                  maximumCharacterDistance,
                                  maximumItemCharactersScanned,
-                                 enableBestWordScoring);
+                                 enableBestWordScoring,
+                                 otherTermMultiplier);
 }
 
 #pragma mark Tests
-
-- (void)testSetScoringFactors {
-  CGFloat characterMatchFactor = 1.0;
-  CGFloat firstCharacterInWordFactor = 3.0;
-  CGFloat adjacencyFactor = 3.8;
-  CGFloat startDistanceFactor = 0.8;
-  CGFloat wordPortionFactor = 5.0;
-  CGFloat itemPortionFactor = 0.8;
-  NSUInteger maximumCharacterDistance = 22;
-  NSUInteger maximumItemCharactersScanned = 250;
-  BOOL enableBestWordScoring = YES;
-  
-  HGSSetSearchTermScoringFactors(characterMatchFactor,
-                                 firstCharacterInWordFactor,
-                                 adjacencyFactor,
-                                 startDistanceFactor,
-                                 wordPortionFactor,
-                                 itemPortionFactor,
-                                 maximumCharacterDistance,
-                                 maximumItemCharactersScanned,
-                                 enableBestWordScoring);
-}
 
 - (void)testBasicTermScoring {
   [self ResetScoringFactors];
@@ -197,9 +177,9 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
       itemScores[i] = 0.0;
       itemIndex[i] = i;
     }
-    NSString *testTermsString = [test objectForKey:@"search terms"];
+    NSString *testTermsString = [test objectForKey:@"query"];
     NSArray *testTerms = [testTermsString componentsSeparatedByString:@" "];
-    NSArray *testItems = [test objectForKey:@"search items"];
+    NSArray *testItems = [test objectForKey:@"results"];
     NSUInteger itemsCount = [testItems count];
     for (NSUInteger j = itemsCount; j > 0; --j) {
       // Pick a random item index then compress the index choices.
@@ -208,16 +188,45 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
       for (NSUInteger k = indexChoice + 1; k < 50; ++k) {
         itemIndex[k - 1] = itemIndex[k];
       }
-      NSString *testItem = [testItems objectAtIndex:randomIndex];
-      NSArray *scores = HGSScoreTermsForItem(testTerms, testItem, nil);
-      for (NSNumber *score in scores) {
-        if ([score floatValue] > 0.01) {
-          itemScores[randomIndex] += [score floatValue];
-        } else {
-          // One of the terms didn't match at all so it's not a match.
-          itemScores[randomIndex] = 0.0;
-          break;
+      id testItem = [testItems objectAtIndex:randomIndex];
+      NSString *primaryItem = nil;
+      NSArray *secondaryItems = nil;
+      if ([testItem isKindOfClass:[NSString class]]) {
+        primaryItem = testItem;
+      } else if ([testItem isKindOfClass:[NSArray class]]) {
+        secondaryItems = testItem;
+        NSUInteger itemCount = [secondaryItems count];
+        if (itemCount > 0) {
+          primaryItem = [secondaryItems objectAtIndex:0];
+          secondaryItems = (itemCount > 1)
+            ? [secondaryItems subarrayWithRange:NSMakeRange(1, itemCount - 1)]
+            : nil;
         }
+      }
+      if (primaryItem) {
+        // This replicates the score formula used in HGSMemorySearchSource
+        // when secondaryItems are taken into consideration.
+        NSArray *wordRanges = nil;
+        CGFloat itemScore = 0.0;
+        for (NSString *queryTerm in testTerms) {
+          CGFloat termScore
+            = HGSScoreTermForItem(queryTerm, primaryItem, &wordRanges);
+          // Only consider secondaryItem that have better scores than the main
+          // search item.
+          for (NSString *secondaryItem in secondaryItems) {
+            termScore = MAX(termScore,
+                            HGSScoreTermForItem(queryTerm, secondaryItem, nil)
+                            / 2.0);
+          }
+          if (termScore < 0.01) {
+            // Short-circuit this item since at least one search term
+            // was not adequately matched.
+            itemScore = 0.0;
+            break;
+          }
+          itemScore += termScore;
+        }
+        itemScores[randomIndex] = itemScore;
       }
     }
     // Verify that we got ascending scores.

@@ -3,9 +3,9 @@
 <plist version="1.0">
 <array>
 	<dict>
-		<key>search terms</key>
+		<key>query</key>
 		<string>can</string>
-		<key>search items</key>
+		<key>results</key>
 		<array>
 			<string>can</string>
 			<string>celebrate armalite noogies</string>
@@ -23,9 +23,9 @@
 		</array>
 	</dict>
 	<dict>
-		<key>search terms</key>
+		<key>query</key>
 		<string>abc</string>
-		<key>search items</key>
+		<key>results</key>
 		<array>
 			<string>abc</string>
 			<string>am i a bad cook</string>
@@ -33,9 +33,9 @@
 		</array>
 	</dict>
 	<dict>
-		<key>search terms</key>
+		<key>query</key>
 		<string>abc def</string>
-		<key>search items</key>
+		<key>results</key>
 		<array>
 			<string>army brats can defend every friend</string>
 			<string>abc defend every fiendish person</string>
@@ -44,6 +44,244 @@
 			<string>abcdef</string>
 			<string>abc</string>
 			<string>def</string>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>goog</string>
+		<key>results</key>
+		<array>
+			<string>goog - stock quote ticker price</string>
+			<string>google chrome</string>
+			<string>google quick search box</string>
+			<string>google talks labs edition</string>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>can</string>
+		<key>results</key>
+		<array>
+			<string>can arithmetic nurture</string>
+			<string>could arithmetic nurture</string>
+			<string>the can in the canter</string>
+			<string>canada</string>
+			<string>thecan in thecanter</string>
+			<string>arcangent</string>
+			<string>xxxcan</string>
+			<string>xxxxxxcan</string>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>refer</string>
+		<key>results</key>
+		<array>
+			<string>refer</string>
+			<string>reference</string>
+			<string>referentially</string>
+			<string>prefer</string>
+			<string>who is the referee for this game</string>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>a</string>
+		<key>results</key>
+		<array>
+			<string>a</string>
+			<string>apple</string>
+			<string>a a a a a a a a a a a a</string>
+			<string>far and away from here with a car</string>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>ôn</string>
+		<key>results</key>
+		<array>
+			<string>ônibus</string>
+			<string>on</string>
+			<string>ontario</string>
+			<string>ôstarâ</string>
+			<string>olympic games</string>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>goog</string>
+		<key>results</key>
+		<array>
+			<array>
+				<string>goog - stock quote ticker price</string>
+				<string>google Inc nasdaq</string>
+				<string>eric schmidt ceo</string>
+			</array>
+			<array>
+				<string>google chrome</string>
+				<string>the worlds next great browser</string>
+			</array>
+			<array>
+				<string>google quick search box</string>
+				<string>local remove searching</string>
+			</array>
+			<array>
+				<string>google talks labs edition</string>
+				<string>chat instant message video</string>
+			</array>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>goog</string>
+		<key>results</key>
+		<array>
+			<array>
+				<string>goog - stock quote ticker price</string>
+				<string>google Inc nasdaq</string>
+				<string>eric schmidt ceo</string>
+			</array>
+			<string>google quick search box</string>
+			<array>
+				<string>google talks labs edition</string>
+				<string>chat instant message video</string>
+			</array>
+			<string>google talks labs edition</string>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>rohit</string>
+		<key>results</key>
+		<array>
+			<string>rohit</string>
+			<string>rohit makasana</string>
+			<string>makasana, rohit</string>
+			<string>expenseReportrohit</string>
+			<string>roh</string>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>bing com</string>
+		<key>results</key>
+		<array>
+			<string>www bing com</string>
+			<string>some people like to use bing and yahoo com</string>
+			<string>the bing report</string>
+			<string>how fast is bing as a search engine?</string>
+			<string>expense reportrohit</string>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>network pref</string>
+		<key>results</key>
+		<array>
+			<string>network preference pane</string>
+			<string>setting up a network and default preferences</string>
+			<string>analysis of performance and networking concepts</string>
+			<string>energy pref</string>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>pasadena lady</string>
+		<key>results</key>
+		<array>
+			<string>little old lady from pasadena</string>
+			<string>pasadena</string>
+			<string>my friend decided to move to pasadena to be a bum and do whatever it is that people in pasadena do</string>
+			<string>lady marmalade</string>
+			<string>luck be a lady</string>
+		</array>
+	</dict>
+	<!---
+	<dict>
+		<key>query</key>
+		<string>maclachlan</string>
+		<key>results</key>
+		<array>
+			<array>
+				<string>dave maclachlan</string>
+				<string>phones office 1 650 253 1344 grandcentral 425 522 3622 Other vc bridge 3 253 1344 id number 66666 status employee department engineering cost</string>
+			</array>
+			<array>
+				<string>dave maclachlan dmac google com</string>
+				<string>i&apos;ve got a c l in for adding unit tests for the scoring algorithm but I was thinking that it would probably be quite useful if you also had a test harness which would allow you to run the same test data files manually and get a nice</string>
+			</array>
+			<array>
+				<string>the canuck</string>
+				<string>dave maclachlan jabber dmac google com</string>
+			</array>
+			<array>
+				<string>my buddy list</string>
+				<string>john grabowski pankaj kakkar ismail noorbasha greg robbins dave maclachlan neal sidhwaney nicholas jitkoff</string>
+			</array>
+			<array>
+				<string>our new q s b plan for the future</string>
+				<string>are the best approach to prove that the scoring algorithm has not changed from release to release in order to get to that point though it will be necessary to show that the scoring what do you think dave</string>
+			</array>
+			<array>
+				<string>whitepaper on web dav</string>
+				<string>the web d a v current principal extension to the web d a v access control a c l protocol has been approved by the internet engineering task force as r f c 5397 this protocol permits a web d a v client to discover what principal user the server thinks is currently authenticated this is useful in providing full service client implementations that use the a c l protocol congratulations to mac sanchez and cyrus daboo for creating this protocol</string>
+			</array>
+		</array>
+	</dict>
+	--->
+	<dict>
+		<key>query</key>
+		<string>95110</string>
+		<key>results</key>
+		<array>
+			<array>
+				<string>weather report for 95110</string>
+				<string>monday tuesday wednesday thursday friday sunny cloudy</string>
+			</array>
+			<array>
+				<string>kris rambish</string>
+				<string>home 28 main street san jose c a 95110 office 1600 shoreline blvd mountain view c a 95110</string>
+			</array>
+			<array>
+				<string>nirnimesh</string>
+				<string>123 main street hyderabad india 9 324 9511 0232</string>
+			</array>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>lonely</string>
+		<key>results</key>
+		<array>
+			<array>
+				<string>a crowded room</string>
+				<string>it is hard to be lonely when you are in a crowded room unless no one speaks the same language then I could see how one would be lonely</string>
+			</array>
+			<array>
+				<string>isolated</string>
+				<string>i have isolated the problem identify single out pick out point out spot lonely recognize distinguish pinpoint locate</string>
+			</array>
+			<array>
+				<string>all alone</string>
+			</array>
+		</array>
+	</dict>
+	<dict>
+		<key>query</key>
+		<string>mw</string>
+		<key>results</key>
+		<array>
+			<array>
+				<string>microsoft wrd</string>
+			</array>
+			<array>
+				<string>software shopping list</string>
+				<string>microsoft visual studio  microsoft office word excel powerpoint</string>
+			</array>
+			<array>
+				<string>michael smith</string>
+				<string>product manager 54 luzerne street extension seattle w a mw445 gmail com</string>
+			</array>
 		</array>
 	</dict>
 </array>
