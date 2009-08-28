@@ -46,8 +46,8 @@
   NSString *captchaText_;  // The user's response.
   NSString *captchaToken_;  // Captcha token.
   // Set by and only useful within authentication.
-  NSURLConnection *authenticationConnection_;
-  NSMutableData *authenticationData_;
+  BOOL authCompleted_;
+  BOOL authSucceeded_;
 }
 
 @property (nonatomic, retain) NSImage *captchaImage;

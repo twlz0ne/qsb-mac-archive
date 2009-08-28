@@ -37,6 +37,8 @@
 #import "HGSGoogleAccountTypes.h"
 #import "HGSLog.h"
 #import "GTMGoogleSearch.h"
+#import <GData/GData.h>
+#import <GData/GDataAuthenticationFetcher.h>
 
 static NSString *const kGoogleDomain = @"@google.com";
 static NSString *const kGoogleUKDomain = @"@google.co.uk";
@@ -45,6 +47,11 @@ static NSString *const kGoogleCorpAccountType = @"HOSTED_OR_GOOGLE";
 static NSString *const kHostedAccountType = @"HOSTED";
 static NSString *const kCaptchaImageURLPrefix
   = @"http://www.google.com/accounts/";
+static NSString *const kGoogleAccountAsynchAuth = @"GoogleAccountAsynchAuth";
+
+// Authentication timing constants.
+static const NSTimeInterval kAuthenticationRetryInterval = 0.1;
+static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
 
 
 @interface GoogleAccountSetUpViewController ()
@@ -64,13 +71,12 @@ static NSString *const kCaptchaImageURLPrefix
 
 @interface GoogleAccount ()
 
-@property (nonatomic, retain) NSURLConnection *authenticationConnection;
-@property (nonatomic, retain) NSMutableData *authenticationData;
+@property (nonatomic, assign) BOOL authCompleted;
+@property (nonatomic, assign) BOOL authSucceeded;
 
-- (NSURLRequest *)accountURLRequest;
-- (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
-                                      password:(NSString *)password;
-- (void)resetAuthenticationTemporaries;
+// Common function for preparing an authentication fetcher.
+- (GDataHTTPFetcher *)authFetcherForPassword:(NSString *)password
+                                  parameters:(NSDictionary *)params;
 
 // Check the authentication results to see if the account authenticated.
 - (BOOL)validateResult:(NSData *)result;
@@ -85,14 +91,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 @synthesize captchaImage = captchaImage_;
 @synthesize captchaText = captchaText_;
 @synthesize captchaToken = captchaToken_;
-@synthesize authenticationConnection = authenticationConnection_;
-@synthesize authenticationData = authenticationData_;
+@synthesize authCompleted = authCompleted_;
+@synthesize authSucceeded = authSucceeded_;
 
 - (void)dealloc {
   [captchaImage_ release];
   [captchaText_ release];
   [captchaToken_ release];
-  [self resetAuthenticationTemporaries];
   [super dealloc];
 }
 
@@ -110,11 +115,27 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (void)authenticate {
-  NSURLRequest *authRequest = [self accountURLRequest];
-  if (authRequest) {
-    NSURLConnection *connection
-      = [NSURLConnection connectionWithRequest:authRequest delegate:self];
-    [self setAuthenticationConnection:connection];
+  NSDictionary *parameters = nil;
+  NSString *captchaText = [self captchaText];
+  if ([captchaText length]) {
+    NSString *captchaToken = [self captchaToken];
+    parameters = [NSDictionary dictionaryWithObjectsAndKeys:
+                  captchaToken, @"logintoken",
+                  captchaText, @"logincaptcha",
+                  nil];
+    // Clear for next time.
+    [self setCaptchaImage:nil];
+    [self setCaptchaText:nil];
+    [self setCaptchaToken:nil];
+  }
+  NSString *password = [self password];
+  GDataHTTPFetcher *authFetcher = [self authFetcherForPassword:password
+                                                    parameters:parameters];
+  if (authFetcher) {
+    [authFetcher setProperty:@"YES" forKey:kGoogleAccountAsynchAuth];
+    [authFetcher beginFetchWithDelegate:self
+                      didFinishSelector:@selector(fetcher:finishedWithData:)
+                        didFailSelector:@selector(fetcher:failedWithError:)];
   } else {
     // Failed to authenticate because we could not compose an authRequest.
     [self setAuthenticated:NO];
@@ -122,87 +143,60 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (BOOL)authenticateWithPassword:(NSString *)password {
-  BOOL authenticated = NO;
   // Test this account to see if we can connect.
-  NSString *userName = [self userName];
-  NSURLRequest *authRequest = [self accountURLRequestForUserName:userName
-                                                        password:password];
-  if (authRequest) {
-    NSURLResponse *accountResponse = nil;
-    NSError *error = nil;
-    NSData *result = [NSURLConnection sendSynchronousRequest:authRequest
-                                           returningResponse:&accountResponse
-                                                       error:&error];
-    if (error) {
-      HGSLog(@"Error %d occurred during authentication of account '%@'. "
-             @"Reason: %@.", [error code], [self displayName],
-             [error localizedFailureReason]);
+  BOOL authenticated = NO;
+  GDataHTTPFetcher *authFetcher = [self authFetcherForPassword:password
+                                                    parameters:nil];
+  if (authFetcher) {
+    [self setAuthCompleted:NO];
+    [self setAuthSucceeded:NO];
+    [authFetcher beginFetchWithDelegate:self
+                      didFinishSelector:@selector(fetcher:finishedWithData:)
+                        didFailSelector:@selector(fetcher:failedWithError:)];
+    // Block until this fetch is done to make it appear synchronous.  Just in
+    // case, put an upper limit of 30 seconds before we bail.
+    [[authFetcher request] setTimeoutInterval:kAuthenticationGiveUpInterval];
+    NSRunLoop* loop = [NSRunLoop currentRunLoop];
+    while (![self authCompleted]) {
+      NSDate *sleepTilDate
+        = [NSDate dateWithTimeIntervalSinceNow:kAuthenticationRetryInterval];
+      [loop runUntilDate:sleepTilDate];
     }
-    authenticated = [self validateResult:result];
+    authenticated = [self authSucceeded];
   }
   return authenticated;
 }
 
-- (NSURLRequest *)accountURLRequest {
+- (GDataHTTPFetcher *)authFetcherForPassword:(NSString *)password
+                                  parameters:(NSDictionary *)params {
   NSString *userName = [self userName];
-  NSString *password = [self password];
-  NSURLRequest *accountRequest = [self accountURLRequestForUserName:userName
-                                                           password:password];
-  return accountRequest;
-}
-
-- (NSURLRequest *)accountURLRequestForUserName:(NSString *)userName
-                                      password:(NSString *)password {
-  NSURLRequest *accountRequest = nil;
-  // We don't support public access at this time, so a userName and password
-  // are required.
-  if ([userName length] && [password length]) {
-    NSString *encodedAccountName = [userName gtm_stringByEscapingForURLArgument];
-    NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
-    BOOL hosted = [self isKindOfClass:[GoogleAppsAccount class]];
-    NSString *accountType = kHostedAccountType;
-    if (!hosted) {
-      accountType = kGoogleAccountType;
-      NSRange atRange = [userName rangeOfString:@"@"];
-      if (atRange.location != NSNotFound) {
-        NSString *domainString = [userName substringFromIndex:atRange.location];
-        if ([GoogleAccount isMatchToGoogleDomain:domainString]) {
-          accountType = kGoogleCorpAccountType;
-        }
+  BOOL hosted = [self isKindOfClass:[GoogleAppsAccount class]];
+  NSString *accountType = kHostedAccountType;
+  if (!hosted) {
+    accountType = kGoogleAccountType;
+    NSRange atRange = [userName rangeOfString:@"@"];
+    if (atRange.location != NSNotFound) {
+      NSString *domainString = [userName substringFromIndex:atRange.location];
+      if ([GoogleAccount isMatchToGoogleDomain:domainString]) {
+        accountType = kGoogleCorpAccountType;
       }
     }
-    GTMGoogleSearch *gsearch = [GTMGoogleSearch sharedInstance];
-    NSMutableDictionary *args = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                 encodedAccountName, @"Email",
-                                 encodedPassword, @"Passwd",
-                                 accountType, @"accountType",
-                                 nil];
-    NSString *captchaText = [self captchaText];
-    if ([captchaText length]) {
-      NSString *captchaToken = [self captchaToken];
-      [args setObject:captchaToken forKey:@"logintoken"];
-      [args setObject:captchaText forKey:@"logincaptcha"];
-      
-      // Clear for next time.
-      [self setCaptchaImage:nil];
-      [self setCaptchaText:nil];
-      [self setCaptchaToken:nil];
-    }
-    
-    NSString *searchURL = [gsearch searchURLFor:nil 
-                                         ofType:@"accounts/ClientLogin" 
-                                      arguments:args];
-    NSString *accountTestString 
-      = [searchURL stringByReplacingCharactersInRange:NSMakeRange(0, 4)
-                                           withString:@"https"];
-    NSURL *accountTestURL = [NSURL URLWithString:accountTestString];
-    accountRequest
-      = [NSURLRequest requestWithURL:accountTestURL
-                         cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
-                     timeoutInterval:15.0];
   }
-  return accountRequest;
+  GDataHTTPFetcher *authFetcher
+    = [GDataAuthenticationFetcher authTokenFetcherWithUsername:userName
+                                                      password:password
+                                                       service:@"cp"
+                                                        source:@"google-qsb-1.0"
+                                                  signInDomain:nil
+                                                   accountType:accountType
+                                          additionalParameters:params
+                                                 customHeaders:nil];
+  if (!authFetcher) {
+    HGSLog(@"Failed to allocate GDataAuthenticationFetcher.");
+  }
+  return authFetcher;
 }
+
 
 - (BOOL)validateResult:(NSData *)result {
   NSString *answer = [[[NSString alloc] initWithData:result
@@ -214,10 +208,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   BOOL validated = NO;
   BOOL foundSID = NO;
   BOOL foundLSID = NO;
-  NSString *captchaToken = nil;
-  NSString *captchaImageURLString = nil;
-  NSString *const captchaTokenKey = @"CaptchaToken=";
-  NSString *const captchaImageURLKey = @"CaptchaUrl=";
   
   NSArray *answers = [answer componentsSeparatedByString:@"\n"];
   if ([answers count] >= 2) {
@@ -226,32 +216,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         foundSID = YES;
       } else if (!foundLSID && [anAnswer hasPrefix:@"LSID="]) {
         foundLSID = YES;
-      } else if ([anAnswer hasPrefix:captchaTokenKey]) {
-        captchaToken = [anAnswer substringFromIndex:[captchaTokenKey length]];
-      } else if ([anAnswer hasPrefix:captchaImageURLKey]) {
-        captchaImageURLString
-          = [anAnswer substringFromIndex:[captchaImageURLKey length]];
       }
     }
     validated = foundSID && foundLSID;
     if (!validated) {
-      if ([captchaToken length] && [captchaImageURLString length]) {
-        // Retrieve the captcha image.
-        NSString *fullURLString
-          = [kCaptchaImageURLPrefix
-             stringByAppendingString:captchaImageURLString];
-        NSURL *captchaImageURL = [NSURL URLWithString:fullURLString];
-        NSImage *captchaImage
-          = [[[NSImage alloc] initWithContentsOfURL:captchaImageURL]
-             autorelease];
-        [self setCaptchaToken:captchaToken];
-        [self setCaptchaImage:captchaImage];
-        HGSLog(@"Authentication for account '%@' requires captcha.",
-               [self displayName]);
-      } else {
-        HGSLog(@"Authentication for account '%@' failed with a "
-               @"response of '%@'.", [self displayName], answer);
-      }
+      HGSLog(@"Authentication for account '%@' failed with a "
+             @"response of '%@'.", [self displayName], answer);
     }
   }
   return validated;
@@ -304,60 +274,95 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return success;
 }
 
-- (void)resetAuthenticationTemporaries {
-  [self setAuthenticationConnection:nil];
-  [self setAuthenticationData:nil];
+#pragma mark GDataAuthenticationFetcher Delegate Methods
+
+- (void)fetcher:(GDataHTTPFetcher *)authFetcher finishedWithData:(NSData *)data {
+  // An authentication may be synchronous or asynchronous.  The latter is
+  // indicated by the presence of the property key below.
+  BOOL authenticated = [self validateResult:data];
+  if ([authFetcher propertyForKey:kGoogleAccountAsynchAuth]) {
+    [self setAuthenticated:authenticated];
+  } else {
+    // Signal the runLoop that the fetch has completed.
+    [self setAuthCompleted:YES];
+    [self setAuthSucceeded:authenticated];
+  }
 }
 
-- (void)setAuthenticationConnection:(NSURLConnection *)connection {
-  [authenticationConnection_ cancel];
-  [authenticationConnection_ release];
-  authenticationConnection_ = [connection retain];
-}
-
-#pragma mark NSURLConnection Delegate Methods
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-  HGSAssert(connection == authenticationConnection_, nil);
-  BOOL authenticated = [self validateResult:authenticationData_];
-  [self resetAuthenticationTemporaries];
-  [self setAuthenticated:authenticated];
-}
-
-- (void)connection:(NSURLConnection *)connection 
-didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-  HGSAssert(connection == authenticationConnection_, nil);
-  [[challenge sender] cancelAuthenticationChallenge:challenge];
-  [self resetAuthenticationTemporaries];
-  [self setAuthenticated:NO];
-  NSError *error = [challenge error];
-  HGSLog(@"Authentication of account '%@' was challenged with error %d. "
-         @"Reason: %@.", [self displayName], [error code],
-         [error localizedFailureReason]);
-}
-
-- (void)connection:(NSURLConnection *)connection
-  didFailWithError:(NSError *)error {
-  HGSAssert(connection == authenticationConnection_, nil);
-  [self resetAuthenticationTemporaries];
-  [self setAuthenticated:NO];
+- (void)fetcher:(GDataHTTPFetcher *)authFetcher failedWithError:(NSError *)error {
+  // An authentication may be synchronous or asynchronous.  The latter is
+  // indicated by the presence of the property key below. Extract information
+  // from the header for logging purposes as well as to detect a captcha
+  // request.
+  NSDictionary *userInfo = [error userInfo];
+  NSMutableArray *messages = [NSMutableArray array];
+  NSString *dataString = nil;  // Keep for detecting the captcha request.
+  if (userInfo) {
+    // Add a string to the diagnostic message for each item in userInfo.
+    for (NSString *key in userInfo) {
+      if ([key isEqualToString:kGDataHTTPFetcherStatusDataKey]) {
+        NSData *data = [userInfo objectForKey:kGDataHTTPFetcherStatusDataKey];
+        if ([data length]) {
+          dataString = [[[NSString alloc] initWithData:data 
+                                              encoding:NSUTF8StringEncoding]
+                        autorelease];
+          if (dataString) {
+            [messages addObject:[NSString stringWithFormat:@"data: %@",
+                                 dataString]];
+          }
+        }
+      } else {
+        NSString *value = [userInfo objectForKey:key];
+        NSString *infoString = [NSString stringWithFormat:@"%@: %@",
+                                key, value];
+        [messages addObject:infoString];
+      }
+    }
+  }
+  if ([authFetcher propertyForKey:kGoogleAccountAsynchAuth]) {
+    [self setAuthenticated:NO];
+  } else {
+    // Signal the runLoop that the fetch has completed and check for
+    // a captcha request.
+    [self setAuthCompleted:YES];
+    [self setAuthSucceeded:NO];
+    NSString *captchaToken = nil;
+    NSString *captchaImageURLString = nil;
+    NSString *const captchaTokenKey = @"CaptchaToken";
+    NSString *const captchaImageURLKey = @"CaptchaUrl";
+    if (dataString) {
+      NSDictionary *responseInfo
+        = [GDataUtilities dictionaryWithResponseString:dataString];
+      captchaToken = [responseInfo objectForKey:captchaTokenKey];
+      captchaImageURLString = [responseInfo objectForKey:captchaImageURLKey];
+      if ([captchaToken length] && [captchaImageURLString length]) {
+        // Retrieve the captcha image.
+        NSString *fullURLString
+          = [kCaptchaImageURLPrefix
+             stringByAppendingString:captchaImageURLString];
+        NSURL *captchaImageURL = [NSURL URLWithString:fullURLString];
+        NSImage *captchaImage
+          = [[[NSImage alloc] initWithContentsOfURL:captchaImageURL]
+             autorelease];
+        if (captchaImage) {
+          [self setCaptchaToken:captchaToken];
+          [self setCaptchaImage:captchaImage];
+          HGSLog(@"Authentication for account '%@' requires captcha.",
+                 [self displayName]);
+        } else {
+          HGSLog(@"Authentication for account '%@' requires captcha but "
+                 @"failed to retrieve the captcha image from URL '%@'.",
+                 [self displayName], fullURLString);
+        }
+      }
+    }
+  }
+  NSString *userInfoString = [messages componentsJoinedByString:@", "];
   HGSLog(@"Authentication of account '%@' failed with error %d. "
-         @"Reason: %@.", [self displayName], [error code],
-         [error localizedFailureReason]);
+         @"Reason: '%@'.  UserInfo: '%@'", [self displayName], [error code],
+         [error localizedFailureReason], userInfoString);
 }
 
-- (void)connection:(NSURLConnection *)connection 
-didReceiveResponse:(NSURLResponse *)response {
-  HGSAssert(connection == authenticationConnection_, nil);
-  [self setAuthenticationData:[[[NSMutableData alloc] init] autorelease]];
-}
-
-- (void)connection:(NSURLConnection *)connection 
-    didReceiveData:(NSData *)data {
-  HGSAssert(connection == authenticationConnection_, nil);
-  NSMutableData *authenticationData = [self authenticationData];
-  [authenticationData appendData:data];
-}
 @end
 
 
