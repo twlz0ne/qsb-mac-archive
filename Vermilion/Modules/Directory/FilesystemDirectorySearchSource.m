@@ -32,8 +32,6 @@
 
 #import <Vermilion/Vermilion.h>
 #import "NSString+CaseInsensitive.h"
-#import "HGSAbbreviationRanker.h"
-#import "HGSTokenizer.h"
 #import "HGSLog.h"
 #import "GTMMethodCheck.h"
 #import "GTMNSFileManager+Carbon.h"
@@ -124,9 +122,9 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
       }
       
       NSString *tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
-      float score = HGSScoreForAbbreviation(tokenizedSubpath, 
-                                            normalizedQueryString, 
-                                            nil);
+      CGFloat score = HGSScoreTermForItem(normalizedQueryString,
+                                          tokenizedSubpath,
+                                          NULL);
       
       if (score <= 0.0) continue;
       

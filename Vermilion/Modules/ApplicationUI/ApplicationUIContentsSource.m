@@ -34,7 +34,6 @@
 #import "ApplicationUISource.h"
 #import "GTMAXUIElement.h"
 #import "ApplicationUIAction.h"
-#import "HGSTokenizer.h"
 #import "QSBHGSDelegate.h"
 #import "GTMNSWorkspace+Running.h"
 
@@ -92,8 +91,7 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
     } 
     if (value) {
       NSString *normalizedValue = [HGSTokenizer tokenizeString:value];
-      CGFloat rank 
-        = HGSScoreForAbbreviation(normalizedValue, normalizedQuery, NULL);
+      CGFloat rank = HGSScoreTermForItem(normalizedQuery, normalizedValue, NULL);
       if (rank > 0) {
         NSString *name 
           = [window stringValueForAttribute:NSAccessibilityTitleAttribute];

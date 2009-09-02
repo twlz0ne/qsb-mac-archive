@@ -31,7 +31,6 @@
 //
 
 #import <Vermilion/Vermilion.h>
-#import "HGSTokenizer.h"
 
 static NSString *kTrashResultType = HGS_SUBTYPE(@"trash", @"Trash");
 static NSString *kTrashResultUrl = @"gtrash://trash/result";
@@ -114,11 +113,9 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
             for (NSString *file in contents) {
               CGFloat rank = 0;
               if (normalizedLength == 0) {
-                rank = 1.0;
+                rank = HGSPerfectMatchScore();
               } else {
-                rank = HGSScoreForAbbreviation(file,
-                                               normalizedQueryString, 
-                                               NULL);
+                rank = HGSScoreTermForItem(normalizedQueryString, file, NULL);
               }
               if (rank > 0) {
                 NSNumber *nsRank = [NSNumber numberWithFloat:rank];
@@ -138,9 +135,9 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
       }
     }
   } else {
-    CGFloat rank  = HGSScoreForAbbreviation(trashNameNormalized_,
-                                            normalizedQueryString, 
-                                            NULL);
+    CGFloat rank = HGSScoreTermForItem(normalizedQueryString,
+                                       trashNameNormalized_,
+                                       NULL);
     NSDictionary *attributes
       = [NSDictionary dictionaryWithObjectsAndKeys:
          trashIcon_, kHGSObjectAttributeIconKey,

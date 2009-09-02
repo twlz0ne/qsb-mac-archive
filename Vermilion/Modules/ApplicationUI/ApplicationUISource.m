@@ -34,7 +34,6 @@
 #import "ApplicationUISource.h"
 #import "GTMAXUIElement.h"
 #import "ApplicationUIAction.h"
-#import "HGSTokenizer.h"
 #import "GTMNSWorkspace+Running.h"
 
 NSString *const kAppUISourceAttributeElementKey 
@@ -136,7 +135,7 @@ NSString *const kAppUISourceAttributeElementKey
         NSString *compareName 
           = [HGSTokenizer tokenizeString:name];
         
-        CGFloat score = HGSScoreForAbbreviation(compareName, queryString, NULL);
+        CGFloat score = HGSScoreTermForItem(queryString, compareName, NULL);
         if ([queryString length] && !(score > 0.0)) {
           continue;
         }

@@ -540,8 +540,6 @@
 		7F9CDD810DD8D69B007C4BF4 /* QSBMenuButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F9CDD800DD8D69B007C4BF4 /* QSBMenuButtonCell.m */; };
 		7FA450BC0EF88741006FD4E9 /* QSBDraggableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA450BA0EF88741006FD4E9 /* QSBDraggableImageView.m */; };
 		7FD2E82E0F33D75F00189D93 /* ResultsWindow-Large.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7FD2E82C0F33D75F00189D93 /* ResultsWindow-Large.xib */; };
-		7FE098920DC77AEB00D0FB6C /* HGSAbbreviationRanker.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FE098900DC77AEB00D0FB6C /* HGSAbbreviationRanker.m */; };
-		7FE098930DC77AEB00D0FB6C /* HGSAbbreviationRanker.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FE098910DC77AEB00D0FB6C /* HGSAbbreviationRanker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7FE2542C0F5CE3E4004FE5A6 /* blue-nav.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F45C0F17C7BF00896770 /* blue-nav.icns */; };
 		7FE602A60D91975000336364 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796A438C0976F3B5000659B6 /* CoreServices.framework */; };
 		7FE961B20F5E66E100CBBA8D /* action-audiochat-icon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7FE2537B0F5CDA23004FE5A6 /* action-audiochat-icon.pdf */; };
@@ -894,7 +892,6 @@
 		8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B95CD210F6EDF9D003BDBDD /* GTMRegex.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */; };
 		8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
-		8B95CE200F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CE1F0F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m */; };
 		8B98A2C80FA96ECF009DC652 /* WelcomeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8B98A2C70FA96ECF009DC652 /* WelcomeWindow.xib */; };
 		8B98A4550FAA0C6D009DC652 /* Twitter.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B98A4540FAA0C6D009DC652 /* Twitter.icns */; };
 		8BA019C40F14303400926923 /* GTMSQLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BA019C20F14303400926923 /* GTMSQLite.m */; };
@@ -2249,8 +2246,6 @@
 		7FA450BB0EF88741006FD4E9 /* QSBDraggableImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBDraggableImageView.h; sourceTree = "<group>"; };
 		7FD2E82D0F33D75F00189D93 /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = "en_US.lproj/ResultsWindow-Large.xib"; sourceTree = "<group>"; };
 		7FD8F1A70E252CDE00E7E6A5 /* URLDetectionSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLDetectionSource.m; sourceTree = "<group>"; };
-		7FE098900DC77AEB00D0FB6C /* HGSAbbreviationRanker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAbbreviationRanker.m; sourceTree = "<group>"; };
-		7FE098910DC77AEB00D0FB6C /* HGSAbbreviationRanker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAbbreviationRanker.h; sourceTree = "<group>"; };
 		7FE253790F5CDA23004FE5A6 /* action-videochat-icon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "action-videochat-icon.pdf"; sourceTree = "<group>"; };
 		7FE2537A0F5CDA23004FE5A6 /* action-chat-icon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "action-chat-icon.pdf"; sourceTree = "<group>"; };
 		7FE2537B0F5CDA23004FE5A6 /* action-audiochat-icon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "action-audiochat-icon.pdf"; sourceTree = "<group>"; };
@@ -3039,7 +3034,6 @@
 		8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMUnitTestDevLog.m; sourceTree = "<group>"; };
 		8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMRegex.h; sourceTree = "<group>"; };
 		8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMRegex.m; sourceTree = "<group>"; };
-		8B95CE1F0F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAbbreviationRankerTest.m; sourceTree = "<group>"; };
 		8B989F090FA7B93C009DC652 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8B989F0A0FA7B93C009DC652 /* Nodes.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Nodes.xml; sourceTree = "<group>"; };
 		8B989F0B0FA7B93C009DC652 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -5105,9 +5099,6 @@
 		8B6F2D5D0DA2B88E0052CA40 /* Vermilion */ = {
 			isa = PBXGroup;
 			children = (
-				7FE098910DC77AEB00D0FB6C /* HGSAbbreviationRanker.h */,
-				7FE098900DC77AEB00D0FB6C /* HGSAbbreviationRanker.m */,
-				8B95CE1F0F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m */,
 				62D0E9640EF058950028522C /* HGSAccount.h */,
 				62D0E96A0EF059B40028522C /* HGSAccount.m */,
 				62FF5B850F8D846F00B21B5D /* HGSAccountType.h */,
@@ -5767,7 +5758,6 @@
 				8B6F2D7D0DA2B8AF0052CA40 /* HGSSearchOperation.h in Headers */,
 				8B6F2D7F0DA2B8AF0052CA40 /* HGSSearchSource.h in Headers */,
 				E4617A900DC23BE300CE7C0F /* HGSMixer.h in Headers */,
-				7FE098930DC77AEB00D0FB6C /* HGSAbbreviationRanker.h in Headers */,
 				33D2CBAD0DD2573100C1FBDC /* HGSMemorySearchSource.h in Headers */,
 				F427F4610E48E13600ADD2AA /* KeychainItem.h in Headers */,
 				F4D14F120E9BE9A200C0EAA9 /* HGSDelegate.h in Headers */,
@@ -8605,7 +8595,6 @@
 				8B6F2E170DA2B9290052CA40 /* HGSSearchSource.m in Sources */,
 				64C385C60DBFDCF9005EBA69 /* GTMMethodCheck.m in Sources */,
 				E4617A910DC23BE300CE7C0F /* HGSMixer.m in Sources */,
-				7FE098920DC77AEB00D0FB6C /* HGSAbbreviationRanker.m in Sources */,
 				337C2C890DCFDA9B00897EB3 /* KeychainItem.m in Sources */,
 				33D2CBAE0DD2573100C1FBDC /* HGSMemorySearchSource.m in Sources */,
 				F4D1494B0E9A438B00C0EAA9 /* NSString+ReadableURL.m in Sources */,
@@ -8745,7 +8734,6 @@
 				8B55D9380E786B5D00D39CB0 /* GTMSenTestCase.m in Sources */,
 				8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */,
 				8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */,
-				8B95CE200F6EE7F0003BDBDD /* HGSAbbreviationRankerTest.m in Sources */,
 				8BB658F20F73034600E20B99 /* GTMNSObject+UnitTesting.m in Sources */,
 				8BB658F40F73035000E20B99 /* GTMAppKit+UnitTesting.m in Sources */,
 				8BB6594B0F73036600E20B99 /* GTMMethodCheck.m in Sources */,

@@ -35,10 +35,9 @@
 //             instead break them up so that they are easy to parse and debug.
 
 #import "iTunesSource.h"
+#import <Vermilion/Vermilion.h>
 #import "GTMSQLite.h"
 #import "GTMGarbageCollection.h"
-#import "HGSAbbreviationRanker.h"
-#import "HGSTokenizer.h"
 
 NSString *const kITunesAttributeTrackIdKey = @"kITunesAttributeTrackIdKey";
 NSString *const kITunesAttributeArtistKey = @"kITunesAttributeArtistKey";
@@ -1022,7 +1021,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   if (string && queryString) {
     string = [HGSTokenizer tokenizeString:string];
     queryString = [HGSTokenizer tokenizeString:queryString];
-    rank = HGSScoreForAbbreviation(string, queryString, NULL);
+    rank = HGSScoreTermForItem(queryString, string, NULL);
   }
   return rank;
 }

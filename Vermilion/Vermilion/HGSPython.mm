@@ -34,7 +34,7 @@
 #import "HGSResult.h"
 #import "HGSQuery.h"
 #import "HGSLog.h"
-#import "HGSAbbreviationRanker.h"
+#import "HGSSearchTermScorer.h"
 #import "HGSAction.h"
 #import "HGSBundle.h"
 #import "HGSCoreExtensionPoints.h"
@@ -694,9 +694,9 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                   = PyString_AsString(self->normalizedQuery_);
                 NSString *queryString
                   = [NSString stringWithUTF8String:queryCString];
-                rank = HGSScoreForAbbreviation(normalizedDisplayName,
-                                               queryString, 
-                                               NULL);
+                rank = HGSScoreTermForItem(queryString, 
+                                           normalizedDisplayName,
+                                           NULL);
               }
               if (rank > 0.0) {
                 NSMutableDictionary *attributes 

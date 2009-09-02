@@ -583,7 +583,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   }
     
   NSString *normalizedString = [context->query_ normalizedQueryString];
-  CGFloat rank = HGSScoreForAbbreviation(name, normalizedString, NULL);
+  CGFloat rank = HGSScoreTermForItem(normalizedString, name, NULL);
 
   NSMutableDictionary *hgsAttributes 
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:

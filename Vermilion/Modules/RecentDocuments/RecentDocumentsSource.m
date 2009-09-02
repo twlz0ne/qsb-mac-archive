@@ -34,7 +34,6 @@
 #import "GTMNSFileManager+Carbon.h"
 #import "GTMGarbageCollection.h"
 #import "GTMMethodCheck.h"
-#import "HGSTokenizer.h"
 
 // The RecentDocumentsSource provides results containing
 // the recent documents opened for the application being pivoted.
@@ -138,9 +137,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
             // Sort by abbreviation if a query exists, else preserve ordering
             // which is usually by date modified
             if (normalizedQuery) {
-              rank = HGSScoreForAbbreviation(tokenizedName,
-                                             normalizedQuery, 
-                                             NULL);
+              rank = HGSScoreTermForItem(normalizedQuery, tokenizedName, NULL);
             } else {
               rank = count;
             }

@@ -41,7 +41,6 @@
 #import <Vermilion/HGSExtensionPoint.h>
 #import <Vermilion/HGSCoreExtensionPoints.h>
 #import <Vermilion/HGSMixer.h>
-#import <Vermilion/HGSAbbreviationRanker.h>
 #import <Vermilion/HGSMemorySearchSource.h>
 #import <Vermilion/HGSCallbackSearchSource.h>
 #import <Vermilion/HGSDelegate.h>
@@ -58,3 +57,5 @@
 #import <Vermilion/HGSAccountType.h>
 #import <Vermilion/HGSSimpleAccount.h>
 #import <Vermilion/HGSStringUtil.h>
+#import <Vermilion/HGSSearchTermScorer.h>
+#import <Vermilion/HGSTokenizer.h>

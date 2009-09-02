@@ -126,6 +126,10 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
   score = HGSScoreTermForItem(@"abc", @"here is the abc of the matter", nil);
   STAssertTrue(score > kHGSTestGoodScore, @"%f !> %f",
                score, kHGSTestGoodScore);
+  
+  // Perfect score.
+  CGFloat perfectScore = HGSPerfectMatchScore();
+  STAssertEquals(perfectScore, 1000.0f, nil);
 }
 
 - (void)testBasicRelativeTermScoring {
