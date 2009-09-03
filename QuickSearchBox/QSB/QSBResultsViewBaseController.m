@@ -150,7 +150,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)setSwapSelection {
   // The default behavior is to select the first row of the to-be-swapped-in
   // results view.
-  [self scrollToBeginningOfDocument:self];
+  [self moveToBeginningOfDocument:self];
 }
 
 - (void)setQueryString:(NSString *)value {
@@ -182,7 +182,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)reset {
   // Reset our selection to be the first row.
-  [self scrollToBeginningOfDocument:self];
+  [self moveToBeginningOfDocument:self];
 }
 
 - (CGFloat)updateResultsView {
@@ -215,8 +215,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (BOOL)performSelectionMovementSelector:(SEL)selector {
   BOOL acceptable = (selector == @selector(moveUp:)
                      || selector == @selector(moveDown:)
-                     || selector == @selector(scrollToBeginningOfDocument:)
-                     || selector == @selector(scrollToEndOfDocument:)
+                     || selector == @selector(moveToBeginningOfDocument:)
+                     || selector == @selector(moveToEndOfDocument:)
                      || selector == @selector(scrollPageUp:)
                      || selector == @selector(scrollPageDown:));
   if (acceptable) {
@@ -244,12 +244,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
 }
 
-- (void)scrollToBeginningOfDocument:(id)sender {
+- (void)moveToBeginningOfDocument:(id)sender {
   NSInteger selectedRow = [resultsTableView_ selectFirstSelectableRow];
   [resultsTableView_ scrollRowToVisible:selectedRow];
 }
 
-- (void)scrollToEndOfDocument:(id)sender {
+- (void)moveToEndOfDocument:(id)sender {
   NSInteger selectedRow = [resultsTableView_ selectLastSelectableRow];
   [resultsTableView_ scrollRowToVisible:selectedRow];
 }

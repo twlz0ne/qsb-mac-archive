@@ -73,7 +73,7 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 }
 
 - (void)setSwapSelection {
-  [self scrollToEndOfDocument:self];
+  [self moveToEndOfDocument:self];
 }
 
 - (NSString *)categorySummaryString {
