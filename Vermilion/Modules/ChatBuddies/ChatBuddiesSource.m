@@ -264,15 +264,17 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     // Compose the snippet.
     NSString *statusMessage
       = [currentBuddyInfo objectForKey:IMPersonStatusMessageKey];
-
-    if ([statusMessage length]) {
-      [snippet appendString:statusMessage];
-      if ([statusString length] 
-          && ![statusString isEqualToString:statusMessage]) {
-        [snippet appendFormat:@" (%@)", statusString];
+    
+    if (status != IMPersonStatusAvailable) {
+      if ([statusMessage length]) {
+        [snippet appendString:statusMessage];
+        if ([statusString length] 
+            && ![statusString isEqualToString:statusMessage]) {
+          [snippet appendFormat:@" (%@)", statusString];
+        }
+      } else if ([statusString length]) {
+        [snippet appendString:statusString];
       }
-    } else if ([statusString length]) {
-      [snippet appendString:statusString];
     }
     value = snippet;
   } else if ([key isEqualToString:kHGSObjectAttributeFlagIconNameKey]) {
@@ -570,6 +572,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   
   // NOTE: It's possible that the IMBuddy will provide an NSNull for the
   // first and/or last name so we must insure that we detect such case.
+  
   NSString *firstName = [imBuddy objectForKey:IMPersonFirstNameKey];
   if ([firstName isKindOfClass:[NSString class]] && [firstName length]) {
     [displayName appendString:firstName];
@@ -582,8 +585,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     [displayName appendString:lastName];
   }
   
-  if ([displayName length]) [displayName appendString:@" "];
-  [displayName appendFormat:@"(%@: %@)", serviceName, screenName];
+  NSString *displayAccount = [NSString stringWithFormat:@"%@ - %@", 
+                              screenName, serviceName];  
+  if ([displayName length]) {
+    [displayName appendFormat:@" (%@)", displayAccount];
+  } else {
+    [displayName setString:displayAccount]; 
+  }
   
   // This is a list of the attributes that we will retain
   // from the buddy's information dictionary before composing
