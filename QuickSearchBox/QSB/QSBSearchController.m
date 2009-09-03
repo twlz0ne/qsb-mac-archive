@@ -193,16 +193,11 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   
   // Is this search a generic, global search? (No pivot set)
   // If so, there may be special items above and/or below the search results
-  NSMutableArray *prefixResults = [NSMutableArray array];
-  NSMutableArray *suffixResults = [NSMutableArray array];
+  NSMutableArray *suggestResults = [NSMutableArray array];
   HGSQuery *query = [controller query];
   HGSResult *pivotObject = [query pivotObject];
   
-  if (!pivotObject) {
-    // TODO(stuartmorgan): this is something of a hack to account for the fact
-    // that suggest now comes in with the results but is handled like a suffix;
-    // we need to rethink how it should work.
-    
+  if (!pivotObject) {    
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSInteger suggestCount = [prefs integerForKey:kGoogleSuggestCountKey];
     if (suggestCount) {
@@ -213,63 +208,30 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
       } else {
         hgsSuggestions = oldSuggestions_;
       }
-      
-      // a negative tag indicates a prefix
-      BOOL prefixSuggestions = suggestCount < 0;         
-      NSUInteger absSuggestCount = ABS(suggestCount);
-      // enforce a minimum of three suggests for now
-      if (absSuggestCount == 1) absSuggestCount = 3;
-      
-      if ([hgsSuggestions count] > absSuggestCount) {
-        hgsSuggestions = [hgsSuggestions subarrayWithRange:NSMakeRange(0, absSuggestCount)];
+              
+      NSUInteger minSuggestCount = ABS(suggestCount);
+      if (minSuggestCount < 3)
+        minSuggestCount = 3; // minimum of 3 for now
+
+      if ([hgsSuggestions count] > minSuggestCount) {
+        hgsSuggestions =
+            [hgsSuggestions subarrayWithRange:NSMakeRange(0, minSuggestCount)];
       }
       
-      if (absSuggestCount) {
+      if (minSuggestCount && [hgsSuggestions count]) {
+        NSMutableArray *target = suggestResults;
         for (HGSResult *suggest in hgsSuggestions) {
           QSBTableResult *qsbSuggest = nil;
-          // This switch controls icon versus text suggestions
-#if 0          
-          NSString *suggestString = [suggest displayName];
-          qsbSuggest = [QSBGoogleTableResult tableResultForQuery:suggestString];
-#else
           qsbSuggest = [QSBSourceTableResult tableResultWithResult:suggest];
-#endif
-          
-          if (prefixSuggestions) {
-            [prefixResults addObject:qsbSuggest];
-          } else {
-            [suffixResults addObject:qsbSuggest];
-          }
+          [target addObject:qsbSuggest];
         }
       }
     }
-// TODO(alcor): reenable this once we get it cleaned up
-#if 0 // Disable message for now
-  } else {
-    if ([pivotObject conformsToType:kHGSTypeWebpage]) {
-      NSString *queryString = [query rawQueryString];
-      if ([queryString length] == 0) {
-        NSString *messageFormat 
-          = NSLocalizedString(@"Search %@ by typing in the box above.",
-                              @"Message: Search <website> by typing in the "
-                              @"box above. (30 chars excluding <website>)");
-        NSString *messageString = [NSString stringWithFormat:messageFormat, 
-                                   [pivotObject displayName]];
-        QSBMessageTableResult *message 
-          = [QSBMessageTableResult tableResultWithString:messageString];
-        [prefixResults addObject:message];
-      }
-    }
-#endif
   }
   
   // Build the actual list
   [self willChangeValueForKey:kDesktopResultsKVOKey];
   [desktopResults_ removeAllObjects];
-  
-  if ([prefixResults count] > 0) {
-    [desktopResults_ addObjectsFromArray:prefixResults];
-  }
   
   if ([mainResults count] > 0) {
     if ([desktopResults_ count] > 0) {
@@ -278,20 +240,37 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     [desktopResults_ addObjectsFromArray:mainResults];
   }
   
+  int searchItemsIndex = 0; 
   if (![[controller query] pivotObject]) {
+    QSBSeparatorTableResult *spacer = [QSBSeparatorTableResult tableResult];
+      
     // TODO(alcor): this is probably going to be done by the mixer eventually
-    int idx = 0; 
-    if ([desktopResults_ count]) {
-      QSBTableResult *first = [desktopResults_ objectAtIndex:0];
+    
+    NSUInteger count = [desktopResults_ count];
+    
+    // TODO(alcor): we only cycle through this once because ranking is odd
+    // at the moment. Eventually we want to unpin the google result
+    count = 1;
+    
+    if (count) {
+      for(searchItemsIndex = 0; searchItemsIndex < count; searchItemsIndex++) {
+      QSBTableResult *item = [desktopResults_ objectAtIndex:searchItemsIndex];
       // List the google result lower if we have a strong confidence result.
-      if ([first rank] > 0) {
-        idx = 1;
+        if ([item rank] <= 0.667) break;
       }
     }
     
-    QSBGoogleTableResult *googleItem = [QSBGoogleTableResult tableResultForQuery:queryString_];
+    if (searchItemsIndex > 0) {
+      [desktopResults_ insertObject:spacer atIndex:searchItemsIndex++];
+    }
+    
+    QSBGoogleTableResult *googleItem = [QSBGoogleTableResult
+                                         tableResultForQuery:queryString_];
     [desktopResults_ insertObject:googleItem
-                          atIndex:idx];
+                          atIndex:searchItemsIndex];
+    
+    [desktopResults_ insertObject:spacer
+                          atIndex:searchItemsIndex + 1]; 
   }
   
   if ([desktopResults_ count] < [cachedDesktopResults_ count]) {
@@ -317,16 +296,20 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   }
   
   if (showMore && [controller hasAnyRealResults]) {
-    if ([suffixResults count] > 0) {
-      [desktopResults_ addObjectsFromArray:suffixResults];
+    if ([suggestResults count] > 0) {
+      if (![[desktopResults_ lastObject]
+            isKindOfClass:[QSBSeparatorTableResult class]]) {
+        [desktopResults_ addObject:[QSBSeparatorTableResult tableResult]];
+      }
+      [desktopResults_ addObjectsFromArray:suggestResults];
     }
     if (![controller queriesFinished]) {
       [desktopResults_ addObject:[QSBSearchStatusTableResult tableResult]];
     }    
     [desktopResults_ addObject:[QSBFoldTableResult tableResult]];
   } else {
-    if ([suffixResults count] > 0) {
-      [desktopResults_ addObjectsFromArray:suffixResults];
+    if ([suggestResults count] > 0) {
+      [desktopResults_ addObjectsFromArray:suggestResults];
     }
     if (![controller queriesFinished]) {
       [desktopResults_ addObject:[QSBSearchStatusTableResult tableResult]];

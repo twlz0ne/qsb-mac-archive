@@ -589,11 +589,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (Class)topResultsRowViewControllerClass {
-#if 1
-  return [QSBTopStandardRowViewController class];
-#else
   return [QSBTopSearchForRowViewController class];
-#endif
 }
 
 // We want to inherit the google logo, so don't return an icon

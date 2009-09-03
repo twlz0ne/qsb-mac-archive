@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9G55</string>
+		<string key="IBDocument.SystemVersion">9J61</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.43</string>
+		<string key="IBDocument.AppKitVersion">949.46</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -42,7 +42,7 @@
 					<object class="NSTextField" id="763888019">
 						<reference key="NSNextResponder" ref="776526201"/>
 						<int key="NSvFlags">300</int>
-						<string key="NSFrame">{{6, 2}, {105, 17}}</string>
+						<string key="NSFrame">{{6, 1}, {105, 17}}</string>
 						<reference key="NSSuperview" ref="776526201"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="895395576">
@@ -73,7 +73,7 @@
 					<object class="NSTextField" id="106833444">
 						<reference key="NSNextResponder" ref="776526201"/>
 						<int key="NSvFlags">302</int>
-						<string key="NSFrame">{{111, 2}, {299, 17}}</string>
+						<string key="NSFrame">{{111, 1}, {299, 17}}</string>
 						<reference key="NSSuperview" ref="776526201"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="995183247">

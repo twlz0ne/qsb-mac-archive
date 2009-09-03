@@ -422,8 +422,9 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
                                   row:row];
     if (colView) {
       CGFloat viewHeight = NSHeight([colView frame]);
-      if (viewHeight > rowHeight)
+      if (viewHeight > 0) {
         rowHeight = viewHeight;
+      }
     }
   }
   return rowHeight;
