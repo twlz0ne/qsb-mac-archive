@@ -250,7 +250,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     
     // TODO(alcor): we only cycle through this once because ranking is odd
     // at the moment. Eventually we want to unpin the google result
-    count = 1;
+    count = MIN(1, count);
     
     if (count) {
       for(searchItemsIndex = 0; searchItemsIndex < count; searchItemsIndex++) {
