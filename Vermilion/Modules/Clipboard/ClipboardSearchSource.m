@@ -126,14 +126,16 @@ static NSString *const kClipboardCopyAction
     NSMutableDictionary *pasteboardValue = [NSMutableDictionary dictionary];
     NSArray *types = [pb types];
     for (NSString *type in types) {
+      id pbValue = nil;
       if ([type isEqualToString:NSStringPboardType]) {
-        [pasteboardValue setObject:[pb stringForType:NSStringPboardType]
-                            forKey:type];
+        pbValue = [pb stringForType:NSStringPboardType];
       } else if ([type isEqualToString:NSURLPboardType]) {
-        [pasteboardValue setObject:[NSURL URLFromPasteboard:pb]
-                            forKey:type];
+        pbValue = [NSURL URLFromPasteboard:pb];
       } else {
-        [pasteboardValue setObject:[pb dataForType:type]
+        pbValue = [pb dataForType:type];
+      }
+      if (pbValue) {
+        [pasteboardValue setObject:pbValue
                             forKey:type];
       }
     }
