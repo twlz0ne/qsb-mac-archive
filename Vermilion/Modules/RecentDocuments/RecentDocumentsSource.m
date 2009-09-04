@@ -41,6 +41,8 @@
 @interface RecentDocumentsSource : HGSCallbackSearchSource
 @end
 
+static const CGFloat RecentDocumentsSourceInvalidXCodeVersion = 3.2;
+
 @implementation RecentDocumentsSource
 GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
 
@@ -84,35 +86,47 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
         // to include that as well.  But Xcode 2.5 stores recent files
         // using NSRecentDocumentRecords
         if ([appIdentifier isEqualToString:@"com.apple.Xcode"]) {
-          NSArray *recentXCodeProjects
-            = GTMCFAutorelease(
-                CFPreferencesCopyValue(CFSTR("NSRecentXCProjectDocuments"),
-                                       (CFStringRef)appIdentifier,
-                                       kCFPreferencesCurrentUser,
-                                       kCFPreferencesAnyHost));
+          // The recent documents/projects preference format has changed
+          // as of 3.2.
+          // TODO(mrossetti): Figure out the new format and revisit.
+          NSDictionary *infoDict = [appBundle infoDictionary];
+          NSString *xcodeVersionString
+            = [infoDict objectForKey:@"CFBundleShortVersionString"];
+          CGFloat xcodeVersion = [xcodeVersionString floatValue];
+          if (xcodeVersion < RecentDocumentsSourceInvalidXCodeVersion) {
+            NSArray *recentXCodeProjects
+              = GTMCFAutorelease(
+                  CFPreferencesCopyValue(CFSTR("NSRecentXCProjectDocuments"),
+                                         (CFStringRef)appIdentifier,
+                                         kCFPreferencesCurrentUser,
+                                         kCFPreferencesAnyHost));
 
-          NSArray *recentXCFiles
-            = GTMCFAutorelease(CFPreferencesCopyValue(
-                CFSTR("NSRecentXCFileDocuments"),
-                (CFStringRef)appIdentifier,
-                kCFPreferencesCurrentUser,
-                kCFPreferencesAnyHost));
+            NSArray *recentXCFiles
+              = GTMCFAutorelease(CFPreferencesCopyValue(
+                  CFSTR("NSRecentXCFileDocuments"),
+                  (CFStringRef)appIdentifier,
+                  kCFPreferencesCurrentUser,
+                  kCFPreferencesAnyHost));
 
-          // If recentXCodeProjects is not nil, recentDocuments should
-          // be nil since XCode switched from using
-          // NSRecentDocumentRecords to the two different keys above
-          // for files/projects between 2.5 & 3.1.
-          if (recentXCodeProjects) {
-            if (recentDocuments) {
-              HGSLogDebug(@"found XCode files in both NSRecentDocumentRecords"
-                          @" and NSRecentXCProjectDocuments");
+            // If recentXCodeProjects is not nil, recentDocuments should
+            // be nil since XCode switched from using
+            // NSRecentDocumentRecords to the two different keys above
+            // for files/projects between 2.5 & 3.1.
+            if (recentXCodeProjects) {
+              if (recentDocuments) {
+                HGSLogDebug(@"found XCode files in both NSRecentDocumentRecords"
+                            @" and NSRecentXCProjectDocuments");
+              }
+              recentDocuments = recentXCodeProjects;
             }
-            recentDocuments = recentXCodeProjects;
-          }
 
-          if (recentXCFiles) {
-            recentDocuments = [recentDocuments
-                                arrayByAddingObjectsFromArray:recentXCFiles];
+            if (recentXCFiles) {
+              recentDocuments = [recentDocuments
+                                  arrayByAddingObjectsFromArray:recentXCFiles];
+            }
+          } else {
+            // Just ignore Xcode for now.
+            recentDocuments = nil;
           }
         }
 
