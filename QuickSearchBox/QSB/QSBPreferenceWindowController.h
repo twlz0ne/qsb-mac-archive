@@ -48,7 +48,11 @@
  @private
   IBOutlet NSPopUpButton *colorPopUp_;
   IBOutlet NSScrollView *advancedScrollView_;
-
+  IBOutlet NSTabView *tabView_;
+  IBOutlet NSToolbar *toolbar_;
+  IBOutlet NSTableView *sourcesTable_;
+  IBOutlet NSTableView *accountsTable_;
+  
   BOOL prefsColorWellWasShowing_;  // YES if color well was showing.
   NSColorList *colors_;
   NSColor *selectedColor_;
@@ -73,6 +77,9 @@
 - (IBAction)setupAccount:(id)sender;
 - (IBAction)editAccount:(id)sender;
 - (IBAction)removeAccount:(id)sender;
+
+// Tab Selection
+- (IBAction)selectTabForSender:(id)sender;
 
 // Choose a color from the drop down
 - (IBAction)setColorFromMenu:(id)sender;

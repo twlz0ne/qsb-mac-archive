@@ -218,6 +218,10 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   [[advancedScrollView_ verticalScroller] setFloatValue:0.0];
 
   [[self window] setHidesOnDeactivate:YES];
+  
+  [toolbar_ setSelectedItemIdentifier:@"general"];
+  [sourcesTable_ setIntercellSpacing:NSMakeSize(3.0, 6.0)];
+  [accountsTable_ setIntercellSpacing:NSMakeSize(3.0, 6.0)];
 }
 
 
@@ -448,6 +452,10 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   // knowledge of account status.
   NSArray *accounts = [accountsListController_ arrangedObjects];
   [accounts makeObjectsPerformSelector:@selector(authenticate)];
+}
+
+- (IBAction)selectTabForSender:(id)sender {
+  [tabView_ selectTabViewItemWithIdentifier:[sender itemIdentifier]];
 }
 
 #pragma mark Delegate Methods
