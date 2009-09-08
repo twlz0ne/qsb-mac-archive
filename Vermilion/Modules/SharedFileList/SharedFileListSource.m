@@ -32,6 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import "GTMGarbageCollection.h"
+#import "GTMSystemVersion.h"
 
 // This is the LSSharedFileListItemRef for the item. Allows us to get at
 // the icon and other properties as needed.
@@ -57,7 +58,7 @@ static NSString* const kObjectAttributeSharedFileListItem =
 // LSSharedFileListItemResolve can trigger a LSShared file list change 
 // notification
 // Basically this would get us into an infinite loop if someone opened a file
-// off of a server. (http://code.google.com/p/qsb-mac/issues/detail?id=186)
+// off of a server. ( http://code.google.com/p/qsb-mac/issues/detail?id=186 )
 // This was on 10.5.6.
 extern CFDataRef LSSharedFileListItemCopyAliasData(LSSharedFileListItemRef item);
 
@@ -169,24 +170,32 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
   for (id item in items) {
     LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef)item;
     OSStatus err = noErr;
-    // This next chunk of code is to work around rdar://6602133
-    // See comment at top of file. Commented out code below is what
-    // we really should have if it wasn't for the bug in 
-    // LSSharedFileListItemResolve causing us to infinite loop.
-    // I have left the commented code in case things get fixed
-    // for us in the future.
-    NSData *aliasData 
-      = GTMCFAutorelease(LSSharedFileListItemCopyAliasData(itemRef));
-    if (!aliasData) continue;
-    AliasRecord *aliasRecord = (AliasRecord*)[aliasData bytes];
-    AliasHandle alias = NULL;
-    err = PtrToHand(aliasRecord, (Handle *)&alias, [aliasData length]);
-    if (err) continue;
     NSString *path = nil;
-    err = FSCopyAliasInfo (alias, NULL, NULL, (CFStringRef *)&path, NULL, NULL);
-    [path autorelease];
-    DisposeHandle((Handle)alias);
-    if (err) continue;
+    if ([GTMSystemVersion isSnowLeopardOrGreater]) {
+      CFURLRef cfURL = NULL;
+      err = LSSharedFileListItemResolve(itemRef, 
+                                        kLSSharedFileListNoUserInteraction
+                                        | kLSSharedFileListDoNotMountVolumes, 
+                                        &cfURL, NULL);
+      if (err) continue;
+      NSURL *url = GTMCFAutorelease(cfURL);
+      path = [url path];
+    } else {
+      // This next chunk of code is to work around rdar://6602133 where
+      // pre-Snow Leopard there is a bug in LSSharedFileListItemResolve
+      // causing it to infinite loop.
+      NSData *aliasData 
+        = GTMCFAutorelease(LSSharedFileListItemCopyAliasData(itemRef));
+      if (!aliasData) continue;
+      AliasRecord *aliasRecord = (AliasRecord*)[aliasData bytes];
+      AliasHandle alias = NULL;
+      err = PtrToHand(aliasRecord, (Handle *)&alias, [aliasData length]);
+      if (err) continue;
+      err = FSCopyAliasInfo (alias, NULL, NULL, (CFStringRef *)&path, NULL, NULL);
+      [path autorelease];
+      DisposeHandle((Handle)alias);
+      if (err) continue;
+    }    
     
     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                 item, kObjectAttributeSharedFileListItem,
