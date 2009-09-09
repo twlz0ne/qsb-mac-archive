@@ -570,6 +570,9 @@
 		8B312E61105700CA00D57495 /* libobjc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B312E4F1057008C00D57495 /* libobjc.dylib */; };
 		8B312E66105700F400D57495 /* libobjc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B312E4F1057008C00D57495 /* libobjc.dylib */; };
 		8B313266105759C800D57495 /* QSBKeyMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BE8488E0E9425C200C611B0 /* QSBKeyMap.m */; };
+		8B31346D10581C1800D57495 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
+		8B31346E10581C1A00D57495 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
+		8B31346F10581C1C00D57495 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B3D26760EAE8E7A004EA504 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		8B3D26770EAE8E7A004EA504 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		8B3D26790EAE8E7A004EA504 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
@@ -8389,6 +8392,7 @@
 				5AF0EEDF0F61D1520041E0B9 /* TrashActions.m in Sources */,
 				5AF0EEE00F61D1520041E0B9 /* TrashSearchSource.m in Sources */,
 				5AF0EEEF0F61D2EA0041E0B9 /* HGSBundle.m in Sources */,
+				8B31346F10581C1C00D57495 /* GTMMethodCheck.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8541,6 +8545,7 @@
 				8B3D33FE0EB23DFC004EA504 /* GTMAXUIElement.m in Sources */,
 				8B3D35240EB27FAA004EA504 /* ApplicationUIContentsSource.m in Sources */,
 				8B8B13170EEBADE400E543D0 /* HGSBundle.m in Sources */,
+				8B31346D10581C1800D57495 /* GTMMethodCheck.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8844,6 +8849,7 @@
 			files = (
 				F4E3B5BC0EB6580E00CB713D /* CalculatorSource.m in Sources */,
 				8B8B13180EEBADE400E543D0 /* HGSBundle.m in Sources */,
+				8B31346E10581C1A00D57495 /* GTMMethodCheck.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
