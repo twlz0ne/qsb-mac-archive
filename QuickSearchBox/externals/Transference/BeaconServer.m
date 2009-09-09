@@ -111,14 +111,16 @@ static NSString *const kResultActionKey = @"ResultAction";
   }
 
   int flag = 1;
-  if (setsockopt(sockHandle, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag))
+  if (setsockopt(sockHandle, SOL_SOCKET, SO_REUSEADDR, &flag,
+                 (socklen_t)sizeof(flag))
       != noErr) {
     HGSLog(@"Transference Server: There was an error setting the socket "
            @"options.  Message=%s", strerror(errno));
     return nil;
   }
 
-  if (bind(sockHandle, (struct sockaddr *)&serverAddress, namelen) != noErr) {
+  if (bind(sockHandle, (struct sockaddr *)&serverAddress,
+           (socklen_t)namelen) != noErr) {
     HGSLog(@"Transference Server: There was a problem binding to the socket.  "
            @"Message=%s", strerror(errno));
     return nil;
@@ -347,12 +349,12 @@ static NSString *const kResultActionKey = @"ResultAction";
 }
 
 - (in bycopy NSNumber *)numberOfResults {
-  int results = 0;
+  NSInteger results = 0;
   if ([lastSearchResults_ count] > 0) {
     results = [lastSearchResults_ count];
   }
 
-  return [NSNumber numberWithInt:results];
+  return [NSNumber numberWithInteger:results];
 }
 
 - (oneway void)lastSearchResults:(in byref id <TransferenceClientProtocol>)client {

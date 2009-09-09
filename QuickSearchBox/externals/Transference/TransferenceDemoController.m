@@ -120,7 +120,7 @@
 
 - (void)searchDidComplete {
   NSTimeInterval lastSearch = [client_ lastSearchTime];
-  int results = [client_ numberOfSearchResults];
+  NSInteger results = [client_ numberOfSearchResults];
 
   NSString *lastSearchString =
     [NSString stringWithFormat:@"%f seconds", lastSearch];

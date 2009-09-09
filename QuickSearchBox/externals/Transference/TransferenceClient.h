@@ -205,7 +205,7 @@
 // Returns:
 //  Number of results from the last completed search.
 //
-- (int)numberOfSearchResults;
+- (NSInteger)numberOfSearchResults;
 
 // Performs a search in QSB asynchronously.
 //

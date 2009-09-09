@@ -259,8 +259,8 @@ const NSTimeInterval kProcessingTimeout = 240.0;
   return [[proxy_ lastSearchStats] objectForKey:kSearchModuleTimesKey];
 }
 
-- (int)numberOfSearchResults {
-  return [[proxy_ numberOfResults] intValue];
+- (NSInteger)numberOfSearchResults {
+  return [[proxy_ numberOfResults] integerValue];
 }
 
 - (void)performAsynchronousSearch:(NSString *)query {
