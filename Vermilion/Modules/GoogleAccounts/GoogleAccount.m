@@ -199,30 +199,18 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 
 - (BOOL)validateResult:(NSData *)result {
+  BOOL validated = NO;
   NSString *answer = [[[NSString alloc] initWithData:result
                                             encoding:NSUTF8StringEncoding]
                       autorelease];
-  // Simple test to see if the string contains 'SID=' at the beginning
-  // of the first line and 'LSID=' on the beginning of the second.
-  // While we're in here we'll look for a captcha request.
-  BOOL validated = NO;
-  BOOL foundSID = NO;
-  BOOL foundLSID = NO;
-  
-  NSArray *answers = [answer componentsSeparatedByString:@"\n"];
-  if ([answers count] >= 2) {
-    for (NSString *anAnswer in answers) {
-      if (!foundSID && [anAnswer hasPrefix:@"SID="]) {
-        foundSID = YES;
-      } else if (!foundLSID && [anAnswer hasPrefix:@"LSID="]) {
-        foundLSID = YES;
-      }
-    }
-    validated = foundSID && foundLSID;
-    if (!validated) {
-      HGSLog(@"Authentication for account '%@' failed with a "
-             @"response of '%@'.", [self displayName], answer);
-    }
+  // Simple test to see if the string contains 'SID=' and 'LSID='.
+  NSDictionary *responseDict
+    = [GDataUtilities dictionaryWithResponseString:answer];
+  validated = ([responseDict objectForKey:@"SID"]
+               && [responseDict objectForKey:@"LSID"]);
+  if (!validated) {
+    HGSLog(@"Authentication for account '%@' failed with a "
+           @"response of '%@'.", [self displayName], answer);
   }
   return validated;
 }
