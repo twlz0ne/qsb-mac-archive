@@ -132,7 +132,7 @@
   }
   if (isSpreadsheet_) {
     NSNumber *worksheetIndex
-      = [NSNumber numberWithUnsignedInt:fileTypeIndex];
+      = [NSNumber numberWithInteger:fileTypeIndex];
     [saveAsInfo setObject:worksheetIndex
                    forKey:kGoogleDocsDocSaveAsWorksheetIndexKey];
   }

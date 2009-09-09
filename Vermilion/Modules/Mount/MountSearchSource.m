@@ -147,13 +147,13 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
     switch (inetAddress->sin_family) {
       case AF_INET:
         ipCString = inet_ntop(inetAddress->sin_family, &inetAddress->sin_addr,
-                             ipStringBuffer, sizeof(ipStringBuffer));
+                             ipStringBuffer, (socklen_t)sizeof(ipStringBuffer));
         ipString = [NSString stringWithUTF8String:ipCString];
         break;
       case AF_INET6:
         ipCString = inet_ntop(inetAddress->sin_family,
                              &((struct sockaddr_in6 *)inetAddress)->sin6_addr,
-                            ipStringBuffer, sizeof(ipStringBuffer));
+                            ipStringBuffer, (socklen_t)sizeof(ipStringBuffer));
         ipString = [NSString stringWithFormat:@"[%s]", ipCString];
         break;
     }

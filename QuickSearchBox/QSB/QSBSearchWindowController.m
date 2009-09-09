@@ -554,7 +554,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   NSArray *corpora = [self corpora];
   for (unsigned int i = 0; i < [corpora count]; i++) {
     HGSResult *corpus = [corpora objectAtIndex:i];
-    NSString *key = [[NSNumber numberWithInt:i] stringValue];
+    NSString *key = [[NSNumber numberWithUnsignedInt:i] stringValue];
     NSMenuItem *item = [[[NSMenuItem alloc] initWithTitle:[corpus displayName]
                                                    action:@selector(selectCorpus:)
                                             keyEquivalent:key]

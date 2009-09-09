@@ -35,6 +35,7 @@
 #import "HGSLog.h"
 #import "GTMMethodCheck.h"
 #import "GTMNSFileManager+Carbon.h"
+#import "GTMNSNumber+64Bit.h"
 
 // This source provides results for directory restricted searches:
 // If a pivot object is a folder, it will find direct children with a prefix
@@ -46,6 +47,7 @@
 
 @implementation FilesystemDirectorySearchSource
 GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (BOOL)isSearchConcurrent {
   return YES;
@@ -132,10 +134,12 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
       
       NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
       if (isApplication && ![normalizedQueryString length]) {
-        [attributes setObject:[NSNumber numberWithInt:eHGSBelowFoldRankFlag] 
+        NSNumber *flags 
+          = [NSNumber numberWithUnsignedInteger:eHGSBelowFoldRankFlag];
+        [attributes setObject:flags
                        forKey:kHGSObjectAttributeRankFlagsKey];
       }
-      [attributes setObject:[NSNumber numberWithFloat:score] 
+      [attributes setObject:[NSNumber gtm_numberWithCGFloat:score] 
                      forKey:kHGSObjectAttributeRankKey];
                      
       NSError *error = nil;               

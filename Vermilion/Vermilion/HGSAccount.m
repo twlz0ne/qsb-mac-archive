@@ -174,7 +174,7 @@ NSString *const kHGSAccountIdentifierFormat = @"%@.%@";
 
 - (NSDictionary *)configuration {
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   NSDictionary *accountDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                [self userName], kHGSAccountUserNameKey,
                                [self type], kHGSAccountTypeKey,
@@ -267,7 +267,7 @@ NSString *const kHGSAccountIdentifierFormat = @"%@.%@";
         }
       }
       NSNumber *updatedVersionNumber
-        = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
+        = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
       [upgradedAccount setObject:updatedVersionNumber
                           forKey:kHGSAccountsPrefVersionKey];
 

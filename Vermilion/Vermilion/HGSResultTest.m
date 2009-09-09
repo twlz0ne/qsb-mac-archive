@@ -211,7 +211,7 @@
   NSArray *paths = [NSArray arrayWithObjects:path1, path2, nil];
   HGSResultArray *results = [HGSResultArray arrayWithFilePaths:paths];
   STAssertNotNil(results, nil);
-  STAssertEquals([results count], 2U, nil);
+  STAssertEquals([results count], (NSUInteger)2, nil);
   STAssertEqualObjects([results displayName], @"Multiple Items", nil);
   HGSResult *result2 = [results objectAtIndex:1];
   STAssertEqualObjects(result2, [results lastObject], nil);

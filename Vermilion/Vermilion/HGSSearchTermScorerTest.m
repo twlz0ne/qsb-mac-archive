@@ -129,7 +129,7 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
   
   // Perfect score.
   CGFloat perfectScore = HGSPerfectMatchScore();
-  STAssertEquals(perfectScore, 1000.0f, nil);
+  STAssertEquals(perfectScore, (CGFloat)1000.0, nil);
 }
 
 - (void)testBasicRelativeTermScoring {
@@ -174,7 +174,7 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
   // pattern even though the items will be scored randomly.
   CGFloat itemScores[kHGSMaximumRelativeTermScoringTests];
   NSUInteger itemIndex[kHGSMaximumRelativeTermScoringTests];  // Used to randomize the items.
-  srandom([NSDate timeIntervalSinceReferenceDate]);
+  srandom((float)[NSDate timeIntervalSinceReferenceDate]);
   
   for (NSDictionary *test in testList) {
     for (NSUInteger i = 0; i < kHGSMaximumRelativeTermScoringTests; ++i) {

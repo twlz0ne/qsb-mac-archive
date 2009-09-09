@@ -32,6 +32,8 @@
 
 #import <Vermilion/Vermilion.h>
 #import "CalculatePrivate.h"
+#import "GTMNSNumber+64Bit.h"
+#import "GTMMethodCheck.h"
 
 @interface CalculatorSource : HGSCallbackSearchSource {
  @private
@@ -42,6 +44,8 @@
 @end
 
 @implementation CalculatorSource
+
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -127,7 +131,7 @@
       CGFloat rank = HGSPerfectMatchScore();
       NSDictionary *attributes
         = [NSDictionary dictionaryWithObjectsAndKeys:
-           [NSNumber numberWithFloat:rank], kHGSObjectAttributeRankKey, 
+           [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey, 
            pasteboardData, kHGSObjectAttributePasteboardValueKey, 
            nil];
       HGSResult *hgsObject

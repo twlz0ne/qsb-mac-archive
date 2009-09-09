@@ -226,7 +226,7 @@ static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
     = [[[NSImage alloc] initByReferencingFile:path] autorelease];
   HGSAssert(categoryIcon, @"Missing Google Doc category icon.");
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  NSNumber *successNumber = [NSNumber numberWithInt:successCode];
+  NSNumber *successNumber = [NSNumber numberWithInteger:successCode];
   NSString *summary 
     = HGSLocalizedString(@"Google Docs", @"A dialog title.");
   NSDictionary *messageDict

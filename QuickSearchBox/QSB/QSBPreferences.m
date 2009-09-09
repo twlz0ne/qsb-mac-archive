@@ -40,10 +40,10 @@
   NSDictionary *dictOfDefaults =
     [NSDictionary dictionaryWithObjectsAndKeys:
      // QSB result list length
-     [NSNumber numberWithInt:kQSBResultCountDefault],
+     [NSNumber numberWithInteger:kQSBResultCountDefault],
      kQSBResultCountKey,
      // QSB more category result count
-     [NSNumber numberWithInt:kQSBMoreCategoryResultCountDefault],
+     [NSNumber numberWithInteger:kQSBMoreCategoryResultCountDefault],
      kQSBMoreCategoryResultCountKey,
      // QSB snippets
      [NSNumber numberWithBool:kQSBSnippetsDefault],
@@ -68,10 +68,10 @@
      [NSNumber numberWithBool:kQSBUseGrowlDefault],
      kQSBUseGrowlKey,
      // Do we show suggestions
-     [NSNumber numberWithInt:kGoogleSuggestCountDefault],
+     [NSNumber numberWithInteger:kGoogleSuggestCountDefault],
      kGoogleSuggestCountKey,
      // Do we show nav suggestions
-     [NSNumber numberWithInt:kGoogleNavSuggestCountDefault],
+     [NSNumber numberWithInteger:kGoogleNavSuggestCountDefault],
      kGoogleNavSuggestCountKey,
      // done
      nil];

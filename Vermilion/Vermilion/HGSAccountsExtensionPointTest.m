@@ -311,7 +311,7 @@ static NSString *const kAccountTypeAName = @"Account Type A";
   
   // Add several accounts.
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   NSString *accountName = [NSString stringWithFormat:@"%@ (%@)", @"account1",
                            kAccountTypeAName];
   [[[bundleMock stub] andReturn:accountName] 

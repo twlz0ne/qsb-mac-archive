@@ -106,11 +106,12 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
   [[NSColor colorWithCalibratedWhite:0.0 alpha:0.4] setStroke];
   [path stroke];
   
-  
-  GTMLinearRGBShading *shading = [GTMLinearRGBShading shadingWithColors:colors
-                                                         fromSpaceNamed:NSCalibratedRGBColorSpace
-                                                            atPositions:positions
-                                                                  count:sizeof(positions) / sizeof(float)];
+  size_t count = sizeof(positions) / sizeof(positions[0]);
+  GTMLinearRGBShading *shading 
+    = [GTMLinearRGBShading shadingWithColors:colors
+                              fromSpaceNamed:NSCalibratedRGBColorSpace
+                                 atPositions:positions
+                                       count:count];
   
   [path gtm_fillAxiallyFrom:NSMakePoint(0, NSMaxY(rect))
                          to:NSMakePoint(0, NSMinY(rect))

@@ -145,7 +145,7 @@ static NSString *const kAccountType = @"FactorableAccount";
 
   // Add an account.
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   NSDictionary *accountDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                kAccountTypeID, kHGSAccountTypeKey,
                                bundleMock, kHGSExtensionBundleKey,

@@ -122,7 +122,7 @@
   [cache_ setValue:@"xx" forKey:@"2"];
   [cache_ setValue:@"xx" forKey:@"3"];
   [cache_ setValue:@"xx" forKey:@"4"];
-  STAssertEquals(4U, [cache_ count], @"Size mismatch");
+  STAssertEquals((NSUInteger)4, [cache_ count], @"Size mismatch");
 
   // Record a checkpoint timestamp.
   [NSThread sleepForTimeInterval:2.0];
@@ -132,11 +132,11 @@
   // Insert some more entries after the checkpoint.
   [cache_ setValue:@"xx" forKey:@"5"];
   [cache_ setValue:@"xx" forKey:@"6"];
-  STAssertEquals(6U, [cache_ count], @"Size mismatch");
+  STAssertEquals((NSUInteger)6, [cache_ count], @"Size mismatch");
 
   // Remove the entries that were inserted before the check point.
   [cache_ invalidateEntriesNotAccessedAfter:checkPoint];
-  STAssertEquals(2U, [cache_ count], @"Size mismatch after delete");
+  STAssertEquals((NSUInteger)2, [cache_ count], @"Size mismatch after delete");
 }
 
 - (void)tearDown {

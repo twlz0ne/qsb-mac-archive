@@ -38,6 +38,8 @@
 #import <Vermilion/Vermilion.h>
 #import "GTMSQLite.h"
 #import "GTMGarbageCollection.h"
+#import "GTMNSNumber+64Bit.h"
+#import "GTMMethodCheck.h"
 
 NSString *const kITunesAttributeTrackIdKey = @"kITunesAttributeTrackIdKey";
 NSString *const kITunesAttributeArtistKey = @"kITunesAttributeArtistKey";
@@ -184,6 +186,8 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
 @end
 
 @implementation ITunesSource
+
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {    
@@ -819,7 +823,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   NSMutableDictionary *attributes 
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        [NSNumber numberWithInt:trackNumber], kITunesAttributeTrackIdKey,
-       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
+       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        nil];
   NSInteger artistLength = [artist length], albumLength = [album length];
@@ -868,7 +872,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        [NSURL fileURLWithPath:iconFilePath], kHGSObjectAttributeIconPreviewFileKey,
-       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
+       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        albumIcon_, kHGSObjectAttributeIconKey,
        nil];
   if ([artist length]) {
@@ -904,7 +908,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
        artist, kITunesAttributeArtistKey,
        artistIcon_, kHGSObjectAttributeIconKey,
        action, kHGSObjectAttributeDefaultActionKey,
-       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
+       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        nil];
   return [HGSResult resultWithURI:artistUrlString
                              name:artist
@@ -925,7 +929,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
        composer, kITunesAttributeComposerKey,
        composerIcon_, kHGSObjectAttributeIconKey,
        action, kHGSObjectAttributeDefaultActionKey,
-       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
+       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        nil];
   return [HGSResult resultWithURI:composerUrlString
                              name:composer
@@ -974,7 +978,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
        genre, kITunesAttributeGenreKey,
        icon, kHGSObjectAttributeIconKey, 
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
-       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
+       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        nil];
   return [HGSResult resultWithURI:genreUrlString
                              name:genre
@@ -996,7 +1000,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
        playlist, kITunesAttributePlaylistKey,
        playlistIcon_, kHGSObjectAttributeIconKey,
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
-       [NSNumber numberWithDouble:rank], kHGSObjectAttributeRankKey,
+       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        nil];
   return [HGSResult resultWithURI:playlistUrlString
                              name:playlist

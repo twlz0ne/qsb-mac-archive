@@ -156,32 +156,6 @@ static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 
 @end
 
-static OSStatus QSBAppEventHandler(EventHandlerCallRef inHandlerCallRef, 
-                                   EventRef inEvent, void *inUserData) {
-  OSStatus err = eventNotHandledErr;
-  SEL selector = NULL;
-  switch(GetEventKind(inEvent)) {
-    case kEventAppLaunched:
-      selector = @selector(didLaunchApp:);
-      break;
-    case kEventAppTerminated:
-      selector = @selector(didTerminateApp:);
-      break;
-  }
-  if (selector) {
-    ProcessSerialNumber psn;
-    err = GetEventParameter(inEvent, kEventParamProcessID, 
-                            typeProcessSerialNumber, NULL,
-                            sizeof(psn), NULL, &psn);
-    if (err == noErr) {
-      NSValue *value = [NSValue valueWithBytes:&psn 
-                                      objCType:@encode(ProcessSerialNumber)];
-      [(id)inUserData performSelector:selector withObject:value];
-    }
-  }
-  return err;
-}
-
 @implementation QSBApplicationDelegate
 
 GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionaryForActiveApp);
@@ -199,16 +173,16 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     hgsDelegate_ = [[QSBHGSDelegate alloc] init];
     [[HGSPluginLoader sharedPluginLoader] setDelegate:hgsDelegate_];
 
-    EventTypeSpec appEvents[] = {
-      { kEventClassApplication, kEventAppLaunched },
-      { kEventClassApplication, kEventAppTerminated }
-    };
-    // Using CarbonEvents here instead of NSWorkspace notifications because
-    // the NSWorkspace notifications use WAY more memory (~256 k on my machine)
-    // just to exist. We don't need their level of sophistication.
-    InstallApplicationEventHandler(QSBAppEventHandler, 
-                                   sizeof(appEvents) / sizeof(appEvents[0]), 
-                                   appEvents, self, NULL);
+    NSNotificationCenter *wsNotificationCenter 
+      = [[NSWorkspace sharedWorkspace] notificationCenter];
+    [wsNotificationCenter addObserver:self 
+                             selector:@selector(didLaunchApp:) 
+                                 name:NSWorkspaceDidLaunchApplicationNotification 
+                               object:nil];
+    [wsNotificationCenter addObserver:self 
+                             selector:@selector(didTerminateApp:) 
+                                 name:NSWorkspaceDidTerminateApplicationNotification 
+                               object:nil];
     
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self 
@@ -236,7 +210,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     [NSApp setServicesProvider:self];
     NSUpdateDynamicServices();
     
+#if QSB_BUILD_WITH_GROWL
     [GrowlApplicationBridge setGrowlDelegate:self];
+#endif  // QSB_BUILD_WITH_GROWL
   }
   return self;
 }
@@ -638,10 +614,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 // it dies. This is to make working with QSB easier for us as we can have a
 // version running all the time, even when we are debugging the newer version.
 // See "hitHotKey:" to see where otherQSBPSN_ is actually used.
-- (void)didLaunchApp:(NSValue *)psnValue {
+- (void)didLaunchApp:(NSNotification *)notification {
   if (otherQSBPSN_.highLongOfPSN == 0 && otherQSBPSN_.lowLongOfPSN == 0) {
+    NSDictionary *userInfo = [notification userInfo];
     ProcessSerialNumber psn;
-    [psnValue getValue:&psn];
+    psn.highLongOfPSN 
+      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
+    psn.lowLongOfPSN 
+      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberLow"] unsignedIntValue];
     NSDictionary *info
       = GTMCFAutorelease(ProcessInformationCopyDictionary(&psn, 
                                                           kProcessDictionaryIncludeAllInformationMask));
@@ -680,10 +660,15 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
 }
 
-- (void)didTerminateApp:(NSValue *)psnValue {
+- (void)didTerminateApp:(NSNotification *)notification {
   if (otherQSBPSN_.highLongOfPSN != 0 || otherQSBPSN_.lowLongOfPSN != 0) {
+    NSDictionary *userInfo = [notification userInfo];
     ProcessSerialNumber psn;
-    [psnValue getValue:&psn];
+    psn.highLongOfPSN 
+      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
+    psn.lowLongOfPSN 
+      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberLow"] unsignedIntValue];
+    
     Boolean sameProcess;
     if (SameProcess(&otherQSBPSN_, &psn, &sameProcess) == noErr 
         && sameProcess) {
@@ -1009,8 +994,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)presentMessageToUser:(NSNotification *)notification {
   NSDictionary *messageDict = [notification userInfo];
   if (messageDict) {
+#if QSB_BUILD_WITH_GROWL
     SEL selector = [self useGrowl] ? @selector(presentUserMessageViaGrowl:)
                                    : @selector(presentUserMessageViaMessenger:);
+#else
+    SEL selector = @selector(presentUserMessageViaMessenger:);
+#endif  // QSB_BUILD_WITH_GROWL
     [self performSelectorOnMainThread:selector 
                            withObject:messageDict 
                         waitUntilDone:NO];
@@ -1048,6 +1037,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)presentUserMessageViaGrowl:(NSDictionary *)messageDict {
+#if QSB_BUILD_WITH_GROWL
   id summaryMessage = [messageDict objectForKey:kHGSSummaryMessageKey];
   NSImage *image = [messageDict objectForKey:kHGSImageMessageKey];
   if ([summaryMessage isKindOfClass:[NSAttributedString class]]) {
@@ -1072,21 +1062,30 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                                  priority:priority
                                  isSticky:NO
                              clickContext:nil];
+#endif  // QSB_BUILD_WITH_GROWL
 }
 
 #pragma mark Growl Support
 
 - (BOOL)growlIsInstalledAndRunning {
+#if QSB_BUILD_WITH_GROWL
   BOOL installed = [GrowlApplicationBridge isGrowlInstalled];
   BOOL running = [GrowlApplicationBridge isGrowlRunning];
-  return installed && running;
+  return installed && running;  
+#else
+  return NO;
+#endif  // QSB_BUILD_WITH_GROWL
 }
 
 - (BOOL)useGrowl {
+#if QSB_BUILD_WITH_GROWL
   BOOL growlRunning = [self growlIsInstalledAndRunning];
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   BOOL userWantsGrowl = [defaults boolForKey:kQSBUseGrowlKey];
-  return growlRunning && userWantsGrowl;
+  return growlRunning && userWantsGrowl;  
+#else
+  return NO;
+#endif  // QSB_BUILD_WITH_GROWL
 }
 
 - (void)setUseGrowl:(BOOL)value {

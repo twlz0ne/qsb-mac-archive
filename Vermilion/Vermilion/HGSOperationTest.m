@@ -35,10 +35,10 @@
 #import "HGSOperation.h"
 #import <GData/GDataHTTPFetcher.h>
 
-static const int kDiskOperationLength = 500000; // microseconds
-static const int kNetworkOperationLength = 500000; // microseconds
-static const int kMemoryOperationCount = 10;
-static const int kNormalOperationCount = 5;
+static const useconds_t kDiskOperationLength = 500000; // microseconds
+static const useconds_t kNetworkOperationLength = 500000; // microseconds
+static const NSInteger kMemoryOperationCount = 10;
+static const NSInteger kNormalOperationCount = 5;
 static NSString * const kGoogleUrl = @"http://www.google.com/";
 static NSString * const kGoogle404Url = @"http://www.google.com/dfhasjhdfkhdgkshg";
 static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.google.com/";
@@ -67,7 +67,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   
   @synchronized(self) {
     // Ensure that we are running sequentially
-    STAssertEquals(expectOpNum, [obj intValue],
+    STAssertEquals(expectOpNum, [obj integerValue],
                    @"disk operation ran out of order");
     if (expectOpNum == 3) {
       // Op 4 is cancelled
@@ -76,7 +76,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
       expectOpNum++;
     }
     // Ensure that we are not running simultaneously
-    STAssertEquals(counter, 0, @"disk operation is already running");
+    STAssertEquals(counter, (NSInteger)0, @"disk operation is already running");
     counter++;
   }
   
@@ -88,7 +88,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   
   @synchronized(self) {
     // Ensure that we are still not running simultaneously
-    STAssertEquals(counter, 1, @"disk operation started while one was running");
+    STAssertEquals(counter, (NSInteger)1, @"disk operation started while one was running");
     counter--;
   }
 }
@@ -129,7 +129,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
 
     NSInteger status = [error code];
     if ([[[[fetcher request] URL] absoluteString] isEqual:kGoogle404Url]) {
-      STAssertEquals(status, 404, @"failedWithStatus expected a 404 response");
+      STAssertEquals(status, (NSInteger)404, @"failedWithStatus expected a 404 response");
     }
     if ([[[[fetcher request] URL] absoluteString] isEqual:kGoogleUrl]) {
       STFail(@"Google home page request failed");
@@ -271,7 +271,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
 
 - (void)testMemoryOperations {
   NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
-  for (int i = 0; i < kMemoryOperationCount; i++) {
+  for (NSInteger i = 0; i < kMemoryOperationCount; i++) {
     NSOperation *memoryOp = [HGSInvocationOperation
                              memoryInvocationOperationWithTarget:self
                                                         selector:@selector(memoryOperationCounter:)

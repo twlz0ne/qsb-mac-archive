@@ -35,6 +35,8 @@
 #import "GTMMethodCheck.h"
 #import "GTMGarbageCollection.h"
 #import "GTMExceptionalInlines.h"
+#import "GTMNSNumber+64Bit.h"
+#import "GTMMethodCheck.h"
 
 static NSString *const kSpotlightSourceReturnIntermediateResultsKey = @"SLFilesSourceReturnIntermediateResults";
 static CFStringRef kSpotlightGroupIdAttribute = CFSTR("_kMDItemGroupId");
@@ -295,6 +297,8 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
 
 
 @implementation SLFilesSource
+
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -589,7 +593,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        lastUsedDate, kHGSObjectAttributeLastUsedDateKey,
        iconFlagName, kHGSObjectAttributeFlagIconNameKey,
-       [NSNumber numberWithFloat:rank], kHGSObjectAttributeRankKey,
+       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        nil];
   if (isURL) {
     [hgsAttributes setObject:uri forKey:kHGSObjectAttributeSourceURLKey];

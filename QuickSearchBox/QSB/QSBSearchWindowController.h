@@ -64,7 +64,7 @@ extern NSString *const kQSBSelectedResultKey;
   BOOL needToUpdatePositionOnActivation_;  // Do we need to reposition
   // (STRONG) Resets our query to "" after kQSBResetQueryTimeoutPrefKey seconds
   NSTimer *queryResetTimer_;
-  int findPasteBoardChangeCount_;  // used to detect if the pasteboard has changed
+  NSInteger findPasteBoardChangeCount_;  // used to detect if the pasteboard has changed
   // (STRONG) controls whether we put the pasteboard data in the qsb
   NSTimer *findPasteBoardChangedTimer_;
   BOOL insertFindPasteBoardString_;  // should we use the find pasteboard string
@@ -91,7 +91,7 @@ extern NSString *const kQSBSelectedResultKey;
 - (QSBSearchViewController *)activeSearchViewController;
 
 // Offset of all results views from top of window.
-- (float)resultsViewOffsetFromTop;
+- (CGFloat)resultsViewOffsetFromTop;
 
 // Change search window visibility
 - (IBAction)showSearchWindow:(id)sender;
@@ -124,7 +124,7 @@ extern NSString *const kQSBSelectedResultKey;
 // Attempt to set the height of the results window while insuring that
 // the results window fits comfortably on the screen along with the
 // search box window.
-- (void)setResultsWindowHeight:(float)height
+- (void)setResultsWindowHeight:(CGFloat)height
                      animating:(BOOL)animating;
 
 // Grab the selection from the Finder

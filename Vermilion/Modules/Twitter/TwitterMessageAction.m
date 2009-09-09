@@ -224,7 +224,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSString *path = [bundle pathForResource:@"Twitter" ofType:@"icns"];
   NSImage *twitterT
     = [[[NSImage alloc] initByReferencingFile:path] autorelease];
-  NSNumber *successNumber = [NSNumber numberWithInt:successCode];
+  NSNumber *successNumber = [NSNumber numberWithInteger:successCode];
   NSString *summary 
     = HGSLocalizedString(@"Twitter", 
                          @"A dialog title. Twitter is a product name");

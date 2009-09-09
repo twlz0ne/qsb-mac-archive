@@ -195,7 +195,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
     = [[[NilTypeAccount alloc] initWithConfiguration:configuration] autorelease];
   STAssertNil(account, nil);
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME A", kHGSAccountUserNameKey,
                    versionNumber, kHGSAccountsPrefVersionKey,
@@ -248,7 +248,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
    localizedStringForKey:@"USERNAME D ((null))" 
                    value:@"NOT_FOUND" table:@"InfoPlist"];
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME D", kHGSAccountUserNameKey,
                                  @"DUMMY TYPE D", kHGSAccountTypeKey,
@@ -314,7 +314,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
                    value:@"NOT_FOUND" table:@"InfoPlist"];
   // Let's add an account.
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   NSDictionary *accountConfig = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME E", kHGSAccountUserNameKey,
                                  bundleMock, kHGSExtensionBundleKey,
@@ -348,7 +348,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
    localizedStringForKey:@"USERNAME F ((null))" 
                    value:@"NOT_FOUND" table:@"InfoPlist"];
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME F", kHGSAccountUserNameKey,
                                  @"DUMMY TYPE F", kHGSAccountTypeKey,
@@ -370,7 +370,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
    localizedStringForKey:@"USERNAME G ((null))"
                    value:@"NOT_FOUND" table:@"InfoPlist"];
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"USERNAME G", kHGSAccountUserNameKey,
                                  @"DUMMY TYPE G", kHGSAccountTypeKey,
@@ -399,7 +399,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   STAssertNil(account, nil);
 
   NSNumber *oldVersionNumber
-    = [NSNumber numberWithInt:kHGSAccountsPrefVersion0];
+    = [NSNumber numberWithInteger:kHGSAccountsPrefVersion0];
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME G", kHGSAccountUserNameKey,
                    @"GoogleAccount", kHGSAccountTypeKey,

@@ -208,7 +208,7 @@ static NSString *const kServiceName
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   NSNumber *versionNumber
-    = [NSNumber numberWithInt:kHGSAccountsPrefCurrentVersion];
+    = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"HGSSimpleAccount D", kHGSAccountUserNameKey,
                                  bundleMock, kHGSExtensionBundleKey,

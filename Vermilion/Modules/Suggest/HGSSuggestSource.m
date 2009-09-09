@@ -40,6 +40,7 @@
 #import "GTMNSDictionary+URLArguments.h"
 #import "JSON/JSON.h"
 #import "NSString+ReadableURL.h"
+#import "GTMNSNumber+64Bit.h"
 
 #if TARGET_OS_IPHONE
 #import "GMOCompletionSourceNotifications.h"
@@ -157,6 +158,7 @@ typedef enum {
 @implementation HGSSuggestSource
 GTM_METHOD_CHECK(NSString, readableURLString);
 GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 #if TARGET_OS_IPHONE
 - (NSSet *)pivotableTypes {
@@ -169,8 +171,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   BOOL isValid = [super isValidSourceForQuery:query];
   if (isValid) {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    int suggestCount = [prefs integerForKey:kGoogleSuggestCountKey];
-    int navSuggestCount = [prefs integerForKey:kGoogleNavSuggestCountKey];
+    NSInteger suggestCount = [prefs integerForKey:kGoogleSuggestCountKey];
+    NSInteger navSuggestCount = [prefs integerForKey:kGoogleNavSuggestCountKey];
     
     // Don't show suggestions for queries under 3 letters,
     // and anything over 20 is probably a tweet or a text append, so we
@@ -622,7 +624,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       CGFloat rank1 = HGSScoreTermForItem(normalizedQuery, urlString, NULL);
       CGFloat rank2 = HGSScoreTermForItem(normalizedQuery, urlPath, NULL);
       CGFloat rank = MAX(rank1, rank2);
-      NSNumber *nsRank = [NSNumber numberWithFloat:rank];
+      NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
       attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                     yesValue, kHGSObjectAttributeAllowSiteSearchKey,
                     yesValue, kHGSObjectAttributeIsSyntheticKey,

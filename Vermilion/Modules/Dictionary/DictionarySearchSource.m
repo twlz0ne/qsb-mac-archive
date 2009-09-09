@@ -115,7 +115,7 @@ static const int kMinQueryLength = 3;
         = [NSMutableDictionary dictionaryWithObjectsAndKeys:
            (NSString *)def, kHGSObjectAttributeSnippetKey,
            dictionaryIcon_, kHGSObjectAttributeIconKey,
-           [NSNumber numberWithInt:eHGSSpecialUIRankFlag], 
+           [NSNumber numberWithUnsignedInteger:eHGSSpecialUIRankFlag], 
              kHGSObjectAttributeRankFlagsKey,
            [NSValue valueWithRange:nsRange], kDictionaryRangeKey,
            [query substringWithRange:nsRange], kDictionaryTermKey,

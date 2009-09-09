@@ -437,7 +437,7 @@ GTM_METHOD_CHECK(NSScanner, gtm_scanJSONObjectString:);
         // See if the next two characters are hex.
         NSUInteger hexLocation = [scanner scanLocation] + 2;
         [scanner setScanLocation:hexLocation];
-        NSUInteger hexValue = 0;
+        unsigned hexValue = 0;
         // While we should get exactly two hex digits, just grab what comes
         // along and then check the location.
         [scanner scanHexInt:&hexValue];

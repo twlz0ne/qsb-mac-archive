@@ -215,7 +215,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   NSPoint leftTop = [[advancedScrollView_ contentView]
                      constrainScrollPoint:NSMakePoint(0, CGFLOAT_MAX)];
   [[advancedScrollView_ contentView] scrollToPoint:leftTop];
-  [[advancedScrollView_ verticalScroller] setFloatValue:0.0];
+  [[advancedScrollView_ verticalScroller] setFloatValue:0.0f];
 
   [[self window] setHidesOnDeactivate:YES];
   

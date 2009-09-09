@@ -203,7 +203,7 @@ static NSString *const kHGSDSHomeNumberKey = @"HGSDSHomeNumberKey";
               if (attrType) {
                 do {
                   UInt32 count;
-                  tContextData context = NULL;
+                  tContextData context = 0;
                   tDirPatternMatch match 
                     = ([queryString length] >= kExactMatchThreshold) ?
                        eDSiStartsWith : eDSiExact;

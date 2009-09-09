@@ -36,6 +36,8 @@
 #import "ApplicationUIAction.h"
 #import "QSBHGSDelegate.h"
 #import "GTMNSWorkspace+Running.h"
+#import "GTMNSNumber+64Bit.h"
+#import "GTMMethodCheck.h"
 
 // Turns out the Finder has a couple of places with recursive
 // accessibility references. 10 should be deep enough for most cases.
@@ -48,6 +50,8 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
 @end
 
 @implementation ApplicationUIContentsSource
+
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -101,7 +105,7 @@ const NSUInteger kApplicationUIContentsSourceMaximumRecursion = 10;
         NSString *uriString 
           = [NSString stringWithFormat:@"AppUISource://%@/%p", 
              nameString, window];
-        NSNumber *nsRank = [NSNumber numberWithFloat:rank];
+        NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
         NSDictionary *attributes
           = [NSDictionary dictionaryWithObjectsAndKeys:
              window, kAppUISourceAttributeElementKey, 

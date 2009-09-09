@@ -520,9 +520,9 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
   UInt32 keyMaterialLengthFromKeychain;
   void *keyMaterialFromKeychain;
   OSStatus status = SecKeychainFindGenericPassword(NULL,
-                                                   [appName length],
+                                                   (UInt32)[appName length],
                                                    [appName UTF8String],
-                                                   [kKeychainName length],
+                                                   (UInt32)[kKeychainName length],
                                                    [kKeychainName UTF8String],
                                                    &keyMaterialLengthFromKeychain,
                                                    &keyMaterialFromKeychain,
@@ -542,9 +542,9 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
     [self deleteEncryptionKey];
     if ([self generateRandomBytes:key count:kEncryptionKeyLength]) {
       status = SecKeychainAddGenericPassword(NULL,
-                                             [appName length],
+                                             (UInt32)[appName length],
                                              [appName UTF8String],
-                                             [kKeychainName length],
+                                             (UInt32)[kKeychainName length],
                                              [kKeychainName UTF8String],
                                              kEncryptionKeyLength,
                                              key,
@@ -565,9 +565,9 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
   UInt32 keyMaterialLengthFromKeychain;
   void *keyMaterialFromKeychain;
   OSStatus status = SecKeychainFindGenericPassword(NULL,
-                                                   [appName length],
+                                                   (UInt32)[appName length],
                                                    [appName UTF8String],
-                                                   [kKeychainName length],
+                                                   (UInt32)[kKeychainName length],
                                                    [kKeychainName UTF8String],
                                                    &keyMaterialLengthFromKeychain,
                                                    &keyMaterialFromKeychain,
@@ -586,7 +586,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
   int devRandFD = open("/dev/urandom", O_RDONLY | O_NONBLOCK);
   if (devRandFD > 0) {
     do {
-      int amountRead = read(devRandFD, bytes + pos, count - pos);
+      ssize_t amountRead = read(devRandFD, bytes + pos, count - pos);
       if (amountRead <= 0) {
         if (errno == EAGAIN || errno == EINTR) {
           continue;

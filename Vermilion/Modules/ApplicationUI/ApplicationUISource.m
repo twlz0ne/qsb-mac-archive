@@ -35,6 +35,8 @@
 #import "GTMAXUIElement.h"
 #import "ApplicationUIAction.h"
 #import "GTMNSWorkspace+Running.h"
+#import "GTMNSNumber+64Bit.h"
+#import "GTMMethodCheck.h"
 
 NSString *const kAppUISourceAttributeElementKey 
   = @"kHGSAppUISourceAttributeElementKey";
@@ -49,6 +51,8 @@ NSString *const kAppUISourceAttributeElementKey
 @end
 
 @implementation ApplicationUISource
+
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -163,7 +167,7 @@ NSString *const kAppUISourceAttributeElementKey
           = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              child, kAppUISourceAttributeElementKey,
              icon, kHGSObjectAttributeIconKey,
-             [NSNumber numberWithFloat:score], kHGSObjectAttributeRankKey,
+             [NSNumber gtm_numberWithCGFloat:score], kHGSObjectAttributeRankKey,
              nil];
         HGSAction *defaultAction 
           = [ApplicationUIAction defaultActionForElement:child];

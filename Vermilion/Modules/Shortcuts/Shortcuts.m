@@ -98,9 +98,9 @@ static const unsigned int kMaxEntriesPerShortcut = 3;
 
 @end
 
-static inline int KeyLength(NSString *a, NSString *b, void *c) {
-  int lengthA = [a length];
-  int lengthB = [b length];
+static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
+  NSUInteger lengthA = [a length];
+  NSUInteger lengthB = [b length];
   if (lengthA < lengthB) {
     return NSOrderedAscending;
   } else if (lengthA > lengthB) {
@@ -242,11 +242,11 @@ static inline int KeyLength(NSString *a, NSString *b, void *c) {
       = [[[self arrayForShortcut:normalizeShortcut] mutableCopy] autorelease];
     // see if we have an array for the given shortcut
     
-    int currentIndex = [valueArray indexOfObject:identifier];
+    NSUInteger currentIndex = [valueArray indexOfObject:identifier];
     
     // The only way to be inserted at 0 is if you are in 2nd place, 
     // otherwise insert at 1
-    int newIndex = (currentIndex <= 1) ? 0 : 1;
+    NSUInteger newIndex = (currentIndex <= 1) ? 0 : 1;
     
     // Only perform the insertion/update if the current index changed
     // or if the array doesn't exist yet.

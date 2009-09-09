@@ -87,9 +87,9 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
 - (BOOL)PSN:(ProcessSerialNumber *)psn forApplication:(NSDictionary *)theApp {
   if (!theApp) return NO;
   psn->highLongOfPSN
-    = [[theApp objectForKey:@"NSApplicationProcessSerialNumberHigh"] longValue];
+    = [[theApp objectForKey:@"NSApplicationProcessSerialNumberHigh"] intValue];
   psn->lowLongOfPSN
-    = [[theApp objectForKey:@"NSApplicationProcessSerialNumberLow"] longValue];
+    = [[theApp objectForKey:@"NSApplicationProcessSerialNumberLow"] intValue];
   return (psn->lowLongOfPSN != 0 || psn->highLongOfPSN != 0);
 }
 
@@ -126,12 +126,12 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
 }
 
 - (BOOL)hideOtherApplications:(NSArray *)theApps { 
-  int count = [theApps count];
-  int i;
+  NSUInteger count = [theApps count];
   ProcessSerialNumber *psn = calloc(sizeof(ProcessSerialNumber), count);
   if (!psn) return NO;
-  for (i = 0; i < count; i++)
+  for (NSUInteger i = 0; i < count; i++) {
     [self PSN:psn+i forApplication:[theApps objectAtIndex:i]];
+  }
   // TODO(alcor): first open the primary app (to avoid constant switching)
   //[self switchToApplication:theApp frontWindowOnly:YES];
   
@@ -139,9 +139,9 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
   thisPSN.highLongOfPSN = kNoProcess;
   thisPSN.lowLongOfPSN = 0;
   Boolean show = NO;  // Initialize with default so CLANG is happy
-  while(GetNextProcess ( &thisPSN ) == noErr) {
-    for (i = 0; i < [theApps count]; i++) {
-      OSStatus err = SameProcess(&thisPSN, psn+i, &show);
+  while(GetNextProcess(&thisPSN) == noErr) {
+    for (NSUInteger i = 0; i < count; i++) {
+      OSStatus err = SameProcess(&thisPSN, psn + i, &show);
       if (err != noErr) continue;
       if (show) break;
     }
@@ -161,11 +161,10 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
 }
 
 - (BOOL)quitOtherApplications:(NSArray *)theApps { 
-  int count = [theApps count];
-  int i;
+  NSUInteger count = [theApps count];
   ProcessSerialNumber *psn = calloc(sizeof(ProcessSerialNumber), count);
   if (!psn) return NO;
-  for (i = 0; i < count; i++) {
+  for (NSUInteger i = 0; i < count; i++) {
     [self PSN:psn+i forApplication:[theApps objectAtIndex:i]];
   }
   // TODO(alcor): first open the primary app (to avoid constant switching)
@@ -176,7 +175,6 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
   Boolean show = NO;
   ProcessSerialNumber myPSN;
   MacGetCurrentProcess(&myPSN);
-  
   
   while(GetNextProcess(&thisPSN) == noErr) {
     NSDictionary *dict
@@ -194,13 +192,14 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_launchedApplications);
     SameProcess(&thisPSN, &myPSN, &show);
     if (show) continue;
     
-    for (i = 0; i<[theApps count]; i++) {
+    for (NSUInteger i = 0; i < count; i++) {
       err = SameProcess(&thisPSN, psn+i, &show);
       if (err) continue;
       if (show) break;
     }
-    if (!show)
+    if (!show) {
       [self quitPSN:thisPSN];
+    }
   }
   free(psn);
   return YES;

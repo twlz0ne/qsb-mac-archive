@@ -356,7 +356,7 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
       = [imageEntry propertyForKey:kPicasaWebUploadImageActionAttemptNumberKey];
     NSUInteger attempt = [attemptNumber unsignedIntValue];
     if (attempt < kMaxUploadAttempts) {
-      attemptNumber = [NSNumber numberWithUnsignedInt:++attempt];
+      attemptNumber = [NSNumber numberWithUnsignedInteger:++attempt];
       [imageEntry setProperty:attemptNumber
                        forKey:kPicasaWebUploadImageActionAttemptNumberKey];
 
@@ -418,7 +418,7 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
   NSString *path = [bundle pathForResource:@"PicasaWeb" ofType:@"icns"];
   NSImage *picasaIcon
     = [[[NSImage alloc] initByReferencingFile:path] autorelease];
-  NSNumber *successNumber = [NSNumber numberWithInt:successCode];
+  NSNumber *successNumber = [NSNumber numberWithInteger:successCode];
   NSString *summary 
     = HGSLocalizedString(@"Picasa Web", 
                          @"A dialog title. Picasa Web is a product name");

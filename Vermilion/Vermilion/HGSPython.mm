@@ -41,6 +41,9 @@
 #import "HGSPythonSource.h"
 #import "HGSTokenizer.h"    
 #import "GTMObjectSingleton.h"
+#import "GTMNSNumber+64Bit.h"
+#import "GTMMethodCheck.h"
+
 #import <Python/structmember.h>
 
 const NSString *kHGSPythonPrivateValuesKey = @"kHGSPythonPrivateValuesKey";
@@ -107,6 +110,55 @@ static PyMemberDef QueryMembers[] = {
   { NULL, 0, 0,0, NULL }
 };
 
+// The standard definitions for Py_TPFLAGS produce warnings on 64 bit
+
+// PyBufferProcs contains bf_getcharbuffer
+#define HGS_Py_TPFLAGS_HAVE_GETCHARBUFFER_64BIT  (1L<<0L)
+
+// PySequenceMethods contains sq_contains
+#define HGS_Py_TPFLAGS_HAVE_SEQUENCE_IN_64BIT (1L<<1L)
+
+// PySequenceMethods and PyNumberMethods contain in-place operators
+#define HGS_Py_TPFLAGS_HAVE_INPLACEOPS_64BIT (1L<<3L)
+
+// tp_richcompare is defined
+#define HGS_Py_TPFLAGS_HAVE_RICHCOMPARE_64BIT (1L<<5L)
+
+// Objects which are weakly referencable if their tp_weaklistoffset is >0
+#define HGS_Py_TPFLAGS_HAVE_WEAKREFS_64BIT (1L<<6L)
+
+// tp_iter is defined
+#define HGS_Py_TPFLAGS_HAVE_ITER_64BIT (1L<<7L)
+
+// New members introduced by Python 2.2 exist
+#define HGS_Py_TPFLAGS_HAVE_CLASS_64BIT (1L<<8L)
+
+// Set if the type allows subclassing
+#define HGS_Py_TPFLAGS_BASETYPE_64BIT (1L<<10L)
+
+// These two bits are preserved for Stackless Python, next after this is 17
+#ifdef STACKLESS
+#define HGS_Py_TPFLAGS_HAVE_STACKLESS_EXTENSION_64BIT (3L<<15L)
+#else
+#define HGS_Py_TPFLAGS_HAVE_STACKLESS_EXTENSION_64BIT 0L
+#endif
+
+// Objects support nb_index in PyNumberMethods
+#define HGS_Py_TPFLAGS_HAVE_INDEX_64BIT (1L<<17L)
+
+#define HGS_Py_TPFLAGS_DEFAULT_64BIT  ( \
+  HGS_Py_TPFLAGS_HAVE_GETCHARBUFFER_64BIT | \
+  HGS_Py_TPFLAGS_HAVE_SEQUENCE_IN_64BIT | \
+  HGS_Py_TPFLAGS_HAVE_INPLACEOPS_64BIT | \
+  HGS_Py_TPFLAGS_HAVE_RICHCOMPARE_64BIT | \
+  HGS_Py_TPFLAGS_HAVE_WEAKREFS_64BIT | \
+  HGS_Py_TPFLAGS_HAVE_ITER_64BIT | \
+  HGS_Py_TPFLAGS_HAVE_CLASS_64BIT | \
+  HGS_Py_TPFLAGS_HAVE_STACKLESS_EXTENSION_64BIT | \
+  HGS_Py_TPFLAGS_HAVE_INDEX_64BIT | \
+  0L)
+
+
 static PyTypeObject QueryType = {
   PyObject_HEAD_INIT(NULL)
   0,                            // ob_size
@@ -128,7 +180,7 @@ static PyTypeObject QueryType = {
   0,                            // tp_getattro
   0,                            // tp_setattro
   0,                            // tp_as_buffer
-  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, // tp_flags
+  (UInt32)(HGS_Py_TPFLAGS_DEFAULT_64BIT | HGS_Py_TPFLAGS_BASETYPE_64BIT), // tp_flags
   "Query objects",              // tp_doc
   0,                            // tp_traverse
   0,                            // tp_clear
@@ -199,6 +251,7 @@ static PyMethodDef LocalizeMethods[] = {
 @implementation HGSPython
 
 GTMOBJECT_SINGLETON_BOILERPLATE(HGSPython, sharedPython);
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)init {
   if ((self = [super init])) {
@@ -701,7 +754,7 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
               if (rank > 0.0) {
                 NSMutableDictionary *attributes 
                   = [NSMutableDictionary
-                     dictionaryWithObject:[NSNumber numberWithFloat:rank]
+                     dictionaryWithObject:[NSNumber gtm_numberWithCGFloat:rank]
                                    forKey:kHGSObjectAttributeRankKey];
                 NSString *urlString = [NSString stringWithUTF8String:identifier];
                 if (snippet && strlen(snippet) > 0) {

@@ -34,6 +34,7 @@
 #import "GTMNSFileManager+Carbon.h"
 #import "GTMGarbageCollection.h"
 #import "GTMMethodCheck.h"
+#import "GTMNSNumber+64Bit.h"
 
 // The RecentDocumentsSource provides results containing
 // the recent documents opened for the application being pivoted.
@@ -44,8 +45,9 @@
 static const CGFloat RecentDocumentsSourceInvalidXCodeVersion = 3.2;
 
 @implementation RecentDocumentsSource
-GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
 
+GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (BOOL)isSearchConcurrent {
   // NSFilemanager isn't listed as thread safe
@@ -135,7 +137,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
                                            [recentDocuments count]];
 
         NSFileManager *manager = [NSFileManager defaultManager];
-        int count = [recentDocuments count];
+        NSUInteger count = [recentDocuments count];
         for (id recentDocumentItem in recentDocuments) {
           NSData *aliasData = [[recentDocumentItem objectForKey:@"_NSLocator"]
                                 objectForKey:@"_NSAlias"];
@@ -157,7 +159,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
             }
             
             if (rank > 0) {
-              NSNumber *nsRank = [NSNumber numberWithFloat:rank];
+              NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
               NSDictionary *attributes 
                 = [NSDictionary dictionaryWithObjectsAndKeys:
                    aliasData, kHGSObjectAttributeAliasDataKey,

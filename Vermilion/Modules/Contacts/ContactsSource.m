@@ -44,6 +44,8 @@
 #import "QSBHGSDelegate.h"
 #import "GTMNSString+URLArguments.h"
 #import "GTMGoogleSearch.h"
+#import "GTMNSNumber+64Bit.h"
+#import "GTMMethodCheck.h"
 
 static NSString *const kMetaDataFilePath
   = @"~/Library/Application Support/AddressBook/Metadata/%@.abcdp";
@@ -87,6 +89,8 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 @end
 
 @implementation HGSContactsSource
+
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -336,7 +340,7 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
         
         // We rank the primary identifiers higher so they show up better
         CGFloat rank = [identifier isEqualToString:primary] ? 1.0 : 0.0;
-        NSNumber *nsRank = [NSNumber numberWithFloat:rank];
+        NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
         // Snippets look like phone: home
         NSString *snippet = [NSString stringWithFormat:@"%@: %@",
                              localizedProperty, localizedLabel];

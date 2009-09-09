@@ -31,6 +31,8 @@
 //
 
 #import <Vermilion/Vermilion.h>
+#import "GTMNSNumber+64Bit.h"
+#import "GTMMethodCheck.h"
 
 static NSString *kTrashResultType = HGS_SUBTYPE(@"trash", @"Trash");
 static NSString *kTrashResultUrl = @"gtrash://trash/result";
@@ -44,6 +46,8 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
 @end
 
 @implementation TrashSearchSource
+
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -118,7 +122,7 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
                 rank = HGSScoreTermForItem(normalizedQueryString, file, NULL);
               }
               if (rank > 0) {
-                NSNumber *nsRank = [NSNumber numberWithFloat:rank];
+                NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
                 NSDictionary *attributes 
                   = [NSDictionary dictionaryWithObjectsAndKeys:
                      nsRank, kHGSObjectAttributeRankKey, nil];
@@ -141,7 +145,7 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
     NSDictionary *attributes
       = [NSDictionary dictionaryWithObjectsAndKeys:
          trashIcon_, kHGSObjectAttributeIconKey,
-         [NSNumber numberWithFloat:rank], kHGSObjectAttributeRankKey,
+         [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
          nil];
     
     HGSResult *result 

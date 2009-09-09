@@ -299,7 +299,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (BOOL)tableView:(NSTableView *)tv
 writeRowsWithIndexes:(NSIndexSet *)rowIndexes 
      toPasteboard:(NSPasteboard*)pb {
-  unsigned row = [rowIndexes firstIndex];
+  NSUInteger row = [rowIndexes firstIndex];
   QSBTableResult *tableResult = [self tableResultForRow:row];
   return [tableResult copyToPasteboard:pb];
 }
