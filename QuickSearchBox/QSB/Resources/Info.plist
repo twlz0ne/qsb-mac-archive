@@ -124,6 +124,8 @@
 	<string>QSBApplication</string>
 	<key>OSAScriptingDefinition</key>
 	<string>QSB.sdef</string>
+	<key>NSSupportsSuddenTermination</key>
+	<true/>
 	<key>LSHasLocalizedDisplayName</key>
 	<true/>
 	<key>QSBFeedbackURL</key>
