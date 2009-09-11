@@ -455,7 +455,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 }
 
 - (IBAction)selectTabForSender:(id)sender {
-  [tabView_ selectTabViewItemWithIdentifier:[sender itemIdentifier]];
+  [tabView_ selectTabViewItemAtIndex:[sender tag]];
 }
 
 #pragma mark Delegate Methods
