@@ -117,7 +117,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
             for (NSString *file in contents) {
               CGFloat rank = 0;
               if (normalizedLength == 0) {
-                rank = HGSPerfectMatchScore();
+                rank = HGSCalibratedScore(kHGSCalibratedPerfectScore);
               } else {
                 rank = HGSScoreTermForItem(normalizedQueryString, file, NULL);
               }

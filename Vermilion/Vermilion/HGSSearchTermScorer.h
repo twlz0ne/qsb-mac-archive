@@ -38,7 +38,7 @@
       several factors, including how complete of a match the term is
       when compared to the item, how much of a word is matched, if the
       term represents an abbreviation of the item, and so forth.
- 
+
       Functions are provided for those applications that wish to collect
       metrics about the candidate matches for the term within each item.
       In order to have access to those function it is necessary to
@@ -74,7 +74,7 @@ extern "C" {
  Sets how each component comprising the matching algorithm influences
  the overall score acheived by a match.
  @param characterMatchFactor This is the basic value a character gets
-        in a search term for matching a character in the search item.  Default 
+        in a search term for matching a character in the search item.  Default
         value: 1.0.
  @param firstCharacterInWordFactor This is how much value a character in the
         search term gets if it happens to match the first character in a
@@ -104,7 +104,7 @@ extern "C" {
  @param maximumItemCharactersScanned The maximum number of characters of the
         search item which will be scanned.  All characters in the search
         item beyond this limit are ignored.  Note that there is an absolute
-        maximum at 250.  Default value: 250.  
+        maximum at 250.  Default value: 250.
  @param enableBestWordScoring When NO, this turns off the best word match
         portion of the scoring algorithm.  The effect is to prevent the
         calculation of the word boundaries within the search item and,
@@ -125,7 +125,7 @@ void HGSSetSearchTermScoringFactors(CGFloat characterMatchFactor,
                                     NSUInteger maximumItemCharactersScanned,
                                     BOOL enableBestWordScoring,
                                     CGFloat otherTermMultiplier);
-  
+
 /*!
  Scores how well a given term comprised of a singe word matches to a
  string.  (Release version.)
@@ -141,10 +141,10 @@ void HGSSetSearchTermScoringFactors(CGFloat characterMatchFactor,
         This array should be cached and provided in subsequent calls
         to the scoring function.  If this pointer is nil then no word
         metric information will be returned.
- @result an unbounded float representing the matching score of the best match. 
+ @result an unbounded float representing the matching score of the best match.
 */
 CGFloat HGSScoreTermForItem(NSString *term,
-                            NSString *item, 
+                            NSString *item,
                             NSArray **pWordRanges);
 
 /*!
@@ -197,7 +197,7 @@ CGFloat HGSScoreTermsForMainAndOtherItems(NSArray *searchTerms,
         in searchTerms.  Each dictionary will contain details describing the
         highest scoring match of the search term against the  main item
         and the other items.  Each dictionary provides: 1) the score of the
-        best match, 2) the character details,  3) sds, 4) abs, 5) bmls, 
+        best match, 2) the character details,  3) sds, 4) abs, 5) bmls,
         6) poimf, and 7) the index of the item within which the match
         with 0 being the main item.
         If the caller provides a nil pointer then no details are collected
@@ -232,22 +232,22 @@ CGFloat HGSScoreTermsForMainAndOtherItemsWithDetails(NSArray *searchTerms,
  @param pSearchTermDetails An NSDictionary containing the details describing
         the candidate matches of the search term against the search item.  The
         dictionary provides: 1) the score of the best match, 2) the
-        count of matches,  3) the search term, and 4) an NSArray of 
+        count of matches,  3) the search term, and 4) an NSArray of
         NSDictionaries giving details about each candidate match ('match
         details').  The match detail dictionary provides the various
         values and scores which contributed to the overall match's score as
-        was as detail about how each character in the search term matched. 
+        was as detail about how each character in the search term matched.
         If the caller provides a nil pointer then no details are collected
         and returned.  If this pointer is not nil, anything to which it
         points is ignored (and the caller must insure any old NSDictionary is
         properly disposed) and the address of the newly created dictionary
         is placed therein.  If a search term exactly matches the search item
         this pointer will be set to NULL.
- @result an unbounded float representing the matching score of the best match. 
+ @result an unbounded float representing the matching score of the best match.
 */
 CGFloat HGSScoreTermAndDetailsForItem(NSString *term,
-                                      NSString *item, 
-                                      NSArray **pWordRanges, 
+                                      NSString *item,
+                                      NSArray **pWordRanges,
                                       NSDictionary **pSearchTermDetails);
 
 /*!
@@ -272,16 +272,41 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *term,
         of the best match for each search term.
 */
 NSArray *HGSScoreTermsAndDetailsForItem(NSArray *searchTerms,
-                                        NSString *item, 
-                                        NSArray **pWordRanges, 
+                                        NSString *item,
+                                        NSArray **pWordRanges,
                                         NSArray **pSearchTermsDetails);
 
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+
 /*!
-  Provides what we consider to be a perfect match score.
-  @result A CGFloat containing the value of gHGSPerfectMatchScore.
+ @enum Calibrated Score Categories
+ @abstract Used to specify the minimum score required to achieve the
+           desired category.
+ @constant kHGSCalibratedPerfectScore The score assigned for a perfect math.
+ @constant kHGSCalibratedStrongScore A strong match score.
+ @constant kHGSCalibratedModerateScore A moderately match score.
+ @constant kHGSCalibratedWeakScore A moderate match score.
+ @constant kHGSCalibratedInsignificantScore An insignificant match score.
+ @constant kHGSCalibratedLastScore Can be used as a count of possible values.
+*/  
+typedef enum {
+  kHGSCalibratedPerfectScore = 0,
+  kHGSCalibratedStrongScore,
+  kHGSCalibratedModerateScore,
+  kHGSCalibratedWeakScore,
+  kHGSCalibratedInsignificantScore,
+  kHGSCalibratedLastScore
+} HGSCalibratedScoreType;
+
+  
+/*!
+ Returns a calibrated score based on the desired category strengh.
+ @param scoreType The strength category for which the minimum match score
+        is to be returned.
+ @result A CGFloat containing the minimum match score for the given
+         strength category.
 */
-CGFloat HGSPerfectMatchScore();
+CGFloat HGSCalibratedScore(HGSCalibratedScoreType scoreType);
 
 #ifdef __cplusplus
 }

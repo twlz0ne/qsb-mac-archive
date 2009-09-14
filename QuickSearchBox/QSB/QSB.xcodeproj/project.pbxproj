@@ -432,6 +432,7 @@
 		62D14DFB0F15651B0053B99F /* QSBBooleanToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D14DFA0F15651B0053B99F /* QSBBooleanToColorTransformer.m */; };
 		62D2A92A0E256FCA00D42E81 /* DoubleDownChevrons.png in Resources */ = {isa = PBXBuildFile; fileRef = 62D2A9290E256FCA00D42E81 /* DoubleDownChevrons.png */; };
 		62D56E240EF317A900D3EB5F /* HGSAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D0E9640EF058950028522C /* HGSAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		62D570C71059E704002D086B /* ScoreCalibration.plist in Resources */ = {isa = PBXBuildFile; fileRef = 62D570C61059E704002D086B /* ScoreCalibration.plist */; };
 		62D5B51E0E648FF400C66E15 /* InstantMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629A95630E5F244D005AE855 /* InstantMessage.framework */; };
 		62D5B58D0E6491B500C66E15 /* InstantMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629A95630E5F244D005AE855 /* InstantMessage.framework */; };
 		62D5B6A00E64D0DC00C66E15 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
@@ -2154,6 +2155,7 @@
 		62D0E96E0EF05D0E0028522C /* HGSAccountsExtensionPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccountsExtensionPoint.m; sourceTree = "<group>"; };
 		62D14DFA0F15651B0053B99F /* QSBBooleanToColorTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBBooleanToColorTransformer.m; sourceTree = "<group>"; };
 		62D2A9290E256FCA00D42E81 /* DoubleDownChevrons.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DoubleDownChevrons.png; sourceTree = "<group>"; };
+		62D570C61059E704002D086B /* ScoreCalibration.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ScoreCalibration.plist; sourceTree = "<group>"; };
 		62D824BA0FD05D15002429C4 /* finance.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = finance.icns; sourceTree = "<group>"; };
 		62D9B78B0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBEditSimpleAccountWindowController.h; sourceTree = "<group>"; };
 		62D9B78C0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBEditSimpleAccountWindowController.m; sourceTree = "<group>"; };
@@ -5137,6 +5139,7 @@
 			children = (
 				8B6EB648101A0D18006CFF7A /* Localizable.strings */,
 				8B6EB64C101A0D18006CFF7A /* TypeCategories.plist */,
+				62D570C61059E704002D086B /* ScoreCalibration.plist */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -7527,6 +7530,7 @@
 				5A2710B90ECA52F200C72257 /* Vermilion.py in Resources */,
 				8B6EB655101A0D18006CFF7A /* Localizable.strings in Resources */,
 				8B6EB656101A0D18006CFF7A /* TypeCategories.plist in Resources */,
+				62D570C71059E704002D086B /* ScoreCalibration.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -128,7 +128,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       NSDictionary *pasteboardData 
         = [NSDictionary dictionaryWithObject:answerString 
                                       forKey:NSStringPboardType];
-      CGFloat rank = HGSPerfectMatchScore();
+      CGFloat rank = HGSCalibratedScore(kHGSCalibratedPerfectScore);
       NSDictionary *attributes
         = [NSDictionary dictionaryWithObjectsAndKeys:
            [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey, 

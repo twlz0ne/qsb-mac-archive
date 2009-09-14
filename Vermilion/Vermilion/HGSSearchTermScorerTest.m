@@ -128,7 +128,7 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
                score, kHGSTestGoodScore);
   
   // Perfect score.
-  CGFloat perfectScore = HGSPerfectMatchScore();
+  CGFloat perfectScore = HGSCalibratedScore(kHGSCalibratedPerfectScore);
   STAssertEquals(perfectScore, (CGFloat)1000.0, nil);
 }
 
@@ -242,6 +242,25 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
                    [testItems objectAtIndex:l], l, itemScores[l],
                    testTermsString);
     }
+  }
+}
+
+- (void)testCalibratedScores {
+  HGSCalibratedScoreType scoreType[] = {
+    kHGSCalibratedPerfectScore,
+    kHGSCalibratedStrongScore,
+    kHGSCalibratedModerateScore,
+    kHGSCalibratedWeakScore,
+    kHGSCalibratedInsignificantScore
+  };
+  _GTMCompileAssert(sizeof(scoreType) / sizeof(scoreType[0]) ==
+                    kHGSCalibratedLastScore, UNEXPECTED_SCORE_SET_SIZE);
+  const CGFloat arbitraryMinimumSeparation = 5.0;
+  CGFloat higherScore = 9999999.0;
+  for (NSUInteger i = 0; i < kHGSCalibratedLastScore; ++i) {
+    CGFloat lowerScore = HGSCalibratedScore(scoreType[i]);
+    STAssertTrue(higherScore > (lowerScore + arbitraryMinimumSeparation), nil);
+    higherScore = lowerScore;
   }
 }
 
