@@ -558,7 +558,7 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
   CFStringRef itemRef = (CFStringRef)itemString;
   CFIndex termLength = CFStringGetLength(termRef);
   CFIndex itemLength = CFStringGetLength(itemRef);
-  if (termLength < kHGSMaximumItemCharactersScanned) {
+  if (termLength > 0 && termLength < kHGSMaximumItemCharactersScanned) {
     if (termLength < itemLength) {
       // Max out itemLength to desired maximum.
       itemLength = MIN(itemLength, gHGSMaximumItemCharactersScanned);

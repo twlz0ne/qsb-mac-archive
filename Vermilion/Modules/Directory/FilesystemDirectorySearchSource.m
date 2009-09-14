@@ -128,7 +128,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                           tokenizedSubpath,
                                           NULL);
       
-      if (score <= 0.0) continue;
+      if ([normalizedQueryString length] && score <= 0.0) continue;
       
       subpath = [path stringByAppendingPathComponent:subpath];
       
