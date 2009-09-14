@@ -35,6 +35,7 @@
  */
 
 #import <Vermilion/Vermilion.h>
+#import "GTMSenTestCase.h"
 
 /*!
   Loads a single plugin if it hasn't already been loaded
@@ -50,3 +51,70 @@
 */
 + (BOOL)loadPlugin:(NSString *)path;
 @end
+
+/*!
+ A base class for testing various extensions. Takes care of loading and
+ unloading the extension appropriately for you.
+*/
+@interface HGSExtensionTestCase : GTMTestCase {
+ @private
+  HGSExtension *extension_;
+  HGSExtensionPoint *extensionPoint_;
+  NSString *pluginName_;
+  NSString *identifier_;
+}
+
+@property (readonly, retain, nonatomic) id extension;
+@property (readonly, assign, nonatomic) HGSExtensionPoint *extensionPoint;
+@property (readonly, retain, nonatomic) NSString *pluginName;
+@property (readonly, retain, nonatomic) NSString *identifier;
+
+/*!
+ Designated initializer for HGSExtensionTestCase.
+ @param invocation. The test to be invoked.
+ @param pluginName The name of the plugin that we want to access 
+        (without the hgs extension). 
+ @param identifier The identifier for the extension we want to load.
+ @param extensionPoint The extension point that we expect the extension to
+        extend.
+*/
+- (id)initWithInvocation:(NSInvocation *)invocation
+             pluginNamed:(NSString *)pluginName 
+     extensionIdentifier:(NSString *)identifier
+extensionPointIdentifier:(NSString *)extensionPoint;
+@end
+
+/*!
+ A base class for testing source extensions.
+*/
+@interface HGSSearchSourceTestCase : HGSExtensionTestCase
+@property (readonly, retain, nonatomic) HGSSearchSource *source;
+/*!
+ Designated initializer for HGSSearchSourceTestCase.
+ @param invocation. The test to be invoked.
+ @param pluginName The name of the plugin that we want to access 
+ (without the hgs extension). 
+ @param identifier The identifier for the extension we want to load
+*/
+- (id)initWithInvocation:(NSInvocation *)invocation
+             pluginNamed:(NSString *)pluginName 
+     extensionIdentifier:(NSString *)identifier;
+@end
+
+/*!
+ A base class for testing action extensions.
+ */
+@interface HGSActionTestCase : HGSExtensionTestCase
+@property (readonly, retain, nonatomic) HGSAction *action;
+/*!
+ Designated initializer for HGSActionTestCase.
+ @param invocation. The test to be invoked.
+ @param pluginName The name of the plugin that we want to access 
+ (without the hgs extension). 
+ @param identifier The identifier for the extension we want to load
+ */
+- (id)initWithInvocation:(NSInvocation *)invocation
+             pluginNamed:(NSString *)pluginName 
+     extensionIdentifier:(NSString *)identifier;
+@end
+

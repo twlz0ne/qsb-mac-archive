@@ -65,6 +65,12 @@ NSString *const kHGSSearchOperationNotificationResultsKey
   if ((self = [super init])) {
     source_ = [source retain];
     query_ = [query retain]; 
+    if (!source_ || !query_) {
+      HGSLogDebug(@"HGSSearchOperation -initWithQuery:source: nil source "
+                  @"or query");
+      [self release];
+      self = nil;
+    }
   }
   return self;
 }

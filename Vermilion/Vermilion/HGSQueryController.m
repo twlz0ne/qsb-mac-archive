@@ -53,10 +53,12 @@ NSString *const kHGSQueryControllerDidFinishNotification
   = @"HGSQueryControllerDidFinishNotification";
 NSString *const kHGSQueryControllerDidUpdateResultsNotification 
   = @"HGSQueryControllerDidUpdateResultsNotification";
-NSString *const kHGSQueryControllerOperationsKey = 
-  @"HGSQueryControllerOperationsKey";
-NSString *const kHGSShortcutsSourceIdentifier =
-  @"com.google.qsb.shortcuts.source";
+NSString *const kHGSQueryControllerDidFinishOperationNotification
+  = @"kHGSQueryControllerDidFinishOperationNotification";
+NSString *const kHGSQueryControllerOperationsKey
+  = @"HGSQueryControllerOperationsKey";
+NSString *const kHGSShortcutsSourceIdentifier
+  = @"com.google.qsb.shortcuts.source";
 
 NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 
@@ -410,14 +412,20 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     deltaTime = mach_absolute_time() - [startTime unsignedLongLongValue];
   }
   [[HGSSourceRanker sharedSourceRanker] addTimeDataPoint:deltaTime
-                                               forSource:source];  
+                                               forSource:source];
+  NSDictionary *userInfo 
+     = [NSDictionary dictionaryWithObject:[NSArray arrayWithObject:operation]
+                                   forKey:kHGSQueryControllerOperationsKey];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:kHGSQueryControllerDidFinishOperationNotification
+                    object:self
+                  userInfo:userInfo];
   // If this is the last query operation to complete then report as overall
   // query completion and cancel our timer.
   if ([self queriesFinished]) {
     [slowSourceTimer_ invalidate];
     slowSourceTimer_ = nil;
 
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:kHGSQueryControllerDidFinishNotification 
                       object:self];
   }

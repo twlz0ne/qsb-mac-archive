@@ -1,7 +1,7 @@
 //
-//  SharedScript.m
+//  SLFilesSource.h
 //
-//  Copyright (c) 2009 Google Inc. All rights reserved.
+//  Copyright (c) 2008 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,7 +30,52 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-// This is a simple placeholder for script plugins to enable them to
-// be signed (Leopard code signing requires a mach-o executable).
+#import <Vermilion/Vermilion.h>
 
-char gSharedScriptSigningGlobalVarThatIsntUsedAnywhere;
+@class SLFilesOperation;
+
+@interface SLFilesSource : HGSSearchSource {
+ @private
+  NSString *utiFilter_;
+  BOOL rebuildUTIFilter_;
+  NSArray *attributeArray_;
+}
+@property (readonly, nonatomic) NSArray *attributeArray;
+
+- (void)operationReceivedNewResults:(SLFilesOperation*)operation
+                   withNotification:(NSNotification*)notification;
+- (HGSResult *)hgsResultFromQueryItem:(MDItemRef)item 
+                            operation:(SLFilesOperation *)operation;
+- (void)operationCompleted:(SLFilesOperation*)operation;
+- (void)startSearchOperation:(HGSSearchOperation*)operation;
+- (void)extensionPointSourcesChanged:(NSNotification*)notification;
+@end
+
+#pragma mark -
+
+@interface SLFilesOperation : HGSSearchOperation {
+ @private
+  NSMutableArray* accumulatedResults_;
+  CFIndex nextQueryItemIndex_;
+  BOOL mdQueryFinished_;
+}
+
+// Runs |query|
+- (void)runMDQuery:(MDQueryRef)query;
+
+// Using an accumulator rather than using setResults: directly allows us to
+// control the timing of propagation of results to observers.
+- (NSMutableArray*)accumulatedResults;
+
+// Callbacksfor MDQuery updates
+- (void)queryNotification:(NSNotification*)notification;
+@end
+
+@interface SLHGSResult : HGSResult {
+ @private
+  MDItemRef mdItem_;
+}
+- (id)initWithMDItem:(MDItemRef)mdItem 
+           operation:(SLFilesOperation *)operation;
+@end
+

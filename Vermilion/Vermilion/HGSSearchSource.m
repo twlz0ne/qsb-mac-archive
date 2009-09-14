@@ -52,6 +52,9 @@ static NSSet *CopyStringSetFromId(id value) {
   return result;
 }
 
+NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources 
+  = @"HGSSearchSourceUTIsToExcludeFromDiskSources";
+
 @implementation HGSSearchSource
 @synthesize pivotableTypes = pivotableTypes_;
 @synthesize cannotArchive = cannotArchive_;
@@ -79,7 +82,7 @@ static NSSet *CopyStringSetFromId(id value) {
     pivotableTypes_ = CopyStringSetFromId(value);
 
     value
-      = [configuration objectForKey:@"HGSSearchSourceUTIsToExcludeFromDiskSources"];
+      = [configuration objectForKey:kHGSSearchSourceUTIsToExcludeFromDiskSources];
     utisToExcludeFromDiskSources_ = CopyStringSetFromId(value);
     
     value = [configuration objectForKey:@"HGSSearchSourceCannotArchive"];

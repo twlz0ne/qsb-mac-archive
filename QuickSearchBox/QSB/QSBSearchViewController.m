@@ -56,6 +56,15 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 @synthesize searchWindowController = searchWindowController_;
 @synthesize savedPivotQueryString = pivotQueryString_;
 @synthesize savedPivotQueryRange = pivotQueryRange_;
+@synthesize topResultsController = topResultsController_;
+@synthesize moreResultsController = moreResultsController_;
+@synthesize activeResultsViewController = activeResultsViewController_;
+@synthesize searchController = searchController_;
+@synthesize parentSearchViewController = parentSearchViewController_;
+@dynamic windowHeight;
+@dynamic results;
+@dynamic selectedObject;
+@dynamic queryString;
 
 - (id)initWithWindowController:(QSBSearchWindowController *)searchWindowController {
   if ((self = [super initWithNibName:@"BaseResultsViews" bundle:nil])) {
@@ -94,22 +103,6 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   [self setResults:results];
 }
 
-- (QSBSearchViewController *)parentSearchViewController {
-  return parentSearchViewController_;
-}
-
-- (QSBResultsViewBaseController *)activeResultsViewController {
-  return activeResultsViewController_;
-}
-
-- (QSBTopResultsViewDelegate *)topResultsController {
-  return [[topResultsController_ retain] autorelease];
-}
-
-- (QSBMoreResultsViewDelegate *)moreResultsController {
-  return [[moreResultsController_ retain] autorelease];
-}
-
 - (void)updateResultsViewNow {
   // Mark all results controllers as needing to be updated.
   [topResultsController_ setResultsNeedUpdating:YES];
@@ -130,10 +123,6 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 - (CGFloat)windowHeight {
   return [[self activeResultsViewController] windowHeight]
   + NSHeight([statusBar_ bounds]);
-}
-
-- (QSBSearchController *)searchController {
-  return searchController_;
 }
 
 - (void)setQueryString:(NSString *)queryString {

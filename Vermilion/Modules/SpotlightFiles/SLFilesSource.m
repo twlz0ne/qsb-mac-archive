@@ -30,17 +30,20 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
-#import "GTMNSFileManager+Carbon.h"
+#import "SLFilesSource.h"
 #import "GTMMethodCheck.h"
 #import "GTMGarbageCollection.h"
-#import "GTMExceptionalInlines.h"
 #import "GTMNSNumber+64Bit.h"
 #import "GTMMethodCheck.h"
 
-static NSString *const kSpotlightSourceReturnIntermediateResultsKey = @"SLFilesSourceReturnIntermediateResults";
-static CFStringRef kSpotlightGroupIdAttribute = CFSTR("_kMDItemGroupId");
+static NSString *const kSpotlightSourceReturnIntermediateResultsKey 
+  = @"SLFilesSourceReturnIntermediateResults";
 
+// Borrowing some private stuff from spotlight here.
+static CFStringRef kSpotlightGroupIdAttribute 
+  = CFSTR("_kMDItemGroupId");
+extern CFStringRef _MDQueryCreateQueryString(CFAllocatorRef allocator, 
+                                             CFStringRef query);
 typedef enum {
   SpotlightGroupMessage = 1,
   SpotlightGroupContact = 2,
@@ -48,167 +51,24 @@ typedef enum {
   SpotlightGroupFont = 4,
   SpotlightGroupWeb = 5,
   SpotlightGroupCalendar = 6,
-  SpotlightGroupPresentation = 7,
+  SpotlightGroupMovie = 7,
   SpotlightGroupApplication = 8,
   SpotlightGroupDirectory = 9,
   SpotlightGroupMusic = 10,
   SpotlightGroupPDF = 11,
-  SpotlightGroupMovie = 12,
+  SpotlightGroupPresentation = 12,
   SpotlightGroupImage = 13,
   SpotlightGroupDocument = 14
 } SpotlightGroup;
 
-#pragma mark -
-
-@class SLFilesOperation;
-
-@interface SLFilesSource : HGSSearchSource {
- @private
-  NSString *utiFilter_;
-  BOOL rebuildUTIFilter_;
-  NSArray *attributeArray_;
-}
-- (void)operationReceivedNewResults:(SLFilesOperation*)operation
-                   withNotification:(NSNotification*)notification;
-- (HGSResult *)hgsResultFromQueryItem:(MDItemRef)item 
-                            operation:(SLFilesOperation *)operation;
-- (void)operationCompleted:(SLFilesOperation*)operation;
-- (void)startSearchOperation:(HGSSearchOperation*)operation;
-- (void)extensionPointSourcesChanged:(NSNotification*)notification;
-- (NSString *)utiFilter;
-- (BOOL)isFilePackageAtPath:(NSString *)path;
-@end
-
-@interface SLFilesCreateContext : NSObject {
- @public
-  HGSQuery *query_;
-  NSString *userHomePath_;
-  NSUInteger userHomePathLength_;
-  NSString *userDesktopPath_;
-  NSUInteger userDesktopPathLength_;
-  NSString *userDownloadsPath_;
-  NSUInteger userDownloadsPathLength_;
-  NSSet *userPersistentItemPaths_;
-  NSMutableIndexSet *hiddenFolderCatalogIDs_;
-  NSMutableIndexSet *visibleFolderCatalogIDs_;
-}
-- (id)initWithQuery:(HGSQuery*)query;
-// No accessors, this is just a bag of data
-@end
-
-@implementation SLFilesCreateContext
-
-GTM_METHOD_CHECK(NSFileManager, gtm_pathFromAliasData:);
-GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
-
-- (id)initWithQuery:(HGSQuery*)query {
-  if (!query) return nil;
-
-  self = [super init];
-  if (!self) return nil;
-
-  // Cache query
-  query_ = [query retain];
-
-  // Home directories (standardized just in case its a symlink)
-  userHomePath_ = [[NSHomeDirectory() stringByStandardizingPath] retain];
-  userHomePathLength_ = [userHomePath_ length];
-  userDesktopPath_ = [[userHomePath_ stringByAppendingPathComponent:@"Desktop"] retain];
-  userDesktopPathLength_ = [userDesktopPath_ length];
-  // TODO(aharper): Look up user's download folder preference
-  userDownloadsPath_ = [[userHomePath_ stringByAppendingPathComponent:@"Downloads"] retain];
-  userDownloadsPathLength_ = [userDownloadsPath_ length];
-
-  // User persistent items
-  userPersistentItemPaths_ = [[NSMutableSet set] retain];
-  // Read the Dock prefs
-  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-  NSDictionary *dockPrefs = [ud persistentDomainForName:@"com.apple.dock"];
-  NSArray *persistentApps = [dockPrefs objectForKey:@"persistent-apps"];
-  NSArray *persistentOthers = [dockPrefs objectForKey:@"persistent-others"];
-  NSArray *dockItems 
-    = [persistentApps arrayByAddingObjectsFromArray:persistentOthers];
-  NSFileManager *fileManager = [NSFileManager defaultManager];
-  for (NSDictionary *dockItem in dockItems) {
-    NSDictionary *tileData = [dockItem objectForKey:@"tile-data"];
-    NSDictionary *fileData = [tileData objectForKey:@"file-data"];
-    NSData *aliasData = [fileData objectForKey:@"_CFURLAliasData"];
-    NSString *dockItemPath = [fileManager gtm_pathFromAliasData:aliasData];
-    if (dockItemPath) {
-      [(NSMutableSet *)userPersistentItemPaths_ addObject:dockItemPath];
-    }
-  }
-  // TODO(aharper): Read Finder.app sidebar info as persistent paths
-  
-  // Index set for tracking hidden folders
-  hiddenFolderCatalogIDs_ = [[NSMutableIndexSet indexSet] retain];
-  visibleFolderCatalogIDs_ = [[NSMutableIndexSet indexSet] retain];
-
-  // Sanity
-  if (!userHomePath_ || !userDesktopPath_ || !userDownloadsPath_ ||
-      !userPersistentItemPaths_ ||
-       !hiddenFolderCatalogIDs_ || !visibleFolderCatalogIDs_) {
-    [self release];
-    return nil;
-  }
-
-  return self;
-} // init
-
-- (void)dealloc {
-  [query_ release];
-  [userHomePath_ release];
-  [userDesktopPath_ release];
-  [userDownloadsPath_ release];
-  [userPersistentItemPaths_ release];
-  [hiddenFolderCatalogIDs_ release];
-  [visibleFolderCatalogIDs_ release];
-  [super dealloc];
-} // dealloc
-
-@end
-
-#pragma mark -
-
-@interface SLFilesOperation : HGSSearchOperation {
- @private
-  SLFilesCreateContext* context_;
-  // TODO: it's kind of hacky for these and their accessors to be hard-coded
-  // into this object when they are only used from outside; maybe there should
-  // just be a dictionary of arbitrary context (here or in all operations) that
-  // the result could use as it sees fit without coupling implementation.
-  NSMutableArray* accumulatedResults_;
-  size_t nextQueryItemIndex_;
-  BOOL mdQueryFinished_;
-}
-
-- (id)initWithQuery:(HGSQuery *)query source:(SLFilesSource *)source;
-
-// Runs |query|, calling back to |callbackHandler|.
-- (void)runMDQuery:(MDQueryRef)query;
-
-- (SLFilesCreateContext*)context;
-- (void)setContext:(SLFilesCreateContext*)context;
-- (size_t)nextQueryItemIndex;
-- (void)setNextQueryItemIndex:(size_t)nextIndex;
-// Using an accumulator rather than using setResults: directly allows us to
-// control the timing of propagation of results to observers.
-- (NSMutableArray*)accumulatedResults;
-
-// Callbacksfor MDQuery updates
-- (void)queryNotification:(NSNotification*)notification;
+@interface SLFilesOperation ()
+@property (readwrite, assign, nonatomic) CFIndex nextQueryItemIndex;
 @end
 
 @implementation SLFilesOperation
-GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
-
-- (id)initWithQuery:(HGSQuery *)query 
-             source:(SLFilesSource *)source {
-  return [super initWithQuery:query source:source];
-}
+@synthesize nextQueryItemIndex = nextQueryItemIndex_;
 
 - (void)dealloc {
-  [context_ release];
   [accumulatedResults_ release];
   [super dealloc];
 }
@@ -218,9 +78,7 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
 }
 
 - (void)runMDQuery:(MDQueryRef)query {
-  if (accumulatedResults_) {
-    HGSLog(@"accumulatedResults_ should be empty");
-  }
+  HGSAssert(!accumulatedResults_, @"accumulatedResults_ should be empty");
   accumulatedResults_ = [[NSMutableArray alloc] init];
   nextQueryItemIndex_ = 0;
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -244,11 +102,13 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
       [innerPool release];
     }
   } else {
+    // COV_NF_START
     CFStringRef queryString = MDQueryCopyQueryString(query);
     // If something goes wrong, let the handler think we just completed with
     // no results so that we get cleaned up correctly.
     HGSLog(@"Failed to start mdquery: %@", queryString);
     CFRelease(queryString);
+    // COV_NF_END
   }
   [nc removeObserver:self
                 name:nil
@@ -267,36 +127,19 @@ GTM_METHOD_CHECK(NSFileManager, gtm_FSRefForPath:);
   }
 }
 
-- (SLFilesCreateContext*)context {
-  return context_;
-}
-
-- (void)setContext:(SLFilesCreateContext*)context {
-  [context_ autorelease];
-  context_ = [context retain];
-}
-
-- (size_t)nextQueryItemIndex {
-  return nextQueryItemIndex_;
-}
-
-- (void)setNextQueryItemIndex:(size_t)nextIndex {
-  nextQueryItemIndex_ = nextIndex;
-}
-
 - (NSMutableArray*)accumulatedResults {
   return [[accumulatedResults_ retain] autorelease];
 }
 
-- (NSString *)displayName {
-  return HGSLocalizedString(@"Spotlight", 
-                            @"A label denoting a Spotlight result.");
-}
-
 @end
 
+@interface SLFilesSource ()
+@property (readonly, nonatomic) NSString *utiFilter;
+@end
 
 @implementation SLFilesSource
+@synthesize utiFilter = utiFilter_;
+@synthesize attributeArray = attributeArray_;
 
 GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
@@ -352,22 +195,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   BOOL isValid = NO;
   HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
-    if ([pivotObject conformsToType:kHGSTypeContact]) {
-      NSString *name = [pivotObject valueForKey:kHGSObjectAttributeNameKey];
-      if (name) {
-        isValid = YES;
-      } else {
-        NSString *emailAddress 
-          = [pivotObject valueForKey:kHGSObjectAttributeContactEmailKey];
-        if (emailAddress) {
-          isValid = YES;
-        }
-      }
-    }
+    isValid = [pivotObject conformsToType:kHGSTypeContact];
   } else {
     // Since Spotlight can return a lot of stuff, we only run the query if
     // it is at least 5 characters long.
-    isValid = [[query rawQueryString] length] >= 5 ? YES : NO;
+    isValid = [[query rawQueryString] length] >= 5;
   }
   return isValid;
 }
@@ -382,34 +214,30 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   HGSQuery* query = [operation query];
   HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
-    if ([pivotObject conformsToType:kHGSTypeContact]) {
-      NSString *emailAddress = [pivotObject valueForKey:kHGSObjectAttributeContactEmailKey];
-      NSString *name = [pivotObject valueForKey:kHGSObjectAttributeNameKey];
-      if (name && emailAddress) {
-        [predicateSegments addObject:[NSString stringWithFormat:@"(* = \"%@\"cdw || * = \"%@\"cdw)",
-                                      name, emailAddress]];
-      } else if (name) {
-        [predicateSegments addObject:[NSString stringWithFormat:@"(* = \"%@\"cdw)",
-                                      name]];
-      } else if (emailAddress) {
-        [predicateSegments addObject:[NSString stringWithFormat:@"(* = \"%@\"cdw)",
-                                      emailAddress]];
-      } else {
-        // Can't pivot off a contact with no name or email address
-        return;
-      }
+    HGSAssert([pivotObject conformsToType:kHGSTypeContact], 
+              @"Bad pivotObject: %@", pivotObject);
+              
+    NSString *emailAddress = [pivotObject valueForKey:kHGSObjectAttributeContactEmailKey];
+    NSString *name = [pivotObject valueForKey:kHGSObjectAttributeNameKey];
+    HGSAssert(name, 
+              @"How did we get a pivotObject without a name? %@", 
+              pivotObject);
+    NSString *predString = nil;
+    if (emailAddress) {
+      predString 
+        = [NSString stringWithFormat:@"(* = \"%@\"cdw || * = \"%@\"cdw)",
+           name, emailAddress];
     } else {
-      // Unrecognized type of pivotObject
-      return;
-    }
+      predString = [NSString stringWithFormat:@"(* = \"%@\"cdw)", name];
+    } 
+    [predicateSegments addObject:predString];
   }
 
-  NSString *const kPredicateString = @"(* = \"%@*\"cdw || kMDItemTextContent = \"%@*\"cdw)";
-
-  NSString *rawQuery = [query rawQueryString];
-  NSString *predicateSegment  = [NSString stringWithFormat:kPredicateString, 
-                                 rawQuery, rawQuery];
-  [predicateSegments addObject:predicateSegment];
+  NSString *rawQueryString = [query rawQueryString];
+  NSString *spotlightString
+    = GTMCFAutorelease(_MDQueryCreateQueryString(NULL,
+                                                 (CFStringRef)rawQueryString));
+  [predicateSegments addObject:spotlightString];
 
   // if we have a uti filter, add it
   NSString *utiFilter = [self utiFilter];
@@ -418,22 +246,27 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
 
   // Make the final predicate string
-  NSString *predicateString = [predicateSegments componentsJoinedByString:@" && "];
+  NSString *predicateString 
+    = [predicateSegments componentsJoinedByString:@" && "];
 
+  NSLog(@"Predicate String: %@", predicateString);
   // Build the query
-  MDQueryRef mdQuery = MDQueryCreate(kCFAllocatorDefault,
-                                     (CFStringRef)predicateString,
-                                     (CFArrayRef)attributeArray_,
-                                     // We must not sort here because it means that the
-                                     // result indexing will be stable (we leverage this
-                                     // behavior elsewhere)
-                                     NULL);
+  MDQueryRef mdQuery 
+    = MDQueryCreate(kCFAllocatorDefault,
+                    (CFStringRef)predicateString,
+                    (CFArrayRef)attributeArray_,
+                    // We must not sort here because it means that the
+                    // result indexing will be stable (we leverage this
+                    // behavior elsewhere)
+                    NULL);
   if (!mdQuery) return;
-
+  
+  MDQueryBatchingParams params = MDQueryGetBatchingParameters(mdQuery);
+  params.first_max_ms = 1000;
+  params.progress_max_ms = 1000;
+  MDQuerySetBatchingParameters(mdQuery, params);
+  
   SLFilesOperation* filesOperation = (SLFilesOperation*)operation;
-  SLFilesCreateContext* context 
-    = [[[SLFilesCreateContext alloc] initWithQuery:query] autorelease];
-  [filesOperation setContext:context];
 
   // Run
   [filesOperation runMDQuery:mdQuery];
@@ -445,19 +278,10 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                    withNotification:(NSNotification*)notification {
   NSMutableArray *accumulatedResults = [operation accumulatedResults];
   MDQueryRef mdQuery = (MDQueryRef)[notification object];
-
-  // TODO(pink) - handle deletes and updates from the notification
-  BOOL rescrapeAllResults = NO;
-
-  // With deletes and updates done, its time to go looking for new results
   CFIndex currentCount = MDQueryGetResultCount(mdQuery);
-
-  if (rescrapeAllResults) {
-    // TODO(pink) - handle deletes and updates
-  } else {
-    // No rescrape needed so we can do the fast thing
-
-    for (CFIndex i = [operation nextQueryItemIndex]; 
+  CFIndex oldCount = [operation nextQueryItemIndex];
+  if (currentCount != oldCount) {
+    for (CFIndex i = oldCount; 
          i < currentCount && ![operation isCancelled]; 
          i++) {
       MDItemRef mdItem = (MDItemRef)MDQueryGetResultAtIndex(mdQuery, i);
@@ -468,142 +292,20 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           [accumulatedResults addObject:result];
         }
       }
+      
     }
-  }
-
-  // Next time around we can start from the current result count
-  [operation setNextQueryItemIndex:currentCount];
-
-  // We don't do incremental updates, because we don't want poor results to
-  // get locked into the UI.
-  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-  if ([ud boolForKey:kSpotlightSourceReturnIntermediateResultsKey]) {
-    HGSLogDebug(@"... Spotlight complete got %d intermediate file results",
-                [accumulatedResults count]);
+    // Next time around we can start from the current result count
+    [operation setNextQueryItemIndex:currentCount];
     [operation setResults:accumulatedResults];
   }
 }
 
 - (HGSResult *)hgsResultFromQueryItem:(MDItemRef)item 
                             operation:(SLFilesOperation *)operation {
-  if ([operation isCancelled]) return nil;
-  SLFilesCreateContext* context = [operation context];
-  if (!context) return nil;
-  
-  NSString *iconFlagName = nil;
-  
-  HGSResult* result = nil;
-  NSDictionary *attributes 
-    = GTMCFAutorelease(MDItemCopyAttributes(item, (CFArrayRef)attributeArray_));
-  // Path is used a lot but can't be obtained from the query
-  NSString *path = [attributes objectForKey:(NSString *)kMDItemPath];
-  // Don't use fileURLWithPath here because it hits the disk.
-  NSString *uriPath = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-  NSString *uri = nil;
-  if (uriPath) {
-    uri = [@"file://" stringByAppendingString:uriPath];
+  HGSResult *result = nil;
+  if (![operation isCancelled]) {
+    result = [[[SLHGSResult alloc] initWithMDItem:item operation:operation] autorelease];
   }
-  BOOL isURL = NO;
-  NSString *contentType
-    = [attributes objectForKey:(NSString *)kMDItemContentType];
-  NSString *resultType = kHGSTypeFile;
-  if (contentType && uri) {
-    NSNumber *typeGroupNumber
-      = [attributes objectForKey:(NSString *)kSpotlightGroupIdAttribute];
-    int typeGroup = [typeGroupNumber intValue];
-
-    // TODO: further subdivide the result types.
-    switch (typeGroup) {
-      case SpotlightGroupApplication:
-        // TODO: do we want a different type for prefpanes?
-        resultType = kHGSTypeFileApplication; 
-        break;
-      case SpotlightGroupMessage:
-        resultType = kHGSTypeEmail;
-        break;
-      case SpotlightGroupContact:
-        resultType = kHGSTypeContact;
-        break;
-      case SpotlightGroupWeb:
-        resultType = HGS_SUBTYPE(kHGSTypeWebpage, @"fileloc");
-        isURL = YES;
-        uriPath = GTMCFAutorelease(MDItemCopyAttribute(item, kMDItemURL));
-        if (uriPath) {
-          uri = uriPath;
-        }
-        // TODO(alcor): are there any items that are not history?
-        iconFlagName = @"history-flag";
-        break;
-      case SpotlightGroupPDF:
-        resultType = kHGSTypeFile;
-        break;
-      case SpotlightGroupImage:
-        resultType = kHGSTypeFileImage;
-        break;
-      case SpotlightGroupMovie:
-        resultType = kHGSTypeFileMovie;
-        break;
-      case SpotlightGroupMusic:
-        resultType = kHGSTypeFileMusic;
-        break;
-      case SpotlightGroupDirectory:
-        resultType = kHGSTypeDirectory;
-        if ([self isFilePackageAtPath:path]) {
-          resultType = kHGSTypeFile;
-        }
-        break;
-      case SpotlightGroupDocument:
-      case SpotlightGroupPresentation:
-      case SpotlightGroupFont:
-      case SpotlightGroupCalendar:
-      default:
-        if (UTTypeConformsTo((CFStringRef)contentType, kUTTypePlainText)) {
-          resultType = kHGSTypeTextFile;
-        } else {
-          resultType = kHGSTypeFile;
-        }
-        break;
-    }
-  } else {
-    CFStringRef description = CFCopyDescription(item);
-    HGSLogDebug(@"%@ tossing result, no content type", description);
-    CFRelease(description);
-    return nil;
-  }
-  
-  // Cache values the query has already copied
-  NSDate *lastUsedDate 
-    = [attributes objectForKey:(NSString *)kMDItemLastUsedDate];
-  if (!lastUsedDate) {
-    lastUsedDate = [NSDate distantPast];
-  }
-  NSString *name 
-    = [attributes objectForKey:(NSString *)kMDItemTitle]; 
-  if (!name) {
-    name = GTMCFAutorelease(MDItemCopyAttribute(item, kMDItemDisplayName));
-    if (!name) {
-      name = GTMCFAutorelease(MDItemCopyAttribute(item, kMDItemFSName));
-    }
-  }
-    
-  NSString *normalizedString = [context->query_ normalizedQueryString];
-  CGFloat rank = HGSScoreTermForItem(normalizedString, name, NULL);
-
-  NSMutableDictionary *hgsAttributes 
-    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-       lastUsedDate, kHGSObjectAttributeLastUsedDateKey,
-       iconFlagName, kHGSObjectAttributeFlagIconNameKey,
-       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
-       nil];
-  if (isURL) {
-    [hgsAttributes setObject:uri forKey:kHGSObjectAttributeSourceURLKey];
-  }
-  
-  result = [HGSResult resultWithURI:uri
-                               name:name
-                               type:resultType
-                             source:self
-                         attributes:hgsAttributes];
   return result;
 }
 
@@ -640,7 +342,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     NSMutableArray *utiFilterArray = [NSMutableArray arrayWithCapacity:[utiSet count]];
     for (NSString *uti in utiSet) {
       NSString *utiFilterStr
-        = [NSString stringWithFormat:@"( kMDItemContentType != '%@' )", uti];
+        = [NSString stringWithFormat:@"( kMDItemContentTypeTree != '%@' )", uti];
       [utiFilterArray addObject:utiFilterStr];
     }
     NSString *utiFilter = [utiFilterArray componentsJoinedByString:@" && "];
@@ -652,7 +354,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     @synchronized(self) {
       [utiFilter_ release];
       utiFilter_ = [utiFilter retain];
-      HGSLogDebug(@"Spotlight Source UTI Filter = %@", utiFilter_);
     }
   }
 
@@ -664,22 +365,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     result = [[utiFilter_ retain] autorelease];
   }
   return result;
-}
-
-- (BOOL)isFilePackageAtPath:(NSString *)path {
-  NSFileManager *fileManager = [NSFileManager defaultManager];
-  FSRef *pathRef = [fileManager gtm_FSRefForPath:path];
-  if (!pathRef) return NO;
-  
-  LSItemInfoRecord infoRecord;
-  OSStatus lsErr = LSCopyItemInfoForRef(pathRef, 
-                                        kLSRequestBasicFlagsOnly, 
-                                        &infoRecord);
-  if (lsErr != noErr) {
-    HGSLogDebug(@"LSCopyItemInfoForRef returned error %ld.", lsErr);
-    return NO;
-  }
-  return (infoRecord.flags & kLSItemInfoIsPackage) != 0;
 }
 
 #pragma mark -
@@ -753,4 +438,147 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return value;
 }
 
+@end
+
+@implementation SLHGSResult
+- (id)initWithMDItem:(MDItemRef)mdItem 
+           operation:(SLFilesOperation *)operation {
+  SLFilesSource *source = (SLFilesSource *)[operation source];
+  if (!mdItem || !source) {
+    return nil;
+  }
+  NSString *uri = [NSString stringWithFormat:@"spotlightresult://%p", mdItem];
+  NSString *iconFlagName = nil;
+  NSArray *attributeArray = [source attributeArray];
+  NSDictionary *attributes = GTMCFAutorelease(MDItemCopyAttributes(mdItem, 
+                                              (CFArrayRef)attributeArray));
+  NSString *name = [attributes objectForKey:(NSString *)kMDItemTitle]; 
+  if (!name) {
+    name = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemDisplayName));
+    if (!name) {
+      name = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemFSName));  // COV_NF_LINE
+    }
+  }  
+  BOOL isURL = NO;
+  NSString *contentType
+    = [attributes objectForKey:(NSString *)kMDItemContentType];
+  NSString *resultType = kHGSTypeFile;
+  if (contentType) {
+    NSNumber *typeGroupNumber
+      = [attributes objectForKey:(NSString *)kSpotlightGroupIdAttribute];
+    int typeGroup = [typeGroupNumber intValue];
+    
+    // TODO: further subdivide the result types.
+    switch (typeGroup) {
+      case SpotlightGroupApplication:
+        // TODO: do we want a different type for prefpanes?
+        resultType = kHGSTypeFileApplication; 
+        break;
+      case SpotlightGroupMessage:
+        resultType = kHGSTypeEmail;
+        break;
+      case SpotlightGroupContact:
+        resultType = kHGSTypeContact;
+        break;
+      case SpotlightGroupWeb:
+        resultType = kHGSTypeWebHistory;
+        isURL = YES;
+        NSString *uriPath = GTMCFAutorelease(MDItemCopyAttribute(mdItem, 
+                                                                 kMDItemURL));
+        if (uriPath) {
+          uri = uriPath;
+        }
+        // TODO(alcor): are there any items that are not history?
+        iconFlagName = @"history-flag";
+        break;
+      case SpotlightGroupPDF:
+        resultType = kHGSTypeFile;
+        break;
+      case SpotlightGroupImage:
+        resultType = kHGSTypeFileImage;
+        break;
+      case SpotlightGroupMovie:
+        resultType = kHGSTypeFileMovie;
+        break;
+      case SpotlightGroupMusic:
+        resultType = kHGSTypeFileMusic;
+        break;
+      case SpotlightGroupDirectory:
+        resultType = kHGSTypeDirectory;
+        break;
+      case SpotlightGroupDocument:
+      case SpotlightGroupPresentation:
+      case SpotlightGroupFont:
+      case SpotlightGroupCalendar:
+      default: {
+          if ([[name pathExtension] caseInsensitiveCompare:@"webloc"] 
+              == NSOrderedSame) {
+            resultType = kHGSTypeWebBookmark;
+          } else if (UTTypeConformsTo((CFStringRef)contentType, 
+                                      kUTTypePlainText)) {
+            resultType = kHGSTypeTextFile;
+          } else {
+            resultType = kHGSTypeFile;
+          }
+        }
+        break;
+    }
+  }
+  
+  // Cache values the query has already copied
+  NSDate *lastUsedDate 
+    = [attributes objectForKey:(NSString *)kMDItemLastUsedDate];
+  if (!lastUsedDate) {
+    lastUsedDate = [NSDate distantPast];  // COV_NF_LINE
+  }
+  NSString *tokenizedName = [HGSTokenizer tokenizeString:name];
+  NSString *normalizedString = [[operation query] normalizedQueryString];
+  CGFloat rank = HGSScoreTermForItem(tokenizedName, normalizedString, NULL);
+  
+  // TODO(mrossetti): Fix this once
+  // http://code.google.com/p/qsb-mac/issues/detail?id=758 
+  // is fixed. Right now 20 is just a guess.
+  if (rank < 20) rank = 20;
+  
+  NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
+  NSDictionary *hgsAttributes 
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       lastUsedDate, kHGSObjectAttributeLastUsedDateKey,
+       nsRank, kHGSObjectAttributeRankKey,
+       (isURL ? uri : nil), kHGSObjectAttributeSourceURLKey,
+       iconFlagName, kHGSObjectAttributeFlagIconNameKey,
+       nil];
+  if ((self = [super initWithURI:uri
+                            name:name
+                            type:resultType
+                          source:source
+                      attributes:hgsAttributes])) {
+    mdItem_ = (MDItemRef)CFRetain(mdItem);
+  }
+  return self;
+}
+
+- (void)dealloc {
+  if (mdItem_) {
+    CFRelease(mdItem_);
+  }
+  [super dealloc];
+}
+
+- (NSString *)filePath {
+  return GTMCFAutorelease(MDItemCopyAttribute(mdItem_, kMDItemPath));
+}
+
+- (NSURL *)url {
+  NSURL *url = nil;
+  NSString *urlString = GTMCFAutorelease(MDItemCopyAttribute(mdItem_, 
+                                                             kMDItemURL));
+  if (urlString) {
+    url = [NSURL URLWithString:urlString];
+  } else {
+    url = [NSURL fileURLWithPath:[self filePath]];
+  }
+  return url;
+}
+  
 @end

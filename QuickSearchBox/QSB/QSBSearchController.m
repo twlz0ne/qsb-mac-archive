@@ -54,18 +54,13 @@ static const NSUInteger kDefaultMaximumResultsToCollect = 500;
 - (void)displayTimerElapsed:(NSTimer*)timer;
 
 - (void)startDisplayTimers;
-- (void)cancelDisplayTimers:(BOOL)moreResults;
+- (void)cancelDisplayTimers;
 
 - (void)cancelAndReleaseQueryController;
 
 // Reset the 'More Results'
 - (void)setMoreResults:(NSDictionary *)value;
-
-// Set up the more results timer
-- (void)resetMoreResultsTimer;
-
-// Iterates current query results and updates the 'More' results view.
-- (void)updateMoreResultsOperation:(id)unused;
+- (void)updateMoreResults;
 
 @end
 
@@ -421,7 +416,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   lockedResults_ = nil;
   currentResultDisplayCount_ = 0;
   [self setQueryIsInProcess:YES];
-  [self cancelDisplayTimers:YES];
+  [self cancelDisplayTimers];
   
   if (queryString_ || results_) {
     
@@ -449,6 +444,10 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
            selector:@selector(queryControllerDidAddResults:) 
                name:kHGSQueryControllerDidUpdateResultsNotification 
              object:queryController_];
+    [nc addObserver:self 
+           selector:@selector(queryControllerDidFinishOperation:)
+               name:kHGSQueryControllerDidFinishOperationNotification 
+             object:queryController_];
     // This became a separate call because some sources come back before
     // this call returns and queryController_ must be set first
     [queryController_ startQuery];
@@ -457,7 +456,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
 }
 
 - (void)stopQuery {
-  [self cancelDisplayTimers:YES];
+  [self cancelDisplayTimers];
   [NSObject cancelPreviousPerformRequestsWithTarget:self 
                                            selector:@selector(doDesktopQuery:) 
                                              object:nil];
@@ -472,9 +471,11 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
 // possible, but the query has been stopped by the user or by the query
 // reaching a time threshhold. 
 - (void)queryControllerDidFinish:(NSNotification *)notification {
-  [self resetMoreResultsTimer];
+  [moreResultsUpdateTimer_ invalidate];
+  moreResultsUpdateTimer_ = nil;
   currentResultDisplayCount_ = [self maximumResultsToCollect];
   [self updateDesktopResults]; 
+  [self updateMoreResults];
 #if DEBUG
   BOOL dumpTopResults = [[NSUserDefaults standardUserDefaults]
                          boolForKey:@"dumpTopResults"];
@@ -485,13 +486,15 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
 #endif
   
   [self setQueryIsInProcess:NO];
-  [self cancelDisplayTimers:NO];
+}
+
+- (void)queryControllerDidFinishOperation:(NSNotification *)notification {
+  [self willChangeValueForKey:@"searchStatus"];
+  [self didChangeValueForKey:@"searchStatus"];
 }
 
 // Called when more results are added to the query.
 - (void)queryControllerDidAddResults:(NSNotification *)notification {
-  [self willChangeValueForKey:@"searchStatus"];
-  [self didChangeValueForKey:@"searchStatus"];
   // We treat the shortcut source "specially" because it tends
   // to have high quality results.
   if (shortcutDisplayTimer_) {
@@ -506,7 +509,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
       }
     }
   }
-  [self resetMoreResultsTimer];
 }
 
 // called when enough time has elapsed that we want to display some results
@@ -524,6 +526,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     // Leave one slot for the very best (queryDidFinish: sets
     // currentResultDisplayCount_ = [self maximumResultsToCollect]
     currentResultDisplayCount_ = [self maximumResultsToCollect] - 1;
+  } else if (timer == moreResultsUpdateTimer_) {
+    [self updateMoreResults];
   }
   [self updateDesktopResults];
   
@@ -541,7 +545,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   const CGFloat kShortcutDisplayInterval = 0.100;
   const CGFloat kFirstTierDisplayInterval = 0.300;
   const CGFloat kSecondTierDisplayInterval = 0.750;
-  [self cancelDisplayTimers:YES];
+  const CGFloat kUpdateTierDisplayInterval = 3;
+  [self cancelDisplayTimers];
   shortcutDisplayTimer_ =
     [NSTimer scheduledTimerWithTimeInterval:kShortcutDisplayInterval
                                      target:self
@@ -560,20 +565,26 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
                                    selector:@selector(displayTimerElapsed:)
                                    userInfo:@"secondTierTimer"
                                     repeats:NO];
+  moreResultsUpdateTimer_ 
+    = [NSTimer scheduledTimerWithTimeInterval:kUpdateTierDisplayInterval
+                                       target:self 
+                                     selector:@selector(displayTimerElapsed:) 
+                                     userInfo:@"updateMoreResultsTimer" 
+                                      repeats:YES];
+  
+  
 }
 
 // cancels all timers and clears the member variables.
-- (void)cancelDisplayTimers:(BOOL)moreResults {
+- (void)cancelDisplayTimers {
   [shortcutDisplayTimer_ invalidate];
   shortcutDisplayTimer_ = nil;
   [firstTierDisplayTimer_ invalidate];
   firstTierDisplayTimer_ = nil;
   [secondTierDisplayTimer_ invalidate];
   secondTierDisplayTimer_ = nil;
-  if (moreResults) {
-    [moreResultsUpdateTimer_ invalidate];
-    moreResultsUpdateTimer_ = nil;
-  }
+  [moreResultsUpdateTimer_ invalidate];
+  moreResultsUpdateTimer_ = nil;
 }
 
 - (void)cancelAndReleaseQueryController {
@@ -592,27 +603,10 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   [moreResultsViewDelegate_ setMoreResultsWithDict:value];
 }
 
-- (void)resetMoreResultsTimer {
-  [moreResultsUpdateTimer_ invalidate];
-  moreResultsUpdateTimer_ 
-    = [NSTimer scheduledTimerWithTimeInterval:0.25 
-                                       target:self 
-                                     selector:@selector(updateMoreResults:) 
-                                     userInfo:@"updateMoreResultsTimer" 
-                                      repeats:NO];
-}
-
-- (void)updateMoreResults:(NSTimer *)ignored {
+- (void)updateMoreResults {
   NSDictionary *resultsByCategory = [queryController_ rankedResultsByCategory];
   [self setMoreResults:resultsByCategory];
-  moreResultsUpdateTimer_ = nil;
 }
 
-- (void)updateMoreResultsOperation:(id)unused {
-  NSDictionary *resultsByCategory = [queryController_ rankedResultsByCategory];
-  [self performSelectorOnMainThread:@selector(setMoreResults:)
-                         withObject:resultsByCategory
-                      waitUntilDone:NO];
-}
 
 @end

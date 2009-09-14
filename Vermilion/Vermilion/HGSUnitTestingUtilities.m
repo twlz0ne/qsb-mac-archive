@@ -136,3 +136,91 @@
 }
 
 @end
+
+@implementation HGSExtensionTestCase 
+
+@synthesize extension = extension_;
+@synthesize extensionPoint = extensionPoint_;
+@synthesize pluginName = pluginName_;
+@synthesize identifier = identifier_;
+
+- (id)initWithInvocation:(NSInvocation *)invocation
+             pluginNamed:(NSString *)pluginName 
+     extensionIdentifier:(NSString *)identifier
+extensionPointIdentifier:(NSString *)extensionPoint {
+  if ((self = [super initWithInvocation:invocation])) {
+    pluginName_ = [pluginName copy];
+    STAssertGreaterThan([pluginName_ length], (NSUInteger)0, nil);
+    identifier_ = [identifier copy];
+    STAssertGreaterThan([identifier_ length], (NSUInteger)0, nil);
+    extensionPoint_ = [HGSExtensionPoint pointWithIdentifier:extensionPoint];
+    STAssertNotNil(extensionPoint_, nil);
+  }
+  return self;
+}
+
+- (void)dealloc {
+  [pluginName_ release];
+  [identifier_ release];
+  [super dealloc];
+}
+
+- (void)setUp {
+  [super setUp];
+  NSBundle *hgsBundle = HGSGetPluginBundle();
+  NSString *bundlePath = [hgsBundle bundlePath];
+  NSString *workingDir = [bundlePath stringByDeletingLastPathComponent];
+  NSString *path 
+    = [workingDir stringByAppendingPathComponent:[self pluginName]];
+  path = [path stringByAppendingPathExtension:@"hgs"];
+  BOOL didLoad = [HGSUnitTestingPluginLoader loadPlugin:path];
+  STAssertTrue(didLoad, @"Unable to load %@", path);
+  HGSExtensionPoint *sp = [self extensionPoint];
+  NSString *identifier = [self identifier];
+  extension_ = [sp extensionWithIdentifier:identifier];
+  STAssertNotNil(extension_, @"Unable to load %@ from %@", identifier, path);
+  [extension_ retain];
+  STAssertNotNil(extension_, nil);
+}
+
+- (void)tearDown {
+  [[extension_ protoExtension] uninstall];
+  [extension_ release];
+  [super tearDown];
+}
+@end
+
+@implementation HGSSearchSourceTestCase
+@dynamic source;
+
+- (id)initWithInvocation:(NSInvocation *)invocation
+             pluginNamed:(NSString *)pluginName 
+     extensionIdentifier:(NSString *)identifier {
+  return [super initWithInvocation:invocation 
+                       pluginNamed:pluginName 
+               extensionIdentifier:identifier 
+          extensionPointIdentifier:kHGSSourcesExtensionPoint];
+}
+
+- (HGSSearchSource *)source {
+  return [self extension];
+}
+@end
+
+@implementation HGSActionTestCase
+@dynamic action;
+
+- (id)initWithInvocation:(NSInvocation *)invocation
+             pluginNamed:(NSString *)pluginName 
+     extensionIdentifier:(NSString *)identifier {
+  return [super initWithInvocation:invocation 
+                       pluginNamed:pluginName 
+               extensionIdentifier:identifier 
+          extensionPointIdentifier:kHGSSourcesExtensionPoint];
+}
+
+- (HGSAction *)action {
+  return [self extension];
+}
+@end
+

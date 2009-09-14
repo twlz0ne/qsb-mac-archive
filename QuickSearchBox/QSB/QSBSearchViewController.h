@@ -59,7 +59,8 @@
   IBOutlet QSBMoreResultsViewDelegate *moreResultsController_;
   IBOutlet NSPathControl *statusBar_;
   QSBSearchWindowController *searchWindowController_;
-  QSBResultsViewBaseController *activeResultsViewController_;  // Weak
+  __weak QSBResultsViewBaseController *activeResultsViewController_;
+  // The view from which this query was pivoted, if any.
   QSBSearchViewController *parentSearchViewController_;
   NSString *pivotQueryString_;  // What was typed when the user pivoted.
   NSRange pivotQueryRange_;  // What was selected when the user pivoted.
@@ -70,14 +71,22 @@
 @property(nonatomic, retain) QSBSearchWindowController *searchWindowController;
 @property(nonatomic, copy) NSString *savedPivotQueryString;
 @property(nonatomic, assign) NSRange savedPivotQueryRange;
+@property(nonatomic, readonly, retain) QSBTopResultsViewDelegate *topResultsController;
+@property(nonatomic, readonly, retain) QSBMoreResultsViewDelegate *moreResultsController;
+@property(nonatomic, readonly, assign) QSBResultsViewBaseController *activeResultsViewController;
+@property(nonatomic, readonly, assign) QSBSearchController *searchController;
+@property(nonatomic, readwrite, retain) QSBSearchViewController *parentSearchViewController;
+// The height of the results window necessary to accommodate the active view.
+@property(nonatomic, readonly, assign) CGFloat windowHeight;
+// The current results for the query.
+@property(nonatomic, readwrite, retain) HGSResultArray *results;
+// Return the selected object from the active results controller.
+@property(nonatomic, readonly, retain) QSBTableResult *selectedObject;
+// The search text string for our query
+@property(nonatomic, readwrite, retain) NSString *queryString;
 
 // Initialize and install into the search results window.  Designated initializer.
 - (id)initWithWindowController:(QSBSearchWindowController *)searchWindowController;
-
-// Set/get this guy's parent QSBSearchViewController (i.e. the one from which
-// this query was pivoted, if any.
-- (void)setParentSearchViewController:(QSBSearchViewController *)parentController;
-- (QSBSearchViewController *)parentSearchViewController;
 
 // Update active results views immediately.
 - (void)updateResultsViewNow;
@@ -88,10 +97,6 @@
 // Stop all source operations for this query.
 - (void)stopQuery;
 
-// Return the height of the results window necessary to accommodate
-// the active view.
-- (CGFloat)windowHeight;
-
 // Show Top Results or More Results.
 - (void)showTopResults:(id)sender;
 - (void)showMoreResults:(id)sender;
@@ -99,20 +104,6 @@
 
 // Reset our results views.
 - (void)reset;
-
-// search controller
-- (QSBSearchController *)searchController;
-
-// Set/Get the search text string for our query.
-- (void)setQueryString:(NSString *)queryString;
-- (NSString *)queryString;
-
-// Return the selected object from the active results controller.
-- (QSBTableResult *)selectedObject;
-
-// Set/get the current results for the query.
-- (void)setResults:(HGSResultArray *)results;
-- (HGSResultArray *)results;
 
 // Perform an action on results
 - (void)performAction:(HGSAction *)action 
@@ -123,15 +114,6 @@
 
 // Change the selection, if acceptable, in the active results presentation.
 - (BOOL)performSelectionMovementSelector:(SEL)selector;
-
-// Return the active results view controller.
-- (QSBResultsViewBaseController *)activeResultsViewController;
-
-// Return the 'Top Results' view controller.
-- (QSBTopResultsViewDelegate *)topResultsController;
-
-// Return the 'More Results' view controller.
-- (QSBMoreResultsViewDelegate *)moreResultsController;
 
 @end
 

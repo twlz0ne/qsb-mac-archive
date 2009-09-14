@@ -88,7 +88,7 @@
      2 this can be called on any thread, so keep that in mind for a sources
        implementation.
  
-  Defaults to nil or the value of "HGSSearchSourceUTIsToExcludeFromDiskSources"
+  Defaults to nil or the value of kHGSSearchSourceUTIsToExcludeFromDiskSources
   from the config dict.
 */
 @property (readonly) NSSet *utisToExcludeFromDiskSources;
@@ -175,3 +175,10 @@
 */
 #define kHGSValidateSearchSourceBehaviorsPrefKey \
   @"HGSValidateSearchSourceBehaviors"
+
+/*!
+  kHGSSearchSourceUTIsToExcludeFromDiskSources allows sources to define UTIs
+  that we will exclude from disk sources (specifically spotlight). See comment
+  about utisToExcludeFromDiskSources above.
+*/
+extern NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources;

@@ -122,10 +122,16 @@ GTM_EXTERN NSString *const kHGSQueryControllerWillStartNotification;
 GTM_EXTERN NSString *const kHGSQueryControllerDidFinishNotification;
 
 /*!
-  Called when more results are available for the query.  Object is the
+  Posted when more results are available for the query.  Object is the
   QueryController.  UserInfo contains kHGSQueryControllerOperationsKey.
 */
 GTM_EXTERN NSString *const kHGSQueryControllerDidUpdateResultsNotification;
+
+/*!
+  Posted when an operation of a query completes. Object is the queryController.
+  UserInfo contains kHGSQueryControllerOperationsKey.
+*/
+GTM_EXTERN NSString *const kHGSQueryControllerDidFinishOperationNotification;
 
 /*!
   The HGSSearchOperations that updated the results. Array of

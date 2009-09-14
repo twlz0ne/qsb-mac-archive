@@ -64,6 +64,7 @@
 @property (readonly, assign, getter=isConcurrent) BOOL concurrent;
 @property (readonly, assign, getter=isFinished) BOOL finished;
 @property (readonly, assign, getter=isCancelled) BOOL cancelled;
+@property (readonly, retain) NSString *displayName;
 
 - (id)initWithQuery:(HGSQuery*)query source:(HGSSearchSource *)source;
 

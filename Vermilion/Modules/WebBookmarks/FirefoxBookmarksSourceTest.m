@@ -34,14 +34,19 @@
 #import "HGSUnitTestingUtilities.h"
 #import "FirefoxBookmarksSource.h"
 
-@interface FirefoxBookmarksSourceTest : GTMTestCase {
-  @private
-  id fireFoxSource_;
-}
+@interface FirefoxBookmarksSourceTest : HGSSearchSourceTestCase
 @end
 
 @implementation FirefoxBookmarksSourceTest
+- (id)initWithInvocation:(NSInvocation *)invocation {
+  self = [super initWithInvocation:invocation 
+                       pluginNamed:@"WebBookmarks" 
+               extensionIdentifier:@"com.google.qsb.webbookmarks.firefox.source"];
+  return self;
+}
+
 - (void)setUp {
+  [super setUp];
   NSBundle *hgsBundle = HGSGetPluginBundle();
   NSString *firefoxSupportDir
     = [@"~/Library/Application Support/Firefox" stringByExpandingTildeInPath];
@@ -53,21 +58,6 @@
                        toPath:firefoxSupportDir
                       handler:nil], @"Could not copy Firefox app support");
   }
-  NSString *bundlePath = [hgsBundle bundlePath];
-  NSString *workingDir = [bundlePath stringByDeletingLastPathComponent];
-  NSString *path 
-    = [workingDir stringByAppendingPathComponent:@"WebBookmarks.hgs"];
-  BOOL didLoad = [HGSUnitTestingPluginLoader loadPlugin:path];
-  STAssertTrue(didLoad, @"Unable to load %@", path);
-  HGSExtensionPoint *sp = [HGSExtensionPoint sourcesPoint];
-  fireFoxSource_ 
-    = [sp extensionWithIdentifier:@"com.google.qsb.webbookmarks.firefox.source"];
-  [fireFoxSource_ retain];
-  STAssertNotNil(fireFoxSource_, nil);
-}
-
-- (void)tearDown {
-  [fireFoxSource_ release];
 }
 
 - (void)testParseFirefoxIniFile {
@@ -75,7 +65,8 @@
   NSString *iniPath = [pluginBundle pathForResource:@"profiles" 
                                              ofType:@"ini"
                                         inDirectory:@"Firefox"];
-  NSDictionary *dict = [fireFoxSource_ parseIniFileAtPath:iniPath];
+  FirefoxBookmarksSource *ffSource = (FirefoxBookmarksSource *)[self source];
+  NSDictionary *dict = [ffSource parseIniFileAtPath:iniPath];
   STAssertNotNil(dict, @"Unable to parse %@", iniPath);
 
   NSString *masterPath = [pluginBundle pathForResource:@"profiles.ini"
@@ -88,7 +79,8 @@
 }
 
 - (void)testFirefoxIniPath {
-  NSString *path = [fireFoxSource_ iniFilePath];
+  FirefoxBookmarksSource *ffSource = (FirefoxBookmarksSource *)[self source];
+  NSString *path = [ffSource iniFilePath];
   NSString *expectedPath 
     = @"~/Library/Application Support/Firefox/profiles.ini";
   expectedPath = [expectedPath stringByStandardizingPath];
@@ -96,16 +88,17 @@
 }
 
 - (void)testDefaultProfileFromIniFileDict {
+  FirefoxBookmarksSource *ffSource = (FirefoxBookmarksSource *)[self source];
   NSBundle *pluginBundle = HGSGetPluginBundle();
   NSString *iniPath = [pluginBundle pathForResource:@"profiles" 
                                              ofType:@"ini"
                                         inDirectory:@"Firefox"];
   
   // Test with a solo entry
-  NSDictionary *iniDict = [fireFoxSource_ parseIniFileAtPath:iniPath];
+  NSDictionary *iniDict = [ffSource parseIniFileAtPath:iniPath];
   STAssertNotNil(iniDict, @"Unable to parse %@", iniPath);
   NSDictionary *defaultDict 
-    = [fireFoxSource_ defaultProfileDictFromIniFileDict:iniDict];
+    = [ffSource defaultProfileDictFromIniFileDict:iniDict];
   NSString *path = [defaultDict objectForKey:@"Path"];
   STAssertEqualObjects(path, @"Profiles/mt3pkk17.default", nil);
   
@@ -113,21 +106,22 @@
   iniPath = [pluginBundle pathForResource:@"profilesWith2Profiles" 
                                    ofType:@"ini"
                               inDirectory:@"Firefox"];
-  iniDict = [fireFoxSource_ parseIniFileAtPath:iniPath];
+  iniDict = [ffSource parseIniFileAtPath:iniPath];
   STAssertNotNil(iniDict, @"Unable to parse %@", iniPath);
-  defaultDict = [fireFoxSource_ defaultProfileDictFromIniFileDict:iniDict];
+  defaultDict = [ffSource defaultProfileDictFromIniFileDict:iniDict];
   path = [defaultDict objectForKey:@"Path"];
   STAssertEqualObjects(path, @"Profiles/308lm7ed.Foo", nil);
 }
 
 - (void)testParseBookmarksFile {
+  FirefoxBookmarksSource *ffSource = (FirefoxBookmarksSource *)[self source];
   NSBundle *pluginBundle = HGSGetPluginBundle();
   NSString *jsonPath = [pluginBundle pathForResource:@"bookmarks" 
                                               ofType:@"json"
                                          inDirectory:@"Firefox"];
   
   // Test with a solo entry
-  NSDictionary *iniDict = [fireFoxSource_ bookmarksFromFile:jsonPath];
+  NSDictionary *iniDict = [ffSource bookmarksFromFile:jsonPath];
   STAssertNotNil(iniDict, @"Unable to parse %@", jsonPath);
   NSString *masterPath = [pluginBundle pathForResource:@"bookmarks.json" 
                                                 ofType:@"xml"
@@ -139,12 +133,13 @@
 }
 
 - (void)testFirefoxDefaultProfilePath {
+  FirefoxBookmarksSource *ffSource = (FirefoxBookmarksSource *)[self source];
   NSBundle *pluginBundle = HGSGetPluginBundle();
   NSString *iniPath = [pluginBundle pathForResource:@"profiles" 
                                              ofType:@"ini"
                                         inDirectory:@"Firefox"];
   STAssertNotNil(iniPath, nil);
-  NSString *ffPath = [fireFoxSource_ defaultProfilePathFromIniFilePath:iniPath];
+  NSString *ffPath = [ffSource defaultProfilePathFromIniFilePath:iniPath];
   NSString *expected = [iniPath stringByDeletingLastPathComponent];
   expected 
     = [expected stringByAppendingPathComponent:@"Profiles/mt3pkk17.default"];
@@ -152,12 +147,13 @@
 }
 
 - (void)testFirefoxBookmarksBackupDirectoryFromProfilePath {
+  FirefoxBookmarksSource *ffSource = (FirefoxBookmarksSource *)[self source];
   NSBundle *pluginBundle = HGSGetPluginBundle();
   NSString *iniPath = [pluginBundle pathForResource:@"profiles" 
                                              ofType:@"ini"
                                         inDirectory:@"Firefox"];
   STAssertNotNil(iniPath, nil);
-  NSString *ffPath = [fireFoxSource_ defaultProfilePathFromIniFilePath:iniPath];
+  NSString *ffPath = [ffSource defaultProfilePathFromIniFilePath:iniPath];
   NSString *expected = [iniPath stringByDeletingLastPathComponent];
   expected 
     = [expected stringByAppendingPathComponent:@"Profiles/mt3pkk17.default"];
@@ -165,12 +161,13 @@
 }
 
 - (void)testInventorySearchPluginsAtPath {
+  FirefoxBookmarksSource *ffSource = (FirefoxBookmarksSource *)[self source];
   NSBundle *pluginBundle = HGSGetPluginBundle();
   NSString *pluginsPath = [pluginBundle pathForResource:@"searchplugins"
                                                  ofType:nil
                                             inDirectory:@"Firefox"];
   STAssertNotNil(pluginsPath, nil);
-  NSArray *items = [fireFoxSource_ inventorySearchPluginsAtPath:pluginsPath];
+  NSArray *items = [ffSource inventorySearchPluginsAtPath:pluginsPath];
   NSString *masterPath = [pluginBundle pathForResource:@"searchPluginsMaster" 
                                                 ofType:@"xml"
                                            inDirectory:@"Firefox"];
@@ -180,13 +177,14 @@
 }
  
 - (void)testInventoryBookmarks {
+  FirefoxBookmarksSource *ffSource = (FirefoxBookmarksSource *)[self source];
   NSBundle *pluginBundle = HGSGetPluginBundle();
   NSString *jsonPath = [pluginBundle pathForResource:@"bookmarks" 
                                               ofType:@"json"
                                          inDirectory:@"Firefox"];
-  NSDictionary *bookmarksDict = [fireFoxSource_ bookmarksFromFile:jsonPath];
+  NSDictionary *bookmarksDict = [ffSource bookmarksFromFile:jsonPath];
   STAssertNotNil(bookmarksDict, @"Unable to parse %@", jsonPath);
-  NSArray *bookmarks = [fireFoxSource_ inventoryBookmarks:bookmarksDict];
+  NSArray *bookmarks = [ffSource inventoryBookmarks:bookmarksDict];
   NSString *masterPath = [pluginBundle pathForResource:@"bookmarksMaster" 
                                                 ofType:@"xml"
                                            inDirectory:@"Firefox"];
