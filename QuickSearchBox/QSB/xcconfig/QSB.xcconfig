@@ -35,8 +35,8 @@
 // Package Versioning
 #include "PackageVersion.xcconfig"
 
-ARCHS[sdk=macosx10.5*] = i386 ppc x86_64
-ARCHS[sdk=macosx10.6*] = i386 ppc x86_64
+ARCHS[sdk=macosx10.5*] = i386 ppc 
+ARCHS[sdk=macosx10.6*] = x86_64
 
 GCC_PREFIX_HEADER = QSB.pch
 GCC_PRECOMPILE_PREFIX_HEADER = YES

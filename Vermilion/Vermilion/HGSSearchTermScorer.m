@@ -272,9 +272,11 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
   termScore += abbrevationScore;  // Add in the abbreviation score.
 
   // Determine the best complete word match length score.
+#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   NSUInteger bestTermMatchLength = 0;  // Best word match length
   NSUInteger bestMatchedWordLength = 0;  // Best word length
   CGFloat bestMatchLengthValue = 0.0;  // Best word match length value
+#endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   CGFloat bestMatchLengthScore = 0.0;  // Best word match length score
   // Scan charStats in reverse to determine best match.
   CFIndex charStatCount = termLength;
@@ -296,9 +298,11 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
             = (CGFloat)(adjacencyValue + 1) / (CGFloat)wordLength;
           CGFloat matchScore = gHGSWordPortionFactor * matchValue;
           if (matchScore > bestMatchLengthScore) {
+#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
             bestTermMatchLength = adjacencyValue + 1;
             bestMatchedWordLength = [wordRange wordLength];
             bestMatchLengthValue = matchValue;
+#endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
             bestMatchLengthScore = matchScore;
             break;
           }
