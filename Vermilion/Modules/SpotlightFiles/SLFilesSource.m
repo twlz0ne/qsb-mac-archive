@@ -249,7 +249,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   NSString *predicateString 
     = [predicateSegments componentsJoinedByString:@" && "];
 
-  NSLog(@"Predicate String: %@", predicateString);
   // Build the query
   MDQueryRef mdQuery 
     = MDQueryCreate(kCFAllocatorDefault,
