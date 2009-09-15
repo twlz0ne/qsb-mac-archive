@@ -49,7 +49,6 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   HGSSimpleAccount *account_;
   NSURLConnection *connection_;
   BOOL currentlyFetching_;
-  NSTimeInterval previousErrorReportingTime_;
   NSUInteger previousFailureCount_;
 }
 
