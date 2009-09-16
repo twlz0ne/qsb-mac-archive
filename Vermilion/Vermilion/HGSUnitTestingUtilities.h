@@ -99,6 +99,12 @@ extensionPointIdentifier:(NSString *)extensionPoint;
 - (id)initWithInvocation:(NSInvocation *)invocation
              pluginNamed:(NSString *)pluginName 
      extensionIdentifier:(NSString *)identifier;
+
+/*!
+ Returns a list of results that can be archived by this source. Needs
+ to be overridden by any subclass that supports archiving of results.
+*/
+- (NSArray *)archivableResults;
 @end
 
 /*!

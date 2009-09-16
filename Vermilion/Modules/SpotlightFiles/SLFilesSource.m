@@ -44,6 +44,10 @@ static CFStringRef kSpotlightGroupIdAttribute
   = CFSTR("_kMDItemGroupId");
 extern CFStringRef _MDQueryCreateQueryString(CFAllocatorRef allocator, 
                                              CFStringRef query);
+
+static NSString *const kSpotlightSourceMDItemPathKey 
+  = @"SpotlightSourceMDItemPath";
+
 typedef enum {
   SpotlightGroupMessage = 1,
   SpotlightGroupContact = 2,
@@ -139,9 +143,24 @@ typedef enum {
 
 @implementation SLFilesSource
 @synthesize utiFilter = utiFilter_;
-@synthesize attributeArray = attributeArray_;
 
 GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
+
++ (CFArrayRef)attributeArray {
+  static NSArray *sAttributeArray = nil;
+  @synchronized(self) {
+    if (!sAttributeArray) {
+      sAttributeArray = [[NSArray alloc] initWithObjects:
+                         (NSString *)kMDItemPath,
+                         (NSString *)kMDItemTitle,
+                         (NSString *)kMDItemLastUsedDate,
+                         (NSString *)kMDItemContentType,
+                         (NSString *)kSpotlightGroupIdAttribute,
+                         nil];
+    }
+  }
+  return (CFArrayRef)sAttributeArray;
+}
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -164,14 +183,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
            selector:@selector(extensionPointSourcesChanged:)
                name:kHGSExtensionPointDidRemoveExtensionNotification
              object:sourcesPoint];
-    
-    attributeArray_ = [[NSArray alloc] initWithObjects:
-                       (NSString *)kMDItemPath,
-                       (NSString *)kMDItemTitle,
-                       (NSString *)kMDItemLastUsedDate,
-                       (NSString *)kMDItemContentType,
-                       (NSString *)kSpotlightGroupIdAttribute,
-                       nil];
   }
   return self;
 }
@@ -179,7 +190,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [utiFilter_ release];
-  [attributeArray_ release];
   [super dealloc];
 }
 
@@ -253,7 +263,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   MDQueryRef mdQuery 
     = MDQueryCreate(kCFAllocatorDefault,
                     (CFStringRef)predicateString,
-                    (CFArrayRef)attributeArray_,
+                    (CFArrayRef)[[self class] attributeArray],
                     // We must not sort here because it means that the
                     // result indexing will be stable (we leverage this
                     // behavior elsewhere)
@@ -279,14 +289,18 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   MDQueryRef mdQuery = (MDQueryRef)[notification object];
   CFIndex currentCount = MDQueryGetResultCount(mdQuery);
   CFIndex oldCount = [operation nextQueryItemIndex];
+  NSString *normalizedQuery = [[operation query] normalizedQueryString];
+  HGSSearchSource *source = [operation source];
   if (currentCount != oldCount) {
     for (CFIndex i = oldCount; 
          i < currentCount && ![operation isCancelled]; 
          i++) {
       MDItemRef mdItem = (MDItemRef)MDQueryGetResultAtIndex(mdQuery, i);
       if (mdItem) {
-        HGSResult *result = [self hgsResultFromQueryItem:mdItem 
-                                               operation:operation];
+        HGSResult *result = [[[SLHGSResult alloc] initWithMDItem:mdItem
+                                                           query:normalizedQuery
+                                                          source:source] 
+                             autorelease];
         if (result) {
           [accumulatedResults addObject:result];
         }
@@ -297,15 +311,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     [operation setNextQueryItemIndex:currentCount];
     [operation setResults:accumulatedResults];
   }
-}
-
-- (HGSResult *)hgsResultFromQueryItem:(MDItemRef)item 
-                            operation:(SLFilesOperation *)operation {
-  HGSResult *result = nil;
-  if (![operation isCancelled]) {
-    result = [[[SLHGSResult alloc] initWithMDItem:item operation:operation] autorelease];
-  }
-  return result;
 }
 
 - (void)operationCompleted:(SLFilesOperation*)operation {
@@ -437,20 +442,40 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return value;
 }
 
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
+  return [NSMutableDictionary dictionaryWithObject:[result filePath]
+                                            forKey:kSpotlightSourceMDItemPathKey];
+}
+
+- (Class)resultClass {
+  return [SLHGSResult class];
+}
 @end
 
 @implementation SLHGSResult
-- (id)initWithMDItem:(MDItemRef)mdItem 
-           operation:(SLFilesOperation *)operation {
-  SLFilesSource *source = (SLFilesSource *)[operation source];
+- (id)initWithDictionary:(NSDictionary*)dict
+                  source:(HGSSearchSource *)source {
+  NSString *path = [dict objectForKey:kSpotlightSourceMDItemPathKey];
+  MDItemRef mdItem = NULL;
+  if (path) {
+    mdItem = MDItemCreate(kCFAllocatorDefault, (CFStringRef)path);
+  }
+  self = [self initWithMDItem:mdItem query:nil source:source];
+  return self;
+}
+
+- (id)initWithMDItem:(MDItemRef)mdItem
+               query:(NSString *)normalizedQuery
+              source:(HGSSearchSource *)source {
   if (!mdItem || !source) {
-    return nil;
+    [self release];
+    self = nil;
+    return self;
   }
   NSString *uri = [NSString stringWithFormat:@"spotlightresult://%p", mdItem];
   NSString *iconFlagName = nil;
-  NSArray *attributeArray = [source attributeArray];
   NSDictionary *attributes = GTMCFAutorelease(MDItemCopyAttributes(mdItem, 
-                                              (CFArrayRef)attributeArray));
+                                              [SLFilesSource attributeArray]));
   NSString *name = [attributes objectForKey:(NSString *)kMDItemTitle]; 
   if (!name) {
     name = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemDisplayName));
@@ -531,8 +556,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     lastUsedDate = [NSDate distantPast];  // COV_NF_LINE
   }
   NSString *tokenizedName = [HGSTokenizer tokenizeString:name];
-  NSString *normalizedString = [[operation query] normalizedQueryString];
-  CGFloat rank = HGSScoreTermForItem(tokenizedName, normalizedString, NULL);
+  
+  CGFloat rank = 0.0;
+  if (normalizedQuery) {
+    rank = HGSScoreTermForItem(tokenizedName, normalizedQuery, NULL);
+  }
   
   // TODO(mrossetti): Fix this once
   // http://code.google.com/p/qsb-mac/issues/detail?id=758 
@@ -560,22 +588,33 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 - (void)dealloc {
   if (mdItem_) {
     CFRelease(mdItem_);
+    mdItem_ = NULL;
   }
   [super dealloc];
 }
 
 - (NSString *)filePath {
-  return GTMCFAutorelease(MDItemCopyAttribute(mdItem_, kMDItemPath));
+  NSString *path = nil;
+  if (mdItem_) {
+    path = GTMCFAutorelease(MDItemCopyAttribute(mdItem_, kMDItemPath));
+  } else {
+    HGSLogDebug(@"filePath: No mdItem for %@", self);  // COV_NF_LINE
+  }
+  return path;
 }
 
 - (NSURL *)url {
   NSURL *url = nil;
-  NSString *urlString = GTMCFAutorelease(MDItemCopyAttribute(mdItem_, 
-                                                             kMDItemURL));
-  if (urlString) {
-    url = [NSURL URLWithString:urlString];
+  if (mdItem_) {
+    NSString *urlString = GTMCFAutorelease(MDItemCopyAttribute(mdItem_, 
+                                                               kMDItemURL));
+    if (urlString) {
+      url = [NSURL URLWithString:urlString];
+    } else {
+      url = [NSURL fileURLWithPath:[self filePath]];
+    }
   } else {
-    url = [NSURL fileURLWithPath:[self filePath]];
+    HGSLogDebug(@"url: No mdItem for %@", self);  // COV_NF_LINE
   }
   return url;
 }

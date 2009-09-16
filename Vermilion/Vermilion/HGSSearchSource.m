@@ -173,7 +173,7 @@ NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources
   // Do we allow archiving?
   HGSResult *result = nil;
   if (!cannotArchive_) {
-    result = [HGSResult resultWithDictionary:representation source:self];
+    result = [[self resultClass] resultWithDictionary:representation source:self];
   }
   return result;
 }
@@ -184,6 +184,10 @@ NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources
 
 - (BOOL)providesIconsForResults {
   return NO;
+}
+
+- (Class)resultClass {
+  return [HGSResult class];
 }
 
 @end

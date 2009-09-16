@@ -33,7 +33,7 @@
 #import "GTMObjectSingleton.h"
 #import "GTMGarbageCollection.h"
 #import "GTMDebugThreadValidation.h"
-
+#import <objc/runtime.h>
 #import <sys/param.h>
 
 @interface HGSUnitTestingPluginLoader()
@@ -188,6 +188,11 @@ extensionPointIdentifier:(NSString *)extensionPoint {
   [extension_ release];
   [super tearDown];
 }
+
+- (void)testDisplayName {
+  STAssertNotNil([[self extension] displayName], nil);
+}
+
 @end
 
 @implementation HGSSearchSourceTestCase
@@ -205,6 +210,26 @@ extensionPointIdentifier:(NSString *)extensionPoint {
 - (HGSSearchSource *)source {
   return [self extension];
 }
+
+// Must be overridden by subclasses.
+- (NSArray *)archivableResults {
+  [self doesNotRecognizeSelector:_cmd];
+  return nil;
+}
+
+- (void)testArchiving {
+  HGSSearchSource *source = [self source];
+  if (![source cannotArchive]) {
+    NSArray *results = [self archivableResults];
+    for (HGSResult *result in results) {
+      NSDictionary *archive = [source archiveRepresentationForResult:result];
+      STAssertNotNil(archive, nil);
+      HGSResult *thawedResult = [source resultWithArchivedRepresentation:archive];
+      STAssertEqualObjects(result, thawedResult, nil);
+    }
+  }
+}
+
 @end
 
 @implementation HGSActionTestCase
@@ -221,6 +246,11 @@ extensionPointIdentifier:(NSString *)extensionPoint {
 
 - (HGSAction *)action {
   return [self extension];
+}
+
+// TODO(dmaclach):remove this once we have some subclasses of this thing.
++ (BOOL)isAbstractTestCase {
+  return YES;
 }
 @end
 

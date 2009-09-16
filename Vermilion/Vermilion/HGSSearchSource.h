@@ -164,6 +164,11 @@
 */ 
 - (void)promoteResult:(HGSResult *)result;
 
+/*!
+  Returns the class that the source should use to instantiate results.
+*/
+- (Class)resultClass;
+
 @end
 
 

@@ -118,25 +118,33 @@
 }
 
 - (HGSResult *)spotlightResultForQuery:(NSString *)query path:(NSString *)path {
-  Class resultClass = NSClassFromString(@"SLHGSResult");
+  Class resultClass = [[self source] resultClass];
   STAssertNotNULL(resultClass, nil);
   MDItemRef mdItem = MDItemCreate(kCFAllocatorDefault, (CFStringRef)path);
-  STAssertNotNULL(mdItem, @"Unable to create mdItem for %@", path);
-  HGSQuery *hgsQuery = [[[HGSQuery alloc] initWithString:query 
-                                                 results:nil 
-                                              queryFlags:0] autorelease];
-  STAssertNotNil(hgsQuery, nil);
-  SLFilesOperation *operation 
-    = (SLFilesOperation *)[[self source] searchOperationForQuery:hgsQuery];
-  Class operationClass = NSClassFromString(@"SLFilesOperation");
-  STAssertNotNil(operationClass, nil);
-  STAssertEqualObjects(operationClass, [operation class], nil);
-  
-  HGSResult *result = [[resultClass alloc] initWithMDItem:mdItem 
-                                                operation:operation];
+  STAssertNotNULL(mdItem, @"Unable to create mdItem for %@", path);  
+  HGSResult *result = [[resultClass alloc] initWithMDItem:mdItem
+                                                    query:query
+                                                source:[self source]];
   STAssertNotNil(result, nil);
   CFRelease(mdItem);
   return result;
+}
+
+- (NSArray *)archivableResults {
+  NSString *paths[] = {
+    @"/Applications/TextEdit.app",
+    @"/System"
+  };
+  size_t count = sizeof(paths) / sizeof(paths[0]);
+  NSMutableArray *results 
+    = [NSMutableArray arrayWithCapacity:count];
+  for (size_t i = 0; i < count; ++i) {
+    HGSResult *result = [self spotlightResultForQuery:uniqueTestString_
+                                                 path:paths[i]];
+    STAssertNotNil(result, nil);
+    [results addObject:result];
+  }
+  return results;
 }
 
 - (void)testNilOperation {
@@ -215,10 +223,6 @@
   [sourcesPoint removeExtension:source];
 }
 
-- (void)testDisplayName {
-  STAssertNotNil([[self source] displayName], nil);
-}
-
 - (void)testValidSourceForQuery {
   HGSSearchSource *source = [self source];
   HGSQuery *query = [[[HGSQuery alloc] initWithString:@"happ" 
@@ -269,7 +273,7 @@
   STAssertNotNil(resultClass, nil);
   
   id result = [[[resultClass alloc] 
-                initWithMDItem:NULL operation:nil] 
+                initWithMDItem:NULL query:nil source:nil] 
                autorelease];
   STAssertNil(result, nil);
   
@@ -278,7 +282,7 @@
        absolutePathForAppBundleWithIdentifier:@"com.apple.Finder"];
   MDItemRef mdItem = MDItemCreate(kCFAllocatorDefault, (CFStringRef)finderPath);
   STAssertNotNULL(mdItem, nil);
-  result = [[resultClass alloc] initWithMDItem:mdItem operation:nil];
+  result = [[resultClass alloc] initWithMDItem:mdItem query:nil source:nil];
   STAssertNil(result, nil);
   
   result = [self spotlightResultForQuery:uniqueTestString_

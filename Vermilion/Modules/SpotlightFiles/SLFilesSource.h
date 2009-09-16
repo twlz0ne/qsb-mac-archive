@@ -38,24 +38,20 @@
  @private
   NSString *utiFilter_;
   BOOL rebuildUTIFilter_;
-  NSArray *attributeArray_;
 }
-@property (readonly, nonatomic) NSArray *attributeArray;
-
-- (void)operationReceivedNewResults:(SLFilesOperation*)operation
-                   withNotification:(NSNotification*)notification;
-- (HGSResult *)hgsResultFromQueryItem:(MDItemRef)item 
-                            operation:(SLFilesOperation *)operation;
-- (void)operationCompleted:(SLFilesOperation*)operation;
-- (void)startSearchOperation:(HGSSearchOperation*)operation;
-- (void)extensionPointSourcesChanged:(NSNotification*)notification;
++ (CFArrayRef)attributeArray;
+- (void)operationReceivedNewResults:(SLFilesOperation *)operation
+                   withNotification:(NSNotification *)notification;
+- (void)operationCompleted:(SLFilesOperation *)operation;
+- (void)startSearchOperation:(HGSSearchOperation *)operation;
+- (void)extensionPointSourcesChanged:(NSNotification *)notification;
 @end
 
 #pragma mark -
 
 @interface SLFilesOperation : HGSSearchOperation {
  @private
-  NSMutableArray* accumulatedResults_;
+  NSMutableArray *accumulatedResults_;
   CFIndex nextQueryItemIndex_;
   BOOL mdQueryFinished_;
 }
@@ -65,17 +61,18 @@
 
 // Using an accumulator rather than using setResults: directly allows us to
 // control the timing of propagation of results to observers.
-- (NSMutableArray*)accumulatedResults;
+- (NSMutableArray *)accumulatedResults;
 
 // Callbacksfor MDQuery updates
-- (void)queryNotification:(NSNotification*)notification;
+- (void)queryNotification:(NSNotification *)notification;
 @end
 
 @interface SLHGSResult : HGSResult {
  @private
   MDItemRef mdItem_;
 }
-- (id)initWithMDItem:(MDItemRef)mdItem 
-           operation:(SLFilesOperation *)operation;
+- (id)initWithMDItem:(MDItemRef)mdItem
+               query:(NSString *)query
+              source:(HGSSearchSource *)source;
 @end
 
