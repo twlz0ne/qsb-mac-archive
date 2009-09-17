@@ -142,13 +142,18 @@ NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources
   if (cannotArchive_) return nil;
   
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-  NSMutableSet *defaultArchiveKeys = [NSMutableSet setWithObjects:
-                                      kHGSObjectAttributeNameKey,
-                                      kHGSObjectAttributeURIKey,
-                                      kHGSObjectAttributeTypeKey,
-                                      kHGSObjectAttributeSnippetKey,
-                                      kHGSObjectAttributeSourceURLKey,
-                                      nil];
+  NSSet *requiredKeys = [NSSet setWithObjects:
+                         kHGSObjectAttributeNameKey,
+                         kHGSObjectAttributeURIKey,
+                         kHGSObjectAttributeTypeKey,
+                         nil];
+  NSArray *otherKeys = [NSArray arrayWithObjects:
+                        kHGSObjectAttributeSnippetKey,
+                        kHGSObjectAttributeSourceURLKey,
+                        nil];
+  
+  NSMutableSet *defaultArchiveKeys = [NSMutableSet setWithSet:requiredKeys];
+  [defaultArchiveKeys addObjectsFromArray:otherKeys];
   NSArray *sourceArchiveKeys = [self archiveKeys];
   if ([sourceArchiveKeys count]) {
     [defaultArchiveKeys addObjectsFromArray:sourceArchiveKeys];
@@ -160,6 +165,14 @@ NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources
         value = [value absoluteString];
       }
       [dict setObject:value forKey:archiveKey];
+    } else {
+      if ([requiredKeys containsObject:archiveKey]) {
+        HGSLogDebug(@"Attempting to archive %@. Missing required key %@",
+                    result, archiveKey);
+        [dict release];
+        dict = nil;
+        break;
+      }
     }
   }
   return dict;

@@ -443,8 +443,16 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 }
 
 - (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
-  return [NSMutableDictionary dictionaryWithObject:[result filePath]
-                                            forKey:kSpotlightSourceMDItemPathKey];
+  NSMutableDictionary *archive = nil;
+  NSString *path = [result filePath];
+  if (path) {
+    archive 
+      = [NSMutableDictionary dictionaryWithObject:path
+                                           forKey:kSpotlightSourceMDItemPathKey];
+  } else {
+    HGSLogDebug(@"Unable to archiveRepresentationForResult: %@", result);
+  }
+  return archive;
 }
 
 - (Class)resultClass {
@@ -453,6 +461,16 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 @end
 
 @implementation SLHGSResult
+- (id)initWithURI:(NSString *)uri
+             name:(NSString *)name
+             type:(NSString *)typeStr
+           source:(HGSSearchSource *)source
+       attributes:(NSDictionary *)attributes {
+  HGSLogDebug(@"Don't init SLHGSResult this way");
+  [self release];
+  return nil;
+}
+
 - (id)initWithDictionary:(NSDictionary*)dict
                   source:(HGSSearchSource *)source {
   NSString *path = [dict objectForKey:kSpotlightSourceMDItemPathKey];
