@@ -164,6 +164,34 @@
 			<key>HGSAppleScriptHandlerName</key>
 			<string>closeDiskTray</string>
 		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>HGSAppleScriptAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.systemapplescript.action.captureregion</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Capture Region</string>
+			<key>HGSExtensionIconImagePath</key>
+			<string>grabicon.icns</string>
+			<key>HGSAppleScriptHandlerName</key>
+			<string>captureRegion</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>HGSAppleScriptAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.systemapplescript.action.capturewindow</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Capture Window</string>
+			<key>HGSExtensionIconImagePath</key>
+			<string>grabicon.icns</string>
+			<key>HGSAppleScriptHandlerName</key>
+			<string>captureWindow</string>
+		</dict>
 	</array>
 </dict>
 </plist>

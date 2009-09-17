@@ -30,3 +30,9 @@
 
 /* Name of action that closes the user's dvd drive tray. Do not include ^ in localization. */
 "^Close Disk Tray" = "Close Disk Tray";
+
+/* Name of action that performs a screen snapshot and captures a region of the screen. Do not include ^ in localization. */
+"^Capture Region" = "Capture Region";
+
+/* Name of action that performs a screen snapshot and captures a window on the screen. Do not include ^ in localization. */
+"^Capture Window" = "Capture Window";

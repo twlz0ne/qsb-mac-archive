@@ -88,3 +88,35 @@ end shutDown
 on sleep()
 	tell application "System Events" to sleep
 end sleep
+
+on uniqueName(baseName)
+	tell application "System Events"
+		set dFolder to (POSIX path of desktop folder)
+		set basePath to dFolder & "/" & baseName
+		set i to 1
+		set finalPath to ""
+		repeat while true
+			set finalPath to basePath & i & ".png"
+			try
+				set finalItem to file finalPath
+			on error e
+				exit repeat
+			end try
+			set i to i + 1
+		end repeat
+		finalPath
+	end tell
+end uniqueName
+
+on captureRegion()
+	set pictureString to (localized string "^Picture ")
+	tell me to set picName to uniqueName(pictureString)
+	do shell script "syslog -s -l 1 " & picName
+	do shell script "screencapture -i \"" & picName & "\""
+end captureRegion
+
+on captureWindow()
+	set pictureString to (localized string "^Picture ")
+	tell me to set picName to uniqueName(pictureString)
+	do shell script "screencapture -iW \"" & picName & "\""
+end captureWindow

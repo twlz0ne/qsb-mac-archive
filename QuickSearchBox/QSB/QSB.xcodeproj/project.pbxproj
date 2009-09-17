@@ -563,6 +563,8 @@
 		8B10AB690FA679A60087DE20 /* HGSAppleScriptHandlerTest.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
 		8B1490A80F715781002E05FA /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
 		8B21631F0EB9022300183DE4 /* QSBDetailedRowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B21631E0EB9022300183DE4 /* QSBDetailedRowViewController.m */; };
+		8B232E811062B46800AF7287 /* grabicon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B232E801062B46800AF7287 /* grabicon.icns */; };
+		8B23300E1062C12700AF7287 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B23300C1062C12700AF7287 /* Localizable.strings */; };
 		8B307B0F1051AB40006C4C7A /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
 		8B307C421051B606006C4C7A /* SampleEmail.emlx in Resources */ = {isa = PBXBuildFile; fileRef = 8B307BDE1051B5D4006C4C7A /* SampleEmail.emlx */; };
 		8B3082DD1056EE1F006C4C7A /* GTMNSNumber+64Bit.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3082DB1056EE1F006C4C7A /* GTMNSNumber+64Bit.m */; };
@@ -2342,6 +2344,8 @@
 		8B1B49340E5F994800A08972 /* GTMExceptionalInlines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMExceptionalInlines.h; sourceTree = "<group>"; };
 		8B21631D0EB9022300183DE4 /* QSBDetailedRowViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBDetailedRowViewController.h; sourceTree = "<group>"; };
 		8B21631E0EB9022300183DE4 /* QSBDetailedRowViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBDetailedRowViewController.m; sourceTree = "<group>"; };
+		8B232E801062B46800AF7287 /* grabicon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = grabicon.icns; sourceTree = "<group>"; };
+		8B23300D1062C12700AF7287 /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = en_US.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8B307BDE1051B5D4006C4C7A /* SampleEmail.emlx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SampleEmail.emlx; sourceTree = "<group>"; };
 		8B3082DB1056EE1F006C4C7A /* GTMNSNumber+64Bit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSNumber+64Bit.m"; sourceTree = "<group>"; };
 		8B3082DC1056EE1F006C4C7A /* GTMNSNumber+64Bit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSNumber+64Bit.h"; sourceTree = "<group>"; };
@@ -4777,7 +4781,7 @@
 				8B637B570F2777C300997738 /* GData.framework */,
 				8BCCB03C10348ABE0051B567 /* libGDataTouchStaticLib.a */,
 				8B637B590F2777C300997738 /* GDataUnitTests.octest */,
-				62BD15D9103DB32A00C85BC3 /* GDataIPhoneUnitTests.octest */,
+				62BD15D9103DB32A00C85BC3 /* GDataTouchUnitTests.octest */,
 				8B637B5B0F2777C300997738 /* DevelopmentTestTool */,
 			);
 			name = Products;
@@ -4889,6 +4893,7 @@
 		8B6EB31A1019FCC8006CFF7A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8B23300C1062C12700AF7287 /* Localizable.strings */,
 				8B6EB31B1019FCC8006CFF7A /* InfoPlist.strings */,
 			);
 			path = Resources;
@@ -5705,6 +5710,7 @@
 				8B6EB31A1019FCC8006CFF7A /* Resources */,
 				8BCCD2C00EC8E6D900688D64 /* main.applescript */,
 				8BC6E6280FAAC4D7005A0F6F /* SystemInfo.plist */,
+				8B232E801062B46800AF7287 /* grabicon.icns */,
 				8BCCD2A20EC8E67300688D64 /* closeDiskTray.icns */,
 				8BCCD2A40EC8E67300688D64 /* ejectDiskTray.icns */,
 				8BCCD2A50EC8E67300688D64 /* emptyTrash.icns */,
@@ -7018,10 +7024,10 @@
 			remoteRef = 620054580F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		62BD15D9103DB32A00C85BC3 /* GDataIPhoneUnitTests.octest */ = {
+		62BD15D9103DB32A00C85BC3 /* GDataTouchUnitTests.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = GDataIPhoneUnitTests.octest;
+			path = GDataTouchUnitTests.octest;
 			remoteRef = 62BD15D8103DB32A00C85BC3 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -7613,6 +7619,8 @@
 				8BCCD2BE0EC8E67300688D64 /* shutDown.icns in Resources */,
 				8BCCD2BF0EC8E67300688D64 /* sleep.icns in Resources */,
 				8B6EB3261019FCC8006CFF7A /* InfoPlist.strings in Resources */,
+				8B232E811062B46800AF7287 /* grabicon.icns in Resources */,
+				8B23300E1062C12700AF7287 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9654,6 +9662,14 @@
 				8B0E666F0FD82C6300461C4A /* zh_TW */,
 			);
 			name = GTMHotKeyTextField.strings;
+			sourceTree = "<group>";
+		};
+		8B23300C1062C12700AF7287 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8B23300D1062C12700AF7287 /* en_US */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		8B3F7235101AD955004FACA9 /* InfoPlist.strings */ = {
