@@ -9,3 +9,6 @@
 
 /* Name of action that will convert an image from one file type to another. Do not include ^ in localization. */
 "^Convert" = "Convert";
+
+/* Name of action that will set the desktop picture. Do not include ^ in localization. */
+"^Set As Desktop Picture" = "Set As Desktop Picture";

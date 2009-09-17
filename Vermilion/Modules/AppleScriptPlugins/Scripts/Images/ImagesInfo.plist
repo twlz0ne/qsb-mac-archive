@@ -66,6 +66,20 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file.media.image</string>
 		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>HGSAppleScriptAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.imagesapplescript.action.setasdesktoppicture</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Set As Desktop Picture</string>
+			<key>HGSAppleScriptHandlerName</key>
+			<string>setAsDesktopPicture</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file.media.image</string>
+		</dict>
 	</array>
 </dict>
 </plist>

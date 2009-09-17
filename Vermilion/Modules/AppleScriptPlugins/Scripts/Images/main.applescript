@@ -178,4 +178,16 @@ on convert(results)
 	end if
 end convert
 
+on setAsDesktopPicture(results)
+	set theResult to item 1 of results
+	set theURL to «class pURI» of theResult
+	tell me to set thePath to filePathForURL(theURL)
+	if length of thePath ≠ 0 then
+		set asFile to POSIX file (thePath)
+		tell application "System Events"
+			set picture of current desktop to asFile
+		end tell
+	end if
+end setAsDesktopPicture
+end
 
