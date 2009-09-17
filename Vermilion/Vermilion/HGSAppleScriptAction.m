@@ -164,12 +164,40 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
   }
 }
 
+- (void)handleLocalizedString:(NSAppleEventDescriptor *)event 
+               withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
+  NSAppleEventDescriptor *stringDesc 
+    = [event descriptorForKeyword:keyDirectObject];
+  NSString *string = [stringDesc stringValue];
+  NSString *localizedString = [[self bundle] localizedStringForKey:string 
+                                                             value:string 
+                                                             table:nil];
+  NSAppleEventDescriptor *localizedStringDesc
+    = [NSAppleEventDescriptor descriptorWithString:localizedString];
+  [replyEvent setDescriptor:localizedStringDesc
+                 forKeyword:keyDirectObject];
+}
+
+- (void)installLocalizedStringHandler {
+  NSAppleEventManager *manager = [NSAppleEventManager sharedAppleEventManager];
+  [manager setEventHandler:self 
+               andSelector:@selector(handleLocalizedString:withReplyEvent:) 
+             forEventClass:'appS' 
+                andEventID:'locS'];
+}
+
+- (void)uninstallLocalizedStringHandler {
+  NSAppleEventManager *manager = [NSAppleEventManager sharedAppleEventManager];
+  [manager removeEventHandlerForEventClass:'appS' andEventID:'locS'];
+}
+
 - (BOOL)performWithInfo:(NSDictionary*)info {
   // If we have a handler we call it
   // if not and it supports open, we call that
   // otherwise we just run the script.
   BOOL wasGood = NO;
   @synchronized(self) {
+    [self installLocalizedStringHandler];
     if (!script_) {
       [self performSelectorOnMainThread:@selector(loadScript) 
                              withObject:nil 
@@ -249,6 +277,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
                         object:self
                       userInfo:message];
     }
+    [self uninstallLocalizedStringHandler];
   }
   return wasGood;
 }

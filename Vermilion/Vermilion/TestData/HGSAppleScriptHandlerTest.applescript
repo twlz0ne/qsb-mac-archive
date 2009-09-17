@@ -40,6 +40,9 @@ on testHandler(results)
 	if (name of item 1 of results) ≠ "test1" then
 		error "Bad result name"
 	end if
+	if (localized string "Localized Value") ≠ "Localized Value in English" then
+		error "Bad Localization"
+	end if
 end testHandler
 
 on open (results)
