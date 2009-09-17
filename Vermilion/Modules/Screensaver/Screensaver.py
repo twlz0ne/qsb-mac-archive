@@ -203,6 +203,11 @@ class Screensaver(ScreensaverBase):
     format = VermilionLocalize.String("%s Screen Saver")
     result[Vermilion.DISPLAY_NAME] = format % name
     result[Vermilion.TYPE] = SCREEN_SAVER_TYPE
+    result[Vermilion.MAIN_ITEM] = name
+    screensaver = VermilionLocalize.String("screensaver")
+    screen_saver = VermilionLocalize.String("screen saver")
+    result[Vermilion.OTHER_ITEMS] = '%s %s' % (screensaver, screen_saver)
+
     return result
 
 class SetScreensaverAction(ScreensaverBase):

@@ -308,6 +308,8 @@ class StockQuoter(object):
     snippet = snippet_format % (exchange_name, hi, lo, volume)
     if self.debugging_enabled:
       print "Snippet: %s." % snippet
+    result[Vermilion.MAIN_ITEM] = symbol
+    result[Vermilion.OTHER_ITEMS] = '%s %s' % (company_name, exchange_name)
     result[Vermilion.SNIPPET] = snippet
     result[Vermilion.TYPE] = STOCK_QUOTE_TYPE
     result[Vermilion.IMAGE] = 'StockQuoter.icns'

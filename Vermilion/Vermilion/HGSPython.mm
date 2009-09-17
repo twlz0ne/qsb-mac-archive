@@ -64,6 +64,14 @@ static const char *kHGSPythonNormalizedQueryMemberName = "normalized_query";
 static const char *kHGSPythonRawQueryMemberName = "raw_query";
 static const char *kHGSPythonPivotObjectMemberName = "pivot_object";
 
+// Accommodate passing along the primary search terms for scoring purposes.
+static const char *kHGSPythonResultMainItemKey = "MAIN_ITEM";
+static const char *kHGSPythonResultOtherItemsKey = "OTHER_ITEMS";
+NSString* const kHGSPythonResultMainItemStringKey
+  = @"kHGSPythonResultMainItemStringKey";
+NSString* const kHGSPythonResultOtherItemsStringKey
+  = @"kHGSPythonResultOtherItemsStringKey";
+
 typedef struct {
   PyObject_HEAD
   PyObject  *rawQuery_;    // string
@@ -296,6 +304,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                  [kHGSObjectAttributeDefaultActionKey UTF8String]);
       PyModule_AddStringConstant(vermilionModule_, kPythonResultTypeKey,
                                  [kHGSObjectAttributeTypeKey UTF8String]);
+      PyModule_AddStringConstant(vermilionModule_, kHGSPythonResultMainItemKey,
+                                 [kHGSPythonResultMainItemStringKey UTF8String]);
+      PyModule_AddStringConstant(vermilionModule_, kHGSPythonResultOtherItemsKey,
+                                 [kHGSPythonResultOtherItemsStringKey UTF8String]);
+
       // Add our implemented-in-C Query class
       if (PyType_Ready(&QueryType) >= 0) {
         Py_INCREF(&QueryType);
@@ -690,6 +703,7 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
         for (Py_ssize_t i = 0; i < resultCount; ++i) {
           PyObject *dict = PyList_GET_ITEM(pythonResults, i);
           char *identifier = nil, *displayName = nil, *snippet = nil;
+          char *mainItem = nil, *otherItems = nil;
           char *image = nil, *defaultAction = nil;
           NSString *type = kHGSTypePython;
           if (PyDict_Check(dict)) {
@@ -726,6 +740,14 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                     type = [NSString stringWithUTF8String:
                             PyString_AsString(pyValue)];
                   }
+                } else if ([key isEqual:kHGSPythonResultMainItemStringKey]) {
+                  if (PyString_Check(pyValue)) {
+                    mainItem = PyString_AsString(pyValue);
+                  }
+                } else if ([key isEqual:kHGSPythonResultOtherItemsStringKey]) {
+                  if (PyString_Check(pyValue)) {
+                    otherItems = PyString_AsString(pyValue);
+                  }
                 } else if (pyValue) {
                   HGSPythonObject *pyObj 
                     = [HGSPythonObject pythonObjectWithObject:pyValue];
@@ -734,23 +756,32 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
               }
             }
             if (identifier) {
-              // TODO(dmaclach): Update the following ranking approach
-              // at the appropriate time.
-              CGFloat rank = 0.0;
               NSString *displayNameString = nil;
               if (displayName) {
                 displayNameString = [NSString stringWithUTF8String:displayName];
-                NSString *normalizedDisplayName
-                  = [HGSTokenizer tokenizeString:displayNameString];
-
+              }
+              // Score the main term and then the other terms, giving the
+              // other terms a 50% weight.
+              CGFloat rank = 0.0;
+              if (mainItem) {
                 const char *queryCString
                   = PyString_AsString(self->normalizedQuery_);
                 NSString *queryString
                   = [NSString stringWithUTF8String:queryCString];
-                rank = HGSScoreTermForItem(queryString, 
-                                           normalizedDisplayName,
-                                           NULL);
+                NSArray *queryTerms
+                  = [queryString componentsSeparatedByString:@" "];
+                NSString *itemString = [NSString stringWithUTF8String:mainItem];
+                NSString *mainItemString = [HGSTokenizer tokenizeString:itemString];
+                itemString = [NSString stringWithUTF8String:otherItems];
+                NSString *otherItemsString = [HGSTokenizer tokenizeString:itemString];
+                NSArray *otherItemsArray
+                  = [otherItemsString componentsSeparatedByString:@" "];
+                rank = HGSScoreTermsForMainAndOtherItems(queryTerms, 
+                                                         mainItemString,
+                                                         otherItemsArray,
+                                                         NULL);
               }
+              
               if (rank > 0.0) {
                 NSMutableDictionary *attributes 
                   = [NSMutableDictionary
