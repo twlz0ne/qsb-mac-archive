@@ -78,6 +78,8 @@ class VermilionTest(object):
       result[Vermilion.DISPLAY_NAME] = "%s Result" % query.normalized_query
       result[Vermilion.TYPE] = "python.test.type"
       result[Vermilion.SNIPPET] = VermilionLocalize.String("Localized Value")
+      result[Vermilion.MAIN_ITEM] = query.normalized_query
+      result[Vermilion.OTHER_ITEMS] = ""
       result["CustomKey"] = "CustomValue"
       results.append(result)
       query.SetResults(results)
