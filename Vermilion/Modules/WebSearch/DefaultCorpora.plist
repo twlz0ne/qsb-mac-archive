@@ -80,7 +80,7 @@
 		<key>kHGSObjectAttributeGoogleAPIURL</key>
 		<string></string>
 		<key>kHGSCorporaSourceAttributeIconNameKey</key>
-		<string>alt-images</string>
+		<string>image_search</string>
 		<key>kHGSObjectAttributeInlineBrowserLimit</key>
 		<string>http://images.google.com/images</string>
 		<key>kHGSObjectAttributeSearchInline</key>
@@ -138,7 +138,7 @@
 		<key>kHGSObjectAttributeGoogleAPIAlwaysHideResults</key>
 		<true/>
 		<key>kHGSCorporaSourceAttributeIconNameKey</key>
-		<string>alt-news</string>
+		<string>news</string>
 		<key>kHGSObjectAttributeName</key>
 		<string>^Google News</string>
 		<key>kHGSObjectAttributeCorpusName</key>
@@ -224,7 +224,7 @@
 		<key>kHGSObjectAttributeCategory</key>
 		<string>Google</string>
 		<key>kHGSCorporaSourceAttributeIconNameKey</key>
-		<string>alt-wikipedia</string>
+		<string>wikipedia</string>
 		<key>kHGSObjectAttributeName</key>
 		<string>^Wikipedia</string>
 		<key>kHGSCorporaSourceAttributeURIString</key>
@@ -383,19 +383,19 @@
 		<key>kHGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
-  <dict>
-    <key>kHGSCorporaSourceAttributeIconNameKey</key>
-    <string>finance</string>
-    <key>kHGSObjectAttributeName</key>
-    <string>Google Finance</string>
-    <key>kHGSCorporaSourceAttributeURIString</key>
-    <string>http://www.google.com/finance</string>
-    <key>kHGSCorporaSourceAttributeMobileURIString</key>
-    <string>finance:</string>
-    <key>kHGSObjectAttributeWebSearchTemplate</key>
-    <string>http://www.google.com/finance?q={searchterms}</string>
-    <key>kHGSObjectAttributeType</key>
-    <string>webpage.application</string>
-  </dict>
+	<dict>
+		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<string>finance</string>
+		<key>kHGSObjectAttributeName</key>
+		<string>Google Finance</string>
+		<key>kHGSCorporaSourceAttributeURIString</key>
+		<string>http://www.google.com/finance</string>
+		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<string>finance:</string>
+		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<string>http://www.google.com/finance?q={searchterms}</string>
+		<key>kHGSObjectAttributeType</key>
+		<string>webpage.application</string>
+	</dict>
 </array>
 </plist>
