@@ -2342,7 +2342,7 @@
 		8B21631E0EB9022300183DE4 /* QSBDetailedRowViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBDetailedRowViewController.m; sourceTree = "<group>"; };
 		8B232E801062B46800AF7287 /* grabicon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = grabicon.icns; sourceTree = "<group>"; };
 		8B23300D1062C12700AF7287 /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = en_US.lproj/Localizable.strings; sourceTree = "<group>"; };
-		8B2334721062FF5E00AF7287 /* image_search.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = image_search.icns; path = ../image_search.icns; sourceTree = "<group>"; };
+		8B2334721062FF5E00AF7287 /* image_search.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = image_search.icns; sourceTree = "<group>"; };
 		8B2334801063013600AF7287 /* wikipedia.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = wikipedia.icns; sourceTree = "<group>"; };
 		8B307BDE1051B5D4006C4C7A /* SampleEmail.emlx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SampleEmail.emlx; sourceTree = "<group>"; };
 		8B3082DB1056EE1F006C4C7A /* GTMNSNumber+64Bit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSNumber+64Bit.m"; sourceTree = "<group>"; };
