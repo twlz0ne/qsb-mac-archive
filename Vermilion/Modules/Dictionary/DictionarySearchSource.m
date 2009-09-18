@@ -104,7 +104,9 @@ static const int kMinQueryLength = 3;
     highRelevance = YES;
   }
   CFRange range = DCSGetTermRangeInString(NULL, (CFStringRef)query, 0);
-  if (range.location != kCFNotFound && range.length != kCFNotFound) {
+  if (range.location != kCFNotFound 
+      && range.length != kCFNotFound 
+      && range.length == [query length]) {
     CFStringRef def = DCSCopyTextDefinition(NULL, (CFStringRef)query, range);
     if (def) {
       NSString *urlString 
