@@ -48,12 +48,7 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Copy to Clipboard</string>
 			<key>HGSActionDirectObjectTypes</key>
-			<array>
-				<string>clipboard.string</string>
-				<string>clipboard.rtf</string>
-				<string>clipboard.url</string>
-				<string>clipboard.image</string>
-			</array>
+			<string>*</string>
 		</dict>
 	</array>
 </dict>
