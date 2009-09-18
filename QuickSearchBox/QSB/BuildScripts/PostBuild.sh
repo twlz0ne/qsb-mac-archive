@@ -34,5 +34,7 @@
 # Script that runs postbuild for QSB
 # Generates breakpad symbols and performs basic localization tricks
 
-"${SRCROOT}/BuildScripts/GenerateBreakpadSymbols.sh"
-"${SRCROOT}/BuildScripts/Localization.sh"
+mypath=`dirname "$0"`
+
+"${mypath}/GenerateBreakpadSymbols.sh"
+"${mypath}/Localization.sh"
