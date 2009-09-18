@@ -137,7 +137,7 @@
 
 @end
 
-@implementation HGSExtensionTestCase 
+@implementation HGSExtensionAbstractTestCase 
 
 @synthesize extension = extension_;
 @synthesize extensionPoint = extensionPoint_;
@@ -195,7 +195,7 @@ extensionPointIdentifier:(NSString *)extensionPoint {
 
 @end
 
-@implementation HGSSearchSourceTestCase
+@implementation HGSSearchSourceAbstractTestCase
 @dynamic source;
 
 - (id)initWithInvocation:(NSInvocation *)invocation
@@ -242,7 +242,7 @@ extensionPointIdentifier:(NSString *)extensionPoint {
 
 @end
 
-@implementation HGSActionTestCase
+@implementation HGSActionAbstractTestCase
 @dynamic action;
 
 - (id)initWithInvocation:(NSInvocation *)invocation
@@ -251,16 +251,12 @@ extensionPointIdentifier:(NSString *)extensionPoint {
   return [super initWithInvocation:invocation 
                        pluginNamed:pluginName 
                extensionIdentifier:identifier 
-          extensionPointIdentifier:kHGSSourcesExtensionPoint];
+          extensionPointIdentifier:kHGSActionsExtensionPoint];
 }
 
 - (HGSAction *)action {
   return [self extension];
 }
 
-// TODO(dmaclach):remove this once we have some subclasses of this thing.
-+ (BOOL)isAbstractTestCase {
-  return YES;
-}
 @end
 

@@ -278,8 +278,10 @@ GTM_METHOD_CHECK(NSString, readableURLString);
                                              type:[self type]
                                            source:source_
                                        attributes:attributes];
-  newResult->rank_ = rank_;
-  newResult->rankFlags_ = rankFlags_;
+  if (newResult) {
+    newResult->rank_ = rank_;
+    newResult->rankFlags_ = rankFlags_;
+  }
   return newResult;
 }
 
@@ -443,7 +445,7 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   // be equal at a base impl layer.
   BOOL intersects = NO;
   
-  if (self->conformsToContact_ 
+  if (compareTo && self->conformsToContact_ 
       && compareTo->conformsToContact_) {
     
     // Running through the identifers ourself is faster than creating two

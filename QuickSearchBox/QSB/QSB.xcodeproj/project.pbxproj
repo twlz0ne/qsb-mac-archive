@@ -923,6 +923,17 @@
 		8B92527B0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B92527A0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m */; };
 		8B9257170EE9CCF300F3DF32 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B93E3A80FC8F7A50077616C /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
+		8B95AA0110642867000C4C6B /* GTMSenTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */; };
+		8B95AA0210642867000C4C6B /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
+		8B95AA0310642867000C4C6B /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
+		8B95AA0410642867000C4C6B /* HGSUnitTestingUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B852E401007B1DE00880329 /* HGSUnitTestingUtilities.m */; };
+		8B95AA0710642867000C4C6B /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
+		8B95AA0810642867000C4C6B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
+		8B95AA0910642867000C4C6B /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		8B95AA0A10642867000C4C6B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
+		8B95AA0B10642867000C4C6B /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B55DB010E78832300D39CB0 /* SenTestingKit.framework */; };
+		8B95AA0C10642867000C4C6B /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
+		8B95AA941064298E000C4C6B /* ClipboardTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95AA931064298E000C4C6B /* ClipboardTest.m */; };
 		8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B95CCB60F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1424,13 +1435,6 @@
 			remoteGlobalIDString = 8B3EF87F0EF2C8A80036FFBD;
 			remoteInfo = Shortcuts;
 		};
-		8B48108F1046345700BB6A2D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
-			remoteInfo = Vermilion;
-		};
 		8B4811051046347D00BB6A2D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1591,6 +1595,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
+		};
+		8B95AA6C1064288F000C4C6B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A5831D9100BFBBB00EC32CF /* Clipboard */;
+			remoteInfo = Clipboard;
 		};
 		8B989F400FA7B93C009DC652 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -3084,6 +3095,8 @@
 		8B9250DB0EE861E000F3DF32 /* QSBOpenProductHomepageCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBOpenProductHomepageCommand.m; sourceTree = "<group>"; };
 		8B9250DC0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBOpenPreferencesCommand.m; sourceTree = "<group>"; };
 		8B92527A0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBHGSObjectSpecifiers.m; sourceTree = "<group>"; };
+		8B95AA1210642867000C4C6B /* Spotlight Files Test.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Spotlight Files Test.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B95AA931064298E000C4C6B /* ClipboardTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClipboardTest.m; sourceTree = "<group>"; };
 		8B95CA910F6B09FE003BDBDD /* HGSAccountTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccountTest.m; sourceTree = "<group>"; };
 		8B95CA920F6B09FE003BDBDD /* HGSQueryControllerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSQueryControllerTest.m; sourceTree = "<group>"; };
 		8B95CA930F6B09FE003BDBDD /* HGSIconProviderTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSIconProviderTest.m; sourceTree = "<group>"; };
@@ -3740,6 +3753,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8B95AA0610642867000C4C6B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B95AA0710642867000C4C6B /* GTM.framework in Frameworks */,
+				8B95AA0810642867000C4C6B /* AppKit.framework in Frameworks */,
+				8B95AA0910642867000C4C6B /* Vermilion.framework in Frameworks */,
+				8B95AA0A10642867000C4C6B /* Foundation.framework in Frameworks */,
+				8B95AA0B10642867000C4C6B /* SenTestingKit.framework in Frameworks */,
+				8B95AA0C10642867000C4C6B /* OCMock.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8BD97D080E636D8C00F5C83B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -3867,6 +3893,7 @@
 				8B852BDE1007AD1B00880329 /* WebBookmarksTest.octest */,
 				5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */,
 				8B4810AD1046345700BB6A2D /* Spotlight Files Test.octest */,
+				8B95AA1210642867000C4C6B /* Spotlight Files Test.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -4005,6 +4032,7 @@
 			isa = PBXGroup;
 			children = (
 				5A583727101120D300EC32CF /* clipboard.icns */,
+				8B95AA931064298E000C4C6B /* ClipboardTest.m */,
 				5A5833A0100D117100EC32CF /* ClipboardActions.m */,
 				5A5834A0100D523E00EC32CF /* ClipboardSearchSource.h */,
 				5A58323D100BFC4D00EC32CF /* ClipboardSearchSource.m */,
@@ -4773,7 +4801,7 @@
 				8B637B570F2777C300997738 /* GData.framework */,
 				8BCCB03C10348ABE0051B567 /* libGDataTouchStaticLib.a */,
 				8B637B590F2777C300997738 /* GDataUnitTests.octest */,
-				62BD15D9103DB32A00C85BC3 /* GDataTouchUnitTests.octest */,
+				62BD15D9103DB32A00C85BC3 /* GDataIPhoneUnitTests.octest */,
 				8B637B5B0F2777C300997738 /* DevelopmentTestTool */,
 			);
 			name = Products;
@@ -6520,7 +6548,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				8B48108E1046345700BB6A2D /* PBXTargetDependency */,
 				8B4811061046347D00BB6A2D /* PBXTargetDependency */,
 			);
 			name = "Spotlight Files Test";
@@ -6695,6 +6722,25 @@
 			name = "Web Bookmarks Test";
 			productName = VermilionTest;
 			productReference = 8B852BDE1007AD1B00880329 /* WebBookmarksTest.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+		8B95A9F010642867000C4C6B /* Clipboard Test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8B95AA0E10642867000C4C6B /* Build configuration list for PBXNativeTarget "Clipboard Test" */;
+			buildPhases = (
+				8B95A9F510642867000C4C6B /* Resources */,
+				8B95AA0010642867000C4C6B /* Sources */,
+				8B95AA0610642867000C4C6B /* Frameworks */,
+				8B95AA0D10642867000C4C6B /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8B95AA6D1064288F000C4C6B /* PBXTargetDependency */,
+			);
+			name = "Clipboard Test";
+			productName = VermilionTest;
+			productReference = 8B95AA1210642867000C4C6B /* Spotlight Files Test.octest */;
 			productType = "com.apple.product-type.bundle";
 		};
 		8BCCD2620EC8E5EC00688D64 /* System AppleScript */ = {
@@ -6962,6 +7008,7 @@
 				F4E3B57B0EB6573300CB713D /* Calculator */,
 				623FA35E0E5C8D97003630C1 /* ChatBuddies */,
 				5A5831D9100BFBBB00EC32CF /* Clipboard */,
+				8B95A9F010642867000C4C6B /* Clipboard Test */,
 				8B6F2F200DA2BB660052CA40 /* Contacts */,
 				F4FEECCC0EC4BF99000758EC /* CorePlugin */,
 				8B3D266E0EAE8E7A004EA504 /* Developer Documentation */,
@@ -7012,10 +7059,10 @@
 			remoteRef = 620054580F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		62BD15D9103DB32A00C85BC3 /* GDataTouchUnitTests.octest */ = {
+		62BD15D9103DB32A00C85BC3 /* GDataIPhoneUnitTests.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = GDataTouchUnitTests.octest;
+			path = GDataIPhoneUnitTests.octest;
 			remoteRef = 62BD15D8103DB32A00C85BC3 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -7554,6 +7601,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8B95A9F510642867000C4C6B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8BC6DD4E0FAA5E21005A0F6F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -7963,6 +8017,19 @@
 			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/GData.build/${CONFIGURATION}/GDataFramework.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/PostBuild.sh\"";
 		};
 		8B852BD91007AD1B00880329 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\nset -o errexit\nset -o nounset\nset -o verbose\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
+		};
+		8B95AA0D10642867000C4C6B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -8889,6 +8956,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8B95AA0010642867000C4C6B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B95AA0110642867000C4C6B /* GTMSenTestCase.m in Sources */,
+				8B95AA0210642867000C4C6B /* GTMUnitTestDevLog.m in Sources */,
+				8B95AA0310642867000C4C6B /* HGSBundle.m in Sources */,
+				8B95AA0410642867000C4C6B /* HGSUnitTestingUtilities.m in Sources */,
+				8B95AA941064298E000C4C6B /* ClipboardTest.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8BD97D070E636D8C00F5C83B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -9224,11 +9303,6 @@
 			target = 8B3EF87F0EF2C8A80036FFBD /* Shortcuts */;
 			targetProxy = 8B3EF9860EF2C9000036FFBD /* PBXContainerItemProxy */;
 		};
-		8B48108E1046345700BB6A2D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
-			targetProxy = 8B48108F1046345700BB6A2D /* PBXContainerItemProxy */;
-		};
 		8B4811061046347D00BB6A2D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B6F2EF80DA2BA260052CA40 /* Spotlight Files */;
@@ -9303,6 +9377,11 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 8B93E3BC0FC8F86B0077616C /* PBXContainerItemProxy */;
+		};
+		8B95AA6D1064288F000C4C6B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A5831D9100BFBBB00EC32CF /* Clipboard */;
+			targetProxy = 8B95AA6C1064288F000C4C6B /* PBXContainerItemProxy */;
 		};
 		8B989F5A0FA7B977009DC652 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -11672,6 +11751,45 @@
 			};
 			name = Release;
 		};
+		8B95AA0F10642867000C4C6B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				PRODUCT_NAME = "Spotlight Files Test";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		8B95AA1010642867000C4C6B /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				PRODUCT_NAME = "Spotlight Files Test";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = "Debug-gcov";
+		};
+		8B95AA1110642867000C4C6B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238D0F12B97E008182B5 /* ReleaseUnittest.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				PRODUCT_NAME = "Spotlight Files Test";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
 		8B95CBB10F6B1DEE003BDBDD /* Debug-gcov */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624C00F12C79E008182B5 /* QSBDebug.xcconfig */;
@@ -12832,6 +12950,16 @@
 				8B852BDB1007AD1B00880329 /* Debug */,
 				8B852BDC1007AD1B00880329 /* Debug-gcov */,
 				8B852BDD1007AD1B00880329 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8B95AA0E10642867000C4C6B /* Build configuration list for PBXNativeTarget "Clipboard Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B95AA0F10642867000C4C6B /* Debug */,
+				8B95AA1010642867000C4C6B /* Debug-gcov */,
+				8B95AA1110642867000C4C6B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

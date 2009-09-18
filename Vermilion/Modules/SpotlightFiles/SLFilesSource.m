@@ -466,9 +466,16 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
              type:(NSString *)typeStr
            source:(HGSSearchSource *)source
        attributes:(NSDictionary *)attributes {
-  HGSLogDebug(@"Don't init SLHGSResult this way");
+  
+  // If we are being initialized like this, we really don't want an
+  // SLHGSResult, because we don't have an MDItem to wrap.
   [self release];
-  return nil;
+  self = [[HGSResult alloc] initWithURI:uri 
+                                   name:name 
+                                   type:typeStr 
+                                 source:source 
+                             attributes:attributes];
+  return self;
 }
 
 - (id)initWithDictionary:(NSDictionary*)dict

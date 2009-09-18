@@ -56,7 +56,7 @@
  A base class for testing various extensions. Takes care of loading and
  unloading the extension appropriately for you.
 */
-@interface HGSExtensionTestCase : GTMTestCase {
+@interface HGSExtensionAbstractTestCase : GTMTestCase {
  @private
   HGSExtension *extension_;
   HGSExtensionPoint *extensionPoint_;
@@ -87,7 +87,7 @@ extensionPointIdentifier:(NSString *)extensionPoint;
 /*!
  A base class for testing source extensions.
 */
-@interface HGSSearchSourceTestCase : HGSExtensionTestCase
+@interface HGSSearchSourceAbstractTestCase : HGSExtensionAbstractTestCase
 @property (readonly, retain, nonatomic) HGSSearchSource *source;
 /*!
  Designated initializer for HGSSearchSourceTestCase.
@@ -110,7 +110,7 @@ extensionPointIdentifier:(NSString *)extensionPoint;
 /*!
  A base class for testing action extensions.
  */
-@interface HGSActionTestCase : HGSExtensionTestCase
+@interface HGSActionAbstractTestCase : HGSExtensionAbstractTestCase
 @property (readonly, retain, nonatomic) HGSAction *action;
 /*!
  Designated initializer for HGSActionTestCase.

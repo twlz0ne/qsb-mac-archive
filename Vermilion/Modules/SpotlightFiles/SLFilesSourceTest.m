@@ -34,7 +34,7 @@
 #import "SLFilesSource.h"
 #import <OCMock/OCMock.h>
 
-@interface SLFilesSourceTest : HGSSearchSourceTestCase {
+@interface SLFilesSourceTest : HGSSearchSourceAbstractTestCase {
  @private
   NSString *testFolderPath_;
   NSString *uniqueTestString_;
@@ -418,18 +418,6 @@
                           @"Path: %@", path);
     ++i;
   }
-}
-
-- (void)testBadInit {
-  HGSSearchSource *source = [self source];
-  Class cls = [source resultClass];
-  STAssertNotNil(cls, nil);
-  HGSResult *result = [[[cls alloc] initWithURI:@"foo" 
-                                           name:@"foo" 
-                                           type:kHGSTypeFile 
-                                         source:source 
-                                     attributes:nil] autorelease];
-  STAssertNil(result, nil);
 }
 
 @end
