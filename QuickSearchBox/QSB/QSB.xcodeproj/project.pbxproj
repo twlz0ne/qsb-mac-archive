@@ -934,6 +934,7 @@
 		8B95AA0B10642867000C4C6B /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B55DB010E78832300D39CB0 /* SenTestingKit.framework */; };
 		8B95AA0C10642867000C4C6B /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
 		8B95AA941064298E000C4C6B /* ClipboardTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95AA931064298E000C4C6B /* ClipboardTest.m */; };
+		8B95AC8310644731000C4C6B /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B95CCB50F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B95CCB60F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B95CD200F6EDF9D003BDBDD /* GTMRegex.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -8588,6 +8589,7 @@
 				5AF0EB6F0F6074A00041E0B9 /* DictionaryActions.m in Sources */,
 				5AF0EB700F6074A00041E0B9 /* DictionarySearchSource.m in Sources */,
 				5AF0EC640F6075A30041E0B9 /* HGSBundle.m in Sources */,
+				8B95AC8310644731000C4C6B /* GTMMethodCheck.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

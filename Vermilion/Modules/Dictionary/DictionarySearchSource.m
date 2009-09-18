@@ -32,6 +32,8 @@
 
 #import <Vermilion/Vermilion.h>
 #import <CoreServices/CoreServices.h>
+#import "GTMNSNumber+64Bit.h"
+#import "GTMMethodCheck.h"
 
 static NSString *kDictionaryUrlFormat = @"qsbdict://%@";
 static NSString *kDictionaryResultType
@@ -50,6 +52,7 @@ static const int kMinQueryLength = 3;
 @end
 
 @implementation DictionarySearchSource
+GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -94,9 +97,19 @@ static const int kMinQueryLength = 3;
   NSString *dictionaryPrefix = HGSLocalizedString(@"define ",
                                                   @"prefix for explicit "
                                                   @"dictionary searches of the "
-                                                  @"form define: foo");
-  if ([[query lowercaseString] hasPrefix:dictionaryPrefix]) {
+                                                  @"form define foo");
+  NSString *dictionarySuffix = HGSLocalizedString(@" define",
+                                                  @"suffix for explicit "
+                                                  @"dictionary searches of the "
+                                                  @"form 'foo define'");
+  NSString *lowerQuery = [query lowercaseString];
+  if ([lowerQuery hasPrefix:dictionaryPrefix]) {
     query = [query substringFromIndex:[dictionaryPrefix length]];
+    NSCharacterSet *set = [NSCharacterSet whitespaceCharacterSet];
+    query = [query stringByTrimmingCharactersInSet:set];
+    highRelevance = YES;
+  } else if ([lowerQuery hasSuffix:dictionarySuffix]) {
+    query = [query substringToIndex:[query length] - [dictionarySuffix length]];
     NSCharacterSet *set = [NSCharacterSet whitespaceCharacterSet];
     query = [query stringByTrimmingCharactersInSet:set];
     highRelevance = YES;
@@ -123,10 +136,12 @@ static const int kMinQueryLength = 3;
            [query substringWithRange:nsRange], kDictionaryTermKey,
            nil];
       
-      if (highRelevance) {
-        [attributes setValue:[NSNumber numberWithInt:1] 
-                      forKey:kHGSObjectAttributeRankKey]; 
-      }
+      HGSCalibratedScoreType scoreType 
+        = highRelevance ? kHGSCalibratedStrongScore 
+                        : kHGSCalibratedInsignificantScore;
+      CGFloat rank = HGSCalibratedScore(scoreType);
+      NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
+      [attributes setObject:nsRank forKey:kHGSObjectAttributeRankKey]; 
       
       HGSAction *action 
         = [[HGSExtensionPoint actionsPoint]
