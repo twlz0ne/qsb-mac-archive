@@ -3,8 +3,34 @@
 
 <!--
 
-QSB.sdef
-Copyright 2007-2008 Google, Inc. All rights reserved.
+QSB.sdefsrc
+Copyright 2007-2009 Google, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+  * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+  * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -->
 
@@ -35,12 +61,12 @@ Copyright 2007-2008 Google, Inc. All rights reserved.
       <property name="version" code="vers" type="text" access="r"
                 description="The version of the application."/>
       
-      <element name="plugins" code="QSPl" type="plugin" access="r"
+      <element type="plugin" access="r"
                description="The plugins installed in the application.">
         <cocoa key="plugins"/>
       </element>
 
-      <element name="search source" code="QSSS" type="extension" access="r"
+      <element type="extension" access="r"
                description="The search sources installed in the application.">
         <cocoa key="sourceExtensions"/>
       </element>
@@ -83,8 +109,8 @@ Copyright 2007-2008 Google, Inc. All rights reserved.
     </result>
   </command>
 
-  <event name="results received" code="QSBSReRe" 
-         description="This handler is called when results come back from a search">
+  <command name="results received" code="QSBSReRe" 
+           description="This handler is called when results come back from a search">
     <cocoa name="ResultsReceived" class="EventHandlerCommand"/>
     <direct-parameter description="The search results.">
       <type type="search result" list="yes"/>
@@ -93,7 +119,7 @@ Copyright 2007-2008 Google, Inc. All rights reserved.
                description="The text of the original query">
       <cocoa key="forQuery"/>
     </parameter>
-  </event>
+  </command>
   
   <command name="path for file URL" code="QSBSFiUr"
            description="Returns a posix path to a file if the direct object represents a file URL, otherwise returns an empty string">
@@ -136,7 +162,7 @@ Copyright 2007-2008 Google, Inc. All rights reserved.
      </property>
      <property name="id" code="ID  " type="text" access="r"
                description="Extension ID">
-        <cocoa key="extensionIdentifier"/>
+        <cocoa key="identifier"/>
      </property>
      <property name="installed" code="Enab" type="boolean" access="rw"
                description="Is this search source installed?">

@@ -648,6 +648,7 @@
 		8B55450610587A3D00D23AD2 /* SampleImage.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 8B55450510587A3D00D23AD2 /* SampleImage.jpeg */; };
 		8B55450810587AB700D23AD2 /* SampleText.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8B55450710587AB700D23AD2 /* SampleText.txt */; };
 		8B55450A10587B5E00D23AD2 /* SampleCal.ics in Resources */ = {isa = PBXBuildFile; fileRef = 8B55450910587B5E00D23AD2 /* SampleCal.ics */; };
+		8B559ACB10692AA000DB256C /* QSB.sdefsrc in Sources */ = {isa = PBXBuildFile; fileRef = 8B559ACA10692AA000DB256C /* QSB.sdefsrc */; };
 		8B55D9380E786B5D00D39CB0 /* GTMSenTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */; };
 		8B55D9570E786B5D00D39CB0 /* GTMSenTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */; };
 		8B55DAE60E78829300D39CB0 /* GTMNSObject+UnitTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55DAE20E78829300D39CB0 /* GTMNSObject+UnitTesting.m */; };
@@ -917,7 +918,6 @@
 		8B9248A90EE65A2A00F3DF32 /* QSBPathCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B9248A70EE65A2A00F3DF32 /* QSBPathCell.m */; };
 		8B9249CF0EE6DE1C00F3DF32 /* GTMHotKeyTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B9249CD0EE6DE1C00F3DF32 /* GTMHotKeyTextField.m */; };
 		8B9249D00EE6DE1C00F3DF32 /* GTMHotKeyTextField.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B9249CE0EE6DE1C00F3DF32 /* GTMHotKeyTextField.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8B9250970EE8610800F3DF32 /* QSB.sdef in Resources */ = {isa = PBXBuildFile; fileRef = 8B9250960EE8610800F3DF32 /* QSB.sdef */; };
 		8B9250DE0EE861E000F3DF32 /* QSBOpenProductHomepageCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B9250DB0EE861E000F3DF32 /* QSBOpenProductHomepageCommand.m */; };
 		8B9250DF0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B9250DC0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m */; };
 		8B92527B0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B92527A0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m */; };
@@ -1148,6 +1148,20 @@
 		F4FEECD60EC4BF99000758EC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		F4FEECF00EC4C07B000758EC /* URLDetectionSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FD8F1A70E252CDE00E7E6A5 /* URLDetectionSource.m */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXBuildRule section */
+		8B559BB41069322B00DB256C /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.sdefsrc";
+			fileType = pattern.proxy;
+			isEditable = 1;
+			outputFiles = (
+				"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${INPUT_FILE_BASE}.sdef",
+			);
+			script = "${SRCROOT}/BuildScripts/SDEFCompiler.sh";
+		};
+/* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
 		33D2CB1F0DD24CEB00C1FBDC /* PBXContainerItemProxy */ = {
@@ -1602,7 +1616,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 5A5831D9100BFBBB00EC32CF /* Clipboard */;
+			remoteGlobalIDString = 5A5831D9100BFBBB00EC32CF;
 			remoteInfo = Clipboard;
 		};
 		8B989F400FA7B93C009DC652 /* PBXContainerItemProxy */ = {
@@ -2408,6 +2422,8 @@
 		8B55450510587A3D00D23AD2 /* SampleImage.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = SampleImage.jpeg; sourceTree = "<group>"; };
 		8B55450710587AB700D23AD2 /* SampleText.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SampleText.txt; sourceTree = "<group>"; };
 		8B55450910587B5E00D23AD2 /* SampleCal.ics */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SampleCal.ics; sourceTree = "<group>"; };
+		8B559ACA10692AA000DB256C /* QSB.sdefsrc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = QSB.sdefsrc; sourceTree = "<group>"; };
+		8B559BB51069323500DB256C /* SDEFCompiler.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = SDEFCompiler.sh; sourceTree = "<group>"; };
 		8B55D9100E786B5D00D39CB0 /* GTMSenTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMSenTestCase.h; sourceTree = "<group>"; };
 		8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMSenTestCase.m; sourceTree = "<group>"; };
 		8B55D9250E786B5D00D39CB0 /* RunMacOSUnitTests.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = RunMacOSUnitTests.sh; sourceTree = "<group>"; };
@@ -3093,7 +3109,6 @@
 		8B9248A70EE65A2A00F3DF32 /* QSBPathCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPathCell.m; sourceTree = "<group>"; };
 		8B9249CD0EE6DE1C00F3DF32 /* GTMHotKeyTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMHotKeyTextField.m; sourceTree = "<group>"; };
 		8B9249CE0EE6DE1C00F3DF32 /* GTMHotKeyTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMHotKeyTextField.h; sourceTree = "<group>"; };
-		8B9250960EE8610800F3DF32 /* QSB.sdef */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.sdef; path = QSB.sdef; sourceTree = "<group>"; };
 		8B9250DB0EE861E000F3DF32 /* QSBOpenProductHomepageCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBOpenProductHomepageCommand.m; sourceTree = "<group>"; };
 		8B9250DC0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBOpenPreferencesCommand.m; sourceTree = "<group>"; };
 		8B92527A0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBHGSObjectSpecifiers.m; sourceTree = "<group>"; };
@@ -4425,6 +4440,7 @@
 				8B6870871017DF6600ADEA67 /* PostBuild.sh */,
 				8B07C41C0B69234900827344 /* GenerateBreakpadSymbols.sh */,
 				8B07C41D0B69234900827344 /* StripHeaders.sh */,
+				8B559BB51069323500DB256C /* SDEFCompiler.sh */,
 			);
 			path = BuildScripts;
 			sourceTree = "<group>";
@@ -4720,7 +4736,6 @@
 				7F838BF60DB79DB200530EAE /* NewButton.png */,
 				5ACEF2C90F40EBFC007EA38B /* PluginVerifyWindow.xib */,
 				621B1E390E4CD7B800EEF553 /* PreferencesWindow.xib */,
-				8B9250960EE8610800F3DF32 /* QSB.sdef */,
 				8B4893FF0F16EA5300786C1E /* QSBIcon.icns */,
 				8B4894540F16EB1E00786C1E /* QSBPlugin.icns */,
 				8B4894600F16EB9900786C1E /* QSBStatusMenuIconGray.png */,
@@ -4760,6 +4775,7 @@
 				8B92527A0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m */,
 				8B3E067F0EF630DE0036FFBD /* QSBSearchForCommand.m */,
 				8B611BFB0F43949600E29B40 /* QSBPathForFileURLCommand.m */,
+				8B559ACA10692AA000DB256C /* QSB.sdefsrc */,
 			);
 			path = ScriptingSupport;
 			sourceTree = "<group>";
@@ -6492,6 +6508,7 @@
 				8B3EED760CEA86A100D933C0 /* Post Build Script */,
 			);
 			buildRules = (
+				8B559BB41069322B00DB256C /* PBXBuildRule */,
 			);
 			dependencies = (
 				620CB3630FAA838F0029801C /* PBXTargetDependency */,
@@ -7421,7 +7438,6 @@
 				623A00340E9BC5A6002A8401 /* TopFoldResultView.xib in Resources */,
 				623A008F0E9BCA70002A8401 /* TopMessageResultView.xib in Resources */,
 				7F0415BC0EC9356A00B60A18 /* DasherCorpora.plist in Resources */,
-				8B9250970EE8610800F3DF32 /* QSB.sdef in Resources */,
 				7F73699E0EED975C00CE8FCC /* ShowAllButton.png in Resources */,
 				7FF711EB0EF24030000C2AE7 /* ChildArrow.png in Resources */,
 				7F79A24C0F0AA28A000D14CB /* TopSearchStatusResultView.xib in Resources */,
@@ -8824,6 +8840,7 @@
 				8B611BFC0F43949600E29B40 /* QSBPathForFileURLCommand.m in Sources */,
 				8B453B390FB9EFA900C0E951 /* QSBWelcomeController.m in Sources */,
 				8B8516C9100278CC00880329 /* QSBResultIconView.m in Sources */,
+				8B559ACB10692AA000DB256C /* QSB.sdefsrc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
