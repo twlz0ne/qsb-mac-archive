@@ -39,11 +39,6 @@
   #import <Cocoa/Cocoa.h>
 #endif
 
-// Make sure no one includes GMLog.h since we don't want it in QSB specific
-// code.
-// TODO: remove this when we remove shared for open sourcing the code.
-#define SHARED_LOGGING_GMLOG_H_
-
 // In Release builds --
 // 1. we don't want to bother w/ GData's HTTPFetcher's logging support.
 // 2. we turn off NSAssert usage in GData (or any other lib we use as source).
