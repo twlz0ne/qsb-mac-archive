@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dictionary SYSTEM "file://localhost/System/Library/DTDs/sdef.dtd">
+<dictionary title="Google Accounts Terminology">
+
+  <suite name="Standard Suite"
+         code="????"
+         description="Common classes and commands for all applications.">
+    <command name="make" code="corecrel" description="Create a new object.">
+      <cocoa class="NSCreateCommand"/>
+      <parameter name="new" code="kocl" type="type"
+                 description="The class of the new object.">
+        <cocoa key="ObjectClass"/>
+      </parameter>
+      <parameter name="at" code="insh" type="location specifier" optional="yes"
+                 description="The location at which to insert the object.">
+        <cocoa key="Location"/>
+      </parameter>
+      <parameter name="with data"
+                 code="data"
+                 type="any"
+                 optional="yes"
+                 description="The initial contents of the object.">
+        <cocoa key="ObjectData"/>
+      </parameter>
+      <parameter name="with properties" code="prdt" type="record" optional="yes"
+                 description="The initial values for properties of the object.">
+        <cocoa key="KeyDictionary"/>
+      </parameter>
+      <result type="specifier" description="The new object."/>
+    </command>
+  </suite>
+
+  <suite name="Google Accounts Suite"
+         code="gacc"
+         description="Classes for Google Accounts in QSB.">
+    <class name="account"
+           code="pact"
+           description="An account with a password. There are subclasses for each kind of Google account.">
+      <cocoa class="HGSSimpleAccount"/>
+      <property name="user name" code="user" type="text"> 
+        <cocoa key="userName"/>
+      </property>
+      <property name="password" code="pass" type="text"/>
+    </class>
+    <class name="google account"
+           code="gact"
+           inherits="account"
+           description="A standard Google account.">
+      <cocoa class="GoogleAccount"/>
+    </class>
+    <class name="google apps account"
+           code="aact"
+           inherits="account"
+           description="A Google Apps account.">
+      <cocoa class="GoogleAppsAccount"/>
+    </class>
+  </suite>
+</dictionary>

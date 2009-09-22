@@ -39,6 +39,7 @@
 @end
 
 @implementation HGSPluginTest
+
 - (void)testInit {
   HGSPlugin *plugin = [[HGSPlugin alloc] init];
   STAssertNil(plugin, nil);
@@ -72,6 +73,9 @@
   [[[bundleMock stub] 
     andReturn:@"pluginName"] 
    objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+  [[[bundleMock stub] 
+    andReturn:@"bundle.identifier"] 
+   bundleIdentifier];  
   NSDictionary *extensionDict 
     = [NSDictionary dictionaryWithObjectsAndKeys:
        @"HGSPluginTestExtensionClass", kHGSExtensionClassKey,
@@ -90,6 +94,9 @@
    bundlePath];  
   plugin = [[[HGSPlugin alloc] initWithBundle:bundleMock] autorelease];
   STAssertNotNil(plugin, nil);
+  NSString *bundleIdentifier = [plugin bundleIdentifier];
+  STAssertEqualObjects(bundleIdentifier, @"bundle.identifier", nil);
   [bundleMock verify];
 }
+
 @end

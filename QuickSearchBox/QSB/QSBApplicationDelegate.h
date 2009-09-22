@@ -71,6 +71,7 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
   QSBPreferenceWindowController *prefsWindowController_;
   QSBHGSDelegate *hgsDelegate_;
   QSBUserMessenger *userMessenger_;
+  NSAppleEventDescriptor *applicationASDictionary_;
 }
 
 // Manage our application preferences.

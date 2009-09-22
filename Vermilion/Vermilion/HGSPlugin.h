@@ -125,6 +125,11 @@
 */
 - (void)uninstall;
 
+/*!
+ Returns the identifier for the bundle associated with this plugin.
+*/
+- (NSString *)bundleIdentifier;
+
 /*! 
   Remove and discard a protoextension. 
 */

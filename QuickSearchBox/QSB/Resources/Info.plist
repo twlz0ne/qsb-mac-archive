@@ -123,7 +123,7 @@
 	<key>NSPrincipalClass</key>
 	<string>QSBApplication</string>
 	<key>OSAScriptingDefinition</key>
-	<string>QSB.sdef</string>
+	<string>dynamic</string>
 	<key>NSSupportsSuddenTermination</key>
 	<true/>
 	<key>LSHasLocalizedDisplayName</key>

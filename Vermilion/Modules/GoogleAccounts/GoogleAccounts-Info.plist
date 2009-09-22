@@ -69,5 +69,7 @@
 	</array>
 	<key>HGSPluginAPIVersion</key>
 	<string>${VERMILLION_PLUGIN_API_VERSION}</string>
+	<key>NSAppleScriptEnabled</key>
+	<true/>
 </dict>
 </plist>

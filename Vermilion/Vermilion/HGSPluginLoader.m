@@ -42,6 +42,9 @@
 #import <openssl/x509v3.h>
 
 @interface HGSPluginLoader()
+// Returns an array containing the full paths for all bundles
+// found within the given plugin's path.
++ (NSArray *)bundlePathsForPluginPath:(NSString *)pluginPath;
 - (BOOL)isPluginBundleCertified:(NSBundle *)pluginBundle;
 - (BOOL)pluginIsWhitelisted:(NSBundle *)pluginBundle
           withCodeSignature:(HGSCodeSignature *)pluginCodeSignature;
@@ -143,6 +146,66 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
   [super dealloc];
 }
 // COV_NF_END
+
++ (NSArray *)bundlePathsForPluginPath:(NSString *)pluginPath {
+  NSMutableArray *bundlePaths = nil;
+  BOOL isDirectory;
+  NSFileManager *fm = [NSFileManager defaultManager];
+  if ([fm fileExistsAtPath:pluginPath isDirectory:&isDirectory]) {
+    BOOL isPackage = NO;
+    if (isDirectory) {
+      isPackage
+        = [[NSWorkspace sharedWorkspace] isFilePackageAtPath:pluginPath];
+    }
+    id fileEnum
+      = (isDirectory && !isPackage)
+        ? [[NSFileManager defaultManager] enumeratorAtPath:pluginPath]
+        : [NSArray arrayWithObject:pluginPath];
+    for (NSString *path in fileEnum) {
+      NSString* fullPath = nil;
+      if (isDirectory && !isPackage) {
+        [fileEnum skipDescendents];
+        fullPath = [pluginPath stringByAppendingPathComponent:path];
+      } else {
+        fullPath = path;
+      }
+      if (!bundlePaths) {
+        bundlePaths = [NSMutableArray arrayWithObject:fullPath];
+      } else {
+        [bundlePaths addObject:fullPath];
+      }
+    }
+  }
+  return bundlePaths;
+}
+
+- (NSArray *)scriptablePluginBundles {
+  NSMutableArray *plugins = nil;
+  NSArray *pluginPaths = [[self delegate] pluginFolders];
+  for (NSString *pluginPath in pluginPaths) {
+    NSArray *bundlePaths = [HGSPluginLoader bundlePathsForPluginPath:pluginPath];
+    for (NSString *bundlePath in bundlePaths) {
+      NSBundle *pluginBundle = [NSBundle bundleWithPath:bundlePath];
+      // Is it scriptable?
+      BOOL pluginScriptable 
+        = [[pluginBundle objectForInfoDictionaryKey:@"NSAppleScriptEnabled"]
+           boolValue];
+      if (pluginScriptable) {
+        // Does it have any sdefs?
+        NSArray *sdefResourcePaths
+          = [pluginBundle pathsForResourcesOfType:@"sdef" inDirectory:nil];
+        if ([sdefResourcePaths count]) {
+          if (!plugins) {
+            plugins = [NSMutableArray arrayWithObject:pluginBundle];
+          } else {
+            [plugins addObject:pluginBundle];
+          }
+        }
+      }
+    }
+  }
+  return plugins;
+}
 
 - (void)loadPluginsWithErrors:(NSArray **)errors {
   NSArray *pluginPaths = [[self delegate] pluginFolders];
@@ -286,34 +349,15 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 }
 
 - (void)loadPluginsAtPath:(NSString*)pluginPath errors:(NSArray **)errors {
-  BOOL isDirectory;
-  NSFileManager *fm = [NSFileManager defaultManager];
-  if ([fm fileExistsAtPath:pluginPath isDirectory:&isDirectory]) {
-    BOOL isPackage = NO;
-    if (isDirectory) {
-      isPackage = [[NSWorkspace sharedWorkspace] isFilePackageAtPath:pluginPath];
-    }
-    NSMutableArray *ourErrors = [NSMutableArray array];
-    id fileEnum;
-    if (isDirectory && !isPackage) {
-      fileEnum = [[NSFileManager defaultManager] enumeratorAtPath:pluginPath];
-    } else {
-      fileEnum = [NSArray arrayWithObject:pluginPath];
-    }
-    HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
+  NSArray *bundlePaths = [HGSPluginLoader bundlePathsForPluginPath:pluginPath];
+  if ([bundlePaths count]) {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:kHGSPluginLoaderWillLoadPluginsNotification 
                       object:self 
                     userInfo:nil];
-    for (NSString *path in fileEnum) {
+    NSMutableArray *ourErrors = [NSMutableArray array];
+    for (NSString *fullPath in bundlePaths) {
       NSString *errorType = nil;
-      NSString* fullPath = nil;
-      if (isDirectory && !isPackage) {
-        [fileEnum skipDescendents];
-        fullPath = [pluginPath stringByAppendingPathComponent:path];
-      } else {
-        fullPath = path;
-      }
       NSString *extension = [fullPath pathExtension];
       Class pluginClass = [extensionMap_ objectForKey:extension];
       NSString *pluginName = [fullPath lastPathComponent];
@@ -340,6 +384,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
             plugin 
               = [[[pluginClass alloc] initWithBundle:pluginBundle] autorelease];
             if (plugin) {
+              HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
               [pluginsPoint extendWithObject:plugin];
             } else {
               errorType = kHGSPluginLoaderPluginFailedInstantiation;

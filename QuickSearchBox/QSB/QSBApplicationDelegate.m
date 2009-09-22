@@ -1,7 +1,7 @@
 //
 //  QSBApplicationDelegate.m
 //
-//  Copyright (c) 2006-2008 Google Inc. All rights reserved.
+//  Copyright (c) 2006-2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -97,6 +97,8 @@ static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 
 @interface QSBApplicationDelegate ()
 
+@property (retain, nonatomic) NSAppleEventDescriptor *applicationASDictionary;
+
 // sets us up so we're looking for the right hotkey
 - (void)updateHotKeyRegistration;
 
@@ -108,6 +110,9 @@ static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 
 - (void)hotKeyValueChanged:(GTMKeyValueChangeNotification *)note;
 - (void)iconInMenubarValueChanged:(GTMKeyValueChangeNotification *)note;
+
+// Identify all sdef files and compose the application AE dictionary.
+- (void)composeApplicationAEDictionary;
 
 // Reconcile what we previously knew about accounts and saved in our
 // preferences with what we now know about accounts.
@@ -162,6 +167,8 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionaryForActiveApp);
 GTM_METHOD_CHECK(GTMHotKeyTextField, stringForKeycode:useGlyph:resourceBundle:);
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
 GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
+
+@synthesize applicationASDictionary = applicationASDictionary_;
 
 + (NSSet *)keyPathsForValuesAffectingSourceExtensions {
   NSSet *affectingKeys = [NSSet setWithObject:@"plugins"];
@@ -245,6 +252,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [prefsWindowController_ release];
   [hgsDelegate_ release];
   [searchWindowController_ release];
+  [applicationASDictionary_ release];
   [super dealloc];
 }
 
@@ -710,10 +718,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // Check to make sure our plugin data is valid.
   if ([pluginPrefs isKindOfClass:[NSDictionary class]]) {
     NSNumber *version 
-    = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefVersionKey];
+      = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefVersionKey];
     if ([version integerValue] == kQSBPluginConfigurationPrefCurrentVersion) {
       pluginsFromPrefs 
-      = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefPluginsKey];
+        = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefPluginsKey];
     }
   }
   // Install our plugins and enable them based on our previously stored
@@ -810,6 +818,16 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self updateMenuWithAppName:[NSApp mainMenu]];
   [self updateMenuWithAppName:dockMenu_];
   [self updateMenuWithAppName:statusItemMenu_];
+  
+  // Inventory the application and plugin Apple Script sdef files.
+  [self composeApplicationAEDictionary];
+
+  // Install a custom scripting dictionary event handler.
+  NSAppleEventManager *aeManager = [NSAppleEventManager sharedAppleEventManager];
+  [aeManager setEventHandler:self
+                 andSelector:@selector(handleGetSDEFEvent:withReplyEvent:)
+               forEventClass:kASAppleScriptSuite
+                  andEventID:'gsdf'];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
@@ -987,6 +1005,92 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self willChangeValueForKey:@"accounts"];
   [self updateAccountsPreferences];
   [self didChangeValueForKey:@"accounts"];
+}
+
+#pragma mark Apple Script Support
+
+- (void)composeApplicationAEDictionary {
+  // Inventory all .sdef files, including the app's and all plugins.
+  NSMutableArray *sdefPaths = [NSMutableArray array];
+  NSArray *bundleSDEFPaths
+    = [[NSBundle mainBundle] pathsForResourcesOfType:@"sdef" inDirectory:nil];
+  if (bundleSDEFPaths) {
+    [sdefPaths addObjectsFromArray:bundleSDEFPaths];
+  }
+  NSArray *pluginBundles
+    = [[HGSPluginLoader sharedPluginLoader] scriptablePluginBundles];
+  for (NSBundle *pluginBundle in pluginBundles) {
+    bundleSDEFPaths = [pluginBundle pathsForResourcesOfType:@"sdef"
+                                                inDirectory:nil];
+    if (bundleSDEFPaths) {
+      [sdefPaths addObjectsFromArray:bundleSDEFPaths];
+    }
+  }
+  
+  if ([sdefPaths count]) {
+    // load the first .sdef file's xml data.  All of the scripting definitions
+    // from the app and the plugins will be combined into one NSXMLDocument and
+    // then copied into the response Apple event descriptor as UTF-8 XML text.
+    NSString *sdefPath = [sdefPaths objectAtIndex:0];
+    NSURL *sdefURL = [NSURL fileURLWithPath:sdefPath];
+    NSError *xmlError = nil;
+    NSXMLDocument *sdefXML
+      = [[NSXMLDocument alloc] initWithContentsOfURL:sdefURL
+                                             options:NSXMLNodePreserveWhitespace
+                                               error:&xmlError];
+    if (sdefXML) {
+      // Retrieve the root element which will be the root of the final
+      // combined dictionary.
+      NSXMLElement *rootElement = [sdefXML rootElement];
+      [sdefPaths removeObjectAtIndex:0];
+      for (sdefPath in sdefPaths) {
+        NSError *pluginXMLError = nil;
+        sdefURL = [NSURL fileURLWithPath:sdefPath];
+        NSXMLDocument *pluginXML
+          = [[[NSXMLDocument alloc] initWithContentsOfURL:sdefURL
+                                                  options:NSXMLNodePreserveWhitespace
+                                                    error:&pluginXMLError]
+             autorelease];
+        if (pluginXML) {
+          // Copy the plugin definitions over into the collective.
+          NSXMLElement *pluginRoot = [pluginXML rootElement];
+          for (NSXMLNode *childElement in [pluginRoot children]) {
+            [childElement detach];
+            [rootElement addChild:childElement];
+          }
+        } else {
+          HGSLog(@"Error loading plugin .sdef file '%@': %@",
+                 sdefPath, xmlError);
+        }
+      }
+      [sdefXML setCharacterEncoding:
+       (NSString *)CFStringConvertEncodingToIANACharSetName(kCFStringEncodingUTF8)];
+      // The newer version of libxml in Mac OS X 10.6.1 has a couple more 
+      // fields in the sax parser struct, one of which isn't getting
+      // initialized properly.  As a workaround, these fields are never
+      // accessed if -[NSXMLDocument setStandAlone:NO] is called.
+      // See Radar 7242013.
+      [sdefXML setStandalone:NO];
+      NSData *combinedXML = [sdefXML XMLDataWithOptions:NSXMLDocumentValidate];
+      NSAppleEventDescriptor *xmlDictionaryDescriptor
+        = [NSAppleEventDescriptor descriptorWithDescriptorType:typeUTF8Text
+                                                          data:combinedXML];
+      [self setApplicationASDictionary:xmlDictionaryDescriptor];
+    } else {
+      HGSLog(@"Error loading application .sdef file '%@': %@",
+             sdefPath, xmlError);
+    }
+  } else {
+    HGSLogDebug(@"Strange!  No .sdef's found in QSB or its plugins.");
+  }
+}
+
+- (void)handleGetSDEFEvent:(NSAppleEventDescriptor *)event
+            withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
+  if (applicationASDictionary_) {
+    [replyEvent setDescriptor:applicationASDictionary_
+                   forKeyword:keyDirectObject];
+  }
 }
 
 #pragma mark User Messages

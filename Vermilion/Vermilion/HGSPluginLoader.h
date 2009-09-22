@@ -112,7 +112,14 @@
 - (void)registerClass:(Class)cls forExtensions:(NSArray *)extensions;
 
 /*!
- Identify all plugins and their sources and actions.
+ Inventory all plugins which contain one or more sdef files.
+ @result An NSArray containing all plugin bundles which contain
+ sdef files.  nil if there were no sdef files found.
+*/
+- (NSArray *)scriptablePluginBundles;
+
+/*!
+ Identify and load all plugins and their sources and actions.
 */
 - (void)loadPluginsWithErrors:(NSArray **)errors;
 

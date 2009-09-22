@@ -33,9 +33,64 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSPluginLoader.h"
+#import "HGSDelegate.h"
 
-@interface HGSPluginLoaderTest : GTMTestCase 
+@interface HGSTestLoaderDelegate : NSObject <HGSDelegate> 
 @end
 
+@implementation HGSTestLoaderDelegate
+
+- (NSArray *)pluginFolders {
+  NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+  NSString *pluginsPath = [bundle bundlePath];
+  NSArray *pluginsPaths = [NSArray arrayWithObject:pluginsPath];
+  return pluginsPaths;
+}
+
+// Unused delegate functions.
+- (NSString *)userApplicationSupportFolderForApp {
+  return nil;
+}
+- (NSString *)userCacheFolderForApp {
+  return nil;
+}
+- (NSString *)suggestLanguage {
+  return nil;
+}
+- (NSString *)clientID {
+  return nil;
+}
+- (HGSPluginLoadResult)shouldLoadPluginAtPath:(NSString *)path
+                                withSignature:(HGSCodeSignature *)signature {
+  return 0;
+}
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
+  return nil;
+}
+- (NSDictionary *)getActionSaveAsInfoFor:(NSDictionary *)request {
+  return nil;
+}
+
+@end
+
+
+@interface HGSPluginLoaderTest : GTMTestCase
+@end
+
+
 @implementation HGSPluginLoaderTest
+
+- (void)testBundlePathsForPluginPath {
+  HGSPluginLoader *pluginLoader = [HGSPluginLoader sharedPluginLoader];
+  STAssertNotNil(pluginLoader, nil);
+  HGSTestLoaderDelegate *loaderDelegate
+    = [[[HGSTestLoaderDelegate alloc] init] autorelease];
+  STAssertNotNil(loaderDelegate, nil);
+  [pluginLoader setDelegate:loaderDelegate];
+  NSArray *bundles = [pluginLoader scriptablePluginBundles];
+  STAssertNotNil(bundles, nil);
+  STAssertEquals((NSUInteger)1, [bundles count], nil);
+  [pluginLoader setDelegate:nil];
+}
+
 @end

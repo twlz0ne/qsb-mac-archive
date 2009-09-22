@@ -238,6 +238,10 @@ static NSString *const kHGSPluginAPIVersionKey
   }
 }
 
+- (NSString *)bundleIdentifier {
+  return [[self bundle] bundleIdentifier];
+}
+
 - (void)removeProtoExtension:(HGSProtoExtension *)protoExtension {
   [protoExtension uninstall];
   
