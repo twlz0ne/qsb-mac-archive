@@ -462,10 +462,19 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (NSString*)displayToolTip {
-  // TODO(alcor): for now add in rank info to help with debugging. remove.
-  NSString *displayString = [self displayName];
+  NSString *displayString = nil;
+#if DEBUG
+  NSString *sourceName = [[[self representedResult] source] displayName];
+  if (!sourceName) {
+    NSBeep();
+  }
+  displayString = [NSString stringWithFormat:@"%@ (Rank: %.2f, Source: %@)", 
+                   displayString, [self rank], sourceName];
+#else  // DEBUG
+  displayString = [self displayName];
   HGSResult *result = [self representedResult];
-  NSString *snippetString = [result valueForKey:kHGSObjectAttributeSnippetKey];
+  NSString *snippetString 
+    = [result valueForKey:kHGSObjectAttributeSnippetKey];
   if ([snippetString length]) {
     displayString = [displayString stringByAppendingFormat:@" — %@",
                      snippetString];
@@ -475,10 +484,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     displayString = [displayString stringByAppendingFormat:@" — %@",
                      resultSourceURL];
   }
-  return [NSString stringWithFormat:@"%@ (Rank: %.2f, %d)", 
-                                    displayString,
-                                    [self rank],
-                                    [[self representedResult] rankFlags]];
+#endif  // DEBUG
+  return displayString;
 }
 
 - (NSImage *)displayThumbnail {
