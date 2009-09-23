@@ -145,7 +145,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
           = [HGSResult resultWithURI:url
                                 name:searchName
                                 type:kHGSTypeSearchCorpus
-                              source:nil
+                              source:self
                           attributes:attributes];
         [operation setResults:[NSArray arrayWithObject:placeholderItem]];
       }
@@ -160,7 +160,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
       HGSResult *placeholderItem = [HGSResult resultWithURI:identifier
                                                        name:name 
                                                        type:kHGSTypeWebpage 
-                                                     source:nil 
+                                                     source:self 
                                                  attributes:nil];
       [operation setResults:[NSArray arrayWithObjects:placeholderItem, nil]];
     }
