@@ -50,6 +50,7 @@ static NSString *const kClipboardCopyAction
   NSMutableArray *recentResults_;
   NSInteger lastChangeCount_;
   NSImage *clipboardIcon_;
+  HGSResult *clipboardResult_;
 }
 - (NSString *)nameFromStringValue:(NSString *)stringValue;
 - (NSString *)snippetFromStringValue:(NSString *)stringValue;
@@ -74,14 +75,13 @@ static NSString *const kClipboardCopyAction
       = [NSMutableDictionary dictionaryWithObjectsAndKeys:
          clipboardIcon_, kHGSObjectAttributeIconKey,
          nil];
-    HGSResult *result
-      = [HGSResult resultWithURI:urlString
-                            name:name
-                            type:kTypeClipboardGeneric
-                          source:self
-                      attributes:attributes];
-    recentResults_ = [[NSMutableArray arrayWithObject:result] retain];
-    [self indexResult:result];
+    clipboardResult_
+      = [[HGSResult alloc] initWithURI:urlString
+                                  name:name
+                                  type:kTypeClipboardGeneric
+                                source:self
+                            attributes:attributes];
+    recentResults_ = [[NSMutableArray alloc] init];
     types_ = [[NSArray arrayWithObjects:NSRTFPboardType, NSURLPboardType,
                NSStringPboardType, NSTIFFPboardType, NSPDFPboardType,
                NSPICTPboardType, nil] retain];
@@ -103,19 +103,17 @@ static NSString *const kClipboardCopyAction
   [super dealloc];
 }
 
-- (void)processMatchingResults:(NSMutableArray *)results
-                      forQuery:(HGSQuery *)query {
-  if ([query pivotObject]) {
-    // We're pivoting off the persistent "Clipboard" result. Adjust the
-    // ranking of the results so that they appear in chronological order
-    // and remove the persistent result from the array
-    [results removeObjectAtIndex:0];
-    CGFloat rankIncrement = 1.0 / [results count], pos = 0;
-    for (HGSMutableResult *result in results) {
-      [result setRank:rankIncrement * pos];
-      ++pos;
+- (HGSResult *)preFilterResult:(HGSResult *)result 
+               matchesForQuery:(HGSQuery*)query
+                   pivotObject:(HGSResult *)pivotObject {
+  if (pivotObject) {
+    // We're pivoting off the persistent "Clipboard" result. 
+    // Remove the persistent result from the array
+    if ([result isEqual:clipboardResult_]) {
+      result = nil;
     }
   }
+  return result;
 }
 
 - (void)updatePasteboard:(NSTimer *)timer {
@@ -279,11 +277,11 @@ static NSString *const kClipboardCopyAction
           }
         }
         if ([recentResults_ count] > kMaxHistoryItems) {
-          // Zero-index item in the array is the persistent clipboard result
-          [recentResults_ removeObjectAtIndex:1];
+          [recentResults_ removeObjectAtIndex:0];
         }
         [recentResults_ addObject:result];
         [self clearResultIndex];
+        [self indexResult:clipboardResult_]; 
         for (HGSResult *recentResult in recentResults_) {
           [self indexResult:recentResult];
         }

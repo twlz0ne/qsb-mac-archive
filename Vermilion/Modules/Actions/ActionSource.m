@@ -183,57 +183,48 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   [super performSearchOperation:operation];
 }
 
-- (void)processMatchingResults:(NSMutableArray*)results
-                      forQuery:(HGSQuery *)query {
-  NSMutableArray *filteredResults
-    = [NSMutableArray arrayWithCapacity:[results count]];
-
-  
+- (HGSResult *)postFilterResult:(HGSMutableResult *)result 
+                matchesForQuery:(HGSQuery *)query
+                    pivotObject:(HGSResult *)pivotObject {
   HGSResultArray *queryResults = [query results];
+  HGSResult *actionResult = nil;
   if (queryResults) {
     BOOL emptyQuery = [[query rawQueryString] length] == 0;
     
     // Pivot: filter to actions that support this object as the target of the
     // action.
-    for (HGSResult *actionObject in results) {
-      HGSAction *action
-        = [actionObject valueForKey:kHGSObjectAttributeDefaultActionKey];
-      if ([action appliesToResults:queryResults]) {
-        // Now that it is all set up, let's wrap it up in our proxy action.
-        // We do this so that we can sub in the query's pivot object
-        // when our action is called.
-        ActionPivotObjectProxy *proxy 
-          = [[[ActionPivotObjectProxy alloc] initWithAction:action
-                                                      query:query]
-             autorelease];
-        
-        actionObject = [self objectFromAction:(HGSAction *)proxy
-                                  resultArray:queryResults];
-        
-        if (emptyQuery) {
-          HGSMutableResult *mutable = [[actionObject mutableCopy] autorelease];
-          [mutable addRankFlags:eHGSBelowFoldRankFlag];
-          actionObject = mutable;
-        }
-        
-        [filteredResults addObject:actionObject];
+    HGSAction *action
+      = [result valueForKey:kHGSObjectAttributeDefaultActionKey];
+    if ([action appliesToResults:queryResults]) {
+      // Now that it is all set up, let's wrap it up in our proxy action.
+      // We do this so that we can sub in the query's pivot object
+      // when our action is called.
+      ActionPivotObjectProxy *proxy 
+        = [[[ActionPivotObjectProxy alloc] initWithAction:action
+                                                    query:query]
+           autorelease];
+      
+      actionResult = [self objectFromAction:(HGSAction *)proxy
+                                resultArray:queryResults];
+      
+      if (emptyQuery) {
+        HGSMutableResult *mutable = [[actionResult mutableCopy] autorelease];
+        [mutable addRankFlags:eHGSBelowFoldRankFlag];
+        actionResult = mutable;
       }
     }
-
   } else {
-
+    
     // No pivot: so just include the actions that are valid for a top level
     // query.
-    for (HGSResult *actionObject in results) {
-      HGSAction *action
-        = [actionObject valueForKey:kHGSObjectAttributeDefaultActionKey];
-      if ([action showInGlobalSearchResults]) {
-        [filteredResults addObject:actionObject];
-      }
+    HGSAction *action
+      = [result valueForKey:kHGSObjectAttributeDefaultActionKey];
+    if ([action showInGlobalSearchResults]) {
+      actionResult = result;
     }
   }
-
-  [results setArray:filteredResults];
+  
+  return actionResult;
 }
 
 @end

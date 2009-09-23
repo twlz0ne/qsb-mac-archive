@@ -306,23 +306,17 @@ static NSString *const kApplicationSourcePredicateString
   [super performSearchOperation:operation];
 }
 
-- (void)processMatchingResults:(NSMutableArray*)results
-                      forQuery:(HGSQuery *)query {
-  HGSResult *pivotObject = [query pivotObject];
+- (HGSResult *)preFilterResult:(HGSResult *)result 
+               matchesForQuery:(HGSQuery*)query
+                   pivotObject:(HGSResult *)pivotObject {
   if (pivotObject) {
     // Remove things that aren't preference panes
-    NSMutableIndexSet *itemsToRemove = [NSMutableIndexSet indexSet];
-    NSUInteger indexToRemove = 0;
-    for (HGSResult *result in results) {
-      NSString *absolutePath = [result filePath];
-        // TODO(alcor): ignore invalid preference panes
-      if (![self pathIsPrefPane:absolutePath]) {
-        [itemsToRemove addIndex:indexToRemove];
-      }
-      ++indexToRemove;
+    NSString *absolutePath = [result filePath];
+    if (![self pathIsPrefPane:absolutePath]) {
+      result = nil;
     }
-    [results removeObjectsAtIndexes:itemsToRemove];
   }
+  return result;
 }
   
 @end

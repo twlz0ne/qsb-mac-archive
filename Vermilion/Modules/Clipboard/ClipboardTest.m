@@ -31,8 +31,12 @@
 //
 
 #import "HGSUnitTestingUtilities.h"
+static NSString *const kClipboardTestString = @"Lazarus Long Text";
 
-@interface ClipboardSourceTest : HGSSearchSourceAbstractTestCase 
+@interface ClipboardSourceTest : HGSSearchSourceAbstractTestCase {
+ @private
+  NSArray *results_;
+}
 @end
 
 @interface ClipboardCopyActionTest : HGSActionAbstractTestCase
@@ -47,7 +51,40 @@
   return self;
 }
 
-// TODO(dmaclach): add tests
+- (void)testSource {
+  NSPasteboard *pb = [NSPasteboard generalPasteboard];
+  NSData *stringData 
+    = [kClipboardTestString dataUsingEncoding:NSUTF8StringEncoding];
+  [pb setData:stringData forType:NSStringPboardType];
+  NSRunLoop *rl = [NSRunLoop currentRunLoop];
+  [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.5]];
+  HGSSearchSource *source = [self source];
+  HGSQuery *query = [[HGSQuery alloc] initWithString:@"Lazarus" 
+                                             results:nil 
+                                          queryFlags:0];
+  HGSSearchOperation *op = [source searchOperationForQuery:query];
+  NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+  [center addObserver:self 
+             selector:@selector(gotResults:) 
+                 name:kHGSSearchOperationDidUpdateResultsNotification 
+               object:op];
+  STAssertNil(results_, nil);
+  NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
+  [queue addOperation:[op searchOperation]];
+  [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.5]];
+  STAssertEquals([results_ count], (NSUInteger)1, nil);
+  HGSResult *result = [results_ objectAtIndex:0];
+  STAssertEqualObjects([result displayName], kClipboardTestString, nil);
+  [results_ release];
+  results_ = nil;
+}
+
+- (void)gotResults:(NSNotification *)notification {
+  results_ = [[notification userInfo] objectForKey:kHGSSearchOperationNotificationResultsKey];
+  STAssertNotNil(results_, nil);
+  [results_ retain];
+  
+}
 
 @end
 
@@ -60,7 +97,56 @@
   return self;
 }
 
-// TODO(dmaclach): add tests
+- (void)testCopy {
+
+  HGSSearchSource *textSource
+    = (HGSSearchSource *)[self extensionWithIdentifier:@"com.google.qsb.core.textinput.source"
+                                       fromPluginNamed:@"CorePlugin"
+                              extensionPointIdentifier:kHGSSourcesExtensionPoint];
+  STAssertNotNil(textSource, nil);
+  HGSResult *textResult 
+    = [HGSResult resultWithURI:@"userinput:text"
+                          name:@"Lazarus Long"
+                          type:kHGSTypeTextUserInput
+                        source:textSource
+                    attributes:nil];
+  STAssertNotNil(textResult, nil);
+  HGSResultArray *array = [HGSResultArray arrayWithResult:textResult];
+  STAssertNotNil(array, nil);
+  HGSAction *action = [self action];
+  STAssertNotNil(action, nil);
+  
+  // Things we want to copy should have clipbard data attached to them
+  BOOL isGood = [action appliesToResults:array];
+  STAssertFalse(isGood, nil);
+  
+  // Attach some clipboard data
+  NSDictionary *pasteBoardValue 
+    = [NSDictionary dictionaryWithObject:kClipboardTestString
+                                  forKey:NSStringPboardType];
+  NSDictionary *attributes 
+    = [NSDictionary dictionaryWithObject:pasteBoardValue 
+                                  forKey:kHGSObjectAttributePasteboardValueKey];
+  HGSResult *newResult = [textResult resultByAddingAttributes:attributes];
+  STAssertNotNil(newResult, nil);
+  array = [HGSResultArray arrayWithResult:newResult];
+  STAssertNotNil(array, nil);
+  isGood = [action appliesToResults:array];
+  STAssertTrue(isGood, nil);
+  NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+                        array, kHGSActionDirectObjectsKey, nil];
+  
+  // Perform copy
+  isGood = [action performWithInfo:info];
+  STAssertTrue(isGood, nil);
+  
+  // Check to make sure the values actually made it to the clipboard.
+  NSPasteboard *pb = [NSPasteboard generalPasteboard];
+  NSData *data = [pb dataForType:NSStringPboardType];
+  NSString *dataString = [[NSString alloc] initWithData:data 
+                                               encoding:NSUTF8StringEncoding];
+  STAssertEqualObjects(dataString, kClipboardTestString, nil);
+}
 
 @end
 

@@ -38,22 +38,25 @@
 */
 
 @class HGSQuery;
+@class HGSMutableResult;
 
 /*!
  Subclass of HGSCallbackSearchSource that handles the search logic for simple
  sources that precompute all possible results and keep them in memory.
-
- When a query comes in, all matching items will be found, then passed through
- |processMatchingResults:forQuery:| and returned. The default implementation
- of that method does nothing, so by default results will be returned
- unchanged.
-
+ 
+ When a query comes in, all items will be passed through
+ |preFilterResult:matchesForQuery:pivotObject:|, then they will be filtered
+ by name  and then passed through
+ |postFilterResult:matchesForQuery:pivotObject:| and returned. The default
+ implementations of the filters do nothing, so by default results will be
+ returned unchanged.
+ 
  HGSMemorySearchSource gets the base behavior for |pivotableTypes| and
  |isValidSourceForQuery:|, meaning it will support a query without a context
  object, but not match if there is a context (pivot) object.  Subclasses can
- override this method to support pivots.  When a query with a pivot without a 
- search term comes in, all objects are returned as matches, meaning they all get 
- sent to |processMatchingResults:forQuery:|, the subclass then has the
+ override this method to support pivots.  When a query with a pivot without a
+ search term comes in, all objects are returned as matches, meaning they all
+ get sent to the pre and post filter methods, the subclass then has the
  responsibility to filter based on the pivot object.
 */
 @interface HGSMemorySearchSource : HGSCallbackSearchSource {
@@ -125,12 +128,23 @@
 @interface HGSMemorySearchSource (ProtectedMethods)
 
 /*!
- Called after matching results are found, before the array is returned.
- The array and results in the array may be modified in any way.
- @param results is an array of HGSObjects matching the query. 
- @param query is the query that the results matched to.
+ Called for each result before HGSMemorySearchSource does it's default
+ name matching. Use it to filter our results that are easy to remove without
+ going through our name ranking. The returned result is what is passed through
+ the name matching and eventually added to results if applicable. Default
+ version just returns result. Return nil if you want the result filtered out.
 */
-- (void)processMatchingResults:(NSMutableArray*)results
-                      forQuery:(HGSQuery *)query;
-
+- (HGSResult *)preFilterResult:(HGSResult *)result 
+               matchesForQuery:(HGSQuery*)query
+                   pivotObject:(HGSResult *)pivotObject;
+/*!
+ Called for each result after HGSMemorySearchSource does it's default
+ name matching. Use it to filter our results that cost more than our name 
+ ranking. (eg anything that hits the disk). Return nil to filter out the
+ result. Default version just returns result.
+*/
+- (HGSResult *)postFilterResult:(HGSMutableResult *)result 
+                matchesForQuery:(HGSQuery *)query
+                    pivotObject:(HGSResult *)pivotObject;
+ 
 @end

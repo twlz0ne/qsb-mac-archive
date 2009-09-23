@@ -132,6 +132,7 @@
     = [[[HGSSearchOperation alloc] initWithQuery:searchQueryMock
                                           source:memSource] autorelease];
   [[[searchQueryMock stub] andReturn:@"foo"] normalizedQueryString];
+  [[[searchQueryMock stub] andReturn:nil] pivotObject];
   [memSource performSearchOperation:op];
 }
 @end

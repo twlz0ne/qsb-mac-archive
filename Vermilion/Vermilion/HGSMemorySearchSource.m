@@ -125,31 +125,43 @@ NSString* const kHGSObjectAttributeWordRangesKey
   NSMutableArray* results = [NSMutableArray array];
   NSString *normalizedQuery = [query normalizedQueryString];
   NSUInteger normalizedLength = [normalizedQuery length];
+  HGSResult *pivotObject = [query pivotObject];
   @synchronized(resultsArray_) {
 
-    if ((normalizedLength == 0) && ([query pivotObject])) {
+    if ((normalizedLength == 0) && pivotObject) {
       // Per the note above this class in the header, if we get a pivot w/o
       // any query terms, we match everything so the subclass can filter it
-      // w/in |processMatchingResults:forQuery:|.
+      // w/in pre/postFilterResult:matchesForQuery:pivotObject
 
       NSEnumerator* indexEnumerator = [resultsArray_ objectEnumerator];
       HGSMemorySearchSourceObject* indexObject;
       while (((indexObject = [indexEnumerator nextObject])) 
              && ![operation isCancelled]) {
         HGSResult* result = [indexObject result];
-
+        result = [self preFilterResult:result 
+                       matchesForQuery:query 
+                           pivotObject:pivotObject];
+        if (!result) continue;
         // Copy the result so any attributes looked up and cached don't stick.
         // Also take care of any dup folding not leaving set attributes on other
         // objects.
         HGSMutableResult *resultCopy = [[result mutableCopy] autorelease];
-        [results addObject:resultCopy];
+        result = [self postFilterResult:resultCopy 
+                        matchesForQuery:query 
+                            pivotObject:pivotObject];
+        if (result) {
+          [results addObject:result];
+        }
       }
-        
     } else if (normalizedLength > 0) {
       // Match the terms
       for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
         if ([operation isCancelled]) break;
         HGSResult* result = [indexObject result];
+        result = [self preFilterResult:result 
+                       matchesForQuery:query 
+                           pivotObject:pivotObject];
+        if (!result) continue;
         NSString* name = [indexObject name];
         NSArray *wordRanges
           = [result valueForKey:kHGSObjectAttributeWordRangesKey];
@@ -160,33 +172,32 @@ NSString* const kHGSObjectAttributeWordRangesKey
         CGFloat rank = HGSScoreTermsForMainAndOtherItems(queryTerms,
                                                          name,
                                                          otherItems,
-                                                         &wordRanges);
+                                                         &wordRanges);        
         if (rank > 0.0) {
           // Copy the result so we can apply rank to it
           HGSMutableResult *resultCopy = [[result mutableCopy] autorelease];
           [resultCopy addRankFlags:eHGSNameMatchRankFlag];
           [resultCopy setRank:rank];
-
-          // Add the word metrics to the result.
-          if (addWordRanges && [wordRanges count]) {
+          
+          result = [self postFilterResult:resultCopy 
+                          matchesForQuery:query 
+                              pivotObject:pivotObject];
+          if (result) {
+            // Add the word metrics to the result.
+            if (addWordRanges && [wordRanges count]) {
               NSDictionary *wordRangesAttributes
-                = [NSDictionary dictionaryWithObject:wordRanges
-                                              forKey:kHGSObjectAttributeWordRangesKey];
-              [resultCopy resultByAddingAttributes:wordRangesAttributes];
+               = [NSDictionary dictionaryWithObject:wordRanges
+                                             forKey:kHGSObjectAttributeWordRangesKey];
+              result = [resultCopy resultByAddingAttributes:wordRangesAttributes];
+            }
+          
+            [results addObject:result];
           }
-          [results addObject:resultCopy];
         }
       }
     }
   }
-
-  if ([results count]) {
-    // Give subclasses a chance to modify the result list.
-    [self processMatchingResults:results forQuery:query];
-
-    // And into the operation.
-    [operation setResults:results];
-  }
+  [operation setResults:results];
 }
 
 - (void)clearResultIndex {
@@ -331,9 +342,18 @@ NSString* const kHGSObjectAttributeWordRangesKey
 
 @implementation HGSMemorySearchSource (ProtectedMethods)
 
-- (void)processMatchingResults:(NSMutableArray*)results
-                      forQuery:(HGSQuery *)query {
-  // Do nothing; subclasses may override.
+- (HGSResult *)preFilterResult:(HGSResult *)result 
+               matchesForQuery:(HGSQuery*)query
+                   pivotObject:(HGSResult *)pivotObject {
+  // Do nothing. Subclasses can override.
+  return result;
+}
+
+- (HGSResult *)postFilterResult:(HGSMutableResult *)result 
+                matchesForQuery:(HGSQuery *)query
+                    pivotObject:(HGSResult *)pivotObject {
+  // Do nothing. Subclasses can override.
+  return result;
 }
 
 @end

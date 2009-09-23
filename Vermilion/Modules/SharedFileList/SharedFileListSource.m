@@ -235,21 +235,18 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
   
   return value;
 }
-    
-- (void)processMatchingResults:(NSMutableArray*)results
-                      forQuery:(HGSQuery *)query {
+
+- (HGSResult *)postFilterResult:(HGSMutableResult *)result 
+                matchesForQuery:(HGSQuery *)query
+                    pivotObject:(HGSResult *)pivotObject {
   // Filter out any documents that are no longer named or located where
   // we remembered them being.
-  NSMutableArray *goodFiles = [NSMutableArray arrayWithCapacity:[results count]];
   NSFileManager *fm = [NSFileManager defaultManager];
-  for (HGSResult *fileResult in results) {
-    NSString *path = [fileResult filePath];
-    if (path && [fm fileExistsAtPath:path isDirectory:NULL]) {
-      [goodFiles addObject:fileResult];
-    }
+  NSString *path = [result filePath];
+  if (!path || ![fm fileExistsAtPath:path isDirectory:NULL]) {
+    result = nil;
   }
-
-  [results setArray:goodFiles];
+  return result;
 }
 
 // Reset our HGSMemorySource index with all of our values.

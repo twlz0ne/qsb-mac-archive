@@ -238,26 +238,18 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 }
 
 #pragma mark -
-
-- (void)processMatchingResults:(NSMutableArray*)results
-                      forQuery:(HGSQuery *)query {
+- (HGSResult *)preFilterResult:(HGSResult *)result 
+               matchesForQuery:(HGSQuery*)query
+                   pivotObject:(HGSResult *)pivotObject {
   // if we had a pivot object, we filter the results w/ the pivot info
-  HGSResult *pivotObject = [query pivotObject];
   if (pivotObject && ![pivotObject isOfType:kTypeContactAddressBook]) {
-    // To suvive the pivot, the contact has to have our a matching email
+    // To survive the pivot, the contact has to have our a matching email
     // address.
-
     NSArray *emailAddresses
       = [pivotObject valueForKey:kHGSObjectAttributeEmailAddressesKey];
     
-    NSMutableIndexSet *indexesToRemove = [NSMutableIndexSet indexSet];
-    
-    NSUInteger resultCount = [results count];
-    for (NSUInteger idx = 0; idx < resultCount ; ++idx) {
-
-      HGSResult *hgsResult = [results objectAtIndex:idx];
-      ABRecord *person = [self personForResult:hgsResult];
-      if (!person) continue;
+    ABRecord *person = [self personForResult:result];
+    if (person) {      
       BOOL isMatch = NO;
       
       // check for email match
@@ -272,7 +264,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           }
         }
       }
-      if (isMatch) continue;
+      if (!isMatch) result = nil;
       
       // NOTE: it would be really nice to kHGSObjectAttributeContactsKey off the
       // pivot to turn authors into contacts, etc.  But, the format of that key
@@ -282,15 +274,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       // some sort for query w/ optional terms, or each set of terms together
       // incase there is >1 name in the list, etc.  But that's no trivial, and
       // the lower layers don't do that either, so...no support for now!  :)
-      
-      // not found, mark for remove
-      [indexesToRemove addIndex:idx];
     }
-
-    // remove the indexes that weren't matches
-    [results removeObjectsAtIndexes:indexesToRemove];
-    
   }
+  return result;
 }
 
 - (NSArray *)objectsForMultiValueProperty:(NSString *)property 
@@ -666,9 +652,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   BOOL isValidSource = [super isValidSourceForQuery:query];
   // Limit the pivot support to just things w/ an email address.  We do this in
-  // isValidSourceForQuery instead of processMatchingResults:forQuery:
-  // because we want to avoid the extra work when this attribute isn't present
-  // at all.
+  // isValidSourceForQuery instead of 
+  // preFilterResult:matchesForQuery:pivotObject: because we want to avoid 
+  // the extra work when this attribute isn't present at all.
   HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
     // Default to not handling the search when pivoting

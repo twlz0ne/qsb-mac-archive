@@ -37,6 +37,9 @@
 @end
 
 @implementation ClipboardCopyAction
+- (BOOL)appliesToResult:(HGSResult *)result {
+  return [result valueForKey:kHGSObjectAttributePasteboardValueKey] != nil;
+}
 
 - (BOOL)performWithInfo:(NSDictionary *)info {
   BOOL didCopy = NO;

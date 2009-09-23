@@ -170,26 +170,20 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   return isValid;
 }
 
-- (void)processMatchingResults:(NSMutableArray*)results
-                      forQuery:(HGSQuery *)query {
-  // Return photos matching the query for the pivot album.
-  HGSResult *pivotObject = [query pivotObject];
+- (HGSResult *)preFilterResult:(HGSResult *)result 
+               matchesForQuery:(HGSQuery*)query
+                   pivotObject:(HGSResult *)pivotObject {
+  // Remove things that aren't from this album.
   if ([pivotObject conformsToType:kHGSTypeWebPhotoAlbum]) {
     NSURL *albumURL = [pivotObject url];
     NSString *albumURLString = [albumURL absoluteString];
-    // Remove things that aren't from this album.
-    NSMutableIndexSet *itemsToRemove = [NSMutableIndexSet indexSet];
-    NSUInteger indexToRemove = 0;
-    for (HGSResult *result in results) {
-      NSURL *photoURL = [result url];
-      NSString *photoURLString = [photoURL absoluteString];
-      if (![photoURLString hasPrefix:albumURLString]) {
-        [itemsToRemove addIndex:indexToRemove];
-      }
-      ++indexToRemove;
+    NSURL *photoURL = [result url];
+    NSString *photoURLString = [photoURL absoluteString];
+    if (![photoURLString hasPrefix:albumURLString]) {
+      result = nil;
     }
-    [results removeObjectsAtIndexes:itemsToRemove];
   }
+  return result;
 }
 
 #pragma mark -

@@ -54,18 +54,20 @@
 
 /*!
  A base class for testing various extensions. Takes care of loading and
- unloading the extension appropriately for you.
+ unloading the extension appropriately for you. If you override setup and/or
+ teardown, make sure to call the super class versions from your override.
 */
 @interface HGSExtensionAbstractTestCase : GTMTestCase {
  @private
   HGSExtension *extension_;
-  HGSExtensionPoint *extensionPoint_;
+  NSString *extensionPointIdentifier_;
   NSString *pluginName_;
   NSString *identifier_;
+  NSMutableArray *loadedExtensions_;
 }
 
 @property (readonly, retain, nonatomic) id extension;
-@property (readonly, assign, nonatomic) HGSExtensionPoint *extensionPoint;
+@property (readonly, assign, nonatomic) NSString *extensionPointIdentifier;
 @property (readonly, retain, nonatomic) NSString *pluginName;
 @property (readonly, retain, nonatomic) NSString *identifier;
 
@@ -75,13 +77,26 @@
  @param pluginName The name of the plugin that we want to access 
         (without the hgs extension). 
  @param identifier The identifier for the extension we want to load.
- @param extensionPoint The extension point that we expect the extension to
-        extend.
+ @param extensionPointIdentifier The extension point that we expect the 
+        extension to extend.
 */
 - (id)initWithInvocation:(NSInvocation *)invocation
              pluginNamed:(NSString *)pluginName 
      extensionIdentifier:(NSString *)identifier
-extensionPointIdentifier:(NSString *)extensionPoint;
+extensionPointIdentifier:(NSString *)extensionPointIdentifier;
+
+/*
+  Returns and loads an HGSExtension.
+  @param pluginName The name of the plugin that we want to access 
+  (without the hgs extension). 
+  @param identifier The identifier for the extension we want to load.
+  @param extensionPointIdentifier The extension point that we expect the 
+  extension to extend.
+*/
+
+- (HGSExtension *)extensionWithIdentifier:(NSString *)identifier
+                          fromPluginNamed:(NSString *)pluginName
+                 extensionPointIdentifier:(NSString *)extensionPointID;
 @end
 
 /*!
