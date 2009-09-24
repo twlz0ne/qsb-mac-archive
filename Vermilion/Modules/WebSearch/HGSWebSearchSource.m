@@ -105,7 +105,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
   return YES;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   HGSQuery *query = [operation query];
   HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
@@ -149,20 +149,6 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
                           attributes:attributes];
         [operation setResults:[NSArray arrayWithObject:placeholderItem]];
       }
-    } else {
-      NSString *identifier = [pivotObject uri];
-      NSString *openLabel
-        = HGSLocalizedString(@"Open %@",
-                             @"Open <website> (eg. Wikipedia) (30 chars "
-                             @"excluding <website>)");
-      NSString *name = [NSString stringWithFormat:openLabel,
-                        [pivotObject displayName]];
-      HGSResult *placeholderItem = [HGSResult resultWithURI:identifier
-                                                       name:name 
-                                                       type:kHGSTypeWebpage 
-                                                     source:self 
-                                                 attributes:nil];
-      [operation setResults:[NSArray arrayWithObjects:placeholderItem, nil]];
     }
   }
 

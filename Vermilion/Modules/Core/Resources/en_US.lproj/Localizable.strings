@@ -4,9 +4,6 @@
 /* A label representing Google as a search source. */
 "Google" = "Google";
 
-/* Open <website> (eg. Wikipedia) (30 chars excluding <website>) */
-"Open %@" = "Open %@";
-
 /* Search <website|category> (eg. Wikipedia) (30 chars excluding <website>) */
 "Search %@" = "Search %@";
 
