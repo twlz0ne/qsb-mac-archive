@@ -164,12 +164,15 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     if (okayToAppend) {
       QSBSourceTableResult *sourceResult
         = [QSBSourceTableResult tableResultWithResult:result];
-      
-      if (([result rankFlags] & eHGSBelowFoldRankFlag) == 0) {
-        [mainResults addObject:sourceResult];
-      } else {
-        hasMoreStandardResults = YES;
-        [belowTheFoldResults addObject:sourceResult];
+      CGFloat resultScore = [result rank];
+      if (resultScore > HGSCalibratedScore(kHGSCalibratedInsignificantScore)) {
+        if (([result rankFlags] & eHGSBelowFoldRankFlag) == 0
+            && resultScore > HGSCalibratedScore(kHGSCalibratedWeakScore)) {
+          [mainResults addObject:sourceResult];
+        } else {
+          hasMoreStandardResults = YES;
+          [belowTheFoldResults addObject:sourceResult];
+        }
       }
     }
   }
