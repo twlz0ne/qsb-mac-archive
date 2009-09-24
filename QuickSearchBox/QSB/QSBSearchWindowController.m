@@ -450,6 +450,10 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   if (newSelection != selectedResult_ 
       && ![newSelection isEqual:selectedResult_]) {
     [self setSelectedResult:newSelection];
+    NSTextView *textView = (NSTextView *)[searchTextField_ currentEditor];
+    if (textView) {
+      [textView complete:self];  // Also force a new completion.
+    }
   }
 }
 
@@ -870,6 +874,13 @@ doCommandBySelector:(SEL)commandSelector {
   if (!handled) {
     handled 
       = [activeSearchViewController_ performSelectionMovementSelector:commandSelector];
+  }
+  // Keep the completion text up-to-date for some cursor movement.
+  if (handled
+      || commandSelector == @selector(moveLeft:)
+      || commandSelector == @selector(moveRight:)
+      || commandSelector == @selector(insertNewline:)) {
+    [textView complete:self];
   }
   return handled;
 }
