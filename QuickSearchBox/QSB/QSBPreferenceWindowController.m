@@ -281,7 +281,11 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 - (BOOL)validateMenuItem:(NSMenuItem *)item {
   if ([item action] == @selector(setGlossy:)) {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    BOOL value = [ud boolForKey:kQSBBackgroundGlossyPref];
+    BOOL value = YES;
+    NSNumber *valueNumber = [ud objectForKey:kQSBBackgroundGlossyPref];
+    if (valueNumber) {
+      value = [valueNumber boolValue];
+    }
     [item setState:value];
   } else if ([item action] == @selector(chooseOtherColor:))  {
     NSColor *color = [self selectedColor];
