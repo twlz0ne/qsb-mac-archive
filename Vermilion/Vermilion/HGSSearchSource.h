@@ -187,3 +187,17 @@
   about utisToExcludeFromDiskSources above.
 */
 extern NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources;
+
+/*!
+ A simple way to register a source for things that we generate in non-standard
+ ways, such as items that are dragged in, or otherwise.
+*/
+@interface HGSSimpleNamedSearchSource : HGSSearchSource
++ (id)sourceWithName:(NSString *)displayName 
+          identifier:(NSString *)identifier 
+              bundle:(NSBundle *)bundle;
+
+- (id)initWithName:(NSString *)displayName 
+        identifier:(NSString *)identifier 
+            bundle:(NSBundle *)bundle;
+@end

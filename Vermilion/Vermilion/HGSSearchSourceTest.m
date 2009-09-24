@@ -31,12 +31,45 @@
 //
 
 #import "HGSSearchSource.h"
-
 #import "GTMSenTestCase.h"
+#import "HGSBundle.h"
+#import "HGSCoreExtensionPoints.h"
 
+static NSString *const kHGSSimpleNamedSearchSourceTestID 
+  = @"com.google.hgssearchsourcetest.simplenamedtestid";
 
 @interface HGSSearchSourceTest : GTMTestCase
 @end
 
 @implementation HGSSearchSourceTest
+- (void)testSimpleNamedSearchSource {
+  // Failure tests
+  HGSSearchSource *source 
+    = [HGSSimpleNamedSearchSource sourceWithName:nil
+                                      identifier:kHGSSimpleNamedSearchSourceTestID
+                                          bundle:HGSGetPluginBundle()];
+  STAssertNil(source, nil);
+  source 
+    = [HGSSimpleNamedSearchSource sourceWithName:@"testSource"
+                                      identifier:nil
+                                          bundle:HGSGetPluginBundle()];
+  STAssertNil(source, nil);
+  source 
+    = [HGSSimpleNamedSearchSource sourceWithName:@"testSource"
+                                      identifier:kHGSSimpleNamedSearchSourceTestID
+                                          bundle:nil];
+  STAssertNil(source, nil);
+  source 
+    = [HGSSimpleNamedSearchSource sourceWithName:@"testSource"
+                                      identifier:kHGSSimpleNamedSearchSourceTestID
+                                          bundle:HGSGetPluginBundle()];
+  STAssertNotNil(source, nil);
+  
+  // Success test
+  HGSExtensionPoint *sp = [HGSExtensionPoint sourcesPoint];
+  HGSExtension *extension 
+    = [sp extensionWithIdentifier:kHGSSimpleNamedSearchSourceTestID];
+  STAssertEqualObjects(extension, source, nil);
+  
+}
 @end

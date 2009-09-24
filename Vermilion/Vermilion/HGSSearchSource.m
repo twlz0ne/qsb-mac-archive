@@ -36,6 +36,7 @@
 #import "HGSLog.h"
 #import "HGSBundle.h"
 #import "HGSIconProvider.h"
+#import "HGSCoreExtensionPoints.h"
 
 // The result is already retained for you
 static NSSet *CopyStringSetFromId(id value) {
@@ -201,6 +202,48 @@ NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources
 
 - (Class)resultClass {
   return [HGSResult class];
+}
+
+@end
+
+@implementation HGSSimpleNamedSearchSource
+
++ (id)sourceWithName:(NSString *)displayName 
+          identifier:(NSString *)identifier 
+              bundle:(NSBundle *)bundle {
+  return [[[self alloc] initWithName:displayName
+                          identifier:identifier 
+                              bundle:bundle] autorelease];
+}
+
+- (id)initWithName:(NSString *)displayName 
+        identifier:(NSString *)identifier 
+            bundle:(NSBundle *)bundle {
+  HGSExtensionPoint *sp = [HGSExtensionPoint sourcesPoint];
+  HGSExtension *ext = [sp extensionWithIdentifier:identifier];
+  if (ext) {
+    [self release];
+    self = [ext retain];
+  } else {
+    if (displayName) {
+      NSDictionary *config = 
+        [NSDictionary dictionaryWithObjectsAndKeys:
+         bundle, kHGSExtensionBundleKey,
+         identifier, kHGSExtensionIdentifierKey,
+         displayName, kHGSExtensionUserVisibleNameKey,
+         [NSNumber numberWithBool:YES], @"HGSSearchSourceCannotArchive",
+         nil];
+    
+      self = [super initWithConfiguration:config];
+      if (self) {
+        [sp extendWithObject:self];
+      }
+    } else {
+      [self release];
+      self = nil;
+    }
+  }
+  return self;
 }
 
 @end
