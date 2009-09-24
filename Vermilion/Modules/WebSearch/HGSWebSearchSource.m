@@ -105,7 +105,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
   return YES;
 }
 
-- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
+- (void)performSearchOperation:(HGSSearchOperation *)operation {
   HGSQuery *query = [operation query];
   HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
