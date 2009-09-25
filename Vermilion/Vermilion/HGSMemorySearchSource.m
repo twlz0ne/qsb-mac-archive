@@ -133,14 +133,11 @@ NSString* const kHGSObjectAttributeWordRangesKey
       // any query terms, we match everything so the subclass can filter it
       // w/in pre/postFilterResult:matchesForQuery:pivotObject
 
-      NSEnumerator* indexEnumerator = [resultsArray_ objectEnumerator];
-      HGSMemorySearchSourceObject* indexObject;
-      while (((indexObject = [indexEnumerator nextObject])) 
-             && ![operation isCancelled]) {
-        HGSResult* result = [indexObject result];
-        result = [self preFilterResult:result 
-                       matchesForQuery:query 
-                           pivotObject:pivotObject];
+      for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
+        if ([operation isCancelled]) break;
+        HGSResult* result = [self preFilterResult:[indexObject result] 
+                                  matchesForQuery:query 
+                                      pivotObject:pivotObject];
         if (!result) continue;
         // Copy the result so any attributes looked up and cached don't stick.
         // Also take care of any dup folding not leaving set attributes on other
@@ -157,10 +154,9 @@ NSString* const kHGSObjectAttributeWordRangesKey
       // Match the terms
       for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
         if ([operation isCancelled]) break;
-        HGSResult* result = [indexObject result];
-        result = [self preFilterResult:result 
-                       matchesForQuery:query 
-                           pivotObject:pivotObject];
+        HGSResult* result = [self preFilterResult:[indexObject result] 
+                                  matchesForQuery:query 
+                                      pivotObject:pivotObject];
         if (!result) continue;
         NSString* name = [indexObject name];
         NSArray *wordRanges
@@ -186,9 +182,9 @@ NSString* const kHGSObjectAttributeWordRangesKey
             // Add the word metrics to the result.
             if (addWordRanges && [wordRanges count]) {
               NSDictionary *wordRangesAttributes
-               = [NSDictionary dictionaryWithObject:wordRanges
-                                             forKey:kHGSObjectAttributeWordRangesKey];
-              result = [resultCopy resultByAddingAttributes:wordRangesAttributes];
+                = [NSDictionary dictionaryWithObject:wordRanges
+                                              forKey:kHGSObjectAttributeWordRangesKey];
+              result = [result resultByAddingAttributes:wordRangesAttributes];
             }
           
             [results addObject:result];
