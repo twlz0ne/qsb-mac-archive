@@ -128,6 +128,9 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   }
   NSArray *hgsSuggestions = (NSArray*)hgsMutableSuggestions;
   
+  HGSQuery *query = [controller query];
+  HGSResult *pivotObject = [query pivotObject];
+
   // TODO(dmaclach): we need to revisit this.  as shortcuts, suggest, and
   // regular results go in, they need to be deduped.  the current dedupe is in
   // the mixer as it does the merge, but we don't seem to want to use that here.
@@ -165,9 +168,11 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
       QSBSourceTableResult *sourceResult
         = [QSBSourceTableResult tableResultWithResult:result];
       CGFloat resultScore = [result rank];
-      if (resultScore > HGSCalibratedScore(kHGSCalibratedInsignificantScore)) {
-        if (([result rankFlags] & eHGSBelowFoldRankFlag) == 0
-            && resultScore > HGSCalibratedScore(kHGSCalibratedWeakScore)) {
+      if (pivotObject
+          || resultScore > HGSCalibratedScore(kHGSCalibratedInsignificantScore)) {
+        if (pivotObject
+            || (([result rankFlags] & eHGSBelowFoldRankFlag) == 0
+                && resultScore > HGSCalibratedScore(kHGSCalibratedWeakScore))) {
           [mainResults addObject:sourceResult];
         } else {
           hasMoreStandardResults = YES;
@@ -192,8 +197,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   // Is this search a generic, global search? (No pivot set)
   // If so, there may be special items above and/or below the search results
   NSMutableArray *suggestResults = [NSMutableArray array];
-  HGSQuery *query = [controller query];
-  HGSResult *pivotObject = [query pivotObject];
   
   if (!pivotObject) {    
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
