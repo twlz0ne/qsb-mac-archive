@@ -36,6 +36,7 @@
 #import "HGSIconProvider.h"
 #import "HGSSearchOperation.h"
 #import "HGSBundle.h"
+#import "HGSResult.h"
 
 static const char *const kPerformSearch = "PerformSearch";
 static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
@@ -165,6 +166,11 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
 
 - (PyObject *)instance {
   return instance_;
+}
+
+- (NSArray *)archiveKeys {
+  NSArray *archiveKeys = [NSArray arrayWithObject:kHGSObjectAttributeIconKey];
+  return archiveKeys;
 }
 
 @end
