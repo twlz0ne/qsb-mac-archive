@@ -279,6 +279,12 @@ NSArray *HGSScoreTermsAndDetailsForItem(NSArray *searchTerms,
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
 
 /*!
+ Function for verifying that a string has been properly tokenized.
+ Used in debug builds.
+*/
+BOOL HGSValidateTokenizedString(NSString *tokenizedString);  
+  
+/*!
  @enum Calibrated Score Categories
  @abstract Used to specify the minimum score required to achieve the
            desired category.

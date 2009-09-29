@@ -102,13 +102,6 @@ typedef struct {
 // Utility function to clear a charStat.
 static void HGSResetCharStat(HGSTermCharStat *pCharStat);
 
-#if DEBUG
-
-// Debug function for verifying that a string has been properly tokenized.
-BOOL HGSValidateTokenizedString(NSString *tokenizedString);
-
-#endif // DEBUG
-
 #ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
 
 // Utility function to grab the best scoring detail from term details.
@@ -510,25 +503,38 @@ NSArray *HGSScoreTermsAndDetailsForItem(NSArray *searchTerms,
 
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
 
-#if DEBUG
+
 
 BOOL HGSValidateTokenizedString(NSString *tokenizedString) {
+  static NSMutableCharacterSet *antiNumberCharacterSet = nil;
+  static NSMutableCharacterSet *antiWordCharacterSet = nil;
+  @synchronized (@"HGSValidateTokenizedString") {
+    if (!antiNumberCharacterSet) {
+      antiNumberCharacterSet = [NSMutableCharacterSet decimalDigitCharacterSet];
+      [antiNumberCharacterSet addCharactersInString:@",."];
+      [antiNumberCharacterSet invert];
+      [antiNumberCharacterSet retain];  // Leak
+    }
+    
+    if (!antiWordCharacterSet) {
+      antiWordCharacterSet 
+        = [NSMutableCharacterSet capitalizedLetterCharacterSet];
+      NSCharacterSet *puncSet = [NSCharacterSet punctuationCharacterSet];
+      [antiWordCharacterSet formUnionWithCharacterSet:puncSet];
+      [antiWordCharacterSet removeCharactersInString:@"'’"];
+      [antiWordCharacterSet retain];  // Leak
+    }
+  }
   BOOL isNormalized = YES;
   NSArray *strings = [tokenizedString componentsSeparatedByString:@" "];
   for (NSString *string in strings) {
     // See if it's a valid number, which can have digits, commas and periods.
+    NSCharacterSet *decDigitSet = [NSCharacterSet decimalDigitCharacterSet];
     NSRange testRange
-      = [string rangeOfCharacterFromSet:[NSCharacterSet decimalDigitCharacterSet]];
+      = [string rangeOfCharacterFromSet:decDigitSet];
     if (testRange.location != NSNotFound) {
       // A potential number was found but insure that it does not contain
       // any other types of characters.
-      static NSMutableCharacterSet *antiNumberCharacterSet = nil;
-      if (!antiNumberCharacterSet) {
-        antiNumberCharacterSet = [NSMutableCharacterSet decimalDigitCharacterSet];
-        [antiNumberCharacterSet addCharactersInString:@",."];
-        [antiNumberCharacterSet invert];
-        [antiNumberCharacterSet retain];  // Leak
-      }
       testRange = [string rangeOfCharacterFromSet:antiNumberCharacterSet];
       isNormalized = (testRange.location == NSNotFound);
     } else {
@@ -537,14 +543,6 @@ BOOL HGSValidateTokenizedString(NSString *tokenizedString) {
       isNormalized = (![string isEqualToString:@"'"]
                       && ![string isEqualToString:@"’"]);
       if (isNormalized) {
-        static NSMutableCharacterSet *antiWordCharacterSet = nil;
-        if (!antiWordCharacterSet) {
-          antiWordCharacterSet = [NSMutableCharacterSet capitalizedLetterCharacterSet];
-          [antiWordCharacterSet formUnionWithCharacterSet:[NSCharacterSet
-                                                           punctuationCharacterSet]];
-          [antiWordCharacterSet removeCharactersInString:@"'’"];
-          [antiWordCharacterSet retain];  // Leak
-        }
         testRange = [string rangeOfCharacterFromSet:antiWordCharacterSet];
         isNormalized = (testRange.location == NSNotFound);
       }
@@ -555,8 +553,6 @@ BOOL HGSValidateTokenizedString(NSString *tokenizedString) {
   }
   return isNormalized;
 }
-
-#endif // DEBUG
 
 CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
                                       NSString *itemString,

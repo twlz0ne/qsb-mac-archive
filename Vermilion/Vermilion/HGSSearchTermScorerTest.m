@@ -264,4 +264,9 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
   }
 }
 
+- (void)testValidateTokenizedString {
+  STAssertTrue(HGSValidateTokenizedString(@"familyondock 2 jpg"), nil);
+  STAssertFalse(HGSValidateTokenizedString(@"familyondock 2;1 jpg"), nil);
+  STAssertFalse(HGSValidateTokenizedString(@"familyondock! 2 jpg"), nil);
+}
 @end
