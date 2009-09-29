@@ -381,7 +381,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return isValid;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   // We use a bool to keep track of when we need to update the index so we don't
   // spend lots of time doing this as buddies come and go.  This is needed
   // because when the im service goes online/offline, it sends a notification

@@ -31,28 +31,43 @@
 //
 
 #import "HGSSearchSource.h"
+#import "HGSSimpleArraySearchOperation.h"
 
 @class HGSSearchOperation;
-// Subclass of HGSSearchSource that uses a search operation to call back
-// into the SearchSource to do the actual search work.
+/*!
+ Subclass of HGSSearchSource that uses a search operation to call back
+ into the SearchSource to do the actual search work.
+*/
 @interface HGSCallbackSearchSource : HGSSearchSource
 @end
 
-// These are methods subclasses can override to do the actual search
+/*!
+ Subclass of HGSSearchOperation that calls back into the SearchSource to do 
+ the actual search work.
+*/
+@interface HGSCallbackSearchOperation : HGSSimpleArraySearchOperation 
+- (id)initWithQuery:(HGSQuery *)query 
+             source:(HGSCallbackSearchSource *)callbackSource;
+@end
+
+/*!
+ These are methods subclasses can override to do the actual search.
+*/
 @interface HGSCallbackSearchSource (ProtectedMethods)
 
-// Do the actual search, this must be overridden.  An implementor needs to call
-// setResults: on the search operation if it has any results.  If the source
-// returns YES for isSearchConcurrent, then it must also call finishQuery on the
-// operation when it has completed.  See -[HGSSearchOperation main] for the full
-// details on how this works.
-- (void)performSearchOperation:(HGSSearchOperation*)operation;
+/*!
+ Do the actual search, this must be overridden.  An implementor needs to call
+ setResults: on the search operation if it has any results.  If the source
+ returns YES for isSearchConcurrent, then it must also call finishQuery on the
+ operation when it has completed.  See -[HGSSearchOperation main] for the full
+ details on how this works.
+*/
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation;
 
-// The rest are optional methods, which you only need to override if you want to
-// override the default behavior.
-
-// See -[HGSSearchOperation isConcurrent] for details.  The default is NO,
-// meaning a thread will be created for each search operation.
+/*!
+ See -[HGSSearchOperation isConcurrent] for details.  The default is NO,
+ meaning a thread will be created for each search operation.
+*/
 - (BOOL)isSearchConcurrent;
 
 @end

@@ -117,7 +117,7 @@ static NSString *const kHGSDSHomeNumberKey = @"HGSDSHomeNumberKey";
                        attributes:attributes];
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSMutableArray *results = [NSMutableArray array];
   
   NSString *queryString = [[operation query] rawQueryString];

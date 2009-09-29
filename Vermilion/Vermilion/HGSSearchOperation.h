@@ -80,13 +80,6 @@
 - (void)main;
 
 /*!
- Call to replace the results of the operation with something more up to date.
- Threadsafe, can be called from any thread. Tells the observer about the
- presence of new results on the main thread.
-*/
-- (void)setResults:(NSArray*)results;
-
-/*!
  Call to indicate the query has been completed. Tells the observer on the main
  thread.  This will be called for for the operation is it is NOT concurrent.
  If an operation returns YES for isConcurrent, then the search operation must

@@ -76,7 +76,7 @@ static NSString *const kDateTimeMarker = @"[DTS]";
   return isValid;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation *)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSString *rawQuery = [[operation query] rawQueryString];
 
   // TODO(thomasvl): support indirect w/o loading space

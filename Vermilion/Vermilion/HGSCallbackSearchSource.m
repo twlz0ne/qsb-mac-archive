@@ -36,11 +36,6 @@
 #import "HGSStringUtil.h"
 #import "HGSTokenizer.h"
 
-@interface HGSCallbackSearchOperation : HGSSearchOperation 
-- (id)initWithQuery:(HGSQuery *)query 
-             source:(HGSCallbackSearchSource *)callbackSource;
-@end
-
 @implementation HGSCallbackSearchSource
 
 - (HGSSearchOperation *)searchOperationForQuery:(HGSQuery *)query {
@@ -54,7 +49,7 @@
 
 @implementation HGSCallbackSearchSource (ProtectedMethods)
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   // Must be overridden
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   if ([defaults boolForKey:kHGSValidateSearchSourceBehaviorsPrefKey]) {

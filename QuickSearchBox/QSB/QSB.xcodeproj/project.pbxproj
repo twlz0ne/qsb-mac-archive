@@ -570,6 +570,9 @@
 		8B23300E1062C12700AF7287 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B23300C1062C12700AF7287 /* Localizable.strings */; };
 		8B2334731062FF5E00AF7287 /* image_search.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B2334721062FF5E00AF7287 /* image_search.icns */; };
 		8B2334811063013600AF7287 /* wikipedia.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B2334801063013600AF7287 /* wikipedia.icns */; };
+		8B2B01911071813D00427404 /* HGSSimpleArraySearchOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B2B018F1071813C00427404 /* HGSSimpleArraySearchOperation.h */; };
+		8B2B01921071813D00427404 /* HGSSimpleArraySearchOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2B01901071813D00427404 /* HGSSimpleArraySearchOperation.m */; };
+		8B2B01961071815700427404 /* HGSSimpleArraySearchOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2B01951071815700427404 /* HGSSimpleArraySearchOperationTest.m */; };
 		8B2BFC51107130BF00427404 /* QSBViewAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFC4C107130BF00427404 /* QSBViewAnimation.m */; };
 		8B2BFDCF107160A100427404 /* QSBSimpleInvocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDCB107160A100427404 /* QSBSimpleInvocation.m */; };
 		8B2BFDEB1071621C00427404 /* QSBSimpleInvocationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDE71071621C00427404 /* QSBSimpleInvocationTest.m */; };
@@ -2402,6 +2405,9 @@
 		8B23300D1062C12700AF7287 /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = en_US.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8B2334721062FF5E00AF7287 /* image_search.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = image_search.icns; sourceTree = "<group>"; };
 		8B2334801063013600AF7287 /* wikipedia.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = wikipedia.icns; sourceTree = "<group>"; };
+		8B2B018F1071813C00427404 /* HGSSimpleArraySearchOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSimpleArraySearchOperation.h; sourceTree = "<group>"; };
+		8B2B01901071813D00427404 /* HGSSimpleArraySearchOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleArraySearchOperation.m; sourceTree = "<group>"; };
+		8B2B01951071815700427404 /* HGSSimpleArraySearchOperationTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleArraySearchOperationTest.m; sourceTree = "<group>"; };
 		8B2BFC4C107130BF00427404 /* QSBViewAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBViewAnimation.m; sourceTree = "<group>"; };
 		8B2BFC4D107130BF00427404 /* QSBViewAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBViewAnimation.h; sourceTree = "<group>"; };
 		8B2BFDCA107160A100427404 /* QSBSimpleInvocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSimpleInvocation.h; sourceTree = "<group>"; };
@@ -4863,7 +4869,7 @@
 				8B637B570F2777C300997738 /* GData.framework */,
 				8BCCB03C10348ABE0051B567 /* libGDataTouchStaticLib.a */,
 				8B637B590F2777C300997738 /* GDataUnitTests.octest */,
-				62BD15D9103DB32A00C85BC3 /* GDataTouchUnitTests.octest */,
+				62BD15D9103DB32A00C85BC3 /* GDataIPhoneUnitTests.octest */,
 				8B637B5B0F2777C300997738 /* DevelopmentTestTool */,
 			);
 			name = Products;
@@ -5433,6 +5439,9 @@
 				6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */,
 				6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */,
 				8B95CA9D0F6B09FE003BDBDD /* HGSSimpleAccountTest.m */,
+				8B2B018F1071813C00427404 /* HGSSimpleArraySearchOperation.h */,
+				8B2B01901071813D00427404 /* HGSSimpleArraySearchOperation.m */,
+				8B2B01951071815700427404 /* HGSSimpleArraySearchOperationTest.m */,
 				7F3F75D80E152E6D001AF34E /* HGSSQLiteBackedCache.h */,
 				7F3F75D90E152E6D001AF34E /* HGSSQLiteBackedCache.m */,
 				7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */,
@@ -6026,6 +6035,7 @@
 				5A0BB3750FAB9CDA00AA4858 /* HGSPluginBlacklist.h in Headers */,
 				62E3FF4110112F5D005D77F2 /* NSNotificationCenter+MainThread.h in Headers */,
 				62541753102C904A00808254 /* HGSSearchTermScorer.h in Headers */,
+				8B2B01911071813D00427404 /* HGSSimpleArraySearchOperation.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7126,10 +7136,10 @@
 			remoteRef = 620054580F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		62BD15D9103DB32A00C85BC3 /* GDataTouchUnitTests.octest */ = {
+		62BD15D9103DB32A00C85BC3 /* GDataIPhoneUnitTests.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = GDataTouchUnitTests.octest;
+			path = GDataIPhoneUnitTests.octest;
 			remoteRef = 62BD15D8103DB32A00C85BC3 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -8983,6 +8993,7 @@
 				5A0BB3760FAB9CDA00AA4858 /* HGSPluginBlacklist.m in Sources */,
 				62E3FF4210112F5D005D77F2 /* NSNotificationCenter+MainThread.m in Sources */,
 				62541754102C904A00808254 /* HGSSearchTermScorer.m in Sources */,
+				8B2B01921071813D00427404 /* HGSSimpleArraySearchOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9145,6 +9156,7 @@
 				8B791D890FA1FC35006BFE1E /* HGSAppleScriptActionTest.m in Sources */,
 				5A0BB67B0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m in Sources */,
 				62DDD6DA1035D7BF00C0EABD /* HGSSearchTermScorerTest.m in Sources */,
+				8B2B01961071815700427404 /* HGSSimpleArraySearchOperationTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -193,7 +193,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     && [super isValidSourceForQuery:query];
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   HGSResult *pivotObject = [[operation query] pivotObject];
   GTMAXUIElement *element 
     = [pivotObject valueForKey:kAppUISourceAttributeElementKey];

@@ -104,7 +104,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return YES;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation *)operation {  
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {  
   NSString *rawQuery = [[operation query] rawQueryString];
   if ([rawQuery length]) {
     char answer[1024];

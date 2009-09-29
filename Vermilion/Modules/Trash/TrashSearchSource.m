@@ -89,7 +89,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return isValid;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSMutableArray *results = [NSMutableArray array];
   HGSQuery *query = [operation query];
   HGSResult *pivotObject = [query pivotObject];

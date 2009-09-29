@@ -120,7 +120,7 @@ NSString* const kHGSObjectAttributeWordRangesKey
   [super dealloc];
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   HGSQuery* query = [operation query];
   NSMutableArray* results = [NSMutableArray array];
   NSString *normalizedQuery = [query normalizedQueryString];

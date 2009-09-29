@@ -1,7 +1,7 @@
 //
-//  SLFilesSource.h
+//  HGSSimpleArraySearchOperation.h
 //
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,49 +30,23 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
+#import "HGSSearchOperation.h"
 
-@class SLFilesOperation;
-
-@interface SLFilesSource : HGSSearchSource {
- @private
-  NSString *utiFilter_;
-  BOOL rebuildUTIFilter_;
-}
-+ (CFArrayRef)attributeArray;
-- (void)operationReceivedNewResults:(SLFilesOperation *)operation
-                   withNotification:(NSNotification *)notification;
-- (void)operationCompleted:(SLFilesOperation *)operation;
-- (void)startSearchOperation:(HGSSearchOperation *)operation;
-- (void)extensionPointSourcesChanged:(NSNotification *)notification;
-@end
-
-#pragma mark -
-
-@interface SLFilesOperation : HGSSimpleArraySearchOperation {
- @private
-  NSMutableArray *accumulatedResults_;
-  CFIndex nextQueryItemIndex_;
-  BOOL mdQueryFinished_;
+/*!
+ A search operation that stores it's results in a simple NSArray of HGSResults.
+*/
+@interface HGSSimpleArraySearchOperation : HGSSearchOperation {
+ @private 
+  NSArray *results_;
 }
 
-// Runs |query|
-- (void)runMDQuery:(MDQueryRef)query;
+/*!
+ Call to replace the results of the operation with something more up to date.
+ Threadsafe, can be called from any thread. Tells the observer about the
+ presence of new results on the main thread.
+ */
+- (void)setResults:(NSArray*)results;
 
-// Using an accumulator rather than using setResults: directly allows us to
-// control the timing of propagation of results to observers.
-- (NSMutableArray *)accumulatedResults;
-
-// Callbacksfor MDQuery updates
-- (void)queryNotification:(NSNotification *)notification;
 @end
 
-@interface SLHGSResult : HGSResult {
- @private
-  MDItemRef mdItem_;
-}
-- (id)initWithMDItem:(MDItemRef)mdItem
-               query:(NSString *)query
-              source:(HGSSearchSource *)source;
-@end
 

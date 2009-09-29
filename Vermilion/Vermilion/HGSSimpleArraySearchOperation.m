@@ -1,7 +1,7 @@
 //
-//  SLFilesSource.h
+//  HGSSimpleArraySearchOperation.m
 //
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,49 +30,35 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
+#import "HGSSimpleArraySearchOperation.h"
+#import "HGSLog.h"
+#import "NSNotificationCenter+MainThread.h"
+#import "GTMMethodCheck.h"
 
-@class SLFilesOperation;
+@implementation HGSSimpleArraySearchOperation
+GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:object:userInfo:);
 
-@interface SLFilesSource : HGSSearchSource {
- @private
-  NSString *utiFilter_;
-  BOOL rebuildUTIFilter_;
+// call to replace the results of the operation with something more up to date.
+// Threadsafe, can be called from any thread. Tells observers about the
+// presence of new results on the main thread.
+- (void)setResults:(NSArray*)results {
+  if ([self isCancelled]) return;
+  HGSAssert(![self isFinished], @"setting results after the query is done?");
+  // No point in telling the observers there weren't results.  The source
+  // should be calling finishQuery shortly to let it know it's done.
+  if ([results count] == 0) return;
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  // We do a copy here in case sources pass us a mutable object
+  // and then go and mutate it underneath us.
+  NSArray *cachedResults = [[results copy] autorelease];
+  NSDictionary *userInfo 
+  = [NSDictionary dictionaryWithObject:cachedResults 
+                                forKey:kHGSSearchOperationNotificationResultsKey];
+  [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationDidUpdateResultsNotification
+                                    object:self
+                                  userInfo:userInfo];
 }
-+ (CFArrayRef)attributeArray;
-- (void)operationReceivedNewResults:(SLFilesOperation *)operation
-                   withNotification:(NSNotification *)notification;
-- (void)operationCompleted:(SLFilesOperation *)operation;
-- (void)startSearchOperation:(HGSSearchOperation *)operation;
-- (void)extensionPointSourcesChanged:(NSNotification *)notification;
+
 @end
 
-#pragma mark -
-
-@interface SLFilesOperation : HGSSimpleArraySearchOperation {
- @private
-  NSMutableArray *accumulatedResults_;
-  CFIndex nextQueryItemIndex_;
-  BOOL mdQueryFinished_;
-}
-
-// Runs |query|
-- (void)runMDQuery:(MDQueryRef)query;
-
-// Using an accumulator rather than using setResults: directly allows us to
-// control the timing of propagation of results to observers.
-- (NSMutableArray *)accumulatedResults;
-
-// Callbacksfor MDQuery updates
-- (void)queryNotification:(NSNotification *)notification;
-@end
-
-@interface SLHGSResult : HGSResult {
- @private
-  MDItemRef mdItem_;
-}
-- (id)initWithMDItem:(MDItemRef)mdItem
-               query:(NSString *)query
-              source:(HGSSearchSource *)source;
-@end
 

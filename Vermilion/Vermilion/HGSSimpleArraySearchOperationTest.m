@@ -1,7 +1,7 @@
 //
-//  SLFilesSource.h
+//  HGSSimpleArraySearchOperationTest.m
 //
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,49 +30,12 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
+#import "GTMSenTestCase.h"
 
-@class SLFilesOperation;
-
-@interface SLFilesSource : HGSSearchSource {
- @private
-  NSString *utiFilter_;
-  BOOL rebuildUTIFilter_;
+@interface HGSSimpleArraySearchOperationTest : GTMTestCase {
 }
-+ (CFArrayRef)attributeArray;
-- (void)operationReceivedNewResults:(SLFilesOperation *)operation
-                   withNotification:(NSNotification *)notification;
-- (void)operationCompleted:(SLFilesOperation *)operation;
-- (void)startSearchOperation:(HGSSearchOperation *)operation;
-- (void)extensionPointSourcesChanged:(NSNotification *)notification;
 @end
 
-#pragma mark -
 
-@interface SLFilesOperation : HGSSimpleArraySearchOperation {
- @private
-  NSMutableArray *accumulatedResults_;
-  CFIndex nextQueryItemIndex_;
-  BOOL mdQueryFinished_;
-}
-
-// Runs |query|
-- (void)runMDQuery:(MDQueryRef)query;
-
-// Using an accumulator rather than using setResults: directly allows us to
-// control the timing of propagation of results to observers.
-- (NSMutableArray *)accumulatedResults;
-
-// Callbacksfor MDQuery updates
-- (void)queryNotification:(NSNotification *)notification;
+@implementation HGSSimpleArraySearchOperationTest
 @end
-
-@interface SLHGSResult : HGSResult {
- @private
-  MDItemRef mdItem_;
-}
-- (id)initWithMDItem:(MDItemRef)mdItem
-               query:(NSString *)query
-              source:(HGSSearchSource *)source;
-@end
-

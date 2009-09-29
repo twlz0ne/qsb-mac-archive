@@ -295,7 +295,7 @@ static NSString *const kApplicationSourcePredicateString
   return isValid;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation *)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   // Put a hold on queries while indexing
   [condition_ lock];
   while (indexing_) {

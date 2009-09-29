@@ -19,7 +19,7 @@
 
 // Collect results for a search operation. You can use the pivot object
 // and unique words to perform your search
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   // The query
   // HGSQuery *query = [operation query];
   // The pivot object (if any)

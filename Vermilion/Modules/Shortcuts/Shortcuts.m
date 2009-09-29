@@ -299,7 +299,7 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   }
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   // shortcuts start w/ the raw query so anything can get remembered.
   HGSQuery *query = [operation query];
   NSString *queryString = [query rawQueryString];

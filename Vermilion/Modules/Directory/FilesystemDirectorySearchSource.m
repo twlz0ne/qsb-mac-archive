@@ -66,7 +66,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return isValid;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSFileManager *fm = [NSFileManager defaultManager];
   HGSQuery *query = [operation query];
   // use the raw query since we're trying to match paths to specific folders.

@@ -838,7 +838,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return YES;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   HGSQuery *query = [operation query];
   _GTMDevAssert([operation isConcurrent],
                 @"Implementation expects the operation to be set to concurrent.");

@@ -46,7 +46,7 @@
 #import "GMOUserPreferences.h"
 #endif
 
-@interface HGSGoogleWebSearchOperation : HGSSearchOperation {
+@interface HGSGoogleWebSearchOperation : HGSSimpleArraySearchOperation {
  @private
   GDataHTTPFetcher *fetcher_;
 }

@@ -88,7 +88,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return isValid;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSMutableSet *results = [NSMutableSet set];
   HGSQuery *hgsQuery = [operation query];
   NSString *query = [hgsQuery rawQueryString];

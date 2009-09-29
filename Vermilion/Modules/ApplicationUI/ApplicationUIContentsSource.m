@@ -180,7 +180,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     && [super isValidSourceForQuery:query];
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSArray *apps = [[NSWorkspace sharedWorkspace] gtm_launchedApplications];
   pid_t mypid = getpid();
   NSMutableArray *results = [NSMutableArray array];

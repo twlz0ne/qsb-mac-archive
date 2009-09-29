@@ -105,27 +105,6 @@ NSString *const kHGSSearchOperationNotificationResultsKey
   return queryCancelled_ || [operation_ isCancelled];
 }
 
-// call to replace the results of the operation with something more up to date.
-// Threadsafe, can be called from any thread. Tells observers about the
-// presence of new results on the main thread.
-- (void)setResults:(NSArray*)results {
-  if ([self isCancelled]) return;
-  HGSAssert(![self isFinished], @"setting results after the query is done?");
-  // No point in telling the observers there weren't results.  The source
-  // should be calling finishQuery shortly to let it know it's done.
-  if ([results count] == 0) return;
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  // We do a copy here in case sources pass us a mutable object
-  // and then go and mutate it underneath us.
-  NSArray *cachedResults = [[results copy] autorelease];
-  NSDictionary *userInfo 
-    = [NSDictionary dictionaryWithObject:cachedResults 
-                                  forKey:kHGSSearchOperationNotificationResultsKey];
-  [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationDidUpdateResultsNotification
-                                    object:self
-                                  userInfo:userInfo];
-}
-
 - (void)wrappedMain {
   // Wrap main so we can log any exceptions and make sure we finish the search
   // operation if it threw.

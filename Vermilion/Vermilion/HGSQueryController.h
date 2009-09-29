@@ -74,7 +74,6 @@
   performance. Each of these pulls the most up to date results from the
   operation.
 */
-- (NSArray *)results;
 - (NSArray *)rankedResults;
 - (NSDictionary *)rankedResultsByCategory;
 

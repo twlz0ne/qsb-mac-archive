@@ -145,15 +145,15 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
 - (void)updateIndex;
 - (void)updateIndexTimerFired:(NSTimer *)timer;
 - (GTMSQLiteDatabase *)createDatabase;
-- (void)performPivotOperation:(HGSSearchOperation*)operation
+- (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
                forTrackObject:(HGSResult *)pivotObject;
-- (void)performPivotOperation:(HGSSearchOperation*)operation
+- (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
                forAlbumObject:(HGSResult *)pivotObject
                     withQuery:(NSString *)query ;
-- (void)performPivotOperation:(HGSSearchOperation*)operation
+- (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
             forPlaylistObject:(HGSResult *)pivotObject
                     withQuery:(NSString *)query;
-- (void)performPivotOperation:(HGSSearchOperation*)operation
+- (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
                     forObject:(HGSResult *)pivotObject
                     withQuery:(NSString *)query;
 - (HGSResult *)trackResult:(NSString *)track
@@ -432,7 +432,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return db;
 }
 
-- (void)performPivotOperation:(HGSSearchOperation*)operation
+- (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
                forTrackObject:(HGSResult *)pivotObject {
   // For tracks, return the artist, composer, genre, and the album
   // on which the track appears 
@@ -494,7 +494,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   [operation setResults:results];
 }
 
-- (void)performPivotOperation:(HGSSearchOperation*)operation
+- (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
                forAlbumObject:(HGSResult *)pivotObject
                     withQuery:(NSString *)query  {
   // For albums, return tracks from the album
@@ -544,7 +544,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
 }
 
-- (void)performPivotOperation:(HGSSearchOperation*)operation
+- (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
             forPlaylistObject:(HGSResult *)pivotObject
                     withQuery:(NSString *)query {
   // For playlists, return tracks from the playlist
@@ -596,7 +596,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
 }
 
-- (void)performPivotOperation:(HGSSearchOperation*)operation
+- (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
                     forObject:(HGSResult *)pivotObject
                     withQuery:(NSString *)query {
   NSString *sqlSelect = nil;
@@ -658,7 +658,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSString *sqlSelect = nil;
   // TODO(hawk): we should probably revisit a fair amount of this to better
   // handle more then one query term:

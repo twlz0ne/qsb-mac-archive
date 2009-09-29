@@ -111,7 +111,7 @@ static NSString *const kWeatherResultURL
   return isValid;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation *)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSString *rawQuery = [[operation query] rawQueryString];
   NSString *location;
   NSUInteger rawQueryLength = [rawQuery length];

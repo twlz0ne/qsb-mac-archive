@@ -210,7 +210,7 @@ static NSString *const kiPhoneReferenceDocSetPath
   return ([super isValidSourceForQuery:query] && [queryString length] >= 4);
 }
 
-- (void)performSearchOperation:(HGSSearchOperation *)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   // make sure we're done any parsing
   [condition_ lock];
   while (!indexed_) {

@@ -175,7 +175,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 
 #pragma mark -
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   // Recollect things on demand
   if (rebuildCache_) {
     [self collectActions];

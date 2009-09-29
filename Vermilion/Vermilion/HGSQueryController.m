@@ -230,15 +230,6 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   return parsedQuery_;
 }
 
-- (NSArray*)results {
-  NSMutableArray* results = [NSMutableArray array];
-  NSDictionary *nsSourceResults = (NSDictionary *)sourceResults_;
-  for (NSArray *opResult in [nsSourceResults allValues]) {
-    [results addObjectsFromArray:opResult];
-  }
-  return results;
-}
-
 - (NSDictionary *)rankedResultsByCategory {
   // Return a dictionary of results organized by category.  If there
   // were no acceptable results then return nil.

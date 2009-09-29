@@ -73,7 +73,7 @@
   return isValid;
 }
 
-- (void)performSearchOperation:(HGSSearchOperation*)operation {
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSString *queryString = [[operation query] rawQueryString];
   NSString *urlString = queryString;
   NSURL *url = [NSURL URLWithString:urlString];
