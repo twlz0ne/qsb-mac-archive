@@ -40,9 +40,8 @@
 #import "QSBSearchWindowController.h"
 #import "QSBTopResultsViewControllers.h"
 #import "GTMGeometryUtils.h"
-#import "GTMNSObject+KeyValueObserving.h"
-#import "GTMMethodCheck.h"
 #import "QSBHGSDelegate.h"
+#import "QSBSearchController.h"
 
 static const CGFloat kScrollViewMinusTableHeight = 7.0;
 static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
@@ -51,21 +50,19 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 
 // Return our main search window controller.
 - (QSBSearchWindowController *)searchWindowController;
-- (void)resultsObjectsChanged:(GTMKeyValueChangeNotification *)notification;
+- (void)resultsUpdated:(NSNotification *)notification;
 @end
 
 
 @implementation QSBResultsViewBaseController
-GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
-GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)awakeFromNib {
   rowViewControllers_ = [[NSMutableDictionary dictionary] retain];
-  [resultsArrayController_ gtm_addObserver:self
-                                forKeyPath:kQSBArrangedObjectsKVOKey
-                                  selector:@selector(resultsObjectsChanged:)
-                                  userInfo:nil
-                                   options:0];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc addObserver:self 
+         selector:@selector(resultsUpdated:) 
+             name:kQSBSearchControllerDidUpdateResultsNotification 
+           object:nil];
 
   resultsNeedUpdating_ = YES;
   [resultsTableView_ setDoubleAction:@selector(openResultsTableItem:)];
@@ -75,10 +72,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)dealloc {
   [rowViewControllers_ release];
-  [resultsArrayController_ gtm_removeObserver:self
-                                   forKeyPath:kQSBArrangedObjectsKVOKey
-                                     selector:@selector(resultsObjectsChanged:)];
-  [queryString_ release];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [super dealloc];
 }
 
@@ -149,22 +143,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self moveToBeginningOfDocument:self];
 }
 
-- (void)setQueryString:(NSString *)value {
-  [queryString_ release];
-  queryString_ = [value copy];
-}
-
-- (NSString *)queryString {
-  return [[queryString_ retain] autorelease];
-}
-
 - (QSBTableResult *)selectedTableResult {
   return [self tableResultForRow:[resultsTableView_ selectedRow]];
 }
 
 - (QSBTableResult *)tableResultForRow:(NSInteger)row { 
   QSBTableResult *object = nil;
-  NSArray *objects = [resultsArrayController_ arrangedObjects];
+  NSArray *objects = [self tableResultsArray];
   if (row < [objects count]) {
     object = [objects objectAtIndex:row];
   }
@@ -279,11 +264,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return [searchViewController_ searchWindowController];
 }
 
-- (void)resultsObjectsChanged:(GTMKeyValueChangeNotification *)notification {
-  id object = [notification object];
-  NSArray *newArrangedObjects = [object arrangedObjects];
-  rowCount_ = [newArrangedObjects count];
-  [[self resultsTableView] reloadData];
+- (void)resultsUpdated:(NSNotification *)notification {
+  NSTableView *resultsTableView = [self resultsTableView];
+  [resultsTableView reloadData];
+  if ([resultsTableView selectedRow] == -1) {
+    [resultsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
+                  byExtendingSelection:NO];
+  }
   [searchViewController_ updateResultsView];
 }
 
@@ -295,6 +282,10 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   return [tableResult copyToPasteboard:pb];
 }
 
+- (NSArray *)tableResultsArray {
+  [self doesNotRecognizeSelector:_cmd];
+  return nil;
+}
 
 #pragma mark QSBViewTableViewDelegateProtocol methods
 
@@ -373,19 +364,6 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
 
 #pragma mark Table Delegate Methods
 
-// Sets us up so that the user can drag across us and get updated correctly
-- (void)tableViewSelectionIsChanging:(NSNotification *)aNotification {
-  NSTableView *view = (NSTableView *)[aNotification object];
-  NSInteger newSelectedRow = [view selectedRow];
-  NSIndexSet *selectionSet = nil;
-  if (newSelectedRow >= 0) {
-    selectionSet = [NSIndexSet indexSetWithIndex:newSelectedRow];
-  } else {
-    selectionSet = [NSIndexSet indexSet];
-  }
-  [resultsArrayController_ setSelectionIndexes:selectionSet];
-}
-
 - (BOOL)tableView:(NSTableView *)aTableView
   shouldSelectRow:(NSInteger)rowIndex {
   QSBTableResult *object = [self tableResultForRow:rowIndex];
@@ -396,7 +374,7 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
-  return rowCount_;
+  return [[self tableResultsArray] count];
 }
 
 - (CGFloat)tableView:(NSTableView *)tableView
@@ -430,5 +408,3 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 }
 
 @end
-
-

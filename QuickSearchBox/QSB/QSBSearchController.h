@@ -105,3 +105,7 @@
 - (void)stopQuery;
 
 @end
+
+// Notification sent out when results have been updated
+extern NSString *const kQSBSearchControllerDidUpdateResultsNotification;
+

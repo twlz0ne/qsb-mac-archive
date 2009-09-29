@@ -38,12 +38,10 @@
 #import "QSBResultRowViewController.h"
 #import "QSBResultsViewTableView.h"
 #import "QSBSearchWindowController.h"
-#import "GTMMethodCheck.h"
-#import "NSAttributedString+Attributes.h"
+#import "QSBSearchController.h"
 
 @implementation QSBTopResultsViewDelegate
 
-GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 
 - (void)awakeFromNib {  
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
@@ -52,7 +50,7 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   [resultsTableView reloadData];
 
   [resultsTableView setIntercellSpacing:NSMakeSize(0.0, 0.0)];
-
+  
   // Adjust the 'Top' results view to properly fit.
   NSView *resultsView = [self resultsView];
   NSRect viewFrame = [resultsView frame];
@@ -105,5 +103,8 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   return [result topResultsRowViewControllerClass];
 }
 
+- (NSArray *)tableResultsArray {
+  return [[[self searchViewController] searchController] desktopResults];
+}
 @end
 

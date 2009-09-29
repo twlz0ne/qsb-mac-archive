@@ -53,9 +53,7 @@
   NSTimeInterval blockTime_; // Time we started blocking repeats
 }
 
-// Set/get the full more results.
-- (NSArray *)moreResults;
-- (void)setMoreResults:(NSArray *)value;
+// Set the full more results.
 - (void)setMoreResultsWithDict:(NSDictionary *)value;
 
 // Returns a list of all categories available for presentation.

@@ -46,16 +46,13 @@
   IBOutlet QSBSearchViewController *searchViewController_;
   IBOutlet NSView *resultsView_;
   IBOutlet QSBResultsViewTableView *resultsTableView_;
-  IBOutlet NSArrayController *resultsArrayController_;
 
   // Storage for our lazily created row results view controllers.
   NSMutableDictionary *rowViewControllers_;
   
-  NSString *queryString_;
   BOOL isShowing_;  // YES when our results section is showing.
   BOOL resultsNeedUpdating_;
   CGFloat lastWindowHeight_;  // Remember last calculated window height.
-  NSInteger rowCount_;  // Cached count of result rows.
 }
 
 // Returns the query controller.
@@ -64,6 +61,9 @@
 // Return the various views associated with this controller.
 - (NSView *)resultsView;
 - (QSBResultsViewTableView *)resultsTableView;
+
+// The array of results that this controller is manipulating.
+- (NSArray *)tableResultsArray;
 
 // Get some UI metrics
 - (CGFloat)minimumTableHeight;
@@ -83,10 +83,6 @@
 // is made in the result table.  The default behavior is to select
 // the first selectable row.
 - (void)setSwapSelection;
-
-// Set/Get the query string.
-- (void)setQueryString:(NSString *)value;
-- (NSString *)queryString;
 
 // Return the last selected table item.
 - (QSBTableResult *)selectedTableResult;

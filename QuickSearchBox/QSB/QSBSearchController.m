@@ -44,10 +44,9 @@
 #import "NSString+ReadableURL.h"
 #import "HGSOpenSearchSuggestSource.h"
 
-// KVO Selector strings.
-static NSString *const kDesktopResultsKVOKey = @"desktopResults";
-
 static const NSUInteger kDefaultMaximumResultsToCollect = 500;
+NSString *const kQSBSearchControllerDidUpdateResultsNotification 
+  = @"QSBSearchControllerDidUpdateResultsNotification";
 
 @interface QSBSearchController ()
 
@@ -231,7 +230,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   }
   
   // Build the actual list
-  [self willChangeValueForKey:kDesktopResultsKVOKey];
   [desktopResults_ removeAllObjects];
   
   if ([mainResults count] > 0) {
@@ -321,15 +319,9 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     [cachedDesktopResults_ setArray:desktopResults_];
   }
   
-  [self didChangeValueForKey:kDesktopResultsKVOKey];
-}
-
-- (void)purgeInvalidResults {
-  if (![cachedDesktopResults_ isEqualToArray:desktopResults_]) {
-    [self willChangeValueForKey:kDesktopResultsKVOKey];
-    [cachedDesktopResults_ setArray:desktopResults_];
-    [self didChangeValueForKey:kDesktopResultsKVOKey];
-  }
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:kQSBSearchControllerDidUpdateResultsNotification 
+                    object:self];
 }
 
 - (NSString *)searchStatus {
@@ -369,20 +361,13 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
              withObject:nil
              afterDelay:0.0];
   
-  [NSObject cancelPreviousPerformRequestsWithTarget:self 
-                                           selector:@selector(purgeInvalidResults) 
-                                             object:nil];
-  
-  [self performSelector:@selector(purgeInvalidResults)
-             withObject:nil
-             afterDelay:0.5];
-  
   if (clearResults) {
-    [self willChangeValueForKey:kDesktopResultsKVOKey];
     [desktopResults_ removeAllObjects];
     [cachedDesktopResults_ removeAllObjects];
-    [self didChangeValueForKey:kDesktopResultsKVOKey];
     [self setMoreResults:nil];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc postNotificationName:kQSBSearchControllerDidUpdateResultsNotification 
+                      object:self];    
   }
 }
 

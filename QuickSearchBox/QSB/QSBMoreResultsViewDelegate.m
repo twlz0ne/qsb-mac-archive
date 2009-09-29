@@ -137,13 +137,8 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   return NO;
 }
 
-- (NSArray *)moreResults {
+- (NSArray *)tableResultsArray {
   return [[moreResults_ retain] autorelease];
-}
-
-- (void)setMoreResults:(NSArray *)value {
-  [moreResults_ autorelease];
-  moreResults_ = [value retain];
 }
 
 - (void)setMoreResultsWithDict:(NSDictionary *)rawDict {
@@ -233,7 +228,11 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   [self setSortedCategoryIndexes:sortedIndexes];
   [self setSortedCategoryCounts:sortedCounts];
 
-  [self setMoreResults:results];
+  [moreResults_ autorelease];
+  moreResults_ = [results retain];
+  [[self resultsTableView] reloadData];
+  [[self searchViewController] updateResultsView];
+  
   [self updateCategoryNames];
   
   // If we're setting to nil then we want to reset the expanded categories.
