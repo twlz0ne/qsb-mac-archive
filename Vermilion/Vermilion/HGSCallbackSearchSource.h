@@ -30,6 +30,11 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion HGSCallbackSearchSource
+*/
+
 #import "HGSSearchSource.h"
 #import "HGSSimpleArraySearchOperation.h"
 
