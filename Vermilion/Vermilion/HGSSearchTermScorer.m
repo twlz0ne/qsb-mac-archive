@@ -213,17 +213,8 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
                   ) {
   CGFloat termScore = 0.0;
-  // Determine if all are first characters because we don't count
-  // a first character value unless they're _all_ first characters.
-  BOOL allFirstCharacter = YES;
-  for (CFIndex cj = 0; cj < termLength; ++cj) {
-    if (charStat[cj].firstCharacterValue_ == 0) {
-      allFirstCharacter = NO;
-      break;
-    }
-  }
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   // Calculate the individual charScores and accumulate term scores.
+#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   NSMutableArray *charDetailsArray
     = (pMatchDetailsArray)
       ? [NSMutableArray arrayWithCapacity:termLength]
@@ -234,9 +225,7 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
     CGFloat charScore = gHGSCharacterMatchFactor;
     NSUInteger firstCharacterValue = charStat[ci].firstCharacterValue_;
     CGFloat firstCharacterScore
-      = (allFirstCharacter && firstCharacterValue != 0)
-        ? (CGFloat)(firstCharacterValue) * gHGSFirstCharacterInWordFactor
-        : 0.0;
+      = (CGFloat)(firstCharacterValue) * gHGSFirstCharacterInWordFactor;
     abbrevationScore += firstCharacterScore;
     CGFloat adjacencyScore
       = (CGFloat)(charStat[ci].adjacencyValue_) * gHGSAdjacencyFactor;
@@ -276,29 +265,27 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
   while (charStatCount > 0 && gHGSEnableBestWordScoring) {
     CFIndex charStatItem = charStatCount - 1;
     NSUInteger adjacencyValue = charStat[charStatItem].adjacencyValue_;
-    if (adjacencyValue > 0) {
-      if (!wordRanges) {
-        wordRanges = BuildWordRanges(itemString);
-        if (pWordRanges) {
-          *pWordRanges = wordRanges;
-        }
+    if (!wordRanges) {
+      wordRanges = BuildWordRanges(itemString);
+      if (pWordRanges) {
+        *pWordRanges = wordRanges;
       }
-      for (HGSItemWordRange *wordRange in wordRanges) {
-        if (charStat[charStatItem].charMatchIndex_
-            >= [wordRange wordStart]) {
-          NSUInteger wordLength = [wordRange wordLength];
-          CGFloat matchValue
-            = (CGFloat)(adjacencyValue + 1) / (CGFloat)wordLength;
-          CGFloat matchScore = gHGSWordPortionFactor * matchValue;
-          if (matchScore > bestMatchLengthScore) {
+    }
+    for (HGSItemWordRange *wordRange in wordRanges) {
+      if (charStat[charStatItem].charMatchIndex_
+          >= [wordRange wordStart]) {
+        NSUInteger wordLength = [wordRange wordLength];
+        CGFloat matchValue
+          = (CGFloat)(adjacencyValue + 1) / (CGFloat)wordLength;
+        CGFloat matchScore = gHGSWordPortionFactor * matchValue;
+        if (matchScore > bestMatchLengthScore) {
 #ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
-            bestTermMatchLength = adjacencyValue + 1;
-            bestMatchedWordLength = [wordRange wordLength];
-            bestMatchLengthValue = matchValue;
+          bestTermMatchLength = adjacencyValue + 1;
+          bestMatchedWordLength = [wordRange wordLength];
+          bestMatchLengthValue = matchValue;
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
-            bestMatchLengthScore = matchScore;
-            break;
-          }
+          bestMatchLengthScore = matchScore;
+          break;
         }
       }
     }
@@ -521,7 +508,7 @@ BOOL HGSValidateTokenizedString(NSString *tokenizedString) {
         = [NSMutableCharacterSet capitalizedLetterCharacterSet];
       NSCharacterSet *puncSet = [NSCharacterSet punctuationCharacterSet];
       [antiWordCharacterSet formUnionWithCharacterSet:puncSet];
-      [antiWordCharacterSet removeCharactersInString:@"'’"];
+      [antiWordCharacterSet removeCharactersInString:@"'‚Äô"];
       [antiWordCharacterSet retain];  // Leak
     }
   }
@@ -658,10 +645,17 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
                 if (termCharIndex > 0 && itemCharIndex > 0) {
                   firstCharacterValue
                     += charStat[termCharIndex - 1].firstCharacterValue_;
+                  // Adjacency value (for word break adjacency)
+                  if (itemCharIndex
+                       == (charStat[termCharIndex - 1].charMatchIndex_ + 2)) {
+                    adjacencyValue
+                      = charStat[termCharIndex - 1].adjacencyValue_ + 1;
+                    charStat[termCharIndex].adjacencyValue_ = adjacencyValue;
+                  }
                 }
                 charStat[termCharIndex].firstCharacterValue_ = firstCharacterValue;
               } else {
-                // Adjacency value (a word break resets adjacency chain)
+                // Adjacency value (for non-word break adjacency)
                 if (termCharIndex > 0
                     && itemCharIndex > 0
                     && itemCharIndex
