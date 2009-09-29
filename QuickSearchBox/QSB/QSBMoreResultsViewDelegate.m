@@ -257,9 +257,10 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   }
   // Force our category lists and indexes to be regenerated.
   // The selection gets lost so save/restore the selection.
-  NSUInteger selectedRow = [[self arrayController] selectionIndex];
+  QSBResultsViewTableView *resultsTableView = [self resultsTableView];
+  NSUInteger selectedRow = [resultsTableView selectedRow];
   [self setMoreResultsWithDict:moreResultsDict_];
-  [[self arrayController] setSelectionIndex:selectedRow];
+  [resultsTableView selectRow:selectedRow byExtendingSelection:NO];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   NSDictionary *userInfo 
     = [NSDictionary dictionaryWithObject:category 

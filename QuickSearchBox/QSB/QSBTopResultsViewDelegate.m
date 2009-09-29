@@ -85,23 +85,6 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   categorySummaryString_ = [value copy];
 }
 
-- (CGFloat)updateResultsView {
-  CGFloat tableHeight = [super updateResultsView];
-  
-  // Force a selection if there is not already a selection and if there
-  // is no pivot.
-  QSBResultsViewTableView *resultsTableView = [self resultsTableView];
-  NSInteger lastCellRow = [resultsTableView numberOfRows] - 1;
-  if (lastCellRow > -1) {
-    NSUInteger selectedRow = [[self arrayController] selectionIndex];
-    if (selectedRow == NSNotFound
-        && ![[self searchViewController] results]) {
-      [resultsTableView selectFirstSelectableRow];
-    }
-  }
-  return tableHeight;
-}
-
 #pragma mark NSTableView Delegate Methods
 
 - (void)moveDown:(id)sender {

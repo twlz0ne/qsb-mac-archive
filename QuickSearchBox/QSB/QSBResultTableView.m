@@ -190,7 +190,7 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
       int offset = incrementing ? 1 : -1;
       do {
         currSelection += offset;
-        if (currSelection == [self numberOfRows]) {
+        if (currSelection >= [self numberOfRows]) {
           currSelection = 0;
         } else if (currSelection < 0) {
           currSelection = [self numberOfRows] - 1;

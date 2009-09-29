@@ -104,19 +104,12 @@ static NSString *const kQSBSearchWindowFrameAnimationName
 static NSString *const kQSBResetQueryTimeoutPrefKey 
   = @"QSBResetQueryTimeoutPrefKey";
 
-// Unicode codepoint for the zero width no break space. Used for a fix around
-// radar 
-static const unichar kZeroWidthNoBreakSpace = 0xFEFF;
-
 // This is a tag value for corpora in the corpora menu.
 static const NSInteger kBaseCorporaTagValue = 10000;
-  
-NSString *const kQSBSelectedResultKey = @"selectedResult";
 
 @interface QSBSearchWindowController ()
 
 @property (nonatomic, retain) QSBWelcomeController *welcomeController;
-@property (nonatomic, readwrite, retain) QSBTableResult *selectedResult;
 
 - (void)updateLogoView;
 - (BOOL)firstLaunch;
@@ -203,6 +196,7 @@ NSString *const kQSBSelectedResultKey = @"selectedResult";
 // Change the visibility of the welcome window.
 - (void)setWelcomeHidden:(BOOL)hidden;
 
+- (QSBTableResult *)selectedTableResult;
 @end
 
 
@@ -210,7 +204,6 @@ NSString *const kQSBSelectedResultKey = @"selectedResult";
 
 @synthesize activeSearchViewController = activeSearchViewController_;
 @synthesize welcomeController = welcomeController_;
-@synthesize selectedResult = selectedResult_;
 
 GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionary);
 GTM_METHOD_CHECK(NSWorkspace, gtm_wasLaunchedAsLoginItem);
@@ -387,8 +380,15 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
                                                   name:kQSBPivotingAnimationName
                                               userInfo:nil];
   [pivotingAnimation_ setDelegate:self];
+  
+  [thumbnailView_ setHidden:YES];
+  
+  [nc addObserver:self 
+         selector:@selector(selectedTableResultDidChange:) 
+             name:kQSBSelectedTableResultDidChangeNotification 
+           object:nil];
 }
-
+  
 - (void)dealloc {
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   [ud gtm_removeObserver:self 
@@ -404,7 +404,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [activeSearchViewController_ release];
   [corpora_ release];
   [welcomeController_ release];
-  [selectedResult_ release];
   [resultWindowVisibilityAnimation_ release];
   [searchWindowVisibilityAnimation_ release];
   [pivotingAnimation_ release];
@@ -438,7 +437,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     // Dispose of the welcome window if it is being shown.
     [self closeWelcomeWindow];
 
-    BOOL likelyResult = [[self selectedResult] rank] > 1.0;
+    BOOL likelyResult = [[self selectedTableResult] rank] > 1.0;
     NSTimeInterval delay 
       = likelyResult ? kQSBLongerAppearDelay : kQSBAppearDelay;
     [self performSelector:@selector(displayResults:)
@@ -450,25 +449,10 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   }
 }
 
-- (void)resultsIndicesChanged:(GTMKeyValueChangeNotification *)notification {
-  QSBSearchViewController *viewController = [notification object];
-  QSBResultsViewBaseController *resultsController 
-    = [viewController activeResultsViewController];
-  NSArrayController *resultsArray = [resultsController arrayController];
-  NSArray *selectedObjects 
-    = [resultsArray selectedObjects];
-  QSBTableResult *newSelection = nil;
-  if ([selectedObjects count]) {
-    newSelection = [selectedObjects objectAtIndex:0];
-  }
-  if (newSelection != selectedResult_ 
-      && ![newSelection isEqual:selectedResult_]) {
-    [self setSelectedResult:newSelection];
-    NSTextView *textView = (NSTextView *)[searchTextField_ currentEditor];
-    if (textView) {
-      [textView complete:self];  // Also force a new completion.
-    }
-  }
+- (QSBTableResult *)selectedTableResult {
+  QSBResultsViewBaseController *resultsViewController 
+    = [activeSearchViewController_ activeResultsViewController];
+  return [resultsViewController selectedTableResult];
 }
 
 - (QSBSearchViewController *)activeSearchViewController {
@@ -728,7 +712,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
 }
 
 - (void)pivotOnSelection {
-  QSBTableResult *pivotObject = [self selectedResult];
+  QSBTableResult *pivotObject = [self selectedTableResult];
   [self pivotOnObject:pivotObject];
 }
 
@@ -738,10 +722,9 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     = [self activeSearchViewController];
   QSBResultsViewBaseController *activeResultsViewController
     = [activeSearchViewController activeResultsViewController];
-  NSArrayController *resultsController
-    = [activeResultsViewController arrayController];
-  NSArray *arrangedResults = [resultsController arrangedObjects];
-  if ([arrangedResults count]) {
+  QSBResultsViewTableView *tableView 
+    = [activeResultsViewController resultsTableView];
+  if ([tableView numberOfRows] > 0) {
     [self displayResults:nil];
     handled = NO;  // Allow it to proceed to change the selection.
   }
@@ -839,7 +822,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   BOOL validated = NO;
   if ([anItem action] == @selector(copy:)) {
     QSBTableResult *qsbTableResult 
-      = [activeSearchViewController_ selectedObject];
+      = [activeSearchViewController_ selectedTableResult];
     validated = [qsbTableResult isKindOfClass:[QSBSourceTableResult class]];
   } else {
     HGSLogDebug(@"Unexpected userItem validation %@ at [%@ %@]", 
@@ -849,7 +832,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
 }
 
 - (void)copy:(id)sender {
-  QSBTableResult *qsbTableResult = [activeSearchViewController_ selectedObject];
+  QSBTableResult *qsbTableResult 
+    = [activeSearchViewController_ selectedTableResult];
   NSPasteboard *pb = [NSPasteboard generalPasteboard];
   [qsbTableResult copyToPasteboard:pb];
 }
@@ -913,7 +897,7 @@ doCommandBySelector:(SEL)commandSelector {
   // text.
   NSString *queryString = [[textView textStorage] string];
   if ([queryString length]) {
-    id result = [self selectedResult];
+    id result = [self selectedTableResult];
     if (result && [result respondsToSelector:@selector(displayName)]) {
       completion = [result displayName];
       // If the query string is not a prefix of the completion then
@@ -1119,6 +1103,7 @@ doCommandBySelector:(SEL)commandSelector {
     [animation release];
     [resultsWindow_ setIgnoresMouseEvents:YES];
     [searchWindow setIgnoresMouseEvents:YES];
+    showResults_ = NO;
     [resultsWindow_ orderOut:nil];
     [searchWindow orderOut:nil];
   }  else {
@@ -1481,6 +1466,23 @@ doCommandBySelector:(SEL)commandSelector {
               object:sharedLoader];
 }
 
+- (void)selectedTableResultDidChange:(NSNotification *)notification {
+  [thumbnailView_ unbind:NSValueBinding];
+  QSBTableResult *tableResult 
+    = [[notification userInfo] objectForKey:kQSBSelectedTableResultKey];
+  if (tableResult) {
+    [thumbnailView_ bind:NSValueBinding 
+                toObject:tableResult 
+             withKeyPath:@"displayThumbnail" 
+                 options:nil];
+    [thumbnailView_ setHidden:NO];
+  } else {
+    [thumbnailView_ setHidden:YES];
+  }
+  [searchTextFieldEditor_ complete:self];
+  NSImage* thumbnail = [tableResult displayThumbnail];
+  [logoView_ setHidden:(thumbnail != nil)];
+}
 
 #pragma mark Animations
   - (void)animationDidEnd:(QSBViewAnimation *)animation {
@@ -1607,16 +1609,11 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (void)setActiveSearchViewController:(QSBSearchViewController *)searchViewController {
-  NSString *selectionIndexesKeyPath 
-    = @"activeResultsViewController.arrayController.selectionIndexes";
   QSBSearchController *searchController
     = [activeSearchViewController_ searchController];
   [searchController gtm_removeObserver:self
                             forKeyPath:kQSBQueryStringKey
                               selector:@selector(queryStringChanged:)];
-  [activeSearchViewController_ gtm_removeObserver:self
-                                       forKeyPath:selectionIndexesKeyPath
-                                         selector:@selector(resultsIndicesChanged:)];
   // We are no longer interested in the current controller producing results.
   [activeSearchViewController_ stopQuery];
   [activeSearchViewController_ autorelease];
@@ -1627,11 +1624,6 @@ doCommandBySelector:(SEL)commandSelector {
                            selector:@selector(queryStringChanged:)
                            userInfo:nil
                             options:0];
-  [activeSearchViewController_ gtm_addObserver:self
-                                    forKeyPath:selectionIndexesKeyPath
-                                      selector:@selector(resultsIndicesChanged:)
-                                      userInfo:nil
-                                       options:NSKeyValueObservingOptionInitial];
   [self updatePivotToken];
 }
 
@@ -1789,12 +1781,6 @@ doCommandBySelector:(SEL)commandSelector {
     // Force the results view to show
     [self updateResultsView];
   }
-}
-
-- (QSBTableResult *)selection {
-  // TODO(mrossetti): Eliminate this in favor of the query controller.
-  QSBTableResult *result = [activeSearchViewController_ selectedObject];
-  return result;
 }
 
 - (BOOL)isOurScreenCaptured {

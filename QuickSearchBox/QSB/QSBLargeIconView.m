@@ -33,15 +33,9 @@
 #import "QSBLargeIconView.h"
 #import "GTMNSImage+Scaling.h"
 #import "GTMGeometryUtils.h"
-#import "QSBSearchWindowController.h"
-#import "QSBTableResult.h"
-#import "QSBSearchViewController.h"
+#import "GTMNSObject+KeyValueObserving.h"
 
 @implementation QSBLargeIconView
-
-- (BOOL)mouseDownCanMoveWindow {
-  return YES;
-}
 
 CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
   size_t width = CGBitmapContextGetWidth(c);
@@ -89,7 +83,7 @@ CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
                            maxAvgY - minAvgY + 1);
   return rect;
 }
-
+   
 - (void)drawRect:(NSRect)rect {
   NSRect bounds = [self bounds];
   NSImage *image = [[self cell] image];

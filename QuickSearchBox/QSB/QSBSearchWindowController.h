@@ -45,10 +45,6 @@
 
 extern const NSTimeInterval kQSBAppearDelay;
 
-// QSBSearchWindowController has objects observing it's selected result
-// via this key.
-extern NSString *const kQSBSelectedResultKey;
-
 @interface QSBSearchWindowController : NSWindowController {
  @private
   IBOutlet QSBTextFieldEditor *searchTextFieldEditor_;
@@ -59,7 +55,8 @@ extern NSString *const kQSBSelectedResultKey;
   IBOutlet QSBCustomPanel *resultsWindow_;
   IBOutlet NSWindow *shieldWindow_;
   IBOutlet NSView *resultsOffsetterView_;
-
+  IBOutlet NSImageView *thumbnailView_;
+  
   QSBSearchViewController *activeSearchViewController_;  // Currently active query.
 
   BOOL needToUpdatePositionOnActivation_;  // Do we need to reposition
@@ -75,9 +72,6 @@ extern NSString *const kQSBSelectedResultKey;
   // The welcome window controller.
   QSBWelcomeController *welcomeController_;
   
-  // The currently selected result
-  QSBTableResult *selectedResult_;
-  
   // Animations
   QSBViewAnimation *resultWindowVisibilityAnimation_;
   QSBViewAnimation *searchWindowVisibilityAnimation_;
@@ -85,7 +79,6 @@ extern NSString *const kQSBSelectedResultKey;
 }
 
 @property (nonatomic, retain) QSBSearchViewController *activeSearchViewController;
-@property (nonatomic, readonly, retain) QSBTableResult *selectedResult;
 
 // Designated initializer
 - (id)init;

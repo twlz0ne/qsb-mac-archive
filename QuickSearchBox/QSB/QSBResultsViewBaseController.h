@@ -61,9 +61,6 @@
 // Returns the query controller.
 - (QSBSearchViewController *)searchViewController;
 
-// Returns the results array controller.
-- (NSArrayController *)arrayController;
-
 // Return the various views associated with this controller.
 - (NSView *)resultsView;
 - (QSBResultsViewTableView *)resultsTableView;

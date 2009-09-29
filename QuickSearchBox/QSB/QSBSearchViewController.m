@@ -38,6 +38,7 @@
 #import "QSBResultsViewBaseController.h"
 #import "QSBSearchWindowController.h"
 #import "QSBTopResultsViewDelegate.h"
+#import "QSBHGSDelegate.h"
 
 NSString *const kScrollViewHiddenKeyPath = @"hidden";
 
@@ -63,7 +64,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 @synthesize parentSearchViewController = parentSearchViewController_;
 @dynamic windowHeight;
 @dynamic results;
-@dynamic selectedObject;
+@dynamic selectedTableResult;
 @dynamic queryString;
 
 - (id)initWithWindowController:(QSBSearchWindowController *)searchWindowController {
@@ -78,12 +79,24 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 
 - (void)awakeFromNib {
   [self setActiveResultsViewController:topResultsController_ animate:NO];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  QSBResultsViewTableView *topResultsView = [topResultsController_ resultsTableView];
+  [nc addObserver:self 
+         selector:@selector(tableViewSelectionDidChange:) 
+             name:NSTableViewSelectionDidChangeNotification 
+           object:topResultsView];
+  QSBResultsViewTableView *moreResultsView = [moreResultsController_ resultsTableView];
+  [nc addObserver:self 
+         selector:@selector(tableViewSelectionDidChange:) 
+             name:NSTableViewSelectionDidChangeNotification 
+           object:moreResultsView];
 }
 
 - (void)dealloc {
   [parentSearchViewController_ release];
   [pivotQueryString_ release];
   [searchWindowController_ release];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [super dealloc];
 }
 
@@ -94,7 +107,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
     = [parentViewController searchController];
   [searchController_ setParentSearchController:parentSearchController];
   QSBSourceTableResult *selectedObject 
-    = (QSBSourceTableResult *)[parentViewController selectedObject];
+    = (QSBSourceTableResult *)[parentViewController selectedTableResult];
   HGSAssert(!selectedObject 
             || [selectedObject isKindOfClass:[QSBSourceTableResult class]],
             @"expected a QSBSourceTableResult and got %@", selectedObject);
@@ -122,7 +135,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 
 - (CGFloat)windowHeight {
   return [[self activeResultsViewController] windowHeight]
-  + NSHeight([statusBar_ bounds]);
+    + NSHeight([statusBar_ bounds]);
 }
 
 - (void)setQueryString:(NSString *)queryString {
@@ -142,7 +155,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   return queryString;
 }
 
-- (QSBTableResult *)selectedObject {
+- (QSBTableResult *)selectedTableResult {
   QSBResultsViewBaseController *controller = [self activeResultsViewController];
   QSBTableResult *result = [controller selectedTableResult];
   return result;
@@ -174,7 +187,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 }
 
 - (BOOL)performDefaultActionOnSelectedRow {
-  QSBTableResult *result = [self selectedObject];
+  QSBTableResult *result = [self selectedTableResult];
   return [result performDefaultActionWithSearchViewController:self];
 }
 
@@ -182,6 +195,26 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   BOOL acceptable = [[self activeResultsViewController]
                      performSelectionMovementSelector:selector];
   return acceptable;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  QSBTableResult *tableResult = [self selectedTableResult];
+  NSArray *cellValues = nil;
+  if ([tableResult respondsToSelector:@selector(representedResult)]) {
+    HGSResult *result = [(QSBSourceTableResult *)tableResult representedResult];
+    cellValues = [result valueForKey:kQSBObjectAttributePathCellsKey];
+  }
+  [statusBar_ setObjectValue:cellValues];
+  
+  NSDictionary *userInfo = nil;
+  if (tableResult) {
+    userInfo = [NSDictionary dictionaryWithObject:tableResult 
+                                           forKey:kQSBSelectedTableResultKey];
+  }
+  [nc postNotificationName:kQSBSelectedTableResultDidChangeNotification
+                    object:self 
+                  userInfo:userInfo];
 }
 
 #pragma mark Top/More Results View Control

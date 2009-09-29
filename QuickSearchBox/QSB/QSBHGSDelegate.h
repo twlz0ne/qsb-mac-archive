@@ -45,12 +45,22 @@
 // compose and provide your own in your source's provideValueForKey: method.
 
 // Path cell-related keys
-#define kQSBObjectAttributePathCellClickHandlerKey @"kQSBObjectAttributePathCellClickHandler"  // selector as string
-#define kQSBObjectAttributePathCellsKey @"kQSBbjectAttributePathCells"  // NSArray of NSDictionaries
-#define kQSBPathCellDisplayTitleKey @"kQSBPathCellDisplayTitle"  // NSString
-#define kQSBPathCellImageKey @"kQSBPathCellImage"  // NSImage
-#define kQSBPathCellURLKey @"kQSBPathCellURL"  // NSURL
-#define kQSBPathCellHiddenKey @"kQSBPathCellHidden"  // NSNumber (BOOL)
+
+//   selector as string
+#define kQSBObjectAttributePathCellClickHandlerKey \
+  @"QSBObjectAttributePathCellClickHandler"
+//   NSArray of NSDictionaries
+#define kQSBObjectAttributePathCellsKey \
+  @"QSBObjectAttributePathCells"
+//   NSString
+#define kQSBPathCellDisplayTitleKey @"QSBPathCellDisplayTitle"
+//   NSImage
+#define kQSBPathCellImageKey @"QSBPathCellImage"
+//   NSURL
+#define kQSBPathCellURLKey @"QSBPathCellURL"
+//   NSNumber (BOOL)
+#define kQSBPathCellHiddenKey @"QSBPathCellHidden"
+
 
 @class QSBPluginVerifyWindowController;
 

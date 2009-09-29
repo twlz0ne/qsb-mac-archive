@@ -80,8 +80,8 @@
 @property(nonatomic, readonly, assign) CGFloat windowHeight;
 // The current results for the query.
 @property(nonatomic, readwrite, retain) HGSResultArray *results;
-// Return the selected object from the active results controller.
-@property(nonatomic, readonly, retain) QSBTableResult *selectedObject;
+// Return the selected table result from the active results controller.
+@property(nonatomic, readonly, retain) QSBTableResult *selectedTableResult;
 // The search text string for our query
 @property(nonatomic, readwrite, retain) NSString *queryString;
 
@@ -132,4 +132,15 @@
 // object is the action being performed (HGSAction)
 #define kQSBQueryControllerWillPerformActionNotification \
   @"QSBQueryControllerWillPerformActionNotification"
+
+// Notification that the selected result did change.
+// Object is the QSBSearchViewController
+// Userinfo keys:
+//   QSBSelectedTableResultKey - the QSBTableResult if one is selected.
+//
+// If nothing is selected, there will be no kQSBSelectedResultKey.
+#define kQSBSelectedTableResultDidChangeNotification \
+  @"QSBSelectedTableResultDidChangeNotification"
+#define kQSBSelectedTableResultKey @"QSBSelectedTableResultKey"
+
 

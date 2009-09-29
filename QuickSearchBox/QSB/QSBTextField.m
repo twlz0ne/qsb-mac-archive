@@ -34,37 +34,17 @@
 #import "GTMMethodCheck.h"
 #import "GTMNSEnumerator+Filter.h"
 #import "NSString+CaseInsensitive.h"
-#import "GTMNSObject+KeyValueObserving.h"
-#import "QSBSearchWindowController.h"
 
 @implementation QSBTextFieldEditor
 
 GTM_METHOD_CHECK(NSEnumerator,
                  gtm_enumeratorByMakingEachObjectPerformSelector:withObject:);
 GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
-GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:)
-GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:)
 
 - (void)awakeFromNib {
   [self setEditable:YES];
   [self setFieldEditor:YES];
   [self setSelectable:YES];
-  [windowController_ gtm_addObserver:self 
-                          forKeyPath:kQSBSelectedResultKey 
-                            selector:@selector(observeSelectedResult:)
-                            userInfo:nil 
-                             options:0];
-}
-
-- (void)dealloc {
-  [windowController_ gtm_removeObserver:self 
-                             forKeyPath:kQSBSelectedResultKey 
-                               selector:@selector(observeSelectedResult:)];
-  [super dealloc];
-}
-
-- (void)observeSelectedResult:(GTMKeyValueChangeNotification *)notification {
-  [self complete:nil];
 }
 
 - (void)deleteCompletion {

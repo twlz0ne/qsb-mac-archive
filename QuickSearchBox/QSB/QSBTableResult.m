@@ -100,8 +100,6 @@ GTM_METHOD_CHECK(NSMutableAttributedString,
                  addAttributes:fontTraits:toTextDelimitedBy:postDelimiter:);
 GTM_METHOD_CHECK(NSString, qsb_displayPath);
 GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromHTML);
-GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
-GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 static NSDictionary *gBaseStringAttributes_ = nil;
 

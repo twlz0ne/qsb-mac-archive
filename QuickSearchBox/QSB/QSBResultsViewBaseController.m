@@ -86,10 +86,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return searchViewController_;
 }
 
-- (NSArrayController *)arrayController {
-  return resultsArrayController_;
-}
-
 - (NSView *)resultsView {
   return resultsView_;
 }
@@ -163,12 +159,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (QSBTableResult *)selectedTableResult {
-  QSBTableResult *tableResult = nil;
-  NSInteger selectedRow = [resultsTableView_ selectedRow];
-  if (selectedRow >= 0) {
-    tableResult = [self tableResultForRow:selectedRow];
-  }
-  return tableResult;
+  return [self tableResultForRow:[resultsTableView_ selectedRow]];
 }
 
 - (QSBTableResult *)tableResultForRow:(NSInteger)row { 
@@ -365,8 +356,7 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
     NSURL *pathURL = [clickedComponentCell URL];
     if (!pathURL || ![[NSWorkspace sharedWorkspace] openURL:pathURL]) {
       // No URI or the URI launch failed.  Fallback to let the result take a shot.
-      QSBTableResult *selectedObject = [[[self arrayController] selectedObjects]
-                                        objectAtIndex:0];
+      QSBTableResult *selectedObject = [self selectedTableResult];
       SEL cellClickHandler
         = NSSelectorFromString([selectedObject
                                 valueForKey:kQSBObjectAttributePathCellClickHandlerKey]);
