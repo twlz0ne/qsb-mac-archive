@@ -1110,9 +1110,9 @@ doCommandBySelector:(SEL)commandSelector {
     [searchWindowVisibilityAnimation_ stopAnimation];
 
     QSBViewAnimation *animation 
-      = [[NSViewAnimation alloc] initWithViewAnimations:animations
-                                                   name:kQSBHideSearchAndResultsWindowAnimationName
-                                               userInfo:nil];
+      = [[QSBViewAnimation alloc] initWithViewAnimations:animations
+                                                    name:kQSBHideSearchAndResultsWindowAnimationName
+                                                userInfo:nil];
     [animation setDuration:0.2];
     [animation setAnimationBlockingMode:NSAnimationBlocking];
     [animation startAnimation];
