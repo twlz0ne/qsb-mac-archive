@@ -570,6 +570,15 @@
 		8B23300E1062C12700AF7287 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B23300C1062C12700AF7287 /* Localizable.strings */; };
 		8B2334731062FF5E00AF7287 /* image_search.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B2334721062FF5E00AF7287 /* image_search.icns */; };
 		8B2334811063013600AF7287 /* wikipedia.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B2334801063013600AF7287 /* wikipedia.icns */; };
+		8B2BFC51107130BF00427404 /* QSBViewAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFC4C107130BF00427404 /* QSBViewAnimation.m */; };
+		8B2BFDCC107160A100427404 /* QSBSimpleInvocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDCB107160A100427404 /* QSBSimpleInvocation.m */; };
+		8B2BFDCD107160A100427404 /* QSBSimpleInvocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDCB107160A100427404 /* QSBSimpleInvocation.m */; };
+		8B2BFDCE107160A100427404 /* QSBSimpleInvocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDCB107160A100427404 /* QSBSimpleInvocation.m */; };
+		8B2BFDCF107160A100427404 /* QSBSimpleInvocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDCB107160A100427404 /* QSBSimpleInvocation.m */; };
+		8B2BFDE81071621C00427404 /* QSBSimpleInvocationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDE71071621C00427404 /* QSBSimpleInvocationTest.m */; };
+		8B2BFDE91071621C00427404 /* QSBSimpleInvocationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDE71071621C00427404 /* QSBSimpleInvocationTest.m */; };
+		8B2BFDEA1071621C00427404 /* QSBSimpleInvocationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDE71071621C00427404 /* QSBSimpleInvocationTest.m */; };
+		8B2BFDEB1071621C00427404 /* QSBSimpleInvocationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDE71071621C00427404 /* QSBSimpleInvocationTest.m */; };
 		8B307B0F1051AB40006C4C7A /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
 		8B307C421051B606006C4C7A /* SampleEmail.emlx in Resources */ = {isa = PBXBuildFile; fileRef = 8B307BDE1051B5D4006C4C7A /* SampleEmail.emlx */; };
 		8B3082DD1056EE1F006C4C7A /* GTMNSNumber+64Bit.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3082DB1056EE1F006C4C7A /* GTMNSNumber+64Bit.m */; };
@@ -2399,6 +2408,11 @@
 		8B23300D1062C12700AF7287 /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = en_US.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8B2334721062FF5E00AF7287 /* image_search.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = image_search.icns; sourceTree = "<group>"; };
 		8B2334801063013600AF7287 /* wikipedia.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = wikipedia.icns; sourceTree = "<group>"; };
+		8B2BFC4C107130BF00427404 /* QSBViewAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBViewAnimation.m; sourceTree = "<group>"; };
+		8B2BFC4D107130BF00427404 /* QSBViewAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBViewAnimation.h; sourceTree = "<group>"; };
+		8B2BFDCA107160A100427404 /* QSBSimpleInvocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSimpleInvocation.h; sourceTree = "<group>"; };
+		8B2BFDCB107160A100427404 /* QSBSimpleInvocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSimpleInvocation.m; sourceTree = "<group>"; };
+		8B2BFDE71071621C00427404 /* QSBSimpleInvocationTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSimpleInvocationTest.m; sourceTree = "<group>"; };
 		8B307BDE1051B5D4006C4C7A /* SampleEmail.emlx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SampleEmail.emlx; sourceTree = "<group>"; };
 		8B3082DB1056EE1F006C4C7A /* GTMNSNumber+64Bit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSNumber+64Bit.m"; sourceTree = "<group>"; };
 		8B3082DC1056EE1F006C4C7A /* GTMNSNumber+64Bit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSNumber+64Bit.h"; sourceTree = "<group>"; };
@@ -4702,6 +4716,9 @@
 				6282B2210DD8985000AC9C3C /* QSBSearchWindowController.m */,
 				624137510F2A657B009229E6 /* QSBSetUpAccountWindowController.h */,
 				624137520F2A657B009229E6 /* QSBSetUpAccountWindowController.m */,
+				8B2BFDCA107160A100427404 /* QSBSimpleInvocation.h */,
+				8B2BFDCB107160A100427404 /* QSBSimpleInvocation.m */,
+				8B2BFDE71071621C00427404 /* QSBSimpleInvocationTest.m */,
 				7F3F75930E152BA5001AF34E /* QSBSmallScroller.h */,
 				7F3F75940E152BA5001AF34E /* QSBSmallScroller.m */,
 				8BCFD1800D34004F003A33F4 /* QSBTableResult.h */,
@@ -4716,6 +4733,8 @@
 				62F381000EA7FC1900370F6F /* QSBTopSearchController.m */,
 				626585210F43BD4C008A94B2 /* QSBUserMessenger.h */,
 				626585220F43BD4C008A94B2 /* QSBUserMessenger.m */,
+				8B2BFC4C107130BF00427404 /* QSBViewAnimation.m */,
+				8B2BFC4D107130BF00427404 /* QSBViewAnimation.h */,
 				62521AB20EFAC30000A6E647 /* QSBViewTableViewCell.h */,
 				62521AB30EFAC30000A6E647 /* QSBViewTableViewCell.m */,
 				62521AB40EFAC30000A6E647 /* QSBViewTableViewColumn.h */,
@@ -4850,7 +4869,7 @@
 				8B637B570F2777C300997738 /* GData.framework */,
 				8BCCB03C10348ABE0051B567 /* libGDataTouchStaticLib.a */,
 				8B637B590F2777C300997738 /* GDataUnitTests.octest */,
-				62BD15D9103DB32A00C85BC3 /* GDataIPhoneUnitTests.octest */,
+				62BD15D9103DB32A00C85BC3 /* GDataTouchUnitTests.octest */,
 				8B637B5B0F2777C300997738 /* DevelopmentTestTool */,
 			);
 			name = Products;
@@ -7015,16 +7034,16 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 8B989F360FA7B93C009DC652 /* Products */;
-					ProjectRef = 8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+					ProductGroup = 8B989F150FA7B93C009DC652 /* Products */;
+					ProjectRef = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
 					ProductGroup = 8B989F2B0FA7B93C009DC652 /* Products */;
 					ProjectRef = 8B989F2A0FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
-					ProductGroup = 8B989F150FA7B93C009DC652 /* Products */;
-					ProjectRef = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+					ProductGroup = 8B989F360FA7B93C009DC652 /* Products */;
+					ProjectRef = 8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
 					ProductGroup = 8B637B4D0F2777C300997738 /* Products */;
@@ -7113,10 +7132,10 @@
 			remoteRef = 620054580F77F0FD00C806A1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		62BD15D9103DB32A00C85BC3 /* GDataIPhoneUnitTests.octest */ = {
+		62BD15D9103DB32A00C85BC3 /* GDataTouchUnitTests.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = GDataIPhoneUnitTests.octest;
+			path = GDataTouchUnitTests.octest;
 			remoteRef = 62BD15D8103DB32A00C85BC3 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -8609,6 +8628,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AEC5C730FBA2A2A005608EA /* SharedScript.m in Sources */,
+				8B2BFDCC107160A100427404 /* QSBSimpleInvocation.m in Sources */,
+				8B2BFDE81071621C00427404 /* QSBSimpleInvocationTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8617,6 +8638,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AEC5C740FBA2A2C005608EA /* SharedScript.m in Sources */,
+				8B2BFDCE107160A100427404 /* QSBSimpleInvocation.m in Sources */,
+				8B2BFDEA1071621C00427404 /* QSBSimpleInvocationTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8625,6 +8648,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AEC5C720FBA2A29005608EA /* SharedScript.m in Sources */,
+				8B2BFDCD107160A100427404 /* QSBSimpleInvocation.m in Sources */,
+				8B2BFDE91071621C00427404 /* QSBSimpleInvocationTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8876,6 +8901,8 @@
 				8B453B390FB9EFA900C0E951 /* QSBWelcomeController.m in Sources */,
 				8B8516C9100278CC00880329 /* QSBResultIconView.m in Sources */,
 				8B559ACB10692AA000DB256C /* QSB.sdefsrc in Sources */,
+				8B2BFC51107130BF00427404 /* QSBViewAnimation.m in Sources */,
+				8B2BFDCF107160A100427404 /* QSBSimpleInvocation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8922,6 +8949,7 @@
 				8B55DAE70E78829300D39CB0 /* GTMAppKit+UnitTesting.m in Sources */,
 				8BE848B40E94313A00C611B0 /* QSBKeyMapTest.m in Sources */,
 				8B95CCB60F6EDD8C003BDBDD /* GTMUnitTestDevLog.m in Sources */,
+				8B2BFDEB1071621C00427404 /* QSBSimpleInvocationTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

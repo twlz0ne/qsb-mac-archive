@@ -54,6 +54,8 @@
 #import "NSString+CaseInsensitive.h"
 #import "QSBTableResult.h"
 #import "QSBWelcomeController.h"
+#import "QSBViewAnimation.h"
+#import "QSBSimpleInvocation.h"
 
 static const NSTimeInterval kQSBShowDuration = 0.1;
 static const NSTimeInterval kQSBHideDuration = 0.3;
@@ -80,16 +82,22 @@ static NSString * const kQSBQueryStringKey = @"queryString";
 static NSString * const kQSBMainInterfaceNibName = @"MainInterfaceNibName";
 static NSString * const kQSBWelcomeWindowNibName = @"WelcomeWindow";
 
-static NSString * const kQSBAnimationWindowAlphaValueName
-  = @"QSBAnimationWindowAlphaValueName";
-
-static NSString * const kQSBAnimationViewFrameOriginName
-  = @"QSBAnimationViewFrameOriginName";
-
-static NSString * const kQSBAnimationViewExitingKey 
-  = @"QSBAnimationViewExiting";
-
 static NSString * const kQSBAnimationNameKey = @"QSBAnimationName";
+
+// Animation names
+static NSString *const kQSBHideSearchAndResultsWindowAnimationName
+  = @"QSBHideSearchAndResultsWindowAnimationName";
+
+static NSString *const kQSBResultWindowVisibilityAnimationName 
+  = @"QSBResultWindowVisibilityAnimationName"; 
+static NSString *const kQSBSearchWindowVisibilityAnimationName 
+  = @"QSBSearchWindowVisibilityAnimationName"; 
+static NSString *const kQSBPivotingAnimationName 
+  = @"QSBPivotingAnimationName"; 
+static NSString *const kQSBResultWindowFrameAnimationName 
+  = @"QSBResultWindowFrameAnimationName"; 
+static NSString *const kQSBSearchWindowFrameAnimationName 
+  = @"QSBSearchWindowFrameAnimationName"; 
 
 // NSNumber value in seconds that controls how fast the QSB clears out
 // an old query once it's put in the background.
@@ -248,7 +256,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   
   // Tell the window to tell us when it has changed position on the screen.
   [self setObservingMoveAndResizeNotifications:YES];
-  [self hideResultsWindow];
   
   NSUserDefaults *userPrefs = [NSUserDefaults standardUserDefaults];
   [userPrefs gtm_addObserver:self
@@ -321,18 +328,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [searchWindow setMovableByWindowBackground:YES];
   [searchWindow invalidateShadow];
   [searchWindow setAlphaValue:0.0];
-  CAAnimation *searchWindowSetAlphaAnimation
-    = [[[searchWindow animationForKey:@"alphaValue"] copy] autorelease];
-  [searchWindowSetAlphaAnimation setDelegate:self];
-  [searchWindowSetAlphaAnimation setValue:kQSBAnimationWindowAlphaValueName 
-                                   forKey:kQSBAnimationNameKey];
-  NSMutableDictionary *animations 
-    = [NSMutableDictionary dictionaryWithDictionary:[searchWindow animations]];
-  if (!animations) {
-    animations = [NSMutableDictionary dictionary];
-  }
-  [animations setObject:searchWindowSetAlphaAnimation forKey:@"alphaValue"];
-  [searchWindow setAnimations:animations];
   [resultsWindow_ setCanBecomeKeyWindow:NO];
   [resultsWindow_ setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces]; 
   
@@ -359,11 +354,12 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   NSPasteboard *findPasteBoard = [NSPasteboard pasteboardWithName:NSFindPboard];
   findPasteBoardChangeCount_ = [findPasteBoard changeCount] - 1;
   [self checkFindPasteboard:nil];
-  findPasteBoardChangedTimer_ = [NSTimer scheduledTimerWithTimeInterval:resetInterval
-                                                                 target:self
-                                                               selector:@selector(checkFindPasteboard:) 
-                                                               userInfo:nil
-                                                                repeats:YES];
+  findPasteBoardChangedTimer_ 
+    = [NSTimer scheduledTimerWithTimeInterval:resetInterval
+                                       target:self
+                                     selector:@selector(checkFindPasteboard:) 
+                                     userInfo:nil
+                                      repeats:YES];
   if ([self firstLaunch]) {
     [searchWindow center];
   }
@@ -374,6 +370,23 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   
   [searchTextField_ setStringValue:startupString];
   [searchTextField_ setEnabled:NO];
+  
+  resultWindowVisibilityAnimation_ 
+    = [[QSBViewAnimation alloc] initWithViewAnimations:nil 
+                                                  name:kQSBResultWindowVisibilityAnimationName
+                                              userInfo:nil];
+  [resultWindowVisibilityAnimation_ setDelegate:self];
+  
+  searchWindowVisibilityAnimation_
+    = [[QSBViewAnimation alloc] initWithViewAnimations:nil 
+                                                  name:kQSBSearchWindowVisibilityAnimationName
+                                              userInfo:nil];
+  [searchWindowVisibilityAnimation_ setDelegate:self];
+  pivotingAnimation_
+    = [[QSBViewAnimation alloc] initWithViewAnimations:nil 
+                                                  name:kQSBPivotingAnimationName
+                                              userInfo:nil];
+  [pivotingAnimation_ setDelegate:self];
 }
 
 - (void)dealloc {
@@ -390,10 +403,11 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [activeSearchViewController_ release];
   [corpora_ release];
-  [visibilityChangedUserInfo_ release];
   [welcomeController_ release];
   [selectedResult_ release];
-
+  [resultWindowVisibilityAnimation_ release];
+  [searchWindowVisibilityAnimation_ release];
+  [pivotingAnimation_ release];
   [super dealloc];
 }
 
@@ -559,10 +573,11 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   for (unsigned int i = 0; i < [corpora count]; i++) {
     HGSResult *corpus = [corpora objectAtIndex:i];
     NSString *key = [[NSNumber numberWithUnsignedInt:i] stringValue];
-    NSMenuItem *item = [[[NSMenuItem alloc] initWithTitle:[corpus displayName]
-                                                   action:@selector(selectCorpus:)
-                                            keyEquivalent:key]
-                        autorelease];
+    NSMenuItem *item 
+      = [[[NSMenuItem alloc] initWithTitle:[corpus displayName]
+                                    action:@selector(selectCorpus:)
+                             keyEquivalent:key]
+         autorelease];
     
     // Insert after the everything item
     [menu insertItem:item atIndex:i + 2];
@@ -823,7 +838,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
   BOOL validated = NO;
   if ([anItem action] == @selector(copy:)) {
-    QSBTableResult *qsbTableResult = [activeSearchViewController_ selectedObject];
+    QSBTableResult *qsbTableResult 
+      = [activeSearchViewController_ selectedObject];
     validated = [qsbTableResult isKindOfClass:[QSBSourceTableResult class]];
   } else {
     HGSLogDebug(@"Unexpected userItem validation %@ at [%@ %@]", 
@@ -839,7 +855,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
 }
 
 - (void)hitHotKey:(id)sender {
-  if ([[self window] isVisible]) {
+  if (![[self window] ignoresMouseEvents]) {
     [self hideSearchWindowBecause:kQSBHotKeyChangeVisiblityToggle];
   } else {
     // Check to see if the display is captured, and if so beep and don't
@@ -1006,18 +1022,17 @@ doCommandBySelector:(SEL)commandSelector {
   if (!modalWindow) {
     // a window must be "visible" for it to be key. This makes it "visible"
     // but invisible to the user so we can accept keystrokes while we are
-    // busy opening the window. We order it front as a invisible window, and then
-    // slowly fade it in.
+    // busy opening the window. We order it front as a invisible window, and 
+    // then slowly fade it in.
     NSWindow *searchWindow = [self window];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [visibilityChangedUserInfo_ autorelease];
-    visibilityChangedUserInfo_
-      = [[NSDictionary alloc] initWithObjectsAndKeys:
+    NSDictionary *visibilityChangedUserInfo
+      = [NSDictionary dictionaryWithObjectsAndKeys:
          toggle, kQSBSearchWindowChangeVisibilityToggleKey,
          nil];
     [nc postNotificationName:kQSBSearchWindowWillShowNotification
                       object:searchWindow
-                    userInfo:visibilityChangedUserInfo_];
+                    userInfo:visibilityChangedUserInfo];
     
     if ([[NSUserDefaults standardUserDefaults]
          boolForKey:kQSBSearchWindowDimBackground]) {
@@ -1033,23 +1048,14 @@ doCommandBySelector:(SEL)commandSelector {
       [[shieldWindow animator] setAlphaValue:0.1];
       [NSAnimationContext endGrouping];
     }
-    
+    [searchWindow setIgnoresMouseEvents:NO];
+    [searchWindowVisibilityAnimation_ setViewAnimations:nil];
     [searchWindow makeKeyAndOrderFront:self];
-    
-    // Start the window partially shown, and animate the rest of the way.
-    if (![toggle isEqualToString:kQSBAppLaunchedChangeVisiblityToggle]) {
-      [searchWindow setAlphaValue:0.75];
-
-      [NSAnimationContext beginGrouping];
-      [[NSAnimationContext currentContext] setDuration:kQSBShowDuration];
-      [[searchWindow animator] setAlphaValue:1.0];
-      [self setWelcomeHidden:NO];
-      [NSAnimationContext endGrouping];
-    } else {
-      [searchWindow setAlphaValue:1.0];
-      [self setWelcomeHidden:NO];
-    }
-    
+    [self setWelcomeHidden:NO];
+    [searchWindow setAlphaValue:1.0];
+    [nc postNotificationName:kQSBSearchWindowDidShowNotification
+                      object:[self window]
+                    userInfo:visibilityChangedUserInfo];
     if ([[activeSearchViewController_ queryString] length]) {
       [self performSelector:@selector(displayResults:)
                  withObject:nil 
@@ -1065,14 +1071,13 @@ doCommandBySelector:(SEL)commandSelector {
 - (void)hideSearchWindowBecause:(NSString *)toggle {
   NSWindow *searchWindow = [self window];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [visibilityChangedUserInfo_ autorelease];
-  visibilityChangedUserInfo_
-    = [[NSDictionary alloc] initWithObjectsAndKeys:
+  NSDictionary *visibilityChangedUserInfo
+    = [NSDictionary dictionaryWithObjectsAndKeys:
        toggle, kQSBSearchWindowChangeVisibilityToggleKey,
        nil];
   [nc postNotificationName:kQSBSearchWindowWillHideNotification
                     object:searchWindow
-                  userInfo:visibilityChangedUserInfo_];
+                  userInfo:visibilityChangedUserInfo];
   [NSObject cancelPreviousPerformRequestsWithTarget:self
                                            selector:@selector(displayResults:)
                                              object:nil];
@@ -1087,37 +1092,65 @@ doCommandBySelector:(SEL)commandSelector {
   
   if ([toggle isEqualToString:kQSBExecutedChangeVisiblityToggle]) {
     // Block when executing
-    NSDictionary *anim1 = [NSDictionary dictionaryWithObjectsAndKeys:
-                           searchWindow, NSViewAnimationTargetKey, 
-                           NSViewAnimationFadeOutEffect,
-                           NSViewAnimationEffectKey, 
-                           nil];
+    NSDictionary *anim1 
+      = [NSDictionary dictionaryWithObjectsAndKeys:
+         searchWindow, NSViewAnimationTargetKey, 
+         NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey, 
+         nil];
     
-    NSDictionary *anim2 = [NSDictionary dictionaryWithObjectsAndKeys:
-                           resultsWindow_, NSViewAnimationTargetKey, 
-                           NSViewAnimationFadeOutEffect,
-                           NSViewAnimationEffectKey, 
-                           nil];
+    NSDictionary *anim2 
+      = [NSDictionary dictionaryWithObjectsAndKeys:
+         resultsWindow_, NSViewAnimationTargetKey, 
+         NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey, 
+         nil];
+    NSArray *animations = [NSArray arrayWithObjects:anim1, anim2, nil];
     
-    NSViewAnimation *animation = [[NSViewAnimation alloc] 
-                                  initWithViewAnimations:
-                                  [NSArray arrayWithObjects:anim1, anim2, nil]];
+    // Stop any other visibility animations we may have currently running
+    [resultWindowVisibilityAnimation_ stopAnimation];
+    [searchWindowVisibilityAnimation_ stopAnimation];
+
+    QSBViewAnimation *animation 
+      = [[NSViewAnimation alloc] initWithViewAnimations:animations
+                                                   name:kQSBHideSearchAndResultsWindowAnimationName
+                                               userInfo:nil];
     [animation setDuration:0.2];
     [animation setAnimationBlockingMode:NSAnimationBlocking];
     [animation startAnimation];
     [animation release];
+    [resultsWindow_ setIgnoresMouseEvents:YES];
+    [searchWindow setIgnoresMouseEvents:YES];
     [resultsWindow_ orderOut:nil];
     [searchWindow orderOut:nil];
-    // TODO(alcor): add custom behaviors for toggle, execute, fade
-    //  } else if ([toggle isEqualToString:kQSBHotKeyChangeVisiblityToggle]) {
   }  else {
-    [NSAnimationContext beginGrouping];
     [self hideResultsWindow];
+    [searchWindow setIgnoresMouseEvents:YES];
     [self setWelcomeHidden:YES];
-    [[NSAnimationContext currentContext] setDuration:kQSBHideDuration];
-    [[searchWindow animator] setAlphaValue:0.0];
-    [NSAnimationContext endGrouping];    
+    [searchWindowVisibilityAnimation_ stopAnimation];
+    NSDictionary *animation 
+      = [NSDictionary dictionaryWithObjectsAndKeys:
+         searchWindow, NSViewAnimationTargetKey,
+         NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey,
+         nil];
+    NSArray *animations = [NSArray arrayWithObject:animation];
+    [searchWindowVisibilityAnimation_ setViewAnimations:animations];
+    QSBSimpleInvocation *invocation 
+      = [QSBSimpleInvocation selector:@selector(hideSearchWindowAnimationCompleted:) 
+                               target:self 
+                               object:visibilityChangedUserInfo];
+    [searchWindowVisibilityAnimation_ setUserInfo:invocation];
+    [searchWindowVisibilityAnimation_ setDuration:kQSBHideDuration];
+    [searchWindowVisibilityAnimation_ setAnimationBlockingMode:NSAnimationNonblocking];
+    [searchWindowVisibilityAnimation_ startAnimation];   
   }
+}
+
+- (void)hideSearchWindowAnimationCompleted:(NSDictionary *)userInfo {
+  NSWindow *window = [self window];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:kQSBSearchWindowDidHideNotification
+                    object:window
+                  userInfo:userInfo];
+  [window orderOut:self];
 }
 
 - (NSWindow *)resultsWindow {
@@ -1131,7 +1164,7 @@ doCommandBySelector:(SEL)commandSelector {
   [NSObject cancelPreviousPerformRequestsWithTarget:self
                                            selector:@selector(updateResultsViewNow) 
                                              object:nil];
-  // Prevent a recusion since we're quite likely to resize the window.
+  // Prevent a recursion since we're quite likely to resize the window.
   [self setObservingMoveAndResizeNotifications:NO];
   
   NSWindow *queryWindow = [self window];
@@ -1153,8 +1186,9 @@ doCommandBySelector:(SEL)commandSelector {
                                                 onScreen:[queryWindow screen]];
     if (!NSEqualRects(actualFrame, proposedFrame)) {
       // We need to move the query window as well as the results window.
-      NSPoint deltaPoint = NSMakePoint(actualFrame.origin.x - proposedFrame.origin.x,
-                                       actualFrame.origin.y - proposedFrame.origin.y);
+      NSPoint deltaPoint 
+        = NSMakePoint(actualFrame.origin.x - proposedFrame.origin.x,
+                      actualFrame.origin.y - proposedFrame.origin.y);
       
       NSRect queryFrame = NSOffsetRect([queryWindow frame],
                                 deltaPoint.x, deltaPoint.y);
@@ -1231,11 +1265,9 @@ doCommandBySelector:(SEL)commandSelector {
   NSRect windowFrame = [[self window] frame];
   NSPoint topLeft = windowFrame.origin;
   topLeft.y += windowFrame.size.height;
-  // TODO: change this over to setCGFloat when we get support for it.
-  [[NSUserDefaults standardUserDefaults] setFloat:(float)topLeft.x
-                                           forKey:kQSBSearchWindowFrameLeftPrefKey];
-  [[NSUserDefaults standardUserDefaults] setFloat:(float)topLeft.y
-                                           forKey:kQSBSearchWindowFrameTopPrefKey];
+  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+  [ud setDouble:topLeft.x forKey:kQSBSearchWindowFrameLeftPrefKey];
+  [ud setDouble:topLeft.y forKey:kQSBSearchWindowFrameTopPrefKey];
   CGFloat newWindowHeight = windowFrame.size.height;
   if ([resultsWindow_ isVisible]) {
     newWindowHeight = [activeSearchViewController_ windowHeight];
@@ -1273,7 +1305,7 @@ doCommandBySelector:(SEL)commandSelector {
   } else if (![window isKindOfClass:[QLPreviewPanel class]] 
              && [searchWindow isVisible]) {
     // We check for QLPreviewPanel because we don't want to hide for quicklook
-    [self hideSearchWindow:self];
+    [self hideSearchWindowBecause:kQSBAppLostKeyFocusVisibilityToggle];
   }
   
 }
@@ -1308,7 +1340,7 @@ doCommandBySelector:(SEL)commandSelector {
       [searchTextFieldEditor_ selectAll:self];
     }
     if (![[self window] ignoresMouseEvents]) {
-      [self hideSearchWindow:self];
+      [self hideSearchWindowBecause:kQSBAppLostKeyFocusVisibilityToggle];
     }
   }
 }
@@ -1451,34 +1483,12 @@ doCommandBySelector:(SEL)commandSelector {
 
 
 #pragma mark Animations
-
-- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)finished {
-  NSString *name = [anim valueForKey:kQSBAnimationNameKey];
-  if ([name isEqualTo:kQSBAnimationWindowAlphaValueName] && finished) {
-    
-    [self performSelector:@selector(animationStopped)
-               withObject:nil 
-               afterDelay:0.0];
-  } else if ([name isEqualTo:kQSBAnimationViewFrameOriginName]) {
-    NSView *view = [anim valueForKey:kQSBAnimationViewExitingKey];
-    [view removeFromSuperview];
+  - (void)animationDidEnd:(QSBViewAnimation *)animation {
+  HGSAssert([animation isKindOfClass:[QSBViewAnimation class]], nil);
+  id<NSObject> userInfo = [animation userInfo];
+  if ([userInfo isKindOfClass:[QSBSimpleInvocation class]]) {
+    [(QSBSimpleInvocation *)userInfo invoke];
   }
-}
-
-- (void)animationStopped {
-  NSString *notification = nil;
-  if ([[self window] alphaValue] > 0.0) {
-    notification = kQSBSearchWindowDidShowNotification;
-  } else {
-    [[self window] orderOut:self];
-    notification = kQSBSearchWindowDidHideNotification;
-  }
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc postNotificationName:notification
-                    object:[self window]
-                  userInfo:visibilityChangedUserInfo_];
-  [visibilityChangedUserInfo_ autorelease];
-  visibilityChangedUserInfo_ = nil;
 }
 
 - (void)updateShadows {
@@ -1493,23 +1503,33 @@ doCommandBySelector:(SEL)commandSelector {
 
 // See comment at declaration regarding why we move offscreen as well as hide
 - (void)hideResultsWindow {
-  showResults_ = NO;
-  [[self window] removeChildWindow:resultsWindow_];
-  
-  [NSAnimationContext beginGrouping];
-  [[NSAnimationContext currentContext] setDuration:kQSBShortHideDuration];
-  
-  [resultsWindow_ setIgnoresMouseEvents:YES];
-  [resultsWindow_ setFrame:NSOffsetRect([resultsWindow_ frame], 
-                                                   0.0, 0.0) 
-                   display:YES
-                   animate:YES];
-  [[resultsWindow_ animator] setAlphaValue:0.0];
-  [NSAnimationContext endGrouping];
-  
-  [resultsWindow_ performSelector:@selector(orderOut:)
-                       withObject:nil 
-                       afterDelay:kQSBHideDuration];
+  if (![resultsWindow_ ignoresMouseEvents]) {
+    [resultsWindow_ setIgnoresMouseEvents:YES];
+    NSRect newFrame = NSOffsetRect([resultsWindow_ frame], 0.0, 0.0);
+    [resultWindowVisibilityAnimation_ stopAnimation];
+    NSDictionary *animation 
+      = [NSDictionary dictionaryWithObjectsAndKeys:
+         resultsWindow_, NSViewAnimationTargetKey,
+         [NSValue valueWithRect:newFrame], NSViewAnimationEndFrameKey,
+         NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey,
+         nil];
+    NSArray *animations = [NSArray arrayWithObject:animation];
+    [resultWindowVisibilityAnimation_ setViewAnimations:animations];
+    QSBSimpleInvocation *invocation
+      = [QSBSimpleInvocation selector:@selector(hideResultsWindowAnimationCompleted:) 
+                               target:self 
+                               object:resultsWindow_];
+    [resultWindowVisibilityAnimation_ setUserInfo:invocation];
+    [resultWindowVisibilityAnimation_ setAnimationBlockingMode:NSAnimationNonblocking];
+    [resultWindowVisibilityAnimation_ setDuration:kQSBHideDuration];
+    [resultWindowVisibilityAnimation_ setDelegate:self];
+    [resultWindowVisibilityAnimation_ startAnimation];
+  }
+}
+
+- (void)hideResultsWindowAnimationCompleted:(NSWindow *)window {
+  [[resultsWindow_ parentWindow] removeChildWindow:resultsWindow_];
+  [resultsWindow_ orderOut:self];
 }
 
 - (void)showResultsWindow {
@@ -1615,25 +1635,6 @@ doCommandBySelector:(SEL)commandSelector {
   [self updatePivotToken];
 }
 
-- (void)prepareViewSlideAnimation:(NSView *)view exiting:(BOOL)exiting {
-  CAAnimation *animation = [NSView defaultAnimationForKey:@"frameOrigin"];
-  if (exiting) {
-    animation = [[animation copy] autorelease];
-    [animation setDelegate:self];
-    [animation setValue:kQSBAnimationViewFrameOriginName 
-                 forKey:kQSBAnimationNameKey];
-    [animation setValue:view forKey:kQSBAnimationViewExitingKey];
-  }
-  id viewAnimator = [view animator];
-  NSMutableDictionary *animations 
-    = [[[viewAnimator animations] mutableCopy] autorelease];
-  if (!animations) {
-    animations = [NSMutableDictionary dictionary];
-  }
-  [animations setValue:animation forKey:@"frameOrigin"];
-  [viewAnimator setAnimations:animations];
-}
-
 - (void)pushViewController:(NSViewController *)viewController {
   QSBSearchViewController *searchViewController = nil;
   if ([viewController isKindOfClass:[QSBSearchViewController class]]) {
@@ -1659,15 +1660,30 @@ doCommandBySelector:(SEL)commandSelector {
     [resultsView addSubview:viewControllerView];
     
     NSView *activeSearchView = [activeSearchViewController_ view];
-    [self prepareViewSlideAnimation:activeSearchView exiting:YES];
-    [self prepareViewSlideAnimation:viewControllerView exiting:NO];
     
-    // Slide out the old and slide in the new
-    [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:kQSBPushPopDuration];
-    [[activeSearchView animator] setFrame:[self leftOffscreenViewRect]];
-    [[viewControllerView animator] setFrame:[self mainViewRect]];
-    [NSAnimationContext endGrouping];
+    NSRect activeSearchRect = [self leftOffscreenViewRect];
+    NSValue *activeSearchRectValue = [NSValue valueWithRect:activeSearchRect];
+    NSDictionary *anim1 = [NSDictionary dictionaryWithObjectsAndKeys:
+                           activeSearchView, NSViewAnimationTargetKey, 
+                           activeSearchRectValue, NSViewAnimationEndFrameKey,
+                           nil];
+    NSRect viewRect = [self mainViewRect];
+    NSValue *viewRectValue = [NSValue valueWithRect:viewRect];   
+    NSDictionary *anim2 = [NSDictionary dictionaryWithObjectsAndKeys:
+                           viewControllerView, NSViewAnimationTargetKey, 
+                           viewRectValue, NSViewAnimationEndFrameKey, 
+                           nil];
+    NSArray *animations = [NSArray arrayWithObjects:anim1, anim2, nil];
+    [pivotingAnimation_ stopAnimation];
+    [pivotingAnimation_ setDuration:kQSBPushPopDuration];
+    [pivotingAnimation_ setAnimationBlockingMode:NSAnimationNonblocking];
+    [pivotingAnimation_ setViewAnimations:animations];
+    QSBSimpleInvocation *invocation 
+      = [QSBSimpleInvocation selector:@selector(pushPopAnimationCompleted:) 
+                               target:self 
+                               object:activeSearchViewController_];
+    [pivotingAnimation_ setUserInfo:invocation];
+    [pivotingAnimation_ startAnimation];
   } else {
     [[viewController view] setFrame:[self mainViewRect]];
     [[self resultsView] addSubview:[viewController view]];
@@ -1690,7 +1706,8 @@ doCommandBySelector:(SEL)commandSelector {
     // insert the text to be replaced with an extra character at the end
     // so that the text engine deletes that character when it gets around
     // to processing the deleteBackwards.
-    NSString *savedQueryString = [parentSearchViewController savedPivotQueryString];
+    NSString *savedQueryString 
+      = [parentSearchViewController savedPivotQueryString];
     [searchTextFieldEditor_ selectAll:self];
     [searchTextFieldEditor_ insertText:savedQueryString];
     NSRange savedQueryRange = [parentSearchViewController savedPivotQueryRange];
@@ -1703,21 +1720,35 @@ doCommandBySelector:(SEL)commandSelector {
     
     NSView *activeView = [activeSearchViewController_ view];
 
-    [self prepareViewSlideAnimation:activeView exiting:YES];
-    [self prepareViewSlideAnimation:parentSearchView exiting:NO];
-
     // Slide the top controller out and the parent controller in.
-    NSRect mainViewRect = [self mainViewRect];
-    NSRect rightOffscreenViewRect = [self rightOffscreenViewRect];
+    NSRect viewRect = [self mainViewRect];
+    NSRect activeSearchRect = [self rightOffscreenViewRect];
     if (animate) {
-      [NSAnimationContext beginGrouping];
-      [[NSAnimationContext currentContext] setDuration:kQSBPushPopDuration];
-      [[activeView animator] setFrame:rightOffscreenViewRect];
-      [[parentSearchView animator] setFrame:mainViewRect];
-      [NSAnimationContext endGrouping];
+      NSView *activeSearchView = [activeSearchViewController_ view];
+      NSValue *activeSearchRectValue = [NSValue valueWithRect:activeSearchRect];
+      NSDictionary *anim1 = [NSDictionary dictionaryWithObjectsAndKeys:
+                             activeSearchView, NSViewAnimationTargetKey, 
+                             activeSearchRectValue, NSViewAnimationEndFrameKey,
+                             nil];
+      NSValue *viewRectValue = [NSValue valueWithRect:viewRect];   
+      NSDictionary *anim2 = [NSDictionary dictionaryWithObjectsAndKeys:
+                             parentSearchView, NSViewAnimationTargetKey, 
+                             viewRectValue, NSViewAnimationEndFrameKey, 
+                             nil];
+      NSArray *animations = [NSArray arrayWithObjects:anim1, anim2, nil];
+      [pivotingAnimation_ stopAnimation];
+      [pivotingAnimation_ setDuration:kQSBPushPopDuration];
+      [pivotingAnimation_ setAnimationBlockingMode:NSAnimationNonblocking];
+      [pivotingAnimation_ setViewAnimations:animations];
+      QSBSimpleInvocation *invocation 
+        = [QSBSimpleInvocation selector:@selector(pushPopAnimationCompleted:) 
+                                 target:self 
+                                 object:activeSearchViewController_];
+      [pivotingAnimation_ setUserInfo:invocation];
+      [pivotingAnimation_ startAnimation];
     } else {
-      [activeView setFrame:rightOffscreenViewRect];
-      [parentSearchView setFrame:mainViewRect];
+      [activeView setFrame:activeSearchRect];
+      [parentSearchView setFrame:viewRect];
       [activeView removeFromSuperview];
     }
     
@@ -1725,6 +1756,10 @@ doCommandBySelector:(SEL)commandSelector {
     [self setActiveSearchViewController:parentSearchViewController];
   }
   return parentSearchViewController;
+}
+
+- (void)pushPopAnimationCompleted:(QSBSearchViewController *)controller {
+  [[controller view] removeFromSuperview];
 }
 
 - (void)clearAllViewControllersAndSearchString {
@@ -1742,7 +1777,8 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (void)checkFindPasteboard:(NSTimer *)timer {
-  NSInteger newCount = [[NSPasteboard pasteboardWithName:NSFindPboard] changeCount];
+  NSInteger newCount 
+    = [[NSPasteboard pasteboardWithName:NSFindPboard] changeCount];
   insertFindPasteBoardString_ = newCount != findPasteBoardChangeCount_;
   findPasteBoardChangeCount_ = newCount;
 }
@@ -1810,16 +1846,14 @@ doCommandBySelector:(SEL)commandSelector {
     if (proposedFrame.origin.y < screenFrame.origin.y) {
       proposedFrame.origin.y = screenFrame.origin.y;
     }
-    if (proposedFrame.origin.x + NSWidth(proposedFrame) > 
-        screenFrame.origin.x + NSWidth(screenFrame)){
-      proposedFrame.origin.x = screenFrame.origin.x + NSWidth(screenFrame) - NSWidth(proposedFrame);
+    if (NSMaxX(proposedFrame) > NSMaxX(screenFrame)) {
+      proposedFrame.origin.x = NSMaxX(screenFrame) - NSWidth(proposedFrame);
     }    
     if (proposedFrame.origin.x < screenFrame.origin.x) {
       proposedFrame.origin.x = screenFrame.origin.x;
     }
-    if (proposedFrame.origin.y + NSHeight(proposedFrame) > 
-        screenFrame.origin.y + NSHeight(screenFrame)){
-      proposedFrame.origin.y = screenFrame.origin.y + NSHeight(screenFrame) - NSHeight(proposedFrame);
+    if (NSMaxY(proposedFrame) > NSMaxY(screenFrame)) {
+      proposedFrame.origin.y = NSMaxY(screenFrame) - NSHeight(proposedFrame);
     }
   }
   return proposedFrame;

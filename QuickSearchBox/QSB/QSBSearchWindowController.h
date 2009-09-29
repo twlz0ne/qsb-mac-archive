@@ -41,6 +41,7 @@
 @class QSBSearchViewController;
 @class QSBWelcomeController;
 @class QSBTableResult;
+@class QSBViewAnimation;
 
 extern const NSTimeInterval kQSBAppearDelay;
 
@@ -71,14 +72,16 @@ extern NSString *const kQSBSelectedResultKey;
   BOOL showResults_;
   // Our list of corpora for the searchMenu
   NSArray *corpora_;
-  // Our last visibility change userinfo dictionary for notifications
-  NSDictionary *visibilityChangedUserInfo_;
   // The welcome window controller.
   QSBWelcomeController *welcomeController_;
   
   // The currently selected result
   QSBTableResult *selectedResult_;
-
+  
+  // Animations
+  QSBViewAnimation *resultWindowVisibilityAnimation_;
+  QSBViewAnimation *searchWindowVisibilityAnimation_;
+  QSBViewAnimation *pivotingAnimation_;
 }
 
 @property (nonatomic, retain) QSBSearchViewController *activeSearchViewController;
@@ -172,6 +175,7 @@ extern NSString *const kQSBSelectedResultKey;
 #define kQSBFilesFromFinderChangeVisiblityToggle @"QSBFilesFromFinderChangeVisiblityToggle"
 #define kQSBServicesMenuChangeVisiblityToggle @"QSBServicesMenuChangeVisiblityToggle"
 #define kQSBAppLaunchedChangeVisiblityToggle @"QSBAppLaunchedChangeVisiblityToggle"
+#define kQSBAppLostKeyFocusVisibilityToggle @"QSBAppLostKeyFocusVisibilityToggle"
 
 // Notifications for pivoting
 // Object is the QSBTableResult that is being pivoted on
