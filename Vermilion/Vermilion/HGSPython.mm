@@ -852,9 +852,7 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
       }
       Py_DECREF(pythonResults);
     }
-    [self->operation_ performSelectorOnMainThread:@selector(setResults:)
-                                       withObject:results
-                                    waitUntilDone:NO];
+    [self->operation_ setResults:results];
   }
   
   [pool release];

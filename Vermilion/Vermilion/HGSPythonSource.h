@@ -31,7 +31,6 @@
 //
 
 #import "HGSCallbackSearchSource.h"
-#import "HGSSearchOperation.h"
 #import "HGSPython.h"
 
 // TODO(hawk): probably want to eventually drop this and let the sources
@@ -47,7 +46,7 @@
 - (id)initWithConfiguration:(NSDictionary *)configuration;
 @end
 
-@interface HGSPythonSearchOperation : HGSSearchOperation
+@interface HGSPythonSearchOperation : HGSSimpleArraySearchOperation
 - (id)initWithQuery:(HGSQuery*)query
              source:(HGSPythonSource *)source;
 @end
