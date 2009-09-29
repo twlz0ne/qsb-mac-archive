@@ -571,13 +571,7 @@
 		8B2334731062FF5E00AF7287 /* image_search.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B2334721062FF5E00AF7287 /* image_search.icns */; };
 		8B2334811063013600AF7287 /* wikipedia.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B2334801063013600AF7287 /* wikipedia.icns */; };
 		8B2BFC51107130BF00427404 /* QSBViewAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFC4C107130BF00427404 /* QSBViewAnimation.m */; };
-		8B2BFDCC107160A100427404 /* QSBSimpleInvocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDCB107160A100427404 /* QSBSimpleInvocation.m */; };
-		8B2BFDCD107160A100427404 /* QSBSimpleInvocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDCB107160A100427404 /* QSBSimpleInvocation.m */; };
-		8B2BFDCE107160A100427404 /* QSBSimpleInvocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDCB107160A100427404 /* QSBSimpleInvocation.m */; };
 		8B2BFDCF107160A100427404 /* QSBSimpleInvocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDCB107160A100427404 /* QSBSimpleInvocation.m */; };
-		8B2BFDE81071621C00427404 /* QSBSimpleInvocationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDE71071621C00427404 /* QSBSimpleInvocationTest.m */; };
-		8B2BFDE91071621C00427404 /* QSBSimpleInvocationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDE71071621C00427404 /* QSBSimpleInvocationTest.m */; };
-		8B2BFDEA1071621C00427404 /* QSBSimpleInvocationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDE71071621C00427404 /* QSBSimpleInvocationTest.m */; };
 		8B2BFDEB1071621C00427404 /* QSBSimpleInvocationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFDE71071621C00427404 /* QSBSimpleInvocationTest.m */; };
 		8B307B0F1051AB40006C4C7A /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
 		8B307C421051B606006C4C7A /* SampleEmail.emlx in Resources */ = {isa = PBXBuildFile; fileRef = 8B307BDE1051B5D4006C4C7A /* SampleEmail.emlx */; };
@@ -8628,8 +8622,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AEC5C730FBA2A2A005608EA /* SharedScript.m in Sources */,
-				8B2BFDCC107160A100427404 /* QSBSimpleInvocation.m in Sources */,
-				8B2BFDE81071621C00427404 /* QSBSimpleInvocationTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8638,8 +8630,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AEC5C740FBA2A2C005608EA /* SharedScript.m in Sources */,
-				8B2BFDCE107160A100427404 /* QSBSimpleInvocation.m in Sources */,
-				8B2BFDEA1071621C00427404 /* QSBSimpleInvocationTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8648,8 +8638,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AEC5C720FBA2A29005608EA /* SharedScript.m in Sources */,
-				8B2BFDCD107160A100427404 /* QSBSimpleInvocation.m in Sources */,
-				8B2BFDE91071621C00427404 /* QSBSimpleInvocationTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
