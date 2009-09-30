@@ -226,7 +226,7 @@
 		33EEA6E70DD0DBEC005766AB /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		5A0BB19E0FAB8A7D00AA4858 /* Screensaver.py in Resources */ = {isa = PBXBuildFile; fileRef = 5A0BB19C0FAB8A7D00AA4858 /* Screensaver.py */; };
 		5A0BB2EB0FAB8B4400AA4858 /* Screensaver.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */; };
-		5A0BB3750FAB9CDA00AA4858 /* HGSPluginBlacklist.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A0BB3730FAB9CDA00AA4858 /* HGSPluginBlacklist.h */; };
+		5A0BB3750FAB9CDA00AA4858 /* HGSPluginBlacklist.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A0BB3730FAB9CDA00AA4858 /* HGSPluginBlacklist.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A0BB3760FAB9CDA00AA4858 /* HGSPluginBlacklist.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0BB3740FAB9CDA00AA4858 /* HGSPluginBlacklist.m */; };
 		5A0BB3B20FABB1F500AA4858 /* PubSub.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A0BB3B10FABB1F500AA4858 /* PubSub.framework */; };
 		5A0BB67B0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0BB67A0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m */; };
@@ -570,7 +570,7 @@
 		8B23300E1062C12700AF7287 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B23300C1062C12700AF7287 /* Localizable.strings */; };
 		8B2334731062FF5E00AF7287 /* image_search.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B2334721062FF5E00AF7287 /* image_search.icns */; };
 		8B2334811063013600AF7287 /* wikipedia.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B2334801063013600AF7287 /* wikipedia.icns */; };
-		8B2B01911071813D00427404 /* HGSSimpleArraySearchOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B2B018F1071813C00427404 /* HGSSimpleArraySearchOperation.h */; };
+		8B2B01911071813D00427404 /* HGSSimpleArraySearchOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B2B018F1071813C00427404 /* HGSSimpleArraySearchOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B2B01921071813D00427404 /* HGSSimpleArraySearchOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2B01901071813D00427404 /* HGSSimpleArraySearchOperation.m */; };
 		8B2B01961071815700427404 /* HGSSimpleArraySearchOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2B01951071815700427404 /* HGSSimpleArraySearchOperationTest.m */; };
 		8B2BFC51107130BF00427404 /* QSBViewAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2BFC4C107130BF00427404 /* QSBViewAnimation.m */; };
@@ -867,7 +867,7 @@
 		8B7911200F9FCAD3006BFE1E /* KeychainItemTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6200571E0F7A909E00C806A1 /* KeychainItemTest.m */; };
 		8B7911210F9FCAD3006BFE1E /* NSString+ReadableURLTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D1491B0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m */; };
 		8B791D850FA1FC24006BFE1E /* HGSAppleScriptAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B791D810FA1FC24006BFE1E /* HGSAppleScriptAction.m */; };
-		8B791D860FA1FC24006BFE1E /* HGSAppleScriptAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B791D820FA1FC24006BFE1E /* HGSAppleScriptAction.h */; };
+		8B791D860FA1FC24006BFE1E /* HGSAppleScriptAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B791D820FA1FC24006BFE1E /* HGSAppleScriptAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B791D890FA1FC35006BFE1E /* HGSAppleScriptActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B791D870FA1FC35006BFE1E /* HGSAppleScriptActionTest.m */; };
 		8B8257990D189EA6002A6C3C /* QSBGrayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8257980D189EA6002A6C3C /* QSBGrayView.m */; };
 		8B834AFF0FBCCFE200862FF5 /* GTMAbstractDOListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B834AFA0FBCCFE200862FF5 /* GTMAbstractDOListener.m */; };
