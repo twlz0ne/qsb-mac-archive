@@ -53,11 +53,11 @@
   NSTimeInterval blockTime_; // Time we started blocking repeats
 }
 
+// Returns a list of all categories available for presentation.
+@property (readonly, retain, nonatomic) NSAttributedString *categoriesString;
+
 // Set the full more results.
 - (void)setMoreResultsWithDict:(NSDictionary *)value;
-
-// Returns a list of all categories available for presentation.
-- (NSAttributedString *)categoriesString;
 
 // Adds a category to the 'show all' list and then recalculates the
 // contents of the more results dictionary.

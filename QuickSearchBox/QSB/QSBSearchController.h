@@ -36,6 +36,7 @@
 
 @class HGSResultArray;
 @class QSBMoreResultsViewDelegate;
+@class QSBTableResult;
 
 // Interface between QSB and the web suggestor and the desktop query
 // takes a query string and is responsible for turning it into results.
@@ -78,8 +79,9 @@
 // indicator.
 @property(nonatomic, assign) BOOL queryIsInProcess;
 
-// Returns the desktop results
-- (NSArray *)desktopResults;
+// Returns the top results
+- (QSBTableResult *)topResultForIndex:(NSInteger)idx;
+- (NSUInteger)topResultCount;
 
 // Returns the more results
 - (NSDictionary *)moreResults;

@@ -103,8 +103,14 @@
   return [result topResultsRowViewControllerClass];
 }
 
-- (NSArray *)tableResultsArray {
-  return [[[self searchViewController] searchController] desktopResults];
+- (QSBTableResult *)tableResultForRow:(NSInteger)row { 
+  return [[[self searchViewController] searchController] topResultForIndex:row];
 }
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
+  return [[[self searchViewController] searchController] topResultCount];
+}
+
+
 @end
 

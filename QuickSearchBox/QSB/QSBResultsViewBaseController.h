@@ -62,9 +62,6 @@
 - (NSView *)resultsView;
 - (QSBResultsViewTableView *)resultsTableView;
 
-// The array of results that this controller is manipulating.
-- (NSArray *)tableResultsArray;
-
 // Get some UI metrics
 - (CGFloat)minimumTableHeight;
 - (CGFloat)maximumTableHeight;

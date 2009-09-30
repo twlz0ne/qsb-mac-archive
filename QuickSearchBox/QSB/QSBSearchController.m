@@ -84,7 +84,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   self = [super init];
   if (self != nil) {
     desktopResults_ = [[NSMutableArray alloc] init];
-    cachedDesktopResults_ = [[NSMutableArray alloc] init];
   }
   return self;
 }
@@ -97,7 +96,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   [results_ release];
   [parentSearchController_ release];
   [desktopResults_ release];
-  [cachedDesktopResults_ release];
   [lockedResults_ release];
   [oldSuggestions_ release];
   [moreResults_ release];
@@ -230,13 +228,10 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   }
   
   // Build the actual list
-  [desktopResults_ removeAllObjects];
+  NSMutableArray *newResults = [NSMutableArray array];
   
   if ([mainResults count] > 0) {
-    if ([desktopResults_ count] > 0) {
-      [desktopResults_ addObject:[QSBSeparatorTableResult tableResult]];
-    }
-    [desktopResults_ addObjectsFromArray:mainResults];
+    [newResults addObjectsFromArray:mainResults];
   }
   
   int searchItemsIndex = 0; 
@@ -245,7 +240,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
       
     // TODO(alcor): this is probably going to be done by the mixer eventually
     
-    NSUInteger count = [desktopResults_ count];
+    NSUInteger count = [newResults count];
     
     // TODO(alcor): we only cycle through this once because ranking is odd
     // at the moment. Eventually we want to unpin the google result
@@ -253,31 +248,29 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     
     if (count) {
       for(searchItemsIndex = 0; searchItemsIndex < count; searchItemsIndex++) {
-      QSBTableResult *item = [desktopResults_ objectAtIndex:searchItemsIndex];
+      QSBTableResult *item = [newResults objectAtIndex:searchItemsIndex];
       // List the google result lower if we have a strong confidence result.
         if ([item rank] <= 0.667) break;
       }
     }
     
     if (searchItemsIndex > 0) {
-      [desktopResults_ insertObject:spacer atIndex:searchItemsIndex++];
+      [newResults insertObject:spacer atIndex:searchItemsIndex++];
     }
     
     QSBGoogleTableResult *googleItem = [QSBGoogleTableResult
                                          tableResultForQuery:queryString_];
-    [desktopResults_ insertObject:googleItem
-                          atIndex:searchItemsIndex];
+    [newResults insertObject:googleItem atIndex:searchItemsIndex];
     
-    [desktopResults_ insertObject:spacer
-                          atIndex:searchItemsIndex + 1]; 
+    [newResults insertObject:spacer atIndex:searchItemsIndex + 1]; 
   }
   
-  if ([desktopResults_ count] < [cachedDesktopResults_ count]) {
-    [cachedDesktopResults_ replaceObjectsInRange:
-     NSMakeRange(0, [desktopResults_ count])
-                            withObjectsFromArray:desktopResults_];
+  if ([newResults count] < [desktopResults_ count]) {
+    NSRange newRange = NSMakeRange(0, [newResults count]);
+    [desktopResults_ replaceObjectsInRange:newRange
+                      withObjectsFromArray:newResults];
   } else {
-    [cachedDesktopResults_ setArray:desktopResults_];
+    [desktopResults_ setArray:newResults];
   }
 
   // If there is still room in top results for things marked for showing
@@ -290,33 +283,33 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     for (NSInteger idx = 0; idx < countToMove; ++idx) {
       QSBSourceTableResult *belowTheFoldResult
         = [belowTheFoldResults objectAtIndex:idx];
-      [desktopResults_ addObject:belowTheFoldResult];
+      [newResults addObject:belowTheFoldResult];
     }
   }
   
   if (showMore && [controller hasAnyRealResults]) {
     if ([suggestResults count] > 0) {
-      if (![[desktopResults_ lastObject]
+      if (![[newResults lastObject]
             isKindOfClass:[QSBSeparatorTableResult class]]) {
-        [desktopResults_ addObject:[QSBSeparatorTableResult tableResult]];
+        [newResults addObject:[QSBSeparatorTableResult tableResult]];
       }
-      [desktopResults_ addObjectsFromArray:suggestResults];
+      [newResults addObjectsFromArray:suggestResults];
     }
     if (![controller queriesFinished]) {
-      [desktopResults_ addObject:[QSBSearchStatusTableResult tableResult]];
+      [newResults addObject:[QSBSearchStatusTableResult tableResult]];
     }    
-    [desktopResults_ addObject:[QSBFoldTableResult tableResult]];
+    [newResults addObject:[QSBFoldTableResult tableResult]];
   } else {
     if ([suggestResults count] > 0) {
-      [desktopResults_ addObjectsFromArray:suggestResults];
+      [newResults addObjectsFromArray:suggestResults];
     }
     if (![controller queriesFinished]) {
-      [desktopResults_ addObject:[QSBSearchStatusTableResult tableResult]];
+      [newResults addObject:[QSBSearchStatusTableResult tableResult]];
     }    
   }
   
   if ([controller queriesFinished]) {
-    [cachedDesktopResults_ setArray:desktopResults_];
+    [desktopResults_ setArray:newResults];
   }
   
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -332,8 +325,16 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
           componentsJoinedByString:listSeparator];
 }
 
-- (NSArray*)desktopResults {
-  return [[cachedDesktopResults_ retain] autorelease];
+- (QSBTableResult *)topResultForIndex:(NSInteger)idx {
+  QSBTableResult *result = nil;
+  if (idx >= 0 && idx < [self topResultCount]) {
+    result = [desktopResults_ objectAtIndex:idx];
+  }
+  return result;
+}
+
+- (NSUInteger)topResultCount {
+  return [desktopResults_ count];
 }
 
 - (NSDictionary *)moreResults {
@@ -363,7 +364,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   
   if (clearResults) {
     [desktopResults_ removeAllObjects];
-    [cachedDesktopResults_ removeAllObjects];
     [self setMoreResults:nil];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:kQSBSearchControllerDidUpdateResultsNotification 
@@ -471,7 +471,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   BOOL dumpTopResults = [[NSUserDefaults standardUserDefaults]
                          boolForKey:@"dumpTopResults"];
   if (dumpTopResults) {
-    HGSLog(@"QSB: Desktop Results:\n%@", [self desktopResults]);
+    HGSLog(@"QSB: Desktop Results:\n%@", desktopResults_);
     HGSLog(@"QSB: More Results:\n%@", [self moreResults]);
   }
 #endif

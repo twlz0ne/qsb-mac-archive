@@ -147,15 +147,6 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
   return [self tableResultForRow:[resultsTableView_ selectedRow]];
 }
 
-- (QSBTableResult *)tableResultForRow:(NSInteger)row { 
-  QSBTableResult *object = nil;
-  NSArray *objects = [self tableResultsArray];
-  if (row < [objects count]) {
-    object = [objects objectAtIndex:row];
-  }
-  return object;
-}
-
 - (void)reset {
   // Reset our selection to be the first row.
   [self moveToBeginningOfDocument:self];
@@ -282,7 +273,7 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   return [tableResult copyToPasteboard:pb];
 }
 
-- (NSArray *)tableResultsArray {
+- (QSBTableResult *)tableResultForRow:(NSInteger)row {
   [self doesNotRecognizeSelector:_cmd];
   return nil;
 }
@@ -373,9 +364,6 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   return isSelectable;
 }
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
-  return [[self tableResultsArray] count];
-}
 
 - (CGFloat)tableView:(NSTableView *)tableView
          heightOfRow:(NSInteger)row {

@@ -55,30 +55,30 @@ static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 
 // Get/set sorted array of localized category names, suitable
 // for use as keys to the dictionary returned by resultsByCategory.
-- (NSArray *)sortedCategoryNames;
-- (void)setSortedCategoryNames:(NSArray *)value;
+@property (readwrite, retain, nonatomic) NSArray *sortedCategoryNames;
+
 
 // Get/set an array, in one-to-one correspondence with the array returned
 // by sortedCategoryNames, containing the index of the first results in
 // our arrangedObjects for each category.
-- (NSArray *)sortedCategoryIndexes;
-- (void)setSortedCategoryIndexes:(NSArray *)value;
+@property (readwrite, retain, nonatomic) NSArray *sortedCategoryIndexes;
+
 
 // Get/set an array, in one-to-one correspondence with the array returned
 // by sortedCategoryNames, containing the counts of the number of results in
 // our arrangedObjects for each category.
-- (NSArray *)sortedCategoryCounts;
-- (void)setSortedCategoryCounts:(NSArray *)value;
+@property (readwrite, retain, nonatomic) NSArray *sortedCategoryCounts;
 
-- (void)setCategoriesString:(NSAttributedString *)value;
+// Set/get the 'show all' categories.
+@property (readwrite, retain, nonatomic) NSSet *showAllCategoriesSet;
+
+@property (readwrite, retain, nonatomic) NSAttributedString *categoriesString;
+
 - (void)updateCategoryNames;
 
 // Determines if 'show all' is indicated for the given category.
 - (BOOL)showAllForCategory:(NSString *)category;
 
-// Set/get the 'show all' categories.
-- (void)setShowAllCategoriesSet:(NSSet *)showAllCategoriesSet;
-- (NSSet *)showAllCategoriesSet;
 
 @end
 
@@ -86,6 +86,12 @@ static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 @implementation QSBMoreResultsViewDelegate
 
 GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
+
+@synthesize sortedCategoryNames = sortedCategoryNames_;
+@synthesize sortedCategoryIndexes = sortedCategoryIndexes_;
+@synthesize sortedCategoryCounts = sortedCategoryCounts_;
+@synthesize showAllCategoriesSet = showAllCategoriesSet_;
+@synthesize categoriesString = categoriesString_;
 
 - (void)awakeFromNib {  
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
@@ -137,8 +143,16 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   return NO;
 }
 
-- (NSArray *)tableResultsArray {
-  return [[moreResults_ retain] autorelease];
+- (QSBTableResult *)tableResultForRow:(NSInteger)row { 
+  QSBTableResult *object = nil;
+  if (row >= 0 && row < [moreResults_ count]) {
+    object = [moreResults_ objectAtIndex:row];
+  }
+  return object;
+}
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
+  return [moreResults_ count];
 }
 
 - (void)setMoreResultsWithDict:(NSDictionary *)rawDict {
@@ -241,10 +255,6 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   }
 }
 
-- (NSAttributedString *)categoriesString {
-  return [[categoriesString_ retain] autorelease];
-}
-
 - (void)addShowAllCategory:(NSString *)category {
   NSSet *oldSet = [self showAllCategoriesSet];
   if (oldSet) {
@@ -338,38 +348,6 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   return [result moreResultsRowViewControllerClass];
 }
 
-- (NSArray *)sortedCategoryNames {
-  return [[sortedCategoryNames_ retain] autorelease];
-}
-
-- (void)setSortedCategoryNames:(NSArray *)value {
-  [sortedCategoryNames_ autorelease];
-  sortedCategoryNames_ = [value retain];
-}
-
-- (NSArray *)sortedCategoryIndexes {
-  return [[sortedCategoryIndexes_ retain] autorelease];
-}
-
-- (void)setSortedCategoryIndexes:(NSArray *)value {
-  [sortedCategoryIndexes_ autorelease];
-  sortedCategoryIndexes_ = [value retain];
-}
-
-- (NSArray *)sortedCategoryCounts {
-  return [[sortedCategoryCounts_ retain] autorelease];
-}
-
-- (void)setSortedCategoryCounts:(NSArray *)value {
-  [sortedCategoryCounts_ autorelease];
-  sortedCategoryCounts_ = [value retain];
-}
-
-- (void)setCategoriesString:(NSAttributedString *)value {
-  [categoriesString_ autorelease];
-  categoriesString_ = [value retain];
-}
-
 - (void)updateCategoryNames {
   NSArray *categories = [self sortedCategoryNames];
   NSArray *categoryIndexes = [self sortedCategoryIndexes];
@@ -437,15 +415,6 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
     [resultsTableView scrollRowToVisible:[resultsTableView numberOfRows] - 1];
     [resultsTableView scrollRowToVisible:catIndex];
   }
-}
-
-- (void)setShowAllCategoriesSet:(NSSet *)showAllCategoriesSet {
-  [showAllCategoriesSet_ autorelease];
-  showAllCategoriesSet_ = [showAllCategoriesSet retain];
-}
-
-- (NSSet *)showAllCategoriesSet {
-  return [[showAllCategoriesSet_ retain] autorelease];
 }
 
 - (BOOL)showAllForCategory:(NSString *)category {
