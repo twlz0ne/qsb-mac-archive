@@ -204,7 +204,9 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
     HGSResult *result = [HGSResult resultWithFilePath:path
                                                source:self
                                            attributes:attributes];
-    [results addObject:result];
+    if (result) {
+      [results addObject:result];
+    }
   }
   SharedFileListStorage *storage = [self storageForList:list];
   // If we have storage, update it, otherwise create a new one.
