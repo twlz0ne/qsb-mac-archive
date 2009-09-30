@@ -89,7 +89,9 @@
 
 @end
 
-// Methods you must override in subclasses of HGSSearchOperation
+/*!
+ Methods you must override in subclasses of HGSSearchOperation.
+*/
 @interface HGSSearchOperation (PureVirtualMethods)
 /*!
  Called to do the actual work and communicate with the search source. The
