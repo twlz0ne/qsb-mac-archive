@@ -278,7 +278,9 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
 
   HGSQueryController *object = [aNotification object];
 
-  [server_ setLastRankedResults:[object rankedResults]];
+  NSRange rankedResultsRange = NSMakeRange(0, [object rankedResultsCount]);
+  NSArray *rankedResults = [object rankedResultsForRange:rankedResultsRange];
+  [server_ setLastRankedResults:rankedResults];
 }
 
 #pragma mark -- HGSSearchOperation notification handlers --

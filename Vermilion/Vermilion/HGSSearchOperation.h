@@ -69,17 +69,6 @@
 - (id)initWithQuery:(HGSQuery*)query source:(HGSSearchSource *)source;
 
 /*!
- Called to do the actual work and communicate with the search source. The
- source can periodically call |-setResults| to push the results into the
- observer and make them available for the UI. |-setResults| must be called at
- least once, usually at the end of the query, unless there are no results.  If
- your search operation returns |YES| for isConcurrent, then you *must* call
- finishQuery when you are complete to single when you are done pushing
- results.
-*/
-- (void)main;
-
-/*!
  Call to indicate the query has been completed. Tells the observer on the main
  thread.  This will be called for for the operation is it is NOT concurrent.
  If an operation returns YES for isConcurrent, then the search operation must
@@ -99,6 +88,32 @@
 - (NSOperation *)searchOperation;
 
 @end
+
+// Methods you must override in subclasses of HGSSearchOperation
+@interface HGSSearchOperation (PureVirtualMethods)
+/*!
+ Called to do the actual work and communicate with the search source. The
+ source can periodically call |-setResults| to push the results into the
+ observer and make them available for the UI. |-setResults| must be called at
+ least once, usually at the end of the query, unless there are no results.  If
+ your search operation returns |YES| for isConcurrent, then you *must* call
+ finishQuery when you are complete to single when you are done pushing
+ results.
+ */
+- (void)main;
+
+/*!
+ Return the sorted results in the given range.
+*/
+- (NSArray *)sortedResultsInRange:(NSRange)range;
+
+/*!
+ Return the total number of results available.
+*/
+- (NSUInteger)resultCount;
+
+@end
+
 
 #pragma mark Notifications
 

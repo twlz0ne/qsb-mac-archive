@@ -43,6 +43,7 @@
 #import "NSString+CaseInsensitive.h"
 #import "NSString+ReadableURL.h"
 #import "HGSOpenSearchSuggestSource.h"
+#import "GTMNSObject+KeyValueObserving.h"
 
 static const NSUInteger kDefaultMaximumResultsToCollect = 500;
 NSString *const kQSBSearchControllerDidUpdateResultsNotification 
@@ -61,6 +62,8 @@ NSString *const kQSBSearchControllerDidUpdateResultsNotification
 - (void)setMoreResults:(NSDictionary *)value;
 - (void)updateMoreResults;
 
+- (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification;
+
 @end
 
 
@@ -72,6 +75,8 @@ NSString *const kQSBSearchControllerDidUpdateResultsNotification
 @synthesize queryIsInProcess = queryIsInProcess_;
 
 GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
+GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
+GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 + (void)initialize {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -100,7 +105,22 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   [oldSuggestions_ release];
   [moreResults_ release];
   [typeCategoryDict_ release];
+  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+  [prefs gtm_removeObserver:self 
+                 forKeyPath:kQSBResultCountKey
+                   selector:@selector(resultCountValueChanged:)];
+  
   [super dealloc];
+}
+
+- (void)awakeFromNib {  
+  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+  [prefs gtm_addObserver:self 
+              forKeyPath:kQSBResultCountKey 
+                selector:@selector(resultCountValueChanged:)
+                userInfo:nil
+                 options:NSKeyValueObservingOptionNew];
+  totalResultDisplayCount_ = [prefs integerForKey:kQSBResultCountKey];
 }
 
 - (void)updateDesktopResults {  
@@ -112,8 +132,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
     HGSLog(@"updateDesktopResults called with display count still at 0!");
     return;
   }
-  
-  NSArray *rankedResults = [controller rankedResults];
+  NSRange rankedResultsRange = NSMakeRange(0, [controller rankedResultsCount]);
+  NSArray *rankedResults = [controller rankedResultsForRange:rankedResultsRange];
   NSMutableArray *hgsResults = [NSMutableArray array];
   NSMutableArray *hgsMutableSuggestions = [NSMutableArray array];
   for (HGSResult *result in rankedResults) {
@@ -399,7 +419,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
 }
 
 - (NSUInteger)maximumResultsToCollect {
-  return kDefaultMaximumResultsToCollect;
+  return totalResultDisplayCount_;
 }
 
 - (BOOL)suppressMoreIfTopShowsAll {
@@ -530,6 +550,13 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   if ([lockedResults_ count] == [self maximumResultsToCollect]) {
     [queryController_ cancel];
   }
+}
+
+- (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification {
+  NSDictionary *change = [notification change];
+  NSNumber *valueOfChange = [change valueForKey:NSKeyValueChangeNewKey];
+  totalResultDisplayCount_ = [valueOfChange unsignedIntegerValue];
+  [self doDesktopQuery:nil];
 }
 
 // start three display timers for 100, 300 and 750ms. We retain them

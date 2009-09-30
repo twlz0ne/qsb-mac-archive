@@ -170,7 +170,8 @@
  
 - (void)queryControllerDidFinish:(NSNotification *)notification {
   // Our query is finished. 
-  NSArray *results = [queryController_ rankedResults];
+  NSRange allResults = NSMakeRange(0, [queryController_ rankedResultsCount]);
+  NSArray *results = [queryController_ rankedResultsForRange:allResults];
   NSUInteger count = [results count];
   NSMutableArray *appleScriptResults = [NSMutableArray arrayWithCapacity:count];
   for (HGSResult *hgsResult in results) {

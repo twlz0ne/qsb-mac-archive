@@ -44,9 +44,6 @@
  @private
   IBOutlet QSBMoreResultsViewDelegate *moreResultsViewDelegate_;
   
-  NSMutableArray *cachedDesktopResults_; // This array persists results between
-  // queries to remove perceived latency
-  
   NSMutableArray *desktopResults_;
   NSMutableArray *lockedResults_;
   NSString *queryString_;  // Current query string entered by user.
@@ -67,6 +64,7 @@
   NSTimer *moreResultsUpdateTimer_;
   BOOL queryIsInProcess_;  // Yes while a query is under way.
   NSUInteger pushModifierFlags_; // NSEvent Modifiers at pivot time
+  NSUInteger totalResultDisplayCount_;
 }
 
 // Sets/Gets NSEvent Modifiers at pivot time

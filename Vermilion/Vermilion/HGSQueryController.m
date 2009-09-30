@@ -87,6 +87,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
 @interface HGSQueryController()
 + (NSString *)categoryForType:(NSString *)type;
 - (void)cancelPendingSearchOperations:(NSTimer*)timer;
+- (NSArray *)rankedResults;
 @end
 
 @implementation HGSQueryController
@@ -288,6 +289,14 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
     rankedResults_ = [results retain];
   }
   return rankedResults_;
+}
+
+- (NSArray *)rankedResultsForRange:(NSRange)range {
+  return [[self rankedResults] subarrayWithRange:range];
+}
+
+- (NSUInteger)rankedResultsCount {
+  return [[self rankedResults] count];
 }
 
 + (NSString *)categoryForType:(NSString *)type {

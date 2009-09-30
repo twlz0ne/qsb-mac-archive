@@ -185,6 +185,16 @@ NSString *const kHGSSearchOperationNotificationResultsKey
   [self doesNotRecognizeSelector:_cmd];
 }
 
+- (NSArray *)sortedResultsInRange:(NSRange)range {
+  [self doesNotRecognizeSelector:_cmd];
+  return nil;
+}
+
+- (NSUInteger)resultCount {
+  [self doesNotRecognizeSelector:_cmd];
+  return 0;
+}
+
 - (NSString*)description {
   return [NSString stringWithFormat:@"%@ %@ - query: %@", 
           [super description],  

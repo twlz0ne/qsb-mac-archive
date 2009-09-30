@@ -38,6 +38,11 @@
 @implementation HGSSimpleArraySearchOperation
 GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:object:userInfo:);
 
+- (void)dealloc {
+  [results_ release];
+  [super dealloc];
+}
+
 // call to replace the results of the operation with something more up to date.
 // Threadsafe, can be called from any thread. Tells observers about the
 // presence of new results on the main thread.
@@ -50,15 +55,34 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   // We do a copy here in case sources pass us a mutable object
   // and then go and mutate it underneath us.
-  NSArray *cachedResults = [[results copy] autorelease];
+  @synchronized (self) {
+    [results_ autorelease];
+    results_ = [results copy];
+  }
   NSDictionary *userInfo 
-  = [NSDictionary dictionaryWithObject:cachedResults 
+  = [NSDictionary dictionaryWithObject:results_ 
                                 forKey:kHGSSearchOperationNotificationResultsKey];
   [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationDidUpdateResultsNotification
                                     object:self
                                   userInfo:userInfo];
 }
 
+- (NSArray *)sortedResultsInRange:(NSRange)range {
+  NSArray *sortedResults = nil;
+  @synchronized (self) {
+    NSRange fullRange = NSMakeRange(0, [results_ count]);
+    NSRange newRange = NSIntersectionRange(fullRange, range);
+    sortedResults = [results_ subarrayWithRange:newRange];
+  }
+  return sortedResults;
+}
+
+- (NSUInteger)resultCount {
+  NSUInteger count = 0;
+  @synchronized (self) {
+    count = [results_ count];
+  }
+  return count;
+}
+
 @end
-
-
