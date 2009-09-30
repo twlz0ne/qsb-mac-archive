@@ -81,6 +81,7 @@
 
 // Returns the top results
 - (QSBTableResult *)topResultForIndex:(NSInteger)idx;
+- (NSArray *)topResultsForRange:(NSRange)range;
 - (NSUInteger)topResultCount;
 
 // Returns the more results

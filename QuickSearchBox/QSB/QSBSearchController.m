@@ -333,6 +333,10 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
   return result;
 }
 
+- (NSArray *)topResultsForRange:(NSRange)range {
+  return [desktopResults_ subarrayWithRange:range];
+}
+
 - (NSUInteger)topResultCount {
   return [desktopResults_ count];
 }
