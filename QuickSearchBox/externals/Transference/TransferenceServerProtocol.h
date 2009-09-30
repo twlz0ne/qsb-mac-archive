@@ -52,15 +52,6 @@
 //
 - (bycopy NSDictionary *)lastSearchStats;
 
-// Returns an array of the last search results
-//
-// Args:
-//  client - reference to the client object.  The command returns immediatley,
-//           rankedResults:(in bycopy NSArray *)results is called when the
-//           results are ready.
-//
-- (oneway void)lastSearchResults:(in byref id <TransferenceClientProtocol>)client;
-
 // Returns an array of the last search results after they have been ranked
 //
 // Args:

@@ -277,7 +277,6 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
   [server_ setLastSearchTime:searchTime moduleInfo:moduleSearchTimes];
 
   HGSQueryController *object = [aNotification object];
-  [server_ setLastSearchResults:[object results]];
 
   [server_ setLastRankedResults:[object rankedResults]];
 }

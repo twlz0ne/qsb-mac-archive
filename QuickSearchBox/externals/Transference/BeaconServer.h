@@ -58,8 +58,6 @@
   NSMutableArray *clients_;       // list of all of the connected clients
   NSMutableDictionary *lastSearchStats_;  // Contains info about the last search
 
-  NSArray *lastSearchResults_;    // Contains the results from the last search
-
   // Contains the ranked results from the last search
   NSArray *lastSearchResultsRanked_;
   NSArray *plugins_;              // List of all plugins loaded by QSB
@@ -95,13 +93,6 @@
 //  plugins - the list of plugins
 //
 - (void)setPlugins:(NSArray *)plugins;
-
-// Sets the last search results
-//
-// Args:
-//  results - array of the last search results
-//
-- (void)setLastSearchResults:(NSArray *)results;
 
 // Sets how long the last search took to complete
 //

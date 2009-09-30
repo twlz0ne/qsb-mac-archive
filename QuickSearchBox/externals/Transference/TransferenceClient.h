@@ -170,13 +170,6 @@
 //
 - (NSTimeInterval)lastSearchTime;
 
-// Returns an array of the search results from the last search
-//
-// Returns:
-//  An array of all of the results from the last completed search
-//
-- (NSArray *)lastSearchResults;
-
 // Returns an array of the search results from the last search after they have
 // been ranked.  Note: The array returned is an array of dictionaries that have
 // the available keys listed in TransferenceProtocol.h.  They all start with

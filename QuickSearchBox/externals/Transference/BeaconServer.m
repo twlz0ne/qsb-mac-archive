@@ -181,7 +181,6 @@ static NSString *const kResultActionKey = @"ResultAction";
   [generalStats_ release];
   [lastSearchStats_ release];
   [clients_ release];
-  [lastSearchResults_ release];
   [lastSearchResultsRanked_ release];
   [super dealloc];
 }
@@ -306,11 +305,6 @@ static NSString *const kResultActionKey = @"ResultAction";
   }
 }
 
-- (void)setLastSearchResults:(NSArray *)results {
-  [lastSearchResults_ release];
-  lastSearchResults_ = [results retain];
-}
-
 - (void)setLastSearchTime:(NSTimeInterval)searchTime
                moduleInfo:(NSArray *)info {
   [lastSearchStats_ setObject:[NSNumber numberWithDouble:searchTime]
@@ -349,20 +343,7 @@ static NSString *const kResultActionKey = @"ResultAction";
 }
 
 - (in bycopy NSNumber *)numberOfResults {
-  NSInteger results = 0;
-  if ([lastSearchResults_ count] > 0) {
-    results = [lastSearchResults_ count];
-  }
-
-  return [NSNumber numberWithInteger:results];
-}
-
-- (oneway void)lastSearchResults:(in byref id <TransferenceClientProtocol>)client {
-  NSArray *returnArray = nil;
-  if ([lastSearchResults_ count] > 0) {
-    returnArray = [self convertResultsToTransferenceResults:lastSearchResults_];
-  }
-  [client rankedResults:returnArray];
+  return [NSNumber numberWithInteger:[lastSearchResultsRanked_ count]];
 }
 
 - (oneway void)lastSearchResultsRanked:(in byref id <TransferenceClientProtocol>)client {

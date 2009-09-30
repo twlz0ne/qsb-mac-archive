@@ -233,17 +233,6 @@ const NSTimeInterval kProcessingTimeout = 240.0;
   return [[[proxy_ lastSearchStats] objectForKey:kSearchTimeKey] doubleValue];
 }
 
-- (NSArray *)lastSearchResults {
-  resultsProcessed_ = NO;
-  [proxy_ lastSearchResults:self];
-  BOOL success = [self waitForResultProcessing];
-  NSArray *results = nil;
-  if (success) {
-    results = [self generateQSBResults:results_];
-  }
-  return results;
-}
-
 - (NSArray *)lastSearchResultsRanked {
   resultsProcessed_ = NO;
   [proxy_ lastSearchResultsRanked:self];
