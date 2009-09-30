@@ -98,6 +98,10 @@ extern "C" {
         accumulated term score.  100% is awarded for terms which are the
         same length as the search item.  It goes down from there.
         Default value: 0.8.
+ @param matchSpreadFactor The multiplier applied to the final score based on
+        the 'spread' of the matching characters within the item being tested
+        (i.e. distance from first matching character to the last matching
+        character) in relation to the length of the term.
  @param maximumCharacterDistance The maximum distance between occurrences of
         search term characters within the search item before the search term
         iteration is abandoned.  Default value: 22.
@@ -121,6 +125,7 @@ void HGSSetSearchTermScoringFactors(CGFloat characterMatchFactor,
                                     CGFloat startDistanceFactor,
                                     CGFloat wordPortionFactor,
                                     CGFloat itemPortionFactor,
+                                    CGFloat matchSpreadFactor,
                                     NSUInteger maximumCharacterDistance,
                                     NSUInteger maximumItemCharactersScanned,
                                     BOOL enableBestWordScoring,

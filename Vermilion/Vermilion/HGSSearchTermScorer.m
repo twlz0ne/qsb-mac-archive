@@ -42,12 +42,15 @@ static CGFloat gHGSFirstCharacterInWordFactor = 3.0;  // First-char-in-word fact
 static CGFloat gHGSAdjacencyFactor = 2.8;  // Adjacency factor.
 // Start distance factor representing the minimum percentage allowed when
 // applying the start distance score.  This should be > 0 and <= 1.00.
-static CGFloat gHGSStartDistanceFactor = 0.8;
+static CGFloat gHGSStartDistanceFactor = 0.5;
 static CGFloat gHGSWordPortionFactor = 3.0; // Portion of complete word factor.
 // Item portion of complete item factor representing the minimum percentage
 // allowed when applying the start distance score.  This should be > 0 and
 // <= 1.00.
 static CGFloat gHGSItemPortionFactor = 0.8;
+// The minimum match distance factor applied to the score calculated by
+// taking the length of the term and dividing by the spread of the match.
+static CGFloat gHGSMatchSpreadFactor = 0.8;
 // Maximum distance between matching characters before abandoning the match.
 static NSUInteger gHGSMaximumCharacterDistance = 22;
 // Maximum distance we will scan into the search item for matches.
@@ -135,6 +138,7 @@ void HGSSetSearchTermScoringFactors(CGFloat characterMatchFactor,
                                     CGFloat startDistanceFactor,
                                     CGFloat wordPortionFactor,
                                     CGFloat itemPortionFactor,
+                                    CGFloat matchSpreadFactor,
                                     NSUInteger maximumCharacterDistance,
                                     NSUInteger maximumItemCharactersScanned,
                                     BOOL enableBestWordScoring,
@@ -145,6 +149,7 @@ void HGSSetSearchTermScoringFactors(CGFloat characterMatchFactor,
   gHGSStartDistanceFactor = startDistanceFactor;
   gHGSWordPortionFactor = wordPortionFactor;
   gHGSItemPortionFactor = itemPortionFactor;
+  gHGSMatchSpreadFactor = matchSpreadFactor;
   gHGSMaximumCharacterDistance = maximumCharacterDistance;
   gHGSMaximumItemCharactersScanned
     = MIN(maximumItemCharactersScanned, kHGSMaximumItemCharactersScanned);
@@ -293,11 +298,11 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
   }
   termScore += bestMatchLengthScore;
 
-  // The complete term matching score and the start distance
-  // scores modify the total term match score by multiplying
-  // as a percentage.  For instance, a match that starts at the
-  // beginning of the search item gets 100%, declining from there.
-  // The factor in each case is the minimum percentage possible.
+  // The complete term matching score, the start distance
+  // score, and the match spread distance modify the total term match
+  // score by multiplying as a percentage.  For instance, a match that
+  // starts at the beginning of the search item gets 100%, declining
+  // from there. The factor in each case is the minimum percentage possible.
 
   // Calculate the complete term matching score.
   NSUInteger itemLength = [itemString length];
@@ -314,6 +319,18 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
   CGFloat startDistanceScore = gHGSStartDistanceFactor + startDistancePortion;
   termScore *= startDistanceScore;
 
+  // Calculate the match spread factor.
+  if (termLength > 1) {
+    CGFloat matchSpread = (CGFloat)(charStat[termLength - 1].charMatchIndex_
+                                    - charStat[0].charMatchIndex_ - 1);
+    CGFloat maxSpread
+      = (CGFloat)(termLength - 1) * gHGSMaximumCharacterDistance - 1.0;
+    CGFloat matchSpreadFactor = 1.0 - ((1.0 - gHGSMatchSpreadFactor)
+                                       * (matchSpread - 1)
+                                       / maxSpread);
+    termScore *= matchSpreadFactor;
+  }
+  
 #ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   if (pMatchDetailsArray) {
     // Collect statistics.

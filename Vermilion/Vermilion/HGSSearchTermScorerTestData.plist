@@ -8,12 +8,11 @@
 		<key>results</key>
 		<array>
 			<string>can</string>
-			<string>celebrate armalite noogies</string>
 			<string>canada</string>
-			<string>cancel my order</string>
+			<string>celebrate armalite noogies</string>
 			<string>candlelight dinner</string>
-			<string>american candles</string>
 			<string>catfish food in cans</string>
+			<string>american candles</string>
 			<string>armenian candles</string>
 			<string>fabulicious</string>
 			<string>spaghetti and noodles</string>
@@ -37,9 +36,9 @@
 		<string>abc def</string>
 		<key>results</key>
 		<array>
-			<string>army brats can defend every friend</string>
-			<string>abc defend every fiendish person</string>
 			<string>abc def</string>
+			<string>abc defend every fiendish person</string>
+			<string>army brats can defend every friend</string>
 			<string>army brats can def</string>
 			<string>abcdef</string>
 			<string>abc</string>
@@ -63,9 +62,9 @@
 		<key>results</key>
 		<array>
 			<string>can arithmetic nurture</string>
-			<string>could arithmetic nurture</string>
-			<string>the can in the canter</string>
 			<string>canada</string>
+			<string>the can in the canter</string>
+			<string>could arithmetic nurture</string>
 			<string>thecan in thecanter</string>
 			<string>arcangent</string>
 			<string>xxxcan</string>
@@ -80,8 +79,8 @@
 			<string>refer</string>
 			<string>reference</string>
 			<string>referentially</string>
-			<string>prefer</string>
 			<string>who is the referee for this game</string>
+			<string>prefer</string>
 		</array>
 	</dict>
 	<dict>
@@ -90,9 +89,9 @@
 		<key>results</key>
 		<array>
 			<string>a</string>
-			<string>apple</string>
 			<string>a a a a a a a a a a a a</string>
 			<string>far and away from here with a car</string>
+			<string>apple</string>
 		</array>
 	</dict>
 	<dict>
@@ -196,39 +195,6 @@
 			<string>luck be a lady</string>
 		</array>
 	</dict>
-	<!---
-	<dict>
-		<key>query</key>
-		<string>maclachlan</string>
-		<key>results</key>
-		<array>
-			<array>
-				<string>dave maclachlan</string>
-				<string>phones office 1 650 253 1344 grandcentral 425 522 3622 Other vc bridge 3 253 1344 id number 66666 status employee department engineering cost</string>
-			</array>
-			<array>
-				<string>dave maclachlan dmac google com</string>
-				<string>i&apos;ve got a c l in for adding unit tests for the scoring algorithm but I was thinking that it would probably be quite useful if you also had a test harness which would allow you to run the same test data files manually and get a nice</string>
-			</array>
-			<array>
-				<string>the canuck</string>
-				<string>dave maclachlan jabber dmac google com</string>
-			</array>
-			<array>
-				<string>my buddy list</string>
-				<string>john grabowski pankaj kakkar ismail noorbasha greg robbins dave maclachlan neal sidhwaney nicholas jitkoff</string>
-			</array>
-			<array>
-				<string>our new q s b plan for the future</string>
-				<string>are the best approach to prove that the scoring algorithm has not changed from release to release in order to get to that point though it will be necessary to show that the scoring what do you think dave</string>
-			</array>
-			<array>
-				<string>whitepaper on web dav</string>
-				<string>the web d a v current principal extension to the web d a v access control a c l protocol has been approved by the internet engineering task force as r f c 5397 this protocol permits a web d a v client to discover what principal user the server thinks is currently authenticated this is useful in providing full service client implementations that use the a c l protocol congratulations to mac sanchez and cyrus daboo for creating this protocol</string>
-			</array>
-		</array>
-	</dict>
-	--->
 	<dict>
 		<key>query</key>
 		<string>95110</string>

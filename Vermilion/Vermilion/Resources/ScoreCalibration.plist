@@ -18,13 +18,13 @@
 		<key>term</key>
 		<string>abcde</string>
 		<key>item</key>
-		<string>abcde 01234567890123456789</string>
+		<string>abx cde 01234567890123456789</string>
 	</dict>
 	<dict>
 		<key>term</key>
 		<string>abcd</string>
 		<key>item</key>
-		<string>ab cd</string>
+		<string>xabx xcdx</string>
 	</dict>
 	<dict>
 		<key>term</key>

@@ -76,6 +76,7 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
   CGFloat startDistanceFactor = 0.8;
   CGFloat wordPortionFactor = 5.0;
   CGFloat itemPortionFactor = 0.8;
+  CGFloat matchSpreadFactor = 0.8;
   NSUInteger maximumCharacterDistance = 22;
   NSUInteger maximumItemCharactersScanned = 250;
   BOOL enableBestWordScoring = YES;
@@ -87,6 +88,7 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
                                  startDistanceFactor,
                                  wordPortionFactor,
                                  itemPortionFactor,
+                                 matchSpreadFactor,
                                  maximumCharacterDistance,
                                  maximumItemCharactersScanned,
                                  enableBestWordScoring,
