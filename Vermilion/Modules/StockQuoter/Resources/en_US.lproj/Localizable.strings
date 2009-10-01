@@ -17,7 +17,7 @@
 "After Hours" = "After Hours";
 
 /* A label placed next to the daily high price of a stock. */
-"High" = "High";
+"High:" = "High:";
 
 /* A label placed next to the daily low price of a stock. */
-"Low" = "Low";
+"Low:" = "Low:";
