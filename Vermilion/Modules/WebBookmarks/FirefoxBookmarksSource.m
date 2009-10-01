@@ -59,7 +59,15 @@
 @end
 
 @interface FirefoxBookmarksSource ()
+// -[NSString JSONValue] can result in NSNull objects in the returned
+// dictionary for the FF JSON so we have to strip those out.
 - (id)removeNullsFromJSONObject:(id)object;
+@end
+
+@interface NSString (FirefoxBookmarksSource)
+// Firefox may have unnecessary, non-standard commas which causes
+// -[NSString JSONValue] to fail.  Remove those commas.
+- (NSString *)stringByStrippingUnnecessaryCommasFromFirefoxJSONString;
 @end
 
 @implementation FirefoxBookmarksSource
@@ -249,6 +257,8 @@
       
 - (NSDictionary *)bookmarksFromFile:(NSString *)path {
   NSString *fileContents = [NSString stringWithContentsOfFile:path];
+  fileContents
+    = [fileContents stringByStrippingUnnecessaryCommasFromFirefoxJSONString];
   NSDictionary *dict = [fileContents JSONValue];
   NSDictionary *dictWithoutNulls = [self removeNullsFromJSONObject:dict];
   return dictWithoutNulls;
@@ -386,6 +396,18 @@
     }
   }
   return recentPath;
+}
+
+@end
+
+@implementation NSString (FirefoxBookmarksSource)
+
+- (NSString *)stringByStrippingUnnecessaryCommasFromFirefoxJSONString {
+  // The only known case at the moment is an extra comma at the end of
+  // the main 'children' section.  Fix: s/,\]/\]/.
+  NSString *cleanString
+    = [self stringByReplacingOccurrencesOfString:@",]" withString:@"]"];
+  return cleanString;
 }
 
 @end
