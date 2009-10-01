@@ -115,6 +115,23 @@ DISPLAY_NAME_FORMAT = '%s %s (%s/%s%%) %s'
 SNIPPET_FORMAT = '%s Hi:%s/Lo:%s Vol:%s'  # <exchange> <hi>/<lo> Vol:<vol>
 STOCK_QUOTE_TYPE = 'script.python.stockquote'
 
+def XEncodeReplace(match_object):
+  """Convert \\xnn encoded characters.
+  
+  Converts \\xnn encoded characters into their Unicode equivalent.
+  
+  Args:
+    match: A string matched by an re pattern of '\\xnn'.
+  
+  Returns:
+    A single character string containing the Unicode equivalent character
+    (always within the ASCII range) if match is of the '\\xnn' pattern,
+    otherwise the match string unchanged.
+  """
+  char_num_string = match_object.group(1)
+  char_num = int(char_num_string, 16)
+  replacement = chr(char_num)
+  return replacement
 
 class StockQuoter(object):
   """The stock quote search source.
@@ -209,16 +226,22 @@ class StockQuoter(object):
       quote_connection = urllib.urlopen(quote_url)
       quote_raw_data = quote_connection.readlines()
       quote_connection.close()
-      quote_dict = {}
       if self.debugging_enabled:
         print "Raw data returned from finance feed: %s" % quote_raw_data
+      # The JSON from the finance feed may have \x26's in it, and perhaps
+      # other improperly encoded characters.  Replace them with the
+      # equivalent characters.  Precompile the pattern.
+      pattern = re.compile('\\\\x(\d{2})')
       # It's JSON but this is a simple extraction.
+      quote_dict = {}
       for line in quote_raw_data:
         line = line.rstrip('\n')
         line_parts = line.split(':')
         if len(line_parts) == 2:
           key, value = line_parts
           key = key.strip('" ,')
+          # Perform the \xnn replacements here.
+          value = pattern.sub(XEncodeReplace, value)
           value = value.strip('" ')
           if key and value:
             quote_dict[key] = value
