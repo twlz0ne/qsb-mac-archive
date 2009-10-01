@@ -146,19 +146,21 @@ typedef enum {
 
 GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
-+ (CFArrayRef)attributeArray {
-  static NSArray *sAttributeArray = nil;
-  @synchronized(self) {
-    if (!sAttributeArray) {
-      sAttributeArray = [[NSArray alloc] initWithObjects:
-                         (NSString *)kMDItemPath,
-                         (NSString *)kMDItemTitle,
-                         (NSString *)kMDItemLastUsedDate,
-                         (NSString *)kMDItemContentType,
-                         (NSString *)kSpotlightGroupIdAttribute,
-                         nil];
-    }
+static NSArray *sAttributeArray = nil;
+
++ (void)initialize {
+  if (!sAttributeArray) {
+    sAttributeArray = [[NSArray alloc] initWithObjects:
+                       (NSString *)kMDItemPath,
+                       (NSString *)kMDItemTitle,
+                       (NSString *)kMDItemLastUsedDate,
+                       (NSString *)kMDItemContentType,
+                       (NSString *)kSpotlightGroupIdAttribute,
+                       nil];
   }
+}
+
++ (CFArrayRef)attributeArray {
   return (CFArrayRef)sAttributeArray;
 }
 
@@ -263,7 +265,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   MDQueryRef mdQuery 
     = MDQueryCreate(kCFAllocatorDefault,
                     (CFStringRef)predicateString,
-                    (CFArrayRef)[[self class] attributeArray],
+                    NULL,
                     // We must not sort here because it means that the
                     // result indexing will be stable (we leverage this
                     // behavior elsewhere)
