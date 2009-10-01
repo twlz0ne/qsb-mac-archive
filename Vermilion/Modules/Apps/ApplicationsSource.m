@@ -318,6 +318,33 @@ static NSString *const kApplicationSourcePredicateString
   }
   return result;
 }
-  
+
+- (HGSResult *)postFilterResult:(HGSMutableResult *)result 
+                matchesForQuery:(HGSQuery *)query
+                    pivotObject:(HGSResult *)pivotObject {
+  NSString *filePath = [result filePath];
+  CGFloat weakRank = HGSCalibratedScore(kHGSCalibratedWeakScore);
+  if ([result rank] > weakRank) {
+    if ([filePath hasPrefix:@"/Volumes/"]) {
+      // Not on our boot drive. Check to see if the user has multiple system
+      // partitions.
+      NSArray *components = [filePath pathComponents];
+      if ([components count] > 2) {
+        NSArray *volPathArray = [components subarrayWithRange:NSMakeRange(0, 3)];
+        volPathArray = [volPathArray arrayByAddingObject:@"System"];
+        NSString *systemPath = [NSString pathWithComponents:volPathArray];
+        NSFileManager *fileMan = [NSFileManager defaultManager];
+        BOOL isDir;
+        if ([fileMan fileExistsAtPath:systemPath isDirectory:&isDir] && isDir) {
+          [result setRank:weakRank];
+        }
+      }
+    }
+  }
+  // TODO(dmaclach): add an architecture check here and give a weak rank if
+  // the app can't actually be run. CFBundlePreflightExecutable doesn't cut it
+  // as it appears to return false for any application.
+  return result;
+}
 @end
 
