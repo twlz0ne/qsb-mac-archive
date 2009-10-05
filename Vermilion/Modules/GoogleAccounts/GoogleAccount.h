@@ -47,7 +47,12 @@
   NSString *captchaToken_;  // Captcha token.
   // Set by and only useful within authentication.
   BOOL authCompleted_;
+  // Set by authentication handler to indicate success or not.
   BOOL authSucceeded_;
+  // Set to YES of the account failed to authenticate as HOSTED but
+  // succeeded as HOSTED_OR_GOOGLE during setup account.  This flag
+  // is saved in the account configuration.
+  BOOL forceNonHosted_;
 }
 
 @property (nonatomic, retain) NSImage *captchaImage;

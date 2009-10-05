@@ -49,6 +49,9 @@ static NSString *const kCaptchaImageURLPrefix
   = @"http://www.google.com/accounts/";
 static NSString *const kGoogleAccountAsynchAuth = @"GoogleAccountAsynchAuth";
 
+static NSString *const kHGSGoogleAccountForceNonhostedKey
+  = @"HGSGoogleAccountForceNonhostedKey";
+
 // Authentication timing constants.
 static const NSTimeInterval kAuthenticationRetryInterval = 0.1;
 static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
@@ -73,10 +76,17 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
 
 @property (nonatomic, assign) BOOL authCompleted;
 @property (nonatomic, assign) BOOL authSucceeded;
+@property (nonatomic, assign) BOOL forceNonHosted;
 
 // Common function for preparing an authentication fetcher.
+// TODO(mrossetti): 1960732: Rework |accountType| when addressed.  
 - (GDataHTTPFetcher *)authFetcherForPassword:(NSString *)password
-                                  parameters:(NSDictionary *)params;
+                                  parameters:(NSDictionary *)params
+                                 accountType:(NSString *)accountType;
+
+// Determine the default account type based on the class and composition
+// of the account name (called |userName|).
+- (NSString *)accountType;
 
 // Check the authentication results to see if the account authenticated.
 - (BOOL)validateResult:(NSData *)result;
@@ -93,12 +103,37 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 @synthesize captchaToken = captchaToken_;
 @synthesize authCompleted = authCompleted_;
 @synthesize authSucceeded = authSucceeded_;
+@synthesize forceNonHosted = forceNonHosted_;
+
+- (id)initWithConfiguration:(NSDictionary *)prefDict {
+  if ((self = [super initWithConfiguration:prefDict])) {
+    NSNumber *forcedNonHostedNumber
+      = [prefDict objectForKey:kHGSGoogleAccountForceNonhostedKey];
+    if (forcedNonHostedNumber) {
+      forceNonHosted_ = [forcedNonHostedNumber boolValue];
+    }
+  }
+  return self;
+}
 
 - (void)dealloc {
   [captchaImage_ release];
   [captchaText_ release];
   [captchaToken_ release];
   [super dealloc];
+}
+
+- (NSDictionary *)configuration {
+  NSDictionary *accountDict = [super configuration];
+  HGSAssert(accountDict, @"HGSAccount should be providing a configuration.");
+  if ([self forceNonHosted]) {
+    NSMutableDictionary *newDict
+      = [NSMutableDictionary dictionaryWithDictionary:accountDict];
+    [newDict setObject:[NSNumber numberWithBool:YES]
+                forKey:kHGSGoogleAccountForceNonhostedKey];
+    accountDict = newDict;
+  }
+  return accountDict;
 }
 
 - (NSString *)type {
@@ -129,8 +164,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     [self setCaptchaToken:nil];
   }
   NSString *password = [self password];
+  NSString *accountType = [self accountType];
+  if ([self forceNonHosted]) {
+    accountType = kGoogleCorpAccountType;
+  }
   GDataHTTPFetcher *authFetcher = [self authFetcherForPassword:password
-                                                    parameters:parameters];
+                                                    parameters:parameters
+                                                   accountType:accountType];
   if (authFetcher) {
     [authFetcher setProperty:@"YES" forKey:kGoogleAccountAsynchAuth];
     [authFetcher beginFetchWithDelegate:self
@@ -145,8 +185,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (BOOL)authenticateWithPassword:(NSString *)password {
   // Test this account to see if we can connect.
   BOOL authenticated = NO;
+  BOOL hosted = [self isKindOfClass:[GoogleAppsAccount class]];
+  NSString *accountType = [self accountType];
   GDataHTTPFetcher *authFetcher = [self authFetcherForPassword:password
-                                                    parameters:nil];
+                                                    parameters:nil
+                                                   accountType:accountType];
   if (authFetcher) {
     [self setAuthCompleted:NO];
     [self setAuthSucceeded:NO];
@@ -164,14 +207,46 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     }
     authenticated = [self authSucceeded];
   }
+  
+  if (!authenticated && hosted) {
+    // Try again, this time forcing non-hosted.
+    authFetcher = [self authFetcherForPassword:password
+                                    parameters:nil
+                                   accountType:kGoogleCorpAccountType];
+    if (authFetcher) {
+      [self setAuthCompleted:NO];
+      [authFetcher beginFetchWithDelegate:self
+                        didFinishSelector:@selector(fetcher:finishedWithData:)
+                          didFailSelector:@selector(fetcher:failedWithError:)];
+      // Block until this fetch is done to make it appear synchronous.  Just in
+      // case, put an upper limit of 30 seconds before we bail.
+      [[authFetcher request] setTimeoutInterval:kAuthenticationGiveUpInterval];
+      NSRunLoop* loop = [NSRunLoop currentRunLoop];
+      while (![self authCompleted]) {
+        NSDate *sleepTilDate
+          = [NSDate dateWithTimeIntervalSinceNow:kAuthenticationRetryInterval];
+        [loop runUntilDate:sleepTilDate];
+      }
+      authenticated = [self authSucceeded];
+      // If it succeeded then force this in the future.
+      // Note: At some point (i.e. when 1960732 has been fixed) accounts for
+      // which |forceNonHosted| has been set will fail to authenticate at
+      // QSB startup.  The user will need to remove and re-add such accounts
+      // at that time, at least until this temporary work-around code is
+      // removed and a new release is sent out.
+      [self setForceNonHosted:authenticated];
+    }
+  }
   return authenticated;
 }
 
 - (GDataHTTPFetcher *)authFetcherForPassword:(NSString *)password
-                                  parameters:(NSDictionary *)params {
+                                  parameters:(NSDictionary *)params
+                                 accountType:(NSString *)accountType {
   NSString *userName = [self userName];
-  BOOL hosted = [self isKindOfClass:[GoogleAppsAccount class]];
+#ifdef REENABLE_WHEN_1960732_HAS_BEEN_ADDRESSED
   NSString *accountType = kHostedAccountType;
+  BOOL hosted = [self isKindOfClass:[GoogleAppsAccount class]];
   if (!hosted) {
     accountType = kGoogleAccountType;
     NSRange atRange = [userName rangeOfString:@"@"];
@@ -182,10 +257,15 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       }
     }
   }
+#endif  // REENABLE_WHEN_1960732_HAS_BEEN_ADDRESSED
+
+  // Validate the account using the contacts service since a basic account
+  // should have at least mail service with contacts.
+  NSString *serviceID = [GDataServiceGoogleContact serviceID];
   GDataHTTPFetcher *authFetcher
     = [GDataAuthenticationFetcher authTokenFetcherWithUsername:userName
                                                       password:password
-                                                       service:@"cp"
+                                                       service:serviceID
                                                         source:@"google-qsb-1.0"
                                                   signInDomain:nil
                                                    accountType:accountType
@@ -197,6 +277,22 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return authFetcher;
 }
 
+- (NSString *)accountType {
+  NSString *accountType = kHostedAccountType;
+  BOOL hosted = [self isKindOfClass:[GoogleAppsAccount class]];
+  if (!hosted) {
+    accountType = kGoogleAccountType;
+    NSString *userName = [self userName];
+    NSRange atRange = [userName rangeOfString:@"@"];
+    if (atRange.location != NSNotFound) {
+      NSString *domainString = [userName substringFromIndex:atRange.location];
+      if ([GoogleAccount isMatchToGoogleDomain:domainString]) {
+        accountType = kGoogleCorpAccountType;
+      }
+    }
+  }
+  return accountType;
+}
 
 - (BOOL)validateResult:(NSData *)result {
   BOOL validated = NO;
