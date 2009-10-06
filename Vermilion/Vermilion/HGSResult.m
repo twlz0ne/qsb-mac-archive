@@ -124,20 +124,24 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 + (id)resultWithFilePath:(NSString *)path 
                   source:(HGSSearchSource *)source 
               attributes:(NSDictionary *)attributes {
+  id result = nil;
   NSFileManager *fm = [NSFileManager defaultManager];
-  NSString *type = [self hgsTypeForPath:path];
-  if (!type) {
-    type = kHGSTypeFile;
+  if ([fm fileExistsAtPath:path]) {
+    NSString *type = [self hgsTypeForPath:path];
+    if (!type) {
+      type = kHGSTypeFile;
+    }
+    NSString *uriPath 
+      = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *uri 
+      = [NSString stringWithFormat:@"%@%@", kHGSResultFileSchemePrefix, uriPath];
+    result = [self resultWithURI:uri
+                            name:[fm displayNameAtPath:path]
+                            type:type
+                          source:source
+                      attributes:attributes];
   }
-  NSString *uriPath 
-    = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-  NSString *uri 
-    = [NSString stringWithFormat:@"%@%@", kHGSResultFileSchemePrefix, uriPath];
-  return [self resultWithURI:uri
-                        name:[fm displayNameAtPath:path]
-                        type:type
-                      source:source
-                  attributes:attributes];
+  return result;
 }
 
 + (id)resultWithDictionary:(NSDictionary *)dictionary 
