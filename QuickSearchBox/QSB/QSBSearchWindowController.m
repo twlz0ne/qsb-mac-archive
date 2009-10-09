@@ -1764,6 +1764,7 @@ doCommandBySelector:(SEL)commandSelector {
 - (void)resetQuery:(NSTimer *)timer {
   queryResetTimer_ = nil;
   while([self popViewControllerAnimate:NO]) { }
+  showResults_ = NO;
   [activeSearchViewController_ setQueryString:nil];
   [searchTextField_ setStringValue:@""];
 }
