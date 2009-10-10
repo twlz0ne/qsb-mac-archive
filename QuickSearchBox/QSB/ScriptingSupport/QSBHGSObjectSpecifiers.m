@@ -30,8 +30,15 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-
+#import "QSBHGSObjectSpecifiers.h"
 #import <Vermilion/Vermilion.h>
+
+// Scripting KVO Keys
+NSString *const kQSBPluginsScriptingKVOKey = @"plugins";
+NSString *const kQSBProtoExtensionsKVOKey = @"protoExtensions";
+NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
+NSString *const kQSBAccountsScriptingKVOKey = @"accounts";
+
 
 @interface HGSPlugin (QSBHGSObjectSpecifiers)
 @end
@@ -61,10 +68,55 @@
   NSScriptClassDescription *classDesc 
     = [NSScriptClassDescription classDescriptionForClass:[NSApp class]];
   NSScriptObjectSpecifier * specifier 
-    = [[[NSUniqueIDSpecifier alloc] initWithContainerClassDescription:classDesc
-                                                   containerSpecifier:nil 
-                                                                  key:@"sourceExtensions" 
-                                                             uniqueID:uID] autorelease];
+    = [[[NSUniqueIDSpecifier alloc]
+        initWithContainerClassDescription:classDesc
+                       containerSpecifier:nil 
+                                      key:kQSBSourceExtensionsKVOKey 
+                                 uniqueID:uID] autorelease];
   return specifier;
 }
+@end
+
+
+@interface HGSAccount (QSBHGSObjectSpecifiers)
+@end
+
+@implementation HGSAccount (QSBHGSObjectSpecifiers)
+
+- (NSScriptObjectSpecifier *)objectSpecifier {
+  NSString *uID = [self identifier];
+  NSScriptClassDescription *classDesc 
+    = [NSScriptClassDescription classDescriptionForClass:[NSApp class]];
+  NSScriptObjectSpecifier * specifier 
+    = [[[NSUniqueIDSpecifier alloc]
+        initWithContainerClassDescription:classDesc
+                       containerSpecifier:nil 
+                                      key:kQSBAccountsScriptingKVOKey
+                                 uniqueID:uID]
+       autorelease];
+  return specifier;
+}
+
+@end
+
+
+@interface HGSSimpleAccount (QSBHGSObjectSpecifiers)
+@end
+
+@implementation HGSSimpleAccount (QSBHGSObjectSpecifiers)
+
+- (NSScriptObjectSpecifier *)objectSpecifier {
+  NSString *uID = [self identifier];
+  NSScriptClassDescription *classDesc 
+    = [NSScriptClassDescription classDescriptionForClass:[NSApp class]];
+  NSScriptObjectSpecifier * specifier 
+    = [[[NSUniqueIDSpecifier alloc]
+        initWithContainerClassDescription:classDesc
+                       containerSpecifier:nil 
+                                      key:kQSBAccountsScriptingKVOKey
+                                 uniqueID:uID]
+     autorelease];
+  return specifier;
+}
+
 @end

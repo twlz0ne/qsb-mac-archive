@@ -357,6 +357,16 @@
   }
 }
 
+- (NSString *)associatedAccount {
+  NSString *account = nil;
+  NSString *identifier = [self identifier];
+  NSRange accountRange = [identifier rangeOfString:@"ACCOUNT="];
+  if (accountRange.location != NSNotFound) {
+    account = [identifier substringFromIndex:NSMaxRange(accountRange)];
+  }
+  return account;
+}
+
 - (BOOL)isUserVisibleAndExtendsExtensionPoint:(NSString *)extensionPoint {
   BOOL doesExtend = [[self extensionPointKey] isEqualToString:extensionPoint];
   if (doesExtend) {

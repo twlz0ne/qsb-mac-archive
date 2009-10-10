@@ -137,6 +137,15 @@
  */
 @property (nonatomic, assign, readonly) BOOL canSetEnabled;
 
+/*!
+ Return the account used by the extension, if any.
+ 
+ @result The default implementation looks for an account identifier
+         as a part of the extension identifier and is the portion of
+         the identifier following 'ACCOUNT='.
+ */
+@property (readonly, copy) NSString *associatedAccount;
+
 /*! 
   Initialize a prototype extension given a dictionary. 
 */

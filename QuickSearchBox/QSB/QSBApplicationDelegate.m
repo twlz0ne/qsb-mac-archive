@@ -36,6 +36,7 @@
 #import <unistd.h>
 #import <Vermilion/Vermilion.h>
 
+#import "QSBHGSObjectSpecifiers.h"
 #import "QSBKeyMap.h"
 #import "QSBPreferences.h"
 #import "QSBPreferenceWindowController.h"
@@ -88,12 +89,6 @@ static NSString *const kQSBFeedbackKey = @"QSBFeedbackURL";
 
 // Human-readable growl notification name.
 static NSString *const kGrowlNotificationName = @"QSB User Message";
-
-// KVO Keys
-// Observe each plugins protoExtensions so that we can update sourceExtensions.
-static NSString *const kQSBProtoExtensionsKVOKey = @"protoExtensions";
-// Signal a sourceExtensions change in response to a protoExtension change.
-static NSString *const kQSBSourceExtensionsKVOKey = @"sourceExtensions";
 
 @interface QSBApplicationDelegate ()
 
@@ -171,7 +166,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 @synthesize applicationASDictionary = applicationASDictionary_;
 
 + (NSSet *)keyPathsForValuesAffectingSourceExtensions {
-  NSSet *affectingKeys = [NSSet setWithObject:@"plugins"];
+  NSSet *affectingKeys = [NSSet setWithObject:kQSBPluginsScriptingKVOKey];
   return affectingKeys;
 }
 
@@ -778,7 +773,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
 }
 
-
 #pragma mark Account Management
 
 - (NSArray *)accounts {
@@ -907,9 +901,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 // Reroute certain properties off to our delegate for scripting purposes.
-- (BOOL)application:(NSApplication *)sender delegateHandlesKey:(NSString *)key
-{
-  if ([key isEqual:@"plugins"] || [key isEqual:kQSBSourceExtensionsKVOKey]) {
+- (BOOL)application:(NSApplication *)sender
+ delegateHandlesKey:(NSString *)key {
+  if ([key isEqual:kQSBPluginsScriptingKVOKey]
+      || [key isEqual:kQSBSourceExtensionsKVOKey]
+      || [key isEqual:kQSBAccountsScriptingKVOKey]) {
     return YES;
   } else {
     return NO;
@@ -977,7 +973,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)pluginsDidInstall:(NSNotification *)notification {
   HGSPluginLoader *loader = [notification object];
   [loader gtm_addObserver:self
-               forKeyPath:@"plugins"
+               forKeyPath:kQSBPluginsScriptingKVOKey
                  selector:@selector(pluginsValueChanged:)
                  userInfo:nil
                   options:(NSKeyValueObservingOptionPrior 

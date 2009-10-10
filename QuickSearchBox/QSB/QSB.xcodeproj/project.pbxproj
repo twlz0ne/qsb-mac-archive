@@ -417,6 +417,8 @@
 		62A4AD160F2FCE0E0007CD99 /* TwitterMessageAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A4AD120F2FCE0E0007CD99 /* TwitterMessageAction.m */; };
 		62A4ADAA0F2FD4890007CD99 /* Twitter.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 62A4AC8A0F2FCD950007CD99 /* Twitter.hgs */; };
 		62A4AEAC0F30DF9F0007CD99 /* GTMBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A4AEAB0F30DF9F0007CD99 /* GTMBase64.m */; };
+		62A5B283107E570200444AC9 /* GoogleAccountObjectSpecifiers.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A5B282107E570200444AC9 /* GoogleAccountObjectSpecifiers.m */; };
+		62A5B289107E576E00444AC9 /* GoogleAccountRegisterAccountCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A5B288107E576E00444AC9 /* GoogleAccountRegisterAccountCommand.m */; };
 		62AD18A60F16B034000D380C /* QSBPathControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 62AD18A50F16B034000D380C /* QSBPathControl.m */; };
 		62AD99150F33AB190063579F /* google_products.png in Resources */ = {isa = PBXBuildFile; fileRef = 62AD99140F33AB190063579F /* google_products.png */; };
 		62B4406C10631A4E00984D34 /* FakeHGSPluginLoaderTest.sdefsrc in Sources */ = {isa = PBXBuildFile; fileRef = 62B4406B10631A4E00984D34 /* FakeHGSPluginLoaderTest.sdefsrc */; };
@@ -2200,12 +2202,15 @@
 		62A4AD120F2FCE0E0007CD99 /* TwitterMessageAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwitterMessageAction.m; sourceTree = "<group>"; };
 		62A4AEAA0F30DF9F0007CD99 /* GTMBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMBase64.h; sourceTree = "<group>"; };
 		62A4AEAB0F30DF9F0007CD99 /* GTMBase64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMBase64.m; sourceTree = "<group>"; };
+		62A5B282107E570200444AC9 /* GoogleAccountObjectSpecifiers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountObjectSpecifiers.m; sourceTree = "<group>"; };
+		62A5B288107E576E00444AC9 /* GoogleAccountRegisterAccountCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountRegisterAccountCommand.m; sourceTree = "<group>"; };
 		62AD18A40F16B034000D380C /* QSBPathControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPathControl.h; sourceTree = "<group>"; };
 		62AD18A50F16B034000D380C /* QSBPathControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPathControl.m; sourceTree = "<group>"; };
 		62AD99140F33AB190063579F /* google_products.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = google_products.png; sourceTree = "<group>"; };
 		62B4406B10631A4E00984D34 /* FakeHGSPluginLoaderTest.sdefsrc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = FakeHGSPluginLoaderTest.sdefsrc; sourceTree = "<group>"; };
 		62BFDDE9103CE02F00421C85 /* HGSSearchTermScorerTestData.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = HGSSearchTermScorerTestData.plist; path = ../../Vermilion/Vermilion/HGSSearchTermScorerTestData.plist; sourceTree = SOURCE_ROOT; };
 		62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PicasaPlaceholder.icns; sourceTree = "<group>"; };
+		62D0909F107FAFA300D2F334 /* QSBHGSObjectSpecifiers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBHGSObjectSpecifiers.h; sourceTree = "<group>"; };
 		62D0E9640EF058950028522C /* HGSAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAccount.h; sourceTree = "<group>"; };
 		62D0E96A0EF059B40028522C /* HGSAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccount.m; sourceTree = "<group>"; };
 		62D0E96D0EF05D0E0028522C /* HGSAccountsExtensionPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAccountsExtensionPoint.h; sourceTree = "<group>"; };
@@ -4309,6 +4314,8 @@
 				62EA8C1A0F2E7E5E00C92E0B /* GoogleAccounts-Info.plist */,
 				62AD99140F33AB190063579F /* google_products.png */,
 				62DF2008105964A500AF1801 /* GoogleAccounts.sdefsrc */,
+				62A5B288107E576E00444AC9 /* GoogleAccountRegisterAccountCommand.m */,
+				62A5B282107E570200444AC9 /* GoogleAccountObjectSpecifiers.m */,
 			);
 			path = GoogleAccounts;
 			sourceTree = "<group>";
@@ -4816,6 +4823,7 @@
 				8B9250DB0EE861E000F3DF32 /* QSBOpenProductHomepageCommand.m */,
 				8B9250DC0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m */,
 				8B58E9ED0E548F8C00A0E02E /* QSBGoogleSuggestURLHandler.m */,
+				62D0909F107FAFA300D2F334 /* QSBHGSObjectSpecifiers.h */,
 				8B92527A0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m */,
 				8B3E067F0EF630DE0036FFBD /* QSBSearchForCommand.m */,
 				8B611BFB0F43949600E29B40 /* QSBPathForFileURLCommand.m */,
@@ -8780,6 +8788,8 @@
 				622912F40F2EAF80005D34CE /* GTMMethodCheck.m in Sources */,
 				620055690F78595F00C806A1 /* GoogleAccountEditController.m in Sources */,
 				6200556A0F78595F00C806A1 /* GoogleAccountSetUpViewController.m in Sources */,
+				62A5B283107E570200444AC9 /* GoogleAccountObjectSpecifiers.m in Sources */,
+				62A5B289107E576E00444AC9 /* GoogleAccountRegisterAccountCommand.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

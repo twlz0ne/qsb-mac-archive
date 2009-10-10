@@ -30,3 +30,12 @@
 
 /* A button that denotes that you want to update your account. */
 "Update" = "Update";
+
+/* An error message saying that the account could not be installed. */
+"The account failed to install." = "The account failed to install.";
+
+/* An error message saying that the account could not be authenticated." */
+"The account failed to authenticate." = "The account failed to authenticate.";
+
+/* An error message explaining that an account of that type with that login information has already been set up." */
+"Account already set up." = "Account already set up.";
