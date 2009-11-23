@@ -219,7 +219,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 
   [[self window] setHidesOnDeactivate:YES];
   
-  [toolbar_ setSelectedItemIdentifier:@"general"];
+  [tabView_ selectTabViewItemAtIndex:0];
   [sourcesTable_ setIntercellSpacing:NSMakeSize(3.0, 6.0)];
   [accountsTable_ setIntercellSpacing:NSMakeSize(3.0, 6.0)];
 }
