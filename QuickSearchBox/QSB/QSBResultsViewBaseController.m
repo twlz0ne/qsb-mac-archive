@@ -140,7 +140,7 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 - (void)setSwapSelection {
   // The default behavior is to select the first row of the to-be-swapped-in
   // results view.
-  [self moveToBeginningOfDocument:self];
+  [self scrollToBeginningOfDocument:self];
 }
 
 - (QSBTableResult *)selectedTableResult {
@@ -149,7 +149,7 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 
 - (void)reset {
   // Reset our selection to be the first row.
-  [self moveToBeginningOfDocument:self];
+  [self scrollToBeginningOfDocument:self];
 }
 
 - (CGFloat)updateResultsView {
@@ -182,6 +182,8 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 - (BOOL)performSelectionMovementSelector:(SEL)selector {
   BOOL acceptable = (selector == @selector(moveUp:)
                      || selector == @selector(moveDown:)
+                     || selector == @selector(scrollToBeginningOfDocument:)
+                     || selector == @selector(scrollToEndOfDocument:)
                      || selector == @selector(moveToBeginningOfDocument:)
                      || selector == @selector(moveToEndOfDocument:)
                      || selector == @selector(scrollPageUp:)
@@ -211,14 +213,22 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
   }
 }
 
-- (void)moveToBeginningOfDocument:(id)sender {
+- (void)scrollToBeginningOfDocument:(id)sender {
   NSInteger selectedRow = [resultsTableView_ selectFirstSelectableRow];
   [resultsTableView_ scrollRowToVisible:selectedRow];
 }
 
-- (void)moveToEndOfDocument:(id)sender {
+- (void)scrollToEndOfDocument:(id)sender {
   NSInteger selectedRow = [resultsTableView_ selectLastSelectableRow];
   [resultsTableView_ scrollRowToVisible:selectedRow];
+}
+
+- (void)moveToBeginningOfDocument:(id)sender {
+  [self scrollToBeginningOfDocument:sender];
+}
+
+- (void)moveToEndOfDocument:(id)sender {
+  [self scrollToEndOfDocument:sender];
 }
 
 - (void)scrollPageUp:(id)sender {

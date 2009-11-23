@@ -71,7 +71,7 @@
 }
 
 - (void)setSwapSelection {
-  [self moveToEndOfDocument:self];
+  [self scrollToEndOfDocument:self];
 }
 
 - (NSString *)categorySummaryString {

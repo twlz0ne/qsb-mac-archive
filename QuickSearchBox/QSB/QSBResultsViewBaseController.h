@@ -104,8 +104,8 @@
 // Select previous, next, first or last rows in the results table.
 - (void)moveUp:(id)sender;
 - (void)moveDown:(id)sender;
-- (void)moveToBeginningOfDocument:(id)sender;
-- (void)moveToEndOfDocument:(id)sender;
+- (void)scrollToBeginningOfDocument:(id)sender;
+- (void)scrollToEndOfDocument:(id)sender;
 - (void)scrollPageUp:(id)sender;
 - (void)scrollPageDown:(id)sender;
 
