@@ -214,6 +214,13 @@
 //
 - (void)performSynchronousSearch:(NSString *)query;
 
+// Performs a search for unicode type query in QSB.
+//
+// Args:
+//  Search query term
+//
+- (void)performSynchronousUnicodeSearch:(NSString *)query;
+
 // List of all plugins loaded and not loaded.  The returned array is an array of
 // QSBPlugin objects.  Use the methods of those objects to retrieve and change
 // the value of each plugin.

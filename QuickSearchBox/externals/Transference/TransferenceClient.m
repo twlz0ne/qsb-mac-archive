@@ -260,6 +260,15 @@ const NSTimeInterval kProcessingTimeout = 240.0;
   [self performSearch:query waitUntilComplete:YES];
 }
 
+- (void)performSynchronousUnicodeSearch:(NSString *)query {
+  NSString *script =
+    [NSString stringWithFormat:
+     @"tell application \"Quick Search Box\" to search for \"%@\"", query]; 
+  NSAppleScript *handler = [[NSAppleScript alloc] initWithSource:script];
+  [handler autorelease];
+  [handler executeAndReturnError:nil];
+}
+
 - (NSArray *)plugins {
   NSArray *pluginList = [proxy_ plugins];
   NSMutableArray *returnArray =
