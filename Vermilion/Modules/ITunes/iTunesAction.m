@@ -38,19 +38,25 @@
 #import "GTMDebugThreadValidation.h"
 #import "GTMNSWorkspace+Running.h"
 
-static NSString *const kITunesAppleScriptHandlerKey 
+static NSString *const kITunesAppleScriptHandlerKey
   = @"kITunesAppleScriptHandlerKey";
-static NSString *const kITunesAppleScriptParametersKey 
+static NSString *const kITunesAppleScriptParametersKey
   = @"kITunesAppleScriptParametersKey";
-static NSString *const kITunesPlayerInfoNotification 
+static NSString *const kITunesPlayerInfoNotification
   = @"com.apple.iTunes.playerInfo";
 static NSString *const kITunesAppBundleID = @"com.apple.iTunes";
 static NSString *const kITunesShowIfPlayingKey = @"ITunesShowIfPlaying";
 
-@interface ITunesPlayAction : HGSAction
+// Music tracks are of type file.media.music.
+// ITunesTrackAction actions requires that they be file.media.music tracks that
+// come from the iTunes source.
+@interface ITunesTrackAction : HGSAction
 @end
 
-@interface ITunesPartyShuffleAction : HGSAction
+@interface ITunesPlayAction : ITunesTrackAction
+@end
+
+@interface ITunesPartyShuffleAction : ITunesTrackAction
 - (NSString *)shuffleActionName;
 @end
 
@@ -98,7 +104,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(ITunesActionSupport, sharedSupport);
       [self release];
       self = nil;
     }
-  }  
+  }
   return self;
 }
 
@@ -123,6 +129,20 @@ GTMOBJECT_SINGLETON_BOILERPLATE(ITunesActionSupport, sharedSupport);
 
 @end
 
+@implementation ITunesTrackAction
+
+- (BOOL)appliesToResult:(HGSResult *)result {
+  BOOL isGood = [super appliesToResult:result];
+  if (isGood) {
+    if ([result conformsToType:kHGSTypeFileMusic]) {
+      isGood = [result valueForKey:kITunesAttributeTrackIdKey] != nil;
+    }
+  }
+  return isGood;
+}
+
+@end
+
 // "Play in iTunes" action for iTunes search results
 @implementation ITunesPlayAction
 
@@ -143,7 +163,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
   NSString *directObjectKey = nil;
   id extraArg = nil;
   HGSResult *directObject = [directObjects objectAtIndex:0];
-  if ([directObject isOfType:kTypeITunesTrack]) {
+  if ([directObject isOfType:kHGSTypeFileMusic]) {
     extraArg = [directObject valueForKey:kITunesAttributePlaylistIdKey];
     if (extraArg) {
       handler = @"playTrackIDInPlaylistID";
@@ -170,11 +190,11 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
   }
   if (handler && directObjectKey) {
     id directObjectVal = [directObject valueForKey:directObjectKey];
-    NSArray *parameters 
+    NSArray *parameters
       = [NSArray arrayWithObjects:directObjectVal, extraArg, nil];
     NSDictionary *scriptParams = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  handler, kITunesAppleScriptHandlerKey, 
-                                  parameters, kITunesAppleScriptParametersKey, 
+                                  handler, kITunesAppleScriptHandlerKey,
+                                  parameters, kITunesAppleScriptParametersKey,
                                   nil];
     ITunesActionSupport *support = [ITunesActionSupport sharedSupport];
     [support performSelectorOnMainThread:@selector(execute:)
@@ -188,7 +208,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
 
 @implementation ITunesPartyShuffleAction
 - (BOOL)performWithInfo:(NSDictionary*)info {
-  HGSResultArray *directObjects 
+  HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
   NSMutableArray *tracks = [NSMutableArray arrayWithCapacity:[directObjects count]];
   for (HGSResult *result in directObjects) {
@@ -224,7 +244,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
   if (doesApply) {
     if ([results count] == 1) {
       HGSResult *result = [results objectAtIndex:0];
-      if ([result isOfType:kTypeITunesTrack]) {
+      if ([result isOfType:kHGSTypeFileMusic]) {
         doesApply = NO;
       }
     }
@@ -252,7 +272,7 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_isAppWithIdentifierRunning:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    NSDistributedNotificationCenter *nc 
+    NSDistributedNotificationCenter *nc
       = [NSDistributedNotificationCenter defaultCenter];
     [nc addObserver:self selector:@selector(iTunesPlayerInfoNotification:)
                name:kITunesPlayerInfoNotification object:NULL];
@@ -264,7 +284,7 @@ GTM_METHOD_CHECK(NSWorkspace, gtm_isAppWithIdentifierRunning:);
 }
 
 - (void)dealloc {
-  NSDistributedNotificationCenter *nc 
+  NSDistributedNotificationCenter *nc
     = [NSDistributedNotificationCenter defaultCenter];
   [nc removeObserver:self];
   [super dealloc];

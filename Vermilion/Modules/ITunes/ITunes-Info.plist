@@ -341,7 +341,10 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Play in iTunes</string>
 			<key>HGSActionDirectObjectTypes</key>
-			<string>itunes</string>
+			<array>
+				<string>itunes</string>
+				<string>file.media.music</string>
+			</array>
 			<key>HGSExtensionIconImagePath</key>
 			<string>Play.icns</string>
 		</dict>
@@ -353,7 +356,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSActionDirectObjectTypes</key>
-			<string>itunes.track</string>
+			<string>file.media.music</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Play in iTunes DJ</string>
 			<key>HGSExtensionIconImagePath</key>
@@ -367,7 +370,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.itunes.action.addtopartyshuffle</string>
 			<key>HGSActionDirectObjectTypes</key>
-			<string>itunes.track</string>
+			<string>file.media.music</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Add to iTunes DJ</string>
 			<key>HGSExtensionIconImagePath</key>

@@ -34,7 +34,6 @@
 #import <Vermilion/Vermilion.h>
 
 #define kTypeITunes    @"itunes"
-#define kTypeITunesTrack     HGS_SUBTYPE(kTypeITunes, @"track")
 #define kTypeITunesArtist    HGS_SUBTYPE(kTypeITunes, @"artist")
 #define kTypeITunesAlbum     HGS_SUBTYPE(kTypeITunes, @"album")
 #define kTypeITunesComposer  HGS_SUBTYPE(kTypeITunes, @"composer")
