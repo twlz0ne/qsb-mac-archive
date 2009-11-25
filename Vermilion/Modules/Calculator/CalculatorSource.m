@@ -52,10 +52,10 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     NSCharacterSet *mathSet
       = [NSCharacterSet characterSetWithCharactersInString:@"1234567890+-*/() "];
     mathSet_ = [mathSet retain];
-    NSCharacterSet *nonAlphanumericSet = 
+    NSCharacterSet *nonAlphanumericSet =
       [[NSCharacterSet alphanumericCharacterSet] invertedSet];
     nonAlphanumericSet_ = [nonAlphanumericSet retain];
-    
+
     NSString *calcPath
       = [[NSWorkspace sharedWorkspace]
          absolutePathForAppBundleWithIdentifier:@"com.apple.calculator"];
@@ -83,7 +83,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   BOOL isValid = NO;
   NSString *rawQuery = [query rawQueryString];
-  
+
   // It takes atleast 3 chars to make an expression ie- 1+1
   if ([rawQuery length] > 2) {
     // As long as any of the math characters are in the string, let it through
@@ -104,13 +104,28 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return YES;
 }
 
-- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {  
+- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSString *rawQuery = [[operation query] rawQueryString];
   if ([rawQuery length]) {
+    // Fix up separators and decimals. The Calculator framework wants
+    // '.' for decimals, and no grouping separators.
+    NSLocale *locale = [NSLocale autoupdatingCurrentLocale];
+    NSString *decimalSeparator = [locale objectForKey:NSLocaleDecimalSeparator];
+    NSString *groupingSeparator
+      = [locale objectForKey:NSLocaleGroupingSeparator];
+    NSMutableString *fixedQuery = [NSMutableString stringWithString:rawQuery];
+    [fixedQuery replaceOccurrencesOfString:groupingSeparator
+                                withString:@""
+                                   options:0
+                                     range:NSMakeRange(0, [fixedQuery length])];
+    [fixedQuery replaceOccurrencesOfString:decimalSeparator
+                                withString:@"."
+                                   options:0
+                                     range:NSMakeRange(0, [fixedQuery length])];
     char answer[1024];
     answer[0] = '\0';
     int success
-      = CalculatePerformExpression((char *)[rawQuery UTF8String], 
+      = CalculatePerformExpression((char *)[fixedQuery UTF8String],
                                    10, 1, answer);
     if (success) {
       NSString *answerString = [NSString stringWithUTF8String:answer];
@@ -125,14 +140,14 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       // Cheat, force this result high in the list.
       // TODO(dmaclach): figure out a cleaner way to get results like this high
       // in the results.
-      NSDictionary *pasteboardData 
-        = [NSDictionary dictionaryWithObject:answerString 
+      NSDictionary *pasteboardData
+        = [NSDictionary dictionaryWithObject:answerString
                                       forKey:NSStringPboardType];
       CGFloat rank = HGSCalibratedScore(kHGSCalibratedPerfectScore);
       NSDictionary *attributes
         = [NSDictionary dictionaryWithObjectsAndKeys:
-           [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey, 
-           pasteboardData, kHGSObjectAttributePasteboardValueKey, 
+           [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
+           pasteboardData, kHGSObjectAttributePasteboardValueKey,
            nil];
       HGSResult *hgsObject
         = [HGSResult resultWithURI:calculatorAppPath_
@@ -142,8 +157,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                         attributes:attributes];
       NSArray *resultsArray = [NSArray arrayWithObject:hgsObject];
       [operation setResults:resultsArray];
-    } 
-  }     
+    }
+  }
   // Since we are concurent, finish the query ourselves.
   [operation finishQuery];
 }
