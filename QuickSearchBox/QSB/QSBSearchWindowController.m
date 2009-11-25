@@ -1074,6 +1074,8 @@ doCommandBySelector:(SEL)commandSelector {
     [NSAnimationContext endGrouping];
   }
   
+  showResults_ = NO;
+  
   if ([toggle isEqualToString:kQSBExecutedChangeVisiblityToggle]) {
     // Block when executing
     NSDictionary *anim1 
@@ -1103,7 +1105,6 @@ doCommandBySelector:(SEL)commandSelector {
     [animation release];
     [resultsWindow_ setIgnoresMouseEvents:YES];
     [searchWindow setIgnoresMouseEvents:YES];
-    showResults_ = NO;
     [resultsWindow_ orderOut:nil];
     [searchWindow orderOut:nil];
   }  else {
