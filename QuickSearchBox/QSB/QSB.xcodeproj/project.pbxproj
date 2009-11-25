@@ -53,6 +53,17 @@
 			name = "Release Notes";
 			productName = "Release Notes";
 		};
+		8BAB339110BC81A7002E1AC9 /* Delete Preferences */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 8BAB33A810BC81C6002E1AC9 /* Build configuration list for PBXAggregateTarget "Delete Preferences" */;
+			buildPhases = (
+				8BAB339010BC81A7002E1AC9 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "Delete Preferences";
+			productName = "Delete Preferences";
+		};
 		8BC6E3ED0FAABE71005A0F6F /* Build All */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 8BC6E48F0FAABF02005A0F6F /* Build configuration list for PBXAggregateTarget "Build All" */;
@@ -968,6 +979,8 @@
 		8BAAA8670F813E2A00DF4F12 /* HGSExtensionPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85E0F813E2A00DF4F12 /* HGSExtensionPoint.m */; };
 		8BAAA8680F813E2A00DF4F12 /* HGSPluginLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BAAA85F0F813E2A00DF4F12 /* HGSPluginLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BAAA86B0F813E2A00DF4F12 /* HGSCoreExtensionPoints.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BAAA8620F813E2A00DF4F12 /* HGSCoreExtensionPoints.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8BAB307B10BC4C84002E1AC9 /* PFMoveApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAB307910BC4C84002E1AC9 /* PFMoveApplication.m */; };
+		8BAB322A10BC55D2002E1AC9 /* MoveApplication.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BAB322810BC55D2002E1AC9 /* MoveApplication.strings */; };
 		8BB658F20F73034600E20B99 /* GTMNSObject+UnitTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55DAE20E78829300D39CB0 /* GTMNSObject+UnitTesting.m */; };
 		8BB658F40F73035000E20B99 /* GTMAppKit+UnitTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55DAE40E78829300D39CB0 /* GTMAppKit+UnitTesting.m */; };
 		8BB6594B0F73036600E20B99 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
@@ -3234,6 +3247,9 @@
 		8BAAA8600F813E2A00DF4F12 /* HGSExtensionPointTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSExtensionPointTest.m; sourceTree = "<group>"; };
 		8BAAA8610F813E2A00DF4F12 /* HGSCoreExtensionPointsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCoreExtensionPointsTest.m; sourceTree = "<group>"; };
 		8BAAA8620F813E2A00DF4F12 /* HGSCoreExtensionPoints.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSCoreExtensionPoints.h; sourceTree = "<group>"; };
+		8BAB307810BC4C84002E1AC9 /* PFMoveApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMoveApplication.h; sourceTree = "<group>"; };
+		8BAB307910BC4C84002E1AC9 /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
+		8BAB322910BC55D2002E1AC9 /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = en_US.lproj/MoveApplication.strings; sourceTree = "<group>"; };
 		8BB275AB0D6F81EA008DC1CA /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
 		8BC3F4410F17C7BE00896770 /* action-share-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "action-share-icon.png"; sourceTree = "<group>"; };
 		8BC3F44B0F17C7BE00896770 /* alt-local.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "alt-local.png"; sourceTree = "<group>"; };
@@ -5640,6 +5656,7 @@
 		8BA62B350F13B128008182B5 /* externals */ = {
 			isa = PBXGroup;
 			children = (
+				8BAB307610BC4C5E002E1AC9 /* LetsMove */,
 				8B6127B00F46299900E29B40 /* json-framework */,
 				8B488EAA0F16842500786C1E /* UndocumentedGoodness */,
 				5AF274610F155D3700C087B2 /* GData */,
@@ -5650,6 +5667,16 @@
 			);
 			name = externals;
 			path = ../externals;
+			sourceTree = "<group>";
+		};
+		8BAB307610BC4C5E002E1AC9 /* LetsMove */ = {
+			isa = PBXGroup;
+			children = (
+				8BAB307810BC4C84002E1AC9 /* PFMoveApplication.h */,
+				8BAB307910BC4C84002E1AC9 /* PFMoveApplication.m */,
+				8BAB322810BC55D2002E1AC9 /* MoveApplication.strings */,
+			);
+			path = LetsMove;
 			sourceTree = "<group>";
 		};
 		8BC3F43D0F17C7BE00896770 /* Resources */ = {
@@ -7005,7 +7032,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = NO;
+				BuildIndependentTargetsInParallel = YES;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "QSB" */;
 			compatibilityVersion = "Xcode 3.1";
@@ -7069,6 +7096,7 @@
 			targets = (
 				8BC6E3ED0FAABE71005A0F6F /* Build All */,
 				795F071909870215004C6BFE /* Test All */,
+				8BAB339110BC81A7002E1AC9 /* Delete Preferences */,
 				F4EF8F740ECB3EFF008DD6DA /* QSB Application */,
 				8B77DEFE0F284A4C00FA2A3C /* Release Notes */,
 				8B2E2A400F99018600F80E11 /* HeaderDoc */,
@@ -7581,6 +7609,7 @@
 				8B2334731062FF5E00AF7287 /* image_search.icns in Resources */,
 				8B2334811063013600AF7287 /* wikipedia.icns in Resources */,
 				8B95AD3A10653C46000C4C6B /* alt-search.png in Resources */,
+				8BAB322A10BC55D2002E1AC9 /* MoveApplication.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8488,6 +8517,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/BuildScripts/RunUnitTests.sh\"";
 		};
+		8BAB339010BC81A7002E1AC9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "rm \"${HOME}/Library/Preferences/com.google.qsb.plist\"";
+		};
 		8BB905BA101F9C3B00B93AD9 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -8905,6 +8947,7 @@
 				8B559ACB10692AA000DB256C /* QSB.sdefsrc in Sources */,
 				8B2BFC51107130BF00427404 /* QSBViewAnimation.m in Sources */,
 				8B2BFDCF107160A100427404 /* QSBSimpleInvocation.m in Sources */,
+				8BAB307B10BC4C84002E1AC9 /* PFMoveApplication.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10839,6 +10882,14 @@
 			name = WelcomeWindow.xib;
 			sourceTree = "<group>";
 		};
+		8BAB322810BC55D2002E1AC9 /* MoveApplication.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8BAB322910BC55D2002E1AC9 /* en_US */,
+			);
+			name = MoveApplication.strings;
+			sourceTree = "<group>";
+		};
 		8BC685550F5ED38C003B5C6A /* SetUpAccount.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -12351,6 +12402,34 @@
 			};
 			name = "Debug-gcov";
 		};
+		8BAB339210BC81A8002E1AC9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "Delete Preferences";
+			};
+			name = Debug;
+		};
+		8BAB339310BC81A8002E1AC9 /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "Delete Preferences";
+			};
+			name = "Debug-gcov";
+		};
+		8BAB339410BC81A8002E1AC9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "Delete Preferences";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		8BC6E3FB0FAABE73005A0F6F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -13051,6 +13130,16 @@
 				8B95AA0F10642867000C4C6B /* Debug */,
 				8B95AA1010642867000C4C6B /* Debug-gcov */,
 				8B95AA1110642867000C4C6B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8BAB33A810BC81C6002E1AC9 /* Build configuration list for PBXAggregateTarget "Delete Preferences" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BAB339210BC81A8002E1AC9 /* Debug */,
+				8BAB339310BC81A8002E1AC9 /* Debug-gcov */,
+				8BAB339410BC81A8002E1AC9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

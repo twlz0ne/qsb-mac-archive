@@ -54,6 +54,7 @@
 #import "QSBSearchViewController.h"
 #import "GTMNSObject+KeyValueObserving.h"
 #import "QLUIPrivate.h"
+#import "PFMoveApplication.h"
 
 // Local pref set once we've been launched. Used to control whether or not we
 // show the help window at startup.
@@ -63,24 +64,24 @@ NSString *const kQSBBeenLaunchedPrefKey = @"QSBBeenLaunchedPrefKey";
 // It is a dictionary with two keys:
 // kQSBPluginConfigurationPrefVersionKey
 // and kQSBPluginConfigurationPrefPluginsKey.
-static NSString *const kQSBPluginConfigurationPrefKey 
+static NSString *const kQSBPluginConfigurationPrefKey
   = @"QSBPluginConfigurationPrefKey";
 // The version of the preferences data stored in the dictionary (NSNumber).
-static NSString *const kQSBPluginConfigurationPrefVersionKey 
+static NSString *const kQSBPluginConfigurationPrefVersionKey
   = @"QSBPluginConfigurationPrefVersionKey";
 // The key for an NSArray of plugin configuration information.
-static NSString *const kQSBPluginConfigurationPrefPluginsKey 
+static NSString *const kQSBPluginConfigurationPrefPluginsKey
   = @"QSBPluginConfigurationPrefPluginsKey";
 static const NSInteger kQSBPluginConfigurationPrefCurrentVersion = 1;
 
 // The preference containing the information about our known
 // accounts. It is a dictionary with one key (kQSBAccountsPrefKey) that
-// contains an array of accounts.  Older versions of preferences have an 
-// outer dictionary container with this key (kQSBAccountsPrefKey) which 
+// contains an array of accounts.  Older versions of preferences have an
+// outer dictionary container with this key (kQSBAccountsPrefKey) which
 // contained the array of accounts with the kQSBAccountsPrefAccountsKey.
 static NSString *const kQSBAccountsPrefKey = @"QSBAccountsPrefKey";
 // The old key for an NSArray of account information.
-static NSString *const kQSBAccountsPrefAccountsKey 
+static NSString *const kQSBAccountsPrefAccountsKey
   = @"QSBAccountsPrefAccountsKey";
 
 
@@ -175,25 +176,25 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     hgsDelegate_ = [[QSBHGSDelegate alloc] init];
     [[HGSPluginLoader sharedPluginLoader] setDelegate:hgsDelegate_];
 
-    NSNotificationCenter *wsNotificationCenter 
+    NSNotificationCenter *wsNotificationCenter
       = [[NSWorkspace sharedWorkspace] notificationCenter];
-    [wsNotificationCenter addObserver:self 
-                             selector:@selector(didLaunchApp:) 
-                                 name:NSWorkspaceDidLaunchApplicationNotification 
+    [wsNotificationCenter addObserver:self
+                             selector:@selector(didLaunchApp:)
+                                 name:NSWorkspaceDidLaunchApplicationNotification
                                object:nil];
-    [wsNotificationCenter addObserver:self 
-                             selector:@selector(didTerminateApp:) 
-                                 name:NSWorkspaceDidTerminateApplicationNotification 
+    [wsNotificationCenter addObserver:self
+                             selector:@selector(didTerminateApp:)
+                                 name:NSWorkspaceDidTerminateApplicationNotification
                                object:nil];
-    
+
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(presentMessageToUser:) 
-               name:kHGSUserMessageNotification 
+    [nc addObserver:self
+           selector:@selector(presentMessageToUser:)
+               name:kHGSUserMessageNotification
              object:nil];
-    [nc addObserver:self 
-           selector:@selector(pluginsDidInstall:) 
-               name:kHGSPluginLoaderDidInstallPluginsNotification 
+    [nc addObserver:self
+           selector:@selector(pluginsDidInstall:)
+               name:kHGSPluginLoaderDidInstallPluginsNotification
              object:[HGSPluginLoader sharedPluginLoader]];
     [QSBPreferences registerDefaults];
     BOOL iconInDock
@@ -203,15 +204,15 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       TransformProcessType(&psn, kProcessTransformToForegroundApplication);
     }
     searchWindowController_ = [[QSBSearchWindowController alloc] init];
-    
+
     NSArray *supportedTypes
       = [NSArray arrayWithObjects:NSStringPboardType, NSRTFPboardType, nil];
     [NSApp registerServicesMenuSendTypes:supportedTypes
                              returnTypes:supportedTypes];
-    
+
     [NSApp setServicesProvider:self];
     NSUpdateDynamicServices();
-    
+
 #if QSB_BUILD_WITH_GROWL
     [GrowlApplicationBridge setGrowlDelegate:self];
 #endif  // QSB_BUILD_WITH_GROWL
@@ -224,22 +225,22 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [userMessenger_ release];
   [statusItem_ release];
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  [defaults gtm_removeObserver:self 
+  [defaults gtm_removeObserver:self
                     forKeyPath:kQSBHotKeyKey
                       selector:@selector(hotKeyValueChanged:)];
-  [defaults gtm_removeObserver:self 
+  [defaults gtm_removeObserver:self
                     forKeyPath:kQSBHotKeyKeyEnabled
                       selector:@selector(hotKeyValueChanged:)];
-  [defaults gtm_removeObserver:self 
+  [defaults gtm_removeObserver:self
                     forKeyPath:kQSBHotKeyKey2
                       selector:@selector(hotKeyValueChanged:)];
-  [defaults gtm_removeObserver:self 
+  [defaults gtm_removeObserver:self
                     forKeyPath:kQSBHotKeyKey2Enabled
                       selector:@selector(hotKeyValueChanged:)];
-  [defaults gtm_removeObserver:self 
+  [defaults gtm_removeObserver:self
                     forKeyPath:kQSBIconInMenubarKey
                       selector:@selector(iconInMenubarValueChanged:)];
-  NSNotificationCenter *workspaceNC 
+  NSNotificationCenter *workspaceNC
     = [[NSWorkspace sharedWorkspace] notificationCenter];
   [workspaceNC removeObserver:self];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -254,7 +255,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)awakeFromNib {
   // set up all our menu bar UI
   [self updateIconInMenubar];
-  
+
   // watch for prefs changing
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   [defaults gtm_addObserver:self
@@ -302,7 +303,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // and if we are in the process of activating, we want to ignore the hotkey
   // so we don't try to process it twice.
   if (!hotModifiers_ || [NSApp keyWindow]) return;
-  
+
   NSUInteger flags = [event qsbModifierFlags];
   if (flags != hotModifiers_) return;
   const useconds_t oneMilliSecond = 10000;
@@ -328,10 +329,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   invertedHotMap = [invertedHotMap keyMapByInverting];
   NSTimeInterval startDate = [NSDate timeIntervalSinceReferenceDate];
   BOOL isGood = NO;
-  while(([NSDate timeIntervalSinceReferenceDate] - startDate) 
+  while(([NSDate timeIntervalSinceReferenceDate] - startDate)
         < [self doubleClickTime]) {
     QSBKeyMap *currentKeyMap = [QSBKeyMap currentKeyMap];
-    if ([currentKeyMap containsAnyKeyIn:invertedHotMap] 
+    if ([currentKeyMap containsAnyKeyIn:invertedHotMap]
         || GetCurrentButtonState()) {
       return;
     }
@@ -345,10 +346,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if (!isGood) return;
   isGood = NO;
   startDate = [NSDate timeIntervalSinceReferenceDate];
-  while(([NSDate timeIntervalSinceReferenceDate] - startDate) 
+  while(([NSDate timeIntervalSinceReferenceDate] - startDate)
         < [self doubleClickTime]) {
     QSBKeyMap *currentKeyMap = [QSBKeyMap currentKeyMap];
-    if ([currentKeyMap containsAnyKeyIn:invertedHotMap] 
+    if ([currentKeyMap containsAnyKeyIn:invertedHotMap]
         || GetCurrentButtonState()) {
       return;
     }
@@ -361,7 +362,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
   if (!isGood) return;
   startDate = [NSDate timeIntervalSinceReferenceDate];
-  while(([NSDate timeIntervalSinceReferenceDate] - startDate) 
+  while(([NSDate timeIntervalSinceReferenceDate] - startDate)
         < [self doubleClickTime]) {
     QSBKeyMap *currentKeyMap = [QSBKeyMap currentKeyMap];
     if ([currentKeyMap containsAnyKeyIn:invertedHotMap]) {
@@ -443,7 +444,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [[NSWorkspace sharedWorkspace] openURL:homepageURL];
 }
 
-- (IBAction)sendFeedbackToGoogle:(id)sender { 
+- (IBAction)sendFeedbackToGoogle:(id)sender {
   NSBundle *bundle = [NSBundle mainBundle];
   NSString *feedbackStr = [bundle objectForInfoDictionaryKey:kQSBFeedbackKey];
   NSURL *feedbackURL = [NSURL URLWithString:feedbackStr];
@@ -455,7 +456,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)updateIconInMenubar {
-  BOOL iconInMenubar 
+  BOOL iconInMenubar
     = [[NSUserDefaults standardUserDefaults] boolForKey:kQSBIconInMenubarKey];
   NSStatusBar *statusBar = [NSStatusBar systemStatusBar];
   if (iconInMenubar) {
@@ -477,7 +478,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)updateHotKeyRegistration {
-  GTMCarbonEventDispatcherHandler *dispatcher 
+  GTMCarbonEventDispatcherHandler *dispatcher
     = [GTMCarbonEventDispatcherHandler sharedEventDispatcherHandler];
 
   // Remove any hotkey we currently have.
@@ -527,7 +528,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [statusMenuItem setKeyEquivalentModifierMask:statusMenuItemModifiers];
 }
 
-- (QSBSearchWindowController *)searchWindowController { 
+- (QSBSearchWindowController *)searchWindowController {
   return searchWindowController_;
 }
 
@@ -546,35 +547,35 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // the screensaver is frontmost), but we can at least try to make it
   // less likely.
   // Also check to see if frontRow is running, and if so beep and don't
-  // activate. 
+  // activate.
   // For http://buganizer/issue?id=652067
   if ([self isScreenSaverActive] || [self frontRowActive]) {
     NSBeep();
     return;
   }
-  
+
   [searchWindowController_ hitHotKey:sender];
 }
 
 - (BOOL)isScreenSaverActive {
-  NSDictionary *processInfo 
-  = [[NSWorkspace sharedWorkspace] gtm_processInfoDictionaryForActiveApp];    
-  NSString *bundlePath 
+  NSDictionary *processInfo
+  = [[NSWorkspace sharedWorkspace] gtm_processInfoDictionaryForActiveApp];
+  NSString *bundlePath
   = [processInfo objectForKey:kGTMWorkspaceRunningBundlePath];
   // ScreenSaverEngine is the frontmost app if the screen saver is actually
   // running Security Agent is the frontmost app if the "enter password"
   // dialog is showing
-  return ([bundlePath hasSuffix:@"ScreenSaverEngine.app"] 
+  return ([bundlePath hasSuffix:@"ScreenSaverEngine.app"]
           || [bundlePath hasSuffix:@"SecurityAgent.app"]);
 }
 
 - (BOOL)frontRowActive {
   // Can't use NSWorkspace here because of
-  // rdar://5049713 When FrontRow is frontmost app, 
+  // rdar://5049713 When FrontRow is frontmost app,
   // [NSWorkspace -activeApplication] returns nil
-  NSDictionary *processDict 
+  NSDictionary *processDict
   = [[NSWorkspace sharedWorkspace] gtm_processInfoDictionaryForActiveApp];
-  NSString *bundleID 
+  NSString *bundleID
   = [processDict objectForKey:kGTMWorkspaceRunningBundleIdentifier];
   return [bundleID isEqualToString:@"com.apple.frontrow"];
 }
@@ -586,7 +587,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   for (NSMenuItem *item in items) {
     NSString *appName = @"$APPNAME$";
     NSString *title = [item title];
-    
+
     if ([title rangeOfString:appName].length != 0) {
       NSString *newTitle = [title stringByReplacingOccurrencesOfString:appName
                                                             withString:newName];
@@ -602,10 +603,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 // Returns the amount of time between two clicks to be considered a double click
 - (NSTimeInterval)doubleClickTime {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSTimeInterval doubleClickThreshold 
+  NSTimeInterval doubleClickThreshold
     = [defaults doubleForKey:@"com.apple.mouse.doubleClickThreshold"];
-    
-  // if we couldn't find the value in the user defaults, take a 
+
+  // if we couldn't find the value in the user defaults, take a
   // conservative estimate
   if (doubleClickThreshold <= 0.0) {
     doubleClickThreshold = 1.0;
@@ -621,12 +622,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if (otherQSBPSN_.highLongOfPSN == 0 && otherQSBPSN_.lowLongOfPSN == 0) {
     NSDictionary *userInfo = [notification userInfo];
     ProcessSerialNumber psn;
-    psn.highLongOfPSN 
+    psn.highLongOfPSN
       = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
-    psn.lowLongOfPSN 
+    psn.lowLongOfPSN
       = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberLow"] unsignedIntValue];
     NSDictionary *info
-      = GTMCFAutorelease(ProcessInformationCopyDictionary(&psn, 
+      = GTMCFAutorelease(ProcessInformationCopyDictionary(&psn,
                                                           kProcessDictionaryIncludeAllInformationMask));
     // bundleID is "optional"
     NSString *bundleID = [info objectForKey:(NSString*)kCFBundleIdentifierKey];
@@ -635,27 +636,27 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     MacGetCurrentProcess(&myPSN);
     NSString *myBundleID = [[NSBundle mainBundle] bundleIdentifier];
     Boolean sameProcess;
-    if (SameProcess(&myPSN, &psn, &sameProcess) == noErr 
-        && !sameProcess 
+    if (SameProcess(&myPSN, &psn, &sameProcess) == noErr
+        && !sameProcess
         && [bundleID isEqualToString:myBundleID]) {
       otherQSBPSN_ = psn;
-      
+
       // Fade out our dock tile
       NSDockTile *tile = [NSApp dockTile];
       NSRect tileRect = GTMNSRectOfSize([tile size]);
       NSImage *appImage = [NSImage imageNamed:@"NSApplicationIcon"];
-      NSImage *newImage 
+      NSImage *newImage
         = [[[NSImage alloc] initWithSize:tileRect.size] autorelease];
       [newImage lockFocus];
       [appImage drawInRect:tileRect
-                  fromRect:GTMNSRectOfSize([appImage size]) 
+                  fromRect:GTMNSRectOfSize([appImage size])
                  operation:NSCompositeCopy
                   fraction:0.3];
       [newImage unlockFocus];
-      NSImageView *imageView 
+      NSImageView *imageView
         = [[[NSImageView alloc] initWithFrame:tileRect] autorelease];
       [imageView setImageFrameStyle:NSImageFrameNone];
-      [imageView setImageScaling:NSImageScaleProportionallyDown];      
+      [imageView setImageScaling:NSImageScaleProportionallyDown];
       [imageView setImage:newImage];
       [tile setContentView:imageView];
       [tile display];
@@ -667,13 +668,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if (otherQSBPSN_.highLongOfPSN != 0 || otherQSBPSN_.lowLongOfPSN != 0) {
     NSDictionary *userInfo = [notification userInfo];
     ProcessSerialNumber psn;
-    psn.highLongOfPSN 
+    psn.highLongOfPSN
       = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
-    psn.lowLongOfPSN 
+    psn.lowLongOfPSN
       = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberLow"] unsignedIntValue];
-    
+
     Boolean sameProcess;
-    if (SameProcess(&otherQSBPSN_, &psn, &sameProcess) == noErr 
+    if (SameProcess(&otherQSBPSN_, &psn, &sameProcess) == noErr
         && sameProcess) {
       otherQSBPSN_.highLongOfPSN = 0;
       otherQSBPSN_.lowLongOfPSN = 0;
@@ -698,7 +699,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   for (NSDictionary *error in errors) {
     NSString *type = [error objectForKey:kHGSPluginLoaderPluginFailureKey];
     if (![type isEqualToString:kHGSPluginLoaderPluginFailedUnknownPluginType]) {
-      HGSLogDebug(@"Unable to load %@ (%@)", 
+      HGSLogDebug(@"Unable to load %@ (%@)",
                   [error objectForKey:kHGSPluginLoaderPluginPathKey], type);
     }
   }
@@ -708,14 +709,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // inventoried plug-ins
   NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
   NSArray *pluginsFromPrefs = nil;
-  NSDictionary *pluginPrefs 
+  NSDictionary *pluginPrefs
     = [standardDefaults objectForKey:kQSBPluginConfigurationPrefKey];
   // Check to make sure our plugin data is valid.
   if ([pluginPrefs isKindOfClass:[NSDictionary class]]) {
-    NSNumber *version 
+    NSNumber *version
       = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefVersionKey];
     if ([version integerValue] == kQSBPluginConfigurationPrefCurrentVersion) {
-      pluginsFromPrefs 
+      pluginsFromPrefs
         = [pluginPrefs objectForKey:kQSBPluginConfigurationPrefPluginsKey];
     }
   }
@@ -727,9 +728,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)updatePluginsPreferences {
   NSArray *pluginState = [[HGSPluginLoader sharedPluginLoader] pluginsState];
   NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
-  NSNumber *version 
+  NSNumber *version
     = [NSNumber numberWithInteger:kQSBPluginConfigurationPrefCurrentVersion];
-  NSDictionary *pluginsDict 
+  NSDictionary *pluginsDict
     = [NSDictionary dictionaryWithObjectsAndKeys:
        pluginState, kQSBPluginConfigurationPrefPluginsKey,
        version, kQSBPluginConfigurationPrefVersionKey,
@@ -744,7 +745,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSMutableArray *sourceExtensions = [NSMutableArray array];
   for (HGSPlugin *plugin in [self plugins]) {
     for (HGSProtoExtension *protoExtension in [plugin protoExtensions]) {
-      if ([protoExtension 
+      if ([protoExtension
             isUserVisibleAndExtendsExtensionPoint:kHGSSourcesExtensionPoint]) {
         [sourceExtensions addObject:protoExtension];
       }
@@ -758,7 +759,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   for (HGSPlugin *plugin in plugins) {
     [plugin gtm_addObserver:self
                  forKeyPath:kQSBProtoExtensionsKVOKey
-                   selector:@selector(protoExtensionsValueChanged:) 
+                   selector:@selector(protoExtensionsValueChanged:)
                    userInfo:nil
                     options:0];
   }
@@ -767,7 +768,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)stopObservingProtoExtensions {
   NSArray *plugins = [self plugins];
   for (HGSPlugin *plugin in plugins) {
-    [plugin gtm_removeObserver:self 
+    [plugin gtm_removeObserver:self
                     forKeyPath:kQSBProtoExtensionsKVOKey
                       selector:@selector(protoExtensionsValueChanged:)];
   }
@@ -797,7 +798,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)updateAccountsPreferences {
   // Update preferences to current account knowledge.
   NSArray *archivableAccounts
-    = [[HGSExtensionPoint accountsPoint] accountsAsArray]; 
+    = [[HGSExtensionPoint accountsPoint] accountsAsArray];
   NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
   [standardDefaults setObject:archivableAccounts
                        forKey:kQSBAccountsPrefKey];
@@ -807,12 +808,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 #pragma mark Application Delegate Methods
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
+  PFMoveToApplicationsFolderIfNecessary();
+
   [self updateHotKeyRegistration];
-  
+
   [self updateMenuWithAppName:[NSApp mainMenu]];
   [self updateMenuWithAppName:dockMenu_];
   [self updateMenuWithAppName:statusItemMenu_];
-  
+
   // Inventory the application and plugin Apple Script sdef files.
   [self composeApplicationAEDictionary];
 
@@ -827,7 +830,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
   // Inventory and process all plugins and extensions.
   [self inventoryPlugins];
-  
+
   // Now that all the plugins are loaded, start listening to them. We didn't
   // want to do it earlier as there is a lot of enabled/disabled messages
   // flying around that we don't actually care about.
@@ -840,22 +843,22 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
          selector:@selector(actionDidPerformNotification:)
              name:kHGSActionDidPerformNotification
            object:nil];
-  [nc addObserver:self 
+  [nc addObserver:self
          selector:@selector(pluginOrExtensionDidChangeEnabled:)
              name:kHGSPluginDidChangeEnabledNotification
            object:nil];
-  [nc addObserver:self 
+  [nc addObserver:self
          selector:@selector(pluginOrExtensionDidChangeEnabled:)
              name:kHGSExtensionDidChangeEnabledNotification
            object:nil];
   HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
-  [nc addObserver:self 
-         selector:@selector(didAddOrRemoveAccount:) 
-             name:kHGSExtensionPointDidAddExtensionNotification 
+  [nc addObserver:self
+         selector:@selector(didAddOrRemoveAccount:)
+             name:kHGSExtensionPointDidAddExtensionNotification
            object:accountsPoint];
-  [nc addObserver:self 
-         selector:@selector(didAddOrRemoveAccount:) 
-             name:kHGSExtensionPointDidRemoveExtensionNotification 
+  [nc addObserver:self
+         selector:@selector(didAddOrRemoveAccount:)
+             name:kHGSExtensionPointDidRemoveExtensionNotification
            object:accountsPoint];
 }
 
@@ -863,7 +866,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                     hasVisibleWindows:(BOOL)flag {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kQSBApplicationDidReopenNotification
-                    object:NSApp];  
+                    object:NSApp];
   return NO;
 }
 
@@ -880,22 +883,22 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
   if (hotKey_) {
-    GTMCarbonEventDispatcherHandler *dispatcher 
+    GTMCarbonEventDispatcherHandler *dispatcher
       = [GTMCarbonEventDispatcherHandler sharedEventDispatcherHandler];
     [dispatcher unregisterHotKey:hotKey_];
     hotKey_ = nil;
   }
-  
+
   // Clean up our dock tile in case it got modified when
   // another qsb was launched.
   NSDockTile *tile = [NSApp dockTile];
   [tile setContentView:nil];
   [tile display];
-  
+
   // Set it so we don't think this is first launch anymore
-  [[NSUserDefaults standardUserDefaults] setBool:YES 
+  [[NSUserDefaults standardUserDefaults] setBool:YES
                                           forKey:kQSBBeenLaunchedPrefKey];
-  
+
   // Uninstall all extensions.
   [[self plugins] makeObjectsPerformSelector:@selector(uninstall)];
 }
@@ -925,7 +928,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   } else {
     HGSResultArray *results = [HGSResultArray arrayWithFilePaths:fileList];
     [searchWindowController_ selectResults:results];
-    [searchWindowController_ showSearchWindowBecause:kQSBFilesFromFinderChangeVisiblityToggle];    
+    [searchWindowController_ showSearchWindowBecause:kQSBFilesFromFinderChangeVisiblityToggle];
     [app replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
   }
 }
@@ -942,7 +945,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     userText = [userText stringByTrimmingCharactersInSet:ws];
     [searchWindowController_ searchForString:userText];
   }
-  [searchWindowController_ showSearchWindowBecause:kQSBServicesMenuChangeVisiblityToggle];    
+  [searchWindowController_ showSearchWindowBecause:kQSBServicesMenuChangeVisiblityToggle];
 }
 
 #pragma mark Notifications
@@ -976,14 +979,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                forKeyPath:kQSBPluginsScriptingKVOKey
                  selector:@selector(pluginsValueChanged:)
                  userInfo:nil
-                  options:(NSKeyValueObservingOptionPrior 
+                  options:(NSKeyValueObservingOptionPrior
                            | NSKeyValueObservingOptionInitial)];
 }
 
 - (void)pluginsValueChanged:(GTMKeyValueChangeNotification *)notification {
   NSNumber *prior = [[notification change]
                      objectForKey:NSKeyValueChangeNotificationIsPriorKey];
-  
+
   if ([prior boolValue]) {
     [self stopObservingProtoExtensions];
   } else {
@@ -1022,7 +1025,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       [sdefPaths addObjectsFromArray:bundleSDEFPaths];
     }
   }
-  
+
   if ([sdefPaths count]) {
     // load the first .sdef file's xml data.  All of the scripting definitions
     // from the app and the plugins will be combined into one NSXMLDocument and
@@ -1061,7 +1064,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       }
       [sdefXML setCharacterEncoding:
        (NSString *)CFStringConvertEncodingToIANACharSetName(kCFStringEncodingUTF8)];
-      // The newer version of libxml in Mac OS X 10.6.1 has a couple more 
+      // The newer version of libxml in Mac OS X 10.6.1 has a couple more
       // fields in the sax parser struct, one of which isn't getting
       // initialized properly.  As a workaround, these fields are never
       // accessed if -[NSXMLDocument setStandAlone:NO] is called.
@@ -1100,8 +1103,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 #else
     SEL selector = @selector(presentUserMessageViaMessenger:);
 #endif  // QSB_BUILD_WITH_GROWL
-    [self performSelectorOnMainThread:selector 
-                           withObject:messageDict 
+    [self performSelectorOnMainThread:selector
+                           withObject:messageDict
                         waitUntilDone:NO];
   }
 }
@@ -1171,7 +1174,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 #if QSB_BUILD_WITH_GROWL
   BOOL installed = [GrowlApplicationBridge isGrowlInstalled];
   BOOL running = [GrowlApplicationBridge isGrowlRunning];
-  return installed && running;  
+  return installed && running;
 #else
   return NO;
 #endif  // QSB_BUILD_WITH_GROWL
@@ -1182,7 +1185,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   BOOL growlRunning = [self growlIsInstalledAndRunning];
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   BOOL userWantsGrowl = [defaults boolForKey:kQSBUseGrowlKey];
-  return growlRunning && userWantsGrowl;  
+  return growlRunning && userWantsGrowl;
 #else
   return NO;
 #endif  // QSB_BUILD_WITH_GROWL
@@ -1206,7 +1209,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 @implementation NSEvent (QSBApplicationEventAdditions)
 
 - (NSUInteger)qsbModifierFlags {
-  NSUInteger flags 
+  NSUInteger flags
     = ([self modifierFlags] & NSDeviceIndependentModifierFlagsMask);
   // Ignore caps lock if it's set http://b/issue?id=637380
   if (flags & NSAlphaShiftKeyMask) flags -= NSAlphaShiftKeyMask;
