@@ -8528,7 +8528,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "rm \"${HOME}/Library/Preferences/com.google.qsb.plist\"";
+			shellScript = "rm \"${HOME}/Library/Preferences/com.google.qsb.plist\"\nrm -Rf \"${HOME}/Library/Caches/Google/Quick Search Box\"\nrm  \"${HOME}/Library/Application Support/Google/Quick Search Box/shortcuts.db\"";
 		};
 		8BB905BA101F9C3B00B93AD9 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
