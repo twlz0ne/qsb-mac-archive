@@ -38,15 +38,17 @@
 @interface ApplicationsSource : HGSMemorySearchSource {
  @private
   NSMetadataQuery *query_;
-  NSCondition *condition_;
-  BOOL indexing_;
 }
 
 - (void)startQuery:(NSTimer *)timer;
 
+// Do a fast index of the most likely app locations 
+// (/Applications and ~/Applications).
+- (void)fastIndex;
+
 @end
 
-static NSString *const kApplicationSourcePredicateString 
+static NSString *const kApplicationSourcePredicateString
   = @"(kMDItemContentTypeTree == 'com.apple.application') "
     @"|| (kMDItemContentTypeTree == 'com.apple.systempreference.prefpane')";
 
@@ -57,30 +59,28 @@ static NSString *const kApplicationSourcePredicateString
     // kick off a spotlight query for applications. it'll be a standing
     // query that we keep around for the duration of this source.
     query_ = [[NSMetadataQuery alloc] init];
-    NSPredicate *predicate 
+    NSPredicate *predicate
       = [NSPredicate predicateWithFormat:kApplicationSourcePredicateString];
     NSArray *scope = [NSArray arrayWithObject:NSMetadataQueryLocalComputerScope];
     [query_ setSearchScopes:scope];
-    NSSortDescriptor *desc 
-      = [[[NSSortDescriptor alloc] initWithKey:(id)kMDItemLastUsedDate 
+    NSSortDescriptor *desc
+      = [[[NSSortDescriptor alloc] initWithKey:(id)kMDItemLastUsedDate
                                      ascending:NO] autorelease];
     [query_ setSortDescriptors:[NSArray arrayWithObject:desc]];
     [query_ setPredicate:predicate];
     [query_ setNotificationBatchingInterval:10];
-    
+
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(queryNotification:) 
-               name:nil 
+    [nc addObserver:self
+           selector:@selector(queryNotification:)
+               name:nil
              object:query_];
-    condition_ = [[NSCondition alloc] init];
     if (![self loadResultsCache]) {
-      // Cache didn't exist, hold queries until the first indexing run completes
-      [self startQuery:nil];
+      [self fastIndex];
     } else {
-      // TODO(alcor): this retains us even if everyone else releases. 
+      // TODO(alcor): this retains us even if everyone else releases.
       // add a teardown function for sources where they can invalidate
-      [self performSelector:@selector(startQuery:) 
+      [self performSelector:@selector(startQuery:)
                  withObject:nil
                  afterDelay:10];
     }
@@ -92,7 +92,6 @@ static NSString *const kApplicationSourcePredicateString
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self];
   [query_ release];
-  [condition_ release];
   [super dealloc];
 }
 
@@ -117,7 +116,7 @@ static NSString *const kApplicationSourcePredicateString
     // Only match pref panes if they are installed.
     // TODO(stuartmorgan): This should actually be looking specifically in the
     // boot volume
-    suppress = ([path rangeOfString:@"/PreferencePanes/"].location 
+    suppress = ([path rangeOfString:@"/PreferencePanes/"].location
                 == NSNotFound);
   } else if ([path rangeOfString:@"/Library/"].location != NSNotFound) {
     // TODO(alcor): verify that these paths actually exist, or filter on bndleid
@@ -141,8 +140,6 @@ static NSString *const kApplicationSourcePredicateString
 }
 
 - (void)parseResultsOperation:(NSMetadataQuery *)query {
-  [condition_ lock];
-  indexing_ = YES;
   [self clearResultIndex];
   NSArray *mdAttributeNames = [NSArray arrayWithObjects:
                                (NSString *)kMDItemTitle,
@@ -152,18 +149,20 @@ static NSString *const kApplicationSourcePredicateString
                                (NSString *)kMDItemCFBundleIdentifier,
                                nil];
   NSUInteger resultCount = [query resultCount];
-  //TODO(dmaclach): remove this once real ranking is in
-  NSNumber *rank = [NSNumber numberWithFloat:0.9f];
   NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag];
-  NSMutableDictionary *attributes
-    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-       rankFlags, kHGSObjectAttributeRankFlagsKey,
-       rank, kHGSObjectAttributeRankKey,
-       nil];
-  NSString *prefPaneString = HGSLocalizedString(@"Preference Pane", 
+  NSMutableDictionary *regularAttributes
+    = [NSMutableDictionary dictionaryWithObject:rankFlags
+                                         forKey:kHGSObjectAttributeRankFlagsKey];
+  rankFlags = [NSNumber numberWithUnsignedInt:(eHGSLaunchableRankFlag
+                                               | eHGSBelowFoldRankFlag)];
+  NSMutableDictionary *belowFoldAttributes
+    = [NSMutableDictionary dictionaryWithObject:rankFlags
+                                         forKey:kHGSObjectAttributeRankFlagsKey];
+  NSString *prefPaneString = HGSLocalizedString(@"Preference Pane",
                                                 @"A label denoting that this "
                                                 @"result is a System "
                                                 @"Preference Pane");
+  NSFileManager *fileManager = [NSFileManager defaultManager];
   for (NSUInteger i = 0; i < resultCount; ++i) {
     NSMetadataItem *result = [query resultAtIndex:i];
     NSDictionary *mdAttributes = [result valuesForAttributes:mdAttributeNames];
@@ -171,18 +170,40 @@ static NSString *const kApplicationSourcePredicateString
 
     if ([self pathShouldBeSuppressed:path])
       continue;
-    
+
     NSString *name = [mdAttributes objectForKey:(NSString*)kMDItemTitle];
     if (!name) {
       name = [mdAttributes objectForKey:(NSString*)kMDItemDisplayName];
     }
-    
-    NSString *fileSystemName = [path lastPathComponent];
+
+    NSArray *components = [path pathComponents];
+
+    NSString *fileSystemName = [components objectAtIndex:[components count] - 1];
     fileSystemName = [fileSystemName stringByDeletingPathExtension];
     if (!name) {
       name = fileSystemName;
     }
-        
+
+    NSMutableDictionary *attributes = regularAttributes;
+
+    // Check to see if this same path exists on our root drive without
+    // "Volumes/DriveName" on the front. If so, we will push it beneath the
+    // fold because it is probably a dual boot system.
+    if ([components count] > 3
+        && [[components objectAtIndex:1] isEqualToString:@"Volumes"]) {
+      NSRange range = NSMakeRange(3, [components count] - 3);
+      NSMutableArray *matchPathArray = [NSMutableArray arrayWithObject:@"/"];
+      [matchPathArray addObjectsFromArray:[components subarrayWithRange:range]];
+      NSString *matchPath = [NSString pathWithComponents:matchPathArray];
+      NSDictionary *fileAttrs = [fileManager attributesOfItemAtPath:matchPath
+                                                              error:nil];
+      if (fileAttrs) {
+        // We have the exact same file on our system drive. Most likely an
+        // alternate drive, or backup drive.
+        attributes = belowFoldAttributes;
+      }
+    }
+
     if ([self pathIsPrefPane:path]) {
       // Some prefpanes forget to localize their names and end up with
       // foo.prefpane as their kMDItemTitle. foo.prefPane Preference Pane looks
@@ -196,28 +217,28 @@ static NSString *const kApplicationSourcePredicateString
     if ([[path pathExtension] caseInsensitiveCompare:@"app"] == NSOrderedSame) {
       name = [name stringByDeletingPathExtension];
     }
-        
+
     // set last used date
     NSDate *date = [mdAttributes objectForKey:(NSString*)kMDItemLastUsedDate];
     if (!date) {
       date = [NSDate distantPast];
     }
-    
+
     [attributes setObject:date forKey:kHGSObjectAttributeLastUsedDateKey];
 
     // Grab a bundle ID
-    NSString *bundleID 
+    NSString *bundleID
       = [mdAttributes objectForKey:(NSString *)kMDItemCFBundleIdentifier];
     if (bundleID) {
       [attributes setObject:bundleID forKey:kHGSObjectAttributeBundleIDKey];
     }
-    
+
     // create a HGSResult to talk to the rest of the application
-    HGSResult *hgsResult 
+    HGSResult *hgsResult
       = [HGSResult resultWithFilePath:path
                           source:self
                       attributes:attributes];
-    
+
     // add it to the result array for searching
     // By adding the display name and the file system name this should help
     // with the can't find Quicksilver problem because somebody decided
@@ -230,7 +251,7 @@ static NSString *const kApplicationSourcePredicateString
       [self indexResult:hgsResult];
     }
   }
-  
+
   // Due to a bug in 10.5.6 we can't find the network prefpane
   // add it by hand
   // Radar 6495591 Can't find network prefpane using spotlight
@@ -238,30 +259,26 @@ static NSString *const kApplicationSourcePredicateString
   NSBundle *networkBundle = [NSBundle bundleWithPath:networkPath];
 
   if (networkBundle) {
-    NSString *name 
+    NSString *name
       = [networkBundle objectForInfoDictionaryKey:@"NSPrefPaneIconLabel"];
     name = [name stringByAppendingFormat:@" %@", prefPaneString];
     // Unfortunately last used date is hidden from us.
-    [attributes removeObjectForKey:kHGSObjectAttributeLastUsedDateKey];
-    [attributes setObject:@"com.apple.preference.network"
-                   forKey:kHGSObjectAttributeBundleIDKey];
+    [regularAttributes removeObjectForKey:kHGSObjectAttributeLastUsedDateKey];
+    [regularAttributes setObject:@"com.apple.preference.network"
+                          forKey:kHGSObjectAttributeBundleIDKey];
     NSURL *url = [NSURL fileURLWithPath:networkPath];
-    HGSResult *hgsResult 
+    HGSResult *hgsResult
       = [HGSResult resultWithURI:[url absoluteString]
                             name:name
                             type:kHGSTypeFileApplication
                           source:self
-                      attributes:attributes];
+                      attributes:regularAttributes];
 
     [self indexResult:hgsResult];
   } else {
     HGSLog(@"Unable to find Network.prefpane");
   }
-  
-  indexing_ = NO;
-  [condition_ signal];
-  [condition_ unlock];
-  
+
   [self saveResultsCache];
   [query enableUpdates];
 }
@@ -271,8 +288,8 @@ static NSString *const kApplicationSourcePredicateString
   if ([name isEqualToString:NSMetadataQueryDidFinishGatheringNotification]
       || [name isEqualToString:NSMetadataQueryDidUpdateNotification] ) {
     NSMetadataQuery *query = [notification object];
-    [query_ disableUpdates]; 
-    NSOperation *op 
+    [query_ disableUpdates];
+    NSOperation *op
       = [[[NSInvocationOperation alloc] initWithTarget:self
                                               selector:@selector(parseResultsOperation:)
                                                 object:query]
@@ -295,18 +312,7 @@ static NSString *const kApplicationSourcePredicateString
   return isValid;
 }
 
-- (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
-  // Put a hold on queries while indexing
-  [condition_ lock];
-  while (indexing_) {
-    [condition_ wait];
-  }
-  [condition_ signal];
-  [condition_ unlock];
-  [super performSearchOperation:operation];
-}
-
-- (HGSResult *)preFilterResult:(HGSResult *)result 
+- (HGSResult *)preFilterResult:(HGSResult *)result
                matchesForQuery:(HGSQuery*)query
                    pivotObject:(HGSResult *)pivotObject {
   if (pivotObject) {
@@ -319,32 +325,43 @@ static NSString *const kApplicationSourcePredicateString
   return result;
 }
 
-- (HGSResult *)postFilterResult:(HGSMutableResult *)result 
-                matchesForQuery:(HGSQuery *)query
-                    pivotObject:(HGSResult *)pivotObject {
-  NSString *filePath = [result filePath];
-  CGFloat weakRank = HGSCalibratedScore(kHGSCalibratedWeakScore);
-  if ([result rank] > weakRank) {
-    if ([filePath hasPrefix:@"/Volumes/"]) {
-      // Not on our boot drive. Check to see if the user has multiple system
-      // partitions.
-      NSArray *components = [filePath pathComponents];
-      if ([components count] > 2) {
-        NSArray *volPathArray = [components subarrayWithRange:NSMakeRange(0, 3)];
-        volPathArray = [volPathArray arrayByAddingObject:@"System"];
-        NSString *systemPath = [NSString pathWithComponents:volPathArray];
-        NSFileManager *fileMan = [NSFileManager defaultManager];
-        BOOL isDir;
-        if ([fileMan fileExistsAtPath:systemPath isDirectory:&isDir] && isDir) {
-          [result setRank:weakRank];
+// A real quick and dirty fast pass on the expected locations.
+- (void)fastIndex {
+  NSArray *applicationFolders
+    = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, 
+                                          NSUserDomainMask | NSLocalDomainMask, 
+                                          YES);
+  NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag];
+  NSMutableDictionary *regularAttributes
+    = [NSMutableDictionary dictionaryWithObject:rankFlags
+                                         forKey:kHGSObjectAttributeRankFlagsKey];
+  NSFileManager *fm = [NSFileManager defaultManager];
+  for (NSString *appPath in applicationFolders) {
+    NSDirectoryEnumerator *fileEnumerator = [fm enumeratorAtPath:appPath];
+    for (NSString *path in fileEnumerator) {
+      NSString *extension = [path pathExtension];
+      if ([extension length]) {
+        if ([extension isEqualToString:@"app"]) {
+          NSString *fullPath = [appPath stringByAppendingPathComponent:path];
+          NSString *uriPath 
+            = [fullPath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+          NSString *url = [@"file://localhost" stringByAppendingString:uriPath];
+          HGSResult *hgsResult
+            = [HGSResult resultWithURI:url
+                                  name:[fm displayNameAtPath:fullPath]
+                                  type:kHGSTypeFileApplication
+                                source:self
+                            attributes:regularAttributes];
+          
+          [self indexResult:hgsResult];
         }
+        [fileEnumerator skipDescendents];
       }
     }
   }
-  // TODO(dmaclach): add an architecture check here and give a weak rank if
-  // the app can't actually be run. CFBundlePreflightExecutable doesn't cut it
-  // as it appears to return false for any application.
-  return result;
 }
+        
+        
+      
 @end
 
