@@ -1,5 +1,5 @@
 //
-//  QSBTopResultsViewControllers.m
+//  QSBTopResultsRowViewControllers.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,7 +30,7 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBTopResultsViewControllers.h"
+#import "QSBTopResultsRowViewControllers.h"
 #import "QSBTableResult.h"
 #import <Vermilion/Vermilion.h>
 

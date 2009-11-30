@@ -1,5 +1,5 @@
 //
-//  QSBTopResultsViewControllers.h
+//  QSBTopResultsRowViewControllers.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -32,7 +32,7 @@
 
 /*!
  @header
- @discussion QSBTopResultsViewControllers
+ @discussion QSBTopResultsRowViewControllers
 */
 
 #import "QSBDetailedRowViewController.h"

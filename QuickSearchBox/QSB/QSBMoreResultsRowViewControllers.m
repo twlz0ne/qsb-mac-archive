@@ -1,5 +1,5 @@
 //
-//  QSBMoreResultsViewControllers.m
+//  QSBMoreResultsRowViewControllers.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,7 +30,7 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBMoreResultsViewControllers.h"
+#import "QSBMoreResultsRowViewControllers.h"
 #import "QSBTableResult.h"
 
 #define QSBVIEWCONTROLLER_INIT(name) \

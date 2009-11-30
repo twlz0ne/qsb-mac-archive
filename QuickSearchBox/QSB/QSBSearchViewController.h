@@ -33,11 +33,11 @@
 #import <Cocoa/Cocoa.h>
 #import "GTMDefines.h"
 
-@class QSBMoreResultsViewDelegate;
+@class QSBMoreResultsViewController;
 @class QSBSearchController;
 @class QSBResultsViewBaseController;
 @class QSBSearchWindowController;
-@class QSBTopResultsViewDelegate;
+@class QSBTopResultsViewController;
 @class QSBTableResult;
 @class HGSResult;
 @class HGSResultArray;
@@ -55,8 +55,8 @@
 @interface QSBSearchViewController : NSViewController {
 @private
   IBOutlet QSBSearchController *searchController_;
-  IBOutlet QSBTopResultsViewDelegate *topResultsController_;
-  IBOutlet QSBMoreResultsViewDelegate *moreResultsController_;
+  IBOutlet QSBTopResultsViewController *topResultsController_;
+  IBOutlet QSBMoreResultsViewController *moreResultsController_;
   IBOutlet NSPathControl *statusBar_;
   QSBSearchWindowController *searchWindowController_;
   __weak QSBResultsViewBaseController *activeResultsViewController_;
@@ -71,8 +71,8 @@
 @property(nonatomic, retain) QSBSearchWindowController *searchWindowController;
 @property(nonatomic, copy) NSString *savedPivotQueryString;
 @property(nonatomic, assign) NSRange savedPivotQueryRange;
-@property(nonatomic, readonly, retain) QSBTopResultsViewDelegate *topResultsController;
-@property(nonatomic, readonly, retain) QSBMoreResultsViewDelegate *moreResultsController;
+@property(nonatomic, readonly, retain) QSBTopResultsViewController *topResultsController;
+@property(nonatomic, readonly, retain) QSBMoreResultsViewController *moreResultsController;
 @property(nonatomic, readonly, assign) QSBResultsViewBaseController *activeResultsViewController;
 @property(nonatomic, readonly, assign) QSBSearchController *searchController;
 @property(nonatomic, readwrite, retain) QSBSearchViewController *parentSearchViewController;

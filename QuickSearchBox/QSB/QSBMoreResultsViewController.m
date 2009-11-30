@@ -1,5 +1,5 @@
 //
-//  QSBMoreResultsViewDelegate.m
+//  QSBMoreResultsViewController.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,7 +30,7 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBMoreResultsViewDelegate.h"
+#import "QSBMoreResultsViewController.h"
 #import "QSBApplicationDelegate.h"
 #import "QSBCategoryTextAttachment.h"
 #import "QSBSearchController.h"
@@ -39,7 +39,7 @@
 #import "QSBTableResult.h"
 #import "QSBResultsViewTableView.h"
 #import "QSBSearchWindowController.h"
-#import "QSBTopResultsViewDelegate.h"
+#import "QSBTopResultsViewController.h"
 #import "HGSLog.h"
 #import "GTMGarbageCollection.h"
 #import "GTMMethodCheck.h"
@@ -51,7 +51,7 @@ static const NSUInteger kCategoryRowOverhead = 3;
 static const NSTimeInterval kFirstRowDownwardDelay = 0.6;
 static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 
-@interface QSBMoreResultsViewDelegate ()
+@interface QSBMoreResultsViewController ()
 
 // Get/set sorted array of localized category names, suitable
 // for use as keys to the dictionary returned by resultsByCategory.
@@ -83,7 +83,7 @@ static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 @end
 
 
-@implementation QSBMoreResultsViewDelegate
+@implementation QSBMoreResultsViewController
 
 GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 

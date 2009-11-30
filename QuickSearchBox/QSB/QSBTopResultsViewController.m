@@ -1,5 +1,5 @@
 //
-//  QSBTopResultsViewDelegate.m
+//  QSBTopResultsViewController.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,7 +30,7 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBTopResultsViewDelegate.h"
+#import "QSBTopResultsViewController.h"
 #import <Vermilion/Vermilion.h>
 #import "QSBApplicationDelegate.h"
 #import "QSBTableResult.h"
@@ -40,7 +40,7 @@
 #import "QSBSearchWindowController.h"
 #import "QSBSearchController.h"
 
-@implementation QSBTopResultsViewDelegate
+@implementation QSBTopResultsViewController
 
 
 - (void)awakeFromNib {  

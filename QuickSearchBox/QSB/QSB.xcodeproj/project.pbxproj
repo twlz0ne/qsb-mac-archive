@@ -362,7 +362,7 @@
 		6219B5340E8C1DB3008643F4 /* BaseResultsViews.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */; };
 		621B1E3B0E4CD7B800EEF553 /* PreferencesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 621B1E390E4CD7B800EEF553 /* PreferencesWindow.xib */; };
 		621D21BB0E438F2000D739F2 /* QSBCategoryTextAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 621D21BA0E438F2000D739F2 /* QSBCategoryTextAttachment.m */; };
-		6223C9AD0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.m */; };
+		6223C9AD0E75B9CD00F61030 /* QSBMoreResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewController.m */; };
 		6223CBB30E761AEB00F61030 /* QSBResultsViewBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223CBB10E761AEB00F61030 /* QSBResultsViewBaseController.m */; };
 		6223CC890E76EC4E00F61030 /* QSBResultsViewTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223CC870E76EC4E00F61030 /* QSBResultsViewTableView.m */; };
 		622911E60F2E805B005D34CE /* GoogleAccounts.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 62EA8BCD0F2E7DE200C92E0B /* GoogleAccounts.hgs */; };
@@ -381,7 +381,7 @@
 		623ADD3E0EC0CC17001651D1 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		623ADD790EC0CC31001651D1 /* emailURL.icns in Resources */ = {isa = PBXBuildFile; fileRef = 623ADD750EC0CC31001651D1 /* emailURL.icns */; };
 		623ADD7B0EC0CC31001651D1 /* EmailURLAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 623ADD780EC0CC31001651D1 /* EmailURLAction.m */; };
-		623AFDBE0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 623AFDBC0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.m */; };
+		623AFDBE0E9ABBEF002A8401 /* QSBTopResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 623AFDBC0E9ABBEF002A8401 /* QSBTopResultsViewController.m */; };
 		623B18D21003DD8F009B702D /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		623B19251003E19C009B702D /* GTMNSScanner+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 623B19231003E19C009B702D /* GTMNSScanner+JSON.m */; };
 		623B19261003E19C009B702D /* GTMNSScanner+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 623B19241003E19C009B702D /* GTMNSScanner+JSON.h */; };
@@ -394,7 +394,7 @@
 		624137530F2A657B009229E6 /* QSBSetUpAccountWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 624137520F2A657B009229E6 /* QSBSetUpAccountWindowController.m */; };
 		6242D0C10DC78E7300EFEF22 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6242D0BF0DC78E7300EFEF22 /* MainMenu.xib */; };
 		624DD9ED0E9EA5D90029EF72 /* QSBResultRowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 624DD9EC0E9EA5D90029EF72 /* QSBResultRowViewController.m */; };
-		624DD9F90E9EAA150029EF72 /* QSBTopResultsViewControllers.m in Sources */ = {isa = PBXBuildFile; fileRef = 624DD9F80E9EAA150029EF72 /* QSBTopResultsViewControllers.m */; };
+		624DD9F90E9EAA150029EF72 /* QSBTopResultsRowViewControllers.m in Sources */ = {isa = PBXBuildFile; fileRef = 624DD9F80E9EAA150029EF72 /* QSBTopResultsRowViewControllers.m */; };
 		62521AB70EFAC30000A6E647 /* QSBViewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 62521AB30EFAC30000A6E647 /* QSBViewTableViewCell.m */; };
 		62521AB80EFAC30000A6E647 /* QSBViewTableViewColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = 62521AB50EFAC30000A6E647 /* QSBViewTableViewColumn.m */; };
 		62541753102C904A00808254 /* HGSSearchTermScorer.h in Headers */ = {isa = PBXBuildFile; fileRef = 62541751102C904A00808254 /* HGSSearchTermScorer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -473,7 +473,7 @@
 		62ED5EE50E8AADB200C9C2C3 /* QSBSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62ED5EE40E8AADB200C9C2C3 /* QSBSearchViewController.m */; };
 		62EFB4C71018F35500F984C7 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62F150040DD4EE3D00BCAE1A /* ResultsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 62F150020DD4EE3C00BCAE1A /* ResultsWindow.xib */; };
-		62F380F90EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F380F80EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m */; };
+		62F380F90EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F380F80EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.m */; };
 		62F594B70FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */; };
 		62F594B80FEB06A60076CDDA /* GoogleDocsSaveAsActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */; };
 		62F595B10FEB278A0076CDDA /* GoogleDocsConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */; };
@@ -2138,8 +2138,8 @@
 		621BCE950F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSProtoExtensionFactoringTest.m; sourceTree = "<group>"; };
 		621D21B90E438F2000D739F2 /* QSBCategoryTextAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBCategoryTextAttachment.h; sourceTree = "<group>"; };
 		621D21BA0E438F2000D739F2 /* QSBCategoryTextAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCategoryTextAttachment.m; sourceTree = "<group>"; };
-		6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMoreResultsViewDelegate.m; sourceTree = "<group>"; };
-		6223C9AC0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBMoreResultsViewDelegate.h; sourceTree = "<group>"; };
+		6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMoreResultsViewController.m; sourceTree = "<group>"; };
+		6223C9AC0E75B9CD00F61030 /* QSBMoreResultsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBMoreResultsViewController.h; sourceTree = "<group>"; };
 		6223CBB10E761AEB00F61030 /* QSBResultsViewBaseController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBResultsViewBaseController.m; sourceTree = "<group>"; };
 		6223CBB20E761AEB00F61030 /* QSBResultsViewBaseController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBResultsViewBaseController.h; sourceTree = "<group>"; };
 		6223CC870E76EC4E00F61030 /* QSBResultsViewTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBResultsViewTableView.m; sourceTree = "<group>"; };
@@ -2158,8 +2158,8 @@
 		623ADD750EC0CC31001651D1 /* emailURL.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = emailURL.icns; sourceTree = "<group>"; };
 		623ADD760EC0CC31001651D1 /* EmailActions-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "EmailActions-Info.plist"; sourceTree = "<group>"; };
 		623ADD780EC0CC31001651D1 /* EmailURLAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmailURLAction.m; sourceTree = "<group>"; };
-		623AFDBC0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBTopResultsViewDelegate.m; sourceTree = "<group>"; };
-		623AFDBD0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBTopResultsViewDelegate.h; sourceTree = "<group>"; };
+		623AFDBC0E9ABBEF002A8401 /* QSBTopResultsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBTopResultsViewController.m; sourceTree = "<group>"; };
+		623AFDBD0E9ABBEF002A8401 /* QSBTopResultsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBTopResultsViewController.h; sourceTree = "<group>"; };
 		623B19231003E19C009B702D /* GTMNSScanner+JSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSScanner+JSON.m"; sourceTree = "<group>"; };
 		623B19241003E19C009B702D /* GTMNSScanner+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSScanner+JSON.h"; sourceTree = "<group>"; };
 		623BC8DE0EFABC560004FAB7 /* NSAttributedString+Attributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+Attributes.m"; sourceTree = "<group>"; };
@@ -2175,8 +2175,8 @@
 		6242D0C00DC78E7300EFEF22 /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		624DD9EB0E9EA5D90029EF72 /* QSBResultRowViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBResultRowViewController.h; sourceTree = "<group>"; };
 		624DD9EC0E9EA5D90029EF72 /* QSBResultRowViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBResultRowViewController.m; sourceTree = "<group>"; };
-		624DD9F70E9EAA150029EF72 /* QSBTopResultsViewControllers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBTopResultsViewControllers.h; sourceTree = "<group>"; };
-		624DD9F80E9EAA150029EF72 /* QSBTopResultsViewControllers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBTopResultsViewControllers.m; sourceTree = "<group>"; };
+		624DD9F70E9EAA150029EF72 /* QSBTopResultsRowViewControllers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBTopResultsRowViewControllers.h; sourceTree = "<group>"; };
+		624DD9F80E9EAA150029EF72 /* QSBTopResultsRowViewControllers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBTopResultsRowViewControllers.m; sourceTree = "<group>"; };
 		62521AB20EFAC30000A6E647 /* QSBViewTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBViewTableViewCell.h; sourceTree = "<group>"; };
 		62521AB30EFAC30000A6E647 /* QSBViewTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBViewTableViewCell.m; sourceTree = "<group>"; };
 		62521AB40EFAC30000A6E647 /* QSBViewTableViewColumn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBViewTableViewColumn.h; sourceTree = "<group>"; };
@@ -2250,8 +2250,8 @@
 		62ED5EE30E8AADA800C9C2C3 /* QSBSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSearchViewController.h; sourceTree = "<group>"; };
 		62ED5EE40E8AADB200C9C2C3 /* QSBSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSearchViewController.m; sourceTree = "<group>"; };
 		62F150030DD4EE3D00BCAE1A /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/ResultsWindow.xib; sourceTree = "<group>"; };
-		62F380F70EA7EB0C00370F6F /* QSBMoreResultsViewControllers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBMoreResultsViewControllers.h; sourceTree = "<group>"; };
-		62F380F80EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMoreResultsViewControllers.m; sourceTree = "<group>"; };
+		62F380F70EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBMoreResultsRowViewControllers.h; sourceTree = "<group>"; };
+		62F380F80EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMoreResultsRowViewControllers.m; sourceTree = "<group>"; };
 		62F594B40FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDocsSaveAsAccessoryController.h; sourceTree = "<group>"; };
 		62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSaveAsAccessoryController.m; sourceTree = "<group>"; };
 		62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSaveAsActions.m; sourceTree = "<group>"; };
@@ -4698,10 +4698,10 @@
 				8B488A460F15DE6A00786C1E /* QSBMenuButton.m */,
 				7F9CDD7F0DD8D69B007C4BF4 /* QSBMenuButtonCell.h */,
 				7F9CDD800DD8D69B007C4BF4 /* QSBMenuButtonCell.m */,
-				6223C9AC0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.h */,
-				6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.m */,
-				62F380F70EA7EB0C00370F6F /* QSBMoreResultsViewControllers.h */,
-				62F380F80EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m */,
+				6223C9AC0E75B9CD00F61030 /* QSBMoreResultsViewController.h */,
+				6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewController.m */,
+				62F380F70EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.h */,
+				62F380F80EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.m */,
 				8B9248A40EE65A2A00F3DF32 /* QSBPathCell.h */,
 				8B9248A70EE65A2A00F3DF32 /* QSBPathCell.m */,
 				8B9248A50EE65A2A00F3DF32 /* QSBPathComponentCell.h */,
@@ -4745,10 +4745,10 @@
 				8BCFD1810D34004F003A33F4 /* QSBTableResult.m */,
 				8B5EC6590CEE61BE00AD3BBD /* QSBTextField.h */,
 				8B5EC65A0CEE61BE00AD3BBD /* QSBTextField.m */,
-				623AFDBD0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.h */,
-				623AFDBC0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.m */,
-				624DD9F70E9EAA150029EF72 /* QSBTopResultsViewControllers.h */,
-				624DD9F80E9EAA150029EF72 /* QSBTopResultsViewControllers.m */,
+				623AFDBD0E9ABBEF002A8401 /* QSBTopResultsViewController.h */,
+				623AFDBC0E9ABBEF002A8401 /* QSBTopResultsViewController.m */,
+				624DD9F70E9EAA150029EF72 /* QSBTopResultsRowViewControllers.h */,
+				624DD9F80E9EAA150029EF72 /* QSBTopResultsRowViewControllers.m */,
 				626585210F43BD4C008A94B2 /* QSBUserMessenger.h */,
 				626585220F43BD4C008A94B2 /* QSBUserMessenger.m */,
 				8B2BFC4C107130BF00427404 /* QSBViewAnimation.m */,
@@ -8907,16 +8907,16 @@
 				8B58E9EE0E548F8C00A0E02E /* QSBGoogleSuggestURLHandler.m in Sources */,
 				625A2C980E5614F3008CA9BF /* QSBPreferenceWindowController.m in Sources */,
 				F487E3A90E59D4D0005B47E6 /* QSBPreferences.m in Sources */,
-				6223C9AD0E75B9CD00F61030 /* QSBMoreResultsViewDelegate.m in Sources */,
+				6223C9AD0E75B9CD00F61030 /* QSBMoreResultsViewController.m in Sources */,
 				6223CBB30E761AEB00F61030 /* QSBResultsViewBaseController.m in Sources */,
 				6223CC890E76EC4E00F61030 /* QSBResultsViewTableView.m in Sources */,
 				62ED5EE50E8AADB200C9C2C3 /* QSBSearchViewController.m in Sources */,
 				8BE8488F0E9425C200C611B0 /* QSBKeyMap.m in Sources */,
-				623AFDBE0E9ABBEF002A8401 /* QSBTopResultsViewDelegate.m in Sources */,
+				623AFDBE0E9ABBEF002A8401 /* QSBTopResultsViewController.m in Sources */,
 				624DD9ED0E9EA5D90029EF72 /* QSBResultRowViewController.m in Sources */,
-				624DD9F90E9EAA150029EF72 /* QSBTopResultsViewControllers.m in Sources */,
+				624DD9F90E9EAA150029EF72 /* QSBTopResultsRowViewControllers.m in Sources */,
 				7F4BE5350EA7A9CC0025D57D /* NSColor+Naming.m in Sources */,
-				62F380F90EA7EB0C00370F6F /* QSBMoreResultsViewControllers.m in Sources */,
+				62F380F90EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.m in Sources */,
 				8B21631F0EB9022300183DE4 /* QSBDetailedRowViewController.m in Sources */,
 				8BF517910EDBC11000D981A0 /* QSBHGSDelegate.m in Sources */,
 				8B9248A80EE65A2A00F3DF32 /* QSBPathComponentCell.m in Sources */,

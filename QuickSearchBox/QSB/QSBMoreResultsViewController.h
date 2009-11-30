@@ -1,5 +1,5 @@
 //
-//  QSBTopResultsViewDelegate.h
+//  QSBMoreResultsViewController.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,21 +30,45 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Cocoa/Cocoa.h>
 #import "QSBResultsViewBaseController.h"
-
-// TODO(mrossetti): The behavior here can be abstracted and shared with the
-// similar QSBMoreResultsViewDelegate.
 
 // A controller that manages the view-based 'More' results view.
 //
-@interface QSBTopResultsViewDelegate : QSBResultsViewBaseController {
- @private
-  NSString *categorySummaryString_;
+@interface QSBMoreResultsViewController : QSBResultsViewBaseController {
+ @private  
+  // The results we are presenting.
+  NSArray *moreResults_;
+  NSArray *sortedCategoryNames_;
+  NSArray *sortedCategoryIndexes_;
+  NSArray *sortedCategoryCounts_;
+  
+  // List of all category titles available for presentation in 'More' view.
+  NSAttributedString *categoriesString_;
+  NSSet *showAllCategoriesSet_;  // Category keys for which to 'show all'.
+
+  // Cache our results in case a category is fully exposed (Show All...)
+  // and the indexes and counts need recalculating.
+  NSDictionary *moreResultsDict_;
+  
+  NSTimeInterval blockTime_; // Time we started blocking repeats
 }
 
-// Update the category summary for the 'More' fold line.
-- (NSString *)categorySummaryString;
-- (void)setCategorySummaryString:(NSString *)value;
+// Returns a list of all categories available for presentation.
+@property (readonly, retain, nonatomic) NSAttributedString *categoriesString;
+
+// Set the full more results.
+- (void)setMoreResultsWithDict:(NSDictionary *)value;
+
+// Adds a category to the 'show all' list and then recalculates the
+// contents of the more results dictionary.
+- (void)addShowAllCategory:(NSString *)category;
 
 @end
+
+// Notification sent out when a category is displayed
+// Object is QSBMoreResultsViewController
+// UserInfo contains
+// kQSBMoreResultsCategoryKey
+#define kQSBMoreResultsDidShowCategoryNotification @"QSBMoreResultsDidShowCategoryNotification"
+
+#define kQSBMoreResultsCategoryKey @"QSBMoreResultsCategoryKey"  // NSString *

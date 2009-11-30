@@ -2,14 +2,14 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9L30</string>
+		<string key="IBDocument.SystemVersion">9L31a</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
 		<string key="IBDocument.AppKitVersion">949.54</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="142"/>
 			<integer value="302"/>
+			<integer value="142"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -39,7 +39,7 @@
 				<string key="NSClassName">QSBSearchController</string>
 			</object>
 			<object class="NSCustomObject" id="79985353">
-				<string key="NSClassName">QSBTopResultsViewDelegate</string>
+				<string key="NSClassName">QSBTopResultsViewController</string>
 			</object>
 			<object class="NSCustomView" id="169645350">
 				<reference key="NSNextResponder"/>
@@ -271,7 +271,7 @@
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSCustomObject" id="378526056">
-				<string key="NSClassName">QSBMoreResultsViewDelegate</string>
+				<string key="NSClassName">QSBMoreResultsViewController</string>
 			</object>
 			<object class="NSScrollView" id="717884256">
 				<reference key="NSNextResponder"/>
@@ -411,14 +411,6 @@
 					<int key="connectionID">215</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">moreResultsController_</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="378526056"/>
-					</object>
-					<int key="connectionID">238</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">animate: queryIsInProcess</string>
 						<reference key="source" ref="786931354"/>
@@ -449,14 +441,6 @@
 						<reference key="destination" ref="818021690"/>
 					</object>
 					<int key="connectionID">277</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">topResultsController_</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="79985353"/>
-					</object>
-					<int key="connectionID">279</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -545,6 +529,22 @@
 						<reference key="destination" ref="639432425"/>
 					</object>
 					<int key="connectionID">319</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">topResultsController_</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="79985353"/>
+					</object>
+					<int key="connectionID">327</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">moreResultsController_</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="378526056"/>
+					</object>
+					<int key="connectionID">328</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -866,7 +866,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">326</int>
+			<int key="maxID">328</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -988,19 +988,11 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">QSBMoreResultsViewDelegate</string>
+					<string key="className">QSBMoreResultsViewController</string>
 					<string key="superclassName">QSBResultsViewBaseController</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">QSBMoreResultsViewDelegate.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">QSBMoreResultsViewDelegate</string>
-					<string key="superclassName">QSBResultsViewBaseController</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBUserSource</string>
-						<string key="minorKey"/>
+						<string key="minorKey">QSBMoreResultsViewController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1055,12 +1047,12 @@
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>moveDown:</string>
-							<string>moveToBeginningOfDocument:</string>
-							<string>moveToEndOfDocument:</string>
 							<string>moveUp:</string>
 							<string>pathControlClick:</string>
 							<string>scrollPageDown:</string>
 							<string>scrollPageUp:</string>
+							<string>scrollToBeginningOfDocument:</string>
+							<string>scrollToEndOfDocument:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1122,7 +1114,7 @@
 					<string key="superclassName">NSObject</string>
 					<object class="NSMutableDictionary" key="outlets">
 						<string key="NS.key.0">moreResultsViewDelegate_</string>
-						<string key="NS.object.0">QSBMoreResultsViewDelegate</string>
+						<string key="NS.object.0">QSBMoreResultsViewController</string>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -1164,10 +1156,10 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>QSBMoreResultsViewDelegate</string>
+							<string>QSBMoreResultsViewController</string>
 							<string>QSBSearchController</string>
 							<string>NSPathControl</string>
-							<string>QSBTopResultsViewDelegate</string>
+							<string>QSBTopResultsViewController</string>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -1324,19 +1316,11 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">QSBTopResultsViewDelegate</string>
+					<string key="className">QSBTopResultsViewController</string>
 					<string key="superclassName">QSBResultsViewBaseController</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">QSBTopResultsViewDelegate.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">QSBTopResultsViewDelegate</string>
-					<string key="superclassName">QSBResultsViewBaseController</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBUserSource</string>
-						<string key="minorKey"/>
+						<string key="minorKey">QSBTopResultsViewController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

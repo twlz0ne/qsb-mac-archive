@@ -1,5 +1,5 @@
 //
-//  QSBMoreResultsViewControllers.h
+//  QSBTopResultsViewController.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,37 +30,21 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBDetailedRowViewController.h"
+#import <Cocoa/Cocoa.h>
+#import "QSBResultsViewBaseController.h"
 
-@class QSBTableResult;
+// TODO(mrossetti): The behavior here can be abstracted and shared with the
+// similar QSBMoreResultsViewController.
 
-@interface QSBMoreDetailedRowViewController : QSBDetailedRowViewController
-// return the detail string for a given result.
-- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result;
+// A controller that manages the view-based 'More' results view.
+//
+@interface QSBTopResultsViewController : QSBResultsViewBaseController {
+ @private
+  NSString *categorySummaryString_;
+}
+
+// Update the category summary for the 'More' fold line.
+- (NSString *)categorySummaryString;
+- (void)setCategorySummaryString:(NSString *)value;
+
 @end
-
-@interface QSBMoreStandardRowViewController : QSBMoreDetailedRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
-@interface QSBMoreCategoryRowViewController : QSBMoreDetailedRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
-@interface QSBMoreSeparatorRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
-@interface QSBMoreFoldRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
-@interface QSBMoreShowAllTableRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
-@interface QSBMorePlaceHolderRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
-

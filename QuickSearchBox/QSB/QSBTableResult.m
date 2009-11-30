@@ -37,10 +37,10 @@
 #import "NSAttributedString+Attributes.h"
 #import "GTMNSString+HTML.h"
 #import "QSBSearchViewController.h"
-#import "QSBMoreResultsViewDelegate.h"
+#import "QSBMoreResultsViewController.h"
 #import "NSString+ReadableURL.h"
-#import "QSBTopResultsViewControllers.h"
-#import "QSBMoreResultsViewControllers.h"
+#import "QSBTopResultsRowViewControllers.h"
+#import "QSBMoreResultsRowViewControllers.h"
 #import "GTMNSObject+KeyValueObserving.h"
 #import "GTMMethodCheck.h"
 #import "QSBHGSDelegate.h"
@@ -62,7 +62,7 @@ static NSString *const kClipboardCopyActionIdentifier
 
 - (NSMutableAttributedString *)mutableAttributedStringWithString:(NSString*)string;
 
-- (NSMutableAttributedString *)mutableAttributedStringFromHTMLString:(NSString*)item 
+- (NSMutableAttributedString *)mutableAttributedStringFromHTMLString:(NSString*)item
                                                      prettyPrintPath:(BOOL)prettyPrintPath;
 
 - (NSMutableAttributedString *)mutableAttributedStringFromHTMLString:(NSString*)item;
@@ -96,7 +96,7 @@ static NSString *const kClipboardCopyActionIdentifier
 
 GTM_METHOD_CHECK(NSMutableAttributedString, addAttribute:value:);
 GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
-GTM_METHOD_CHECK(NSMutableAttributedString, 
+GTM_METHOD_CHECK(NSMutableAttributedString,
                  addAttributes:fontTraits:toTextDelimitedBy:postDelimiter:);
 GTM_METHOD_CHECK(NSString, qsb_displayPath);
 GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromHTML);
@@ -105,15 +105,15 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 
 + (void)initialize {
   if (self == [QSBTableResult class]) {
-    NSMutableParagraphStyle *style 
+    NSMutableParagraphStyle *style
     = [[[NSMutableParagraphStyle alloc] init] autorelease];
     [style setLineBreakMode:NSLineBreakByTruncatingTail];
     [style setParagraphSpacing:0];
     [style setParagraphSpacingBefore:0];
     [style setLineSpacing:0];
     [style setMaximumLineHeight:14.0];
-    
-    gBaseStringAttributes_ 
+
+    gBaseStringAttributes_
     = [NSDictionary dictionaryWithObject:style
                                   forKey:NSParagraphStyleAttributeName];
     [gBaseStringAttributes_ retain];
@@ -127,7 +127,7 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 - (void)willPivot {
   HGSLogDebug(@"Tried to pivot on result %@ that doesn't pivot", self);
 }
-  
+
 - (NSAttributedString *)titleString {
   NSMutableAttributedString *resultString = [self genericTitleLine];
   [self addAttributes:resultString elementType:kQSBResultDescriptionTitle];
@@ -135,7 +135,7 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 }
 
 - (NSAttributedString *)titleSnippetSourceURLString {
-  NSMutableAttributedString *fullString 
+  NSMutableAttributedString *fullString
     = [[[self titleSnippetString] mutableCopy] autorelease];
   NSAttributedString *sourceURLString = [self sourceURLString];
   if (sourceURLString) {
@@ -202,16 +202,16 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   // since computations may already have been done based on string sizes.
   [string addAttributes:gBaseStringAttributes_];
   if (itemType == kQSBResultDescriptionSnippet) {
-    [string addAttribute:NSForegroundColorAttributeName 
+    [string addAttribute:NSForegroundColorAttributeName
                    value:[NSColor grayColor]];
   } else if (itemType == kQSBResultDescriptionSourceURL) {
-    [string addAttribute:NSForegroundColorAttributeName 
+    [string addAttribute:NSForegroundColorAttributeName
                    value:[NSColor colorWithCalibratedRed:(float)0x00/0xFF
                                                    green:(float)0x4c/0xFF
                                                     blue:(float)0x00/0xFF
                                                    alpha:0.5]];
   } else if (itemType == kQSBResultDescriptionTitle) {
-    [string addAttribute:NSForegroundColorAttributeName 
+    [string addAttribute:NSForegroundColorAttributeName
                    value:[NSColor blackColor]];
   } else {
     HGSLogDebug(@"Unknown itemType: %d", itemType);
@@ -224,7 +224,7 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   NSDictionary *attributes = nil;
   NSMutableAttributedString *attrString = nil;
   NSRect bounds;
-  NSStringDrawingOptions options = (NSStringDrawingUsesLineFragmentOrigin 
+  NSStringDrawingOptions options = (NSStringDrawingUsesLineFragmentOrigin
                                     | NSStringDrawingUsesFontLeading);
   do {
     // For some fonts (like Devangari) we have to shrink down a bit. We try to
@@ -244,19 +244,19 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   return attrString;
 }
 
-- (NSMutableAttributedString *)mutableAttributedStringFromHTMLString:(NSString*)item 
+- (NSMutableAttributedString *)mutableAttributedStringFromHTMLString:(NSString*)item
                                                      prettyPrintPath:(BOOL)prettyPrintPath {
   NSMutableString *mutableItem = [NSMutableString stringWithString:item];
-  
+
   NSString* boldPrefix = @"%QSB_MAC_BOLD_PREFIX%";
   NSString* boldSuffix = @"%QSB_MAC_BOLD_SUFFIX%";
-  [mutableItem replaceOccurrencesOfString:@"<b>" 
-                               withString:boldPrefix 
-                                  options:NSCaseInsensitiveSearch 
+  [mutableItem replaceOccurrencesOfString:@"<b>"
+                               withString:boldPrefix
+                                  options:NSCaseInsensitiveSearch
                                     range:NSMakeRange(0, [mutableItem length])];
-  [mutableItem replaceOccurrencesOfString:@"</b>" 
-                               withString:boldSuffix 
-                                  options:NSCaseInsensitiveSearch 
+  [mutableItem replaceOccurrencesOfString:@"</b>"
+                               withString:boldSuffix
+                                  options:NSCaseInsensitiveSearch
                                     range:NSMakeRange(0, [mutableItem length])];
   if (prettyPrintPath) {
     NSString *displayString = [mutableItem qsb_displayPath];
@@ -265,9 +265,9 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   NSString *unescapedItem = [mutableItem gtm_stringByUnescapingFromHTML];
   NSMutableAttributedString* mutableAttributedItem =
   [self mutableAttributedStringWithString:unescapedItem];
-  [mutableAttributedItem addAttributes:nil 
-                            fontTraits:NSBoldFontMask 
-                     toTextDelimitedBy:boldPrefix 
+  [mutableAttributedItem addAttributes:nil
+                            fontTraits:NSBoldFontMask
+                     toTextDelimitedBy:boldPrefix
                          postDelimiter:boldSuffix];
   return mutableAttributedItem;
 }
@@ -336,7 +336,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)dealloc {
-  [representedResult_ gtm_removeObserver:self 
+  [representedResult_ gtm_removeObserver:self
                               forKeyPath:kHGSObjectAttributeIconKey
                                 selector:@selector(objectIconChanged:)];
   [representedResult_ release];
@@ -357,7 +357,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)objectIconChanged:(GTMKeyValueChangeNotification *)notification {
   [self willChangeValueForKey:@"displayIcon"];
-  [self didChangeValueForKey:@"displayIcon"]; 
+  [self didChangeValueForKey:@"displayIcon"];
   [self willChangeValueForKey:@"displayThumbnail"];
   [self didChangeValueForKey:@"displayThumbnail"];
 }
@@ -448,7 +448,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (NSImage *)flagIcon {
   HGSResult *result = [self representedResult];
-  NSString *iconName = [result valueForKey:kHGSObjectAttributeFlagIconNameKey]; 
+  NSString *iconName = [result valueForKey:kHGSObjectAttributeFlagIconNameKey];
   NSImage *image = nil;
   if (iconName) image = [NSImage imageNamed:iconName];
   return image;
@@ -466,12 +466,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if (!sourceName) {
     NSBeep();
   }
-  displayString = [NSString stringWithFormat:@"%@ (Rank: %.2f, Source: %@)", 
+  displayString = [NSString stringWithFormat:@"%@ (Rank: %.2f, Source: %@)",
                    displayString, [self rank], sourceName];
 #else  // DEBUG
   displayString = [self displayName];
   HGSResult *result = [self representedResult];
-  NSString *snippetString 
+  NSString *snippetString
     = [result valueForKey:kHGSObjectAttributeSnippetKey];
   if ([snippetString length]) {
     displayString = [displayString stringByAppendingFormat:@" — %@",
@@ -495,14 +495,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // Title is rendered as 12 pt black.
   HGSResult *result = [self representedResult];
   NSString *html = [result valueForKey:kHGSObjectAttributeNameKey];
-  NSMutableAttributedString *title 
+  NSMutableAttributedString *title
     = [self mutableAttributedStringWithString:html];
   if ([title length] == 0) {
     // If we don't have a title, we'll just use a canned string
     NSString *titleString = NSLocalizedString(@"<No Title>", @"");
     title =  [self mutableAttributedStringWithString:titleString];
   }
-  
+
   return title;
 }
 
@@ -523,7 +523,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSMutableAttributedString *sourceURLString = nil;
   HGSResult *result = [self representedResult];
   NSString *sourceURL = [result valueForKey:kHGSObjectAttributeSourceURLKey];
-  
+
   sourceURL = [sourceURL readableURLString];
   if (sourceURL) {
     sourceURLString = [self mutableAttributedStringFromHTMLString:sourceURL];
@@ -533,7 +533,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"%@: %p - %@", 
+  return [NSString stringWithFormat:@"%@: %p - %@",
           [self class], self, representedResult_];
 }
 
@@ -553,7 +553,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 @end
- 
+
 
 @implementation QSBGoogleTableResult
 
@@ -578,15 +578,15 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   } else {
     name = query;
     NSString *cleanedQuery = [query gtm_stringByEscapingForURLArgument];
-    urlString = [googleSearch searchURLFor:cleanedQuery 
-                                    ofType:GTMGoogleSearchWeb 
+    urlString = [googleSearch searchURLFor:cleanedQuery
+                                    ofType:GTMGoogleSearchWeb
                                  arguments:nil];
   }
   NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                              [self displayIcon], kHGSObjectAttributeIconKey, 
+                              [self displayIcon], kHGSObjectAttributeIconKey,
                               nil];
-  HGSResult *result = [HGSResult resultWithURI:urlString 
-                                          name:name 
+  HGSResult *result = [HGSResult resultWithURI:urlString
+                                          name:name
                                           type:kHGSTypeGoogleSearch
                                         source:nil
                                     attributes:attributes];
@@ -599,7 +599,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 // We want to inherit the google logo, so don't return an icon
 - (NSImage *)displayIcon {
-  return [NSImage imageNamed:@"blue-google-white"]; 
+  return [NSImage imageNamed:@"blue-google-white"];
 }
 
 - (NSImage *)displayThumbnail {
@@ -607,13 +607,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (NSArray *)displayPath {
-  NSString *string = NSLocalizedString(@"Search Google for '%@'", 
+  NSString *string = NSLocalizedString(@"Search Google for '%@'",
                                        @"A table result label for an item that "
                                        @"allows you to search google for the "
-                                       @"token represented by %@."); 
+                                       @"token represented by %@.");
   string = [NSString stringWithFormat:string, [self displayName]];
   NSURL *url = [[self representedResult] url];
-  
+
   return [NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:
                                    string, kQSBPathCellDisplayTitleKey,
                                    url, kQSBPathCellURLKey,
@@ -719,7 +719,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (NSString*)stringValue {
-  NSString *format = NSLocalizedString(@"Show all %u %@…", 
+  NSString *format = NSLocalizedString(@"Show all %u %@…",
                                        @"A table result label for an item that "
                                        @"will show the user all x things where "
                                        @"x is %u and the things are %@.");
@@ -732,13 +732,14 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
   NSString *categoryName = [self categoryName];
-  QSBMoreResultsViewDelegate *delegate = [controller moreResultsController];
-  [delegate addShowAllCategory:categoryName];
+  QSBMoreResultsViewController *viewController
+    = [controller moreResultsController];
+  [viewController addShowAllCategory:categoryName];
   return YES;
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"%@: %p - %@", 
+  return [NSString stringWithFormat:@"%@: %p - %@",
           [self class], self, [self stringValue]];
 }
 @end
@@ -763,7 +764,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (NSAttributedString *)titleSnippetString {
-  NSMutableAttributedString *titleSnippet 
+  NSMutableAttributedString *titleSnippet
     = [self mutableAttributedStringWithString:message_];
   [self addAttributes:titleSnippet elementType:kQSBResultDescriptionSnippet];
   return titleSnippet;
@@ -781,7 +782,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"%@: %p - %@", 
+  return [NSString stringWithFormat:@"%@: %p - %@",
           [self class], self, message_];
 }
 
@@ -798,9 +799,9 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         || [container isEqualToString:@""] // Relative path
         || [container isEqualToString:@"/Volumes"])) {
     container = [container qsb_displayPath];
-    displayName = [container stringByAppendingFormat:@" ▸ %@", displayName]; 
+    displayName = [container stringByAppendingFormat:@" ▸ %@", displayName];
   }
   return displayName;
-} 
+}
 
 @end

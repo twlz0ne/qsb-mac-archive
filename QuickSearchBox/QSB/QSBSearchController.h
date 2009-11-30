@@ -35,14 +35,14 @@
 #import <Vermilion/Vermilion.h>
 
 @class HGSResultArray;
-@class QSBMoreResultsViewDelegate;
+@class QSBMoreResultsViewController;
 @class QSBTableResult;
 
 // Interface between QSB and the web suggestor and the desktop query
 // takes a query string and is responsible for turning it into results.
 @interface QSBSearchController : NSObject {
  @private
-  IBOutlet QSBMoreResultsViewDelegate *moreResultsViewDelegate_;
+  IBOutlet QSBMoreResultsViewController *moreResultsViewDelegate_;
   
   NSMutableArray *desktopResults_;
   NSMutableArray *lockedResults_;
