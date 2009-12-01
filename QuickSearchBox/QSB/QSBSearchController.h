@@ -42,8 +42,8 @@
 // takes a query string and is responsible for turning it into results.
 @interface QSBSearchController : NSObject {
  @private
-  IBOutlet QSBMoreResultsViewController *moreResultsViewDelegate_;
-  
+  IBOutlet QSBMoreResultsViewController *moreResultsViewController_;
+
   NSMutableArray *desktopResults_;
   NSMutableArray *lockedResults_;
   NSString *queryString_;  // Current query string entered by user.
@@ -51,12 +51,12 @@
   NSUInteger currentResultDisplayCount_;
   HGSQueryController *queryController_;
   QSBSearchController *parentSearchController_;
-  
+
   NSArray *oldSuggestions_; // The last suggestions seen
-  
+
   NSDictionary *moreResults_;  // Contains one results array per category.
   NSMutableDictionary *typeCategoryDict_;  // type->category conversion.
-  
+
   // used to update the UI at various times through the life of the query
   NSTimer *shortcutDisplayTimer_;
   NSTimer *firstTierDisplayTimer_;
@@ -72,7 +72,7 @@
 // Sets/Gets a context (pivot object) for the current query.
 @property(nonatomic, retain) HGSResultArray *results;
 // Sets/Gets the parent query from which we were spawned.
-@property(nonatomic, retain) QSBSearchController *parentSearchController; 
+@property(nonatomic, retain) QSBSearchController *parentSearchController;
 // Set/Gets in-process indication for query.  Bound to the progress
 // indicator.
 @property(nonatomic, assign) BOOL queryIsInProcess;

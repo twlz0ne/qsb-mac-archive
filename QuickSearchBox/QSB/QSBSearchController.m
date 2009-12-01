@@ -34,7 +34,7 @@
 #import "QSBSearchController.h"
 #import "QSBApplication.h"
 #import "QSBApplicationDelegate.h"
-#import "QSBMoreResultsViewDelegate.h"
+#import "QSBMoreResultsViewController.h"
 #import "QSBPreferences.h"
 #import "QSBTableResult.h"
 #import "QSBResultsViewBaseController.h"
@@ -46,7 +46,7 @@
 #import "GTMNSObject+KeyValueObserving.h"
 
 static const NSUInteger kDefaultMaximumResultsToCollect = 500;
-NSString *const kQSBSearchControllerDidUpdateResultsNotification 
+NSString *const kQSBSearchControllerDidUpdateResultsNotification
   = @"QSBSearchControllerDidUpdateResultsNotification";
 
 @interface QSBSearchController ()
@@ -106,28 +106,28 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [moreResults_ release];
   [typeCategoryDict_ release];
   NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_removeObserver:self 
+  [prefs gtm_removeObserver:self
                  forKeyPath:kQSBResultCountKey
                    selector:@selector(resultCountValueChanged:)];
-  
+
   [super dealloc];
 }
 
-- (void)awakeFromNib {  
+- (void)awakeFromNib {
   NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_addObserver:self 
-              forKeyPath:kQSBResultCountKey 
+  [prefs gtm_addObserver:self
+              forKeyPath:kQSBResultCountKey
                 selector:@selector(resultCountValueChanged:)
                 userInfo:nil
                  options:NSKeyValueObservingOptionNew];
   totalResultDisplayCount_ = [prefs integerForKey:kQSBResultCountKey];
 }
 
-- (void)updateDesktopResults {  
+- (void)updateDesktopResults {
   HGSQueryController* controller = queryController_;
   if (!controller) return;
   HGSAssert(controller, @"No controller?");
-  
+
   if (currentResultDisplayCount_ == 0) {
     HGSLog(@"updateDesktopResults called with display count still at 0!");
     return;
@@ -144,7 +144,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     }
   }
   NSArray *hgsSuggestions = (NSArray*)hgsMutableSuggestions;
-  
+
   HGSQuery *query = [controller query];
   HGSResult *pivotObject = [query pivotObject];
 
@@ -154,16 +154,16 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // so we need to factor that logic into some way it can be used here.  we had
   // been using uris here, but we don't want to require them, and that's not the
   // same deduping that happens w/in mixer.
-  
+
   // Build the main results list.
   // First anything that was locked down, then shortcuts, then the main results.
   // We have to do simple de-duping across the three, since there may be
   // duplication between the three sets.
   NSMutableArray *mainResults = [NSMutableArray array];
-  
+
   // Keep what was locked in
   [mainResults addObjectsFromArray:lockedResults_];
-  
+
   // Standard results
   BOOL hasMoreStandardResults = NO;
   NSMutableArray *belowTheFoldResults = [NSMutableArray array];
@@ -198,35 +198,35 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       }
     }
   }
-  
+
   // If there were more results than could be shown in TOP then we'll
   // need a 'More' fold.
   BOOL showMore = ((hasMoreStandardResults
                     || ![self suppressMoreIfTopShowsAll])
                    && ![[NSUserDefaults standardUserDefaults]
                         boolForKey:@"disableMoreResults"]);
-  
+
   // Anything that ends up in the main results section should be locked down
   // to prevent any rearranging.
   [lockedResults_ release];
   lockedResults_ = [mainResults copy];
-  
+
   // Is this search a generic, global search? (No pivot set)
   // If so, there may be special items above and/or below the search results
   NSMutableArray *suggestResults = [NSMutableArray array];
-  
-  if (!pivotObject) {    
+
+  if (!pivotObject) {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSInteger suggestCount = [prefs integerForKey:kGoogleSuggestCountKey];
     if (suggestCount) {
       NSUInteger length = [[self queryString] length];
       if ([hgsSuggestions count] || length < 3 || length > 20) {
         [oldSuggestions_ autorelease];
-        oldSuggestions_ = [hgsSuggestions retain]; 
+        oldSuggestions_ = [hgsSuggestions retain];
       } else {
         hgsSuggestions = oldSuggestions_;
       }
-              
+
       NSUInteger minSuggestCount = ABS(suggestCount);
       if (minSuggestCount < 3)
         minSuggestCount = 3; // minimum of 3 for now
@@ -235,7 +235,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
         hgsSuggestions =
             [hgsSuggestions subarrayWithRange:NSMakeRange(0, minSuggestCount)];
       }
-      
+
       if (minSuggestCount && [hgsSuggestions count]) {
         NSMutableArray *target = suggestResults;
         for (HGSResult *suggest in hgsSuggestions) {
@@ -246,26 +246,26 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       }
     }
   }
-  
+
   // Build the actual list
   NSMutableArray *newResults = [NSMutableArray array];
-  
+
   if ([mainResults count] > 0) {
     [newResults addObjectsFromArray:mainResults];
   }
-  
-  int searchItemsIndex = 0; 
+
+  int searchItemsIndex = 0;
   if (![[controller query] pivotObject]) {
     QSBSeparatorTableResult *spacer = [QSBSeparatorTableResult tableResult];
-      
+
     // TODO(alcor): this is probably going to be done by the mixer eventually
-    
+
     NSUInteger count = [newResults count];
-    
+
     // TODO(alcor): we only cycle through this once because ranking is odd
     // at the moment. Eventually we want to unpin the google result
     count = MIN(1, count);
-    
+
     if (count) {
       for(searchItemsIndex = 0; searchItemsIndex < count; searchItemsIndex++) {
       QSBTableResult *item = [newResults objectAtIndex:searchItemsIndex];
@@ -273,18 +273,18 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
         if ([item rank] <= 0.667) break;
       }
     }
-    
+
     if (searchItemsIndex > 0) {
       [newResults insertObject:spacer atIndex:searchItemsIndex++];
     }
-    
+
     QSBGoogleTableResult *googleItem = [QSBGoogleTableResult
                                          tableResultForQuery:queryString_];
     [newResults insertObject:googleItem atIndex:searchItemsIndex];
-    
-    [newResults insertObject:spacer atIndex:searchItemsIndex + 1]; 
+
+    [newResults insertObject:spacer atIndex:searchItemsIndex + 1];
   }
-  
+
   if ([newResults count] < [desktopResults_ count]) {
     NSRange newRange = NSMakeRange(0, [newResults count]);
     [desktopResults_ replaceObjectsInRange:newRange
@@ -306,7 +306,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       [newResults addObject:belowTheFoldResult];
     }
   }
-  
+
   if (showMore && [controller hasAnyRealResults]) {
     if ([suggestResults count] > 0) {
       if (![[newResults lastObject]
@@ -317,7 +317,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     }
     if (![controller queriesFinished]) {
       [newResults addObject:[QSBSearchStatusTableResult tableResult]];
-    }    
+    }
     [newResults addObject:[QSBFoldTableResult tableResult]];
   } else {
     if ([suggestResults count] > 0) {
@@ -325,20 +325,20 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     }
     if (![controller queriesFinished]) {
       [newResults addObject:[QSBSearchStatusTableResult tableResult]];
-    }    
+    }
   }
-  
+
   if ([controller queriesFinished]) {
     [desktopResults_ setArray:newResults];
   }
-  
+
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc postNotificationName:kQSBSearchControllerDidUpdateResultsNotification 
+  [nc postNotificationName:kQSBSearchControllerDidUpdateResultsNotification
                     object:self];
 }
 
 - (NSString *)searchStatus {
-  NSString *listSeparator 
+  NSString *listSeparator
     = HGSLocalizedString(@", ", @"A list delimiter.");
   NSArray *pendingQueries = [queryController_ pendingQueries];
   return [[pendingQueries valueForKey:@"displayName"]
@@ -376,22 +376,22 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
 #endif
   [self cancelAndReleaseQueryController];
-  
+
   // wait before sending off our query to coalesce any other restarts in flight.
   // Must cancel any old requests as we only want one in the queue at a time.
-  [NSObject cancelPreviousPerformRequestsWithTarget:self 
-                                           selector:@selector(doDesktopQuery:) 
+  [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                           selector:@selector(doDesktopQuery:)
                                              object:nil];
   [self performSelector:@selector(doDesktopQuery:)
              withObject:nil
              afterDelay:0.0];
-  
+
   if (clearResults) {
     [desktopResults_ removeAllObjects];
     [self setMoreResults:nil];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc postNotificationName:kQSBSearchControllerDidUpdateResultsNotification 
-                      object:self];    
+    [nc postNotificationName:kQSBSearchControllerDidUpdateResultsNotification
+                      object:self];
   }
 }
 
@@ -401,12 +401,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     [queryString_ release];
     queryString_ = nil;
   } else if (![queryString_ isEqualToString:queryString]) {
-    NSStringCompareOptions options = (NSCaseInsensitiveSearch 
-                                      | NSWidthInsensitiveSearch 
+    NSStringCompareOptions options = (NSCaseInsensitiveSearch
+                                      | NSWidthInsensitiveSearch
                                       | NSDiacriticInsensitiveSearch);
-    isPrefix = ([queryString_ length] > 0 && 
-                [queryString length] > 0 && 
-                ([queryString qsb_hasPrefix:queryString_ options:options] || 
+    isPrefix = ([queryString_ length] > 0 &&
+                [queryString length] > 0 &&
+                ([queryString qsb_hasPrefix:queryString_ options:options] ||
                  [queryString_ qsb_hasPrefix:queryString options:options]));
     [queryString_ autorelease];
     queryString_ = [queryString copy];
@@ -426,42 +426,42 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return YES;
 }
 
-- (void)doDesktopQuery:(id)ignoredValue {  
+- (void)doDesktopQuery:(id)ignoredValue {
   [lockedResults_ release];
   lockedResults_ = nil;
   currentResultDisplayCount_ = 0;
   [self setQueryIsInProcess:YES];
   [self cancelDisplayTimers];
-  
+
   if (queryString_ || results_) {
-    
+
     HGSQueryFlags flags = 0;
     if (pushModifierFlags_ & NSAlternateKeyMask) {
       flags |= eHGSQueryShowAlternatesFlag;
     }
-    
+
     HGSQuery *query = [[[HGSQuery alloc] initWithString:queryString_
                                                 results:results_
                                              queryFlags:flags]
                        autorelease];
     [query setMaxDesiredResults:[self maximumResultsToCollect]];
-    
+
     [self cancelAndReleaseQueryController];
     HGSMixer* mixer = [[[HGSMixer alloc] init] autorelease];
     queryController_ = [[HGSQueryController alloc] initWithQuery:query
                                                            mixer:mixer];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(queryControllerDidFinish:) 
-               name:kHGSQueryControllerDidFinishNotification 
+    [nc addObserver:self
+           selector:@selector(queryControllerDidFinish:)
+               name:kHGSQueryControllerDidFinishNotification
              object:queryController_];
-    [nc addObserver:self 
-           selector:@selector(queryControllerDidAddResults:) 
-               name:kHGSQueryControllerDidUpdateResultsNotification 
+    [nc addObserver:self
+           selector:@selector(queryControllerDidAddResults:)
+               name:kHGSQueryControllerDidUpdateResultsNotification
              object:queryController_];
-    [nc addObserver:self 
+    [nc addObserver:self
            selector:@selector(queryControllerDidFinishOperation:)
-               name:kHGSQueryControllerDidFinishOperationNotification 
+               name:kHGSQueryControllerDidFinishOperationNotification
              object:queryController_];
     // This became a separate call because some sources come back before
     // this call returns and queryController_ must be set first
@@ -472,8 +472,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)stopQuery {
   [self cancelDisplayTimers];
-  [NSObject cancelPreviousPerformRequestsWithTarget:self 
-                                           selector:@selector(doDesktopQuery:) 
+  [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                           selector:@selector(doDesktopQuery:)
                                              object:nil];
   [queryController_ cancel];
   [self setQueryIsInProcess:NO];
@@ -484,12 +484,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 // Called when the last active query operation, and thus the query, has
 // completed.  May be called even when there are more results that are
 // possible, but the query has been stopped by the user or by the query
-// reaching a time threshhold. 
+// reaching a time threshhold.
 - (void)queryControllerDidFinish:(NSNotification *)notification {
   [moreResultsUpdateTimer_ invalidate];
   moreResultsUpdateTimer_ = nil;
   currentResultDisplayCount_ = [self maximumResultsToCollect];
-  [self updateDesktopResults]; 
+  [self updateDesktopResults];
   [self updateMoreResults];
 #if DEBUG
   BOOL dumpTopResults = [[NSUserDefaults standardUserDefaults]
@@ -499,7 +499,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     HGSLog(@"QSB: More Results:\n%@", [self moreResults]);
   }
 #endif
-  
+
   [self setQueryIsInProcess:NO];
 }
 
@@ -545,7 +545,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     [self updateMoreResults];
   }
   [self updateDesktopResults];
-  
+
   // If we've locked down all the rows, we can go ahead and cancel the query now
   if ([lockedResults_ count] == [self maximumResultsToCollect]) {
     [queryController_ cancel];
@@ -576,25 +576,25 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                                    userInfo:@"shortcutTimer"
                                     repeats:NO];
   firstTierDisplayTimer_ =
-    [NSTimer scheduledTimerWithTimeInterval:kFirstTierDisplayInterval 
+    [NSTimer scheduledTimerWithTimeInterval:kFirstTierDisplayInterval
                                      target:self
                                    selector:@selector(displayTimerElapsed:)
                                    userInfo:@"firstTierTimer"
                                     repeats:NO];
   secondTierDisplayTimer_ =
-    [NSTimer scheduledTimerWithTimeInterval:kSecondTierDisplayInterval 
+    [NSTimer scheduledTimerWithTimeInterval:kSecondTierDisplayInterval
                                      target:self
                                    selector:@selector(displayTimerElapsed:)
                                    userInfo:@"secondTierTimer"
                                     repeats:NO];
-  moreResultsUpdateTimer_ 
+  moreResultsUpdateTimer_
     = [NSTimer scheduledTimerWithTimeInterval:kUpdateTierDisplayInterval
-                                       target:self 
-                                     selector:@selector(displayTimerElapsed:) 
-                                     userInfo:@"updateMoreResultsTimer" 
+                                       target:self
+                                     selector:@selector(displayTimerElapsed:)
+                                     userInfo:@"updateMoreResultsTimer"
                                       repeats:YES];
-  
-  
+
+
 }
 
 // cancels all timers and clears the member variables.
@@ -622,7 +622,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)setMoreResults:(NSDictionary *)value {
   [moreResults_ autorelease];
   moreResults_ = [value retain];
-  [moreResultsViewDelegate_ setMoreResultsWithDict:value];
+  [moreResultsViewController_ setMoreResultsWithDict:value];
 }
 
 - (void)updateMoreResults {
