@@ -38,18 +38,30 @@
 #import "GTMSenTestCase.h"
 
 /*!
-  Loads a single plugin if it hasn't already been loaded
-*/
-@interface HGSUnitTestingPluginLoader : NSObject <HGSDelegate> {
- @private
+ A base class for a generic delegate to pass into HGSUnitTestingPluginLoader.
+ */
+@interface HGSUnitTestingDelegate : NSObject<HGSDelegate> {
+@private
   NSString *path_;
 }
+@property (readonly, copy) NSString *path;
+
+- (id)initWithPath:(NSString *)path;
+@end
+
 
 /*!
- Loads the plugin at path into the Vermilion framework if it hasn't already
- been loaded. You can then access the plugin via the extension points.
+  Loads a single plugin if it hasn't already been loaded
 */
-+ (BOOL)loadPlugin:(NSString *)path;
+@interface HGSUnitTestingPluginLoader : NSObject
+
+/*!
+ Loads the plugin that the delegate supplies if it hasn't already been loaded.
+ You can then access the plugin via the extension points.
+ Uses delegate as the plugin loading delegate.
+*/
++ (BOOL)loadPluginWithDelegate:(HGSUnitTestingDelegate *)delegate;
+                                                  
 @end
 
 /*!
@@ -60,6 +72,7 @@
 @interface HGSExtensionAbstractTestCase : GTMTestCase {
  @private
   HGSExtension *extension_;
+  HGSUnitTestingDelegate *delegate_;  // Weak.
   NSString *extensionPointIdentifier_;
   NSString *pluginName_;
   NSString *identifier_;
@@ -70,6 +83,7 @@
 @property (readonly, assign, nonatomic) NSString *extensionPointIdentifier;
 @property (readonly, retain, nonatomic) NSString *pluginName;
 @property (readonly, retain, nonatomic) NSString *identifier;
+@property (readonly, assign, nonatomic) HGSUnitTestingDelegate *delegate;
 
 /*!
  Designated initializer for HGSExtensionTestCase.
@@ -79,6 +93,19 @@
  @param identifier The identifier for the extension we want to load.
  @param extensionPointIdentifier The extension point that we expect the 
         extension to extend.
+ @param delegate the HGSUnitTestingDelegate used to control plugin loading.
+        delegate can be nil, in which case a HGSUnitTestingDelegate will be 
+        used.
+*/
+- (id)initWithInvocation:(NSInvocation *)invocation
+             pluginNamed:(NSString *)pluginName 
+     extensionIdentifier:(NSString *)identifier
+extensionPointIdentifier:(NSString *)extensionPointIdentifier
+                delegate:(HGSUnitTestingDelegate *)delegate;
+/*!
+  Calls 
+  initWithInvocation:pluginNamed:extensionIdentifier:extensionPointIdentifier:delegate:
+  with a nil delegate.
 */
 - (id)initWithInvocation:(NSInvocation *)invocation
              pluginNamed:(NSString *)pluginName 
@@ -90,13 +117,15 @@ extensionPointIdentifier:(NSString *)extensionPointIdentifier;
   @param pluginName The name of the plugin that we want to access 
   (without the hgs extension). 
   @param identifier The identifier for the extension we want to load.
-  @param extensionPointIdentifier The extension point that we expect the 
+  @param extensionPointIdentifier The extension point that we expect the
   extension to extend.
+  @param delegate the HGSUnitTestingDelegate used to control plugin loading.
 */
 
 - (HGSExtension *)extensionWithIdentifier:(NSString *)identifier
                           fromPluginNamed:(NSString *)pluginName
-                 extensionPointIdentifier:(NSString *)extensionPointID;
+                 extensionPointIdentifier:(NSString *)extensionPointID
+                                 delegate:(HGSUnitTestingDelegate *)delegate;
 @end
 
 /*!
@@ -137,5 +166,14 @@ extensionPointIdentifier:(NSString *)extensionPointIdentifier;
 - (id)initWithInvocation:(NSInvocation *)invocation
              pluginNamed:(NSString *)pluginName 
      extensionIdentifier:(NSString *)identifier;
+@end
+
+/*!
+ A simple source for using in tests.
+*/
+@interface HGSUnitTestingSource : HGSSearchSource
++ (id)sourceWithBundle:(NSBundle *)bundle;
+
+- (id)initWithBundle:(NSBundle *)bundle;
 @end
 

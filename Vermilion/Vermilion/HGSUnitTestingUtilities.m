@@ -37,20 +37,46 @@
 #import <sys/param.h>
 
 @interface HGSUnitTestingPluginLoader()
-- (BOOL)loadPlugin;
+- (BOOL)loadPluginWithDelegate:(HGSUnitTestingDelegate *)delegate;
 @end
 
 @implementation HGSUnitTestingPluginLoader
-+ (BOOL)loadPlugin:(NSString *)plugin {
+
++ (BOOL)loadPluginWithDelegate:(HGSUnitTestingDelegate *)delegate {
   HGSUnitTestingPluginLoader *loader 
-    = [[[HGSUnitTestingPluginLoader alloc] initWithPath:plugin] autorelease];
-  return [loader loadPlugin];
+    = [[[HGSUnitTestingPluginLoader alloc] init] autorelease];
+  return [loader loadPluginWithDelegate:delegate];
 }
 
-- (id)initWithPath:(NSString *)plugin {
+- (BOOL)loadPluginWithDelegate:(HGSUnitTestingDelegate *)delegate {
+  // This routine messes with the delegate for the plugin loader.
+  // We don't want people changing the delegate out from underneath us.
+  GTMAssertRunningOnMainThread();
+  HGSPluginLoader *loader = [HGSPluginLoader sharedPluginLoader];
+  id oldDelegate = [loader delegate];
+  [loader setDelegate:delegate];
+  NSArray *errors = nil;
+  [loader loadPluginsWithErrors:&errors];
+  BOOL wasGood = YES;
+  if (errors) {
+    wasGood = NO;
+    HGSLog(@"Unable to load plugin %@: %@", [delegate path], errors);
+  } else {
+    [loader installAndEnablePluginsBasedOnPluginsState:nil];
+  }
+  [loader setDelegate:oldDelegate];
+  return wasGood;
+}
+
+@end
+
+@implementation HGSUnitTestingDelegate
+@synthesize path = path_;
+
+- (id)initWithPath:(NSString *)path {
   if ((self = [super init])) {
-    HGSAssert([plugin length], @"Need a valid plugin");
-    path_ = [plugin copy];
+    HGSAssert([path length], @"Need a valid plugin");
+    path_ = [path copy];
   }
   return self;
 }
@@ -59,28 +85,6 @@
   [path_ release];
   [super dealloc];
 }
-
-- (BOOL)loadPlugin {
-  // This routine messes with the delegate for the plugin loader.
-  // We don't want people changing the delegate out from underneath us.
-  GTMAssertRunningOnMainThread();
-  HGSPluginLoader *loader = [HGSPluginLoader sharedPluginLoader];
-  id oldDelegate = [loader delegate];
-  [loader setDelegate:self];
-  NSArray *errors = nil;
-  [loader loadPluginsWithErrors:&errors];
-  BOOL wasGood = YES;
-  if (errors) {
-    wasGood = NO;
-    HGSLog(@"Unable to load plugin %@: %@", path_, errors);
-  } else {
-    [loader installAndEnablePluginsBasedOnPluginsState:nil];
-  }
-  [loader setDelegate:oldDelegate];
-  return wasGood;
-}
-
-#pragma mark Delegate Methods
 
 - (NSString*)userFolderNamed:(NSString* )name {
   NSString *workingDir = NSTemporaryDirectory();
@@ -143,11 +147,13 @@
 @synthesize extensionPointIdentifier = extensionPointIdentifier_;
 @synthesize pluginName = pluginName_;
 @synthesize identifier = identifier_;
+@synthesize delegate = delegate_;
 
 - (id)initWithInvocation:(NSInvocation *)invocation
              pluginNamed:(NSString *)pluginName 
      extensionIdentifier:(NSString *)identifier
-extensionPointIdentifier:(NSString *)extensionPointIdentifier {
+extensionPointIdentifier:(NSString *)extensionPointIdentifier
+                delegate:(HGSUnitTestingDelegate *)delegate {
   if ((self = [super initWithInvocation:invocation])) {
     pluginName_ = [pluginName copy];
     STAssertGreaterThan([pluginName_ length], (NSUInteger)0, nil);
@@ -156,8 +162,20 @@ extensionPointIdentifier:(NSString *)extensionPointIdentifier {
     extensionPointIdentifier_ = [extensionPointIdentifier copy];
     STAssertGreaterThan([extensionPointIdentifier_ length], (NSUInteger)0, nil);
     loadedExtensions_ = [[NSMutableArray alloc] init];
+    delegate_ = delegate;
   }
   return self;
+}
+
+- (id)initWithInvocation:(NSInvocation *)invocation
+             pluginNamed:(NSString *)pluginName 
+     extensionIdentifier:(NSString *)identifier
+extensionPointIdentifier:(NSString *)extensionPointIdentifier {
+  return [self initWithInvocation:invocation 
+                      pluginNamed:pluginName 
+              extensionIdentifier:identifier 
+         extensionPointIdentifier:extensionPointIdentifier 
+                         delegate:nil];
 }
 
 - (void)dealloc {
@@ -173,7 +191,8 @@ extensionPointIdentifier:(NSString *)extensionPointIdentifier {
   STAssertNil(extension_, @"How is extension not nil?");
   extension_ = [self extensionWithIdentifier:identifier_
                              fromPluginNamed:pluginName_
-                    extensionPointIdentifier:extensionPointIdentifier_];
+                    extensionPointIdentifier:extensionPointIdentifier_
+                                    delegate:delegate_];
   STAssertNotNil(extension_, nil);
 }
 
@@ -187,13 +206,17 @@ extensionPointIdentifier:(NSString *)extensionPointIdentifier {
 
 - (HGSExtension *)extensionWithIdentifier:(NSString *)identifier
                           fromPluginNamed:(NSString *)pluginName
-                 extensionPointIdentifier:(NSString *)extensionPointID {
+                 extensionPointIdentifier:(NSString *)extensionPointID
+                                 delegate:(HGSUnitTestingDelegate *)delegate {
   NSBundle *hgsBundle = HGSGetPluginBundle();
   NSString *bundlePath = [hgsBundle bundlePath];
   NSString *workingDir = [bundlePath stringByDeletingLastPathComponent];
   NSString *path = [workingDir stringByAppendingPathComponent:pluginName];
   path = [path stringByAppendingPathExtension:@"hgs"];
-  BOOL didLoad = [HGSUnitTestingPluginLoader loadPlugin:path];
+  if (!delegate) {
+    delegate = [[[HGSUnitTestingDelegate alloc] initWithPath:path] autorelease];
+  }
+  BOOL didLoad = [HGSUnitTestingPluginLoader loadPluginWithDelegate:delegate];
   STAssertTrue(didLoad, @"Unable to load %@", path);
   HGSExtensionPoint *extensionPoint 
     = [HGSExtensionPoint pointWithIdentifier:extensionPointID];
@@ -273,6 +296,37 @@ extensionPointIdentifier:(NSString *)extensionPointIdentifier {
 
 - (HGSAction *)action {
   return [self extension];
+}
+
+@end
+
+@implementation HGSUnitTestingSource
+
++ (id)sourceWithBundle:(NSBundle *)bundle {
+  return [[[self alloc] initWithBundle:bundle] autorelease];
+}
+
+- (id)initWithBundle:(NSBundle *)bundle {
+  HGSExtensionPoint *sp = [HGSExtensionPoint sourcesPoint];
+  NSString *identifier 
+    = [[bundle bundlePath] stringByAppendingString:@".HGSUnitTestingSource"];
+  HGSExtension *ext = [sp extensionWithIdentifier:identifier];
+  if (ext) {
+    [self release];
+    self = [ext retain];
+  } else {
+    NSDictionary *config 
+      = [NSDictionary dictionaryWithObjectsAndKeys:
+         bundle, kHGSExtensionBundleKey,
+         identifier, kHGSExtensionIdentifierKey,
+         identifier, kHGSExtensionUserVisibleNameKey,
+         nil];
+    self = [super initWithConfiguration:config];
+    if (self) {
+      [sp extendWithObject:self];
+    }
+  }
+  return self;
 }
 
 @end
