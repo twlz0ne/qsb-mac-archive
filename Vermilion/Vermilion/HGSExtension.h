@@ -148,6 +148,10 @@
 */
 - (id)defaultObjectForKey:(NSString *)key;
 
+/*!
+  Called when an extension is being uninstalled.
+*/
+- (void)uninstall;
 @end
 
 #pragma mark Extension keys

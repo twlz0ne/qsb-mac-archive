@@ -182,6 +182,10 @@ NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
   [super dealloc];
 }
 
+// Base class does nothing.
+- (void)uninstall {
+}
+
 - (NSString *)defaultIconName {
   return @"QSBPlugin";
 }

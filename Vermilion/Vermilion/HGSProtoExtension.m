@@ -326,7 +326,9 @@
     NSString *extensionPointKey = [self extensionPointKey];
     HGSExtensionPoint *point
       = [HGSExtensionPoint pointWithIdentifier:extensionPointKey];
-    [point removeExtension:extension_];
+    HGSExtension *extension = [self extension];
+    [extension uninstall];
+    [point removeExtension:extension];
     [self setExtension:nil];
   }
 }
