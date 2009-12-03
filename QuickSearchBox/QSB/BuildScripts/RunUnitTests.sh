@@ -48,6 +48,9 @@ test_targets=( "Vermilion Test" "QSB Core Test" "Web Bookmarks Test" "Spotlight 
 
 for test_target in "${test_targets[@]}"; do
   echo "Test All:${LINENO}: note: Testing Target: ${test_target}"
-  xcodebuild -project "QSB.xcodeproj" -target "${test_target}" -configuration "${CONFIGURATION}" OBJROOT="${OBJROOT}" SYMROOT="${SYMROOT}" CACHE_ROOT="${CACHE_ROOT}" GTM_DO_NOT_REMOVE_GCOV_DATA=1
+  # '|| true' at the end avoids 'set -o errexit' from exiting this
+  # script if xcodebuild returns an error. 
+  # Errors from xcodebuild will be logged to the console.
+  xcodebuild -project "QSB.xcodeproj" -target "${test_target}" -configuration "${CONFIGURATION}" OBJROOT="${OBJROOT}" SYMROOT="${SYMROOT}" CACHE_ROOT="${CACHE_ROOT}" GTM_DO_NOT_REMOVE_GCOV_DATA=1 || true
   echo "Test All:${LINENO}: note: Done Testing Target: ${test_target}"
 done
