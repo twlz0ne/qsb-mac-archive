@@ -562,7 +562,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   if (bestThumbnail) {
     NSString *photoURLString = [bestThumbnail URLString];
     if (photoURLString) {
-      [attributes setObject:[NSURL URLWithString:photoURLString]
+      [attributes setObject:photoURLString
                      forKey:kHGSObjectAttributeIconPreviewFileKey];
     }
   }

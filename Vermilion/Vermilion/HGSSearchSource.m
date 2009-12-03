@@ -176,6 +176,11 @@ NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources
       }
     }
   }
+  if (![NSPropertyListSerialization propertyList:dict 
+                                isValidForFormat:NSPropertyListBinaryFormat_v1_0]) {
+    HGSLog(@"Archive cannot be serialized: %@", dict);
+    dict = nil;
+  }
   return dict;
 }
 

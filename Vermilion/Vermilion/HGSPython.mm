@@ -364,9 +364,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       Py_DECREF(pyValue);
     }
     
-    // Icon URL
-    url = [result valueForKey:kHGSObjectAttributeIconPreviewFileKey];
-    value = [url absoluteString];
+    // Icon URLString
+    value = [result valueForKey:kHGSObjectAttributeIconPreviewFileKey];
     if (value && (pyValue = PyString_FromString([value UTF8String]))) {
       PyDict_SetItemString(dict, 
                            [kHGSObjectAttributeIconPreviewFileKey UTF8String], 
@@ -803,34 +802,8 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                 }
                 if (image && strlen(image) > 0) {
                   NSString *imageURLString = [NSString stringWithUTF8String:image];
-                  NSURL *imageURL = [NSURL URLWithString:imageURLString];
-                  if (![imageURL scheme]) {
-                    // If they didn't give us a full URL, let's look in our
-                    // bundle.
-                    NSBundle *bundle = [[self->operation_ source] bundle];
-                    NSString *extension = [imageURLString pathExtension];
-                    NSString *path
-                      = [imageURLString stringByDeletingPathExtension];
-                    NSString *imagePath = [bundle pathForResource:path
-                                                           ofType:extension];
-                    if ([imagePath length]) {
-                      NSImage *icon 
-                        = [[[NSImage alloc] initByReferencingFile:imagePath]
-                           autorelease];
-                      [attributes setObject:icon
-                                     forKey:kHGSObjectAttributeIconKey];
-                      imageURL = nil;
-                    } else {
-                      imagePath = [bundle pathForResource:imageURLString
-                                                   ofType:nil];
-                      if ([imagePath length]) {
-                        imageURL = [NSURL fileURLWithPath:imagePath
-                                              isDirectory:NO];
-                      }
-                    }
-                  }
-                  if (imageURL) {
-                    [attributes setObject:imageURL 
+                  if (imageURLString) {
+                    [attributes setObject:imageURLString
                                    forKey:kHGSObjectAttributeIconPreviewFileKey];
                   }
                 }

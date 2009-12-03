@@ -169,7 +169,8 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
 }
 
 - (NSArray *)archiveKeys {
-  NSArray *archiveKeys = [NSArray arrayWithObject:kHGSObjectAttributeIconKey];
+  NSArray *archiveKeys 
+    = [NSArray arrayWithObject:kHGSObjectAttributeIconPreviewFileKey];
   return archiveKeys;
 }
 

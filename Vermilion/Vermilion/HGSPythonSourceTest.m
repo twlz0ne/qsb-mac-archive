@@ -111,10 +111,9 @@
                           withSearchOperation:nil];
   STAssertNotNULL(py, nil);
   
-  NSURL *preview = [NSURL URLWithString:@"file:///icon.png"];
   NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                               @"A Snippet", kHGSObjectAttributeSnippetKey,
-                              preview, kHGSObjectAttributeIconPreviewFileKey,
+                              @"file:///icon.png", kHGSObjectAttributeIconPreviewFileKey,
                               @"none.test", kHGSObjectAttributeDefaultActionKey,
                               nil];
   HGSResult *result = [HGSResult resultWithURI:@"http://www.google.com/"

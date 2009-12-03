@@ -871,7 +871,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   NSMutableDictionary *attributes
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
-       [NSURL fileURLWithPath:iconFilePath], kHGSObjectAttributeIconPreviewFileKey,
+       iconFilePath, kHGSObjectAttributeIconPreviewFileKey,
        [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        albumIcon_, kHGSObjectAttributeIconKey,
        nil];

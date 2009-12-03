@@ -62,7 +62,7 @@ extern NSString* const kHGSObjectAttributeSourceURLKey;  // NSString
 // Immediate Icon Key blocks the UI until we get an icon back
 extern NSString* const kHGSObjectAttributeIconKey;  // NSImage
 extern NSString* const kHGSObjectAttributeImmediateIconKey;  // NSImage
-extern NSString* const kHGSObjectAttributeIconPreviewFileKey;  // NSURL
+extern NSString* const kHGSObjectAttributeIconPreviewFileKey;  // NSString - either an URL or a filepath
 extern NSString* const kHGSObjectAttributeCompoundIconPreviewFileKey;  // NSURL
 extern NSString* const kHGSObjectAttributeFlagIconNameKey;  // NSString
 extern NSString* const kHGSObjectAttributeAliasDataKey;  // NSData

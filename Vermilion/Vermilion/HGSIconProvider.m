@@ -70,8 +70,9 @@ static NSString *const kHGSIconProviderThumbnailURLFormat
   = @"HGSIconProviderThumbnailURLFormat";
 
 static NSURL* IconURLForResult(HGSResult *result) {
-  NSURL *url = [result valueForKey:kHGSObjectAttributeIconPreviewFileKey];
-  if (!url) {
+  NSURL *url = nil;
+  NSString *urlPath = [result valueForKey:kHGSObjectAttributeIconPreviewFileKey];
+  if (!urlPath) {
     url = [result url];
     
     // For urls, we can specify a thumbnail provider for web sites.
@@ -89,6 +90,29 @@ static NSURL* IconURLForResult(HGSResult *result) {
       }
       if (newURL) {
         url = newURL;
+      }
+    }
+  } else {
+    url = [NSURL URLWithString:urlPath];
+    if (![url scheme]) {
+      url = [NSURL fileURLWithPath:urlPath];
+      if (url) {
+        urlPath = [url relativePath];
+        if ([urlPath characterAtIndex:0] != '/') {
+          // If we have a relative path, look for the icon in the source
+          // bundle.
+          NSString *dir = [urlPath stringByDeletingLastPathComponent];
+          if ([dir length] == 0) dir = nil;
+          NSString *file = [urlPath lastPathComponent];
+          NSString *extension = [file pathExtension];
+          file = [file stringByDeletingPathExtension];
+          NSString *path = [[[result source] bundle] pathForResource:file
+                                                              ofType:extension 
+                                                         inDirectory:dir];
+          if (path) {
+            url = [NSURL fileURLWithPath:path];
+          }
+        }
       }
     }
   }
