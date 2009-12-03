@@ -1,7 +1,7 @@
 //
 //  Shortcuts.m
 //
-//  Copyright (c) 2007-2008 Google Inc. All rights reserved.
+//  Copyright (c) 2007-2009 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -46,7 +46,6 @@
 // first element in the array for a given key.
 
 #import <Vermilion/Vermilion.h>
-#import "HGSSQLiteBackedCache.h"
 #import "HGSStringUtil.h"
 
 #if TARGET_OS_IPHONE
@@ -61,41 +60,44 @@
 #import "GTMObjectSingleton.h"
 #import "GTMExceptionalInlines.h"
 
-static NSString *const kHGSShortcutsKey = @"kHGSShortcutsKey";
-static NSString *const kHGSShortcutsArchiveKey = @"kHGSShortcutsArchiveKey";
+static NSString *const kHGSShortcutsDictionaryKey 
+  = @"kHGSShortcutsDictionaryKey";
 static NSString *const kHGSShortcutsVersionStringKey 
   = @"kHGSShortcutsVersionStringKey";
-
-static NSString *const kHGSShortcutsAliasKey = @"kHGSShortcutsAliasKey";
+static NSString *const kHGSShortcutsSourceIdentifierKey
+  = @"kHGSShortcutsSourceIdentifierKey";
 
 // The current version of the shortcuts DB. If you change how things are stored
 // in the shortcuts DB, you will have to change this.
-static NSString* const kHGSShortcutsVersion = @"0.92";
+static NSString* const kHGSShortcutsVersion = @"0.93";
 
 // Maximum number of entries per shortcut.
 static const unsigned int kMaxEntriesPerShortcut = 3;
 
 @interface ShortcutsSource : HGSCallbackSearchSource {
 @private
-  HGSSQLiteBackedCache *cache_;
+  // Shortcuts Data is keyed by shortcut (what the user typed) and
+  // each object is an NSMutableArray with up to kMaxEntriesPerShortcut.
+  // Each object in the array is an NSDictionary representing a single
+  // HGSResult.
+  NSMutableDictionary *shortcuts_;
+  NSArray *sortedKeys_;
+  NSString *shortcutsFilePath_;
+  BOOL dirty_;
+  NSTimer *writeShortcutsTimer_;
 }
-
-@property (readonly, retain) HGSSQLiteBackedCache *cache;
 
 // Tell the database that "object" was selected for shortcut, and let it do its
 // magic internally to update itself.
 - (BOOL)updateShortcutFromController:(QSBSearchController *)searchController 
                           withResult:(HGSResult *)result;
-// Reads in our shortcut info, and/or creates a new DB for us.
-- (NSMutableDictionary *)readShortcutData;
 
-- (NSArray *)rankedIdentifiersForNormalizedShortcut:(NSString *)shortcut;
 - (NSArray *)rankedObjectsForShortcut:(NSString *)shortcut;
 
 // Remove the given identifier for the shortcut.
 - (void)removeIdentifier:(NSString *)identifier
              forShortcut:(NSString *)shortcut;
-
+- (void)writeShortcuts:(NSTimer *)timer;
 @end
 
 static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
@@ -110,18 +112,17 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
 }
 
 @implementation ShortcutsSource
-@synthesize cache = cache_;
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
 #if TARGET_OS_IPHONE
     GMOSourceConfigProvider *provider = [GMOSourceConfigProvider defaultConfig];
-    NSString* cachePath = [provider shortcutsCacheDbPath];
+    shortcutsFilePath_ = [[provider shortcutsCacheDbPath] copy]
 #else
     id<HGSDelegate> delegate = [[HGSPluginLoader sharedPluginLoader] delegate];
     NSString *appSupportPath = [delegate userApplicationSupportFolderForApp];
-    NSString* cachePath
-      = [appSupportPath stringByAppendingPathComponent:@"shortcuts.db"];
+    shortcutsFilePath_
+      = [[appSupportPath stringByAppendingPathComponent:@"shortcuts.db"] retain];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self 
            selector:@selector(qsbWillPivot:) 
@@ -132,14 +133,21 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
                name:kQSBQueryControllerWillPerformActionNotification
              object:nil];
 #endif
-    cache_ = [[HGSSQLiteBackedCache alloc] initWithPath:cachePath 
-                                                version:kHGSShortcutsVersion
-                                            useArchiver:YES];
-    if (!cache_) {
-      HGSLogDebug(@"Unable to allocate cache in HGSShortcuts");
-      [self release];
-      self = nil;
+    NSMutableDictionary *fileContents 
+      = [NSMutableDictionary dictionaryWithContentsOfFile:shortcutsFilePath_];
+    NSString *vers = [fileContents objectForKey:kHGSShortcutsVersionStringKey];
+    shortcuts_ = [fileContents objectForKey:kHGSShortcutsDictionaryKey];
+    if (![vers isEqualToString:kHGSShortcutsVersion] || !shortcuts_) {
+      shortcuts_ = [NSMutableDictionary dictionary];
     }
+    [shortcuts_ retain];
+    writeShortcutsTimer_ 
+      = [NSTimer scheduledTimerWithTimeInterval:300 
+                                         target:self 
+                                       selector:@selector(writeShortcuts:) 
+                                       userInfo:nil 
+                                        repeats:YES];
+    
   }
   return self;
 }
@@ -147,8 +155,24 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
 - (void) dealloc{
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self];
-  [cache_ release];
+  [shortcuts_ release];
+  [sortedKeys_ release];
+  [shortcutsFilePath_ release];
   [super dealloc];
+}
+
+- (NSUInteger)indexOfResultWithIdentifier:(NSString *)identifier
+                                fromArray:(NSArray *)array {
+  NSUInteger idx = NSNotFound;
+  NSUInteger count = [array count];
+  for (NSUInteger i = 0; i < count; ++i) {
+    NSDictionary *dict = [array objectAtIndex:i];
+    if ([[dict objectForKey:kHGSObjectAttributeURIKey] isEqualTo:identifier]) {
+      idx = i;
+      break;
+    }
+  }
+  return idx;
 }
 
 - (id)defaultObjectForKey:(NSString *)key {
@@ -164,40 +188,30 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   return defaultObject;
 }
 
-- (HGSResult *)unarchiveResultForIdentifier:(NSString *)identifier {
-  id object = [[self cache] valueForKey:identifier];
+- (HGSResult *)unarchiveResult:(NSDictionary *)resultEntry {
   HGSResult *result = nil;
-  // Make sure we get out dictionary we expect of source name and object
-  if ([object isKindOfClass:[NSDictionary class]] &&
-      ([object count] == 1)) {
-    NSDictionary *archiveDict = object;
-    NSString *sourceName = [[archiveDict allKeys] lastObject];
-    NSDictionary *archivedRep = [archiveDict objectForKey:sourceName];
-    if ([archivedRep isKindOfClass:[NSDictionary class]]) {
-      HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
-      HGSSearchSource *source 
-        = [sourcesPoint extensionWithIdentifier:sourceName];
-      result = [source resultWithArchivedRepresentation:archivedRep];
-    } else {
-      HGSLogDebug(@"didn't have a dictionary for the hgsobject's archived rep");
-    }
+  NSString *sourceIdentifier 
+    = [resultEntry objectForKey:kHGSShortcutsSourceIdentifierKey];
+  if (sourceIdentifier) {
+    HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
+    HGSSearchSource *source 
+      = [sourcesPoint extensionWithIdentifier:sourceIdentifier];
+    result = [source resultWithArchivedRepresentation:resultEntry];
   }
   return result;
 }
 
-// TODO(alcor): move storage of shortcuts to a sqlite db
-- (void)setArray:(NSArray *)array forShortcut:(NSString *)key {
-  NSMutableDictionary *shortcutDB = [self readShortcutData];
-  [shortcutDB setObject:array forKey:key];
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  [defaults setObject:shortcutDB forKey:kHGSShortcutsKey];
-  [defaults synchronize];
-}
-
-- (NSArray *)arrayForShortcut:(NSString *)key {
-  NSMutableDictionary *shortcutDB = [self readShortcutData];
-  NSArray *valueArray = [shortcutDB objectForKey:key];
-  return valueArray;
+- (NSDictionary *)archiveResult:(HGSResult *)result {
+  NSMutableDictionary *archive = nil;
+  HGSSearchSource *source = [result source];
+  if (source) {
+    archive = [source archiveRepresentationForResult:result];
+    if (archive) {
+      NSString *identifier = [source identifier];
+      [archive setObject:identifier forKey:kHGSShortcutsSourceIdentifierKey];
+    }
+  }
+  return archive;
 }
 
 - (BOOL)updateShortcutFromController:(QSBSearchController *)searchController  
@@ -230,19 +244,16 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
     return NO;
   }
   
-  HGSSearchSource *source = [result source];
-  NSMutableDictionary *archiveDict 
-    = [source archiveRepresentationForResult:result];
-  if (!archiveDict || [archiveDict count] == 0) {
+  NSDictionary *archiveDict = [self archiveResult:result];
+  if (!archiveDict) {
     return NO;
   }
     
-  @synchronized ([self class]) {
-    NSMutableArray *valueArray 
-      = [[[self arrayForShortcut:normalizeShortcut] mutableCopy] autorelease];
-    // see if we have an array for the given shortcut
-    
-    NSUInteger currentIndex = [valueArray indexOfObject:identifier];
+  @synchronized (shortcuts_) {
+    NSMutableArray *valueArray = [shortcuts_ objectForKey:normalizeShortcut];
+     // see if we have an array for the given shortcut
+    NSUInteger currentIndex = [self indexOfResultWithIdentifier:identifier
+                                                      fromArray:valueArray];
     
     // The only way to be inserted at 0 is if you are in 2nd place, 
     // otherwise insert at 1
@@ -250,30 +261,34 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
     
     // Only perform the insertion/update if the current index changed
     // or if the array doesn't exist yet.
-    
     if (!valueArray || newIndex != currentIndex) {
       if (!valueArray) {
-        valueArray = [NSMutableArray array]; 
+        valueArray = [NSMutableArray arrayWithObject:archiveDict];
+        [shortcuts_ setObject:valueArray forKey:normalizeShortcut];
+        [sortedKeys_ release];
+        sortedKeys_ = nil;
       } else {
-        [valueArray removeObject:identifier];
+        if (currentIndex < [valueArray count]) {
+          [valueArray removeObjectAtIndex:currentIndex];
+        }
+        if (newIndex < [valueArray count]) {
+          [valueArray insertObject:archiveDict atIndex:newIndex];
+        } else {
+          [valueArray addObject:archiveDict];
+        }
+      } 
+      
+      // Clamp the number of shortcuts to kMaxEntriesPerShortcut.
+      if ([valueArray count] > kMaxEntriesPerShortcut) {
+        NSRange toRemove 
+          = GTMNSMakeRange(kMaxEntriesPerShortcut,
+                           [valueArray count] - kMaxEntriesPerShortcut);
+        [valueArray removeObjectsInRange:toRemove];
       }
-      [valueArray insertObject:identifier atIndex:newIndex];
+      dirty_ = YES;
+      HGSLogDebug(@"Shortcut recorded: %@ = %@", shortcut, result);
     }
     
-    // Clamp the number of shortcuts to kMaxEntriesPerShortcut.
-    if ([valueArray count] > kMaxEntriesPerShortcut) {
-      NSRange toRemove 
-        = GTMNSMakeRange(kMaxEntriesPerShortcut,
-                         [valueArray count] - kMaxEntriesPerShortcut);
-      [valueArray removeObjectsInRange:toRemove];
-    }
-    
-    [self setArray:valueArray forShortcut:normalizeShortcut];
-    NSString *srcId = [source identifier];
-    NSDictionary *archiveData = [NSDictionary dictionaryWithObject:archiveDict 
-                                                            forKey:srcId];
-    [[self cache] setValue:archiveData forKey:identifier];
-    HGSLogDebug(@"Shortcut recorded: %@ = %@", shortcut, result);
   }
   return YES;
 }
@@ -282,20 +297,16 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
              forShortcut:(NSString *)shortcut {
   NSString *normalizeShortcut
     = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:shortcut];
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  @synchronized ([self class]) {
-    NSMutableDictionary *shortcutData = [self readShortcutData];
-    NSMutableArray *shortcutArray
-      = [[[shortcutData objectForKey:normalizeShortcut] mutableCopy]
-         autorelease];
-    [shortcutArray removeObject:identifier];
-    if ([shortcutArray count]) {
-      [shortcutData setObject:shortcutArray forKey:normalizeShortcut];
-    } else {
-      [shortcutData removeObjectForKey:normalizeShortcut];
+  @synchronized (shortcuts_) {
+    NSMutableArray *shortcutArray = [shortcuts_ objectForKey:normalizeShortcut];
+    NSUInteger idx = [self indexOfResultWithIdentifier:identifier 
+                                             fromArray:shortcutArray];
+    if (idx != NSNotFound) {
+        [shortcutArray removeObjectAtIndex:idx];
+        [sortedKeys_ release];
+        sortedKeys_ = nil;
+        dirty_ = YES;
     }
-    [defaults setObject:shortcutData forKey:kHGSShortcutsKey];
-    [defaults synchronize];
   }
 }
 
@@ -317,65 +328,38 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   [operation setResults:rankedResults];
 }
 
-- (NSArray *)rankedIdentifiersForNormalizedShortcut:(NSString *)normalizeShortcut {
-  NSDictionary *shortcutDB = [self readShortcutData];
-  NSArray *keyArray = [[shortcutDB allKeys] sortedArrayUsingFunction:KeyLength
-                                                             context:NULL];
-  NSMutableArray *identifierArray = [NSMutableArray array];
-  for (NSString *key in keyArray) {
-    if ([key hasPrefix:normalizeShortcut]) {
-      for(NSString *identifier in [shortcutDB objectForKey:key]) {
-        // Filter out duplicates
-        if (![identifierArray containsObject:identifier]) {
-          [identifierArray addObject:identifier];
+- (NSArray *)rankedObjectsForShortcut:(NSString *)shortcut {
+  NSString *normalizedShortcut
+    = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:shortcut];
+  NSMutableArray *results = [NSMutableArray array];
+  @synchronized(shortcuts_) {
+    if (!sortedKeys_) {
+      NSArray *keyArray = [shortcuts_ allKeys];
+      sortedKeys_ = [[keyArray sortedArrayUsingFunction:KeyLength
+                                                context:NULL] retain];
+    }
+    for (NSString *key in sortedKeys_) {
+      if ([key hasPrefix:normalizedShortcut]) {
+        NSArray *resultArray = [shortcuts_ objectForKey:key];
+        for (NSDictionary *resultDict in resultArray) {
+          HGSResult *result = [self unarchiveResult:resultDict];
+          if (result) {
+            if ([results indexOfObject:result] == NSNotFound) {
+              [results addObject:result];
+            }
+          } else {
+            NSString *identifier 
+              = [resultDict objectForKey:kHGSObjectAttributeURIKey];
+            if (identifier) {
+              [self removeIdentifier:identifier forShortcut:shortcut];
+            }
+          }
         }
       }
     }
   }
-  return identifierArray;
-}
-
-- (NSArray *)rankedObjectsForShortcut:(NSString *)shortcut {
-  NSString *normalizeShortcut
-    = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:shortcut];
-  NSArray *identifiers 
-    = [self rankedIdentifiersForNormalizedShortcut:normalizeShortcut];
-  
-  NSMutableArray *results 
-    = [NSMutableArray arrayWithCapacity:[identifiers count]];
-  for (NSString *identifier in identifiers) {
-    HGSResult *result = [self unarchiveResultForIdentifier:identifier];
-    if (result) {
-      [results addObject:result];
-    } else {
-      // If the result comes back nil then the references item is no
-      // longer available.  Remove it from the shortcut database.
-      [self removeIdentifier:identifier forShortcut:shortcut];
-    }
-  }
   return results;
 }  
-
-- (NSMutableDictionary *)readShortcutData {
-  NSMutableDictionary *shortcutData = nil;
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSString* version = [defaults objectForKey:kHGSShortcutsVersionStringKey];
-  @synchronized ([self class]) {
-    if ([version isEqualToString:kHGSShortcutsVersion]) {
-      NSDictionary *shortCuts = [defaults dictionaryForKey:kHGSShortcutsKey];
-      shortcutData = [NSMutableDictionary dictionaryWithDictionary:shortCuts];
-    }
-    if (!shortcutData) {
-      shortcutData = [NSMutableDictionary dictionary];
-      [defaults setObject:kHGSShortcutsVersion 
-                   forKey:kHGSShortcutsVersionStringKey];
-      [defaults setObject:shortcutData 
-                   forKey:kHGSShortcutsKey];
-      [defaults synchronize];
-    }
-  }
-  return shortcutData;
-}  // readShortcutData
 
 #if TARGET_OS_IPHONE
 - (void)resetHistoryAndCache {
@@ -384,11 +368,12 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   [defaults removeObjectForKey:kHGSShortcutsKey];
   [defaults synchronize];
   
-  [[self cache] removeAllObjects];
+  [shortcuts_ removeAllObjects];
 }
 
 #else 
 
+// Store off the shortcut on a pivot.
 - (void)qsbWillPivot:(NSNotification *)notification {
   NSDictionary *userDict = [notification userInfo];
   QSBSearchController *searchController 
@@ -402,6 +387,7 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   }  
 }
 
+// Store off the shortcut when an action is performed on it.
 - (void)qsbWillPerformAction:(NSNotification *)notification {
   NSDictionary *userDict = [notification userInfo];
   QSBSearchController *searchController 
@@ -415,5 +401,30 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   }
 }
 
+// When the plugin is being uninstalled, write out shortcuts, and invalidate 
+// the timer which is retaining us.
+- (void)uninstall {
+  [writeShortcutsTimer_ invalidate];
+  writeShortcutsTimer_ = nil;
+  [self writeShortcuts:nil];
+  [super uninstall];
+}
+
+- (void)writeShortcuts:(NSTimer *)timer {
+  @synchronized(shortcuts_) {
+    if (dirty_) {
+      NSDictionary *fileData = [NSDictionary dictionaryWithObjectsAndKeys:
+        shortcuts_, kHGSShortcutsDictionaryKey,
+        kHGSShortcutsVersion, kHGSShortcutsVersionStringKey,
+        nil];
+      if (![fileData writeToFile:shortcutsFilePath_ atomically:YES]) {
+        HGSLog(@"Unable to write shortcuts to %@", shortcutsFilePath_);
+      } else {
+        dirty_ = NO;
+      }
+    }
+  }
+}
 #endif
+
 @end

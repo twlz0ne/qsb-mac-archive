@@ -502,7 +502,6 @@
 		7F4BE5350EA7A9CC0025D57D /* NSColor+Naming.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4BE5330EA7A9CC0025D57D /* NSColor+Naming.m */; };
 		7F5717910DB7C83F00D95EBD /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717900DB7C83F00D95EBD /* AddressBook.framework */; };
 		7F5717A90DB7C84F00D95EBD /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
-		7F5856E50DF83D85009EDEA5 /* NSArray+HGSCommonPrefixDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F5856E30DF83D85009EDEA5 /* NSArray+HGSCommonPrefixDetection.m */; };
 		7F58A77F0FCD8B9C0019A859 /* mail-flag.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F58A7750FCD8B9C0019A859 /* mail-flag.png */; };
 		7F58A7800FCD8B9C0019A859 /* presence-available.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F58A7760FCD8B9C0019A859 /* presence-available.png */; };
 		7F58A7810FCD8B9C0019A859 /* presence-busy.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F58A7770FCD8B9C0019A859 /* presence-busy.png */; };
@@ -574,6 +573,22 @@
 		8B02FB0D0EC9D50C00A6EB85 /* HGSExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B02FB0C0EC9D50C00A6EB85 /* HGSExtension.m */; };
 		8B0E66700FD82C6300461C4A /* GTMHotKeyTextField.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B0E665E0FD82C6300461C4A /* GTMHotKeyTextField.strings */; };
 		8B0E67140FD8643900461C4A /* Command.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 8B0E67130FD8643900461C4A /* Command.pdf */; };
+		8B0F054A10C73BD400C1A6FD /* GTMUnitTestingUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B0F054910C73BD400C1A6FD /* GTMUnitTestingUtilities.m */; };
+		8B0F054C10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B0F054B10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h */; };
+		8B0F071910C745EA00C1A6FD /* NSArray+HGSCommonPrefixDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F5856E30DF83D85009EDEA5 /* NSArray+HGSCommonPrefixDetection.m */; };
+		8B0F073110C7465900C1A6FD /* NSString+CaseInsensitive.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7C373C0D78A415009885B4 /* NSString+CaseInsensitive.m */; };
+		8B0F073210C7465E00C1A6FD /* NSString+CaseInsensitive.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B7C373B0D78A415009885B4 /* NSString+CaseInsensitive.h */; };
+		8B0FFC7010C6033800C1A6FD /* GTMSenTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */; };
+		8B0FFC7110C6033800C1A6FD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
+		8B0FFC7210C6033800C1A6FD /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
+		8B0FFC7310C6033800C1A6FD /* HGSUnitTestingUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B852E401007B1DE00880329 /* HGSUnitTestingUtilities.m */; };
+		8B0FFC7610C6033800C1A6FD /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
+		8B0FFC7710C6033800C1A6FD /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
+		8B0FFC7810C6033800C1A6FD /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		8B0FFC7910C6033800C1A6FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
+		8B0FFC7A10C6033800C1A6FD /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B55DB010E78832300D39CB0 /* SenTestingKit.framework */; };
+		8B0FFD1210C603D900C1A6FD /* ShortcutsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B0FFD1110C603D900C1A6FD /* ShortcutsTest.m */; };
+		8B0FFEEB10C639E000C1A6FD /* SampleContact.abcdp in Resources */ = {isa = PBXBuildFile; fileRef = 8B5544FB105874C400D23AD2 /* SampleContact.abcdp */; };
 		8B10A6FD0FA5F5E50087DE20 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B10AB690FA679A60087DE20 /* HGSAppleScriptHandlerTest.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
 		8B1490A80F715781002E05FA /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
@@ -655,7 +670,6 @@
 		8B4810A71046345700BB6A2D /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B55DB010E78832300D39CB0 /* SenTestingKit.framework */; };
 		8B481140104635AE00BB6A2D /* SLFilesSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B48113F104635AD00BB6A2D /* SLFilesSourceTest.m */; };
 		8B488A480F15DE6A00786C1E /* QSBMenuButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B488A460F15DE6A00786C1E /* QSBMenuButton.m */; };
-		8B488A490F15DE9400786C1E /* NSString+CaseInsensitive.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7C373C0D78A415009885B4 /* NSString+CaseInsensitive.m */; };
 		8B48944A0F16EA8F00786C1E /* QSBIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B4893FF0F16EA5300786C1E /* QSBIcon.icns */; };
 		8B4894550F16EB1E00786C1E /* QSBPlugin.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B4894540F16EB1E00786C1E /* QSBPlugin.icns */; };
 		8B4894610F16EB9900786C1E /* QSBStatusMenuIconGrayInverted.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B48945F0F16EB9900786C1E /* QSBStatusMenuIconGrayInverted.png */; };
@@ -953,7 +967,6 @@
 		8B95AA0910642867000C4C6B /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		8B95AA0A10642867000C4C6B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		8B95AA0B10642867000C4C6B /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B55DB010E78832300D39CB0 /* SenTestingKit.framework */; };
-		8B95AA0C10642867000C4C6B /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
 		8B95AA941064298E000C4C6B /* ClipboardTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95AA931064298E000C4C6B /* ClipboardTest.m */; };
 		8B95AC8310644731000C4C6B /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B95AD3A10653C46000C4C6B /* alt-search.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B95AD3910653C46000C4C6B /* alt-search.png */; };
@@ -1440,6 +1453,27 @@
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
+		8B0F072810C745FA00C1A6FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F4FEECCC0EC4BF99000758EC /* CorePlugin */;
+			remoteInfo = CorePlugin;
+		};
+		8B0F07C110C7473B00C1A6FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
+			remoteInfo = "QSB Application";
+		};
+		8B0FFD0810C6038300C1A6FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B3EF87F0EF2C8A80036FFBD /* Shortcuts */;
+			remoteInfo = Shortcuts;
+		};
 		8B1490640F71576B002E05FA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1586,13 +1620,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 4F1AD9020B71603F00DC0485;
 			remoteInfo = DevelopmentTestTool;
-		};
-		8B63DDB80D94591700395A2B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B3EECE20CEA86A100D933C0;
-			remoteInfo = QSB2;
 		};
 		8B6F2F0A0DA2BB060052CA40 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2409,6 +2436,10 @@
 		8B0E666E0FD82C6300461C4A /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/GTMHotKeyTextField.strings; sourceTree = "<group>"; };
 		8B0E666F0FD82C6300461C4A /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/GTMHotKeyTextField.strings; sourceTree = "<group>"; };
 		8B0E67130FD8643900461C4A /* Command.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Command.pdf; sourceTree = "<group>"; };
+		8B0F054910C73BD400C1A6FD /* GTMUnitTestingUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMUnitTestingUtilities.m; sourceTree = "<group>"; };
+		8B0F054B10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMUnitTestingUtilities.h; sourceTree = "<group>"; };
+		8B0FFC8110C6033800C1A6FD /* Shortcuts Test.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Shortcuts Test.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B0FFD1110C603D900C1A6FD /* ShortcutsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShortcutsTest.m; sourceTree = "<group>"; };
 		8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = HGSAppleScriptHandlerTest.applescript; sourceTree = "<group>"; };
 		8B148F720F715697002E05FA /* OCMock.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = OCMock.xcodeproj; sourceTree = "<group>"; };
 		8B148F9A0F7156B6002E05FA /* OCMock.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OCMock.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3169,7 +3200,7 @@
 		8B9250DB0EE861E000F3DF32 /* QSBOpenProductHomepageCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBOpenProductHomepageCommand.m; sourceTree = "<group>"; };
 		8B9250DC0EE861E000F3DF32 /* QSBOpenPreferencesCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBOpenPreferencesCommand.m; sourceTree = "<group>"; };
 		8B92527A0EE871E700F3DF32 /* QSBHGSObjectSpecifiers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBHGSObjectSpecifiers.m; sourceTree = "<group>"; };
-		8B95AA1210642867000C4C6B /* Spotlight Files Test.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Spotlight Files Test.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B95AA1210642867000C4C6B /* Clipboard Test.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Clipboard Test.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B95AA931064298E000C4C6B /* ClipboardTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClipboardTest.m; sourceTree = "<group>"; };
 		8B95AD3910653C46000C4C6B /* alt-search.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "alt-search.png"; sourceTree = "<group>"; };
 		8B95CA910F6B09FE003BDBDD /* HGSAccountTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccountTest.m; sourceTree = "<group>"; };
@@ -3635,6 +3666,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8B0FFC7510C6033800C1A6FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B0FFC7610C6033800C1A6FD /* GTM.framework in Frameworks */,
+				8B0FFC7710C6033800C1A6FD /* AppKit.framework in Frameworks */,
+				8B0FFC7810C6033800C1A6FD /* Vermilion.framework in Frameworks */,
+				8B0FFC7910C6033800C1A6FD /* Foundation.framework in Frameworks */,
+				8B0FFC7A10C6033800C1A6FD /* SenTestingKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B312DA31057003600D57495 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -3840,7 +3883,6 @@
 				8B95AA0910642867000C4C6B /* Vermilion.framework in Frameworks */,
 				8B95AA0A10642867000C4C6B /* Foundation.framework in Frameworks */,
 				8B95AA0B10642867000C4C6B /* SenTestingKit.framework in Frameworks */,
-				8B95AA0C10642867000C4C6B /* OCMock.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3971,7 +4013,8 @@
 				8B852BDE1007AD1B00880329 /* WebBookmarksTest.octest */,
 				5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */,
 				8B4810AD1046345700BB6A2D /* Spotlight Files Test.octest */,
-				8B95AA1210642867000C4C6B /* Spotlight Files Test.octest */,
+				8B95AA1210642867000C4C6B /* Clipboard Test.octest */,
+				8B0FFC8110C6033800C1A6FD /* Shortcuts Test.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -4600,6 +4643,7 @@
 			isa = PBXGroup;
 			children = (
 				8B6EB4B2101A0A7D006CFF7A /* Resources */,
+				8B0FFD1110C603D900C1A6FD /* ShortcutsTest.m */,
 				8B3EFFA40EF31BC70036FFBD /* Shortcuts.m */,
 				8B3EF7670EF2C7CB0036FFBD /* Shortcuts-Info.plist */,
 			);
@@ -4651,6 +4695,8 @@
 				8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */,
 				8B95CCB30F6EDD8C003BDBDD /* GTMUnitTestDevLog.h */,
 				8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */,
+				8B0F054B10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h */,
+				8B0F054910C73BD400C1A6FD /* GTMUnitTestingUtilities.m */,
 				8B55D9250E786B5D00D39CB0 /* RunMacOSUnitTests.sh */,
 			);
 			path = UnitTesting;
@@ -6120,6 +6166,8 @@
 				8BF442D30FC74ED500C29AA1 /* GTMGoogleSearch.h in Headers */,
 				623B19261003E19C009B702D /* GTMNSScanner+JSON.h in Headers */,
 				8B3082DE1056EE1F006C4C7A /* GTMNSNumber+64Bit.h in Headers */,
+				8B0F054C10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h in Headers */,
+				8B0F073210C7465E00C1A6FD /* NSString+CaseInsensitive.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6528,6 +6576,25 @@
 			productReference = 7FF019BD0EB089CB001A2C7B /* Terminal.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
+		8B0FFC6B10C6033800C1A6FD /* Shortcuts Test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8B0FFC7D10C6033800C1A6FD /* Build configuration list for PBXNativeTarget "Shortcuts Test" */;
+			buildPhases = (
+				8B0FFC6E10C6033800C1A6FD /* Resources */,
+				8B0FFC6F10C6033800C1A6FD /* Sources */,
+				8B0FFC7510C6033800C1A6FD /* Frameworks */,
+				8B0FFC7C10C6033800C1A6FD /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8B0FFD0910C6038300C1A6FD /* PBXTargetDependency */,
+			);
+			name = "Shortcuts Test";
+			productName = VermilionTest;
+			productReference = 8B0FFC8110C6033800C1A6FD /* Shortcuts Test.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
 		8B148F940F7156B6002E05FA /* OCMock */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8B148F960F7156B6002E05FA /* Build configuration list for PBXNativeTarget "OCMock" */;
@@ -6688,7 +6755,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				8B63DDB90D94591700395A2B /* PBXTargetDependency */,
+				8B0F07C210C7473B00C1A6FD /* PBXTargetDependency */,
 			);
 			name = "QSB Core Test";
 			productName = WebServerTests;
@@ -6843,10 +6910,11 @@
 			);
 			dependencies = (
 				8B95AA6D1064288F000C4C6B /* PBXTargetDependency */,
+				8B0F072910C745FA00C1A6FD /* PBXTargetDependency */,
 			);
 			name = "Clipboard Test";
 			productName = VermilionTest;
-			productReference = 8B95AA1210642867000C4C6B /* Spotlight Files Test.octest */;
+			productReference = 8B95AA1210642867000C4C6B /* Clipboard Test.octest */;
 			productType = "com.apple.product-type.bundle";
 		};
 		8BCCD2620EC8E5EC00688D64 /* System AppleScript */ = {
@@ -7137,6 +7205,7 @@
 				5A0BB1670FAB8A6300AA4858 /* Screensaver */,
 				7F9415C40EEF52930049AE06 /* Shared File List */,
 				8B3EF87F0EF2C8A80036FFBD /* Shortcuts */,
+				8B0FFC6B10C6033800C1A6FD /* Shortcuts Test */,
 				8B6F2EF80DA2BA260052CA40 /* Spotlight Files */,
 				8B48108D1046345700BB6A2D /* Spotlight Files Test */,
 				62370A520FFC59B000C48624 /* Stock Quoter */,
@@ -7446,6 +7515,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B6EB53F101A0ACC006CFF7A /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8B0FFC6E10C6033800C1A6FD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B0FFEEB10C639E000C1A6FD /* SampleContact.abcdp in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7939,6 +8016,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/PostBuild.sh\"";
+		};
+		8B0FFC7C10C6033800C1A6FD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\nset -o errexit\nset -o nounset\nset -o verbose\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
 		};
 		8B148D850F705F35002E05FA /* Build SDK */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8860,6 +8950,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8B0FFC6F10C6033800C1A6FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B0FFC7010C6033800C1A6FD /* GTMSenTestCase.m in Sources */,
+				8B0FFC7110C6033800C1A6FD /* GTMUnitTestDevLog.m in Sources */,
+				8B0FFC7210C6033800C1A6FD /* HGSBundle.m in Sources */,
+				8B0FFC7310C6033800C1A6FD /* HGSUnitTestingUtilities.m in Sources */,
+				8B0FFD1210C603D900C1A6FD /* ShortcutsTest.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B3D26720EAE8E7A004EA504 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -8900,7 +9002,6 @@
 				64C3866D0DBFE247005EBA69 /* GTMMethodCheck.m in Sources */,
 				6282B2230DD8985000AC9C3C /* QSBSearchWindowController.m in Sources */,
 				7F9CDD810DD8D69B007C4BF4 /* QSBMenuButtonCell.m in Sources */,
-				7F5856E50DF83D85009EDEA5 /* NSArray+HGSCommonPrefixDetection.m in Sources */,
 				7F3F758C0E152A57001AF34E /* QSBScrollView.m in Sources */,
 				7F3F75950E152BA5001AF34E /* QSBSmallScroller.m in Sources */,
 				621D21BB0E438F2000D739F2 /* QSBCategoryTextAttachment.m in Sources */,
@@ -8935,7 +9036,6 @@
 				62521AB80EFAC30000A6E647 /* QSBViewTableViewColumn.m in Sources */,
 				62D14DFB0F15651B0053B99F /* QSBBooleanToColorTransformer.m in Sources */,
 				8B488A480F15DE6A00786C1E /* QSBMenuButton.m in Sources */,
-				8B488A490F15DE9400786C1E /* NSString+CaseInsensitive.m in Sources */,
 				62AD18A60F16B034000D380C /* QSBPathControl.m in Sources */,
 				624137530F2A657B009229E6 /* QSBSetUpAccountWindowController.m in Sources */,
 				7F3F7EC50F39FCE70054680A /* QSBHGSResult+NSPasteboard.m in Sources */,
@@ -9143,6 +9243,8 @@
 				8BF442D40FC74ED500C29AA1 /* GTMGoogleSearch.m in Sources */,
 				623B19251003E19C009B702D /* GTMNSScanner+JSON.m in Sources */,
 				8B3082DD1056EE1F006C4C7A /* GTMNSNumber+64Bit.m in Sources */,
+				8B0F054A10C73BD400C1A6FD /* GTMUnitTestingUtilities.m in Sources */,
+				8B0F073110C7465900C1A6FD /* NSString+CaseInsensitive.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9241,6 +9343,7 @@
 				8B8B131C0EEBADE400E543D0 /* HGSBundle.m in Sources */,
 				8B3EF7650EF2C7B60036FFBD /* FilesystemActions.m in Sources */,
 				7F495C1D0F24E65E0012A1B9 /* TextActions.m in Sources */,
+				8B0F071910C745EA00C1A6FD /* NSArray+HGSCommonPrefixDetection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9397,6 +9500,21 @@
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 7FF019AC0EB089CB001A2C7B /* PBXContainerItemProxy */;
 		};
+		8B0F072910C745FA00C1A6FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F4FEECCC0EC4BF99000758EC /* CorePlugin */;
+			targetProxy = 8B0F072810C745FA00C1A6FD /* PBXContainerItemProxy */;
+		};
+		8B0F07C210C7473B00C1A6FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
+			targetProxy = 8B0F07C110C7473B00C1A6FD /* PBXContainerItemProxy */;
+		};
+		8B0FFD0910C6038300C1A6FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B3EF87F0EF2C8A80036FFBD /* Shortcuts */;
+			targetProxy = 8B0FFD0810C6038300C1A6FD /* PBXContainerItemProxy */;
+		};
 		8B1490650F71576B002E05FA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B148F940F7156B6002E05FA /* OCMock */;
@@ -9461,11 +9579,6 @@
 			isa = PBXTargetDependency;
 			target = 8B61289E0F4641BF00E29B40 /* JSON */;
 			targetProxy = 8B61295D0F46444C00E29B40 /* PBXContainerItemProxy */;
-		};
-		8B63DDB90D94591700395A2B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B3EECE20CEA86A100D933C0 /* QSB Core */;
-			targetProxy = 8B63DDB80D94591700395A2B /* PBXContainerItemProxy */;
 		};
 		8B6F2F0B0DA2BB060052CA40 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -11426,6 +11539,45 @@
 			};
 			name = Release;
 		};
+		8B0FFC7E10C6033800C1A6FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				PRODUCT_NAME = "Shortcuts Test";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		8B0FFC7F10C6033800C1A6FD /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				PRODUCT_NAME = "Shortcuts Test";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = "Debug-gcov";
+		};
+		8B0FFC8010C6033800C1A6FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA6238D0F12B97E008182B5 /* ReleaseUnittest.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				PRODUCT_NAME = "Shortcuts Test";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
 		8B148D870F705F36002E05FA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -11899,9 +12051,9 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
-				PRODUCT_NAME = "Spotlight Files Test";
+				PRODUCT_NAME = "Clipboard Test";
 				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
@@ -11912,9 +12064,9 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
-				PRODUCT_NAME = "Spotlight Files Test";
+				PRODUCT_NAME = "Clipboard Test";
 				WRAPPER_EXTENSION = octest;
 			};
 			name = "Debug-gcov";
@@ -11925,9 +12077,9 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
-				PRODUCT_NAME = "Spotlight Files Test";
+				PRODUCT_NAME = "Clipboard Test";
 				WRAPPER_EXTENSION = octest;
 			};
 			name = Release;
@@ -12930,6 +13082,16 @@
 				7FF019BB0EB089CB001A2C7B /* Debug */,
 				8B95CBD60F6B1DEE003BDBDD /* Debug-gcov */,
 				7FF019BC0EB089CB001A2C7B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8B0FFC7D10C6033800C1A6FD /* Build configuration list for PBXNativeTarget "Shortcuts Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B0FFC7E10C6033800C1A6FD /* Debug */,
+				8B0FFC7F10C6033800C1A6FD /* Debug-gcov */,
+				8B0FFC8010C6033800C1A6FD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

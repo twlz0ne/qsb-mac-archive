@@ -170,7 +170,6 @@ NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources
       if ([requiredKeys containsObject:archiveKey]) {
         HGSLogDebug(@"Attempting to archive %@. Missing required key %@",
                     result, archiveKey);
-        [dict release];
         dict = nil;
         break;
       }

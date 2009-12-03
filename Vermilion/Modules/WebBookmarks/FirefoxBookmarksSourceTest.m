@@ -34,7 +34,7 @@
 #import "HGSUnitTestingUtilities.h"
 #import "FirefoxBookmarksSource.h"
 
-@interface FirefoxBookmarksSourceTest : HGSSearchSourceTestCase
+@interface FirefoxBookmarksSourceTest : HGSSearchSourceAbstractTestCase
 @end
 
 @implementation FirefoxBookmarksSourceTest
@@ -191,5 +191,10 @@
   STAssertNotNil(masterPath, nil);
   NSArray *masterItems = [NSArray arrayWithContentsOfFile:masterPath];
   STAssertEqualObjects(bookmarks, masterItems, nil);
+}
+
+- (NSArray *)archivableResults {
+  // TODO(dmaclach): add some results to test.
+  return nil;
 }
 @end

@@ -102,7 +102,8 @@ static NSString *const kClipboardTestString = @"Lazarus Long Text";
   HGSSearchSource *textSource
     = (HGSSearchSource *)[self extensionWithIdentifier:@"com.google.qsb.core.textinput.source"
                                        fromPluginNamed:@"CorePlugin"
-                              extensionPointIdentifier:kHGSSourcesExtensionPoint];
+                              extensionPointIdentifier:kHGSSourcesExtensionPoint
+                                              delegate:nil];
   STAssertNotNil(textSource, nil);
   HGSResult *textResult 
     = [HGSResult resultWithURI:@"userinput:text"

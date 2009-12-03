@@ -23,6 +23,8 @@
 		<dict>
 			<key>HGSExtensionClass</key>
 			<string>ShortcutsSource</string>
+			<key>HGSSearchSourceCannotArchive</key>
+			<true/>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.shortcuts.source</string>
 			<key>HGSExtensionIsUserVisible</key>

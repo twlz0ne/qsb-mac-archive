@@ -47,6 +47,7 @@
 #import "GTMGeometryUtils.h"
 #import "GTMMethodCheck.h"
 #import "GTMSystemVersion.h"
+#import "GTMUnitTestingUtilities.h"
 #import "QSBSearchWindowController.h"
 #import "GTMHotKeyTextField.h"
 #import "GTMNSWorkspace+Running.h"
@@ -808,7 +809,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 #pragma mark Application Delegate Methods
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
-  PFMoveToApplicationsFolderIfNecessary();
+  if (![GTMUnitTestingUtilities areWeBeingUnitTested]) {
+    PFMoveToApplicationsFolderIfNecessary();
+  }
 
   [self updateHotKeyRegistration];
 

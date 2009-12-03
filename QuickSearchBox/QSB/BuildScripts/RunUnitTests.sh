@@ -44,10 +44,10 @@ echo "Test All:${LINENO}: note: Removing gcov data files from ${CONFIGURATION_TE
 ( cd "${CONFIGURATION_TEMP_DIR}" &&  find . -type f -name "*.gcda" -print0 | xargs -0 rm -f )
 
 # Add new test targets here
-test_targets=( "Vermilion Test" "QSB Core Test" "Web Bookmarks Test" "Spotlight Files Test" "Clipboard Test" )
+test_targets=( "Vermilion Test" "QSB Core Test" "Web Bookmarks Test" "Spotlight Files Test" "Clipboard Test" "Shortcuts Test" )
 
-for test_target in "${test_targets}"; do
-  echo "Testing Target: ${test_target}"
+for test_target in "${test_targets[@]}"; do
+  echo "Test All:${LINENO}: note: Testing Target: ${test_target}"
   xcodebuild -project "QSB.xcodeproj" -target "${test_target}" -configuration "${CONFIGURATION}" OBJROOT="${OBJROOT}" SYMROOT="${SYMROOT}" CACHE_ROOT="${CACHE_ROOT}" GTM_DO_NOT_REMOVE_GCOV_DATA=1
-  echo "Done Testing Target: ${test_target}"
+  echo "Test All:${LINENO}: note: Done Testing Target: ${test_target}"
 done
