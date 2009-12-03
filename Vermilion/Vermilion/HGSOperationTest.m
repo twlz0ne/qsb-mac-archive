@@ -128,16 +128,21 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
     failedWithStatus_ = YES;
 
     NSInteger status = [error code];
-    if ([[[[fetcher request] URL] absoluteString] isEqual:kGoogle404Url]) {
+    NSString *urlString = [[[fetcher request] URL] absoluteString];
+    if ([urlString isEqual:kGoogle404Url]) {
       STAssertEquals(status, (NSInteger)404, @"failedWithStatus expected a 404 response");
-    }
-    if ([[[[fetcher request] URL] absoluteString] isEqual:kGoogleUrl]) {
+    } else if ([urlString isEqual:kGoogleUrl]) {
       STFail(@"Google home page request failed");
       NSCondition *condition = [fetcher userData];
       [condition lock];
       finishedWithDataIsRunning_ = YES;
       [condition signal];
       [condition unlock];
+    } else if ([urlString isEqual:kGoogleNonExistentUrl]) {
+      // Depending on how DNS is done, we could get a 503 or a non 
+      // kGDataHTTPFetcherStatusDomain error. So we set failedWithError_ in
+      // both cases.
+      failedWithError_ = YES;
     }
   } else {
     failedWithError_ = YES;
