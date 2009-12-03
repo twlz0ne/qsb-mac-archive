@@ -38,3 +38,7 @@
 #define kTypeClipboardRTF     HGS_SUBTYPE(kTypeClipboard, @"rtf")
 #define kTypeClipboardURL     HGS_SUBTYPE(kTypeClipboard, @"url")
 #define kTypeClipboardImage   HGS_SUBTYPE(kTypeClipboard, @"image")
+
+// For the clipboard actions, the pasteboard to use. If it is not defined,
+// the action will use the general pasteboard.
+#define kClipboardAttributePasteboardKey @"ClipboardAttributePasteboardKey"  // NSPasteboard

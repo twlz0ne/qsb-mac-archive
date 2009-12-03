@@ -45,6 +45,7 @@
 #import "GTMMethodCheck.h"
 #import "QSBHGSDelegate.h"
 #import "GTMGoogleSearch.h"
+#import "ClipboardSearchSource.h"
 
 typedef enum {
   kQSBResultDescriptionTitle = 0,
@@ -546,6 +547,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     HGSResultArray *resultArray = [HGSResultArray arrayWithResult:result];
     NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
                           resultArray, kHGSActionDirectObjectsKey,
+                          pb, kClipboardAttributePasteboardKey,
                           nil];
     didCopy = [action performWithInfo:info];
   }

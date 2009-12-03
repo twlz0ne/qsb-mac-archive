@@ -43,7 +43,10 @@
 
 - (BOOL)performWithInfo:(NSDictionary *)info {
   BOOL didCopy = NO;
-  NSPasteboard *pb = [NSPasteboard generalPasteboard];
+  NSPasteboard *pb = [info objectForKey:kClipboardAttributePasteboardKey];
+  if (!pb) {
+    pb = [NSPasteboard generalPasteboard];
+  }
   HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
   if ([directObjects count] == 1) {
