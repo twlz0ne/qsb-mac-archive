@@ -71,7 +71,7 @@ static NSString *const kClipboardTestString = @"Lazarus Long Text";
   STAssertNil(results_, nil);
   NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
   [queue addOperation:[op searchOperation]];
-  [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.5]];
+  [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
   STAssertEquals([results_ count], (NSUInteger)1, nil);
   HGSResult *result = [results_ objectAtIndex:0];
   STAssertEqualObjects([result displayName], kClipboardTestString, nil);
