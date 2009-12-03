@@ -258,14 +258,18 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 }
 
 - (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
+  HGSResult *result = nil;
   NSString *identifier = [representation objectForKey:kHGSObjectAttributeURIKey];
-  for (HGSResult *corpus in searchableCorpora_) {
+  NSArray *totalCorpora 
+    = [searchableCorpora_ arrayByAddingObjectsFromArray:visibleCorpora_];
+  for (HGSResult *corpus in totalCorpora) {
     NSString *uri = [corpus uri];
-    if ([uri isEqual:identifier])
-      return corpus;
+    if ([uri isEqual:identifier]) {
+      result = corpus;
+      break;
+    }
   }
-  
-  return nil;
+  return result;
 }
 
 - (void)didAddOrRemoveAccount:(NSNotification *)notification {
