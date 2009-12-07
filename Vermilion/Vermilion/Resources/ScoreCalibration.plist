@@ -24,13 +24,13 @@
 		<key>term</key>
 		<string>abcd</string>
 		<key>item</key>
-		<string>xabx xcdx</string>
+		<string>xabx cdx</string>
 	</dict>
 	<dict>
 		<key>term</key>
 		<string>abcde</string>
 		<key>item</key>
-		<string>0123456789a0123456789b01234567890123456789c01234567890123456789d01234567890123456789e01234567890123456789</string>
+		<string>xax xbx 0 xcx xdx 0 xex</string>
 	</dict>
 </array>
 </plist>

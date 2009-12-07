@@ -38,7 +38,6 @@
 		<array>
 			<string>abc def</string>
 			<string>abc defend every fiendish person</string>
-			<string>army brats can defend every friend</string>
 			<string>army brats can def</string>
 			<string>abcdef</string>
 			<string>abc</string>
@@ -50,7 +49,7 @@
 		<string>goog</string>
 		<key>results</key>
 		<array>
-			<string>goog - stock quote ticker price</string>
+			<string>goog stock quote ticker price</string>
 			<string>google chrome</string>
 			<string>google quick search box</string>
 			<string>google talks labs edition</string>
@@ -112,7 +111,7 @@
 		<key>results</key>
 		<array>
 			<array>
-				<string>goog - stock quote ticker price</string>
+				<string>goog stock quote ticker price</string>
 				<string>google Inc nasdaq</string>
 				<string>eric schmidt ceo</string>
 			</array>
@@ -136,7 +135,7 @@
 		<key>results</key>
 		<array>
 			<array>
-				<string>goog - stock quote ticker price</string>
+				<string>goog stock quote ticker price</string>
 				<string>google Inc nasdaq</string>
 				<string>eric schmidt ceo</string>
 			</array>
@@ -155,7 +154,7 @@
 		<array>
 			<string>rohit</string>
 			<string>rohit makasana</string>
-			<string>makasana, rohit</string>
+			<string>makasana rohit</string>
 			<string>expenseReportrohit</string>
 			<string>roh</string>
 		</array>
@@ -168,7 +167,7 @@
 			<string>www bing com</string>
 			<string>some people like to use bing and yahoo com</string>
 			<string>the bing report</string>
-			<string>how fast is bing as a search engine?</string>
+			<string>how fast is bing as a search engine</string>
 			<string>expense reportrohit</string>
 		</array>
 	</dict>
@@ -246,7 +245,7 @@
 			</array>
 			<array>
 				<string>michael smith</string>
-				<string>product manager 54 luzerne street extension seattle w a mw445 gmail com</string>
+				<string>product manager 54 luzerne street extension seattle w a mw 445 gmail com</string>
 			</array>
 		</array>
 	</dict>

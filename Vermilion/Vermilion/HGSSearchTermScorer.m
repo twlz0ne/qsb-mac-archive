@@ -225,13 +225,16 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
       ? [NSMutableArray arrayWithCapacity:termLength]
       : nil;
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
-  CGFloat abbrevationScore = 0.0;
+  BOOL abbreviation = YES;
   for (CFIndex ci = 0; ci < termLength; ++ci) {
     CGFloat charScore = gHGSCharacterMatchFactor;
     NSUInteger firstCharacterValue = charStat[ci].firstCharacterValue_;
+    if (!firstCharacterValue) {
+      abbreviation = NO;
+    }
     CGFloat firstCharacterScore
       = (CGFloat)(firstCharacterValue) * gHGSFirstCharacterInWordFactor;
-    abbrevationScore += firstCharacterScore;
+    charScore += firstCharacterScore;
     CGFloat adjacencyScore
       = (CGFloat)(charStat[ci].adjacencyValue_) * gHGSAdjacencyFactor;
     charScore += adjacencyScore;
@@ -255,8 +258,6 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
     }
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   }
-
-  termScore += abbrevationScore;  // Add in the abbreviation score.
 
   // Determine the best complete word match length score.
 #ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
@@ -329,6 +330,14 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
                                        * (matchSpread - 1)
                                        / maxSpread);
     termScore *= matchSpreadFactor;
+    
+    // If there is an abbreviation match, see if that scores higher.
+    if (abbreviation) {
+      NSUInteger wordCount = [wordRanges count];
+      CGFloat abbreviationScore = (CGFloat)termLength / (CGFloat)wordCount
+        * HGSCalibratedScore(kHGSCalibratedStrongScore);
+      termScore = MAX(termScore, abbreviationScore);
+    }
   }
   
 #ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
@@ -574,6 +583,13 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
   if (!HGSValidateTokenizedString(itemString)) {
     HGSLog(@"Item string not properly tokenized: '%@'", itemString);
   }
+  // TODO(mrossetti): This occurs frequently and the sources should be changed
+  // so throttle it back for now otherwise it pollutes the console.
+  static NSUInteger singleWordWarningCount = 0;
+  if ([[termString componentsSeparatedByString:@" "] count] > 1
+      && singleWordWarningCount++ < 50) {
+    HGSLog(@"Term string is not single word: '%@'", termString);
+  }
 #endif // DEBUG
 #ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   NSMutableArray *matchDetailsArray = nil;
@@ -711,6 +727,7 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
           }
         } while (!charDone && !done);
       } while (!done);
+
 #ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
       // Encapsulate the matchDetails in a dictionary.
       if (pSearchTermDetails) {

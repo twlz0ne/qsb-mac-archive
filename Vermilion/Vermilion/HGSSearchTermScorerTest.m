@@ -177,14 +177,12 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
   CGFloat itemScores[kHGSMaximumRelativeTermScoringTests];
   NSUInteger itemIndex[kHGSMaximumRelativeTermScoringTests];  // Used to randomize the items.
   srandom((float)[NSDate timeIntervalSinceReferenceDate]);
-  
   for (NSDictionary *test in testList) {
     for (NSUInteger i = 0; i < kHGSMaximumRelativeTermScoringTests; ++i) {
       itemScores[i] = 0.0;
       itemIndex[i] = i;
     }
     NSString *testTermsString = [test objectForKey:@"query"];
-    NSArray *testTerms = [testTermsString componentsSeparatedByString:@" "];
     NSArray *testItems = [test objectForKey:@"results"];
     NSUInteger itemsCount = [testItems count];
     for (NSUInteger j = itemsCount; j > 0; --j) {
@@ -214,23 +212,14 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
         // when secondaryItems are taken into consideration.
         NSArray *wordRanges = nil;
         CGFloat itemScore = 0.0;
-        for (NSString *queryTerm in testTerms) {
-          CGFloat termScore
-            = HGSScoreTermForItem(queryTerm, primaryItem, &wordRanges);
-          // Only consider secondaryItem that have better scores than the main
-          // search item.
-          for (NSString *secondaryItem in secondaryItems) {
-            termScore = MAX(termScore,
-                            HGSScoreTermForItem(queryTerm, secondaryItem, nil)
-                            / 2.0);
-          }
-          if (termScore < 0.01) {
-            // Short-circuit this item since at least one search term
-            // was not adequately matched.
-            itemScore = 0.0;
-            break;
-          }
-          itemScore += termScore;
+        CGFloat termScore
+          = HGSScoreTermForItem(testTermsString, primaryItem, &wordRanges);
+        // Only consider secondaryItem that have better scores than the main
+        // search item.
+        for (NSString *secondaryItem in secondaryItems) {
+          termScore = MAX(termScore,
+                          HGSScoreTermForItem(testTermsString, secondaryItem, nil)
+                          / 2.0);
         }
         itemScores[randomIndex] = itemScore;
       }
@@ -261,7 +250,10 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
   CGFloat higherScore = 9999999.0;
   for (NSUInteger i = 0; i < kHGSCalibratedLastScore; ++i) {
     CGFloat lowerScore = HGSCalibratedScore(scoreType[i]);
-    STAssertTrue(higherScore > (lowerScore + arbitraryMinimumSeparation), nil);
+    STAssertTrue(higherScore > (lowerScore + arbitraryMinimumSeparation), 
+                 @"Inadequate separation between calibrated scores %d and %d, "
+                 "with scores %0.2f and %0.2f.  Desired separation: %0.2f.", 
+                 i-1, i, higherScore, lowerScore, arbitraryMinimumSeparation);
     higherScore = lowerScore;
   }
 }
