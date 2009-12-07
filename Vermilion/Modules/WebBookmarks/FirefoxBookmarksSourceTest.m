@@ -34,19 +34,14 @@
 #import "HGSUnitTestingUtilities.h"
 #import "FirefoxBookmarksSource.h"
 
-@interface FirefoxBookmarksSourceTest : HGSSearchSourceAbstractTestCase
+@interface FirefoxBookmarksSourceTest : HGSSearchSourceAbstractTestCase {
+ @private
+  NSString *dirToRemovePath_;
+}
 @end
 
 @implementation FirefoxBookmarksSourceTest
 - (id)initWithInvocation:(NSInvocation *)invocation {
-  self = [super initWithInvocation:invocation 
-                       pluginNamed:@"WebBookmarks" 
-               extensionIdentifier:@"com.google.qsb.webbookmarks.firefox.source"];
-  return self;
-}
-
-- (void)setUp {
-  [super setUp];
   NSBundle *hgsBundle = HGSGetPluginBundle();
   NSString *firefoxSupportDir
     = [@"~/Library/Application Support/Firefox" stringByExpandingTildeInPath];
@@ -54,10 +49,32 @@
   if (![fm fileExistsAtPath:firefoxSupportDir]) {
     NSString *firefoxResourceDir
       = [[hgsBundle resourcePath] stringByAppendingPathComponent:@"Firefox"];
-    STAssertTrue([fm copyPath:firefoxResourceDir
-                       toPath:firefoxSupportDir
-                      handler:nil], @"Could not copy Firefox app support");
+    NSError *error = nil;
+    if ([fm copyItemAtPath:firefoxResourceDir
+                    toPath:firefoxSupportDir
+                     error:&error]) {
+      dirToRemovePath_ = [firefoxSupportDir retain];
+    } else {
+      STFail(@"Could not copy Firefox app support (%@)", error);
+    }
   }
+  
+  self = [super initWithInvocation:invocation 
+                       pluginNamed:@"WebBookmarks" 
+               extensionIdentifier:@"com.google.qsb.webbookmarks.firefox.source"];
+  return self;
+}
+
+- (void)dealloc {
+  if (dirToRemovePath_) {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSError *error = nil;
+    if (![fm removeItemAtPath:dirToRemovePath_ error:&error]) {
+      STFail(@"Unable to remove %@ (%@)", dirToRemovePath_, error);
+    }
+    [dirToRemovePath_ release];
+  }
+  [super dealloc];
 }
 
 - (void)testParseFirefoxIniFile {
