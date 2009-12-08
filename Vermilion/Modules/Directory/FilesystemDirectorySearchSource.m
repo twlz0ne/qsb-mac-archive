@@ -123,13 +123,21 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         }
       }
       
-      NSString *tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
-      CGFloat score = HGSScoreTermForItem(normalizedQueryString,
-                                          tokenizedSubpath,
-                                          NULL);
-      
-      if ([normalizedQueryString length] && score <= 0.0) continue;
-      
+      // Filter further based on the query string, or, if there is no
+      // query string then boost the score of the folder's contents.
+      CGFloat score = 0.0;
+      if ([normalizedQueryString length]) {
+        NSString *tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
+        score = HGSScoreTermForItem(normalizedQueryString,
+                                    tokenizedSubpath,
+                                    NULL);
+        if (score <= 0.0) continue;
+      } else {
+        // TODO(mrossetti): Fix the following once issue 850 is addressed.
+        // http://code.google.com/p/qsb-mac/issues/detail?id=850
+        score = HGSCalibratedScore(kHGSCalibratedStrongScore);
+      }
+
       subpath = [path stringByAppendingPathComponent:subpath];
       
       NSMutableDictionary *attributes = [NSMutableDictionary dictionary];

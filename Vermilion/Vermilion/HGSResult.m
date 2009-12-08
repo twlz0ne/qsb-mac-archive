@@ -427,9 +427,10 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
 }
 
 - (NSString*)description {
-  return [NSString stringWithFormat:@"<%@:%p> [%@ - %@ rank: %f (%@ from %@)]", 
-          [self class], self, [self displayName], [self type], [self rank],
-          [self class], source_];
+  return [NSString stringWithFormat:
+          @"<%@:%p> [%-#3.3x %2.4f: %@ - %@ (%@ from %@)]", 
+          [self class], self, [self rankFlags], [self rank],
+          [self displayName], [self type], [self class], source_];
 }
 
 // merge the attributes of |result| into this one. Single values that overlap
