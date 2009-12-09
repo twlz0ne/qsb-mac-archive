@@ -294,7 +294,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
       }
       // Due to us moving code around, an extension may have moved from one
       // plugin to another
-      if (!state || oldExtensionDict) {
+      if ((!state || oldExtensionDict) && pluginEnabled) {
         [protoExtension setEnabled:protoExtensionEnabled];
       }
     }
