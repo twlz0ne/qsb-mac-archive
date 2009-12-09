@@ -55,6 +55,7 @@
  @private
   NSSet *directObjectTypes_;
   NSSet *indirectObjectTypes_;
+  NSSet *otherTerms_;
   BOOL indirectObjectOptional_;
   BOOL causesUIContextChange_;
   BOOL mustRunOnMainThread_;
@@ -99,8 +100,14 @@
  Do you have to run this action on the main thread? Most actions should be able
  to be run in any thread.
  @result NO or the value of "HGSActionMustRunOnMainThread" from config dict.
- */
+*/
 @property (readonly) BOOL mustRunOnMainThread;
+
+/*!
+ Other terms that match this action when searching for it other than its name.
+ @result nil or the value of "HGSActionOtherTerms" from config dict.
+*/
+@property (readonly) NSSet *otherTerms;
 
 /*!
   Does the action apply to an individual result. The calling code will check
@@ -183,7 +190,7 @@ extern NSString* const kHGSActionIndirectObjectsKey;
  Default is nil, which means that the action is a global action, and not
  result specific.
  
- Type is NSString, NSArray or NSSet. '*' matches Dall types.
+ Type is NSString, NSArray or NSSet. '*' matches all types.
 */
 extern NSString* const kHGSActionDirectObjectTypesKey;
 
@@ -211,3 +218,10 @@ extern NSString* const kHGSActionIndirectObjectOptionalKey;
  Type is Boolean.
 */
 extern NSString* const kHGSActionDoesActionCauseUIContextChangeKey;
+
+/*!
+ Configuration key for other terms that match for this action. 
+ 
+ Type is NSString, or NSArray of NSString.
+*/
+extern NSString* const kHGSActionOtherTermsKey;

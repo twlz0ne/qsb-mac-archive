@@ -59,12 +59,9 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
     [results_ autorelease];
     results_ = [results copy];
   }
-  NSDictionary *userInfo 
-  = [NSDictionary dictionaryWithObject:results_ 
-                                forKey:kHGSSearchOperationNotificationResultsKey];
   [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationDidUpdateResultsNotification
                                     object:self
-                                  userInfo:userInfo];
+                                  userInfo:nil];
 }
 
 - (NSArray *)sortedResultsInRange:(NSRange)range {
@@ -72,11 +69,21 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
   @synchronized (self) {
     NSRange fullRange = NSMakeRange(0, [results_ count]);
     NSRange newRange = NSIntersectionRange(fullRange, range);
-    sortedResults = [results_ subarrayWithRange:newRange];
+    if (newRange.length) {
+      sortedResults = [results_ subarrayWithRange:newRange];
+    }
   }
   return sortedResults;
 }
 
+- (HGSResult *)sortedResultAtIndex:(NSUInteger)idx {
+  HGSResult *result = nil;
+  @synchronized (self) {
+    result = [results_ objectAtIndex:idx];
+  }
+  return result;
+}
+  
 - (NSUInteger)resultCount {
   NSUInteger count = 0;
   @synchronized (self) {

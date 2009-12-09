@@ -32,7 +32,14 @@
 
 #import <Vermilion/Vermilion.h>
 
-@class SLFilesOperation;
+// SLFilesOperation is for use by unittesting only.
+@interface SLFilesOperation : HGSSearchOperation {
+@private
+  MDQueryRef mdQuery_;
+  NSMutableDictionary *hgsResults_;
+}
+- (HGSResult *)resultFromMDItem:(MDItemRef)mdItem;
+@end
 
 @interface SLFilesSource : HGSSearchSource {
  @private
@@ -42,37 +49,7 @@
 + (CFArrayRef)attributeArray;
 - (void)operationReceivedNewResults:(SLFilesOperation *)operation
                    withNotification:(NSNotification *)notification;
-- (void)operationCompleted:(SLFilesOperation *)operation;
-- (void)startSearchOperation:(HGSSearchOperation *)operation;
 - (void)extensionPointSourcesChanged:(NSNotification *)notification;
 @end
 
-#pragma mark -
-
-@interface SLFilesOperation : HGSSimpleArraySearchOperation {
- @private
-  NSMutableArray *accumulatedResults_;
-  CFIndex nextQueryItemIndex_;
-  BOOL mdQueryFinished_;
-}
-
-// Runs |query|
-- (void)runMDQuery:(MDQueryRef)query;
-
-// Using an accumulator rather than using setResults: directly allows us to
-// control the timing of propagation of results to observers.
-- (NSMutableArray *)accumulatedResults;
-
-// Callbacksfor MDQuery updates
-- (void)queryNotification:(NSNotification *)notification;
-@end
-
-@interface SLHGSResult : HGSResult {
- @private
-  MDItemRef mdItem_;
-}
-- (id)initWithMDItem:(MDItemRef)mdItem
-               query:(NSString *)query
-              source:(HGSSearchSource *)source;
-@end
 

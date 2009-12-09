@@ -39,6 +39,7 @@
 #import "HGSPluginLoader.h"
 #import "HGSLog.h"
 #import "HGSSearchTermScorer.h"
+#import "HGSMixer.h"
 
 static NSString* const kHGSMemorySourceResultKey = @"HGSMSResultObject";
 static NSString* const kHGSMemorySourceNameKey = @"HGSMSName";
@@ -193,6 +194,7 @@ NSString* const kHGSObjectAttributeWordRangesKey
       }
     }
   }
+  [results sortUsingFunction:HGSMixerResultSort context:nil];
   [operation setResults:results];
 }
 

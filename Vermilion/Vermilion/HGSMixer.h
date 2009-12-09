@@ -36,6 +36,7 @@
 */
 
 #import <Foundation/Foundation.h>
+#import "GTMDefines.h"
 
 @class HGSQueryController;
 
@@ -45,15 +46,24 @@
  on global (cross-provider) heuristics. The mixer also handles merging
  duplicate results together (lower ranked into higher ranked).
 */
-@interface HGSMixer : NSObject
-/*!
- Sort and de-dupe |providerArrays| into one results array.
- NOTE: if the query owned by |controller| has a max desired results limit set, 
- then only that many elements will be sorted and de-duped. 
- The rest of the results will still be returned (for use in estimating 
- estimation of "More" counts, for example).
-*/
-- (NSMutableArray*)mix:(NSArray*)providerArrays 
-       queryController:(HGSQueryController*)controller;
-
+@interface HGSMixer : NSOperation {
+ @private
+  NSArray *ops_;
+  NSRange range_;
+  NSMutableArray *results_;
+  NSMutableDictionary *resultsByCategory_;
+  uint64_t firstInterval_;
+  uint64_t progressInterval_;
+}
+- (id)initWithRange:(NSRange)range fromSearchOperations:(NSArray *)ops
+      firstInterval:(NSTimeInterval)firstInterval 
+   progressInterval:(NSTimeInterval)progressInterval;
+- (NSArray *)rankedResults;
+- (NSDictionary *)rankedResultsByCategory;
 @end
+
+
+NSInteger HGSMixerResultSort(id resultA, id resultB, void* context);
+
+GTM_EXTERN NSString *const kHGSMixerDidUpdateResultsNotification;
+GTM_EXTERN NSString *const kHGSMixerDidStopNotification;

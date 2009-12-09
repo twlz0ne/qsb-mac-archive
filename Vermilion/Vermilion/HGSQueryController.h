@@ -53,36 +53,25 @@
 @interface HGSQueryController : NSObject {
  @private
   NSMutableArray* queryOperations_;
-  NSMutableArray* pendingQueryOperations_;  // unfinished query operations
+  /*! Unfinished query operations. */
+  NSMutableArray* pendingQueryOperations_;  
+  /*! Query operations that have reported at least some results */
+  NSMutableSet *queryOperationsWithResults_; 
   BOOL cancelled_;
   HGSQuery* parsedQuery_;
-  HGSMixer* mixer_;
   __weak NSTimer* slowSourceTimer_;
-  CFMutableDictionaryRef sourceResults_; // keyed by source
   NSMutableDictionary *operationStartTimes_;
-  BOOL hasRealResults_;
   NSArray *rankedResults_;
+  HGSMixer *mixer_;
+  NSOperationQueue *mixerQueue_;
 }
 
-- initWithQuery:(HGSQuery*)query
-          mixer:(HGSMixer*)mixer;
+- initWithQuery:(HGSQuery*)query;
 
 - (HGSQuery *)query;
 
-/*!
-  Various ways to walk the results, we may chose all or a subset depending on
-  performance. Each of these pulls the most up to date results from the
-  operation.
-*/
-- (NSArray *)rankedResultsForRange:(NSRange)range;
-- (NSUInteger)rankedResultsCount;
-
-- (NSDictionary *)rankedResultsByCategory;
-
-/*!
-  Returns YES if there is at least one non-suggest result.
-*/
-- (BOOL)hasAnyRealResults;
+- (HGSMixer *)startMixingCurrentResults;
+- (NSUInteger)totalResultsCount;
 
 /*!
   Ask information about the completion status for the queries to each source.
@@ -121,12 +110,6 @@ GTM_EXTERN NSString *const kHGSQueryControllerWillStartNotification;
   the query reaching a time threshhold.  Object is the QueryController.
 */
 GTM_EXTERN NSString *const kHGSQueryControllerDidFinishNotification;
-
-/*!
-  Posted when more results are available for the query.  Object is the
-  QueryController.  UserInfo contains kHGSQueryControllerOperationsKey.
-*/
-GTM_EXTERN NSString *const kHGSQueryControllerDidUpdateResultsNotification;
 
 /*!
   Posted when an operation of a query completes. Object is the queryController.

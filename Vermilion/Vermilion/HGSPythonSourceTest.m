@@ -53,10 +53,10 @@
 - (void)testSource {
   HGSPython *sharedPython = [HGSPython sharedPython];
   STAssertNotNil(sharedPython, nil);
-  
+
   NSBundle *bundle = [NSBundle bundleForClass:[self class]];
   [sharedPython appendPythonPath:[bundle resourcePath]];
-  
+
   NSDictionary *config = [NSDictionary dictionaryWithObjectsAndKeys:
                           @"VermilionTest", kPythonModuleNameKey,
                           @"VermilionTest", kPythonClassNameKey,
@@ -73,14 +73,14 @@
                                               results:nil
                                            queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
-  
+
   STAssertTrue([source isValidSourceForQuery:query], nil);
-  
+
   HGSPythonSearchOperation *op = [[[HGSPythonSearchOperation alloc]
                                    initWithQuery:query
                                           source:source] autorelease];
   STAssertNotNil(op, nil);
-  
+
   NSOperation *operation = [op searchOperation];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc addObserver:self
@@ -89,7 +89,7 @@
            object:op];
   NSOperationQueue *operationQueue = [HGSOperationQueue sharedOperationQueue];
   [operationQueue addOperation:operation];
-  
+
   int loops = 0;
   while (![op isFinished] && loops++ < 20) {
     // Give the operation 2 seconds to complete
@@ -99,7 +99,7 @@
   STAssertTrue([op isConcurrent], nil);
   STAssertTrue([op isFinished], nil);
   STAssertFalse([op isCancelled], nil);
-  
+
   STAssertNotNil(results_, nil);
   STAssertEquals([results_ count], (NSUInteger)1, nil);
   NSString *snippet = [[results_ objectAtIndex:0]
@@ -110,7 +110,6 @@
   PyObject *py = [sharedPython objectForQuery:query
                           withSearchOperation:nil];
   STAssertNotNULL(py, nil);
-  
   NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                               @"A Snippet", kHGSObjectAttributeSnippetKey,
                               @"file:///icon.png", kHGSObjectAttributeIconPreviewFileKey,
@@ -127,18 +126,19 @@
   PyObject *setResults = PyString_FromString("SetResults");
   STAssertNotNULL(setResults, nil);
   PyObject_CallMethodObjArgs(py, setResults, results, nil);
-  
+
   Py_DECREF(results);
   Py_DECREF(setResults);
 }
 
 - (void)gotResults:(NSNotification *)note {
-  STAssertNotNil([note userInfo], nil);
+  STAssertTrue([[note object] isKindOfClass:[HGSSearchOperation class]], nil);
   if (results_) {
     [results_ release];
   }
-  results_ = [[[note userInfo]
-              valueForKey:kHGSSearchOperationNotificationResultsKey] copy];
+  HGSSearchOperation *op = [note object];
+  NSRange range = NSMakeRange(0, [op resultCount]);
+  results_ = [[op sortedResultsInRange:range] copy];
 }
 
 @end

@@ -114,17 +114,21 @@
   HGSSearchOperation *operation = [[self source] searchOperationForQuery:query];
   STAssertNotNil(operation, nil);
   [operation main];
-  return [(SLFilesOperation *)operation accumulatedResults];
+  return [operation sortedResultsInRange:NSMakeRange(0, [operation resultCount])];
 }
 
-- (HGSResult *)spotlightResultForQuery:(NSString *)query path:(NSString *)path {
-  Class resultClass = [[self source] resultClass];
-  STAssertNotNULL(resultClass, nil);
+- (HGSResult *)spotlightResultForQuery:(NSString *)queryString
+                                  path:(NSString *)path {
+  HGSQuery *query = [[[HGSQuery alloc] initWithString:queryString 
+                                              results:nil 
+                                           queryFlags:0] autorelease];
+  HGSSearchOperation *op = [[self source] searchOperationForQuery:query];
+  Class cls = NSClassFromString(@"SLFilesOperation");
+  STAssertTrue([op isKindOfClass:cls], nil);
   MDItemRef mdItem = MDItemCreate(kCFAllocatorDefault, (CFStringRef)path);
   STAssertNotNULL(mdItem, @"Unable to create mdItem for %@", path);  
-  HGSResult *result = [[resultClass alloc] initWithMDItem:mdItem
-                                                    query:query
-                                                source:[self source]];
+  SLFilesOperation *slOp = (SLFilesOperation*)op;
+  HGSResult *result = [slOp resultFromMDItem:mdItem];
   STAssertNotNil(result, nil);
   CFRelease(mdItem);
   return result;
@@ -225,16 +229,16 @@
 
 - (void)testValidSourceForQuery {
   HGSSearchSource *source = [self source];
-  HGSQuery *query = [[[HGSQuery alloc] initWithString:@"happ" 
+  HGSQuery *query = [[[HGSQuery alloc] initWithString:@"ha" 
                                               results:nil 
                                            queryFlags:0] autorelease]; 
   STAssertFalse([source isValidSourceForQuery:query], 
-                @"Queries < 5 characters should be ignored");
-  query = [[[HGSQuery alloc] initWithString:@"happy" 
+                @"Queries < 3 characters should be ignored");
+  query = [[[HGSQuery alloc] initWithString:@"hap" 
                                     results:nil 
                                  queryFlags:0] autorelease]; 
   STAssertTrue([source isValidSourceForQuery:query], 
-                @"Queries >= 5 characters should be accepted");
+                @"Queries >= 3 characters should be accepted");
   
   NSDictionary *badTypeDict
     = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -265,31 +269,6 @@
                              queryFlags:0] autorelease]; 
   STAssertTrue([source isValidSourceForQuery:query],
                @"Queries with pivot of type kHGSTypeContact should succeed.");
-}
-
-- (void)testSLHGSResult {
-  // Have to load these dynamically from the plugin.
-  Class resultClass = NSClassFromString(@"SLHGSResult");
-  STAssertNotNil(resultClass, nil);
-  
-  id result = [[[resultClass alloc] 
-                initWithMDItem:NULL query:nil source:nil] 
-               autorelease];
-  STAssertNil(result, nil);
-  
-  NSString *finderPath 
-    = [[NSWorkspace sharedWorkspace] 
-       absolutePathForAppBundleWithIdentifier:@"com.apple.Finder"];
-  MDItemRef mdItem = MDItemCreate(kCFAllocatorDefault, (CFStringRef)finderPath);
-  STAssertNotNULL(mdItem, nil);
-  result = [[resultClass alloc] initWithMDItem:mdItem query:nil source:nil];
-  STAssertNil(result, nil);
-  
-  result = [self spotlightResultForQuery:uniqueTestString_
-                                    path:finderPath];
-  STAssertNotNil(result, nil);
-  NSURL *url = [result url];
-  STAssertEqualObjects(url, [NSURL fileURLWithPath:finderPath], nil);
 }
 
 - (void)testMailPivots {
@@ -411,7 +390,8 @@
   [expectedTypes addObject:kHGSTypeFile];
   NSUInteger i = 0;
   for (NSString *path in filePaths) {
-    HGSResult *result = [self spotlightResultForQuery:uniqueTestString_ path:path];
+    HGSResult *result = [self spotlightResultForQuery:uniqueTestString_ 
+                                                 path:path];
     STAssertNotNil(result, @"No result for %@", path);
     STAssertEqualObjects([result type], 
                          [expectedTypes objectAtIndex:i], 

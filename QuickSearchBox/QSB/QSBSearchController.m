@@ -57,12 +57,17 @@ NSString *const kQSBSearchControllerDidUpdateResultsNotification
 - (void)cancelDisplayTimers;
 
 - (void)cancelAndReleaseQueryController;
+- (void)updateDesktopResults;
 
 // Reset the 'More Results'
 - (void)setMoreResults:(NSDictionary *)value;
 - (void)updateMoreResults;
 
 - (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification;
+- (void)mixerDidUpdateResults:(NSNotification*)notification;
+- (void)mixerDidStop:(NSNotification*)notification;
+
+@property(nonatomic, assign) BOOL queryIsInProcess;
 
 @end
 
@@ -109,7 +114,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [prefs gtm_removeObserver:self
                  forKeyPath:kQSBResultCountKey
                    selector:@selector(resultCountValueChanged:)];
-
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self];
   [super dealloc];
 }
 
@@ -123,17 +129,34 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   totalResultDisplayCount_ = [prefs integerForKey:kQSBResultCountKey];
 }
 
+- (void)startMixing {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  if (mixer_) {
+    [nc removeObserver:self 
+                  name:nil 
+                object:mixer_];
+  }
+  mixer_ = [queryController_ startMixingCurrentResults];
+  [nc addObserver:self 
+         selector:@selector(mixerDidUpdateResults:) 
+             name:kHGSMixerDidUpdateResultsNotification 
+           object:mixer_];
+  [nc addObserver:self 
+         selector:@selector(mixerDidStop:) 
+             name:kHGSMixerDidStopNotification 
+           object:mixer_];
+}
+
+
 - (void)updateDesktopResults {
   HGSQueryController* controller = queryController_;
   if (!controller) return;
-  HGSAssert(controller, @"No controller?");
 
   if (currentResultDisplayCount_ == 0) {
     HGSLog(@"updateDesktopResults called with display count still at 0!");
     return;
   }
-  NSRange rankedResultsRange = NSMakeRange(0, [controller rankedResultsCount]);
-  NSArray *rankedResults = [controller rankedResultsForRange:rankedResultsRange];
+  NSArray *rankedResults = [mixer_ rankedResults];
   NSMutableArray *hgsResults = [NSMutableArray array];
   NSMutableArray *hgsMutableSuggestions = [NSMutableArray array];
   for (HGSResult *result in rankedResults) {
@@ -165,7 +188,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [mainResults addObjectsFromArray:lockedResults_];
 
   // Standard results
-  BOOL hasMoreStandardResults = NO;
+  BOOL hasMoreStandardResults 
+    = [controller totalResultsCount] > currentResultDisplayCount_;
   NSMutableArray *belowTheFoldResults = [NSMutableArray array];
   for (HGSResult *result in hgsResults) {
     if ([mainResults count] >= currentResultDisplayCount_) {
@@ -201,8 +225,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
   // If there were more results than could be shown in TOP then we'll
   // need a 'More' fold.
-  BOOL showMore = ((hasMoreStandardResults
-                    || ![self suppressMoreIfTopShowsAll])
+  BOOL showMore = (hasMoreStandardResults
                    && ![[NSUserDefaults standardUserDefaults]
                         boolForKey:@"disableMoreResults"]);
 
@@ -261,16 +284,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     // TODO(alcor): this is probably going to be done by the mixer eventually
 
     NSUInteger count = [newResults count];
-
-    // TODO(alcor): we only cycle through this once because ranking is odd
-    // at the moment. Eventually we want to unpin the google result
-    count = MIN(1, count);
-
+    CGFloat moderateResultRank = HGSCalibratedScore(kHGSCalibratedModerateScore);
     if (count) {
       for(searchItemsIndex = 0; searchItemsIndex < count; searchItemsIndex++) {
       QSBTableResult *item = [newResults objectAtIndex:searchItemsIndex];
-      // List the google result lower if we have a strong confidence result.
-        if ([item rank] <= 0.667) break;
+      // List the google result lower if we have a moderate confidence result.
+        if ([item rank] <= moderateResultRank) break;
       }
     }
 
@@ -307,7 +326,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     }
   }
 
-  if (showMore && [controller hasAnyRealResults]) {
+  if (showMore) {
     if ([suggestResults count] > 0) {
       if (![[newResults lastObject]
             isKindOfClass:[QSBSeparatorTableResult class]]) {
@@ -353,10 +372,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return result;
 }
 
-- (NSArray *)topResultsForRange:(NSRange)range {
-  return [desktopResults_ subarrayWithRange:range];
-}
-
 - (NSUInteger)topResultCount {
   return [desktopResults_ count];
 }
@@ -375,14 +390,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     HGSLog(@"QSB: Query Controller status before restart.\n  %@.", queryController_);
   }
 #endif
-  [self cancelAndReleaseQueryController];
-
-  // wait before sending off our query to coalesce any other restarts in flight.
-  // Must cancel any old requests as we only want one in the queue at a time.
-  [NSObject cancelPreviousPerformRequestsWithTarget:self
-                                           selector:@selector(doDesktopQuery:)
-                                             object:nil];
-  [self performSelector:@selector(doDesktopQuery:)
+  [self stopQuery];
+  [self performSelector:@selector(performQuery:)
              withObject:nil
              afterDelay:0.0];
 
@@ -422,11 +431,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return totalResultDisplayCount_;
 }
 
-- (BOOL)suppressMoreIfTopShowsAll {
-  return YES;
-}
-
-- (void)doDesktopQuery:(id)ignoredValue {
+- (void)performQuery:(id)ignoredValue {
   [lockedResults_ release];
   lockedResults_ = nil;
   currentResultDisplayCount_ = 0;
@@ -447,17 +452,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     [query setMaxDesiredResults:[self maximumResultsToCollect]];
 
     [self cancelAndReleaseQueryController];
-    HGSMixer* mixer = [[[HGSMixer alloc] init] autorelease];
-    queryController_ = [[HGSQueryController alloc] initWithQuery:query
-                                                           mixer:mixer];
+    queryController_ = [[HGSQueryController alloc] initWithQuery:query];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self
            selector:@selector(queryControllerDidFinish:)
                name:kHGSQueryControllerDidFinishNotification
-             object:queryController_];
-    [nc addObserver:self
-           selector:@selector(queryControllerDidAddResults:)
-               name:kHGSQueryControllerDidUpdateResultsNotification
              object:queryController_];
     [nc addObserver:self
            selector:@selector(queryControllerDidFinishOperation:)
@@ -473,9 +472,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)stopQuery {
   [self cancelDisplayTimers];
   [NSObject cancelPreviousPerformRequestsWithTarget:self
-                                           selector:@selector(doDesktopQuery:)
+                                           selector:@selector(performQuery:)
                                              object:nil];
-  [queryController_ cancel];
+  [self cancelAndReleaseQueryController];
   [self setQueryIsInProcess:NO];
 }
 
@@ -484,46 +483,16 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 // Called when the last active query operation, and thus the query, has
 // completed.  May be called even when there are more results that are
 // possible, but the query has been stopped by the user or by the query
-// reaching a time threshhold.
+// reaching a time threshold.
 - (void)queryControllerDidFinish:(NSNotification *)notification {
-  [moreResultsUpdateTimer_ invalidate];
-  moreResultsUpdateTimer_ = nil;
+  [self cancelDisplayTimers];  
   currentResultDisplayCount_ = [self maximumResultsToCollect];
-  [self updateDesktopResults];
-  [self updateMoreResults];
-#if DEBUG
-  BOOL dumpTopResults = [[NSUserDefaults standardUserDefaults]
-                         boolForKey:@"dumpTopResults"];
-  if (dumpTopResults) {
-    HGSLog(@"QSB: Desktop Results:\n%@", desktopResults_);
-    HGSLog(@"QSB: More Results:\n%@", [self moreResults]);
-  }
-#endif
-
-  [self setQueryIsInProcess:NO];
+  [self startMixing];
 }
 
 - (void)queryControllerDidFinishOperation:(NSNotification *)notification {
   [self willChangeValueForKey:@"searchStatus"];
   [self didChangeValueForKey:@"searchStatus"];
-}
-
-// Called when more results are added to the query.
-- (void)queryControllerDidAddResults:(NSNotification *)notification {
-  // We treat the shortcut source "specially" because it tends
-  // to have high quality results.
-  if (shortcutDisplayTimer_) {
-    NSDictionary *userinfo = [notification userInfo];
-    NSArray *ops = [userinfo objectForKey:kHGSQueryControllerOperationsKey];
-    for (HGSSearchOperation *op in ops) {
-      HGSSearchSource *source = [op source];
-      NSString *identifier = [source identifier];
-      if ([identifier isEqualToString:kHGSShortcutsSourceIdentifier]) {
-        [shortcutDisplayTimer_ fire];
-        shortcutDisplayTimer_ = nil;
-      }
-    }
-  }
 }
 
 // called when enough time has elapsed that we want to display some results
@@ -532,23 +501,20 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if (timer == shortcutDisplayTimer_) {
     shortcutDisplayTimer_ = nil;
     currentResultDisplayCount_ = 1;
+    [self startMixing];
   } else if (timer == firstTierDisplayTimer_) {
     firstTierDisplayTimer_ = nil;
     // Fill most of the rows, but leave a few for good but slow results.
     currentResultDisplayCount_ = (int)(0.8 * [self maximumResultsToCollect]);
+    [self startMixing];
   } else if (timer == secondTierDisplayTimer_) {
     secondTierDisplayTimer_ = nil;
     // Leave one slot for the very best (queryDidFinish: sets
     // currentResultDisplayCount_ = [self maximumResultsToCollect]
     currentResultDisplayCount_ = [self maximumResultsToCollect] - 1;
+    [self startMixing];
   } else if (timer == moreResultsUpdateTimer_) {
     [self updateMoreResults];
-  }
-  [self updateDesktopResults];
-
-  // If we've locked down all the rows, we can go ahead and cancel the query now
-  if ([lockedResults_ count] == [self maximumResultsToCollect]) {
-    [queryController_ cancel];
   }
 }
 
@@ -556,7 +522,36 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSDictionary *change = [notification change];
   NSNumber *valueOfChange = [change valueForKey:NSKeyValueChangeNewKey];
   totalResultDisplayCount_ = [valueOfChange unsignedIntegerValue];
-  [self doDesktopQuery:nil];
+  [self performQuery:nil];
+}
+
+- (void)mixerDidUpdateResults:(NSNotification*)notification {
+  [self updateDesktopResults];
+  if (!firstTierDisplayTimer_) {
+    [self updateMoreResults];
+  }
+}
+
+- (void)mixerDidStop:(NSNotification*)notification {
+  if (![mixer_ isCancelled]) {
+    [self mixerDidUpdateResults:notification];
+#if DEBUG
+    BOOL dumpTopResults = [[NSUserDefaults standardUserDefaults]
+                           boolForKey:@"dumpTopResults"];
+    if (dumpTopResults) {
+      HGSLog(@"QSB: Desktop Results:\n%@", desktopResults_);
+      HGSLog(@"QSB: More Results:\n%@", [self moreResults]);
+    }
+#endif    
+  }
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self 
+                name:nil 
+              object:mixer_];
+  mixer_ = nil;
+  if ([queryController_ queriesFinished]) {
+    [self setQueryIsInProcess:NO];
+  }
 }
 
 // start three display timers for 100, 300 and 750ms. We retain them
@@ -568,7 +563,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   const CGFloat kFirstTierDisplayInterval = 0.300;
   const CGFloat kSecondTierDisplayInterval = 0.750;
   const CGFloat kUpdateTierDisplayInterval = 3;
-  [self cancelDisplayTimers];
+  HGSAssert(!shortcutDisplayTimer_, nil);
+  HGSAssert(!firstTierDisplayTimer_, nil);
+  HGSAssert(!secondTierDisplayTimer_, nil);
+  HGSAssert(!moreResultsUpdateTimer_, nil);
+  
   shortcutDisplayTimer_ =
     [NSTimer scheduledTimerWithTimeInterval:kShortcutDisplayInterval
                                      target:self
@@ -626,7 +625,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)updateMoreResults {
-  NSDictionary *resultsByCategory = [queryController_ rankedResultsByCategory];
+  NSDictionary *resultsByCategory = [mixer_ rankedResultsByCategory];
   [self setMoreResults:resultsByCategory];
 }
 

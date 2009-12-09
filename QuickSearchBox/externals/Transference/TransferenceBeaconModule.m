@@ -46,7 +46,7 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
 
 @end
 
-@interface TransferenceBeaconModule () 
+@interface TransferenceBeaconModule ()
 // Strips the source string description to make it more human readable.
 //
 - (NSDictionary *)searchSourceDictionaryForObject:(id)searchObject;
@@ -186,7 +186,7 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
                      object:nil];
 
     [server_ setStartupTime:startupTime];
-    
+
     // The server currently runs in the same thread as the BeaconModule, but if
     // we increase the work the server has to do we may want to spin out another
     // thread.
@@ -268,7 +268,7 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
         NSDictionary *dict = [NSDictionary dictionaryWithDictionary:newItem];
         [moduleSearchTimes addObject:dict];
       }
-      
+
       // Start fresh
       [newItem removeAllObjects];
     }
@@ -277,9 +277,11 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
   [server_ setLastSearchTime:searchTime moduleInfo:moduleSearchTimes];
 
   HGSQueryController *object = [aNotification object];
-
-  NSRange rankedResultsRange = NSMakeRange(0, [object rankedResultsCount]);
-  NSArray *rankedResults = [object rankedResultsForRange:rankedResultsRange];
+  HGSMixer *mixer = [object startMixingCurrentResults];
+  while (!([mixer isFinished] || [mixer isCancelled])) {
+    [NSThread sleepForTimeInterval:.1];
+  }
+  NSArray *rankedResults = [mixer rankedResults];
   [server_ setLastRankedResults:rankedResults];
 }
 

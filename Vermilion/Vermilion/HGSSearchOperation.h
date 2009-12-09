@@ -40,6 +40,7 @@
 
 @class HGSQuery;
 @class HGSSearchSource;
+@class HGSResult;
 
 /*!
  Combines a search source and a query into an operation that will be executed
@@ -110,6 +111,11 @@
 - (NSArray *)sortedResultsInRange:(NSRange)range;
 
 /*!
+ Return the result from the sorted results at idx.
+*/
+- (HGSResult *)sortedResultAtIndex:(NSUInteger)idx;
+
+/*!
  Return the total number of results available.
 */
 - (NSUInteger)resultCount;
@@ -148,12 +154,5 @@ GTM_EXTERN NSString *const kHGSSearchOperationWasCancelledNotification;
 /*!
  Posted when results are updated for this source.
  Object is the search operation.
- UserInfo contains HGSSearchOperationNotificationResultsKey.
 */
 GTM_EXTERN NSString *const kHGSSearchOperationDidUpdateResultsNotification;
-
-/*!
- Key for userinfo of HGSSearchOperationDidUpdateResultsNotification.
- Is an array of the current results.
-*/
-GTM_EXTERN NSString *const kHGSSearchOperationNotificationResultsKey;

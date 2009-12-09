@@ -46,8 +46,6 @@ NSString *const kHGSSearchOperationDidUpdateResultsNotification
   = @"HGSSearchOperationDidUpdateResultsNotification";
 NSString *const kHGSSearchOperationWasCancelledNotification
   = @"HGSSearchOperationWasCancelledNotification";
-NSString *const kHGSSearchOperationNotificationResultsKey
-   = @"HGSSearchOperationNotificationResultsKey";
 
 @interface HGSSearchOperation ()
 @property (assign, getter=isFinished) BOOL finished;
@@ -87,16 +85,16 @@ NSString *const kHGSSearchOperationNotificationResultsKey
 }
 
 - (void)cancel {
-  // Even though we clear the operation here, we don't need to
-  // do anything from a threading pov.  If |operation_| were in a queue to run,
-  // the queue would have a retain on it, so it won't get freed from under it.
-  queryCancelled_ = YES;
-  [operation_ cancel];
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationWasCancelledNotification
-                                    object:self];  
-  [operation_ release];
-  operation_ = nil;
+  if (![self isFinished]) {
+    // Even though we clear the operation here, we don't need to
+    // do anything from a threading pov.  If |operation_| were in a queue to run,
+    // the queue would have a retain on it, so it won't get freed from under it.
+    queryCancelled_ = YES;
+    [operation_ cancel];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationWasCancelledNotification
+                                      object:self];
+  }
 }
 
 - (BOOL)isCancelled {
@@ -186,6 +184,11 @@ NSString *const kHGSSearchOperationNotificationResultsKey
 }
 
 - (NSArray *)sortedResultsInRange:(NSRange)range {
+  [self doesNotRecognizeSelector:_cmd];
+  return nil;
+}
+
+- (HGSResult *)sortedResultAtIndex:(NSUInteger)idx {
   [self doesNotRecognizeSelector:_cmd];
   return nil;
 }

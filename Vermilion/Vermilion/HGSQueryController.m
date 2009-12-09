@@ -39,9 +39,7 @@
 #import "HGSCoreExtensionPoints.h"
 #import "HGSMixer.h"
 #import "HGSLog.h"
-#import "HGSBundle.h"
 #import "HGSDTrace.h"
-#import "GTMDebugThreadValidation.h"
 #import "HGSOperation.h"
 #import "HGSMemorySearchSource.h"
 #import "GTMObjectSingleton.h"
@@ -62,18 +60,6 @@ NSString *const kHGSShortcutsSourceIdentifier
 
 NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 
-// Key callbacks for our really simple pointer to id based dictionary
-// The keys we pass in don't support "copy" but all we are interested in
-// is that their pointers don't clash.
-static const void *ResultsDictionaryRetainCallBack(CFAllocatorRef allocator, 
-                                                   const void *value);
-static void ResultsDictionaryReleaseCallBack(CFAllocatorRef allocator, 
-                                             const void *value);
-static CFStringRef ResultsDictionaryCopyDescriptionCallBack(const void *value);
-static Boolean ResultsDictionaryEqualCallBack(const void *value1, 
-                                       const void *value2);
-static CFHashCode ResultsDictionaryHashCallBack(const void *value);
-
 @interface HGSSourceRanker : NSObject {
  @private
   NSMutableDictionary *rankDictionary_;
@@ -85,9 +71,7 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
 @end
 
 @interface HGSQueryController()
-+ (NSString *)categoryForType:(NSString *)type;
 - (void)cancelPendingSearchOperations:(NSTimer*)timer;
-- (NSArray *)rankedResults;
 @end
 
 @implementation HGSQueryController
@@ -102,26 +86,14 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   }
 }
 
-- (id)initWithQuery:(HGSQuery*)query
-              mixer:(HGSMixer*)mixer {
+- (id)initWithQuery:(HGSQuery*)query {
   if ((self = [super init])) {
     queryOperations_ = [[NSMutableArray alloc] init];
     pendingQueryOperations_ = [[NSMutableArray alloc] init];
+    queryOperationsWithResults_ = [[NSMutableSet alloc] init];
     parsedQuery_ = [query retain];
-    mixer_ = [mixer retain];
     operationStartTimes_ = [[NSMutableDictionary alloc] init];
-    CFDictionaryKeyCallBacks keyCallBacks = {
-      0,
-      ResultsDictionaryRetainCallBack,
-      ResultsDictionaryReleaseCallBack,
-      ResultsDictionaryCopyDescriptionCallBack,
-      ResultsDictionaryEqualCallBack,
-      ResultsDictionaryHashCallBack
-    };
-    sourceResults_ = CFDictionaryCreateMutable(NULL,
-                                               0, 
-                                               &keyCallBacks, 
-                                               &kCFTypeDictionaryValueCallBacks);
+    mixerQueue_ = [[NSOperationQueue alloc] init];
   }
   return self;
 }
@@ -136,10 +108,10 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   [queryOperations_ release];
   [parsedQuery_ release];
   [pendingQueryOperations_ release];
+  [queryOperationsWithResults_ release];
+  [mixer_ cancel];
   [mixer_ release];
-  if (sourceResults_) {
-    CFRelease(sourceResults_);
-  }
+  [mixerQueue_ release];
   [super dealloc];
 }
 
@@ -231,117 +203,30 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
   return parsedQuery_;
 }
 
-- (NSDictionary *)rankedResultsByCategory {
-  // Return a dictionary of results organized by category.  If there
-  // were no acceptable results then return nil.
-  NSArray *results = [self rankedResults];
-  NSMutableDictionary *dictionary = nil;
-  NSEnumerator *resultEnumerator = [results objectEnumerator];
-  HGSResult *result = nil;
-  while ((result = [resultEnumerator nextObject])) {
-    NSString *type = [result type];
-    if (type &&
-        ![result conformsToType:kHGSTypeSuggest]) {
-      if (!dictionary) {
-        dictionary = [NSMutableDictionary dictionary];
-      }
-      // Translate |type| into a category.
-      NSString *category = [[self class] categoryForType:type];
-      // Fallback to type if necessary.
-      if (!category) {
-        category = type;
-      }
-      NSMutableArray *array = [dictionary objectForKey:category];
-      if (!array) {
-        array = [NSMutableArray array];
-        [dictionary setObject:array
-                       forKey:category];
-      }
-      [array addObject:result];
+- (HGSMixer *)startMixingCurrentResults {
+  NSArray *currentOps = nil;
+  @synchronized (queryOperationsWithResults_) {
+    currentOps = [queryOperationsWithResults_ allObjects];
+  }
+  [mixer_ cancel];
+  [mixer_ release];
+  NSRange currentRange = NSMakeRange(0, [self totalResultsCount]);
+  mixer_ = [[HGSMixer alloc] initWithRange:currentRange
+                      fromSearchOperations:currentOps
+                             firstInterval:0.05
+                          progressInterval:1];
+  [mixerQueue_ addOperation:mixer_];
+  return mixer_;
+}
+
+- (NSUInteger)totalResultsCount {
+  NSUInteger count = 0;
+  @synchronized (queryOperationsWithResults_) {
+    for (HGSSearchOperation *op in queryOperationsWithResults_) {
+      count += [op resultCount];
     }
   }
-  return dictionary;
-}
-
-- (BOOL)hasAnyRealResults {
-  return hasRealResults_;
-}
-
-// Each source has a list of results, ranked by relevance internally within
-// that source. This method:
-// - ranks them in global order
-// - removes/merges duplicates
-// - removes objects that don't match the type of a pending action
-// - annotates results across all sources
-// TODO(pinkerton) - we can decide whether this should rank everything or just
-//      the top M from each source to get the top N later.
-// TODO(pinkerton) - should annotations re-rank?
-- (NSArray*)rankedResults {
-  if (!rankedResults_) {
-    
-    // gather all the results at the current time
-    NSDictionary *nsSourceResults = (NSDictionary *)sourceResults_;
-    NSArray* operationResultArrays = [nsSourceResults allValues];
-    // mix and de-dupe
-    NSMutableArray* results = [mixer_ mix:operationResultArrays
-                                queryController:self];
-
-    rankedResults_ = [results retain];
-  }
-  return rankedResults_;
-}
-
-- (NSArray *)rankedResultsForRange:(NSRange)range {
-  return [[self rankedResults] subarrayWithRange:range];
-}
-
-- (NSUInteger)rankedResultsCount {
-  return [[self rankedResults] count];
-}
-
-+ (NSString *)categoryForType:(NSString *)type {
-  // If this is being accessed from multiple threads you will
-  // have to make typeCategoryDict threadsafe somehow. Right now it is only
-  // being used off of the main thread, so we assert to make sure it stays
-  // that way.
-  GTMAssertRunningOnMainThread();
-  
-  if (!type) return nil;
-  
-  static NSMutableDictionary *sTypeCategoryDict = nil;
-  if (!sTypeCategoryDict) {
-    NSBundle *bundle = HGSGetPluginBundle();
-    // Pull in our type->category dictionary.
-    NSString *plistPath = [bundle pathForResource:@"TypeCategories"
-                                           ofType:@"plist"];
-    if (plistPath) {
-      sTypeCategoryDict 
-      = [[NSMutableDictionary alloc] initWithContentsOfFile:plistPath];
-    }
-    if (!sTypeCategoryDict) {
-      HGSLogDebug(@"TypeCategories.plist cannot be found in the app bundle.");
-    }
-  }
-  NSString *category = nil;
-  NSString *searchType = type;
-  BOOL addNewMapping = NO;
-  while ([searchType length]
-         && !(category = [sTypeCategoryDict objectForKey:searchType])) {
-    addNewMapping = YES;  // Signal that we should cache a new mapping.
-    NSRange dotRange = [searchType rangeOfString:@"." options:NSBackwardsSearch];
-    if (dotRange.location != NSNotFound) {
-      searchType = [searchType substringToIndex:dotRange.location];
-    } else {
-      searchType = nil;  // Not found.
-      category = @"^Others";
-      HGSLogDebug(@"No category found for type '%@'.  Using 'Others'.", type);
-    }
-  }
-  
-  if (addNewMapping && category) {
-    [sTypeCategoryDict setObject:category forKey:type];
-  }
-  return category;
+  return count;
 }
 
 // stops the query
@@ -444,56 +329,16 @@ static CFHashCode ResultsDictionaryHashCallBack(const void *value);
 // Called when a source has added more results. 
 //
 - (void)searchOperationDidUpdateResults:(NSNotification *)notification {
-  NSDictionary *userInfo = [notification userInfo];
-  NSArray *operationResults 
-    = [userInfo objectForKey:kHGSSearchOperationNotificationResultsKey];
-  if (!hasRealResults_) {
-    for (HGSResult *result in operationResults) {
-      hasRealResults_ = ![result conformsToType:kHGSTypeGoogleSuggest];
-      if (hasRealResults_) break;
-    }
-  }
   HGSSearchOperation *operation = [notification object];
-  CFDictionarySetValue(sourceResults_, operation, operationResults);
-  [rankedResults_ release];
-  rankedResults_ = nil;
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  NSDictionary *newUserInfo 
-    = [NSDictionary dictionaryWithObject:[NSArray arrayWithObject:operation]
-                                  forKey:kHGSQueryControllerOperationsKey];
-  [nc postNotificationName:kHGSQueryControllerDidUpdateResultsNotification 
-                    object:self
-                  userInfo:newUserInfo];
+  @synchronized (self) {
+    [queryOperationsWithResults_ addObject:operation];
+  }
 }
 
 - (NSArray *)pendingQueries {
   return [[pendingQueryOperations_ copy] autorelease];
 }
 @end
-
-// Callbacks for our really simple pointer to id based dictionary
-const void *ResultsDictionaryRetainCallBack(CFAllocatorRef allocator, 
-                                            const void *value) {
-  return [(id)value retain];
-}
-
-void ResultsDictionaryReleaseCallBack(CFAllocatorRef allocator,
-                                      const void *value) {
-  [(id)value release];
-}
-
-CFStringRef ResultsDictionaryCopyDescriptionCallBack(const void *value) {
-  return (CFStringRef)[[(id)value description] copy];
-}
-
-Boolean ResultsDictionaryEqualCallBack(const void *value1, 
-                                       const void *value2) {
-  return value1 == value2;
-}
-
-CFHashCode ResultsDictionaryHashCallBack(const void *value) {
-  return (CFHashCode)value;
-}
 
 // Keep track of the average running time for a given source.
 // These are stored by HGSSourceRanker in it's rankDictionary keyed

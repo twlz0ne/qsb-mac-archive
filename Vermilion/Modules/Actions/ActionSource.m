@@ -97,16 +97,19 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 }
 
 - (HGSResult *)objectFromAction:(HGSAction *)action 
-                    resultArray:(HGSResultArray *)array {
+                    resultArray:(HGSResultArray *)array
+                           rank:(CGFloat)rank {
   // Set some of the flags to bump them up in the result's ranks
   NSNumber *rankFlags 
     = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag 
        | eHGSSpecialUIRankFlag 
        | eHGSUnderHomeRankFlag 
        | eHGSHomeChildRankFlag];
+  NSNumber *nsRank = [NSNumber numberWithDouble:rank];
   NSMutableDictionary *attributes 
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        rankFlags, kHGSObjectAttributeRankFlagsKey,
+       nsRank, kHGSObjectAttributeRankKey,
        action, kHGSObjectAttributeDefaultActionKey,
        nil];
   NSImage *icon = [action displayIconForResults:array];
@@ -135,7 +138,8 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   for (HGSAction *action in [actionPoint extensions]) {
     // Create a result object that wraps our action
     HGSResult *actionObject = [self objectFromAction:action
-                                         resultArray:nil];
+                                         resultArray:nil
+                                                rank:0];
     // Index our result
     [self indexResult:actionObject];
   }
@@ -166,7 +170,8 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     if (action) {
       // We create a new result, but it should fold based out the url
       result = [self objectFromAction:action
-                          resultArray:nil];
+                          resultArray:nil
+                                 rank:0];
     }
   }
   
@@ -205,11 +210,13 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
            autorelease];
       
       actionResult = [self objectFromAction:(HGSAction *)proxy
-                                resultArray:queryResults];
+                                resultArray:queryResults
+                                       rank:[result rank]];
       
       if (emptyQuery) {
         HGSMutableResult *mutable = [[actionResult mutableCopy] autorelease];
         [mutable addRankFlags:eHGSBelowFoldRankFlag];
+        [mutable setRank:HGSCalibratedScore(kHGSCalibratedModerateScore)];
         actionResult = mutable;
       }
     }

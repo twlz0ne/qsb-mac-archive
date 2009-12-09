@@ -31,347 +31,232 @@
 //
 
 #import "HGSMixer.h"
+
+#include <CoreServices/CoreServices.h>
+#include <mach/mach_time.h>
+
 #import "HGSQueryController.h"
 #import "HGSResult.h"
+#import "HGSSearchOperation.h"
+#import "NSNotificationCenter+MainThread.h"
 #import "HGSLog.h"
+#import "HGSBundle.h"
+#import "GTMDebugThreadValidation.h"
 
-static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context);
+NSString *const kHGSMixerDidUpdateResultsNotification 
+  = @"HGSMixerDidUpdateResultsNotification";
+NSString *const kHGSMixerDidStopNotification
+  = @"HGSMixerDidStopNotification";
+
+inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
+  HGSResult *a = (HGSResult *)resultA;
+  HGSResult *b = (HGSResult *)resultB;
+  NSInteger result = NSOrderedSame;
+  CGFloat rankA = [a rank];
+  CGFloat rankB = [b rank]; 
+  if (rankA > rankB) {
+    result = NSOrderedAscending;
+  } else if (rankA < rankB) {
+    result = NSOrderedDescending;
+  }
+  return result;
+}
 
 @interface HGSMixer()
-// these methods can be overridden to customize the behavior of the ranking
-// and de-duping.
-- (void)sortObjectsInSitu:(NSMutableArray*)objects
-          queryController:(HGSQueryController*)controller;
-- (NSMutableArray *)mergeDuplicates:(NSArray*)objects
-                    queryController:(HGSQueryController*)controller;
++ (NSString *)categoryForType:(NSString *)type;
 @end
 
 @implementation HGSMixer
 
-- (NSMutableArray*)mix:(NSArray*)providerArrays 
-       queryController:(HGSQueryController*)controller {
-  // join all arrays into one big one. If we can normalize the rankings
-  // somehow beforehand we can try to just pick off elements from the front
-  // of each pre-sorted list, but until then, we just punt and work in one big
-  // array.
-  NSMutableArray* results = [NSMutableArray array];
-  for (NSArray *curr in providerArrays) {
-    [results addObjectsFromArray:curr];
+- (id)initWithRange:(NSRange)range fromSearchOperations:(NSArray *)ops 
+      firstInterval:(NSTimeInterval)firstInterval 
+   progressInterval:(NSTimeInterval)progressInterval {
+  if ((self = [super init])) {
+    range_ = range;
+    ops_ = [ops copy];
+    results_ = [[NSMutableArray alloc] initWithCapacity:NSMaxRange(range)];
+    resultsByCategory_ = [[NSMutableDictionary alloc] init];
+    
+    firstInterval_ = UnsignedWideToUInt64(DurationToAbsolute(firstInterval * 1000));
+    progressInterval_ = UnsignedWideToUInt64(DurationToAbsolute(progressInterval * 1000));
   }
-  
-  // sort in global order
-  [self sortObjectsInSitu:results queryController:controller];
-  
-  // merge/remove duplicates
-  //
-  results = [self mergeDuplicates:results queryController:controller];
-  
-  return results;
+  return self;
 }
 
-//
-// -sortObjectsInSitu:
-//
-// Sort the objects in-place in the array. Currently does only our standard
-// relevance sort, but can be overridden to apply multiple sorts or tweak
-// results to taste.
-//
-- (void)sortObjectsInSitu:(NSMutableArray*)objects 
-          queryController:(HGSQueryController*)controller {
-  [objects sortUsingFunction:RelevanceCompare context:NULL];
-#if 0
-  if ([controller cancelled]) return;
-  // TODO(pinkerton): move this into the regular compare when the name match
-  //    bit is set.
-  [results sortUsingFunction:NameCompare context:parsedQuery_];
-#endif
+- (void)dealloc {
+  [ops_ release];
+  [results_ release];
+  [resultsByCategory_ release];
+  [super dealloc];
 }
 
-//
-// -mergeDuplicates:
-//
-// merges/removes duplicate results
-//
-- (NSMutableArray *)mergeDuplicates:(NSArray*)results 
-                    queryController:(HGSQueryController*)controller {
-  NSUInteger resultsCount = [results count];
-  id *singulars = malloc(sizeof(id) * resultsCount);
-  NSUInteger singularIndex = 0;
-  id *resultObjects = malloc(sizeof(id) * resultsCount);
-  if (!singulars || !resultObjects) {
-    free(singulars);
-    free(resultObjects);
-    HGSLogDebug(@"Out of memory at mergeDuplicates");
-    return nil;
+- (void)main {
+  NSUInteger maxLength = NSMaxRange(range_);
+  NSUInteger opsCount = [ops_ count];
+  NSInteger *opsIndices = calloc(sizeof(NSInteger), opsCount);
+  NSInteger *opsMaxIndices = malloc(sizeof(NSInteger) * opsCount);
+  NSUInteger currentIndex = 0;
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  
+  NSUInteger opsIndex = 0;
+  for (HGSSearchOperation *op in ops_) {
+    opsMaxIndices[opsIndex] = [op resultCount];
+    ++opsIndex;
   }
-  [results getObjects:resultObjects];
-  for (NSUInteger i = 0; i < resultsCount; ++i) {
-    // Check to see if it's a duplicate of any of the confirmed results
-    HGSResult *currentResult = resultObjects[i];
-    NSUInteger currentHash = currentResult->idHash_;
-    NSUInteger j;
-    for (j = 0; j < singularIndex; ++j) {
-      HGSResult *singular = singulars[j];
-      if (currentHash == singular->idHash_) {
-        if ([currentResult isDuplicate:singular]) {
-          // We've got a match; merge this into the existing result and replace
-          singular = [singular mergeWith:currentResult];
-          singulars[j] = singular;
-          break;
+  
+  uint64_t startTime = mach_absolute_time();
+  
+  // Perform merge sort where we take the top ranked result in each
+  // queue and add it to the sorted results.
+  while (currentIndex < maxLength) {
+    HGSResult *newResult = nil;
+    NSUInteger indexToIncrement = 0;
+    for (NSUInteger i = 0; i < opsCount; ++i) {
+      HGSResult *testResult = nil;
+      if (opsIndices[i] < opsMaxIndices[i]) {
+        testResult = [[ops_ objectAtIndex:i] sortedResultAtIndex:opsIndices[i]];
+        NSInteger compare = HGSMixerResultSort(testResult, newResult, nil);
+        if (compare == NSOrderedAscending) {
+          newResult = testResult;
+          indexToIncrement = i;
         }
       }
     }
-    if ([controller cancelled]) {
-      return nil;
-    }
-    if (j == singularIndex) {
-      singulars[singularIndex] = currentResult;
-      ++singularIndex;
-    }
-  }
-  NSMutableArray *outArray = [NSMutableArray arrayWithObjects:singulars 
-                                                        count:singularIndex];
-  free(singulars);
-  free(resultObjects);
-  return outArray;
-}
-
-#pragma mark -
-
-#if 0
-static int NameCompare(id r1, id r2, void *context) {
-  NSString *query = [[(HGSQuery *)context query] lowercaseString];
-  NSString *n1 = [[r1 valueForKey:kHGSObjectAttributeNameKey] lowercaseString];
-  NSString *n2 = [[r2 valueForKey:kHGSObjectAttributeNameKey] lowercaseString];
-  NSEnumerator *n1Substrings = [[n1 componentsSeparatedByString:@" "] objectEnumerator];
-  NSEnumerator *n2Substrings = [[n2 componentsSeparatedByString:@" "] objectEnumerator];
-  NSString *subString1 = nil;
-  NSString *subString2 = nil;
-  int count1 = 0, count2 = 0;
-  while ((subString1 = [n1Substrings nextObject])) {
-    ++count1;
-    if ([subString1 hasPrefix:query]) {
-      break;
-    }
-  }
-  while ((subString2 = [n2Substrings nextObject])) {
-    ++count2;
-    if ([subString2 hasPrefix:query]) {
-      break;
-    }
-  }
-  int sub1Len = [subString1 length];
-  int sub2Len = [subString2 length];
-  if (sub1Len < sub2Len) {
-    return NSOrderedAscending;
-  } else if (sub1Len > sub2Len) {
-    return NSOrderedDescending;
-  } else {
-    if (count1 < count2) {
-      return NSOrderedAscending;
-    } else if (count2 < count1) {
-      return NSOrderedDescending;
+    if (newResult) {
+      NSUInteger resultIndex = 0;
+      @synchronized (results_) {
+        for (HGSResult *result in results_) {
+          if ([result isDuplicate:newResult]) {
+            newResult = [result mergeWith:newResult];
+            [results_ replaceObjectAtIndex:resultIndex withObject:newResult];
+            newResult = nil;
+            break;
+          }
+          ++resultIndex;
+        }
+        if (newResult) {
+          [results_ addObject:newResult];
+          NSString *type = [newResult type];
+          if (type && ![newResult conformsToType:kHGSTypeSuggest]) {
+            NSString *category = [[self class] categoryForType:type];
+            // Fallback to type if necessary.
+            if (!category) {
+              category = type;
+            }
+            NSMutableArray *array = [resultsByCategory_ objectForKey:category];
+            if (!array) {
+              array = [NSMutableArray arrayWithObject:newResult];
+              [resultsByCategory_ setObject:array forKey:category];
+            } else {
+              [array addObject:newResult];
+            }
+          }
+          currentIndex++;
+        }
+        opsIndices[indexToIncrement]++;
+      }
     } else {
-      sub1Len = [n1 length];
-      sub2Len = [n2 length];
-      if (sub1Len < sub2Len) {
-        return NSOrderedAscending;
-      } else {
-        return NSOrderedDescending;
+      break;
+    }
+    if ([self isCancelled]) {
+      break;
+    }
+    uint64_t intervalToCheck = firstInterval_;
+    if (!intervalToCheck) {
+      intervalToCheck = progressInterval_;
+    }
+    if (intervalToCheck) {
+      uint64_t currentTime = mach_absolute_time();
+      uint64_t deltaTime = currentTime - startTime;
+      if (deltaTime > intervalToCheck) {
+        [nc hgs_postOnMainThreadNotificationName:kHGSMixerDidUpdateResultsNotification
+                                          object:self];
+        firstInterval_ = 0;
+        startTime = mach_absolute_time();
       }
     }
   }
+  free(opsIndices);
+  free(opsMaxIndices);
+  [nc hgs_postOnMainThreadNotificationName:kHGSMixerDidStopNotification
+                                    object:self];
 }
-#endif
 
-//
-// RelevanceCompare
-//
-// Compares two objects based on a series of strong and weak boosts, outlined
-// in . Returns NSOrderedAscending if |ptr1| is "smaller" (higher relevance) 
-// than |ptr2|.
-//
-static NSInteger RelevanceCompare(id ptr1, id ptr2, void *context) {
-  // Sanity
-  if (!(ptr1 && ptr2)) return kCFCompareEqualTo;  // Nothing sane to do
-  
-  // Save some typing and cast
-  HGSResult *item1 = (HGSResult *)ptr1;
-  HGSResult *item2 = (HGSResult *)ptr2;
-  NSDate *dateOne = nil;
-  NSDate *dateTwo = nil;
-  
-  // Final result
-  CFComparisonResult compareResult = kCFCompareEqualTo;
-  
-  ////////////////////////////////////////////////////////////
-  //  Value rank above all else
-  ////////////////////////////////////////////////////////////
-  
-  CGFloat rank1 = [item1 rank];
-  CGFloat rank2 = [item2 rank];
-  if (rank1 < rank2) {
-    compareResult = kCFCompareGreaterThan;
-    goto RelevanceCompareComplete;
-  } else if (rank1 > rank2) {
-    compareResult = kCFCompareLessThan;
-    goto RelevanceCompareComplete;
+- (NSArray *)rankedResults {
+  NSArray *value = nil;
+  @synchronized (results_) {
+    value = [[results_ copy] autorelease];
   }
-  
-  HGSRankFlags flags1 = [item1 rankFlags];
-  HGSRankFlags flags2 = [item2 rankFlags];
-  
-  ////////////////////////////////////////////////////////////
-  //  Penalize spam
-  ////////////////////////////////////////////////////////////
-  
-  if (flags1 & eHGSSpamRankFlag) {
-    if (!flags2 & eHGSSpamRankFlag) {
-      compareResult = kCFCompareGreaterThan;
-      goto RelevanceCompareComplete;
+  return value;
+}
+
+- (NSDictionary *)rankedResultsByCategory {
+  NSDictionary *categoryResults = nil;
+  // Synchronizing on results_ here is intentional. results_ is being used
+  // as the synchronization semaphore for all of the variables.
+  @synchronized (results_) {
+    // Must do a semi-deep copy as we need non-mutable arrays in our dictionary
+    // copy because other threads are going to be accessing them.
+    NSArray *keys = [resultsByCategory_ allKeys];
+    NSArray *objects = [resultsByCategory_ objectsForKeys:keys
+                                           notFoundMarker:[NSNull null]];
+    NSMutableArray *newObjects 
+      = [NSMutableArray arrayWithCapacity:[objects count]];
+    for (id value in objects) {
+      HGSAssert([value isKindOfClass:[NSArray class]], nil);
+      [newObjects addObject:[value copy]];
     }
-    // Fall through
-  } else if (flags2 & eHGSSpamRankFlag) {
-    compareResult = kCFCompareLessThan;
-    goto RelevanceCompareComplete;
+    categoryResults = [NSDictionary dictionaryWithObjects:newObjects 
+                                                  forKeys:keys];
   }
+  return categoryResults;
+}
+
+static NSMutableDictionary *sTypeCategoryDict = nil;
+
++ (void)initialize {
+  if (!sTypeCategoryDict) {
+    NSBundle *bundle = HGSGetPluginBundle();
+    // Pull in our type->category dictionary.
+    NSString *plistPath = [bundle pathForResource:@"TypeCategories"
+                                           ofType:@"plist"];
+    if (plistPath) {
+      sTypeCategoryDict 
+        = [[NSMutableDictionary alloc] initWithContentsOfFile:plistPath];
+    }
+    if (!sTypeCategoryDict) {
+      HGSLogDebug(@"TypeCategories.plist cannot be found in the app bundle.");
+    }
+  }
+}
+
++ (NSString *)categoryForType:(NSString *)type {  
+  if (!type) return nil;
+  NSString *category = nil;
+  NSString *searchType = type;
+  BOOL addNewMapping = NO;
+  @synchronized(sTypeCategoryDict) {
+    while ([searchType length]
+           && !(category = [sTypeCategoryDict objectForKey:searchType])) {
+      addNewMapping = YES;  // Signal that we should cache a new mapping.
+      NSRange dotRange = [searchType rangeOfString:@"." 
+                                           options:NSBackwardsSearch];
+      if (dotRange.location != NSNotFound) {
+        searchType = [searchType substringToIndex:dotRange.location];
+      } else {
+        searchType = nil;  // Not found.
+        category = @"^Others";
+        HGSLogDebug(@"No category found for type '%@'.  Using 'Others'.", type);
+      }
+    }
     
-  ////////////////////////////////////////////////////////////
-  //  "Launchable" (Applications, Pref panes, etc.)
-  ////////////////////////////////////////////////////////////
-  
-  if (flags1 & eHGSLaunchableRankFlag && flags1 & eHGSNameMatchRankFlag) {
-    if (!(flags2 & eHGSLaunchableRankFlag && flags2 & eHGSNameMatchRankFlag)) {
-      compareResult = kCFCompareLessThan;
-      goto RelevanceCompareComplete;
+    if (addNewMapping && category) {
+      [sTypeCategoryDict setObject:category forKey:type];
     }
-    // Fall through
-  } else if (flags2 & eHGSLaunchableRankFlag && flags2 & eHGSNameMatchRankFlag) {
-    compareResult = kCFCompareGreaterThan;
-    goto RelevanceCompareComplete;
   }
-  
-  ////////////////////////////////////////////////////////////
-  //  Contacts
-  ////////////////////////////////////////////////////////////
-  
-  BOOL item1IsContact = [item1 conformsToType:kHGSTypeContact];
-  BOOL item2IsContact = [item2 conformsToType:kHGSTypeContact];
-  if (item1IsContact) {
-    if (item2IsContact) {
-      // Between contacts just sort on last used
-      goto RelevanceCompareLastUsed;
-    } else {
-      compareResult = kCFCompareLessThan;
-      goto RelevanceCompareComplete;
-    }
-  } else if (item2IsContact) {
-    compareResult = kCFCompareGreaterThan;
-    goto RelevanceCompareComplete;
-  }
-  
-  ////////////////////////////////////////////////////////////
-  //  "Persistent" items (Dock, Finder sidebar, etc.)
-  ////////////////////////////////////////////////////////////
-  
-  if (flags1 & eHGSUserPersistentPathRankFlag) {
-    if (!flags2 & eHGSUserPersistentPathRankFlag) {
-      compareResult = kCFCompareLessThan;
-      goto RelevanceCompareComplete;
-    }
-    // Fall through to further comparisons
-  } else if (flags2 & eHGSUserPersistentPathRankFlag) {
-    compareResult = kCFCompareGreaterThan;
-    goto RelevanceCompareComplete;
-  }
-  
-  ////////////////////////////////////////////////////////////
-  //  Special UI objects
-  ////////////////////////////////////////////////////////////
-  
-  if (flags1 & eHGSSpecialUIRankFlag) {
-    if (!flags2 & eHGSSpecialUIRankFlag) {
-      compareResult = kCFCompareLessThan;
-      goto RelevanceCompareComplete;
-    }
-    // Fall through to further comparisons
-  } else if (flags2 & eHGSSpecialUIRankFlag) {
-    compareResult = kCFCompareGreaterThan;
-    goto RelevanceCompareComplete;
-  }
-  
-  ////////////////////////////////////////////////////////////
-  //  Home folder check
-  ////////////////////////////////////////////////////////////
-  
-  // Special home folder places
-  if (flags1 & eHGSUnderHomeRankFlag 
-      || flags1 & eHGSUnderDownloadsRankFlag
-      || flags1 & eHGSUnderDesktopRankFlag) {
-    if (!(flags2 & eHGSUnderHomeRankFlag 
-          || flags2 & eHGSUnderDownloadsRankFlag
-          || flags2 & eHGSUnderDesktopRankFlag)) {
-      compareResult = kCFCompareLessThan;
-      goto RelevanceCompareComplete;
-    }
-    // Fall through
-  } else if (flags2 & eHGSUnderHomeRankFlag 
-             || flags2 & eHGSUnderDownloadsRankFlag
-             || flags2 & eHGSUnderDesktopRankFlag) {
-    compareResult = kCFCompareGreaterThan;
-    goto RelevanceCompareComplete;
-  }
-  
-  // Just under home in general is more relevant
-  if (flags1 & eHGSUnderHomeRankFlag) {
-    if (!flags2 & eHGSUnderHomeRankFlag) {
-      compareResult = kCFCompareLessThan;
-      goto RelevanceCompareComplete;
-    }
-    // Fall through
-  } else if (flags2 & eHGSUnderHomeRankFlag) {
-    compareResult = kCFCompareGreaterThan;
-    goto RelevanceCompareComplete;
-  }
-  
-  ////////////////////////////////////////////////////////////
-  //  Name matches are preferred even over recent usage
-  ////////////////////////////////////////////////////////////
-  if (flags1 & eHGSNameMatchRankFlag) {
-    if (!flags2 & eHGSNameMatchRankFlag) {
-      compareResult = kCFCompareLessThan;
-      goto RelevanceCompareComplete;
-    }
-    // Fall through
-  } else if (flags2 & eHGSNameMatchRankFlag) {
-    compareResult = kCFCompareGreaterThan;
-    goto RelevanceCompareComplete;
-  }
-  
-  ////////////////////////////////////////////////////////////
-  //  Last used date
-  ////////////////////////////////////////////////////////////
-RelevanceCompareLastUsed:
-  // Set sort so that more recent wins, we can do this in one step by inverting
-  // the comparison order (we want newer things to be less than)
-  
-  dateOne = [item2 lastUsedDate]; 
-  dateTwo = [item1 lastUsedDate];
-  
-  compareResult = (CFComparisonResult)[dateOne compare:dateTwo];
-
-  // Barring any better information, sort by name
-  if (compareResult == kCFCompareEqualTo) {
-    NSString *name1 = [item1 displayName];
-    NSString *name2 = [item2 displayName];
-    compareResult = (CFComparisonResult)[name1 caseInsensitiveCompare:name2]; 
-  }
-  
-  
-  // Finished, all comparisons done
-RelevanceCompareComplete:
-  // Return the final result
-  return compareResult;
+  return category;
 }
+
 
 @end
+

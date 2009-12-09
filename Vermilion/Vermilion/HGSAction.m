@@ -45,6 +45,8 @@ NSString *const kHGSActionDoesActionCauseUIContextChangeKey
   = @"HGSActionDoesActionCauseUIContextChange";
 NSString *const kHGSActionMustRunOnMainThreadKey
   = @"HGSActionMustRunOnMainThread";
+NSString* const kHGSActionOtherTermsKey
+  = @"HGSActionOtherTerms";
 
 // The result is already retained for you
 static NSSet *CopyStringSetFromId(id value) {  
@@ -68,6 +70,7 @@ static NSSet *CopyStringSetFromId(id value) {
 @synthesize indirectObjectOptional = indirectObjectOptional_;
 @synthesize causesUIContextChange = causesUIContextChange_;
 @synthesize mustRunOnMainThread = mustRunOnMainThread_;
+@synthesize otherTerms = otherTerms_;
 
 + (void)initialize {
   if (self == [HGSAction class]) {
@@ -97,6 +100,9 @@ static NSSet *CopyStringSetFromId(id value) {
     // Default is NO, so just call boolValue on nil
     indirectObjectOptional_ = [value boolValue];
   
+    value = [configuration objectForKey:kHGSActionOtherTermsKey];
+    otherTerms_ = CopyStringSetFromId(value);
+    
     value 
       = [configuration objectForKey:kHGSActionDoesActionCauseUIContextChangeKey];
     // Default is YES, so only call boolValue if it's non nil.

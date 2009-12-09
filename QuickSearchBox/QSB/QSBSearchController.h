@@ -37,6 +37,7 @@
 @class HGSResultArray;
 @class QSBMoreResultsViewController;
 @class QSBTableResult;
+@class HGSMixer;
 
 // Interface between QSB and the web suggestor and the desktop query
 // takes a query string and is responsible for turning it into results.
@@ -65,6 +66,7 @@
   BOOL queryIsInProcess_;  // Yes while a query is under way.
   NSUInteger pushModifierFlags_; // NSEvent Modifiers at pivot time
   NSUInteger totalResultDisplayCount_;
+  HGSMixer *mixer_; // weak
 }
 
 // Sets/Gets NSEvent Modifiers at pivot time
@@ -75,11 +77,10 @@
 @property(nonatomic, retain) QSBSearchController *parentSearchController;
 // Set/Gets in-process indication for query.  Bound to the progress
 // indicator.
-@property(nonatomic, assign) BOOL queryIsInProcess;
+@property(nonatomic, readonly, assign) BOOL queryIsInProcess;
 
 // Returns the top results
 - (QSBTableResult *)topResultForIndex:(NSInteger)idx;
-- (NSArray *)topResultsForRange:(NSRange)range;
 - (NSUInteger)topResultCount;
 
 // Returns the more results
@@ -95,12 +96,8 @@
 // Returns the maximum number of results to present.
 - (NSUInteger)maximumResultsToCollect;
 
-// Return YES if you don't want a 'More' results view available to be shown if
-// everything can be shown in the 'Top' results.  Defaults to NO.
-- (BOOL)suppressMoreIfTopShowsAll;
-
 // Perform the actual query.  For use only be child classes.
-- (void)doDesktopQuery:(id)ignoredValue;
+- (void)performQuery:(id)ignoredValue;
 
 // Stop all source operations for this query.
 - (void)stopQuery;

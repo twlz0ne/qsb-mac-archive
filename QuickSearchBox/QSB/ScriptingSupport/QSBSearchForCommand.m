@@ -102,11 +102,8 @@
                                            queryFlags:0] autorelease];
   [query setMaxDesiredResults:100];
   
-  HGSMixer* mixer = [[[HGSMixer alloc] init] autorelease];
-
   HGSAssert(!queryController_, @"QueryController should be nil");
-  queryController_ = [[HGSQueryController alloc] initWithQuery:query
-                                                         mixer:mixer];
+  queryController_ = [[HGSQueryController alloc] initWithQuery:query];
 
   // store off the handler if there is one. Optional arg.
   NSDictionary *args = [self evaluatedArguments];
@@ -169,9 +166,18 @@
 }
  
 - (void)queryControllerDidFinish:(NSNotification *)notification {
-  // Our query is finished. 
-  NSRange allResults = NSMakeRange(0, [queryController_ rankedResultsCount]);
-  NSArray *results = [queryController_ rankedResultsForRange:allResults];
+  // Our query is finished.
+  HGSMixer *mixer = [queryController_ startMixingCurrentResults];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc addObserver:self 
+         selector:@selector(mixerDidStop:) 
+             name:kHGSMixerDidStopNotification 
+           object:mixer];
+}
+
+- (void)mixerDidStop:(NSNotification *)notification {
+  HGSMixer *mixer = [notification object];
+  NSArray *results = [mixer rankedResults];
   NSUInteger count = [results count];
   NSMutableArray *appleScriptResults = [NSMutableArray arrayWithCapacity:count];
   for (HGSResult *hgsResult in results) {
