@@ -1182,21 +1182,6 @@ doCommandBySelector:(SEL)commandSelector {
     }
     
     [resultsWindow_ setFrame:actualFrame display:YES animate:animating];
-  } else {
-    // If the results panel is not visible then we insure the search box is
-    // on-screen and then pre-position the results panel in case it becomes
-    // visible soon.
-    NSRect proposedQueryFrame = [queryWindow frame];
-    NSRect actualQueryFrame
-      = [self fullyExposedFrameForFrame:proposedQueryFrame
-                         respectingDock:YES
-                               onScreen:[queryWindow screen]];
-    if (!NSEqualRects(actualQueryFrame, proposedQueryFrame)) {
-      [queryWindow setFrame:actualQueryFrame display:YES animate:animating];
-      CGFloat deltaY = actualQueryFrame.origin.y - proposedQueryFrame.origin.y;
-      proposedFrame.origin.y += deltaY;
-    }
-    [resultsWindow_ setFrame:proposedFrame display:NO];
   }
 
   // Turn back on size/move notifications.
@@ -1258,7 +1243,6 @@ doCommandBySelector:(SEL)commandSelector {
   if ([resultsWindow_ isVisible]) {
     newWindowHeight = [activeSearchViewController_ windowHeight];
   }
-  [self setResultsWindowHeight:newWindowHeight animating:NO];
 }
 
 #pragma mark NSWindow Notification Methods

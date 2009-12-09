@@ -2,8 +2,8 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9L30</string>
-		<string key="IBDocument.InterfaceBuilderVersion">677</string>
+		<string key="IBDocument.SystemVersion">9L31a</string>
+		<string key="IBDocument.InterfaceBuilderVersion">680</string>
 		<string key="IBDocument.AppKitVersion">949.54</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
@@ -105,7 +105,7 @@
 			<object class="NSWindowTemplate" id="832025956">
 				<int key="NSWindowStyleMask">129</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{131, 474}, {450, 128}}</string>
+				<string key="NSWindowRect">{{131, 506}, {426, 96}}</string>
 				<int key="NSWTFlags">1614287872</int>
 				<string key="NSWindowTitle">Search Bar</string>
 				<string key="NSWindowClass">QSBCustomPanel</string>
@@ -121,7 +121,7 @@
 						<object class="NSCustomView" id="534655545">
 							<reference key="NSNextResponder" ref="1053078706"/>
 							<int key="NSvFlags">-2147483382</int>
-							<string key="NSFrame">{{20, 28}, {410, 54}}</string>
+							<string key="NSFrame">{{8, 8}, {410, 54}}</string>
 							<reference key="NSSuperview" ref="1053078706"/>
 							<string key="NSClassName">NSView</string>
 						</object>
@@ -252,7 +252,7 @@
 									</object>
 								</object>
 							</object>
-							<string key="NSFrame">{{20, 40}, {410, 48}}</string>
+							<string key="NSFrame">{{8, 20}, {410, 48}}</string>
 							<reference key="NSSuperview" ref="1053078706"/>
 							<string key="NSClassName">NSView</string>
 							<string key="NSExtension">NSView</string>
@@ -272,7 +272,7 @@
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</object>
 							</object>
-							<string key="NSFrame">{{33, 46}, {84, 36}}</string>
+							<string key="NSFrame">{{21, 26}, {84, 36}}</string>
 							<reference key="NSSuperview" ref="1053078706"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="1063519501">
@@ -304,7 +304,7 @@
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</object>
 							</object>
-							<string key="NSFrame">{{27, 0}, {96, 128}}</string>
+							<string key="NSFrame">{{15, 0}, {96, 96}}</string>
 							<reference key="NSSuperview" ref="1053078706"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="140149889">
@@ -318,7 +318,7 @@
 							<bool key="NSEditable">YES</bool>
 						</object>
 					</object>
-					<string key="NSFrameSize">{450, 128}</string>
+					<string key="NSFrameSize">{426, 96}</string>
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
@@ -577,9 +577,9 @@
 						<reference key="object" ref="1053078706"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="847055969"/>
-							<reference ref="427055929"/>
 							<reference ref="534655545"/>
+							<reference ref="427055929"/>
+							<reference ref="847055969"/>
 							<reference ref="14668177"/>
 						</object>
 						<reference key="parent" ref="832025956"/>
@@ -879,9 +879,9 @@
 					<string>{{280, -110}, {480, 385}}</string>
 					<reference ref="8"/>
 					<string>{3.40282e+38, 3.40282e+38}</string>
-					<string>{{348, 1066}, {450, 128}}</string>
+					<string>{{347, 1099}, {426, 96}}</string>
 					<reference ref="9"/>
-					<string>{{348, 1066}, {450, 128}}</string>
+					<string>{{347, 1099}, {426, 96}}</string>
 					<reference ref="9"/>
 					<reference ref="8"/>
 					<string>{{12, 668}, {552, 480}}</string>

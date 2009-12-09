@@ -37,53 +37,6 @@
 
 @implementation QSBLargeIconView
 
-CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
-  size_t width = CGBitmapContextGetWidth(c);
-  size_t height = CGBitmapContextGetHeight(c);
-  size_t bpc = CGBitmapContextGetBitsPerComponent(c);
-  size_t bpp = CGBitmapContextGetBitsPerPixel(c);
-  size_t spp = bpp / bpc;
-  
-  size_t minX = width;
-  size_t minY = height;
-  size_t maxX = 0;
-  size_t maxY = 0;
-  
-  size_t minAvgY = height;
-  size_t maxAvgY = 0;
-  
-   unsigned char* pixels = CGBitmapContextGetData(c);
-  
-  if (!width || !height || !pixels) {
-    return CGRectZero;
-  }
-  
-  for (size_t j = 0; j < height; j++) {
-    NSInteger rowAverage = 0;
-    for(size_t i = 0; i < width; i++) {
-      size_t value = *(pixels + (j * width * spp) + (i * spp));
-      
-      if (value > 128) {
-        //This pixel is not transparent! Readjust bounds.
-        minX = MIN(minX, i);
-        maxX = MAX(maxX, i);
-        minY = MIN(minY, j);
-        maxY = MAX(maxY, j);
-      }
-      rowAverage = rowAverage + value;
-    }
-    rowAverage /= width;
-    if (rowAverage > 64) {
-      minAvgY = MIN(minAvgY, j);
-      maxAvgY = MAX(maxAvgY, j);
-    }
-  }
-  
-  CGRect rect = CGRectMake(minX, minAvgY, maxX - minX + 1, 
-                           maxAvgY - minAvgY + 1);
-  return rect;
-}
-   
 - (void)drawRect:(NSRect)rect {
   NSRect bounds = [self bounds];
   NSImage *image = [[self cell] image];
@@ -92,17 +45,15 @@ CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
   NSSize size = [bestRep size];
   [image setSize:size];
   
-  NSSize canvasSize = NSMakeSize(96, 96);
-  
   CGColorSpaceRef cspace = CGColorSpaceCreateDeviceRGB();   
   if (!cspace) return;
   
   CGContextRef context = 
     CGBitmapContextCreate(NULL,
-                          canvasSize.width,
-                          canvasSize.height,
+                          NSWidth(bounds),
+                          NSHeight(bounds),
                           8,            // bits per component
-                          canvasSize.width * sizeof(UInt32), // bytes per pixel
+                          NSWidth(bounds) * sizeof(UInt32), // bytes per pixel
                           cspace,
                           kCGImageAlphaPremultipliedFirst);
   CGColorSpaceRelease(cspace);
@@ -114,14 +65,14 @@ CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
     
     NSSize drawSize = size; 
     // Allow us to scale up to 4x if we have an image that is too small
-    if (drawSize.width < canvasSize.width) {
+    if (drawSize.width < NSWidth(bounds)) {
       drawSize.width *= 4;
       drawSize.height *= 4;
     }
   
     NSRect canvasDrawRect
       = GTMNSScaleRectToRect(GTMNSRectOfSize(drawSize),
-                             GTMNSRectOfSize(canvasSize), 
+                             bounds, 
                              GTMScaleProportionally,
                              GTMRectAlignCenter);
     
@@ -138,14 +89,7 @@ CGRect QSBCGWeightedUsedRectForContext(CGContextRef c) {
              fraction:1.0];
     [NSGraphicsContext restoreGraphicsState];
     
-    CGRect drawRect = CGRectMake(0, 16, 96, 96);
-    CGRect contentRect = QSBCGWeightedUsedRectForContext(context);
-    
-    CGFloat offset = 12.0;
-    offset -= CGRectGetMinY(contentRect);
-    offset = MAX(offset, 0);
-    
-    drawRect = CGRectOffset(drawRect, 0, offset);
+    CGRect drawRect = NSRectToCGRect(bounds);
     
     CGImageRef cgimage = CGBitmapContextCreateImage(context);
     if (cgimage) {
