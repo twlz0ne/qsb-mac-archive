@@ -113,13 +113,14 @@
   }
 
   if (url) {
+    CGFloat rank = HGSCalibratedScore(kHGSCalibratedStrongScore);
     NSDictionary *attributes
       = [NSDictionary dictionaryWithObjectsAndKeys:
          [NSImage imageNamed:@"blue-nav"], kHGSObjectAttributeIconKey,
          [NSNumber numberWithBool:YES], kHGSObjectAttributeAllowSiteSearchKey,
          urlString, kHGSObjectAttributeSourceURLKey,
          [NSNumber numberWithBool:YES], kHGSObjectAttributeIsSyntheticKey,
-         [NSNumber numberWithFloat:1.0f], kHGSObjectAttributeRankKey,
+         [NSNumber numberWithFloat:rank], kHGSObjectAttributeRankKey,
          nil];
          
     HGSResult *result = [HGSResult resultWithURL:url
