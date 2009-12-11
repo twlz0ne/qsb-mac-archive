@@ -142,7 +142,6 @@ static NSString *const kApplicationSourcePredicateString
 - (void)parseResultsOperation:(NSMetadataQuery *)query {
   [self clearResultIndex];
   NSArray *mdAttributeNames = [NSArray arrayWithObjects:
-                               (NSString *)kMDItemTitle,
                                (NSString *)kMDItemDisplayName,
                                (NSString *)kMDItemPath,
                                (NSString *)kMDItemLastUsedDate,
@@ -171,11 +170,7 @@ static NSString *const kApplicationSourcePredicateString
     if ([self pathShouldBeSuppressed:path])
       continue;
 
-    NSString *name = [mdAttributes objectForKey:(NSString*)kMDItemTitle];
-    if (!name) {
-      name = [mdAttributes objectForKey:(NSString*)kMDItemDisplayName];
-    }
-
+    NSString *name = [mdAttributes objectForKey:(NSString*)kMDItemDisplayName];
     NSArray *components = [path pathComponents];
 
     NSString *fileSystemName = [components objectAtIndex:[components count] - 1];

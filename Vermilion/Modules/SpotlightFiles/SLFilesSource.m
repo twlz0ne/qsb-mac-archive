@@ -189,13 +189,11 @@ typedef enum {
       = GTMCFAutorelease(MDItemCopyAttributes(mdItem, 
                                               [SLFilesSource attributeArray]));
     NSString *uri = nil; 
-    NSString *name = [attributes objectForKey:(NSString *)kMDItemTitle]; 
+    NSString *name = GTMCFAutorelease(MDItemCopyAttribute(mdItem,
+                                                          kMDItemDisplayName));
     if (!name) {
-      name = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemDisplayName));
-      if (!name) {
-        name = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemFSName));  // COV_NF_LINE
-      }
-    }  
+      name = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemFSName));  // COV_NF_LINE
+    }
     BOOL isURL = NO;
     NSString *contentType
       = [attributes objectForKey:(NSString *)kMDItemContentType];
@@ -279,7 +277,17 @@ typedef enum {
     CGFloat rank = 0.0;
     NSString *normalizedQuery = [[self query] normalizedQueryString];
     if (normalizedQuery) {
-      rank = HGSScoreTermForItem(normalizedQuery, tokenizedName, NULL);
+      rank = HGSScoreTermForItem(normalizedQuery, 
+                                 tokenizedName, 
+                                 NULL);
+      NSString *title = [attributes objectForKey:(NSString *)kMDItemTitle];
+      if (title) {
+        NSString *tokenizedTitle = [HGSTokenizer tokenizeString:title];
+        CGFloat tokenizedRank = HGSScoreTermForItem(normalizedQuery, 
+                                                    tokenizedTitle, 
+                                                    NULL);
+        rank = MAX(rank, tokenizedRank);
+      }
     }
     
     CGFloat moderateScore = HGSCalibratedScore(kHGSCalibratedModerateScore);
