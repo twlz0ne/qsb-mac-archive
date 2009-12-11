@@ -35,12 +35,10 @@
 #import "GTMDefines.h"
 
 @class QSBTextFieldEditor;
-@class QSBLargeIconView;
 @class QSBMenuButton;
 @class QSBCustomPanel;
 @class QSBSearchViewController;
 @class QSBWelcomeController;
-@class QSBTableResult;
 @class QSBViewAnimation;
 
 extern const NSTimeInterval kQSBAppearDelay;
