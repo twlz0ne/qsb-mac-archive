@@ -369,13 +369,13 @@
       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=807">
       Issue 807</a>: The main title for StockQuoter results would show
       improperly encoded ampersands as \x26 due to improperly encoded
-      JSON coming from the stock feed.  StockTicker.py now filters
+      JSON coming from the stock feed. StockTicker.py now filters
       for these encodings.
     </li>
     <li>
       Added a new factor (match spread factor) to the scoring algorithm.
       This modifies the score by considering the distance between the first
-      matching character and the last matching character.  The scoring
+      matching character and the last matching character. The scoring
       algorithm now scores single character word matches, and also gives a
       boost to adjacency when matching characters span words. Also adjusted
       the calibration scores.
@@ -423,6 +423,15 @@
     <li>
       Added "Open Again" action to allow you to open multiple copies of the
       same app/document.
+    </li>
+    <li>
+      A new attribute ("HGSActionExcludedDirectObjectTypesKey") was added to
+      the actions configuration which allows the action to filter out
+      results types that otherwise would be allowed (by
+      "kHGSActionDirectObjectTypesKey"). This could be used, for example,
+      by actions that would normally allow <i>all</i> results ("*") but
+      which want to exclude one or more specific types (such as
+      "webpage" types and all of its subtypes).
     </li>
  </ul>
 </body>

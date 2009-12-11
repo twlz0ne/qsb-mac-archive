@@ -417,13 +417,15 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
 }
 
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet {
+  BOOL conforms = NO;
   NSString *myType = [self type];
   for (NSString *aType in typeSet) {
     if (TypeConformsToType(myType, aType)) {
-      return YES;
+      conforms = YES;
+      break;
     }
   }
-  return NO;
+  return conforms;
 }
 
 - (NSString*)description {
@@ -652,6 +654,18 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
     if (!isOfType) break;
   }
   return isOfType;
+}
+
+- (BOOL)doesNotConformToTypeSet:(NSSet *)typeSet {
+  // Returns YES if all of the results do not conform.
+  BOOL doesNotConform = YES;
+  for (HGSResult *result in self) {
+    if ([result conformsToTypeSet:typeSet]) {
+      doesNotConform = NO;
+      break;
+    }
+  }
+  return doesNotConform;
 }
 
 - (void)promote {

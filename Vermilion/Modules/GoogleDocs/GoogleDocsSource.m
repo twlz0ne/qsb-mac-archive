@@ -49,6 +49,7 @@ static NSString *const kGoogleDocsSpreadsheetDocResultPropertyKey
 static NSString *const kGoogleDocsSpreadsheetDocPropertyKey
   = @"GoogleDocsSpreadsheetDocPropertyKey";
 
+#define kHGSTypeGoogleDoc HGS_SUBTYPE(kHGSTypeWebpage, @"googledoc")
 
 @interface GoogleDocsSource ()
 
@@ -519,7 +520,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   }
   HGSResult* result = [HGSResult resultWithURL:docURL
                                           name:docTitle
-                                          type:kHGSTypeWebpage
+                                          type:kHGSTypeGoogleDoc
                                         source:self
                                     attributes:attributes];
   
@@ -615,7 +616,7 @@ GTM_METHOD_CHECK(NSEnumerator,
                                       forKey:kGoogleDocsWorksheetNamesKey];
       HGSResult* worksheetResult = [HGSResult resultWithURL:[docResult url]
                                                        name:@"Ignored"
-                                                       type:kHGSTypeWebpage
+                                                       type:kHGSTypeGoogleDoc
                                                      source:self
                                                  attributes:attributes];
       docResult = [docResult mergeWith:worksheetResult];

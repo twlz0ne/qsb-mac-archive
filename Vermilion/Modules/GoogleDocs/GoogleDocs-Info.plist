@@ -50,7 +50,7 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.googledocs.action.saveas</string>
 			<key>HGSActionDirectObjectTypes</key>
-			<string>webpage</string>
+			<string>webpage.googledoc</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Save As…</string>
 			<key>HGSActionMustRunOnMainThread</key>

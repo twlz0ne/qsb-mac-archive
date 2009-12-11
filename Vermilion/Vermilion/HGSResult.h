@@ -346,6 +346,7 @@ typedef NSUInteger HGSRankFlags;
 - (BOOL)isOfType:(NSString *)typeStr;
 - (BOOL)conformsToType:(NSString *)typeStr;
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet;
+- (BOOL)doesNotConformToTypeSet:(NSSet *)typeSet;
 /*!
  Mark these results as having been of interest to the user.
  Base implementation sends a promoteResult message to the result's source.

@@ -124,11 +124,13 @@
       icon = [ws iconForFile:finderPath];
     } else {
       CFURLRef appURL = NULL;
-      if (url && noErr == LSGetApplicationForURL((CFURLRef)url,
-                                                 kLSRolesViewer | kLSRolesEditor,
-                                                 NULL, &appURL)) {
+      if (url
+          && noErr == LSGetApplicationForURL((CFURLRef)url,
+                                             kLSRolesViewer | kLSRolesEditor,
+                                             NULL, &appURL)) {
         GTMCFAutorelease(appURL);
-        icon =  [[NSWorkspace sharedWorkspace] iconForFile:[(NSURL *)appURL path]];
+        icon
+          = [[NSWorkspace sharedWorkspace] iconForFile:[(NSURL *)appURL path]];
       }
     }
   }
@@ -136,9 +138,14 @@
 }
 
 - (BOOL)appliesToResults:(HGSResultArray *)results {
-  // If we have an icon, then we probably apply.
-  return [self displayIconForResults:results] != nil;
+  BOOL applies = NO;
+  if ([super appliesToResults:results]) {
+    // If we have an icon, then we probably apply.
+    applies = [self displayIconForResults:results] != nil;
+  }
+  return applies;
 }
+
 @end
 
 

@@ -37,6 +37,8 @@
 NSString *const kHGSActionDirectObjectsKey = @"HGSActionDirectObjects";
 NSString *const kHGSActionIndirectObjectsKey = @"HGSActionIndirectObjects";
 NSString *const kHGSActionDirectObjectTypesKey = @"HGSActionDirectObjectTypes";
+NSString *const kHGSActionExcludedDirectObjectTypesKey
+  = @"HGSActionExcludedDirectObjectTypesKey";
 NSString *const kHGSActionIndirectObjectTypesKey 
   = @"HGSActionIndirectObjectTypes";
 NSString *const kHGSActionIndirectObjectOptionalKey 
@@ -66,6 +68,7 @@ static NSSet *CopyStringSetFromId(id value) {
 @implementation HGSAction
 
 @synthesize directObjectTypes = directObjectTypes_;
+@synthesize excludedDirectObjectTypes = excludedDirectObjectTypes_;
 @synthesize indirectObjectTypes = indirectObjectTypes_;
 @synthesize indirectObjectOptional = indirectObjectOptional_;
 @synthesize causesUIContextChange = causesUIContextChange_;
@@ -92,6 +95,9 @@ static NSSet *CopyStringSetFromId(id value) {
     
     id value = [configuration objectForKey:kHGSActionDirectObjectTypesKey];
     directObjectTypes_ = CopyStringSetFromId(value);
+    
+    value = [configuration objectForKey:kHGSActionExcludedDirectObjectTypesKey];
+    excludedDirectObjectTypes_ = CopyStringSetFromId(value);
     
     value = [configuration objectForKey:kHGSActionIndirectObjectTypesKey];
     indirectObjectTypes_ = CopyStringSetFromId(value);
@@ -124,30 +130,28 @@ static NSSet *CopyStringSetFromId(id value) {
 
 - (void)dealloc {
   [directObjectTypes_ release];
+  [excludedDirectObjectTypes_ release];
   [indirectObjectTypes_ release];
   
   [super dealloc];
 }
 
 - (BOOL)appliesToResults:(HGSResultArray *)results {
-  BOOL doesApply = YES;
+  BOOL doesApply = NO;
   NSSet *directObjectTypes = [self directObjectTypes];
-  
-  if (!directObjectTypes) {
-    // must be global only action
-    doesApply = NO;
-  } else {
+  if (directObjectTypes) {
+    // Not a global-only action.
     NSSet *allTypes = [NSSet setWithObject:@"*"];
-    if (![directObjectTypes isEqual:allTypes] &&
-        ![results conformsToTypeSet:directObjectTypes]) {
-      // not a valid type for this action
-      doesApply = NO;
-    }
-  }
-  if (doesApply) {
-    for (HGSResult *result in results) {
-      doesApply = [self appliesToResult:result];
-      if (!doesApply) break;
+    NSSet *excludedDirectObjectTypes = [self excludedDirectObjectTypes];
+    if (([directObjectTypes isEqual:allTypes]
+         || [results conformsToTypeSet:directObjectTypes])
+        && (!excludedDirectObjectTypes
+            || [results doesNotConformToTypeSet:excludedDirectObjectTypes])) {
+      // All results must apply to the action for the action to show.
+      for (HGSResult *result in results) {
+        doesApply = [self appliesToResult:result];
+        if (!doesApply) break;
+      }
     }
   }
   return doesApply;

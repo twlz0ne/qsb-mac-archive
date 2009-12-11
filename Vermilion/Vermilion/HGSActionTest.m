@@ -40,6 +40,9 @@
 #import "HGSAction.h"
 #import "HGSResult.h"
 
+// A special dummy subtype of the webpage type.
+#define kHGSTypeWebFrammy HGS_SUBTYPE(kHGSTypeWebpage, @"frammy")
+
 @interface HGSActionTest : GTMTestCase {
  @private
   NSBundle *bundle_;
@@ -231,6 +234,68 @@
   
   BOOL result = [myAction performWithInfo:info];
   STAssertTrue(result, @"action failed");
+}
+
+- (void)testAppliesToResults {
+  // Make an action which takes anything except a webpage.
+  NSDictionary *actionConfiguration
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       @"Picky Action", kHGSExtensionUserVisibleNameKey,
+       @"picky.action", kHGSExtensionIdentifierKey,
+       bundle_, kHGSExtensionBundleKey,
+       @"*", kHGSActionDirectObjectTypesKey,
+       kHGSTypeWebpage, kHGSActionExcludedDirectObjectTypesKey,
+       nil];
+  // actionA should accept every result except those with a base type
+  // of webpage.
+  HGSAction* pickyAction
+    = [[[MyAction alloc] initWithConfiguration:actionConfiguration]
+       autorelease];
+  
+  // Various results with acceptable and unacceptable types.
+  NSString* path = @"file:///path/to/file/is/irrelevant";
+  HGSResult* acceptableText = [HGSResult resultWithURI:path 
+                                                  name:@"acceptable"
+                                                  type:kHGSTypeText
+                                                source:nil
+                                            attributes:nil];
+  HGSResult* acceptableFile = [HGSResult resultWithURI:path 
+                                                  name:@"acceptable"
+                                                  type:kHGSTypeFile
+                                                source:nil
+                                            attributes:nil];
+  HGSResult* unacceptableWebpage = [HGSResult resultWithURI:path 
+                                                       name:@"not acceptable"
+                                                       type:kHGSTypeWebpage
+                                                     source:nil
+                                                 attributes:nil];
+  HGSResult* unacceptableFrammy = [HGSResult resultWithURI:path 
+                                                      name:@"not acceptable"
+                                                      type:kHGSTypeWebFrammy
+                                                    source:nil
+                                                attributes:nil];
+  
+  // Accept single result with type not webPage.
+  HGSResultArray *results = [HGSResultArray arrayWithResult:acceptableText];
+  STAssertTrue([pickyAction appliesToResults:results], nil);
+  
+  // Reject single result with type kHGSTypeWebpage.
+  results = [HGSResultArray arrayWithResult:unacceptableWebpage];
+  STAssertFalse([pickyAction appliesToResults:results], nil);
+
+  // Reject single result with type kHGSTypeWebFrammy.
+  results = [HGSResultArray arrayWithResult:unacceptableFrammy];
+  STAssertFalse([pickyAction appliesToResults:results], nil);
+
+  // Reject multiple results with mixed types and one of type kHGSTypeWebFrammy.
+  results = [HGSResultArray arrayWithResults:
+             [NSArray arrayWithObjects:acceptableText, unacceptableFrammy, nil]];
+  STAssertFalse([pickyAction appliesToResults:results], nil);
+  
+  // Accept multiple results with mixed types but none of type kHGSTypeWebpage.
+  results = [HGSResultArray arrayWithResults:
+             [NSArray arrayWithObjects:acceptableText, acceptableFile, nil]];
+  STAssertTrue([pickyAction appliesToResults:results], nil);
 }
 
 @end

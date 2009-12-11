@@ -54,6 +54,7 @@
 @interface HGSAction : HGSExtension {
  @private
   NSSet *directObjectTypes_;
+  NSSet *excludedDirectObjectTypes_;
   NSSet *indirectObjectTypes_;
   NSSet *otherTerms_;
   BOOL indirectObjectOptional_;
@@ -68,6 +69,15 @@
   @result The value of "HGSActionDirectObjectTypes" from config dict.
 */
 @property (readonly, retain) NSSet *directObjectTypes;
+
+/*!
+  The types of direct objects that are specifically excluded for this action.
+  Results are first filtered for acceptable types using directObjectTypes
+  and then eliminated based on types found in excludedDirectObjectTypes,
+  if any.
+  @result The value of "HGSActionExcludedDirectObjectTypes" from config dict.
+*/
+@property (readonly, retain) NSSet *excludedDirectObjectTypes;
 
 /*!
   The types of direct objects that are valid for this action
@@ -120,10 +130,16 @@
 - (BOOL)appliesToResult:(HGSResult *)result;
 
 /*!
-  Does the action apply to the array of results. Normally you want to override
-  appliesToResult:, which appliesToResults: will call.
-  @result YES if all the results in the array conform to 
-          directObjectTypes and they each pass appliesToResult:
+  Does the action apply to the array of results. First check to see if the
+  action supports the results' types as specified in the action's 
+  directObjectTypes and, if it is supported, then check to see if the type
+  is excluded as specified in th action's excludedDirectObjectTypes.
+  Normally you want to override appliesToResult:, which appliesToResults:
+  will call.  If you DO override this method then you will usually want to also
+  call this inherited method at some point so that directObjectTypes/
+  excludedDirectObjectTypes filtering can be applied.
+  @result YES if all the results in the array conform to directObjectTypes/
+          excludedDirectObjectTypes and they each pass appliesToResult:.
 */
 - (BOOL)appliesToResults:(HGSResultArray *)results;
 
@@ -193,6 +209,16 @@ extern NSString* const kHGSActionIndirectObjectsKey;
  Type is NSString, NSArray or NSSet. '*' matches all types.
 */
 extern NSString* const kHGSActionDirectObjectTypesKey;
+
+/*!
+ Configuration key for direct object types that the action specifically
+ does not support and which filters the types allowed by
+ kHGSActionDirectObjectTypesKey.
+ Default is nil, which means that no filtering is performed.
+ 
+ Type is NSString, NSArray or NSSet. '*' is not allowed.
+ */
+extern NSString* const kHGSActionExcludedDirectObjectTypesKey;
 
 /*!
  Configuration key for indirect object types that the action supports.

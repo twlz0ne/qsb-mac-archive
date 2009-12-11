@@ -74,13 +74,6 @@ static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
 
 @implementation GoogleDocsSaveAsAction
 
-- (BOOL)appliesToResult:(HGSResult *)result {
-  // TODO(mrossetti): Only accept webpage results created by the GoogleDocsSource.
-  NSString *category = [result valueForKey:kGoogleDocsDocCategoryKey];
-  BOOL doesApply = (category != nil);
-  return doesApply;
-}
-
 - (BOOL)performWithInfo:(NSDictionary*)info {
   id<HGSDelegate> delegate = [[HGSPluginLoader sharedPluginLoader] delegate];
   HGSResultArray *directObjects = [info objectForKey:kHGSActionDirectObjectsKey];
