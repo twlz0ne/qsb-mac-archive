@@ -37,11 +37,16 @@
 #import "GTMGarbageCollection.h"
 #import "QLUIPrivate.h"
 #import "GTMSystemVersion.h"
+#import "GTMNSWorkspace+Running.h"
+#import "GTMGeometryUtils.h"
 
 @interface FileSystemOpenAction : HGSAction
 @end
 
 @interface FileSystemOpenWithAction : FileSystemOpenAction
+@end
+
+@interface FileSystemOpenAgainAction : HGSAction
 @end
 
 @interface FileSystemQuickLookAction : HGSAction {
@@ -134,6 +139,121 @@
   // If we have an icon, then we probably apply.
   return [self displayIconForResults:results] != nil;
 }
+@end
+
+
+@implementation FileSystemOpenAgainAction
+
+// Creates the open again icon which is just two copies of an icon offset
+// from one another with the background icon faded out.
+- (NSImage *)openAgainIconFromImage:(NSImage *)image {
+  NSInteger sizes[] = {128, 32};
+  NSImage *finalImage 
+    = [[[NSImage alloc] initWithSize:NSMakeSize(128, 128)] autorelease];
+  for (size_t i = 0; i < sizeof(sizes) / sizeof(sizes[0]); ++i) {
+    NSInteger size = sizes[i];
+    NSInteger quarterSize = size / 4;
+    NSBitmapImageRep *imageRep 
+      = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL
+                                                 pixelsWide:size 
+                                                 pixelsHigh:size
+                                              bitsPerSample:8 
+                                            samplesPerPixel:4 
+                                                   hasAlpha:YES 
+                                                   isPlanar:NO 
+                                             colorSpaceName:NSCalibratedRGBColorSpace 
+                                                bytesPerRow:32 * size 
+                                               bitsPerPixel:32] autorelease];
+    NSGraphicsContext *context 
+      = [NSGraphicsContext graphicsContextWithBitmapImageRep:imageRep];
+    [NSGraphicsContext saveGraphicsState];
+    [NSGraphicsContext setCurrentContext:context];
+    NSInteger threeQuarterSize = size - quarterSize;
+    NSRect rect1 = NSMakeRect(0, quarterSize, 
+                              threeQuarterSize, threeQuarterSize);
+    NSRect rect2 = NSMakeRect(quarterSize, 0, 
+                              threeQuarterSize, threeQuarterSize);
+    NSRect imageRect = GTMNSRectOfSize([image size]);
+    [image drawInRect:rect1 
+             fromRect:imageRect 
+            operation:NSCompositeSourceOver 
+             fraction:0.5];
+    [image drawInRect:rect2 
+             fromRect:imageRect 
+            operation:NSCompositeSourceOver 
+             fraction:1.0];
+    [finalImage addRepresentation:imageRep];
+    [NSGraphicsContext restoreGraphicsState];
+  }
+  return finalImage;
+}
+
+- (id)defaultObjectForKey:(NSString *)key {
+  id defaultObject = nil;
+  if ([key isEqualToString:kHGSExtensionIconImageKey]) {
+    
+    IconRef iconRef = NULL;
+    GetIconRef(kOnSystemDisk,
+               kSystemIconsCreator,
+               kGenericApplicationIcon, 
+               &iconRef);
+    
+    NSImage *image = nil;
+    if (iconRef) {
+      image = [[[NSImage alloc] initWithIconRef:iconRef] autorelease];
+      image = [self openAgainIconFromImage:image];
+      ReleaseIconRef(iconRef);
+    } 
+    
+    defaultObject = image;
+  }
+  if (!defaultObject) {
+    defaultObject = [super defaultObjectForKey:key];
+  }
+  return defaultObject;
+}
+
+- (BOOL)performWithInfo:(NSDictionary*)info {
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  
+  NSArray *filePaths = [directObjects filePaths];
+  
+  BOOL success = YES;
+  NSMutableArray *urlsToOpen
+    = [NSMutableArray arrayWithCapacity:[filePaths count]];
+  for (NSString *path in filePaths) {
+    NSURL *fileURL = [NSURL fileURLWithPath:path];
+    [urlsToOpen addObject:fileURL];
+  }
+  LSLaunchURLSpec spec = { 
+    NULL, 
+    (CFArrayRef)urlsToOpen, 
+    NULL, kLSLaunchAsync | kLSLaunchStartClassic | kLSLaunchNewInstance, 
+    NULL 
+  };
+  OSStatus status = LSOpenFromURLSpec(&spec, NULL);
+  if (status) {
+    HGSLog(@"Unable to open %@ (%d)", directObjects, status);
+    NSBeep();
+  }
+  return success;
+}
+
+- (id)displayIconForResults:(HGSResultArray*)results {
+  NSImage *icon = nil;
+  if ([results count] > 1) {
+    icon = [super displayIconForResults:results];
+  } else {
+    HGSResult *result = [results objectAtIndex:0];
+    NSString *path = [result filePath];
+    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+    icon = [ws iconForFile:path];
+  }
+  icon = [self openAgainIconFromImage:icon];
+  return icon;
+}
+
 @end
 
 @implementation FileSystemScriptAction
@@ -360,6 +480,5 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
   }
   return doesApply;
 }
-
 
 @end

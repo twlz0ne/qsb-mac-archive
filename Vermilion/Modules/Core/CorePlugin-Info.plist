@@ -203,6 +203,18 @@
 			<key>HGSActionMustRunOnMainThread</key>
 			<true/>
 		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>FileSystemOpenAgainAction</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.filesystem.action.openagain</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Open Again</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file</string>
+		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>
 	<string>${VERMILLION_PLUGIN_API_VERSION}</string>

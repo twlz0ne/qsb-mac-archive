@@ -39,3 +39,6 @@
 
 /* A label denoting the name of the Get Info action which allows you to get info on a result from the QSB. Do not include ^ in localization. */
 "^Get Info" = "Get Info";
+
+/* A label denoting the name of the Open Again action which allows you to open a file multiple times. Do not include ^ in localization. */
+"^Open Again" = "Open Again";
