@@ -45,14 +45,6 @@
 @implementation SLFilesSourceTest
   
 - (id)initWithInvocation:(NSInvocation *)invocation {
-  self = [super initWithInvocation:invocation 
-                       pluginNamed:@"SpotlightFiles" 
-               extensionIdentifier:@"com.google.qsb.spotlightfiles.source"];
-  return self;
-}
-
-- (void)setUp {
-  [super setUp];
   NSString *cachePath = nil;
   NSProcessInfo *info = [NSProcessInfo processInfo];
   cachePath = [[info environment] objectForKey:@"DERIVED_FILES_DIR"];
@@ -64,9 +56,49 @@
     cachePath = [paths objectAtIndex:0];
   }
   
-  NSFileManager *manager = [NSFileManager defaultManager];
   testFolderPath_ 
     = [[cachePath stringByAppendingPathComponent:@"QSBMacTestFiles"] retain];
+  NSString *volumePath;
+  if ([testFolderPath_ hasPrefix:@"/Volumes/"]) {
+    NSArray *pathElements = [testFolderPath_ pathComponents];
+    pathElements = [pathElements subarrayWithRange:NSMakeRange(0,3)];
+    volumePath = [NSString pathWithComponents:pathElements];
+  } else {
+    volumePath = @"/";
+  }
+  NSTask *slTestTask = [[[NSTask alloc] init] autorelease];
+  [slTestTask setLaunchPath:@"/usr/bin/mdutil"];
+  [slTestTask setArguments:[NSArray arrayWithObjects:@"-s", volumePath, nil]];
+  NSPipe *outPipe = [NSPipe pipe];
+  [slTestTask setStandardOutput:outPipe];
+  [slTestTask launch];
+  [slTestTask waitUntilExit];
+  NSFileHandle *slOut = [outPipe fileHandleForReading];
+  NSData *outData = [slOut readDataToEndOfFile];
+  NSString *outString 
+    = [[[NSString alloc] initWithData:outData 
+                             encoding:NSUTF8StringEncoding] autorelease];
+  if ([outString rangeOfString:@"Indexing enabled."].location != NSNotFound) {
+    self = [super initWithInvocation:invocation 
+                         pluginNamed:@"SpotlightFiles" 
+                 extensionIdentifier:@"com.google.qsb.spotlightfiles.source"];
+  } else {
+    HGSLog(@"**** SLFilesSourceTests disabled because drive %@ does not have "
+           @"indexing enabled.", volumePath);
+    [self release];
+    self = nil;
+  }
+  return self;
+}
+
+- (void)dealloc {
+  [testFolderPath_ release];
+  [super dealloc];
+}
+
+- (void)setUp {
+  [super setUp];
+  NSFileManager *manager = [NSFileManager defaultManager];
   BOOL isDir = YES;
   BOOL goodDir = [manager fileExistsAtPath:testFolderPath_ isDirectory:&isDir];
   if (!goodDir) {
@@ -92,7 +124,6 @@
   NSError *error;
   STAssertTrue([manager removeItemAtPath:testFolderPath_ error:&error],
                @"Unable to remove folder at %@ (%@)", testFolderPath_, error);
-  [testFolderPath_ release];
   [super tearDown];
 }
 
