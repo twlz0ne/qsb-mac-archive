@@ -31,8 +31,7 @@
 //
 
 #import <Vermilion/Vermilion.h>
-#import "GTMMethodCheck.h"
-#import "GTMNSString+URLArguments.h"
+#import <GData/GDataHTTPFetcher.h>
 #import "KeychainItem.h"
 #import "GTMGoogleSearch.h"
 
@@ -45,14 +44,11 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 @interface GoogleBookmarksSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
   __weak NSTimer *updateTimer_;
-  NSMutableData *bookmarkData_;
   HGSSimpleAccount *account_;
-  NSURLConnection *connection_;
+  GDataHTTPFetcher *fetcher_;
   BOOL currentlyFetching_;
   NSUInteger previousFailureCount_;
 }
-
-@property (nonatomic, retain) NSURLConnection *connection;
 
 - (void)setUpPeriodicRefresh;
 - (void)startAsynchronousBookmarkFetch;
@@ -62,10 +58,6 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 @end
 
 @implementation GoogleBookmarksSource
-
-GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
-
-@synthesize connection = connection_;
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -85,12 +77,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return self;
 }
 
-- (void)dealloc {
+- (void)uninstall {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [updateTimer_ invalidate];
-  [bookmarkData_ release];
+  updateTimer_ = nil;
+  [fetcher_ release];
+  fetcher_ = nil;
   [account_ release];
-  [super dealloc];
 }
 
 
@@ -98,41 +91,44 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 #pragma mark Bookmarks Fetching
 
 - (void)startAsynchronousBookmarkFetch {
-  KeychainItem* keychainItem 
-    = [KeychainItem keychainItemForService:[account_ identifier]
-                                  username:nil];
-  NSString *userName = [keychainItem username];
-  NSString *password = [keychainItem password];
-  if (!currentlyFetching_ && userName && password) {
-    NSString *encodedUserName = [userName gtm_stringByEscapingForURLArgument];
-    NSString *encodedPassword = [password gtm_stringByEscapingForURLArgument];
-    GTMGoogleSearch *gsearch = [GTMGoogleSearch sharedInstance];
-    NSDictionary *args = [NSDictionary dictionaryWithObject:@"rss" 
-                                                     forKey:@"output"];
-    NSString *bookmarkSearchURL = [gsearch searchURLFor:nil 
-                                                 ofType:@"bookmarks/lookup" 
-                                              arguments:args];
-    NSString *prefix = [NSString stringWithFormat:@"https://%@:%@@",
-                        encodedUserName, encodedPassword];
-    NSMutableString *bookmarkRequestString 
-      = [NSMutableString stringWithString:bookmarkSearchURL];
-    // Replacing the http:// with https, username and password
-    [bookmarkRequestString replaceCharactersInRange:NSMakeRange(0, 7) 
-                                         withString:prefix];
-    NSURL *bookmarkRequestURL = [NSURL URLWithString:bookmarkRequestString];
-    
-    // Construct an NSMutableURLRequest for the URL and set appropriate
-    // request method.
-    NSMutableURLRequest *bookmarkRequest
-      = [NSMutableURLRequest requestWithURL:bookmarkRequestURL 
-                                cachePolicy:NSURLRequestReloadIgnoringCacheData 
-                            timeoutInterval:15.0];
-    [bookmarkRequest setHTTPMethod:@"POST"];
-    [bookmarkRequest setHTTPShouldHandleCookies:NO];
+  if (!currentlyFetching_) {
+    if (!fetcher_) {
+      GTMGoogleSearch *gsearch = [GTMGoogleSearch sharedInstance];
+      NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
+                            @"rss", @"output", @"10000", @"num", nil];
+      NSString *bookmarkRequestString
+        = [gsearch searchURLFor:nil 
+                         ofType:@"bookmarks/find" 
+                      arguments:args];
+      NSURL *bookmarkRequestURL = [NSURL URLWithString:bookmarkRequestString];
+      NSMutableURLRequest *bookmarkRequest
+        = [NSMutableURLRequest
+           requestWithURL:bookmarkRequestURL 
+              cachePolicy:NSURLRequestReloadIgnoringCacheData 
+          timeoutInterval:15.0];
+      fetcher_ = [[GDataHTTPFetcher httpFetcherWithRequest:bookmarkRequest]
+                  retain];
+      if (!fetcher_) {
+        HGSLog(@"Failed to allocate GDataAuthenticationFetcher.");
+      }
+      KeychainItem* keychainItem 
+        = [KeychainItem keychainItemForService:[account_ identifier]
+                                      username:nil];
+      NSString *userName = [keychainItem username];
+      NSString *password = [keychainItem password];
+      [fetcher_ setCredential:
+       [NSURLCredential credentialWithUser:userName
+                                  password:password
+                               persistence:NSURLCredentialPersistenceNone]];
+      [bookmarkRequest setHTTPMethod:@"POST"];
+      [bookmarkRequest setHTTPShouldHandleCookies:NO];
+      [fetcher_ setRequest:bookmarkRequest];
+    }
+      
     currentlyFetching_ = YES;
-    NSURLConnection *connection
-      = [NSURLConnection connectionWithRequest:bookmarkRequest delegate:self];
-    [self setConnection:connection];
+    [fetcher_ beginFetchWithDelegate:self
+                   didFinishSelector:@selector(httpFetcher:finishedWithData:)
+                     didFailSelector:@selector(httpFetcher:didFail:)];
   }
 }
 
@@ -200,83 +196,22 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
          otherTerms:otherTermStrings];
 }
 
-- (void)setConnection:(NSURLConnection *)connection {
-  if (connection_ != connection) {
-    [connection_ cancel];
-    [connection_ release];
-    connection_ = [connection retain];
-  }
+#pragma mark -
+#pragma mark GDataHTTPFetcher Helpers
+
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)retrievedData {
+  currentlyFetching_ = NO;
+  [self indexBookmarksFromData:retrievedData];
+}
+
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+            didFail:(NSError *)error {
+  HGSLog(@"httpFetcher failed: %@ %@", error, [[fetcher request] URL]);
+  currentlyFetching_ = NO;
 }
 
 #pragma mark -
-#pragma mark NSURLConnection Delegate Methods
-
-- (void)connection:(NSURLConnection *)connection 
-didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-  HGSAssert(connection == connection_, nil);
-  KeychainItem* keychainItem 
-    = [KeychainItem keychainItemForService:[account_ identifier]
-                                  username:nil];
-  NSString *userName = [keychainItem username];
-  NSString *password = [keychainItem password];
-  // See if the account still validates.
-  BOOL accountAuthenticates = [account_ authenticateWithPassword:password];
-  if (accountAuthenticates) {
-    previousFailureCount_ = 0;
-    id<NSURLAuthenticationChallengeSender> sender = [challenge sender];
-    NSInteger previousFailureCount = [challenge previousFailureCount];
-    if (userName && password && previousFailureCount < 3) {
-      NSURLCredential *creds 
-        = [NSURLCredential credentialWithUser:userName
-                                     password:password
-                                  persistence:NSURLCredentialPersistenceNone];
-      [sender useCredential:creds forAuthenticationChallenge:challenge];
-    } else {
-      [sender continueWithoutCredentialForAuthenticationChallenge:challenge];
-    }
-  } else if (++previousFailureCount_ > 3) {
-    // Don't keep trying.
-    [updateTimer_ invalidate];
-    updateTimer_ = nil;
-    HGSLog(@"GoogleBookmarksSource authentication failed (possible bad "
-           @"password) for account '%@'.", [account_ displayName]);
-  }
-}
-
-- (void)connection:(NSURLConnection *)connection 
-didReceiveResponse:(NSURLResponse *)response {
-  HGSAssert(connection == connection_, nil);
-  [bookmarkData_ release];
-  bookmarkData_ = [[NSMutableData alloc] init];
-}
-
-- (void)connection:(NSURLConnection *)connection 
-    didReceiveData:(NSData *)data {
-  HGSAssert(connection == connection_, nil);
-  [bookmarkData_ appendData:data];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-  HGSAssert(connection == connection_, nil);
-  [self setConnection:nil];
-  currentlyFetching_ = NO;
-  [self indexBookmarksFromData:bookmarkData_];
-  [bookmarkData_ release];
-  bookmarkData_ = nil;
-}
-
-- (void)connection:(NSURLConnection *)connection 
-  didFailWithError:(NSError *)error {
-  HGSAssert(connection == connection_, nil);
-  [self setConnection:nil];
-  currentlyFetching_ = NO;
-  [bookmarkData_ release];
-  bookmarkData_ = nil;
-  HGSLog(@"GoogleBookmarksSource fetch failed for account '%@': "
-         @"error=%d '%@'.", [account_ displayName], [error code],
-         [error localizedDescription]);
-}
-
 #pragma mark Authentication & Refresh
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {

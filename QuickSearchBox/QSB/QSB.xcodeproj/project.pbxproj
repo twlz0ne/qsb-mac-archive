@@ -365,6 +365,7 @@
 		6223C9AD0E75B9CD00F61030 /* QSBMoreResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewController.m */; };
 		6223CBB30E761AEB00F61030 /* QSBResultsViewBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223CBB10E761AEB00F61030 /* QSBResultsViewBaseController.m */; };
 		6223CC890E76EC4E00F61030 /* QSBResultsViewTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223CC870E76EC4E00F61030 /* QSBResultsViewTableView.m */; };
+		622689DC10CDFBAF00DE33CF /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		622911E60F2E805B005D34CE /* GoogleAccounts.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 62EA8BCD0F2E7DE200C92E0B /* GoogleAccounts.hgs */; };
 		622912120F2E81E7005D34CE /* GoogleAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 622912110F2E81E7005D34CE /* GoogleAccount.m */; };
 		622912F40F2EAF80005D34CE /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
@@ -1457,21 +1458,21 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F4FEECCC0EC4BF99000758EC /* CorePlugin */;
+			remoteGlobalIDString = F4FEECCC0EC4BF99000758EC;
 			remoteInfo = CorePlugin;
 		};
 		8B0F07C110C7473B00C1A6FD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
+			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA;
 			remoteInfo = "QSB Application";
 		};
 		8B0FFD0810C6038300C1A6FD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B3EF87F0EF2C8A80036FFBD /* Shortcuts */;
+			remoteGlobalIDString = 8B3EF87F0EF2C8A80036FFBD;
 			remoteInfo = Shortcuts;
 		};
 		8B1490640F71576B002E05FA /* PBXContainerItemProxy */ = {
@@ -3457,6 +3458,7 @@
 				33D2CB430DD24E3200C1FBDC /* Security.framework in Frameworks */,
 				8B93E3A80FC8F7A50077616C /* GTM.framework in Frameworks */,
 				7F44B28E0FCEE0BD00F75764 /* Cocoa.framework in Frameworks */,
+				622689DC10CDFBAF00DE33CF /* GData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
