@@ -113,7 +113,7 @@
   STAssertNotNil(query, nil);
   HGSSearchOperation *operation = [[self source] searchOperationForQuery:query];
   STAssertNotNil(operation, nil);
-  [operation main];
+  [operation run:YES];
   return [operation sortedResultsInRange:NSMakeRange(0, [operation resultCount])];
 }
 
@@ -173,15 +173,18 @@
   NSString *scriptSource 
     = @"tell app \"Finder\"\r"
       @"set QSBFile to POSIX file \"%@\"\r"
-      @"set failCount to 3\r"
-      @"repeat while failCount > 0\r"
+      @"set failCount to 0\r"
+      @"repeat while failCount < 3\r"
       @"try\r"
       @"update QSBFile\r"
-      @"set failCount to 0\r"
+      @"set failCount to 10\r"
       @"on error\r"
       @"delay 1\r"
-      @"set failCount to failCount - 1\r"
+      @"set failCount to failCount + 1\r"
       @"end\r"
+      @"end\r"
+      @"if failCount = 4 then\r"
+      @"error \"Unable to update file\" number 1\r"
       @"end\r"
       @"set comment of item QSBFile to \"%@\"\r"
       @"end tell\r";
@@ -199,7 +202,7 @@
   [self mdimportFile:testFilePath];
   NSArray *results = [self performSearchFor:uniqueTestString_ pivotingOn:nil];
   STAssertGreaterThan([results count], (NSUInteger)0,  
-                      @"QueryString: %@", uniqueTestString_);  
+                      @"QueryString: %@ FilePath:%@", uniqueTestString_, testFilePath);  
 
 }
 
@@ -283,7 +286,8 @@
                                              attributes:nil];
   STAssertNotNil(mailResult, nil);
   HGSResultArray *array = [HGSResultArray arrayWithResult:mailResult];
-  STAssertThrows([self performSearchFor:@"sender" pivotingOn:array], nil);
+  NSArray *results = [self performSearchFor:@"sender" pivotingOn:array];
+  STAssertEquals([results count], 0U, nil);
   NSDictionary *attributes 
     = [NSDictionary dictionaryWithObject:@"willy_wonka@wonkamail.com"
                                   forKey:kHGSObjectAttributeContactEmailKey];
@@ -294,7 +298,9 @@
                                            attributes:attributes];
   STAssertNotNil(contactResult, nil);
   array = [HGSResultArray arrayWithResult:contactResult];
-  NSArray *results = [self performSearchFor:@"vermicious" pivotingOn:array];
+  STAssertNotNil(array, nil);
+  results = [self performSearchFor:@"vermicious" pivotingOn:array];
+  STAssertNotNil(results, nil);
   BOOL foundResult = NO;
   for (HGSResult *result in results) {
     if ([[result filePath] isEqualToString:mailFilePath]) {
@@ -346,7 +352,8 @@
                                       result:result];
   STAssertEqualObjects([icon name], 
                        @"blue-nav", 
-                       @"Source provides icons for things with URLS");
+                       @"Source provides icons for things with URLS\n%@",
+                       result);
 }
 
 - (void)testFileTypes {

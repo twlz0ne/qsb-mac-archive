@@ -353,8 +353,13 @@ typedef enum {
 }
 
 - (NSUInteger)resultCount {
-  return MDQueryGetResultCount(mdQuery_);
+  NSUInteger results = 0;
+  if (mdQuery_) {
+    results = MDQueryGetResultCount(mdQuery_);
+  }
+  return results;
 }
+
 @end
 
 @implementation SLFilesSource
