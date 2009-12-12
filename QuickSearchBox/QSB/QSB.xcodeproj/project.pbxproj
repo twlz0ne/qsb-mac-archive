@@ -178,6 +178,16 @@
 			isSharedContext = 0;
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8B6F647F10D2BECF00079EF1 /* AppleScript */ = {
+			isa = PBXAppleScriptBuildPhase;
+			buildActionMask = 2147483647;
+			contextName = "";
+			files = (
+				8B6F647E10D2BEB100079EF1 /* SLFilesSourceTestScript.applescript in AppleScript */,
+			);
+			isSharedContext = 0;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B735FA20EC905E900E74421 /* AppleScript */ = {
 			isa = PBXAppleScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -857,6 +867,7 @@
 		8B6F2FAF0DA2C5180052CA40 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
 		8B6F30DF0DA2FB520052CA40 /* Vermilion.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6F2D5F0DA2B88E0052CA40 /* Vermilion.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6F4BDB0E88570D00425D9F /* GTMDebugThreadValidation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B6F4BD90E88570D00425D9F /* GTMDebugThreadValidation.m */; };
+		8B6F647E10D2BEB100079EF1 /* SLFilesSourceTestScript.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 8B6F642910D2BE8C00079EF1 /* SLFilesSourceTestScript.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
 		8B735FF70EC9066500E74421 /* main.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 8B735FF50EC9066500E74421 /* main.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
 		8B77DC4A0F279D3600FA2A3C /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8B77DCDD0F27A31000FA2A3C /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
@@ -3153,6 +3164,7 @@
 		8B6F2F4E0DA2C37C0052CA40 /* Applications.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Applications.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B6F4BD80E88570D00425D9F /* GTMDebugThreadValidation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GTMDebugThreadValidation.h; path = DebugUtils/GTMDebugThreadValidation.h; sourceTree = "<group>"; };
 		8B6F4BD90E88570D00425D9F /* GTMDebugThreadValidation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GTMDebugThreadValidation.m; path = DebugUtils/GTMDebugThreadValidation.m; sourceTree = "<group>"; };
+		8B6F642910D2BE8C00079EF1 /* SLFilesSourceTestScript.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = SLFilesSourceTestScript.applescript; sourceTree = "<group>"; };
 		8B735F8A0EC9011100E74421 /* AppleScriptPluginBuildCommon.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = AppleScriptPluginBuildCommon.sh; sourceTree = "<group>"; };
 		8B735FA80EC905E900E74421 /* Images.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Images.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B735FF50EC9066500E74421 /* main.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = main.applescript; sourceTree = "<group>"; };
@@ -5402,6 +5414,7 @@
 				8B6F2D1E0DA2B83F0052CA40 /* SLFiles-Info.plist */,
 				8B48115A1046368F00BB6A2D /* SLFilesSource.h */,
 				8B6F2D220DA2B83F0052CA40 /* SLFilesSource.m */,
+				8B6F642910D2BE8C00079EF1 /* SLFilesSourceTestScript.applescript */,
 				8B48113F104635AD00BB6A2D /* SLFilesSourceTest.m */,
 			);
 			path = SpotlightFiles;
@@ -6717,6 +6730,7 @@
 			buildPhases = (
 				8B307C441051B63E006C4C7A /* Resources */,
 				8B48109C1046345700BB6A2D /* Sources */,
+				8B6F647F10D2BECF00079EF1 /* AppleScript */,
 				8B4810A21046345700BB6A2D /* Frameworks */,
 				8B4810A81046345700BB6A2D /* ShellScript */,
 			);

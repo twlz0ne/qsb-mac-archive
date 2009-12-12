@@ -272,6 +272,9 @@ typedef enum {
     }
     if (!uri) {
       path = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemPath));
+      if (!path) {
+        return nil;
+      }
       NSURL *url = [NSURL fileURLWithPath:path];
       uri = [url absoluteString];
     }

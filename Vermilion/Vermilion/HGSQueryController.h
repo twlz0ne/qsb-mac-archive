@@ -35,9 +35,7 @@
 #import "GTMDefines.h"
 
 @class HGSQuery;
-@class HGSResult;
 @class HGSMixer;
-@class HGSSearchOperation;
 @protocol HGSMixerDelegate;
 
 /*!
@@ -54,9 +52,13 @@
 @interface HGSQueryController : NSObject {
  @private
   NSMutableArray* queryOperations_;
-  /*! Unfinished query operations. */
+  /*! 
+   Unfinished query operations. 
+  */
   NSMutableArray* pendingQueryOperations_;  
-  /*! Query operations that have reported at least some results */
+  /*! 
+   Query operations that have reported at least some results 
+  */
   NSMutableSet *queryOperationsWithResults_; 
   BOOL cancelled_;
   HGSQuery* parsedQuery_;
@@ -68,7 +70,7 @@
 
 @property (readonly, retain) HGSMixer *mixer;
 
-- initWithQuery:(HGSQuery*)query;
+- (id)initWithQuery:(HGSQuery*)query;
 
 - (HGSQuery *)query;
 
@@ -79,6 +81,10 @@
   Ask information about the completion status for the queries to each source.
 */
 - (BOOL)queriesFinished;
+
+/*!
+  Has the query been cancelled.
+*/
 - (BOOL)cancelled;
 
 /*!

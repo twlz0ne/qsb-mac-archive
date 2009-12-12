@@ -32,6 +32,7 @@
 
 #import "HGSUnitTestingUtilities.h"
 #import "SLFilesSource.h"
+#import "GTMNSAppleScript+Handler.h"
 #import <OCMock/OCMock.h>
 
 @interface SLFilesSourceTest : HGSSearchSourceAbstractTestCase {
@@ -52,21 +53,34 @@
 
 - (void)setUp {
   [super setUp];
+  NSString *cachePath = nil;
+  NSProcessInfo *info = [NSProcessInfo processInfo];
+  cachePath = [[info environment] objectForKey:@"DERIVED_FILES_DIR"];
+  if (![cachePath length]) {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory,
+                                                         NSUserDomainMask, 
+                                                         YES);
+    STAssertTrue([paths count] > 0, nil);
+    cachePath = [paths objectAtIndex:0];
+  }
+  
   NSFileManager *manager = [NSFileManager defaultManager];
   testFolderPath_ 
-    = [[@"~/QSBMacTestFiles" stringByStandardizingPath] retain];
+    = [[cachePath stringByAppendingPathComponent:@"QSBMacTestFiles"] retain];
   BOOL isDir = YES;
-  NSError *error = nil;
   BOOL goodDir = [manager fileExistsAtPath:testFolderPath_ isDirectory:&isDir];
   if (!goodDir) {
-    goodDir = [manager createDirectoryAtPath:testFolderPath_
-                 withIntermediateDirectories:YES attributes:nil error:&error];
-    STAssertTrue(goodDir, 
+    NSError *error = nil;
+    STAssertTrue([manager createDirectoryAtPath:testFolderPath_
+                    withIntermediateDirectories:YES 
+                                     attributes:nil 
+                                          error:&error],
                  @"Unable to create directory at %@ (%@)", 
                  testFolderPath_, error);
   } else {
     STAssertTrue(isDir, @"File at %@ isn't a directory", testFolderPath_);
   }
+  
   // Weird split done so that spotlight doesn't find this source file for us
   // when we search for our "unique string"
   uniqueTestString_ 
@@ -170,35 +184,28 @@
     = [NSString stringWithFormat:@"%@%@", @"arachi", @"butyrophobia"];
   NSString *testFilePath 
     = [self createTestFile:@"testSearchingFinderComments.txt"];
-  NSString *scriptSource 
-    = @"tell app \"Finder\"\r"
-      @"set QSBFile to POSIX file \"%@\"\r"
-      @"set failCount to 0\r"
-      @"repeat while failCount < 3\r"
-      @"try\r"
-      @"update QSBFile\r"
-      @"set failCount to 10\r"
-      @"on error\r"
-      @"delay 1\r"
-      @"set failCount to failCount + 1\r"
-      @"end\r"
-      @"end\r"
-      @"if failCount = 4 then\r"
-      @"error \"Unable to update file\" number 1\r"
-      @"end\r"
-      @"set comment of item QSBFile to \"%@\"\r"
-      @"end tell\r";
-  scriptSource = [NSString stringWithFormat:scriptSource, 
-                  testFilePath, commentString];
-  NSAppleScript *script 
-    = [[[NSAppleScript alloc] initWithSource:scriptSource] autorelease];
+  NSBundle *pluginBundle = HGSGetPluginBundle();
+  NSString *scriptPath = [pluginBundle pathForResource:@"SLFilesSourceTestScript"
+                                                ofType:@"scpt"
+                                           inDirectory:@"Scripts"];
+  STAssertNotNil(scriptPath, nil);
+  NSURL *scriptURL = [NSURL fileURLWithPath:scriptPath];
+  STAssertNotNil(scriptURL, nil);
   NSDictionary *error = nil;
-  NSAppleEventDescriptor *desc = [script executeAndReturnError:&error];
-  STAssertNotNil(desc, @"Script %@ returned %@ for expression '%@'", 
-                 scriptSource, 
+  NSAppleScript *script 
+    = [[[NSAppleScript alloc] initWithContentsOfURL:scriptURL 
+                                              error:&error] autorelease];
+  STAssertNotNil(script, @"Unable to load script %@", error);
+  NSArray *args = [NSArray arrayWithObjects:testFilePath, commentString, nil];
+  NSAppleEventDescriptor *desc 
+    = [script gtm_executePositionalHandler:@"setSpotlightComment"
+                                parameters:args
+                                     error:&error];
+  STAssertNotNil(desc, @"Script returned %@ for expression '%@' with file %@", 
                  error, 
-                 [scriptSource substringWithRange:
-                  [[error objectForKey:@"NSAppleScriptErrorRange"] rangeValue]]);
+                 [[script source] substringWithRange:
+                  [[error objectForKey:@"NSAppleScriptErrorRange"] rangeValue]],
+                 testFilePath);
   [self mdimportFile:testFilePath];
   NSArray *results = [self performSearchFor:uniqueTestString_ pivotingOn:nil];
   STAssertGreaterThan([results count], (NSUInteger)0,  
@@ -274,7 +281,7 @@
                @"Queries with pivot of type kHGSTypeContact should succeed.");
 }
 
-- (void)testMailPivots {
+- (void)testBadMailPivot {
   HGSSearchSource *source = [self source];
   NSBundle *pluginBundle = HGSGetPluginBundle();
   NSString *mailFilePath = [pluginBundle pathForResource:@"SampleEmail"
@@ -286,8 +293,22 @@
                                              attributes:nil];
   STAssertNotNil(mailResult, nil);
   HGSResultArray *array = [HGSResultArray arrayWithResult:mailResult];
+  STAssertNotNil(array, nil);
   NSArray *results = [self performSearchFor:@"sender" pivotingOn:array];
   STAssertEquals([results count], 0U, nil);
+}
+
+- (void)testGoodMailPivot {
+  HGSSearchSource *source = [self source];
+  NSBundle *pluginBundle = HGSGetPluginBundle();
+  NSString *mailFilePath = [pluginBundle pathForResource:@"SampleEmail"
+                                                  ofType:@"emlx"];
+  STAssertNotNil(mailFilePath, nil);
+  [self mdimportFile:mailFilePath];
+  HGSResult *mailResult = [HGSResult resultWithFilePath:mailFilePath 
+                                                 source:source
+                                             attributes:nil];
+  STAssertNotNil(mailResult, nil);
   NSDictionary *attributes 
     = [NSDictionary dictionaryWithObject:@"willy_wonka@wonkamail.com"
                                   forKey:kHGSObjectAttributeContactEmailKey];
@@ -297,9 +318,9 @@
                                                source:source 
                                            attributes:attributes];
   STAssertNotNil(contactResult, nil);
-  array = [HGSResultArray arrayWithResult:contactResult];
+  HGSResultArray *array = [HGSResultArray arrayWithResult:contactResult];
   STAssertNotNil(array, nil);
-  results = [self performSearchFor:@"vermicious" pivotingOn:array];
+  NSArray *results = [self performSearchFor:@"vermicious" pivotingOn:array];
   STAssertNotNil(results, nil);
   BOOL foundResult = NO;
   for (HGSResult *result in results) {
