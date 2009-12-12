@@ -168,6 +168,11 @@ typedef enum {
   }
 }
 
+- (void)cancel {
+  MDQueryStop(mdQuery_);
+  [super cancel];
+}
+
 - (NSArray *)sortedResultsInRange:(NSRange)range {
   NSMutableArray *array = [NSMutableArray arrayWithCapacity:range.length];
   for (NSUInteger i = range.location; i < NSMaxRange(range); ++i) {
