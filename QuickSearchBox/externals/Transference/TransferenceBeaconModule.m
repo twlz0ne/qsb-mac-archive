@@ -34,7 +34,8 @@
 
 NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
 
-@interface TransferenceBeaconModule : HGSExtension <BeaconServerProtocol> {
+@interface TransferenceBeaconModule : HGSExtension <BeaconServerProtocol, 
+                                                    HGSMixerDelegate> {
  @private
   NSDate *startSearchDate_;
   NSDate *endSearchDate_;
@@ -43,13 +44,10 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
   NSMutableArray *completedSearchSources_;
   BeaconServer *server_;
 }
-
-@end
-
-@interface TransferenceBeaconModule ()
 // Strips the source string description to make it more human readable.
 //
 - (NSDictionary *)searchSourceDictionaryForObject:(id)searchObject;
+
 @end
 
 @implementation TransferenceBeaconModule
@@ -277,12 +275,7 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
   [server_ setLastSearchTime:searchTime moduleInfo:moduleSearchTimes];
 
   HGSQueryController *object = [aNotification object];
-  HGSMixer *mixer = [object startMixingCurrentResults];
-  while (!([mixer isFinished] || [mixer isCancelled])) {
-    [NSThread sleepForTimeInterval:.1];
-  }
-  NSArray *rankedResults = [mixer rankedResults];
-  [server_ setLastRankedResults:rankedResults];
+  [object startMixingCurrentResults:self];
 }
 
 #pragma mark -- HGSSearchOperation notification handlers --
@@ -301,5 +294,15 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
   if (dict) {
     [completedSearchSources_ addObject:dict];
   }
+}
+
+#pragma mark -- HGSMixed Delegate Callbacks --
+- (void)mixerDidUpdateResults:(HGSMixer *)mixer {
+  // We ignore
+}
+
+- (void)mixerDidStop:(HGSMixer *)mixer {
+  NSArray *rankedResults = [mixer rankedResults];
+  [server_ setLastRankedResults:rankedResults];
 }
 @end
