@@ -125,8 +125,7 @@
              selector:@selector(emptyResults:) 
                  name:kHGSSearchOperationDidUpdateResultsNotification 
                object:op];
-  NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
-  [queue addOperation:[op searchOperation]];
+  [op run:YES];
   NSRunLoop *rl = [NSRunLoop currentRunLoop];
   [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
   [center removeObserver:self];
@@ -170,9 +169,9 @@
   [center addObserver:self
              selector:@selector(singleResult:) 
                  name:kHGSSearchOperationDidUpdateResultsNotification 
-               object:op];  
-  NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
-  [queue addOperation:[op searchOperation]];
+               object:op];
+  [op run:YES];
+
   NSRunLoop *rl = [NSRunLoop currentRunLoop];
   [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
 
@@ -180,11 +179,9 @@
 }
 
 - (void)singleResult:(NSNotification *)notification {
-  NSDictionary *userInfo = [notification userInfo];
-  NSArray *results 
-    = [userInfo objectForKey:kHGSSearchOperationNotificationResultsKey];
-  STAssertEquals([results count], 1U, nil);
-  HGSResult *result = [results objectAtIndex:0];
+  HGSSearchOperation *op = [notification object];
+  STAssertEquals([op resultCount], 1U, nil);
+  HGSResult *result = [op sortedResultAtIndex:0];
   STAssertEqualObjects([result displayName], @"SampleContact.abcdp", nil);
 }
 

@@ -81,14 +81,12 @@
                                           source:source] autorelease];
   STAssertNotNil(op, nil);
 
-  NSOperation *operation = [op searchOperation];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc addObserver:self
          selector:@selector(gotResults:)
              name:kHGSSearchOperationDidUpdateResultsNotification
            object:op];
-  NSOperationQueue *operationQueue = [HGSOperationQueue sharedOperationQueue];
-  [operationQueue addOperation:operation];
+  [op run:YES];
 
   int loops = 0;
   while (![op isFinished] && loops++ < 20) {

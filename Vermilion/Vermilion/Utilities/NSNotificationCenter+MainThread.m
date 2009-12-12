@@ -46,9 +46,13 @@
   NSNotification *notification = [NSNotification notificationWithName:name 
                                                                object:object
                                                              userInfo:info];
-  [self performSelectorOnMainThread:@selector(postNotification:)
-                         withObject:notification
-                      waitUntilDone:NO];
+  if ([NSThread isMainThread]) {
+    [self postNotification:notification];
+  } else {
+    [self performSelectorOnMainThread:@selector(postNotification:)
+                           withObject:notification
+                        waitUntilDone:NO];
+  }
 }
 
 @end

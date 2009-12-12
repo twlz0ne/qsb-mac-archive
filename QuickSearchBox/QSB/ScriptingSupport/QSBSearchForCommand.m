@@ -70,7 +70,7 @@
 //   doQuery()
 // end run
 
-@interface QSBSearchForCommand : NSScriptCommand {
+@interface QSBSearchForCommand : NSScriptCommand<HGSMixerDelegate> {
  @private 
   NSAppleEventDescriptor *returnAddress_;
   HGSQueryController *queryController_;
@@ -167,16 +167,14 @@
  
 - (void)queryControllerDidFinish:(NSNotification *)notification {
   // Our query is finished.
-  HGSMixer *mixer = [queryController_ startMixingCurrentResults];
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self 
-         selector:@selector(mixerDidStop:) 
-             name:kHGSMixerDidStopNotification 
-           object:mixer];
+  [queryController_ startMixingCurrentResults:self];
+}
+- (void)mixerDidUpdateResults:(HGSMixer *)mixer {
+  // Currently we don't care.
+  // TODO(dmaclach): fix up the handler case
 }
 
-- (void)mixerDidStop:(NSNotification *)notification {
-  HGSMixer *mixer = [notification object];
+- (void)mixerDidStop:(HGSMixer *)mixer {
   NSArray *results = [mixer rankedResults];
   NSUInteger count = [results count];
   NSMutableArray *appleScriptResults = [NSMutableArray arrayWithCapacity:count];
@@ -233,8 +231,6 @@
 }
 
 - (void)dealloc {
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc removeObserver:self];
   [queryController_ release];
   [handler_ release];
   [results_ release];

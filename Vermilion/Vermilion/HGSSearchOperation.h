@@ -53,10 +53,14 @@
   NSOperation *operation_;
   HGSSearchSource *source_;
   HGSQuery *query_;
+  uint64_t queueTime_;
+  uint64_t runTime_;
 }
 
 @property (readonly, retain) HGSSearchSource *source;
 @property (readonly, retain) HGSQuery *query;
+@property (readonly, assign) uint64_t runTime;
+@property (readonly, assign) uint64_t queueTime;
 /*!
  Is YES if the source will handle its own threading, or not require a
  thread at all. The default is for sources to be non-concurrent (a thread will
@@ -84,10 +88,10 @@
 - (void)cancel;
 
 /*!
- Returns an NSOperation representing the search.
+ Called to get the operation going. |onThread| mean to run it on the current
+ thread.
 */
-- (NSOperation *)searchOperation;
-
+- (void)run:(BOOL)onThread;
 @end
 
 /*!
@@ -124,12 +128,6 @@
 
 
 #pragma mark Notifications
-
-/*!
- Posted when a search operation is added to the operation Queue.
- Object is the search operation.
- */
-GTM_EXTERN NSString *const kHGSSearchOperationDidQueueNotification;
 
 /*!
  Posted when a search operation starts.

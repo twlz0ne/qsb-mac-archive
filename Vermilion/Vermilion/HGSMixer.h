@@ -39,6 +39,7 @@
 #import "GTMDefines.h"
 
 @class HGSQueryController;
+@protocol HGSMixerDelegate;
 
 /*!
  The mixer takes N arrays that are assumed to be internally sorted
@@ -54,10 +55,13 @@
   NSMutableDictionary *resultsByCategory_;
   uint64_t firstInterval_;
   uint64_t progressInterval_;
+  id delegate_; // Weak.
 }
-- (id)initWithRange:(NSRange)range fromSearchOperations:(NSArray *)ops
-      firstInterval:(NSTimeInterval)firstInterval 
-   progressInterval:(NSTimeInterval)progressInterval;
+- (id)initWithDelegate:(id<HGSMixerDelegate>)delegate
+                 range:(NSRange)range 
+      searchOperations:(NSArray *)ops
+         firstInterval:(NSTimeInterval)firstInterval 
+      progressInterval:(NSTimeInterval)progressInterval;
 - (NSArray *)rankedResults;
 - (NSDictionary *)rankedResultsByCategory;
 @end
@@ -65,5 +69,7 @@
 
 NSInteger HGSMixerResultSort(id resultA, id resultB, void* context);
 
-GTM_EXTERN NSString *const kHGSMixerDidUpdateResultsNotification;
-GTM_EXTERN NSString *const kHGSMixerDidStopNotification;
+@protocol HGSMixerDelegate
+- (void)mixerDidUpdateResults:(HGSMixer *)mixer;
+- (void)mixerDidStop:(HGSMixer *)mixer;
+@end

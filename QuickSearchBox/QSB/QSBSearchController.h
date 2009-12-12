@@ -34,19 +34,17 @@
 #import <Cocoa/Cocoa.h>
 #import <Vermilion/Vermilion.h>
 
-@class HGSResultArray;
 @class QSBMoreResultsViewController;
 @class QSBTableResult;
-@class HGSMixer;
 
 // Interface between QSB and the web suggestor and the desktop query
 // takes a query string and is responsible for turning it into results.
-@interface QSBSearchController : NSObject {
+@interface QSBSearchController : NSObject<HGSMixerDelegate> {
  @private
   IBOutlet QSBMoreResultsViewController *moreResultsViewController_;
 
   NSMutableArray *desktopResults_;
-  NSMutableArray *lockedResults_;
+  NSArray *lockedResults_;
   NSString *queryString_;  // Current query string entered by user.
   HGSResultArray *results_;
   NSUInteger currentResultDisplayCount_;
@@ -66,7 +64,6 @@
   BOOL queryIsInProcess_;  // Yes while a query is under way.
   NSUInteger pushModifierFlags_; // NSEvent Modifiers at pivot time
   NSUInteger totalResultDisplayCount_;
-  HGSMixer *mixer_; // weak
 }
 
 // Sets/Gets NSEvent Modifiers at pivot time
@@ -95,9 +92,6 @@
 
 // Returns the maximum number of results to present.
 - (NSUInteger)maximumResultsToCollect;
-
-// Perform the actual query.  For use only be child classes.
-- (void)performQuery:(id)ignoredValue;
 
 // Stop all source operations for this query.
 - (void)stopQuery;

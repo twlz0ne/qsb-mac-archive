@@ -563,5 +563,8 @@ sortDescriptorsDidChange:(NSArray *)oldDescriptors {
     [lastSubview removeFromSuperviewWithoutNeedingDisplay];
   }
   [super reloadData];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:NSTableViewSelectionDidChangeNotification 
+                    object:self];
 }
 @end

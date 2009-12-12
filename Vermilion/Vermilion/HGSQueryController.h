@@ -38,6 +38,7 @@
 @class HGSResult;
 @class HGSMixer;
 @class HGSSearchOperation;
+@protocol HGSMixerDelegate;
 
 /*!
  @header
@@ -60,17 +61,18 @@
   BOOL cancelled_;
   HGSQuery* parsedQuery_;
   __weak NSTimer* slowSourceTimer_;
-  NSMutableDictionary *operationStartTimes_;
   NSArray *rankedResults_;
   HGSMixer *mixer_;
   NSOperationQueue *mixerQueue_;
 }
 
+@property (readonly, retain) HGSMixer *mixer;
+
 - initWithQuery:(HGSQuery*)query;
 
 - (HGSQuery *)query;
 
-- (HGSMixer *)startMixingCurrentResults;
+- (void)startMixingCurrentResults:(id<HGSMixerDelegate>)delegate;
 - (NSUInteger)totalResultsCount;
 
 /*!

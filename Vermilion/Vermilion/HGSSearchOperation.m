@@ -31,13 +31,12 @@
 //
 
 #import "HGSSearchOperation.h"
+#import <mach/mach_time.h>
 #import "HGSSearchSource.h"
 #import "HGSOperation.h"
 #import "HGSLog.h"
 #import "NSNotificationCenter+MainThread.h"
 
-NSString *const kHGSSearchOperationDidQueueNotification
-  = @"HGSSearchOperationDidQueueNotification";
 NSString *const kHGSSearchOperationWillStartNotification 
   = @"HGSSearchOperationWillStartNotification";
 NSString *const kHGSSearchOperationDidFinishNotification 
@@ -56,6 +55,8 @@ NSString *const kHGSSearchOperationWasCancelledNotification
 @synthesize source = source_;
 @synthesize query = query_;
 @synthesize finished = finished_;
+@synthesize runTime = runTime_;
+@synthesize queueTime = queueTime_;
 @dynamic concurrent;
 @dynamic cancelled;
 
@@ -127,6 +128,8 @@ NSString *const kHGSSearchOperationWasCancelledNotification
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationWillStartNotification
                                       object:self];
+    runTime_ = mach_absolute_time();
+    queueTime_ = runTime_ - queueTime_;
     if ([self isConcurrent]) {
       // Concurrents were queued just to get things started, we bounce to the
       // main loop to actually run them (and they have to call finished when
@@ -166,6 +169,7 @@ NSString *const kHGSSearchOperationWasCancelledNotification
     // Never send the notification twice
     return;
   }
+  runTime_ = mach_absolute_time() - runTime_;
   [self setFinished:YES];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationDidFinishNotification
@@ -212,6 +216,18 @@ NSString *const kHGSSearchOperationWasCancelledNotification
   return [[[NSInvocationOperation alloc] initWithTarget:self
                                                selector:@selector(queryOperation:)
                                                  object:nil] autorelease];
+}
+
+- (void)run:(BOOL)onThread {
+  NSOperation *operation = [self searchOperation];
+  queueTime_ = mach_absolute_time();
+  if (onThread) {
+    [operation start];
+  } else {
+    HGSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
+    [operation setQueuePriority:NSOperationQueuePriorityVeryHigh];
+    [queue addOperation:operation];
+  }
 }
 
 @end

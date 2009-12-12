@@ -38,15 +38,9 @@
 #import "HGSQueryController.h"
 #import "HGSResult.h"
 #import "HGSSearchOperation.h"
-#import "NSNotificationCenter+MainThread.h"
 #import "HGSLog.h"
 #import "HGSBundle.h"
 #import "GTMDebugThreadValidation.h"
-
-NSString *const kHGSMixerDidUpdateResultsNotification 
-  = @"HGSMixerDidUpdateResultsNotification";
-NSString *const kHGSMixerDidStopNotification
-  = @"HGSMixerDidStopNotification";
 
 inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
   HGSResult *a = (HGSResult *)resultA;
@@ -68,9 +62,11 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
 
 @implementation HGSMixer
 
-- (id)initWithRange:(NSRange)range fromSearchOperations:(NSArray *)ops 
-      firstInterval:(NSTimeInterval)firstInterval 
-   progressInterval:(NSTimeInterval)progressInterval {
+- (id)initWithDelegate:(id<HGSMixerDelegate>)delegate
+                 range:(NSRange)range 
+      searchOperations:(NSArray *)ops 
+         firstInterval:(NSTimeInterval)firstInterval 
+      progressInterval:(NSTimeInterval)progressInterval {
   if ((self = [super init])) {
     range_ = range;
     ops_ = [ops copy];
@@ -79,6 +75,7 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
     
     firstInterval_ = UnsignedWideToUInt64(DurationToAbsolute(firstInterval * 1000));
     progressInterval_ = UnsignedWideToUInt64(DurationToAbsolute(progressInterval * 1000));
+    delegate_ = delegate;
   }
   return self;
 }
@@ -96,7 +93,6 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
   NSInteger *opsIndices = calloc(sizeof(NSInteger), opsCount);
   NSInteger *opsMaxIndices = malloc(sizeof(NSInteger) * opsCount);
   NSUInteger currentIndex = 0;
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   
   NSUInteger opsIndex = 0;
   for (HGSSearchOperation *op in ops_) {
@@ -169,8 +165,13 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
       uint64_t currentTime = mach_absolute_time();
       uint64_t deltaTime = currentTime - startTime;
       if (deltaTime > intervalToCheck) {
-        [nc hgs_postOnMainThreadNotificationName:kHGSMixerDidUpdateResultsNotification
-                                          object:self];
+        if (![NSThread isMainThread]) {
+          [delegate_ performSelectorOnMainThread:@selector(mixerDidUpdateResults:)
+                                      withObject:self
+                                   waitUntilDone:NO];
+        } else {
+          [delegate_ mixerDidUpdateResults:self];
+        }
         firstInterval_ = 0;
         startTime = mach_absolute_time();
       }
@@ -178,8 +179,13 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
   }
   free(opsIndices);
   free(opsMaxIndices);
-  [nc hgs_postOnMainThreadNotificationName:kHGSMixerDidStopNotification
-                                    object:self];
+  if (![NSThread isMainThread]) {
+    [delegate_ performSelectorOnMainThread:@selector(mixerDidStop:)
+                                withObject:self
+                             waitUntilDone:NO];
+  } else {
+    [delegate_ mixerDidStop:self];
+  }
 }
 
 - (NSArray *)rankedResults {

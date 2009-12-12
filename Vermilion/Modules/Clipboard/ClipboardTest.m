@@ -69,8 +69,7 @@ static NSString *const kClipboardTestString = @"Lazarus Long Text";
                  name:kHGSSearchOperationDidUpdateResultsNotification 
                object:op];
   STAssertNil(results_, nil);
-  NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
-  [queue addOperation:[op searchOperation]];
+  [op run:YES];
   [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
   STAssertEquals([results_ count], (NSUInteger)1, nil);
   HGSResult *result = [results_ objectAtIndex:0];
@@ -80,7 +79,9 @@ static NSString *const kClipboardTestString = @"Lazarus Long Text";
 }
 
 - (void)gotResults:(NSNotification *)notification {
-  results_ = [[notification userInfo] objectForKey:kHGSSearchOperationNotificationResultsKey];
+  HGSSearchOperation *op = [notification object];
+  NSRange resultRange = NSMakeRange(0, [op resultCount]);
+  results_ = [op sortedResultsInRange:resultRange];
   STAssertNotNil(results_, nil);
   [results_ retain];
   
