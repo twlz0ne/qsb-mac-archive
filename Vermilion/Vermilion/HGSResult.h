@@ -305,6 +305,12 @@ typedef NSUInteger HGSRankFlags;
  Base implementation sends a promoteResult message to the result's source.
  */
 - (void)promote;
+
+/*!
+ Given a path to a file, returns it's HGSType.
+*/
++ (NSString *)hgsTypeForPath:(NSString*)path;
+
 @end
 
 @interface HGSMutableResult : HGSResult

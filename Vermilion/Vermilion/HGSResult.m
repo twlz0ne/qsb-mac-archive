@@ -81,8 +81,6 @@ static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
 
 @interface HGSResult ()
 @property (readonly) NSDictionary *attributes;
-+ (NSString *)hgsTypeForPath:(NSString*)path;
-
 @end
 
 @implementation HGSResult
@@ -522,6 +520,7 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
   } typeMap[] = {
     { kUTTypeContact, kHGSTypeContact },
     { kUTTypeMessage, kHGSTypeEmail },
+    { CFSTR("com.apple.safari.history"), kHGSTypeWebHistory },
     { kUTTypeHTML, kHGSTypeWebpage },
     { kUTTypeApplication, kHGSTypeFileApplication },
     { kUTTypeAudio, kHGSTypeFileMusic },
@@ -530,7 +529,7 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
     { kUTTypePlainText, kHGSTypeTextFile },
     { kUTTypePackage, kHGSTypeFile },
     { kUTTypeDirectory, kHGSTypeDirectory },
-    { kUTTypeItem, kHGSTypeFile }
+    { kUTTypeItem, kHGSTypeFile },
   };
   for (size_t i = 0; i < sizeof(typeMap) / sizeof(typeMap[0]); ++i) {
     if (UTTypeConformsTo(cfUTType, typeMap[i].uttype)) {
@@ -538,6 +537,12 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
       break;
     }
   }
+  if (outType == kHGSTypeFile) {
+    NSString *extension = [path pathExtension];
+    if ([extension caseInsensitiveCompare:@"webloc"] == NSOrderedSame) {
+      outType = kHGSTypeWebBookmark;
+    }
+  }  
   CFRelease(cfUTType);
   return outType;
 }

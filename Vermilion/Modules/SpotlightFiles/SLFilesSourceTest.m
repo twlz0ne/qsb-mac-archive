@@ -46,7 +46,7 @@
 - (id)initWithInvocation:(NSInvocation *)invocation {
   self = [super initWithInvocation:invocation 
                        pluginNamed:@"SpotlightFiles" 
-               extensionIdentifier:@"com.google.qsb.spotlight.source"];
+               extensionIdentifier:@"com.google.qsb.spotlightfiles.source"];
   return self;
 }
 

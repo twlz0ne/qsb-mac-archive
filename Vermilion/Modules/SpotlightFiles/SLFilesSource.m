@@ -189,11 +189,9 @@ typedef enum {
   NSValue *key = [NSValue valueWithPointer:mdItem];
   result = [hgsResults_ objectForKey:key];
   if (!result) {
-    NSString *iconFlagName = nil;
     NSDictionary *attributes 
       = GTMCFAutorelease(MDItemCopyAttributes(mdItem, 
                                               [SLFilesSource attributeArray]));
-    NSString *uri = nil; 
     NSString *name = GTMCFAutorelease(MDItemCopyAttribute(mdItem,
                                                           kMDItemDisplayName));
     if (!name) {
@@ -202,74 +200,101 @@ typedef enum {
     BOOL isURL = NO;
     NSString *contentType
       = [attributes objectForKey:(NSString *)kMDItemContentType];
-    NSString *resultType = kHGSTypeFile;
+    NSString *resultType = nil;
     if (contentType) {
       NSNumber *typeGroupNumber
         = [attributes objectForKey:(NSString *)kSpotlightGroupIdAttribute];
-      int typeGroup = [typeGroupNumber intValue];
-      
-      // TODO: further subdivide the result types.
-      switch (typeGroup) {
-        case SpotlightGroupApplication:
-          // TODO: do we want a different type for prefpanes?
-          resultType = kHGSTypeFileApplication; 
-          break;
-        case SpotlightGroupMessage:
-          resultType = kHGSTypeEmail;
-          break;
-        case SpotlightGroupContact:
-          resultType = kHGSTypeContact;
-          break;
-        case SpotlightGroupWeb:
-          resultType = kHGSTypeWebHistory;
-          isURL = YES;
-          NSString *uriPath = GTMCFAutorelease(MDItemCopyAttribute(mdItem, 
-                                                                   kMDItemURL));
-          if (uriPath) {
-            uri = uriPath;
-          }
-          // TODO(alcor): are there any items that are not history?
-          iconFlagName = @"history-flag";
-          break;
-        case SpotlightGroupPDF:
-          resultType = kHGSTypeFile;
-          break;
-        case SpotlightGroupImage:
-          resultType = kHGSTypeFileImage;
-          break;
-        case SpotlightGroupMovie:
-          resultType = kHGSTypeFileMovie;
-          break;
-        case SpotlightGroupMusic:
-          resultType = kHGSTypeFileMusic;
-          break;
-        case SpotlightGroupDirectory:
-          resultType = kHGSTypeDirectory;
-          break;
-        case SpotlightGroupDocument:
-        case SpotlightGroupPresentation:
-        case SpotlightGroupFont:
-        case SpotlightGroupCalendar:
-        default: {
-          if ([[name pathExtension] caseInsensitiveCompare:@"webloc"] 
-              == NSOrderedSame) {
-            resultType = kHGSTypeWebBookmark;
-          } else if (UTTypeConformsTo((CFStringRef)contentType, 
-                                      kUTTypePlainText)) {
-            resultType = kHGSTypeTextFile;
-          } else {
+      if (typeGroupNumber) {
+        int typeGroup = [typeGroupNumber intValue];
+        
+        // TODO: further subdivide the result types.
+        switch (typeGroup) {
+          case SpotlightGroupApplication:
+            // TODO: do we want a different type for prefpanes?
+            resultType = kHGSTypeFileApplication; 
+            break;
+          case SpotlightGroupMessage:
+            resultType = kHGSTypeEmail;
+            break;
+          case SpotlightGroupContact:
+            resultType = kHGSTypeContact;
+            break;
+          case SpotlightGroupWeb:
+            resultType = kHGSTypeWebHistory;
+            isURL = YES;
+            break;
+          case SpotlightGroupPDF:
             resultType = kHGSTypeFile;
-          }
+            break;
+          case SpotlightGroupImage:
+            resultType = kHGSTypeFileImage;
+            break;
+          case SpotlightGroupMovie:
+            resultType = kHGSTypeFileMovie;
+            break;
+          case SpotlightGroupMusic:
+            resultType = kHGSTypeFileMusic;
+            break;
+          case SpotlightGroupDirectory:
+            resultType = kHGSTypeDirectory;
+            break;
+          case SpotlightGroupDocument:
+          case SpotlightGroupPresentation:
+          case SpotlightGroupFont:
+          case SpotlightGroupCalendar:
+          default: 
+            {
+              if ([[name pathExtension] caseInsensitiveCompare:@"webloc"] 
+                  == NSOrderedSame) {
+                resultType = kHGSTypeWebBookmark;
+              } else if (UTTypeConformsTo((CFStringRef)contentType, 
+                                          kUTTypePlainText)) {
+                resultType = kHGSTypeTextFile;
+              } else {
+                resultType = kHGSTypeFile;
+              }
+            }
+            break;
         }
-          break;
-      }
+      } 
     }
     
+    NSString *uri = nil;
+    NSString *path = nil;
+    // We want to avoid getting the path if at all possible,
+    // and we only really need the path if it isn't a URL.
+    if (isURL) {
+      NSString *uriPath 
+        = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemURL));
+      if (uriPath) {
+        uri = uriPath;
+      }
+    }
     if (!uri) {
-      NSString *path = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemPath));
+      path = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemPath));
       NSURL *url = [NSURL fileURLWithPath:path];
       uri = [url absoluteString];
     }
+    
+    if (!resultType && path) {
+      resultType = [HGSResult hgsTypeForPath:path];
+      if ([resultType isEqual:kHGSTypeWebHistory]) {
+        isURL = YES;
+        NSString *uriPath 
+          = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemURL));
+        if (uriPath) {
+          uri = uriPath;
+        }
+      }
+    }
+    
+    NSString *iconFlagName = nil;
+    if ([resultType isEqual:kHGSTypeWebHistory]) {
+      // TODO(alcor): are there any items that are not history
+      iconFlagName = @"history-flag";
+    }
+    
+    HGSAssert(resultType != 0, nil);
     
     // Cache values the query has already copied
     NSDate *lastUsedDate 
