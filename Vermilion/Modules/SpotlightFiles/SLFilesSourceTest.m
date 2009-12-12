@@ -111,7 +111,7 @@
 }
   
 - (void)mdimportFile:(NSString *)path {
-  NSArray *args = [NSArray arrayWithObject:path];
+  NSArray *args = [NSArray arrayWithObjects:@"-d", @"2", path, nil];
   NSTask *mdimport = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/mdimport" 
                                               arguments:args];
   [mdimport waitUntilExit];
@@ -351,6 +351,8 @@
                                           result:result];
       STAssertNil(icon, @"We only expect source to return icons for Web stuff");
       break;
+    } else {
+      HGSLog(@"%@ - %@", result, [result filePath]);
     }
   }
   STAssertTrue(foundResult, nil);
