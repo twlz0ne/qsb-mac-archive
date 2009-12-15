@@ -56,34 +56,12 @@ static NSString *const kApplicationSourcePredicateString
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    // kick off a spotlight query for applications. it'll be a standing
-    // query that we keep around for the duration of this source.
-    query_ = [[NSMetadataQuery alloc] init];
-    NSPredicate *predicate
-      = [NSPredicate predicateWithFormat:kApplicationSourcePredicateString];
-    NSArray *scope = [NSArray arrayWithObject:NSMetadataQueryLocalComputerScope];
-    [query_ setSearchScopes:scope];
-    NSSortDescriptor *desc
-      = [[[NSSortDescriptor alloc] initWithKey:(id)kMDItemLastUsedDate
-                                     ascending:NO] autorelease];
-    [query_ setSortDescriptors:[NSArray arrayWithObject:desc]];
-    [query_ setPredicate:predicate];
-    [query_ setNotificationBatchingInterval:10];
-
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self
-           selector:@selector(queryNotification:)
-               name:nil
-             object:query_];
     if (![self loadResultsCache]) {
       [self fastIndex];
-    } else {
-      // TODO(alcor): this retains us even if everyone else releases.
-      // add a teardown function for sources where they can invalidate
-      [self performSelector:@selector(startQuery:)
-                 withObject:nil
-                 afterDelay:10];
     }
+    [self performSelector:@selector(startQuery:)
+               withObject:nil
+               afterDelay:10];
   }
   return self;
 }
@@ -95,7 +73,32 @@ static NSString *const kApplicationSourcePredicateString
   [super dealloc];
 }
 
+- (void)uninstall {
+  [NSObject cancelPreviousPerformRequestsWithTarget:self];
+  [super uninstall];
+}
+
 - (void)startQuery:(NSTimer *)timer {
+  // kick off a spotlight query for applications. it'll be a standing
+  // query that we keep around for the duration of this source.
+  query_ = [[NSMetadataQuery alloc] init];
+  NSPredicate *predicate
+    = [NSPredicate predicateWithFormat:kApplicationSourcePredicateString];
+  NSArray *scope = [NSArray arrayWithObject:NSMetadataQueryLocalComputerScope];
+  [query_ setSearchScopes:scope];
+  NSSortDescriptor *desc
+    = [[[NSSortDescriptor alloc] initWithKey:(id)kMDItemLastUsedDate
+                                   ascending:NO] autorelease];
+  [query_ setSortDescriptors:[NSArray arrayWithObject:desc]];
+  [query_ setPredicate:predicate];
+  [query_ setNotificationBatchingInterval:10];
+
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc addObserver:self
+         selector:@selector(queryNotification:)
+             name:nil
+           object:query_];
+
   [query_ startQuery];
 }
 
