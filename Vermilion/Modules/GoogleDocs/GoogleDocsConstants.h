@@ -54,6 +54,11 @@ extern NSString* const kDocCategorySpreadsheet;
 extern NSString* const kDocCategoryPresentation;
 
 /*!
+ A category which is used to identify the Google Doc as a 'PDF' document.
+*/
+extern NSString* const kDocCategoryPDFDocument;
+
+/*!
  The key to the NSString result attribute giving the category of the Google Doc.
 */
 extern NSString* const kGoogleDocsDocCategoryKey;  // NSString - Doc category.

@@ -44,3 +44,6 @@
 
 /* A keyword used when searching to detect a Google Doc that is a presentation. */
 "presentation" = "presentation";
+
+/* A keyword used when searching to detect a Google Doc that is a PDF. */
+"pdf" = "pdf";

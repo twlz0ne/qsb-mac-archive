@@ -98,17 +98,23 @@ GTM_METHOD_CHECK(NSEnumerator,
     NSString *presPath = [sourceBundle pathForImageResource:@"gdocpresentation"];
     HGSAssert(presPath, @"Icons for 'gdocpresentation' are missing from the "
               @"GoogleDocsSource bundle.");
+    NSString *pdfPath = [sourceBundle pathForImageResource:@"gdocpdfdocument"];
+    HGSAssert(pdfPath, @"Icons for 'gdocppdfdocument' are missing from the "
+              @"GoogleDocsSource bundle.");
     NSImage *docImage 
       = [[[NSImage alloc] initByReferencingFile:docPath] autorelease];
     NSImage *ssImage
        = [[[NSImage alloc] initByReferencingFile:ssPath] autorelease];
     NSImage *presImage
       = [[[NSImage alloc] initByReferencingFile:presPath] autorelease];
+    NSImage *pdfImage
+      = [[[NSImage alloc] initByReferencingFile:pdfPath] autorelease];
     docIcons_ = [[NSDictionary alloc] initWithObjectsAndKeys:
-                  docImage, kDocCategoryDocument, 
-                  ssImage, kDocCategorySpreadsheet, 
-                  presImage, kDocCategoryPresentation,
-                  nil];
+                 docImage, kDocCategoryDocument, 
+                 ssImage, kDocCategorySpreadsheet, 
+                 presImage, kDocCategoryPresentation,
+                 pdfImage, kDocCategoryPDFDocument,
+                 nil];
     account_ = [[configuration objectForKey:kHGSExtensionAccount] retain];
     userName_ = [[account_ userName] copy];
     if (account_) {
@@ -171,7 +177,8 @@ GTM_METHOD_CHECK(NSEnumerator,
   GDataServiceGoogle *service = nil;
   NSString *category = [doc valueForKey:kGoogleDocsDocCategoryKey];
   if ([category isEqualToString:kDocCategoryDocument]
-      || [category isEqualToString:kDocCategoryPresentation]) {
+      || [category isEqualToString:kDocCategoryPresentation]
+      || [category isEqualToString:kDocCategoryPDFDocument]) {
     service = docService_;
   } else if ([category isEqualToString:kDocCategorySpreadsheet]) {
     service = spreadsheetService_;
@@ -538,6 +545,11 @@ GTM_METHOD_CHECK(NSEnumerator,
         = HGSLocalizedString(@"presentation",
                              @"A search term indicating that this document "
                              @"is a presentation.");
+    } else if ([categoryLabel isEqualToString:kDocCategoryPDFDocument]) {
+      localizedCategory
+        = HGSLocalizedString(@"pdf",
+                             @"A search term indicating that this document "
+                             @"is a PDF document.");
     } else {
       localizedCategory
         = HGSLocalizedString(@"document",
