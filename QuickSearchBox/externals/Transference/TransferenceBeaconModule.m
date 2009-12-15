@@ -297,12 +297,10 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
 }
 
 #pragma mark -- HGSMixed Delegate Callbacks --
-- (void)mixerDidUpdateResults:(HGSMixer *)mixer {
-  // We ignore
-}
 
-- (void)mixerDidStop:(HGSMixer *)mixer {
+- (void)mixerDidFinish:(HGSMixer *)mixer {
   NSArray *rankedResults = [mixer rankedResults];
   [server_ setLastRankedResults:rankedResults];
 }
+
 @end
