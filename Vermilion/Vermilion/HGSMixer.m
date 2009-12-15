@@ -58,24 +58,33 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
 
 @interface HGSMixer()
 + (NSString *)categoryForType:(NSString *)type;
+- (id)mix:(id)ignored;
 @end
 
 @implementation HGSMixer
 
 - (id)initWithDelegate:(id<HGSMixerDelegate>)delegate
-                 range:(NSRange)range 
       searchOperations:(NSArray *)ops 
-         firstInterval:(NSTimeInterval)firstInterval 
-      progressInterval:(NSTimeInterval)progressInterval {
+        mainThreadTime:(NSTimeInterval)mainThreadTime {
   if ((self = [super init])) {
-    range_ = range;
     ops_ = [ops copy];
-    results_ = [[NSMutableArray alloc] initWithCapacity:NSMaxRange(range)];
-    resultsByCategory_ = [[NSMutableDictionary alloc] init];
-    
-    firstInterval_ = UnsignedWideToUInt64(DurationToAbsolute(firstInterval * 1000));
-    progressInterval_ = UnsignedWideToUInt64(DurationToAbsolute(progressInterval * 1000));
+    AbsoluteTime absTime = DurationToAbsolute(mainThreadTime * durationSecond);
+    mainThreadTime_ = UnsignedWideToUInt64(absTime);
     delegate_ = delegate;
+    NSUInteger opsCount = [ops_ count];
+    opsIndices_ = calloc(sizeof(NSInteger), opsCount);
+    opsMaxIndices_ = malloc(sizeof(NSInteger) * opsCount);
+    NSUInteger opsIndex = 0;
+    NSUInteger resultsCapacity = 0;
+    for (HGSSearchOperation *op in ops_) {
+      NSUInteger resultCount = [op resultCount];
+      resultsCapacity += resultCount;
+      opsMaxIndices_[opsIndex] = resultCount;
+      ++opsIndex;
+    }
+    results_ = [[NSMutableArray alloc] initWithCapacity:resultsCapacity];
+    resultsByCategory_ = [[NSMutableDictionary alloc] init];
+    opQueue_ = [[NSOperationQueue alloc] init];
   }
   return self;
 }
@@ -84,40 +93,65 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
   [ops_ release];
   [results_ release];
   [resultsByCategory_ release];
+  [opQueue_ release];
+  free(opsIndices_);
+  free(opsMaxIndices_);
   [super dealloc];
 }
 
-- (void)main {
-  NSUInteger maxLength = NSMaxRange(range_);
-  NSUInteger opsCount = [ops_ count];
-  NSInteger *opsIndices = calloc(sizeof(NSInteger), opsCount);
-  NSInteger *opsMaxIndices = malloc(sizeof(NSInteger) * opsCount);
-  NSUInteger currentIndex = 0;
-  
-  NSUInteger opsIndex = 0;
-  for (HGSSearchOperation *op in ops_) {
-    opsMaxIndices[opsIndex] = [op resultCount];
-    ++opsIndex;
+- (void)start {
+  if (mainThreadTime_) {
+    [self mix:nil];
   }
-  
+  if (!isFinished_) {
+    operation_ = [[NSInvocationOperation alloc] initWithTarget:self 
+                                                      selector:@selector(mix:) 
+                                                        object:nil];
+    [opQueue_ addOperation:operation_];
+  }
+}
+
+- (void)cancel {
+  if (!isFinished_) {
+    [operation_ cancel];
+  }
+}
+
+- (BOOL)isCancelled {
+  return isCancelled_;
+}
+
+- (BOOL)isFinished {
+  return isFinished_;
+}
+
+- (id)mix:(id)ignored {
+  NSUInteger opsCount = [ops_ count];
   uint64_t startTime = mach_absolute_time();
   
   // Perform merge sort where we take the top ranked result in each
   // queue and add it to the sorted results.
-  while (currentIndex < maxLength) {
+  while (YES) {
     HGSResult *newResult = nil;
     NSUInteger indexToIncrement = 0;
     for (NSUInteger i = 0; i < opsCount; ++i) {
       HGSResult *testResult = nil;
-      if (opsIndices[i] < opsMaxIndices[i]) {
-        testResult = [[ops_ objectAtIndex:i] sortedResultAtIndex:opsIndices[i]];
-        NSInteger compare = HGSMixerResultSort(testResult, newResult, nil);
-        if (compare == NSOrderedAscending) {
-          newResult = testResult;
-          indexToIncrement = i;
+      while (opsIndices_[i] < opsMaxIndices_[i]) {
+        // Operations can return nil results.
+        testResult = [[ops_ objectAtIndex:i] sortedResultAtIndex:opsIndices_[i]];
+        if (testResult) {
+          NSInteger compare = HGSMixerResultSort(testResult, newResult, nil);
+          if (compare == NSOrderedAscending) {
+            newResult = testResult;
+            indexToIncrement = i;
+          }
+          break;
+        } else {
+          opsIndices_[i]++;
         }
       }
     }
+    // If we have a result first check for duplicates and do a merge
     if (newResult) {
       NSUInteger resultIndex = 0;
       @synchronized (results_) {
@@ -130,6 +164,7 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
           }
           ++resultIndex;
         }
+        // or else add it.
         if (newResult) {
           [results_ addObject:newResult];
           NSString *type = [newResult type];
@@ -147,45 +182,41 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
               [array addObject:newResult];
             }
           }
-          currentIndex++;
+          currentIndex_++;
         }
-        opsIndices[indexToIncrement]++;
       }
+      opsIndices_[indexToIncrement]++;
     } else {
+      isFinished_ = YES;
       break;
     }
-    if ([self isCancelled]) {
+    if ([operation_ isCancelled]) {
+      isFinished_ = YES;
+      isCancelled_ = YES;
       break;
     }
-    uint64_t intervalToCheck = firstInterval_;
-    if (!intervalToCheck) {
-      intervalToCheck = progressInterval_;
-    }
-    if (intervalToCheck) {
+    // Determine if it is time for us to move off of the main thread.
+    if (mainThreadTime_) {
       uint64_t currentTime = mach_absolute_time();
       uint64_t deltaTime = currentTime - startTime;
-      if (deltaTime > intervalToCheck) {
-        if (![NSThread isMainThread]) {
-          [delegate_ performSelectorOnMainThread:@selector(mixerDidUpdateResults:)
-                                      withObject:self
-                                   waitUntilDone:NO];
-        } else {
-          [delegate_ mixerDidUpdateResults:self];
-        }
-        firstInterval_ = 0;
-        startTime = mach_absolute_time();
+      if (deltaTime > mainThreadTime_) {
+        mainThreadTime_ = 0;
+        break;
       }
     }
   }
-  free(opsIndices);
-  free(opsMaxIndices);
-  if (![NSThread isMainThread]) {
-    [delegate_ performSelectorOnMainThread:@selector(mixerDidStop:)
-                                withObject:self
-                             waitUntilDone:NO];
-  } else {
-    [delegate_ mixerDidStop:self];
+  if (isFinished_) {
+    
+    [operation_ autorelease];
+    if (![NSThread isMainThread]) {
+      [delegate_ performSelectorOnMainThread:@selector(mixerDidFinish:)
+                                  withObject:self
+                               waitUntilDone:NO];
+    } else {
+      [delegate_ mixerDidFinish:self];
+    }
   }
+  return nil;
 }
 
 - (NSArray *)rankedResults {

@@ -47,29 +47,74 @@
  on global (cross-provider) heuristics. The mixer also handles merging
  duplicate results together (lower ranked into higher ranked).
 */
-@interface HGSMixer : NSOperation {
+@interface HGSMixer : NSObject {
  @private
   NSArray *ops_;
-  NSRange range_;
   NSMutableArray *results_;
   NSMutableDictionary *resultsByCategory_;
-  uint64_t firstInterval_;
-  uint64_t progressInterval_;
+  uint64_t mainThreadTime_;
   id delegate_; // Weak.
+  NSInteger *opsIndices_;
+  NSInteger *opsMaxIndices_;
+  NSUInteger currentIndex_;
+  NSOperation *operation_;
+  NSOperationQueue *opQueue_;
+  volatile BOOL isFinished_;
+  volatile BOOL isCancelled_;
 }
+
+/*!
+ Designated initializer.
+ @param delegate - the delegate for the mixer (see HGSMixerDelegate protocol)
+ @param ops - the ops that supply the results that the mixer mixes
+ @param mainThreadTime - the amount of time that the mixer should run on the 
+                         main thread (to optimize speed) before moving to a
+                         background thread (to optimize user responsiveness)
+*/
 - (id)initWithDelegate:(id<HGSMixerDelegate>)delegate
-                 range:(NSRange)range 
       searchOperations:(NSArray *)ops
-         firstInterval:(NSTimeInterval)firstInterval 
-      progressInterval:(NSTimeInterval)progressInterval;
+        mainThreadTime:(NSTimeInterval)mainThreadTime;
+        
+/*!
+  A snapshot of the results. Safe to call from any thread. Calling this too
+  often will slow down the mixing.
+*/
 - (NSArray *)rankedResults;
+
+/*!
+  A snapshot of the results sorted by categories. Safe to call from any thread. 
+  Calling this too often will slow down the mixing.
+*/
 - (NSDictionary *)rankedResultsByCategory;
+
+/*!
+  Start the mixing operation.
+*/
+- (void)start;
+
+- (BOOL)isCancelled;
+- (void)cancel;
+- (BOOL)isFinished;
 @end
 
 
+/*! 
+ The standard HGS sort. Suitable for use with
+ -[NSArray sortedArrayUsingFunction:context:].
+ @param resultA an HGSResult*
+ @param resultB are both HGSResults.
+ @param context is ignored.
+*/
 NSInteger HGSMixerResultSort(id resultA, id resultB, void* context);
 
+/*!
+ Protocol that mixer delegates must implement.
+*/
 @protocol HGSMixerDelegate
-- (void)mixerDidUpdateResults:(HGSMixer *)mixer;
-- (void)mixerDidStop:(HGSMixer *)mixer;
+
+/*!
+ Called when mixing is finished, either due to completion or cancellation.
+ Check the state by calling [mixer isCancelled].
+*/
+- (void)mixerDidFinish:(HGSMixer *)mixer;
 @end

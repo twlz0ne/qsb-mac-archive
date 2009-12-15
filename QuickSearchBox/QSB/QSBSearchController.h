@@ -50,17 +50,11 @@
   NSUInteger currentResultDisplayCount_;
   HGSQueryController *queryController_;
   QSBSearchController *parentSearchController_;
-
   NSArray *oldSuggestions_; // The last suggestions seen
-
-  NSDictionary *moreResults_;  // Contains one results array per category.
   NSMutableDictionary *typeCategoryDict_;  // type->category conversion.
 
   // used to update the UI at various times through the life of the query
-  NSTimer *shortcutDisplayTimer_;
-  NSTimer *firstTierDisplayTimer_;
-  NSTimer *secondTierDisplayTimer_;
-  NSTimer *moreResultsUpdateTimer_;
+  NSTimer *displayTimer_;
   BOOL queryIsInProcess_;  // Yes while a query is under way.
   NSUInteger pushModifierFlags_; // NSEvent Modifiers at pivot time
   NSUInteger totalResultDisplayCount_;
@@ -80,11 +74,7 @@
 - (QSBTableResult *)topResultForIndex:(NSInteger)idx;
 - (NSUInteger)topResultCount;
 
-// Returns the more results
-- (NSDictionary *)moreResults;
-
-// Changes the query and restarts the query to desktop and web if the
-// web tab is frontmost.
+// Changes and restarts the query.
 - (void)setQueryString:(NSString *)queryString;
 
 // Returns the current query

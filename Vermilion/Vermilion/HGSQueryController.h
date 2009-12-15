@@ -65,7 +65,6 @@
   __weak NSTimer* slowSourceTimer_;
   NSArray *rankedResults_;
   HGSMixer *mixer_;
-  NSOperationQueue *mixerQueue_;
 }
 
 @property (readonly, retain) HGSMixer *mixer;
@@ -75,7 +74,10 @@
 - (HGSQuery *)query;
 
 - (void)startMixingCurrentResults:(id<HGSMixerDelegate>)delegate;
-- (NSUInteger)totalResultsCount;
+
+- (NSArray *)rankedResults;
+- (NSDictionary *)rankedResultsByCategory;
+
 
 /*!
   Ask information about the completion status for the queries to each source.
@@ -85,7 +87,7 @@
 /*!
   Has the query been cancelled.
 */
-- (BOOL)cancelled;
+- (BOOL)isCancelled;
 
 /*!
   Start the query by creating a HGSSearchOperation for each search source.
@@ -118,20 +120,3 @@ GTM_EXTERN NSString *const kHGSQueryControllerWillStartNotification;
   the query reaching a time threshhold.  Object is the QueryController.
 */
 GTM_EXTERN NSString *const kHGSQueryControllerDidFinishNotification;
-
-/*!
-  Posted when an operation of a query completes. Object is the queryController.
-  UserInfo contains kHGSQueryControllerOperationsKey.
-*/
-GTM_EXTERN NSString *const kHGSQueryControllerDidFinishOperationNotification;
-
-/*!
-  The HGSSearchOperations that updated the results. Array of
-  HGSSearchOperation.
-*/
-GTM_EXTERN NSString *const kHGSQueryControllerOperationsKey;
-
-/*!
-  Identifier for the shortcuts source.
-*/
-GTM_EXTERN NSString *const kHGSShortcutsSourceIdentifier;

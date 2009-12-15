@@ -169,12 +169,8 @@
   // Our query is finished.
   [queryController_ startMixingCurrentResults:self];
 }
-- (void)mixerDidUpdateResults:(HGSMixer *)mixer {
-  // Currently we don't care.
-  // TODO(dmaclach): fix up the handler case
-}
 
-- (void)mixerDidStop:(HGSMixer *)mixer {
+- (void)mixerDidFinish:(HGSMixer *)mixer {
   NSArray *results = [mixer rankedResults];
   NSUInteger count = [results count];
   NSMutableArray *appleScriptResults = [NSMutableArray arrayWithCapacity:count];

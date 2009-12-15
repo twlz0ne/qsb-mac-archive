@@ -49,14 +49,6 @@ NSString *const kHGSQueryControllerWillStartNotification
   = @"HGSQueryControllerWillStartNotification";
 NSString *const kHGSQueryControllerDidFinishNotification 
   = @"HGSQueryControllerDidFinishNotification";
-NSString *const kHGSQueryControllerDidUpdateResultsNotification 
-  = @"HGSQueryControllerDidUpdateResultsNotification";
-NSString *const kHGSQueryControllerDidFinishOperationNotification
-  = @"kHGSQueryControllerDidFinishOperationNotification";
-NSString *const kHGSQueryControllerOperationsKey
-  = @"HGSQueryControllerOperationsKey";
-NSString *const kHGSShortcutsSourceIdentifier
-  = @"com.google.qsb.shortcuts.source";
 
 NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 
@@ -94,7 +86,6 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
     pendingQueryOperations_ = [[NSMutableArray alloc] init];
     queryOperationsWithResults_ = [[NSMutableSet alloc] init];
     parsedQuery_ = [query retain];
-    mixerQueue_ = [[NSOperationQueue alloc] init];
   }
   return self;
 }
@@ -110,7 +101,6 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   [queryOperationsWithResults_ release];
   [mixer_ cancel];
   [mixer_ release];
-  [mixerQueue_ release];
   [super dealloc];
 }
 
@@ -214,18 +204,18 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   }
   [mixer_ cancel];
   [mixer_ release];
-  NSRange currentRange = NSMakeRange(0, [self totalResultsCount]);
   mixer_ = [[HGSMixer alloc] initWithDelegate:delegate
-                                        range:currentRange
                              searchOperations:currentOps
-                                firstInterval:0.05
-                             progressInterval:1];
-  if (currentRange.length < 1000) {
-  // If we have less than 1000 results, we will mix right on the main thread.
-    [mixer_ start];
-  } else {
-    [mixerQueue_ addOperation:mixer_];
-  }
+                               mainThreadTime:0.05];
+  [mixer_ start];
+}
+
+- (NSArray *)rankedResults {
+  return [mixer_ rankedResults];
+}
+
+- (NSDictionary *)rankedResultsByCategory {
+  return [mixer_ rankedResultsByCategory];
 }
 
 - (NSUInteger)totalResultsCount {
@@ -254,7 +244,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   return ([pendingQueryOperations_ count] == 0) ? YES : NO;
 }
 
-- (BOOL)cancelled {
+- (BOOL)isCancelled {
   return cancelled_;
 }  
 
@@ -297,18 +287,12 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   [[HGSSourceRanker sharedSourceRanker] addTimeDataPoint:runTime
                                                forSource:source];
   
-  NSDictionary *userInfo 
-     = [NSDictionary dictionaryWithObject:[NSArray arrayWithObject:operation]
-                                   forKey:kHGSQueryControllerOperationsKey];
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc postNotificationName:kHGSQueryControllerDidFinishOperationNotification
-                    object:self
-                  userInfo:userInfo];
   // If this is the last query operation to complete then report as overall
   // query completion and cancel our timer.
   if ([self queriesFinished]) {
     [slowSourceTimer_ invalidate];
     slowSourceTimer_ = nil;
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:kHGSQueryControllerDidFinishNotification 
                       object:self];
   }
