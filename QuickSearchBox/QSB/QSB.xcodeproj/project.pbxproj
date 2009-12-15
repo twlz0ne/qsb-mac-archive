@@ -723,6 +723,7 @@
 		8B6128F90F4642C100E29B40 /* JSON.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
 		8B6129B30F46446D00E29B40 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
 		8B6129C30F46447A00E29B40 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
+		8B627CDF10D81BA900F166D1 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8B627CD610D81B9700F166D1 /* Sparkle.framework */; };
 		8B637A250F27706A00997738 /* GTMAppKit+UnitTesting.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B55DAE50E78829300D39CB0 /* GTMAppKit+UnitTesting.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B637A260F27706A00997738 /* GTMCalculatedRange.h in Headers */ = {isa = PBXBuildFile; fileRef = 332AD8AB0DC93EB60009A7E9 /* GTMCalculatedRange.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B637A270F27706A00997738 /* GTMDebugSelectorValidation.h in Headers */ = {isa = PBXBuildFile; fileRef = 64C385C10DBFDCF9005EBA69 /* GTMDebugSelectorValidation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1972,6 +1973,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				8B627CDF10D81BA900F166D1 /* Sparkle.framework in Copy Frameworks */,
 				620CB3870FAA84060029801C /* QSBPluginUI.framework in Copy Frameworks */,
 				8B6128F90F4642C100E29B40 /* JSON.framework in Copy Frameworks */,
 				8B6C0D060F32C86100E51E5D /* GData.framework in Copy Frameworks */,
@@ -2569,6 +2571,16 @@
 		8B6127CA0F46299900E29B40 /* SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJSON.m; sourceTree = "<group>"; };
 		8B6128290F46347B00E29B40 /* JSON.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = JSON.xcodeproj; sourceTree = "<group>"; };
 		8B6128A30F4641BF00E29B40 /* JSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B627CCA10D81B9700F166D1 /* Documentation.url */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Documentation.url; sourceTree = "<group>"; };
+		8B627CCD10D81B9700F166D1 /* rnotes.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = rnotes.css; sourceTree = "<group>"; };
+		8B627CCE10D81B9700F166D1 /* rnotes.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = rnotes.html; sourceTree = "<group>"; };
+		8B627CCF10D81B9700F166D1 /* Sample Appcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Sample Appcast.xml"; sourceTree = "<group>"; };
+		8B627CD110D81B9700F166D1 /* generate_keys.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = generate_keys.rb; sourceTree = "<group>"; };
+		8B627CD210D81B9700F166D1 /* sign_update.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = sign_update.rb; sourceTree = "<group>"; };
+		8B627CD310D81B9700F166D1 /* License.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = License.txt; sourceTree = "<group>"; };
+		8B627CD410D81B9700F166D1 /* ReadMe.Google.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.Google.txt; sourceTree = "<group>"; };
+		8B627CD510D81B9700F166D1 /* Release Notes.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = "Release Notes.rtf"; sourceTree = "<group>"; };
+		8B627CD610D81B9700F166D1 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		8B637B4C0F2777C300997738 /* GData.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = GData.xcodeproj; sourceTree = "<group>"; };
 		8B63DD9F0D9458E500395A2B /* QSBTest.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QSBTest.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B64A6B10FF419630000D893 /* CaminoBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaminoBookmarksSource.m; sourceTree = "<group>"; };
@@ -4945,6 +4957,47 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		8B627CC910D81B9700F166D1 /* Sparkle */ = {
+			isa = PBXGroup;
+			children = (
+				8B627CCA10D81B9700F166D1 /* Documentation.url */,
+				8B627CCB10D81B9700F166D1 /* Extras */,
+				8B627CD310D81B9700F166D1 /* License.txt */,
+				8B627CD410D81B9700F166D1 /* ReadMe.Google.txt */,
+				8B627CD510D81B9700F166D1 /* Release Notes.rtf */,
+				8B627CD610D81B9700F166D1 /* Sparkle.framework */,
+			);
+			path = Sparkle;
+			sourceTree = "<group>";
+		};
+		8B627CCB10D81B9700F166D1 /* Extras */ = {
+			isa = PBXGroup;
+			children = (
+				8B627CCC10D81B9700F166D1 /* Release Notes Template */,
+				8B627CCF10D81B9700F166D1 /* Sample Appcast.xml */,
+				8B627CD010D81B9700F166D1 /* Signing Tools */,
+			);
+			path = Extras;
+			sourceTree = "<group>";
+		};
+		8B627CCC10D81B9700F166D1 /* Release Notes Template */ = {
+			isa = PBXGroup;
+			children = (
+				8B627CCD10D81B9700F166D1 /* rnotes.css */,
+				8B627CCE10D81B9700F166D1 /* rnotes.html */,
+			);
+			path = "Release Notes Template";
+			sourceTree = "<group>";
+		};
+		8B627CD010D81B9700F166D1 /* Signing Tools */ = {
+			isa = PBXGroup;
+			children = (
+				8B627CD110D81B9700F166D1 /* generate_keys.rb */,
+				8B627CD210D81B9700F166D1 /* sign_update.rb */,
+			);
+			path = "Signing Tools";
+			sourceTree = "<group>";
+		};
 		8B637B4D0F2777C300997738 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -5720,6 +5773,7 @@
 		8BA62B350F13B128008182B5 /* externals */ = {
 			isa = PBXGroup;
 			children = (
+				8B627CC910D81B9700F166D1 /* Sparkle */,
 				8BAB307610BC4C5E002E1AC9 /* LetsMove */,
 				8B6127B00F46299900E29B40 /* json-framework */,
 				8B488EAA0F16842500786C1E /* UndocumentedGoodness */,
