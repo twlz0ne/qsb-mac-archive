@@ -69,11 +69,13 @@ static CGFloat const gHGSMinimumSignificantScore = 0.1;
 // Keys to search term detail dictionary items.
 NSString *const kHGSScoreTermWordKey = @"searchTerm";
 NSString *const kHGSScoreTermBestScoreKey = @"bestScore";
+NSString *const kHGSScoreTermNormScoreKey = @"normScore";
 NSString *const kHGSScoreTermMatchCountKey = @"matchCount";
 NSString *const kHGSScoreTermMatchDetailKey = @"matchDetail";
 
 // Keys to match detail dictionary items.
 NSString *const kHGSScoreMatchScoreKey = @"score";
+NSString *const kHGSScoreMatchNormScoreKey = @"norm";
 NSString *const kHGSScoreMatchSDSKey = @"sds";
 NSString *const kHGSScoreMatchABSKey = @"abs";
 NSString *const kHGSScoreMatchBMLKey = @"bml";
@@ -226,6 +228,7 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
       : nil;
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   BOOL abbreviation = YES;
+  CGFloat abbreviationScore = 0.0;
   for (CFIndex ci = 0; ci < termLength; ++ci) {
     CGFloat charScore = gHGSCharacterMatchFactor;
     NSUInteger firstCharacterValue = charStat[ci].firstCharacterValue_;
@@ -309,7 +312,7 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
   NSUInteger itemLength = [itemString length];
   CGFloat itemPortionScore
     = gHGSItemPortionFactor + ((1.0 - gHGSItemPortionFactor)
-                             * ((CGFloat)termLength / (CGFloat)itemLength));
+                               * ((CGFloat)termLength / (CGFloat)itemLength));
   termScore *= itemPortionScore;
 
   // Calculate the start distance score.
@@ -334,8 +337,11 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
     // If there is an abbreviation match, see if that scores higher.
     if (abbreviation) {
       NSUInteger wordCount = [wordRanges count];
-      CGFloat abbreviationScore = (CGFloat)termLength / (CGFloat)wordCount
-        * HGSCalibratedScore(kHGSCalibratedStrongScore);
+      abbreviationScore
+        = ((((CGFloat)termLength / (CGFloat)wordCount)
+            * ((CGFloat)termLength / (CGFloat)itemLength))
+           * HGSCalibratedScore(kHGSCalibratedModerateScore)
+           * gHGSItemPortionFactor);
       termScore = MAX(termScore, abbreviationScore);
     }
   }
@@ -348,11 +354,17 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
       matchDetailsArray = [NSMutableArray array];
       *pMatchDetailsArray = matchDetailsArray;
     }
+    CGFloat strongScore = HGSCalibratedScore(kHGSCalibratedStrongScore);
+    CGFloat weakScore = HGSCalibratedScore(kHGSCalibratedInsignificantScore);
+    CGFloat normScore = MAX(0.0, MIN(1.0,
+                                     ((termScore - weakScore)
+                                      / (strongScore - weakScore))));
     NSMutableDictionary *matchDict
       = [NSMutableDictionary dictionaryWithObjectsAndKeys:
          [NSNumber numberWithFloat:termScore], kHGSScoreMatchScoreKey,
+         [NSNumber numberWithFloat:normScore], kHGSScoreMatchNormScoreKey,
          [NSNumber numberWithFloat:startDistanceScore], kHGSScoreMatchSDSKey,
-         [NSNumber numberWithFloat:abbrevationScore], kHGSScoreMatchABSKey,
+         [NSNumber numberWithFloat:abbreviationScore], kHGSScoreMatchABSKey,
          [NSNumber numberWithUnsignedInt:bestTermMatchLength],
          kHGSScoreMatchBMLKey,
          [NSNumber numberWithUnsignedInt:bestMatchedWordLength],
@@ -575,8 +587,8 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
   // having the search source pre-calculate the word ranges.
 #if DEBUG
   // Verify that the term and item we are receiving are normalized, i.e.
-  // do not contain any caps, punctuation, etc.  Numbers are allowed to
-  // contain commas and periods.
+  // do not contain any caps, punctuation, spaces, etc.  Numbers are allowed
+  // to contain commas and periods.
   if (!HGSValidateTokenizedString(termString)) {
     HGSLog(@"Term string not properly tokenized: '%@'", termString);
   }
@@ -692,7 +704,7 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
                 if (termCharIndex > 0
                     && itemCharIndex > 0
                     && itemCharIndex
-                        == (charStat[termCharIndex - 1].charMatchIndex_ + 1)) {
+                       == (charStat[termCharIndex - 1].charMatchIndex_ + 1)) {
                   adjacencyValue
                     = charStat[termCharIndex - 1].adjacencyValue_ + 1;
                   charStat[termCharIndex].adjacencyValue_ = adjacencyValue;
@@ -734,10 +746,17 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
         NSNumber *termMatchCount
           = [NSNumber numberWithUnsignedInt:[matchDetailsArray count]];
         NSNumber *bestScoreNumber = [NSNumber numberWithFloat:bestScore];
+        CGFloat strongScore = HGSCalibratedScore(kHGSCalibratedStrongScore);
+        CGFloat weakScore = HGSCalibratedScore(kHGSCalibratedInsignificantScore);
+        CGFloat normScore = MAX(0.0, MIN(1.0,
+                                         ((bestScore - weakScore)
+                                          / (strongScore - weakScore))));
+        NSNumber *normScoreNumber = [NSNumber numberWithFloat:normScore];
         NSDictionary *searchTermDetails
           = [NSDictionary dictionaryWithObjectsAndKeys:
              termString, kHGSScoreTermWordKey,
              bestScoreNumber, kHGSScoreTermBestScoreKey,
+             normScoreNumber, kHGSScoreTermNormScoreKey,
              termMatchCount, kHGSScoreTermMatchCountKey,
              matchDetailsArray, kHGSScoreTermMatchDetailKey,
              nil];

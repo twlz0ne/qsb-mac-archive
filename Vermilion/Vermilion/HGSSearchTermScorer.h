@@ -72,47 +72,46 @@ extern "C" {
 
 /*!
  Sets how each component comprising the matching algorithm influences
- the overall score acheived by a match.
+ the overall score acheived by a match. Refer to the .m for the default
+ values for each factor.
  @param characterMatchFactor This is the basic value a character gets
-        in a search term for matching a character in the search item.  Default
-        value: 1.0.
+        in a search term for matching a character in the search item.
  @param firstCharacterInWordFactor This is how much value a character in the
         search term gets if it happens to match the first character in a
-        word of the search item.  Default value: 3.0.
+        word of the search item.
  @param adjacencyFactor This is the factor applied to a character's adjacency
         value.  The value is calculated by summing the adjacency values (not
         factors) for all preceeding adjacent characters.  The character's
         score is then calculated by multiplying its adjacency value by this
-        factor.  Default value: 3.8.
+        factor.
  @param startDistanceFactor This is the minimum percentage allowed when
         calculating the start distance score, which is multiplied to the
         accumulated term score.  100% is awarded for terms which begin
         at the first character of the search item.  It goes down from
-        there.  Default value: 0.8.
+        there.
  @param wordPortionFactor The multiplier applied to the word portion value to
         get the word portion score, which is accumulated into the overall term
         score.  The word portion value is calculated based on the longest
-        word portion matched within the search item.  Default value: 5.0.
+        word portion matched within the search item.
  @param itemPortionFactor This is the minimum percentage allowed when
         calculating the item portion score, which is multiplied to the
         accumulated term score.  100% is awarded for terms which are the
         same length as the search item.  It goes down from there.
-        Default value: 0.8.
  @param matchSpreadFactor The multiplier applied to the final score based on
         the 'spread' of the matching characters within the item being tested
         (i.e. distance from first matching character to the last matching
         character) in relation to the length of the term.
  @param maximumCharacterDistance The maximum distance between occurrences of
         search term characters within the search item before the search term
-        iteration is abandoned.  Default value: 22.
+        iteration is abandoned.
  @param maximumItemCharactersScanned The maximum number of characters of the
         search item which will be scanned.  All characters in the search
         item beyond this limit are ignored.  Note that there is an absolute
-        maximum at 250.  Default value: 250.
+        maximum at 250 regardless of the default.
  @param enableBestWordScoring When NO, this turns off the best word match
         portion of the scoring algorithm.  The effect is to prevent the
         calculation of the word boundaries within the search item and,
-        potentially, improve performance.  Default value: YES.
+        potentially, improve performance.
  @param otherTermMultiplier The weight of the score of an otherItem when
         considering if the other item has scored enough to be significant.
         The score of the other item will be multiplied by this amount and
