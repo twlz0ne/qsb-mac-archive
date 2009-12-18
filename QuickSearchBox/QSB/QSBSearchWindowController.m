@@ -69,8 +69,16 @@ static const NSTimeInterval kQSBReshowResultsDelay = 4.0;
 static const CGFloat kTextFieldPadding = 2.0;
 static const CGFloat kResultsAnimationDistance = 12.0;
 
+// Should we fade the background. User default. Bool value.
 static NSString * const kQSBSearchWindowDimBackground
   = @"QSBSearchWindowDimBackground";
+// How long should the fade animation be. User default. Float value.
+static NSString * const kQSBSearchWindowDimBackgroundDuration
+  = @"QSBSearchWindowDimBackgroundDuration";
+// How dark should the fade be. User default. Float value.
+static NSString * const kQSBSearchWindowDimBackgroundAlpha
+  = @"QSBSearchWindowDimBackgroundAlpha";
+
 static NSString * const kQSBHideQSBWhenInactivePrefKey = @"hideQSBWhenInactive";
 static NSString * const kQSBSearchWindowFrameTopPrefKey
   = @"QSBSearchWindow Top QSBSearchResultsWindow";
@@ -1021,18 +1029,29 @@ doCommandBySelector:(SEL)commandSelector {
                       object:searchWindow
                     userInfo:visibilityChangedUserInfo];
     
-    if ([[NSUserDefaults standardUserDefaults]
-         boolForKey:kQSBSearchWindowDimBackground]) {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    if ([ud boolForKey:kQSBSearchWindowDimBackground]) {
       NSWindow *shieldWindow = [self shieldWindow];
       [shieldWindow setFrame:[[NSScreen mainScreen] frame] display:NO];
       if (![shieldWindow isVisible]) {
         [shieldWindow setAlphaValue:0.0];
         [shieldWindow makeKeyAndOrderFront:nil];
       } 
-      
+      CGFloat fadeDuration 
+        = [ud floatForKey:kQSBSearchWindowDimBackgroundDuration];
+      CGFloat fadeAlpha = [ud floatForKey:kQSBSearchWindowDimBackgroundAlpha];
+      // If fadeDuration (or fadeAlpha) < FLT_EPSILON then the user is using
+      // a bogus value, so we ignore it and use the default value.
+      if (fadeDuration < FLT_EPSILON) {
+        fadeDuration = 0.5;
+      }
+      if (fadeAlpha < FLT_EPSILON) {
+        fadeAlpha = 0.1;
+      }
+      fadeAlpha = MIN(fadeAlpha, 1.0);
       [NSAnimationContext beginGrouping];
-      [[NSAnimationContext currentContext] setDuration:0.5];
-      [[shieldWindow animator] setAlphaValue:0.1];
+      [[NSAnimationContext currentContext] setDuration:fadeDuration];
+      [[shieldWindow animator] setAlphaValue:fadeAlpha];
       [NSAnimationContext endGrouping];
     }
     [searchWindow setIgnoresMouseEvents:NO];
@@ -1069,10 +1088,17 @@ doCommandBySelector:(SEL)commandSelector {
                                            selector:@selector(displayResults:)
                                              object:nil];
   
-  if ([[NSUserDefaults standardUserDefaults]
-      boolForKey:kQSBSearchWindowDimBackground]) {
+  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+  if ([ud boolForKey:kQSBSearchWindowDimBackground]) {
+    CGFloat fadeDuration 
+      = [ud floatForKey:kQSBSearchWindowDimBackgroundDuration];
+    if (fadeDuration < FLT_EPSILON) {
+      // If fadeDuration < FLT_EPSILON then the user has set the duration
+      // to a bogus value, so we ignore it and use the default value.
+      fadeDuration = 0.5;
+    }
     [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:0.5];
+    [[NSAnimationContext currentContext] setDuration:fadeDuration];
     [[[self shieldWindow] animator] setAlphaValue:0.0];
     [NSAnimationContext endGrouping];
   }
