@@ -119,7 +119,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
               if (normalizedLength == 0) {
                 rank = HGSCalibratedScore(kHGSCalibratedPerfectScore);
               } else {
-                rank = HGSScoreTermForItem(normalizedQueryString, file, NULL);
+                rank = HGSScoreTermForString(normalizedQueryString, file);
               }
               if (rank > 0) {
                 NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
@@ -139,9 +139,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       }
     }
   } else {
-    CGFloat rank = HGSScoreTermForItem(normalizedQueryString,
-                                       trashNameNormalized_,
-                                       NULL);
+    CGFloat rank 
+      = HGSScoreTermForString(normalizedQueryString, trashNameNormalized_);
     NSDictionary *attributes
       = [NSDictionary dictionaryWithObjectsAndKeys:
          trashIcon_, kHGSObjectAttributeIconKey,

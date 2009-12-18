@@ -31,6 +31,7 @@
 //
 
 #import "HGSSearchTermScorer.h"
+#import "HGSBundle.h"
 #import "HGSLog.h"
 
 // Use 'define' because compiler complains about stack protection.
@@ -64,7 +65,7 @@ static CGFloat gHGSOtherItemMultiplier = 0.5;
 // Any score less than this is considered as a zero score.
 static CGFloat const gHGSMinimumSignificantScore = 0.1;
 
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
 
 // Keys to search term detail dictionary items.
 NSString *const kHGSScoreTermWordKey = @"searchTerm";
@@ -107,18 +108,17 @@ typedef struct {
 // Utility function to clear a charStat.
 static void HGSResetCharStat(HGSTermCharStat *pCharStat);
 
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
 
 // Utility function to grab the best scoring detail from term details.
 static NSMutableDictionary *HGSBestDetailsFromCandidateDetails(NSDictionary *
                                                                candidateDetails);
 
-#else
+#else  // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
 
 // Main scoring function called by non-detailed functions.
 static CGFloat HGSScoreTermAndDetailsForItem(NSString *term,
-                                             NSString *item,
-                                             NSArray **pWordRanges,
+                                             HGSScoreString *item,
                                              NSDictionary **pSearchTermDetails);
 
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
@@ -133,6 +133,15 @@ static CGFloat HGSScoreTermAndDetailsForItem(NSString *term,
 
 @end
 
+@interface HGSScoreString ()
+
+@property (copy, readwrite) NSString *string;
+@property (retain) NSArray *wordRanges;
+
+- (NSArray *)buildWordRangesForString:(NSString *)wordString;
+- (NSUInteger)length;
+
+@end
 
 void HGSSetSearchTermScoringFactors(CGFloat characterMatchFactor,
                                     CGFloat firstCharacterInWordFactor,
@@ -165,18 +174,21 @@ CGFloat HGSCalibratedScore(HGSCalibratedScoreType scoreType) {
     static BOOL scoresCalibrated = NO;
     static CGFloat calibratedScores[kHGSCalibratedLastScore];
     if (!scoresCalibrated) {
-      NSBundle *bundle = [NSBundle bundleForClass:[HGSItemWordRange class]];
+      NSBundle *bundle = HGSGetPluginBundle();
+      HGSAssert(bundle, nil);
       NSString *plistPath = [bundle pathForResource:@"ScoreCalibration"
                                              ofType:@"plist"];
+      HGSAssert(plistPath, nil);
       NSArray *calibrations = [NSArray arrayWithContentsOfFile:plistPath];
       HGSAssert(calibrations, nil);
       NSUInteger i = 0;
       for (NSDictionary *calibration in calibrations) {
         NSString *term = [calibration objectForKey:@"term"];
         HGSAssert(term, nil);
-        NSString *item = [calibration objectForKey:@"item"];
-        HGSAssert(item, nil);
-        calibratedScores[i] = HGSScoreTermForItem(term, item, NULL);;
+        NSString *itemString = [calibration objectForKey:@"item"];
+        HGSAssert(itemString, nil);
+        HGSScoreString *item = [HGSScoreString scoreStringWithString:itemString];
+        calibratedScores[i] = HGSScoreTermForItem(term, item);
         ++i;
       }
       scoresCalibrated = YES;
@@ -188,40 +200,15 @@ CGFloat HGSCalibratedScore(HGSCalibratedScoreType scoreType) {
 
 #pragma mark Internal Scoring Functions
 
-NSArray *BuildWordRanges(NSString *wordString) {
-  NSArray *revWordRanges = nil;
-  NSArray *wordList = [wordString componentsSeparatedByString:@" "];
-  require([wordList count], BuildWordRangesFailed);
-  NSUInteger wordCount = [wordList count];
-  NSMutableArray *forWordRanges = [NSMutableArray arrayWithCapacity:wordCount];
-  NSUInteger wordStart = 0;
-  for (NSString *word in wordList) {
-    NSUInteger wordLength = [word length];
-    if (wordLength) {
-      HGSItemWordRange *wordRange
-        = [HGSItemWordRange wordRangeWithStart:wordStart
-                                        length:wordLength];
-      [forWordRanges addObject:wordRange];
-    }
-    wordStart += (wordLength + 1);
-  }
-  // Reverse the results
-  NSEnumerator *revRangeEnum = [forWordRanges reverseObjectEnumerator];
-  revWordRanges = [revRangeEnum allObjects];
-BuildWordRangesFailed:
-  return revWordRanges;
-}
-
-CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
-                  HGSTermCharStat *charStat,
-                  NSArray *wordRanges, NSArray **pWordRanges
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+CGFloat ScoreTerm(CFIndex termLength, HGSScoreString *itemString,
+                  HGSTermCharStat *charStat
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
                   , NSMutableArray **pMatchDetailsArray
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
                   ) {
   CGFloat termScore = 0.0;
   // Calculate the individual charScores and accumulate term scores.
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   NSMutableArray *charDetailsArray
     = (pMatchDetailsArray)
       ? [NSMutableArray arrayWithCapacity:termLength]
@@ -242,7 +229,7 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
       = (CGFloat)(charStat[ci].adjacencyValue_) * gHGSAdjacencyFactor;
     charScore += adjacencyScore;
     termScore += charScore;
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
     // Collect statistics.
     if (pMatchDetailsArray) {
       NSMutableDictionary *charDict
@@ -263,7 +250,7 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
   }
 
   // Determine the best complete word match length score.
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   NSUInteger bestTermMatchLength = 0;  // Best word match length
   NSUInteger bestMatchedWordLength = 0;  // Best word length
   CGFloat bestMatchLengthValue = 0.0;  // Best word match length value
@@ -274,12 +261,7 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
   while (charStatCount > 0 && gHGSEnableBestWordScoring) {
     CFIndex charStatItem = charStatCount - 1;
     NSUInteger adjacencyValue = charStat[charStatItem].adjacencyValue_;
-    if (!wordRanges) {
-      wordRanges = BuildWordRanges(itemString);
-      if (pWordRanges) {
-        *pWordRanges = wordRanges;
-      }
-    }
+    NSArray *wordRanges = [itemString wordRanges];
     for (HGSItemWordRange *wordRange in wordRanges) {
       if (charStat[charStatItem].charMatchIndex_
           >= [wordRange wordStart]) {
@@ -288,7 +270,7 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
           = (CGFloat)(adjacencyValue + 1) / (CGFloat)wordLength;
         CGFloat matchScore = gHGSWordPortionFactor * matchValue;
         if (matchScore > bestMatchLengthScore) {
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
           bestTermMatchLength = adjacencyValue + 1;
           bestMatchedWordLength = [wordRange wordLength];
           bestMatchLengthValue = matchValue;
@@ -336,7 +318,8 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
     
     // If there is an abbreviation match, see if that scores higher.
     if (abbreviation) {
-      NSUInteger wordCount = [wordRanges count];
+
+      NSUInteger wordCount = [[itemString wordRanges] count];
       abbreviationScore
         = ((((CGFloat)termLength / (CGFloat)wordCount)
             * ((CGFloat)termLength / (CGFloat)itemLength))
@@ -346,7 +329,7 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
     }
   }
   
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   if (pMatchDetailsArray) {
     // Collect statistics.
     NSMutableArray *matchDetailsArray = *pMatchDetailsArray;
@@ -385,32 +368,29 @@ CGFloat ScoreTerm(CFIndex termLength, NSString *itemString,
 #pragma mark Public Scoring Functions
 
 CGFloat HGSScoreTermForItem(NSString *term,
-                            NSString *item,
-                            NSArray **pWordRanges) {
-  return HGSScoreTermAndDetailsForItem(term, item, pWordRanges, NULL);
+                            HGSScoreString *item) {
+  return HGSScoreTermAndDetailsForItem(term, item, NULL);
+}
+
+CGFloat HGSScoreTermForString(NSString *term, NSString *string) {
+  HGSScoreString *scoreString = [HGSScoreString scoreStringWithString:string];
+  return HGSScoreTermForItem(term, scoreString);
 }
 
 CGFloat HGSScoreTermsForMainAndOtherItems(NSArray *searchTerms,
-                                          NSString *mainItem,
-                                          NSArray *otherItems,
-                                          NSArray **pWordRanges) {
+                                          HGSScoreString *mainString,
+                                          NSArray *otherStrings) {
   // If the caller has not provided a wordRanges then we create and return
   // a new one.
-  NSArray **pTempWordRanges = pWordRanges;
-  NSArray *tempWordRanges = nil;
-  if (!pWordRanges) {
-    pTempWordRanges = &tempWordRanges;
-  }
   CGFloat score = 0.0;
   for (NSString *searchTerm in searchTerms) {
     CGFloat itemScore
-      = HGSScoreTermForItem(searchTerm, mainItem, pTempWordRanges);
+      = HGSScoreTermForItem(searchTerm, mainString);
     // Check |otherItems| only for better matches than the main
     // search item.
-    for (NSString *otherItem in otherItems) {
+    for (HGSScoreString *otherString in otherStrings) {
       itemScore = MAX(itemScore,
-                      HGSScoreTermForItem(searchTerm, otherItem,
-                                          pTempWordRanges)
+                      HGSScoreTermForItem(searchTerm, otherString)
                       * gHGSOtherItemMultiplier);
     }
     if (itemScore < gHGSMinimumSignificantScore) {
@@ -424,20 +404,12 @@ CGFloat HGSScoreTermsForMainAndOtherItems(NSArray *searchTerms,
   return score;
 }
 
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
 
 CGFloat HGSScoreTermsForMainAndOtherItemsWithDetails(NSArray *searchTerms,
-                                                     NSString *mainItem,
+                                                     HGSScoreString *mainItem,
                                                      NSArray *otherItems,
-                                                     NSArray **pWordRanges,
                                                      NSArray **pScoringDetails) {
-  // If the caller has not provided a wordRanges then we create and return
-  // a new one.
-  NSArray **pTempWordRanges = pWordRanges;
-  NSArray *tempWordRanges = nil;
-  if (!pWordRanges) {
-    pTempWordRanges = &tempWordRanges;
-  }
   CGFloat score = 0.0;
   NSMutableArray *scoringDetails
     = [NSMutableArray arrayWithCapacity:[otherItems count] + 1];
@@ -446,18 +418,18 @@ CGFloat HGSScoreTermsForMainAndOtherItemsWithDetails(NSArray *searchTerms,
     NSDictionary *candidateDetails = nil;
     NSUInteger bestItemIndex = 0;
     CGFloat itemScore
-      = HGSScoreTermAndDetailsForItem(searchTerm, mainItem, pTempWordRanges,
-                                      &candidateDetails);
+      = HGSScoreTermAndDetailsForItem(searchTerm, mainItem, &candidateDetails);
     NSMutableDictionary *scoringDetail
       = HGSBestDetailsFromCandidateDetails(candidateDetails);
     // Check |otherItems| only for better matches than the main
     // search item.
     NSUInteger otherItemIndex = 0;
-    for (NSString *otherItem in otherItems) {
+    for (HGSScoreString *otherItem in otherItems) {
       ++otherItemIndex;
       CGFloat otherScore
-        = HGSScoreTermAndDetailsForItem(searchTerm, otherItem, pTempWordRanges,
-                                         &candidateDetails)
+        = HGSScoreTermAndDetailsForItem(searchTerm, 
+                                        otherItem, 
+                                        &candidateDetails)
           * gHGSOtherItemMultiplier;
       if (otherScore > itemScore) {
         itemScore = otherScore;
@@ -488,26 +460,17 @@ CGFloat HGSScoreTermsForMainAndOtherItemsWithDetails(NSArray *searchTerms,
 }
 
 NSArray *HGSScoreTermsAndDetailsForItem(NSArray *searchTerms,
-                                        NSString *item,
-                                        NSArray **pWordRanges,
+                                        HGSScoreString *item,
                                         NSArray **pSearchTermsDetails) {
   NSUInteger searchTermCount = [searchTerms count];
   NSMutableArray *searchTermScores
     = [NSMutableArray arrayWithCapacity:searchTermCount];
-  // If the caller has not provided a wordRanges then we create and return
-  // a new one.
-  NSArray **pTempWordRanges = pWordRanges;
-  NSArray *tempWordRanges = nil;
-  if (!pWordRanges) {
-    pTempWordRanges = &tempWordRanges;
-  }
   NSMutableArray *searchTermsDetails = nil;
   NSDictionary *matchDetails = nil;
   NSDictionary **pMatchDetails = (pSearchTermsDetails) ? &matchDetails : NULL;
   for (NSString *searchTerm in searchTerms) {
     CGFloat searchTermScore = HGSScoreTermAndDetailsForItem(searchTerm,
                                                             item,
-                                                            pTempWordRanges,
                                                             pMatchDetails);
     NSNumber *bestScoreNumber = [NSNumber numberWithFloat:searchTermScore];
     [searchTermScores addObject:bestScoreNumber];
@@ -580,20 +543,14 @@ BOOL HGSValidateTokenizedString(NSString *tokenizedString) {
 }
 
 CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
-                                      NSString *itemString,
-                                      NSArray **pWordRanges,
+                                      HGSScoreString *itemString,
                                       NSDictionary **pSearchTermDetails) {
-  // TODO(mrossetti): Instead of calculating the wordRanges herein, consider
-  // having the search source pre-calculate the word ranges.
 #if DEBUG
-  // Verify that the term and item we are receiving are normalized, i.e.
-  // do not contain any caps, punctuation, spaces, etc.  Numbers are allowed
+  // Verify that the term we are receiving is normalized, i.e.
+  // do not contain any caps, punctuation, etc.  Numbers are allowed
   // to contain commas and periods.
   if (!HGSValidateTokenizedString(termString)) {
     HGSLog(@"Term string not properly tokenized: '%@'", termString);
-  }
-  if (!HGSValidateTokenizedString(itemString)) {
-    HGSLog(@"Item string not properly tokenized: '%@'", itemString);
   }
   // TODO(mrossetti): This occurs frequently and the sources should be changed
   // so throttle it back for now otherwise it pollutes the console.
@@ -603,7 +560,7 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
     HGSLog(@"Term string is not single word: '%@'", termString);
   }
 #endif // DEBUG
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   NSMutableArray *matchDetailsArray = nil;
   if (pSearchTermDetails) {
     *pSearchTermDetails = nil;
@@ -611,7 +568,7 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
   CGFloat bestScore = 0.0;
   CFStringRef termRef = (CFStringRef)termString;
-  CFStringRef itemRef = (CFStringRef)itemString;
+  CFStringRef itemRef = (CFStringRef)[itemString string];
   CFIndex termLength = CFStringGetLength(termRef);
   CFIndex itemLength = CFStringGetLength(itemRef);
   if (termLength > 0 && termLength < kHGSMaximumItemCharactersScanned) {
@@ -636,7 +593,6 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
       CGFloat termScore = 0.0;  // Score of term match.
       HGSTermCharStat charStats[kHGSMaximumItemCharactersScanned];
       HGSTermCharStat *charStat = charStats;
-      NSArray *wordRanges = (pWordRanges) ? *pWordRanges : nil;
       CFIndex termCharIndex = 0;  // Current term character being processed.
       BOOL done = NO;
       do {
@@ -647,13 +603,12 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
                           : 0;
         } else {
           // Done with a match.  Calculate the term's total score.
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
           NSMutableArray **pMatchDetailsArray
             = (pSearchTermDetails) ? &matchDetailsArray : nil;
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
-          termScore = ScoreTerm(termLength, itemString, charStat, wordRanges,
-                                pWordRanges
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+          termScore = ScoreTerm(termLength, itemString, charStat
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
                                 , pMatchDetailsArray
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
                                 );
@@ -740,7 +695,7 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
         } while (!charDone && !done);
       } while (!done);
 
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
       // Encapsulate the matchDetails in a dictionary.
       if (pSearchTermDetails) {
         NSNumber *termMatchCount
@@ -763,7 +718,7 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *termString,
         *pSearchTermDetails = searchTermDetails;
       }
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
-    } else if ([termString isEqualToString:itemString]) {
+    } else if ([termString isEqualToString:[itemString string]]) {
       bestScore = gHGSPerfectMatchScore;
     }
   }
@@ -775,7 +730,7 @@ void HGSResetCharStat(HGSTermCharStat *pCharStat) {
   pCharStat->adjacencyValue_ = 0;
 }
 
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
 
 NSMutableDictionary *HGSBestDetailsFromCandidateDetails(NSDictionary *
                                                         candidateDetails) {
@@ -857,4 +812,69 @@ NSMutableDictionary *HGSBestDetailsFromCandidateDetails(NSDictionary *
 // COV_NF_END
 
 @end
+
+@implementation HGSScoreString
+@synthesize string = string_;
+@synthesize wordRanges = wordRanges_;
+
++ (id)scoreStringWithString:(NSString *)string {
+  return [[[[self class] alloc] initWithString:string] autorelease];
+}
+
++ (id)scoreStringArrayWithStringArray:(NSArray *)strings {
+  NSMutableArray *array = [NSMutableArray arrayWithCapacity:[strings count]];
+  for (NSString *string in strings) {
+    [array addObject:[HGSScoreString scoreStringWithString:string]];
+  }
+  return array;
+}
+
+- (id)initWithString:(NSString *)string {
+  if ((self = [super init])) {
+    string_ = [string copy];
+    wordRanges_ = [[self buildWordRangesForString:string_] retain];
+#if DEBUG
+    if (!HGSValidateTokenizedString(string_)) {
+      HGSLog(@"Item string not properly tokenized: '%@'", string_);
+    }
+#endif
+  }
+  return self;
+}
+
+- (void)dealloc {
+  [string_ release];
+  [wordRanges_ release];
+  [super dealloc];
+}
+
+- (NSArray *)buildWordRangesForString:(NSString *)wordString {
+  NSArray *revWordRanges = nil;
+  NSArray *wordList = [wordString componentsSeparatedByString:@" "];
+  require([wordList count], BuildWordRangesFailed);
+  NSUInteger wordCount = [wordList count];
+  NSMutableArray *forWordRanges = [NSMutableArray arrayWithCapacity:wordCount];
+  NSUInteger wordStart = 0;
+  for (NSString *word in wordList) {
+    NSUInteger wordLength = [word length];
+    if (wordLength) {
+      HGSItemWordRange *wordRange
+        = [HGSItemWordRange wordRangeWithStart:wordStart
+                                        length:wordLength];
+      [forWordRanges addObject:wordRange];
+    }
+    wordStart += (wordLength + 1);
+  }
+  // Reverse the results
+  NSEnumerator *revRangeEnum = [forWordRanges reverseObjectEnumerator];
+  revWordRanges = [revRangeEnum allObjects];
+BuildWordRangesFailed:
+  return revWordRanges;
+}
+
+- (NSUInteger)length {
+  return [string_ length];
+}
+@end
+
 

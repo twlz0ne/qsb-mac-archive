@@ -687,6 +687,9 @@
 		8B4894610F16EB9900786C1E /* QSBStatusMenuIconGrayInverted.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B48945F0F16EB9900786C1E /* QSBStatusMenuIconGrayInverted.png */; };
 		8B4894620F16EB9900786C1E /* QSBStatusMenuIconGray.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B4894600F16EB9900786C1E /* QSBStatusMenuIconGray.png */; };
 		8B4895700F16F19F00786C1E /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 8B48956F0F16F19F00786C1E /* Credits.rtf */; };
+		8B53E13010D95393007E6AF2 /* HGSSearchSourceRanker.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B53E12D10D95393007E6AF2 /* HGSSearchSourceRanker.m */; };
+		8B53E13110D95393007E6AF2 /* HGSSearchSourceRanker.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B53E12E10D95393007E6AF2 /* HGSSearchSourceRanker.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B53E17D10D95790007E6AF2 /* HGSSearchSourceRankerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B53E12F10D95393007E6AF2 /* HGSSearchSourceRankerTest.m */; };
 		8B55446410586CA600D23AD2 /* SampleWeb.webhistory in Resources */ = {isa = PBXBuildFile; fileRef = 8B55446310586CA600D23AD2 /* SampleWeb.webhistory */; };
 		8B5544FC105874C400D23AD2 /* SampleContact.abcdp in Resources */ = {isa = PBXBuildFile; fileRef = 8B5544FB105874C400D23AD2 /* SampleContact.abcdp */; };
 		8B554500105875CB00D23AD2 /* SamplePDF.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 8B5544FF105875CB00D23AD2 /* SamplePDF.pdf */; };
@@ -724,6 +727,7 @@
 		8B6129B30F46446D00E29B40 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
 		8B6129C30F46447A00E29B40 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
 		8B627CDF10D81BA900F166D1 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8B627CD610D81B9700F166D1 /* Sparkle.framework */; };
+		8B62810010D8663E00F166D1 /* HGSSearchSourceRankerCalibration.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B6280FF10D8663E00F166D1 /* HGSSearchSourceRankerCalibration.plist */; };
 		8B637A250F27706A00997738 /* GTMAppKit+UnitTesting.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B55DAE50E78829300D39CB0 /* GTMAppKit+UnitTesting.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B637A260F27706A00997738 /* GTMCalculatedRange.h in Headers */ = {isa = PBXBuildFile; fileRef = 332AD8AB0DC93EB60009A7E9 /* GTMCalculatedRange.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B637A270F27706A00997738 /* GTMDebugSelectorValidation.h in Headers */ = {isa = PBXBuildFile; fileRef = 64C385C10DBFDCF9005EBA69 /* GTMDebugSelectorValidation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2518,6 +2522,9 @@
 		8B48956F0F16F19F00786C1E /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		8B4A7048104F113B0058ABDD /* RunUnitTests.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = RunUnitTests.sh; sourceTree = "<group>"; };
 		8B4D76AA0E3FE97400EFEDD8 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		8B53E12D10D95393007E6AF2 /* HGSSearchSourceRanker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSearchSourceRanker.m; sourceTree = "<group>"; };
+		8B53E12E10D95393007E6AF2 /* HGSSearchSourceRanker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSearchSourceRanker.h; sourceTree = "<group>"; };
+		8B53E12F10D95393007E6AF2 /* HGSSearchSourceRankerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSearchSourceRankerTest.m; sourceTree = "<group>"; };
 		8B55446310586CA600D23AD2 /* SampleWeb.webhistory */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = SampleWeb.webhistory; sourceTree = "<group>"; };
 		8B5544FB105874C400D23AD2 /* SampleContact.abcdp */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = SampleContact.abcdp; sourceTree = "<group>"; };
 		8B5544FF105875CB00D23AD2 /* SamplePDF.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = SamplePDF.pdf; sourceTree = "<group>"; };
@@ -2581,6 +2588,7 @@
 		8B627CD410D81B9700F166D1 /* ReadMe.Google.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.Google.txt; sourceTree = "<group>"; };
 		8B627CD510D81B9700F166D1 /* Release Notes.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = "Release Notes.rtf"; sourceTree = "<group>"; };
 		8B627CD610D81B9700F166D1 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		8B6280FF10D8663E00F166D1 /* HGSSearchSourceRankerCalibration.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = HGSSearchSourceRankerCalibration.plist; sourceTree = "<group>"; };
 		8B637B4C0F2777C300997738 /* GData.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = GData.xcodeproj; sourceTree = "<group>"; };
 		8B63DD9F0D9458E500395A2B /* QSBTest.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QSBTest.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B64A6B10FF419630000D893 /* CaminoBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaminoBookmarksSource.m; sourceTree = "<group>"; };
@@ -5366,6 +5374,7 @@
 		8B6EB647101A0D18006CFF7A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8B6280FF10D8663E00F166D1 /* HGSSearchSourceRankerCalibration.plist */,
 				8B6EB648101A0D18006CFF7A /* Localizable.strings */,
 				8B6EB64C101A0D18006CFF7A /* TypeCategories.plist */,
 				62D570C61059E704002D086B /* ScoreCalibration.plist */,
@@ -5572,6 +5581,9 @@
 				8B6F2D6F0DA2B88E0052CA40 /* HGSSearchSource.h */,
 				8B6F2D700DA2B88E0052CA40 /* HGSSearchSource.m */,
 				8B95CABA0F6B0A4A003BDBDD /* HGSSearchSourceTest.m */,
+				8B53E12D10D95393007E6AF2 /* HGSSearchSourceRanker.m */,
+				8B53E12E10D95393007E6AF2 /* HGSSearchSourceRanker.h */,
+				8B53E12F10D95393007E6AF2 /* HGSSearchSourceRankerTest.m */,
 				6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */,
 				6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */,
 				8B95CA9D0F6B09FE003BDBDD /* HGSSimpleAccountTest.m */,
@@ -6184,6 +6196,7 @@
 				62E3FF4110112F5D005D77F2 /* NSNotificationCenter+MainThread.h in Headers */,
 				62541753102C904A00808254 /* HGSSearchTermScorer.h in Headers */,
 				8B2B01911071813D00427404 /* HGSSimpleArraySearchOperation.h in Headers */,
+				8B53E13110D95393007E6AF2 /* HGSSearchSourceRanker.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7829,6 +7842,7 @@
 				8B6EB655101A0D18006CFF7A /* Localizable.strings in Resources */,
 				8B6EB656101A0D18006CFF7A /* TypeCategories.plist in Resources */,
 				62D570C71059E704002D086B /* ScoreCalibration.plist in Resources */,
+				8B62810010D8663E00F166D1 /* HGSSearchSourceRankerCalibration.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9215,6 +9229,7 @@
 				62E3FF4210112F5D005D77F2 /* NSNotificationCenter+MainThread.m in Sources */,
 				62541754102C904A00808254 /* HGSSearchTermScorer.m in Sources */,
 				8B2B01921071813D00427404 /* HGSSimpleArraySearchOperation.m in Sources */,
+				8B53E13010D95393007E6AF2 /* HGSSearchSourceRanker.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9380,6 +9395,7 @@
 				5A0BB67B0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m in Sources */,
 				62DDD6DA1035D7BF00C0EABD /* HGSSearchTermScorerTest.m in Sources */,
 				8B2B01961071815700427404 /* HGSSimpleArraySearchOperationTest.m in Sources */,
+				8B53E17D10D95790007E6AF2 /* HGSSearchSourceRankerTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -645,6 +645,9 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     NSUInteger flags = [[NSApp currentEvent] modifierFlags];
     [[pivotResultsController searchController] setPushModifierFlags:flags];
     [self pushViewController:pivotResultsController];
+    // We're starting a new query so clear the search string.
+    [activeSearchViewController_ setQueryString:nil];
+    [searchTextField_ setStringValue:@""];
     [nc postNotificationName:kQSBDidPivotNotification
                       object:pivotObject 
                     userInfo:userInfo];
@@ -1667,10 +1670,6 @@ doCommandBySelector:(SEL)commandSelector {
   }
 
   [self setActiveSearchViewController:searchViewController];
-  
-  // We're starting a new query so clear the search string.
-  [activeSearchViewController_ setQueryString:nil];
-  [searchTextField_ setStringValue:@""];
 }
 
 - (NSViewController *)popViewControllerAnimate:(BOOL)animate {

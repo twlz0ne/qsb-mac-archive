@@ -66,6 +66,22 @@
 
 @end
 
+/*!
+ A string with cached data that can be used to optimize scoring.
+*/
+@interface HGSScoreString : NSObject {
+ @private
+  NSString *string_;
+  NSArray *wordRanges_;
+}
+
+@property (readonly, copy) NSString *string;
+
++ (id)scoreStringWithString:(NSString *)string;
++ (id)scoreStringArrayWithStringArray:(NSArray *)strings;
+
+@end
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -135,68 +151,48 @@ void HGSSetSearchTermScoringFactors(CGFloat characterMatchFactor,
  string.  (Release version.)
  @param term The search term against which the candidate item will be
         searched.  This should be a single word.
- @param item The string against which to match the search term.
- @param pWordRanges A pointer to an NSArray containing HGSItemWordRanges
-        of metrics delimiting the words in the search item.  When this pointer
-        points to a NULL the word metrics will be calculated and an
-        HGSItemWordRange created and populated with the start position and
-        length of each word in the search item.  This is then added to the
-        resulting array (in reverse order for internal optimization reasons).
-        This array should be cached and provided in subsequent calls
-        to the scoring function.  If this pointer is nil then no word
-        metric information will be returned.
+ @param string The string against which to match the search term.
  @result an unbounded float representing the matching score of the best match.
 */
-CGFloat HGSScoreTermForItem(NSString *term,
-                            NSString *item,
-                            NSArray **pWordRanges);
+CGFloat HGSScoreTermForItem(NSString *term, HGSScoreString *string);
+
+/*!
+ Scores how well a given term comprised of a singe word matches to a
+ string.  (Release version.)
+ @param term The search term against which the candidate item will be
+        searched.  This should be a single word.
+ @param string The string against which to match the search term.
+ @result an unbounded float representing the matching score of the best match.
+*/
+CGFloat HGSScoreTermForString(NSString *term, NSString *string);
 
 /*!
  Scores how well a one or more words match a string.  (Release version.)
  @param searchTerms An NSArray of search terms against which the candidate
         item will be searched.  This may contain one or more strings.
- @param mainItem The string against which to score the search term.
- @param otherItems An NSArray of alternative items against which the
-        searchTerms will be scored.  If the score for any of the other items
-        is high enough then its score will be used instead of the score
-        for the main item.
- @param pWordRanges A pointer to an NSArray containing HGSItemWordRanges
-        of metrics delimiting the words in the search item.  When this pointer
-        points to a NULL the word metrics will be calculated and an
-        HGSItemWordRange created and populated with the start position and
-        length of each word in the search item.  This is then added to the
-        resulting array (in reverse order for internal optimization reasons).
-        This array should be cached and provided in subsequent calls
-        to the scoring function.  If this pointer is nil then no word
-        metric information will be returned.
+ @param mainString The string against which to score the search term.
+ @param otherStrings An NSArray of HGSScoreStrings which are alternative items
+        against which the searchTerms will be scored.  If the score for any of
+        the other items is high enough then its score will be used instead of 
+        the score for the main item.
  @result an NSArray of float NSNumbers representing the matching scores
         of the best match for each search term.
 */
 CGFloat HGSScoreTermsForMainAndOtherItems(NSArray *searchTerms,
-                                          NSString *mainItem,
-                                          NSArray *otherItems,
-                                          NSArray **pWordRanges);
-
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+                                          HGSScoreString *mainString,
+                                          NSArray *otherStrings);
+  
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
 
 /*!
  Scores how well a one or more words match a string.  (Release version.)
  @param searchTerms An NSArray of search terms against which the candidate
         item will be searched.  This may contain one or more strings.
- @param mainItem The string against which to score the search term.
- @param otherItems An NSArray of alternative items against which the
-        searchTerms will be scored.  If the score for any of the other items
-        is high enough then its score will be used instead of the score
-        for the main item.
- @param pWordRanges A pointer to an NSArray containing HGSItemWordRanges
-        of metrics delimiting the words in the search item.  When this pointer
-        points to a NULL the word metrics will be calculated and an
-        HGSItemWordRange created and populated with the start position and
-        length of each word in the search item.  This is then added to the
-        resulting array (in reverse order for internal optimization reasons).
-        This array should be cached and provided in subsequent calls
-        to the scoring function.  If this pointer is nil then no word
-        metric information will be returned.
+ @param mainString The string against which to score the search term.
+ @param otherStrings An NSArray of HGSScoreStrings which are alternative items
+        against which the searchTerms will be scored.  If the score for any of
+        the other items is high enough then its score will be used instead of 
+        the score for the main item.
  @param pScoringDetails An NSArray containing a dictionary for each term
         in searchTerms.  Each dictionary will contain details describing the
         highest scoring match of the search term against the  main item
@@ -214,9 +210,8 @@ CGFloat HGSScoreTermsForMainAndOtherItems(NSArray *searchTerms,
         of the best match for each search term.
  */
 CGFloat HGSScoreTermsForMainAndOtherItemsWithDetails(NSArray *searchTerms,
-                                                     NSString *mainItem,
-                                                     NSArray *otherItems,
-                                                     NSArray **pWordRanges,
+                                                     HGSScoreString *mainString,
+                                                     NSArray *otherStrings,
                                                      NSArray **pScoringDetails);
 
 /*!
@@ -224,15 +219,6 @@ CGFloat HGSScoreTermsForMainAndOtherItemsWithDetails(NSArray *searchTerms,
  string.  (Debug version.)
  @param term the string to match against.
  @param item the string against which to match the search term.
- @param pWordRanges A pointer to an NSArray containing HGSItemWordRanges
-        of metrics delimiting the words in the search item.  When this pointer
-        points to a NULL the word metrics will be calculated and an
-        HGSItemWordRange created and populated with the start position and
-        length of each word in the search item.  This is then added to the
-        resulting array (in reverse order for internal optimization reasons).
-        This array should be cached and provided in subsequent calls
-        to the scoring function.  If this pointer is nil then no word
-        metric information will be returned.
  @param pSearchTermDetails An NSDictionary containing the details describing
         the candidate matches of the search term against the search item.  The
         dictionary provides: 1) the score of the best match, 2) the
@@ -250,8 +236,7 @@ CGFloat HGSScoreTermsForMainAndOtherItemsWithDetails(NSArray *searchTerms,
  @result an unbounded float representing the matching score of the best match.
 */
 CGFloat HGSScoreTermAndDetailsForItem(NSString *term,
-                                      NSString *item,
-                                      NSArray **pWordRanges,
+                                      HGSScoreString *item,
                                       NSDictionary **pSearchTermDetails);
 
 /*!
@@ -259,15 +244,6 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *term,
  @param searchTerms An NSArray of search terms against which the candidate
         item will be searched.  This may contain one or more strings.
  @param item the string against which to match the search term.
- @param pWordRanges A pointer to an NSArray containing HGSItemWordRanges
-        of metrics delimiting the words in the search item.  When this pointer
-        points to a NULL the word metrics will be calculated and an
-        HGSItemWordRange created and populated with the start position and
-        length of each word in the search item.  This is then added to the
-        resulting array (in reverse order for internal optimization reasons).
-        This array should be cached and provided in subsequent calls
-        to the scoring function.  If this pointer is nil then no word
-        metric information will be returned.
  @param pSearchTermsDetails A pointer to an NSArray of NSDictionaries per
         search term of search term matching details.  See the description
         of HGSScoreTermAndDetailsForItem for a full explanation of the
@@ -276,8 +252,7 @@ CGFloat HGSScoreTermAndDetailsForItem(NSString *term,
         of the best match for each search term.
 */
 NSArray *HGSScoreTermsAndDetailsForItem(NSArray *searchTerms,
-                                        NSString *item,
-                                        NSArray **pWordRanges,
+                                        HGSScoreString *item,
                                         NSArray **pSearchTermsDetails);
 
 #endif // HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
@@ -322,7 +297,7 @@ CGFloat HGSCalibratedScore(HGSCalibratedScoreType scoreType);
 }
 #endif
 
-#ifdef HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
+#if HGS_ENABLE_TERM_SCORING_METRICS_FUNCTIONS
 
 // Keys to search term detail dictionary items.
 extern NSString *const kHGSScoreTermWordKey;         // NSString: The search term word.

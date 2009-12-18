@@ -139,7 +139,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         NSString *compareName 
           = [HGSTokenizer tokenizeString:name];
         
-        CGFloat score = HGSScoreTermForItem(queryString, compareName, NULL);
+        CGFloat score = HGSScoreTermForString(queryString, compareName);
         if ([queryString length] && !(score > 0.0)) {
           continue;
         }

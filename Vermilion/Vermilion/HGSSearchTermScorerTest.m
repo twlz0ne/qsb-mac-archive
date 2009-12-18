@@ -99,33 +99,33 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
 
 - (void)testBasicTermScoring {
   [self ResetScoringFactors];
-  CGFloat score = HGSScoreTermForItem(@"abc", @"abc", nil);
+  CGFloat score = HGSScoreTermForString(@"abc", @"abc");
   STAssertEquals(score, kHGSTestPerfectScore, @"%f != %f",
                  score, kHGSTestPerfectScore);
-  score = HGSScoreTermForItem(@"abc", @"def", nil);
+  score = HGSScoreTermForString(@"abc", @"def");
   STAssertEquals(score, kHGSTestNotAMatchScore, @"%f != %f",
                  score, kHGSTestNotAMatchScore);
   
   // Test a few of what we'd consider excellent scores.
   // Runs-of-characters matches
-  score = HGSScoreTermForItem(@"abc", @"abcdef", nil);
+  score = HGSScoreTermForString(@"abc", @"abcdef");
   STAssertTrue(score > kHGSTestExcellentScore, @"%f !> %f",
                score, kHGSTestExcellentScore);
-  score = HGSScoreTermForItem(@"abcdef", @"xabcxdefx", nil);
+  score = HGSScoreTermForString(@"abcdef", @"xabcxdefx");
   STAssertTrue(score > kHGSTestExcellentScore, @"%f !> %f",
                score, kHGSTestExcellentScore);
 
   // Abbreviations
-  score = HGSScoreTermForItem(@"abc", @"a b c", nil);
+  score = HGSScoreTermForString(@"abc", @"a b c");
   STAssertTrue(score > kHGSTestExcellentScore, @"%f !> %f",
                score, kHGSTestExcellentScore);
-  score = HGSScoreTermForItem(@"abc", @"american bandstand of canada", nil);
+  score = HGSScoreTermForString(@"abc", @"american bandstand of canada");
   STAssertTrue(score > kHGSTestExcellentScore, @"%f !> %f",
                score, kHGSTestExcellentScore);
   
   // Test a few of what we'd consider good scores.
   // Complete words
-  score = HGSScoreTermForItem(@"abc", @"here is the abc of the matter", nil);
+  score = HGSScoreTermForString(@"abc", @"here is the abc of the matter");
   STAssertTrue(score > kHGSTestGoodScore, @"%f !> %f",
                score, kHGSTestGoodScore);
   
@@ -136,24 +136,23 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
 
 - (void)testBasicRelativeTermScoring {
   [self ResetScoringFactors];
-  CGFloat scoreA = HGSScoreTermForItem(@"abc", @"abcd", nil);
-  CGFloat scoreB = HGSScoreTermForItem(@"abc", @"abcde", nil);
+  CGFloat scoreA = HGSScoreTermForString(@"abc", @"abcd");
+  CGFloat scoreB = HGSScoreTermForString(@"abc", @"abcde");
   STAssertTrue(scoreA > scoreB,  @"%f !> %f", scoreA, scoreB);
-  scoreA = HGSScoreTermForItem(@"abc", @"xxabcxx", nil);
-  scoreB = HGSScoreTermForItem(@"abc", @"xxxabcx", nil);
+  scoreA = HGSScoreTermForString(@"abc", @"xxabcxx");
+  scoreB = HGSScoreTermForString(@"abc", @"xxxabcx");
   STAssertTrue(scoreA > scoreB, @"%f !> %f", scoreA, scoreB);
-  scoreA = HGSScoreTermForItem(@"abc", @"american bandstand of canada",
-                               nil);
-  scoreB = HGSScoreTermForItem(@"abc", @"american candy bandstand of canada",
-                               nil);
+  scoreA = HGSScoreTermForString(@"abc", @"american bandstand of canada");
+  scoreB = HGSScoreTermForString(@"abc", 
+                                     @"american candy bandstand of canada");
   STAssertTrue(scoreA > scoreB, @"%f !> %f", scoreA, scoreB);
-  scoreA = HGSScoreTermForItem(@"canada", @"american bandstand of canada", nil);
-  scoreB = HGSScoreTermForItem(@"canada", @"american candy bandstand of canada",
-                               nil);
+  scoreA = HGSScoreTermForString(@"canada", @"american bandstand of canada");
+  scoreB = HGSScoreTermForString(@"canada", 
+                                     @"american candy bandstand of canada");
   STAssertTrue(scoreA > scoreB, @"%f !> %f", scoreA, scoreB);
-  scoreA = HGSScoreTermForItem(@"can", @"american candy bandstand of canada",
-                               nil);
-  scoreB = HGSScoreTermForItem(@"can", @"american bandstand of canada", nil);
+  scoreA = HGSScoreTermForString(@"can", 
+                                     @"american candy bandstand of canada");
+  scoreB = HGSScoreTermForString(@"can", @"american bandstand of canada");
   STAssertTrue(scoreA > scoreB, @"%f !> %f", scoreA, scoreB);
 }
 
@@ -210,15 +209,15 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
       if (primaryItem) {
         // This replicates the score formula used in HGSMemorySearchSource
         // when secondaryItems are taken into consideration.
-        NSArray *wordRanges = nil;
         CGFloat itemScore = 0.0;
         CGFloat termScore
-          = HGSScoreTermForItem(testTermsString, primaryItem, &wordRanges);
+          = HGSScoreTermForString(testTermsString, primaryItem);
         // Only consider secondaryItem that have better scores than the main
         // search item.
         for (NSString *secondaryItem in secondaryItems) {
           termScore = MAX(termScore,
-                          HGSScoreTermForItem(testTermsString, secondaryItem, nil)
+                          HGSScoreTermForString(testTermsString, 
+                                                    secondaryItem)
                           / 2.0);
         }
         itemScores[randomIndex] = itemScore;

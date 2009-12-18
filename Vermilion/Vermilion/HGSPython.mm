@@ -770,15 +770,19 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                 NSArray *queryTerms
                   = [queryString componentsSeparatedByString:@" "];
                 NSString *itemString = [NSString stringWithUTF8String:mainItem];
-                NSString *mainItemString = [HGSTokenizer tokenizeString:itemString];
+                NSString *mainItemString 
+                  = [HGSTokenizer tokenizeString:itemString];
+                HGSScoreString *mainItemScoreString 
+                  = [HGSScoreString scoreStringWithString:mainItemString];
                 itemString = [NSString stringWithUTF8String:otherItems];
                 NSString *otherItemsString = [HGSTokenizer tokenizeString:itemString];
                 NSArray *otherItemsArray
                   = [otherItemsString componentsSeparatedByString:@" "];
+                NSArray *otherItemsScoreStrings
+                  = [HGSScoreString scoreStringArrayWithStringArray:otherItemsArray];
                 rank = HGSScoreTermsForMainAndOtherItems(queryTerms, 
-                                                         mainItemString,
-                                                         otherItemsArray,
-                                                         NULL);
+                                                         mainItemScoreString,
+                                                         otherItemsScoreStrings);
               }
               
               if (rank > 0.0) {

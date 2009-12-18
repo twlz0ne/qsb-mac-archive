@@ -302,7 +302,8 @@ typedef NSUInteger HGSRankFlags;
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet;
 /*!
  Mark this result as having been of interest to the user.
- Base implementation sends a promoteResult message to the result's source.
+ Base implementation sends a promoteResult message to the result's source,
+ and sends out a "kHGSResultDidPromoteNotification".
  */
 - (void)promote;
 
@@ -360,3 +361,9 @@ typedef NSUInteger HGSRankFlags;
 - (void)promote;
 
 @end
+
+/*!
+ Notification sent when a result is promoted.
+ Object is the result.
+*/
+extern NSString *const kHGSResultDidPromoteNotification;

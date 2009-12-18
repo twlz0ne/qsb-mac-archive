@@ -43,6 +43,10 @@
 #import "HGSBundle.h"
 #import "GTMNSString+URLArguments.h"
 
+// Notifications
+NSString *const kHGSResultDidPromoteNotification 
+  = @"HGSResultDidPromoteNotification";
+
 // storage and initialization for value names
 NSString* const kHGSObjectAttributeNameKey = @"kHGSObjectAttributeName";
 NSString* const kHGSObjectAttributeURIKey = @"kHGSObjectAttributeURI";
@@ -494,6 +498,8 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
 
 - (void)promote {
   [[self source] promoteResult:self];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:kHGSResultDidPromoteNotification object:self];
 }
 
 + (NSString *)hgsTypeForPath:(NSString*)path {

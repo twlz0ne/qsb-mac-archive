@@ -146,14 +146,13 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                          withUI:NO];
 
           if (recentPath && [manager fileExistsAtPath:recentPath]) {
-            NSString *basename = [recentPath lastPathComponent];
-            NSString *tokenizedName = [HGSTokenizer tokenizeString:basename];
             CGFloat rank = 0;
-            
             // Sort by abbreviation if a query exists, else preserve ordering
             // which is usually by date modified
             if (normalizedQuery) {
-              rank = HGSScoreTermForItem(normalizedQuery, tokenizedName, NULL);
+              NSString *basename = [recentPath lastPathComponent];
+              NSString *tokenizedName = [HGSTokenizer tokenizeString:basename];
+              rank = HGSScoreTermForString(normalizedQuery, tokenizedName);
             } else {
               rank = count;
             }

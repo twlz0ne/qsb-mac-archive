@@ -48,22 +48,17 @@ static NSString* const kHGSMemorySourceVersionKey = @"HGSMSVersion";
 static NSString* const kHGSMemorySourceEntriesKey = @"HGSMSEntries";
 static NSString* const kHGSMemorySourceVersion = @"1";
 
-// Key for result attribute that contains the word ranges with the test
-// to be searched.
-NSString* const kHGSObjectAttributeWordRangesKey
-  = @"HGSObjectAttributeWordRangesKey";
-
 // HGSMemorySearchSourceObject is our internal storage for caching
 // results with the terms that match for them. We used to use an
 // NSDictionary (80 bytes each). These are only 16 bytes each.
 @interface HGSMemorySearchSourceObject : NSObject {
  @private
   HGSResult *result_;
-  NSString *name_;
+  HGSScoreString *name_;
   NSArray *otherTerms_;
 }
 @property (nonatomic, retain, readonly) HGSResult *result;
-@property (nonatomic, copy, readonly) NSString *name;
+@property (nonatomic, copy, readonly) HGSScoreString *name;
 @property (nonatomic, retain, readonly) NSArray *otherTerms;
 
 - (id)initWithResult:(HGSResult *)result 
@@ -82,8 +77,10 @@ NSString* const kHGSObjectAttributeWordRangesKey
           otherTerms:(NSArray *)otherTerms {
   if ((self = [super init])) {
     result_ = [result retain];
-    name_ = [nameTerms copy];
-    otherTerms_ = [otherTerms retain];
+    name_ = [HGSScoreString scoreStringWithString:nameTerms];
+    otherTerms_ = [HGSScoreString scoreStringArrayWithStringArray:otherTerms];
+    [name_ retain];
+    [otherTerms_ retain];
   }
   return self;
 }
@@ -153,23 +150,19 @@ NSString* const kHGSObjectAttributeWordRangesKey
       }
     } else if (normalizedLength > 0) {
       // Match the terms
+      NSArray *queryTerms
+        = [normalizedQuery componentsSeparatedByString:@" "];
       for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
         if ([operation isCancelled]) break;
         HGSResult* result = [self preFilterResult:[indexObject result] 
                                   matchesForQuery:query 
                                       pivotObject:pivotObject];
         if (!result) continue;
-        NSString* name = [indexObject name];
-        NSArray *wordRanges
-          = [result valueForKey:kHGSObjectAttributeWordRangesKey];
-        BOOL addWordRanges = (wordRanges) ? NO : YES;
-        NSArray *queryTerms
-          = [normalizedQuery componentsSeparatedByString:@" "];
+        HGSScoreString* name = [indexObject name];
         NSArray* otherItems = [indexObject otherTerms];
         CGFloat rank = HGSScoreTermsForMainAndOtherItems(queryTerms,
                                                          name,
-                                                         otherItems,
-                                                         &wordRanges);        
+                                                         otherItems);        
         if (rank > 0.0) {
           // Copy the result so we can apply rank to it
           HGSMutableResult *resultCopy = [[result mutableCopy] autorelease];
@@ -180,14 +173,6 @@ NSString* const kHGSObjectAttributeWordRangesKey
                           matchesForQuery:query 
                               pivotObject:pivotObject];
           if (result) {
-            // Add the word metrics to the result.
-            if (addWordRanges && [wordRanges count]) {
-              NSDictionary *wordRangesAttributes
-                = [NSDictionary dictionaryWithObject:wordRanges
-                                              forKey:kHGSObjectAttributeWordRangesKey];
-              result = [result resultByAddingAttributes:wordRangesAttributes];
-            }
-          
             [results addObject:result];
           }
         }
@@ -274,13 +259,18 @@ NSString* const kHGSObjectAttributeWordRangesKey
         HGSResult *result = [resultObject result];
         NSDictionary *archivedRep = [self archiveRepresentationForResult:result];
         if (archivedRep) {
-          NSString *name = [resultObject name];
+          HGSScoreString *name = [resultObject name];
           NSArray *otherTerms = [resultObject otherTerms];
+          NSMutableArray *otherTermStrings
+            = [NSMutableArray arrayWithCapacity:[otherTerms count]];
+          for (HGSScoreString *otherTerm in otherTerms) {
+            [otherTermStrings addObject:[otherTerm string]];
+          }
           NSDictionary *cacheObject
             = [NSDictionary dictionaryWithObjectsAndKeys:
                                   archivedRep, kHGSMemorySourceResultKey,
-                                  name, kHGSMemorySourceNameKey,
-                                  otherTerms, kHGSMemorySourceOtherTermsKey,
+                                  [name string], kHGSMemorySourceNameKey,
+                                  otherTermStrings, kHGSMemorySourceOtherTermsKey,
                                   nil];
           [archiveObjects addObject:cacheObject];
         }

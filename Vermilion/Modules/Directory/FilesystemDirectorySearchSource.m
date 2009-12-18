@@ -128,9 +128,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       CGFloat score = 0.0;
       if ([normalizedQueryString length]) {
         NSString *tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
-        score = HGSScoreTermForItem(normalizedQueryString,
-                                    tokenizedSubpath,
-                                    NULL);
+        score = HGSScoreTermForString(normalizedQueryString, tokenizedSubpath);
         if (score <= 0.0) continue;
       } else {
         // TODO(mrossetti): Fix the following once issue 850 is addressed.

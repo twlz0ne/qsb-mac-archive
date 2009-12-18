@@ -305,20 +305,17 @@ typedef enum {
     if (!lastUsedDate) {
       lastUsedDate = [NSDate distantPast];  // COV_NF_LINE
     }
-    NSString *tokenizedName = [HGSTokenizer tokenizeString:name];
     
     CGFloat rank = 0.0;
     NSString *normalizedQuery = [[self query] normalizedQueryString];
     if (normalizedQuery) {
-      rank = HGSScoreTermForItem(normalizedQuery, 
-                                 tokenizedName, 
-                                 NULL);
+      NSString *tokenizedName = [HGSTokenizer tokenizeString:name];
+      rank = HGSScoreTermForString(normalizedQuery, tokenizedName);
       NSString *title = [attributes objectForKey:(NSString *)kMDItemTitle];
       if (title) {
         NSString *tokenizedTitle = [HGSTokenizer tokenizeString:title];
-        CGFloat tokenizedRank = HGSScoreTermForItem(normalizedQuery, 
-                                                    tokenizedTitle, 
-                                                    NULL);
+        CGFloat tokenizedRank = HGSScoreTermForString(normalizedQuery, 
+                                                    tokenizedTitle);
         rank = MAX(rank, tokenizedRank);
       }
     }

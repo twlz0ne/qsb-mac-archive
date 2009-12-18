@@ -1025,7 +1025,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   if (string && queryString) {
     string = [HGSTokenizer tokenizeString:string];
     queryString = [HGSTokenizer tokenizeString:queryString];
-    rank = HGSScoreTermForItem(queryString, string, NULL);
+    rank = HGSScoreTermForString(queryString, string);
   }
   return rank;
 }

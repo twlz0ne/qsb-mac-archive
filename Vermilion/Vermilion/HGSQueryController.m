@@ -37,11 +37,13 @@
 #import "HGSSearchSource.h"
 #import "HGSSearchOperation.h"
 #import "HGSCoreExtensionPoints.h"
+#import "HGSSearchSourceRanker.h"
 #import "HGSMixer.h"
 #import "HGSLog.h"
 #import "HGSDTrace.h"
 #import "HGSOperation.h"
 #import "HGSMemorySearchSource.h"
+#import "HGSBundle.h"
 #import "GTMObjectSingleton.h"
 #import <mach/mach_time.h>
 
@@ -51,17 +53,6 @@ NSString *const kHGSQueryControllerDidFinishNotification
   = @"HGSQueryControllerDidFinishNotification";
 
 NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
-
-@interface HGSSourceRanker : NSObject {
- @private
-  NSMutableDictionary *rankDictionary_;
-}
-+ (HGSSourceRanker *)sharedSourceRanker;
-- (void)addTimeDataPoint:(UInt64)machTime 
-               forSource:(HGSSearchSource *)source;
-- (NSArray *)orderedSources;
-- (UInt64)averageTimeForSource:(HGSSearchSource *)source;
-@end
 
 @interface HGSQueryController()
 - (void)cancelPendingSearchOperations:(NSTimer*)timer;
@@ -109,7 +100,8 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   // and kick off the SearchOperations.  
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kHGSQueryControllerWillStartNotification object:self];
-  HGSSourceRanker *sourceRanker = [HGSSourceRanker sharedSourceRanker];
+  HGSSearchSourceRanker *sourceRanker 
+    = [HGSSearchSourceRanker sharedSearchSourceRanker];
   for (HGSSearchSource *source in [sourceRanker orderedSources]) {
     // Check if the source likes the query string
     if ([source isValidSourceForQuery:parsedQuery_]) {
@@ -142,10 +134,29 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   UInt64 waitTime = UnsignedWideToUInt64(absoluteWaitTime);
   for (HGSSearchOperation *operation in queryOperations_) {
     HGSSearchSource *source = [operation source];
-    startUpTime += [sourceRanker averageTimeForSource:source];
-    [operation run:((startUpTime > 0) && (startUpTime < waitTime))];
+    UInt64 averageTimeForSource = [sourceRanker averageTimeForSource:source];
+    BOOL runOnMainThread = ((averageTimeForSource > 0) 
+                            && ((startUpTime + averageTimeForSource) < waitTime));
+    if (runOnMainThread) {
+      startUpTime += averageTimeForSource;
+    }
+    [operation run:runOnMainThread];
   }
-
+#if DEBUG
+  for (HGSSearchOperation *op in pendingQueryOperations_) {
+    NSString *identifier = [[op source] identifier];
+    if ([identifier isEqual:@"com.google.qsb.shortcuts.source"] 
+        || [identifier isEqual:@"com.google.qsb.plugin.Applications"]) {
+      NSMutableArray *runOperations = [[queryOperations_ mutableCopy] autorelease];
+      [runOperations removeObjectsInArray:pendingQueryOperations_];
+      
+      HGSLog(@"*** APPLICATION OR SHORTCUT SOURCE NOT RUN ON MAINTHREAD ***\n"
+             @"Please check for performance issue of these sources.\n"
+             @"Pending Ops: %@\n\n------\n\nRun Ops: %@", 
+             pendingQueryOperations_, runOperations);
+    }
+  }
+#endif  // DEBUG
   // Normally we inform the observer that we are done when the last source
   // reports in; if we don't have any sources that will never happen, so just
   // call the query done immediately.
@@ -283,9 +294,6 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 
   [pendingQueryOperations_ removeObject:operation];
   HGSSearchSource *source = [operation source];
-  UInt64 runTime = [operation runTime];
-  [[HGSSourceRanker sharedSourceRanker] addTimeDataPoint:runTime
-                                               forSource:source];
   
   // If this is the last query operation to complete then report as overall
   // query completion and cancel our timer.
@@ -319,125 +327,5 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 
 - (NSArray *)pendingQueries {
   return [[pendingQueryOperations_ copy] autorelease];
-}
-@end
-
-// Keep track of the average running time for a given source.
-// These are stored by HGSSourceRanker in it's rankDictionary keyed
-// by source identifier. In the future we may use other criteria to determine
-// the order in which to run sources (such as rank relevancy).
-@interface HGSSourceRankerDataPoint : NSObject {
- @private
-  UInt64 runTime_;
-  NSUInteger entries_;
-}
-- (void)addTimeDataPoint:(UInt64)machTime;
-- (UInt64)averageTime;
-@end
-
-NSInteger HGSSourceRankerSort(id src1, id src2, void *rankDict) {
-  HGSSearchSource *source1 = (HGSSearchSource *)src1;
-  HGSSearchSource *source2 = (HGSSearchSource *)src2;
-  NSDictionary *rankDictionary = (NSDictionary *)rankDict;
-  NSString *id1 = [source1 identifier];
-  NSString *id2 = [source2 identifier];
-  HGSSourceRankerDataPoint *dp1 = [rankDictionary objectForKey:id1];
-  HGSSourceRankerDataPoint *dp2 = [rankDictionary objectForKey:id2];
-  UInt64 time1 = [dp1 averageTime];
-  UInt64 time2 = [dp2 averageTime];
-  NSInteger order = NSOrderedSame;
-  if (time1 > time2) {
-    order = NSOrderedDescending;
-  } else if (time1 < time2) {
-    order = NSOrderedAscending;
-  } else if (time1 == 0 && time2 == 0) {
-    // If we have no data on either of them, run memory search sources first.
-    // This will mainly apply for our first searches we run.
-    Class memSourceClass = [HGSMemorySearchSource class]; 
-    BOOL src1IsMemorySource = [source1 isKindOfClass:memSourceClass];
-    BOOL src2IsMemorySource = [source2 isKindOfClass:memSourceClass];
-    if (src1IsMemorySource && !src2IsMemorySource) {
-      order = NSOrderedAscending;
-    } else if (!src1IsMemorySource && src2IsMemorySource) {
-      order = NSOrderedDescending;
-    }
-  }
-  return order;
-}
-    
-@implementation HGSSourceRanker
-GTMOBJECT_SINGLETON_BOILERPLATE(HGSSourceRanker, sharedSourceRanker);
-
-- (id)init {
-  if ((self = [super init])) {
-    rankDictionary_ = [[NSMutableDictionary alloc] init];
-  }
-  return self;
-}
-
-- (void)dealloc {
-  [rankDictionary_ release];
-  [super dealloc];
-}
-
-- (void)addTimeDataPoint:(UInt64)machTime 
-               forSource:(HGSSearchSource *)source {
-  NSString *sourceID = [source identifier];
-  @synchronized (self) {
-    HGSSourceRankerDataPoint *dp = [rankDictionary_ objectForKey:sourceID];
-    if (!dp) {
-      dp = [[[HGSSourceRankerDataPoint alloc] init] autorelease];
-      [rankDictionary_ setObject:dp forKey:sourceID];
-    }
-    [dp addTimeDataPoint:machTime];
-  }
-}
-
-- (UInt64)averageTimeForSource:(HGSSearchSource *)source {
-  UInt64 avgTime = 0;
-  NSString *sourceID = [source identifier];
-  @synchronized (self) {
-    HGSSourceRankerDataPoint *dp = [rankDictionary_ objectForKey:sourceID];
-    if (dp) {
-      avgTime = [dp averageTime];
-    }
-  }
-  return avgTime;
-}
-
-- (NSArray *)orderedSources {
-  HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
-  NSMutableArray *sources = [[[sourcesPoint extensions] mutableCopy] autorelease];
-  @synchronized (self) {
-    [sources sortUsingFunction:HGSSourceRankerSort context:rankDictionary_];
-  }
-  return sources;
-}
-
-- (NSString *)description {
-  NSArray *orderedSources = [self orderedSources];
-  NSMutableString *string = [NSMutableString stringWithString:[super description]];
-  for(HGSSearchSource *source in orderedSources) {
-    NSString *identifier = [source identifier];
-    HGSSourceRankerDataPoint *dp = [rankDictionary_ objectForKey:identifier];
-    [string appendFormat:@"  %15lld %@\n", [dp averageTime], [source displayName]];
-  }
-  return string;
-}
-@end
-
-@implementation HGSSourceRankerDataPoint
-- (void)addTimeDataPoint:(UInt64)machTime {
-  runTime_ += machTime;
-  entries_ += 1;
-}
-
-- (UInt64)averageTime {
-  return runTime_ / entries_;
-}
-
-- (NSString *)description {
-  return [NSString stringWithFormat:@"averageTime: %llu (runTime: %llu entries "
-          @"%lu)", [self averageTime], runTime_, entries_];
 }
 @end

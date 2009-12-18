@@ -621,8 +621,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       NSNumber *yesValue = [NSNumber numberWithBool:YES];
       NSString *normalizedQuery = [query normalizedQueryString];
       NSString *urlPath = [urlString substringFromIndex:[@"http://" length]];
-      CGFloat rank1 = HGSScoreTermForItem(normalizedQuery, urlString, NULL);
-      CGFloat rank2 = HGSScoreTermForItem(normalizedQuery, urlPath, NULL);
+      CGFloat rank1 = HGSScoreTermForString(normalizedQuery, urlString);
+      CGFloat rank2 = HGSScoreTermForString(normalizedQuery, urlPath);
       CGFloat rank = MAX(rank1, rank2);
       NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
       attributes = [NSDictionary dictionaryWithObjectsAndKeys:

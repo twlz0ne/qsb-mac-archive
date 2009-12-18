@@ -95,7 +95,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     } 
     if (value) {
       NSString *normalizedValue = [HGSTokenizer tokenizeString:value];
-      CGFloat rank = HGSScoreTermForItem(normalizedQuery, normalizedValue, NULL);
+      CGFloat rank = HGSScoreTermForString(normalizedQuery, normalizedValue);
       if (rank > 0) {
         NSString *name 
           = [window stringValueForAttribute:NSAccessibilityTitleAttribute];

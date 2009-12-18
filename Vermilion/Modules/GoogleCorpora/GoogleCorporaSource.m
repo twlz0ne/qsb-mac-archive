@@ -142,11 +142,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
                                   forKey:kHGSObjectAttributeWebSearchTemplateKey];
   }
   
-  NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag
-                                                       | eHGSNameMatchRankFlag];  
+  NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag];  
   [objectDict setObject:rankFlags forKey:kHGSObjectAttributeRankFlagsKey];
-  [objectDict setObject:[NSNumber numberWithFloat:0.9f]
-                 forKey:kHGSObjectAttributeRankKey];
   
   NSString *details = identifier;
   if (details) {
