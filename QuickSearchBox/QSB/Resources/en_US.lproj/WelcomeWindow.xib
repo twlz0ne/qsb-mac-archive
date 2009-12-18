@@ -2,13 +2,12 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9G55</string>
-		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.43</string>
+		<string key="IBDocument.SystemVersion">9L31a</string>
+		<string key="IBDocument.InterfaceBuilderVersion">680</string>
+		<string key="IBDocument.AppKitVersion">949.54</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2101"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -37,21 +36,21 @@
 			<object class="NSWindowTemplate" id="403711409">
 				<int key="NSWindowStyleMask">1</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{196, 272}, {350, 220}}</string>
+				<string key="NSWindowRect">{{196, 272}, {350, 228}}</string>
 				<int key="NSWTFlags">-1543502848</int>
 				<string key="NSWindowTitle"/>
 				<string key="NSWindowClass">QSBCustomPanel</string>
 				<nil key="NSViewClass"/>
 				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<object class="NSView" key="NSWindowView" id="330235815">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">274</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSTextField" id="563195403">
 							<reference key="NSNextResponder" ref="330235815"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{56, 128}, {277, 17}}</string>
+							<string key="NSFrame">{{56, 125}, {277, 17}}</string>
 							<reference key="NSSuperview" ref="330235815"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="426977739">
@@ -87,7 +86,7 @@
 						<object class="NSTextField" id="565217646">
 							<reference key="NSNextResponder" ref="330235815"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{56, 112}, {277, 17}}</string>
+							<string key="NSFrame">{{56, 109}, {277, 17}}</string>
 							<reference key="NSSuperview" ref="330235815"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="192749019">
@@ -105,7 +104,7 @@
 						</object>
 						<object class="NSImageView" id="77529380">
 							<reference key="NSNextResponder" ref="330235815"/>
-							<int key="NSvFlags">256</int>
+							<int key="NSvFlags">268</int>
 							<object class="NSMutableSet" key="NSDragTypes">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMutableArray" key="set.sortedObjects">
@@ -118,7 +117,7 @@
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</object>
 							</object>
-							<string key="NSFrame">{{20, 112}, {32, 32}}</string>
+							<string key="NSFrame">{{20, 109}, {32, 32}}</string>
 							<reference key="NSSuperview" ref="330235815"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="1036539956">
@@ -137,7 +136,7 @@
 						</object>
 						<object class="NSImageView" id="978521693">
 							<reference key="NSNextResponder" ref="330235815"/>
-							<int key="NSvFlags">256</int>
+							<int key="NSvFlags">268</int>
 							<object class="NSMutableSet" key="NSDragTypes">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMutableArray" key="set.sortedObjects">
@@ -150,7 +149,7 @@
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</object>
 							</object>
-							<string key="NSFrame">{{20, 67}, {32, 32}}</string>
+							<string key="NSFrame">{{20, 64}, {32, 32}}</string>
 							<reference key="NSSuperview" ref="330235815"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="755990738">
@@ -170,7 +169,7 @@
 						<object class="NSTextField" id="356609688">
 							<reference key="NSNextResponder" ref="330235815"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{57, 66}, {189, 17}}</string>
+							<string key="NSFrame">{{57, 63}, {189, 17}}</string>
 							<reference key="NSSuperview" ref="330235815"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="94655527">
@@ -189,7 +188,7 @@
 						<object class="NSTextField" id="709467667">
 							<reference key="NSNextResponder" ref="330235815"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{57, 82}, {122, 17}}</string>
+							<string key="NSFrame">{{57, 79}, {122, 17}}</string>
 							<reference key="NSSuperview" ref="330235815"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="925794379">
@@ -205,7 +204,7 @@
 						<object class="NSTextField" id="645259911">
 							<reference key="NSNextResponder" ref="330235815"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{57, 20}, {259, 17}}</string>
+							<string key="NSFrame">{{57, 17}, {259, 17}}</string>
 							<reference key="NSSuperview" ref="330235815"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="684958163">
@@ -224,7 +223,7 @@
 						<object class="NSTextField" id="939966326">
 							<reference key="NSNextResponder" ref="330235815"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{57, 35}, {113, 17}}</string>
+							<string key="NSFrame">{{57, 32}, {113, 17}}</string>
 							<reference key="NSSuperview" ref="330235815"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="788027855">
@@ -239,7 +238,7 @@
 						</object>
 						<object class="NSImageView" id="804186334">
 							<reference key="NSNextResponder" ref="330235815"/>
-							<int key="NSvFlags">256</int>
+							<int key="NSvFlags">268</int>
 							<object class="NSMutableSet" key="NSDragTypes">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMutableArray" key="set.sortedObjects">
@@ -252,7 +251,7 @@
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</object>
 							</object>
-							<string key="NSFrame">{{20, 20}, {32, 32}}</string>
+							<string key="NSFrame">{{20, 17}, {32, 32}}</string>
 							<reference key="NSSuperview" ref="330235815"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="152675435">
@@ -272,7 +271,7 @@
 						<object class="NSTextField" id="675336706">
 							<reference key="NSNextResponder" ref="330235815"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 144}, {316, 56}}</string>
+							<string key="NSFrame">{{17, 141}, {316, 56}}</string>
 							<reference key="NSSuperview" ref="330235815"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="748602093">
@@ -290,8 +289,7 @@ aGUgbmV3IFF1aWNrIFNlYXJjaCBCb3guIFR5cGUgaW4gdGhpcyBib3ggdG86Cg</string>
 							</object>
 						</object>
 					</object>
-					<string key="NSFrameSize">{350, 220}</string>
-					<reference key="NSSuperview"/>
+					<string key="NSFrameSize">{350, 228}</string>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {2560, 1578}}</string>
 				<string key="NSMaxSize">{3.40282e+38, 3.40282e+38}</string>
@@ -575,9 +573,9 @@ aGUgbmV3IFF1aWNrIFNlYXJjaCBCb3guIFR5cGUgaW4gdGhpcyBib3ggdG86Cg</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{752, 523}, {350, 220}}</string>
+					<string>{{576, 466}, {350, 228}}</string>
 					<integer value="0" id="8"/>
-					<string>{{752, 523}, {350, 220}}</string>
+					<string>{{576, 466}, {350, 228}}</string>
 					<reference ref="8"/>
 					<string>{3.40282e+38, 3.40282e+38}</string>
 					<string>QSBGrayView</string>
