@@ -65,7 +65,8 @@
 
 /*! 
  Designated initializer. Initialize with data previously obtained from
- rankerData.
+ rankerData. In general you should always use +sharedSearchSourceRanker.
+ This exists mainly for unittesting.
 */
 - (id)initWithRankerData:(id)data;
 
