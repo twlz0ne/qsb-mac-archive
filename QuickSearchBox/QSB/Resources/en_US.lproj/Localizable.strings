@@ -52,6 +52,9 @@
 /* Application menu item that opens the QSB homepage. Do not localize $APPNAME$. */
 "Open $APPNAME$ Homepage" = "Open $APPNAME$ Homepage";
 
+/* Application menu item that checks for a newer version of the application. */
+"Check for Updates…" = "Check for Updates…";
+
 /* Application menu item that shows system services. */
 "Services" = "Services";
 

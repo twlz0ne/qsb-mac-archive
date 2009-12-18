@@ -141,5 +141,9 @@
 	</dict>
 	<key>com.apple.PreferenceSync.ExcludeAllSyncKeys</key>
 	<true/>
+	<key>SUPublicDSAKeyFile</key>
+	<string>dsa_pub.pem</string>
+	<key>SUFeedURL</key>
+	<string>http://qsb-mac.googlecode.com/svn/trunk/installer/QSBUpdateAppcast.xml</string>
 </dict>
 </plist>

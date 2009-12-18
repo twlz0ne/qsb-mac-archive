@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <channel>
+      <title>Quick Search Box Changelog</title>
+      <link>http://qsb-mac.googlecode.com/svn/trunk/QuickSearchBox/QSB/installer/QSBUpdateAppcast.xml</link>
+      <description>Most recent changes with links to updates.</description>
+      <language>en</language>
+         <item>
+            <title>Version 2.0.0.1674 (numerous bugs fixed; numerous new features)</title>
+						<sparkle:releaseNotesLink>
+							http://qsb-mac.googlecode.com/svn/trunk/release_notes/QuickSearchBoxReleaseNotes_2.0.0.1674_Cobalt.html
+						</sparkle:releaseNotesLink>
+            <pubDate>Wed, 17 Dec 2009 13:12:10 -0700</pubDate>
+            <enclosure url="http://qsb-mac.googlecode.com/files/GoogleQuickSearchBox-2.0.0.1674.Release.dmg"
+              sparkle:version="2.0.0.1674"
+              length="5042603"
+              type="application/octet-stream"
+              sparkle:dsaSignature="MCwCFGSoHgbBqZN/L+9Ij6bpswmbeDrWAhRDyb69nhDfqln2hd7z9AM8WdBgug" />
+         </item>
+   </channel>
+</rss>

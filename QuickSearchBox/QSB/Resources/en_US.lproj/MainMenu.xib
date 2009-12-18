@@ -2,15 +2,15 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9J61</string>
-		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.46</string>
+		<string key="IBDocument.SystemVersion">9L31a</string>
+		<string key="IBDocument.InterfaceBuilderVersion">680</string>
+		<string key="IBDocument.AppKitVersion">949.54</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2063"/>
-			<integer value="129"/>
-			<integer value="491"/>
+			<integer value="57"/>
+			<integer value="403"/>
+			<integer value="2145"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -99,6 +99,15 @@
 								<object class="NSMenuItem" id="551084512">
 									<reference key="NSMenu" ref="265213290"/>
 									<string key="NSTitle">^Open $APPNAME$ Homepage</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="640358392"/>
+									<reference key="NSMixedImage" ref="256935064"/>
+								</object>
+								<object class="NSMenuItem" id="703715434">
+									<reference key="NSMenu" ref="265213290"/>
+									<string type="base64-UTF8" key="NSTitle">XkNoZWNrIGZvciBVcGRhdGVz4oCmA</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -444,6 +453,14 @@
 						<reference key="NSOnImage" ref="640358392"/>
 						<reference key="NSMixedImage" ref="256935064"/>
 					</object>
+					<object class="NSMenuItem" id="832156526">
+						<reference key="NSMenu" ref="446976823"/>
+						<string type="base64-UTF8" key="NSTitle">XkNoZWNrIGZvciBVcGRhdGVz4oCmA</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="640358392"/>
+						<reference key="NSMixedImage" ref="256935064"/>
+					</object>
 					<object class="NSMenuItem" id="350140926">
 						<reference key="NSMenu" ref="446976823"/>
 						<bool key="NSIsDisabled">YES</bool>
@@ -471,6 +488,9 @@
 			</object>
 			<object class="NSCustomObject" id="660484415">
 				<string key="NSClassName">GTMUILocalizer</string>
+			</object>
+			<object class="NSCustomObject" id="500615275">
+				<string key="NSClassName">SUUpdater</string>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -772,6 +792,22 @@
 					</object>
 					<int key="connectionID">2143</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">checkForUpdates:</string>
+						<reference key="source" ref="500615275"/>
+						<reference key="destination" ref="703715434"/>
+					</object>
+					<int key="connectionID">2149</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">checkForUpdates:</string>
+						<reference key="source" ref="500615275"/>
+						<reference key="destination" ref="832156526"/>
+					</object>
+					<int key="connectionID">2150</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -841,6 +877,7 @@
 							<reference ref="759776598"/>
 							<reference ref="92836941"/>
 							<reference ref="551084512"/>
+							<reference ref="703715434"/>
 						</object>
 						<reference key="parent" ref="361490485"/>
 					</object>
@@ -1012,6 +1049,7 @@
 							<reference ref="257217019"/>
 							<reference ref="424358234"/>
 							<reference ref="20069196"/>
+							<reference ref="832156526"/>
 						</object>
 						<reference key="parent" ref="614432564"/>
 						<string key="objectName">StatusItemMenu</string>
@@ -1130,6 +1168,21 @@
 						<reference key="object" ref="551084512"/>
 						<reference key="parent" ref="265213290"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2144</int>
+						<reference key="object" ref="703715434"/>
+						<reference key="parent" ref="265213290"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2145</int>
+						<reference key="object" ref="832156526"/>
+						<reference key="parent" ref="446976823"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2148</int>
+						<reference key="object" ref="500615275"/>
+						<reference key="parent" ref="614432564"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -1205,6 +1258,9 @@
 					<string>2137.ImportedFromIB2</string>
 					<string>2139.IBPluginDependency</string>
 					<string>2139.ImportedFromIB2</string>
+					<string>2144.IBPluginDependency</string>
+					<string>2145.IBPluginDependency</string>
+					<string>2148.IBPluginDependency</string>
 					<string>29.IBEditorWindowLastContentRect</string>
 					<string>29.IBPluginDependency</string>
 					<string>29.ImportedFromIB2</string>
@@ -1252,7 +1308,7 @@
 					<integer value="1" id="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{610, 770}, {64, 6}}</string>
+					<string>{{390, 624}, {64, 6}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1315,7 +1371,10 @@
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{272, 690}, {249, 20}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{75, 750}, {249, 20}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1326,7 +1385,7 @@
 					<string>{{21, 1099}, {243, 23}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{272, 267}, {279, 143}}</string>
+					<string>{{92, 277}, {279, 163}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{0, 982}, {263, 163}}</string>
@@ -1348,7 +1407,7 @@
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{284, 467}, {303, 223}}</string>
+					<string>{{87, 507}, {303, 243}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1375,7 +1434,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">2143</int>
+			<int key="maxID">2150</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1481,6 +1540,10 @@
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
 					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSMatrix</string>
+					<reference key="sourceIdentifier" ref="245378992"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSMenu</string>
@@ -1597,7 +1660,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">QSBApplicationDelegate</string>
-					<string key="superclassName">NSObject</string>
+					<string key="superclassName">QSBApplicationDelegateSuperclass</string>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
@@ -1639,7 +1702,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">QSBApplicationDelegate</string>
-					<string key="superclassName">NSObject</string>
+					<string key="superclassName">QSBApplicationDelegateSuperclass</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
@@ -1651,18 +1714,6 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">QSBCustomPanel.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">QSBLargeIconView</string>
-					<string key="superclassName">NSImageView</string>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">controller_</string>
-						<string key="NS.object.0">QSBSearchWindowController</string>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">QSBLargeIconView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1682,7 +1733,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>editAccount:</string>
 							<string>removeAccount:</string>
-							<string>resetHotKey:</string>
+							<string>selectTabForSender:</string>
 							<string>setColorFromMenu:</string>
 							<string>setupAccount:</string>
 							<string>showPreferences:</string>
@@ -1702,14 +1753,22 @@
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>accountsListController_</string>
+							<string>accountsTable_</string>
+							<string>advancedScrollView_</string>
 							<string>colorPopUp_</string>
-							<string>settingsTabView_</string>
+							<string>sourcesTable_</string>
+							<string>tabView_</string>
+							<string>toolbar_</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSArrayController</string>
+							<string>NSTableView</string>
+							<string>NSScrollView</string>
 							<string>NSPopUpButton</string>
+							<string>NSTableView</string>
 							<string>NSTabView</string>
+							<string>NSToolbar</string>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -1736,13 +1795,13 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>clearTextOrLastPivot:</string>
 							<string>dropSelection:</string>
 							<string>grabSelection:</string>
 							<string>hideSearchWindow:</string>
 							<string>hitHotKey:</string>
 							<string>openResultsTableItem:</string>
 							<string>performSearch:</string>
+							<string>resetSearchOrHideQuery:</string>
 							<string>selectCorpus:</string>
 							<string>selectResults:</string>
 							<string>showSearchWindow:</string>
@@ -1766,27 +1825,25 @@
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>logoView_</string>
-							<string>previewImageView_</string>
-							<string>queryBackgroundView_</string>
 							<string>resultsOffsetterView_</string>
 							<string>resultsWindow_</string>
 							<string>searchMenu_</string>
 							<string>searchTextFieldEditor_</string>
 							<string>searchTextField_</string>
 							<string>shieldWindow_</string>
+							<string>thumbnailView_</string>
 							<string>windowMenuButton_</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSImageView</string>
-							<string>QSBLargeIconView</string>
-							<string>NSView</string>
 							<string>NSView</string>
 							<string>QSBCustomPanel</string>
 							<string>QSBMenuButton</string>
 							<string>QSBTextFieldEditor</string>
 							<string>NSTextField</string>
 							<string>NSWindow</string>
+							<string>NSImageView</string>
 							<string>QSBMenuButton</string>
 						</object>
 					</object>
@@ -1798,10 +1855,44 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">QSBTextFieldEditor</string>
 					<string key="superclassName">NSTextView</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">windowController_</string>
+						<string key="NS.object.0">QSBSearchWindowController</string>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">QSBTextField.h</string>
 					</object>
+				</object>
+			</object>
+			<object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBDocumentRelativeSource</string>
+						<string key="minorKey">../../../externals/Sparkle/Sparkle.framework/Versions/A/Headers/SUAppcast.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="653625220">
+						<string key="majorKey">IBDocumentRelativeSource</string>
+						<string key="minorKey">../../../externals/Sparkle/Sparkle.framework/Versions/A/Headers/SUUpdater.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">SUUpdater</string>
+					<string key="superclassName">NSObject</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">checkForUpdates:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">delegate</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<reference key="sourceIdentifier" ref="653625220"/>
 				</object>
 			</object>
 		</object>
