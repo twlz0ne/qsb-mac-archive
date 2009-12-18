@@ -118,7 +118,6 @@
 				5AF0F53C0F671E750041E0B9 /* PBXTargetDependency */,
 				5A0BB2E30FAB8B3100AA4858 /* PBXTargetDependency */,
 				62370BA50FFC5B5E00C48624 /* PBXTargetDependency */,
-				5AB441590FFC312A00001976 /* PBXTargetDependency */,
 				F4EF8F830ECB3F85008DD6DA /* PBXTargetDependency */,
 				5A5832C0100BFD5E00EC32CF /* PBXTargetDependency */,
 			);
@@ -264,8 +263,6 @@
 		5A4D237C0F462D2000F5C05B /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A4D237B0F462D2000F5C05B /* libcrypto.dylib */; };
 		5A4D23FC0F4CD22B00F5C05B /* HGSCodeSignature.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A4D23FD0F4CD22B00F5C05B /* HGSCodeSignature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */; };
-		5A582F921002A9DA00EC32CF /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
-		5A582F991002AA4E00EC32CF /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		5A583243100BFC4D00EC32CF /* ClipboardSearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A58323D100BFC4D00EC32CF /* ClipboardSearchSource.m */; };
 		5A58326A100BFD2100EC32CF /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		5A5832C2100BFD7100EC32CF /* Clipboard.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */; };
@@ -285,11 +282,6 @@
 		5A8A3B180E71BCBB00A0DB4F /* Pause.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B0F0E71BCBB00A0DB4F /* Pause.icns */; };
 		5A8A3B190E71BCBB00A0DB4F /* Play.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B100E71BCBB00A0DB4F /* Play.icns */; };
 		5A8A3B1A0E71BCBB00A0DB4F /* PreviousSong.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B110E71BCBB00A0DB4F /* PreviousSong.icns */; };
-		5AB441300FFC2FB300001976 /* DirectoryServicesSearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4412A0FFC2FB300001976 /* DirectoryServicesSearchSource.m */; };
-		5AB441F80FFC31F100001976 /* DirectoryServices.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5AB440F50FFC2F1F00001976 /* DirectoryServices.hgs */; };
-		5AB4421D0FFC35F000001976 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
-		5AB4421E0FFC35F600001976 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
-		5AB442240FFC36E800001976 /* DirectoryService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB442230FFC36E800001976 /* DirectoryService.framework */; };
 		5AC3E77A0F7C29A900F171EB /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A2711020ECA567B00C72257 /* Python.framework */; };
 		5AC3E8240F7C2F7300F171EB /* VermilionTest.py in Resources */ = {isa = PBXBuildFile; fileRef = 5AC3E8230F7C2F6200F171EB /* VermilionTest.py */; };
 		5ACEF2B80F40EAF5007EA38B /* QSBPluginVerifyWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACEF2B70F40EAF5007EA38B /* QSBPluginVerifyWindowController.m */; };
@@ -803,8 +795,6 @@
 		8B6EB3AF1019FD55006CFF7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB3991019FD55006CFF7A /* InfoPlist.strings */; };
 		8B6EB3B01019FD55006CFF7A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB39B1019FD55006CFF7A /* Localizable.strings */; };
 		8B6EB3BD1019FD6F006CFF7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB3B21019FD6F006CFF7A /* InfoPlist.strings */; };
-		8B6EB3C31019FD7E006CFF7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB3BF1019FD7E006CFF7A /* InfoPlist.strings */; };
-		8B6EB3C41019FD7E006CFF7A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB3C11019FD7E006CFF7A /* Localizable.strings */; };
 		8B6EB3D11019FD8B006CFF7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB3C61019FD8B006CFF7A /* InfoPlist.strings */; };
 		8B6EB3ED1019FDBD006CFF7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB3D31019FDBD006CFF7A /* InfoPlist.strings */; };
 		8B6EB3EE1019FDBD006CFF7A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB3D51019FDBD006CFF7A /* Localizable.strings */; };
@@ -1261,13 +1251,6 @@
 			remoteGlobalIDString = 5A0BB1670FAB8A6300AA4858;
 			remoteInfo = Screensaver;
 		};
-		5A582F961002AA1000EC32CF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
-			remoteInfo = Vermilion;
-		};
 		5A5832BF100BFD5E00EC32CF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1281,13 +1264,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
-		};
-		5AB441580FFC312A00001976 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 5AB440F40FFC2F1F00001976;
-			remoteInfo = "Directory Services";
 		};
 		5AF0EC1B0F6075420041E0B9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2024,7 +2000,6 @@
 			dstSubfolderSpec = 16;
 			files = (
 				5A5832C2100BFD7100EC32CF /* Clipboard.hgs in CopyFiles */,
-				5AB441F80FFC31F100001976 /* DirectoryServices.hgs in CopyFiles */,
 				5A0BB2EB0FAB8B4400AA4858 /* Screensaver.hgs in CopyFiles */,
 				8B3E03CD0EF39E350036FFBD /* Shortcuts.hgs in CopyFiles */,
 				8B3E03AE0EF39DF70036FFBD /* GoogleCorpora.hgs in CopyFiles */,
@@ -2131,7 +2106,6 @@
 		5A8A3B0F0E71BCBB00A0DB4F /* Pause.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Pause.icns; sourceTree = "<group>"; };
 		5A8A3B100E71BCBB00A0DB4F /* Play.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Play.icns; sourceTree = "<group>"; };
 		5A8A3B110E71BCBB00A0DB4F /* PreviousSong.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PreviousSong.icns; sourceTree = "<group>"; };
-		5AB440F50FFC2F1F00001976 /* DirectoryServices.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DirectoryServices.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AB441290FFC2FB300001976 /* DirectoryServices-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "DirectoryServices-Info.plist"; sourceTree = "<group>"; };
 		5AB4412A0FFC2FB300001976 /* DirectoryServicesSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DirectoryServicesSearchSource.m; sourceTree = "<group>"; };
 		5AB442230FFC36E800001976 /* DirectoryService.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DirectoryService.framework; path = System/Library/Frameworks/DirectoryService.framework; sourceTree = SDKROOT; };
@@ -3517,17 +3491,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5AB440F30FFC2F1F00001976 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5AB4421D0FFC35F000001976 /* Vermilion.framework in Frameworks */,
-				5AB4421E0FFC35F600001976 /* Cocoa.framework in Frameworks */,
-				5AB442240FFC36E800001976 /* DirectoryService.framework in Frameworks */,
-				5A582F921002A9DA00EC32CF /* GTM.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		5AF0EB610F60744E0041E0B9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -4045,7 +4008,6 @@
 				5AF0EE220F61D0850041E0B9 /* Trash.hgs */,
 				5AF0F4880F671D9C0041E0B9 /* Mount.hgs */,
 				62370A5D0FFC59B000C48624 /* StockQuoter.hgs */,
-				5AB440F50FFC2F1F00001976 /* DirectoryServices.hgs */,
 				8B852BDE1007AD1B00880329 /* WebBookmarksTest.octest */,
 				5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */,
 				8B4810AD1046345700BB6A2D /* Spotlight Files Test.octest */,
@@ -6353,24 +6315,6 @@
 			productReference = 5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
-		5AB440F40FFC2F1F00001976 /* Directory Services */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 5AB440FA0FFC2F2200001976 /* Build configuration list for PBXNativeTarget "Directory Services" */;
-			buildPhases = (
-				5AB440F10FFC2F1F00001976 /* Resources */,
-				5AB440F20FFC2F1F00001976 /* Sources */,
-				5AB440F30FFC2F1F00001976 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				5A582F971002AA1000EC32CF /* PBXTargetDependency */,
-			);
-			name = "Directory Services";
-			productName = DirectoryServices;
-			productReference = 5AB440F50FFC2F1F00001976 /* DirectoryServices.hgs */;
-			productType = "com.apple.product-type.bundle";
-		};
 		5AF0EB620F60744E0041E0B9 /* Dictionary */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5AF0EB670F60744F0041E0B9 /* Build configuration list for PBXNativeTarget "Dictionary" */;
@@ -7276,7 +7220,6 @@
 				8B3D266E0EAE8E7A004EA504 /* Developer Documentation */,
 				5AF0EB620F60744E0041E0B9 /* Dictionary */,
 				7F9415CE0EEF52970049AE06 /* Directory Scanner */,
-				5AB440F40FFC2F1F00001976 /* Directory Services */,
 				623ADD320EC0CC17001651D1 /* Email URL Action */,
 				33D2CADF0DD24C2500C1FBDC /* Google Bookmarks */,
 				8B3EF76E0EF2C8000036FFBD /* Google Corpora */,
@@ -7465,15 +7408,6 @@
 				5A583728101120D300EC32CF /* clipboard.icns in Resources */,
 				8B6EB3571019FD0B006CFF7A /* InfoPlist.strings in Resources */,
 				8B6EB3581019FD0B006CFF7A /* Localizable.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		5AB440F10FFC2F1F00001976 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8B6EB3C31019FD7E006CFF7A /* InfoPlist.strings in Resources */,
-				8B6EB3C41019FD7E006CFF7A /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8833,15 +8767,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5AB440F20FFC2F1F00001976 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5AB441300FFC2FB300001976 /* DirectoryServicesSearchSource.m in Sources */,
-				5A582F991002AA4E00EC32CF /* HGSBundle.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		5AEC5C670FBA296C005608EA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -9455,11 +9380,6 @@
 			target = 5A0BB1670FAB8A6300AA4858 /* Screensaver */;
 			targetProxy = 5A0BB2E20FAB8B3100AA4858 /* PBXContainerItemProxy */;
 		};
-		5A582F971002AA1000EC32CF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
-			targetProxy = 5A582F961002AA1000EC32CF /* PBXContainerItemProxy */;
-		};
 		5A5832C0100BFD5E00EC32CF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5A5831D9100BFBBB00EC32CF /* Clipboard */;
@@ -9469,11 +9389,6 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 5A583547100D636600EC32CF /* PBXContainerItemProxy */;
-		};
-		5AB441590FFC312A00001976 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 5AB440F40FFC2F1F00001976 /* Directory Services */;
-			targetProxy = 5AB441580FFC312A00001976 /* PBXContainerItemProxy */;
 		};
 		5AF0EC1C0F6075420041E0B9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -11249,36 +11164,6 @@
 			};
 			name = Release;
 		};
-		5AB440F70FFC2F2200001976 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
-			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/DirectoryServices/DirectoryServices-Info.plist";
-				PRODUCT_NAME = DirectoryServices;
-				WRAPPER_EXTENSION = hgs;
-			};
-			name = Debug;
-		};
-		5AB440F80FFC2F2200001976 /* Debug-gcov */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
-			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/DirectoryServices/DirectoryServices-Info.plist";
-				PRODUCT_NAME = DirectoryServices;
-				WRAPPER_EXTENSION = hgs;
-			};
-			name = "Debug-gcov";
-		};
-		5AB440F90FFC2F2200001976 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
-			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/DirectoryServices/DirectoryServices-Info.plist";
-				PRODUCT_NAME = DirectoryServices;
-				WRAPPER_EXTENSION = hgs;
-			};
-			name = Release;
-		};
 		5AF0EB650F60744F0041E0B9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
@@ -13002,16 +12887,6 @@
 				5A5831DC100BFBBC00EC32CF /* Debug */,
 				5A5831DD100BFBBC00EC32CF /* Debug-gcov */,
 				5A5831DE100BFBBC00EC32CF /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		5AB440FA0FFC2F2200001976 /* Build configuration list for PBXNativeTarget "Directory Services" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5AB440F70FFC2F2200001976 /* Debug */,
-				5AB440F80FFC2F2200001976 /* Debug-gcov */,
-				5AB440F90FFC2F2200001976 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
