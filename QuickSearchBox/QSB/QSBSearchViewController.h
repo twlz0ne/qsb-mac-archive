@@ -39,7 +39,6 @@
 @class QSBSearchWindowController;
 @class QSBTopResultsViewController;
 @class QSBTableResult;
-@class HGSResult;
 @class HGSResultArray;
 @class HGSAction;
 
@@ -64,8 +63,6 @@
   QSBSearchViewController *parentSearchViewController_;
   NSString *pivotQueryString_;  // What was typed when the user pivoted.
   NSRange pivotQueryRange_;  // What was selected when the user pivoted.
-  NSRect topResultsFrame_;
-  NSRect moreResultsFrame_;
 }
 
 @property(nonatomic, retain) QSBSearchWindowController *searchWindowController;
@@ -96,6 +93,9 @@
 
 // Stop all source operations for this query.
 - (void)stopQuery;
+
+// Just became active search controller
+- (void)didMakeActiveSearchViewController;
 
 // Show Top Results or More Results.
 - (void)showTopResults:(id)sender;

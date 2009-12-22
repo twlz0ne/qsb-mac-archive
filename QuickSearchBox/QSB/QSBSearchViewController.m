@@ -90,6 +90,14 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
          selector:@selector(tableViewSelectionDidChange:) 
              name:NSTableViewSelectionDidChangeNotification 
            object:moreResultsView];
+  [nc addObserver:self 
+         selector:@selector(tableViewSelectionDidChange:) 
+             name:kQSBMoreResultsDidShowCategoryNotification 
+           object:moreResultsController_];
+  [nc addObserver:self 
+         selector:@selector(tableViewSelectionDidChange:)
+             name:kQSBSearchControllerDidUpdateResultsNotification
+           object:searchController_];
 }
 
 - (void)dealloc {
@@ -197,6 +205,10 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   return acceptable;
 }
 
+- (void)didMakeActiveSearchViewController {
+  [self tableViewSelectionDidChange:nil];
+}
+
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   QSBTableResult *tableResult = [self selectedTableResult];
@@ -218,7 +230,6 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 }
 
 #pragma mark Top/More Results View Control
-
 - (void)showTopResults:(id)sender {
   [self setActiveResultsViewController:topResultsController_ animate:YES];
 }
@@ -289,19 +300,16 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
     moreFrame.origin.y = NSMinY(viewBounds) - NSHeight(moreFrame);
     hideView = moreView;
   }
-  
-  topResultsFrame_ = topFrame;
-  moreResultsFrame_ = moreFrame;
-  
+    
   if (animate) {
     [NSAnimationContext beginGrouping];
     [[NSAnimationContext currentContext] setDuration:0.2];
-    [[topView animator] setFrame:topResultsFrame_];
-    [[moreView animator] setFrame:moreResultsFrame_];
+    [[topView animator] setFrame:topFrame];
+    [[moreView animator] setFrame:moreFrame];
     [NSAnimationContext endGrouping];
   } else {
-    [topView setFrame:topResultsFrame_];
-    [moreView setFrame:moreResultsFrame_];
+    [topView setFrame:topFrame];
+    [moreView setFrame:moreFrame];
   }
   if (hideView == topView) {
     [topView setHidden:YES];
@@ -325,6 +333,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
     activeResultsViewController_ = newController;
     [self didChangeValueForKey:@"activeResultsViewController"];
     [self updateViewsWithAnimation:animate];
+    [self tableViewSelectionDidChange:nil];
   }
 }
 @end

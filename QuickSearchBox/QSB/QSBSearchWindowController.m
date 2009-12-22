@@ -1638,6 +1638,7 @@ doCommandBySelector:(SEL)commandSelector {
                            selector:@selector(queryStringChanged:)
                            userInfo:nil
                             options:0];
+  [activeSearchViewController_ didMakeActiveSearchViewController];
   [self updatePivotToken];
 }
 
