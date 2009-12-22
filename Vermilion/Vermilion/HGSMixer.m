@@ -128,7 +128,7 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
 - (id)mix:(id)ignored {
   NSUInteger opsCount = [ops_ count];
   uint64_t startTime = mach_absolute_time();
-  
+  [ops_ makeObjectsPerformSelector:@selector(disableUpdates)];
   // Perform merge sort where we take the top ranked result in each
   // queue and add it to the sorted results.
   while (YES) {
@@ -205,6 +205,7 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
       }
     }
   }
+  [ops_ makeObjectsPerformSelector:@selector(enableUpdates)];
   if (isFinished_) {
     
     [operation_ autorelease];

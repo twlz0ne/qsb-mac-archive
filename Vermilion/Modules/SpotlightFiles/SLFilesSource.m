@@ -173,17 +173,6 @@ typedef enum {
   [super cancel];
 }
 
-- (NSArray *)sortedResultsInRange:(NSRange)range {
-  NSMutableArray *array = [NSMutableArray arrayWithCapacity:range.length];
-  for (NSUInteger i = range.location; i < NSMaxRange(range); ++i) {
-    HGSResult *result = [self sortedResultAtIndex:i];
-    if (result) {
-      [array addObject:result];
-    }
-  }
-  return array;
-}
-
 - (HGSResult *)resultFromMDItem:(MDItemRef)mdItem {
   HGSResult *result = nil;
   NSValue *key = [NSValue valueWithPointer:mdItem];
@@ -342,7 +331,15 @@ typedef enum {
   }
   return result;
 }
-  
+
+- (void)disableUpdates {
+  MDQueryDisableUpdates(mdQuery_);
+}
+
+- (void)enableUpdates {
+  MDQueryEnableUpdates(mdQuery_);
+}
+
 - (HGSResult *)sortedResultAtIndex:(NSUInteger)idx {
   HGSResult *result = nil;
   if (idx < [self resultCount]) {

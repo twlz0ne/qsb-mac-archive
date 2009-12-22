@@ -188,8 +188,16 @@ NSString *const kHGSSearchOperationWasCancelledNotification
 }
 
 - (NSArray *)sortedResultsInRange:(NSRange)range {
-  [self doesNotRecognizeSelector:_cmd];
-  return nil;
+  NSMutableArray *array = [NSMutableArray arrayWithCapacity:range.length];
+  [self disableUpdates];
+  for (NSUInteger i = range.location; i < NSMaxRange(range); ++i) {
+    HGSResult *result = [self sortedResultAtIndex:i];
+    if (result) {
+      [array addObject:result];
+    }
+  }
+  [self enableUpdates];
+  return array;
 }
 
 - (HGSResult *)sortedResultAtIndex:(NSUInteger)idx {
@@ -230,4 +238,11 @@ NSString *const kHGSSearchOperationWasCancelledNotification
   }
 }
 
+- (void)enableUpdates {
+  // Default does nothing.
+}
+
+- (void)disableUpdates {
+  // Default does nothing.
+}
 @end
