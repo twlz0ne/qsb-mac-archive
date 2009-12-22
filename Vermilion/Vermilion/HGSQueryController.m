@@ -154,6 +154,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
              @"Please check for performance issue of these sources.\n"
              @"Pending Ops: %@\n\n------\n\nRun Ops: %@", 
              pendingQueryOperations_, runOperations);
+      break;
     }
   }
 #endif  // DEBUG
