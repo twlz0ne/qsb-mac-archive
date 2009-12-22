@@ -216,13 +216,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // Is this search a generic, global search? (No pivot set)
   // If so, there may be special items above and/or below the search results
   NSMutableArray *suggestResults = [NSMutableArray array];
-
+  NSUInteger queryLength = [[self queryString] length];
+  
   if (!pivotObject) {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSInteger suggestCount = [prefs integerForKey:kGoogleSuggestCountKey];
     if (suggestCount) {
-      NSUInteger length = [[self queryString] length];
-      if ([hgsSuggestions count] || length < 3 || length > 20) {
+      if ([hgsSuggestions count] || queryLength < 3 || queryLength > 20) {
         [oldSuggestions_ autorelease];
         oldSuggestions_ = [hgsSuggestions retain];
       } else {
@@ -256,33 +256,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     [newResults addObjectsFromArray:mainResults];
   }
 
-  int searchItemsIndex = 0;
-  if (![[queryController_ query] pivotObject]) {
-    QSBSeparatorTableResult *spacer = [QSBSeparatorTableResult tableResult];
-
-    // TODO(alcor): this is probably going to be done by the mixer eventually
-
-    NSUInteger count = [newResults count];
-    CGFloat moderateResultRank = HGSCalibratedScore(kHGSCalibratedModerateScore);
-    if (count) {
-      for(searchItemsIndex = 0; searchItemsIndex < count; searchItemsIndex++) {
-      QSBTableResult *item = [newResults objectAtIndex:searchItemsIndex];
-      // List the google result lower if we have a moderate confidence result.
-        if ([item rank] <= moderateResultRank) break;
-      }
-    }
-
-    if (searchItemsIndex > 0) {
-      [newResults insertObject:spacer atIndex:searchItemsIndex++];
-    }
-
-    QSBGoogleTableResult *googleItem = [QSBGoogleTableResult
-                                         tableResultForQuery:queryString_];
-    [newResults insertObject:googleItem atIndex:searchItemsIndex];
-
-    [newResults insertObject:spacer atIndex:searchItemsIndex + 1];
-  }
-
   if ([newResults count] < [desktopResults_ count]) {
     NSRange newRange = NSMakeRange(0, [newResults count]);
     [desktopResults_ replaceObjectsInRange:newRange
@@ -305,6 +278,34 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     }
   }
 
+  if (![[queryController_ query] pivotObject]) {
+    // TODO(dmaclach): http://code.google.com/p/qsb-mac/issues/detail?id=871
+    NSUInteger count = [newResults count];
+    int searchItemsIndex = count;
+    
+    // Only rank the google query if the length > 3
+    if (queryLength > 3 && count) {
+      CGFloat moderateResultRank = HGSCalibratedScore(kHGSCalibratedModerateScore);
+      for(searchItemsIndex = 0; searchItemsIndex < count; searchItemsIndex++) {
+        QSBTableResult *item = [newResults objectAtIndex:searchItemsIndex];
+        // List the google result lower if we have a moderate confidence result.
+        if ([item rank] <= moderateResultRank) break;
+      }
+    }
+    
+    QSBSeparatorTableResult *spacer = [QSBSeparatorTableResult tableResult];
+    
+    if (searchItemsIndex > 0) {
+      [newResults insertObject:spacer atIndex:searchItemsIndex++];
+    }
+    
+    QSBGoogleTableResult *googleItem = [QSBGoogleTableResult
+                                        tableResultForQuery:queryString_];
+    [newResults insertObject:googleItem atIndex:searchItemsIndex];
+    
+    [newResults insertObject:spacer atIndex:searchItemsIndex + 1];
+  }
+  
   if (showMore) {
     if ([suggestResults count] > 0) {
       if (![[newResults lastObject]
