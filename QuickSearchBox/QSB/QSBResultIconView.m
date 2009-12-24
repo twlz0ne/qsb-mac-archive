@@ -53,7 +53,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                     forKeyPath:kQSBDisplayIconKVOKey
                       selector:@selector(displayIconValueChanged:)
                       userInfo:nil
-                       options:0];
+                       options:NSKeyValueObservingOptionNew];
   [controller_ retain];
 }
 
@@ -66,26 +66,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)displayIconValueChanged:(GTMKeyValueChangeNotification *)notification {
-  iconNeedsUpdating_ = YES;
-  [self setNeedsDisplay:YES];
+  NSImage *icon = [[notification change] objectForKey:NSKeyValueChangeNewKey];
+  HGSAssert(icon == nil || [icon isKindOfClass:[NSImage class]], nil);
+  [self setImage:icon];
 }
 
-- (void)viewDidMoveToWindow {
-  if (iconNeedsUpdating_ && [self window]) {
-    // We can't just call setNeedsDisplay here because we are currently in the
-    // middle of an update loop and it will be ignored.
-    [self display];
-  }
-}
-
-- (void)viewWillDraw {
-  [super viewWillDraw];
-  if (iconNeedsUpdating_) {
-    QSBSourceTableResult *tableResult = [controller_ representedObject];
-    HGSResult *result = [tableResult representedResult];
-    NSImage *icon = [result valueForKey:kHGSObjectAttributeIconKey];
-    [self setImage:icon];
-    iconNeedsUpdating_ = NO;
-  }
-}
 @end

@@ -41,6 +41,5 @@
 @interface QSBResultIconView : NSImageView {
  @private
   IBOutlet QSBResultRowViewController *controller_;
-  BOOL iconNeedsUpdating_;
 }
 @end
