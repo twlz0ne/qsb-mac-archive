@@ -43,6 +43,7 @@
 #import "HGSLog.h"
 #import "GTMGarbageCollection.h"
 #import "GTMMethodCheck.h"
+#import "GTMNSNumber+64Bit.h"
 #import "QSBTableResult.h"
 #import "NSAttributedString+Attributes.h"
 
@@ -93,6 +94,14 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 @synthesize showAllCategoriesSet = showAllCategoriesSet_;
 @synthesize categoriesString = categoriesString_;
 
+- (id)initWithNibName:(NSString *)nibNameOrNil 
+               bundle:(NSBundle *)nibBundleOrNil {
+  if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
+    rowHeightDict_ = [[NSMutableDictionary alloc] init];
+  }
+  return self;
+}
+  
 - (void)awakeFromNib {  
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
   [resultsTableView setDataSource:self];
@@ -130,6 +139,7 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   [categoriesString_ release];
   [showAllCategoriesSet_ release];
   [moreResultsDict_ release];
+  [rowHeightDict_ release];
   [super dealloc];
 }
 
@@ -153,6 +163,20 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
   return [moreResults_ count];
+}
+
+- (CGFloat)tableView:(NSTableView *)tableView
+         heightOfRow:(NSInteger)row {
+  QSBTableResult *result = [self tableResultForRow:row];
+  Class resultClass = [result class];
+  NSNumber *nsHeight = [rowHeightDict_ objectForKey:resultClass];
+  if (!nsHeight) {
+    CGFloat rowHeight = [super tableView:tableView heightOfRow:row];
+    nsHeight = [NSNumber gtm_numberWithCGFloat:rowHeight];
+    [rowHeightDict_ setObject:nsHeight forKey:resultClass];
+  }
+  CGFloat height = [nsHeight gtm_cgFloatValue];
+  return height;
 }
 
 - (void)setMoreResultsWithDict:(NSDictionary *)rawDict {

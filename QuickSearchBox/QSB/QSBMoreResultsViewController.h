@@ -50,6 +50,8 @@
   // and the indexes and counts need recalculating.
   NSDictionary *moreResultsDict_;
   
+  // Dictionary of cached row heights for various classes of result views.
+  NSMutableDictionary *rowHeightDict_;
   NSTimeInterval blockTime_; // Time we started blocking repeats
 }
 

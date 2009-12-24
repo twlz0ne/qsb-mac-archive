@@ -374,25 +374,12 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   return isSelectable;
 }
 
-
 - (CGFloat)tableView:(NSTableView *)tableView
          heightOfRow:(NSInteger)row {
-  // Scan all of the views for this row and return the height of the tallest.
   NSArray *columns = [tableView tableColumns];
-  CGFloat rowHeight = [tableView rowHeight];
-  NSEnumerator *columnEnum = [columns objectEnumerator];
-  NSTableColumn *column = nil;
-  while ((column = [columnEnum nextObject])) {
-    NSView *colView = [self tableView:tableView
-                        viewForColumn:column
-                                  row:row];
-    if (colView) {
-      CGFloat viewHeight = NSHeight([colView frame]);
-      if (viewHeight > 0) {
-        rowHeight = viewHeight;
-      }
-    }
-  }
+  NSTableColumn *column = [columns objectAtIndex:0];
+  NSView *colView = [self tableView:tableView viewForColumn:column row:row];
+  CGFloat rowHeight = NSHeight([colView frame]);
   return rowHeight;
 }
 
