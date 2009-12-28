@@ -76,7 +76,11 @@
   HGSQueryController *queryController_;
   NSAppleScript *handler_;
   NSArray *results_;
+  BOOL mixingHasCompleted_;
 }
+
+@property BOOL mixingHasCompleted;
+
 @end
 
 // Converts a script wrapped up in an AEDesc to an NSAppleScript object for us.
@@ -86,6 +90,8 @@
 @end
 
 @implementation QSBSearchForCommand
+
+@synthesize mixingHasCompleted = mixingHasCompleted_;
 
 - (id)performDefaultImplementation {
   // Store off our return address so we can call back below in finished.
@@ -121,8 +127,9 @@
   // if we don't have a handler, we'll just spin until the search
   // is done. This could take a while and may time out
   if (!handler_) {
+    [self setMixingHasCompleted:NO];
     NSRunLoop *rl = [NSRunLoop currentRunLoop];
-    while (![queryController_ queriesFinished]) {
+    while (![self mixingHasCompleted]) {
       [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     }
   } else {
@@ -166,11 +173,16 @@
 }
  
 - (void)queryControllerDidFinish:(NSNotification *)notification {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self 
+                name:kHGSQueryControllerDidFinishNotification 
+              object:queryController_];
   // Our query is finished.
   [queryController_ startMixingCurrentResults:self];
 }
 
 - (void)mixerDidFinish:(HGSMixer *)mixer {
+  [self setMixingHasCompleted:YES];
   NSArray *results = [mixer rankedResults];
   NSUInteger count = [results count];
   NSMutableArray *appleScriptResults = [NSMutableArray arrayWithCapacity:count];
