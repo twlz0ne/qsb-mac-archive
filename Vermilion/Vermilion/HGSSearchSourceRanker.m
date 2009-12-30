@@ -50,8 +50,7 @@ static NSString *const kHGSSearchSourceRankerSourceIDKey
 // Ranks sources in the order that we should run them
 @interface HGSSearchSourceRankerDataPoint : NSObject {
  @private
-  UInt64 runTime_;
-  UInt32 entries_;
+  UInt64 averageTime_;
   UInt32 promotions_;
   BOOL firstRunCompleted_;
 }
@@ -291,8 +290,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
   if ((self = [super init])) {
     NSNumber *number 
       = [dict objectForKey:kHGSSearchSourceRankerDataPointRunTimeKey];
-    runTime_ = [number unsignedLongLongValue];
-    entries_ = 1;
+    averageTime_ = [number unsignedLongLongValue];
     number = [dict objectForKey:kHGSSearchSourceRankerDataPointPromotionsKey];
     promotions_ = [number unsignedLongValue];
   }
@@ -308,25 +306,25 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
 
 - (void)addTimeDataPoint:(UInt64)machTime {
   if (firstRunCompleted_) {
-    runTime_ += machTime;
-    entries_ += 1;
+    // Calculate a very simple moving average, but only if we already
+    // have data to work with.
+    if (averageTime_ > 0) {
+      averageTime_ = ((machTime * 2) + averageTime_) / 3;
+    } else {
+      averageTime_ = machTime;
+    }
   } else {
     firstRunCompleted_ = YES;
   }
 }
 
 - (UInt64)averageTime {
-  UInt64 averageTime = 0;
-  if (entries_) {
-    averageTime =  runTime_ / entries_;
-  }
-  return averageTime;
+  return averageTime_;
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"promotions %lu averageTime: %llu "
-          @"runTime: %llu entries %lu)", 
-          [self promotionCount], [self averageTime], runTime_, entries_];
+  return [NSString stringWithFormat:@"promotions %lu averageTime: %llu)", 
+          [self promotionCount], [self averageTime]];
 }
 
 - (void)promote {

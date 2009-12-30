@@ -80,11 +80,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     
     LSItemInfoRecord infoRec;
     OSStatus err = LSCopyItemInfoForURL((CFURLRef)url, 
-                                        kLSRequestAllInfo, &infoRec);
+                                        kLSRequestBasicFlagsOnly, &infoRec);
     
     // If the path is an alias, we resolve before continuing
     if (err == noErr && (infoRec.flags & kLSItemInfoIsAliasFile)) {
-        FSRef aliasRef;
+      FSRef aliasRef;
         
       if (CFURLGetFSRef((CFURLRef)url, &aliasRef)) {
         Boolean targetIsFolder;
@@ -100,67 +100,64 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       }
     }
     
+    BOOL emptyQuery = [normalizedQueryString length] == 0;
     NSArray *contents = [fm directoryContentsAtPath:path];
     BOOL showInvisibles = ([query flags] & eHGSQueryShowAlternatesFlag) != 0;
+    // Only construct these one time, rather than each time through the loop.
+    NSNumber *belowFoldRankFlag 
+      = [NSNumber numberWithUnsignedInteger:eHGSBelowFoldRankFlag];
+    CGFloat strongScore = HGSCalibratedScore(kHGSCalibratedStrongScore);
+    NSNumber *nsStrongScore = [NSNumber gtm_numberWithCGFloat:strongScore];
     for (NSString *subpath in contents) {
+      NSString *fullPath = [path stringByAppendingPathComponent:subpath];
       if (!showInvisibles) {
         if ([subpath hasPrefix:@"."]) continue;
-        NSString *fullPath = [path stringByAppendingPathComponent:subpath];
-        FSRef ref;
-        OSStatus osStatus
-          = FSPathMakeRef((const UInt8 *)[fullPath fileSystemRepresentation],
-                          &ref, NULL);
-        // If there's an error we err on the side of disclosure.
-        if (osStatus == noErr) {
-          FSCatalogInfo catalogInfo;
-          OSErr osErr = FSGetCatalogInfo(&ref, kFSCatInfoFinderInfo,
-                                         &catalogInfo, NULL, NULL, NULL);
-          if (osErr == noErr) {
-            FileInfo *fileInfo = (FileInfo *)(catalogInfo.finderInfo);
-            UInt16 finderFlags = (*fileInfo).finderFlags;
-            if (finderFlags & kIsInvisible) continue;
-          }
+        NSURL *subURL = [NSURL fileURLWithPath:fullPath];
+        LSItemInfoRecord subInfoRec;
+        err = LSCopyItemInfoForURL((CFURLRef)subURL, 
+                                   kLSRequestBasicFlagsOnly, &subInfoRec);
+        if (err == noErr) {
+          if (subInfoRec.flags & kLSItemInfoIsInvisible) continue;
+        } else {
+          HGSLogDebug(@"Error %d fetching directory content info for '%@'.",
+                      err, fullPath);
         }
       }
-      
       // Filter further based on the query string, or, if there is no
       // query string then boost the score of the folder's contents.
-      CGFloat score = 0.0;
-      if ([normalizedQueryString length]) {
-        NSString *tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
-        score = HGSScoreTermForString(normalizedQueryString, tokenizedSubpath);
-        if (score <= 0.0) continue;
-      } else {
+      NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+      if (emptyQuery) {
         // TODO(mrossetti): Fix the following once issue 850 is addressed.
         // http://code.google.com/p/qsb-mac/issues/detail?id=850
-        score = HGSCalibratedScore(kHGSCalibratedStrongScore);
+        [attributes setObject:nsStrongScore forKey:kHGSObjectAttributeRankKey];
+        if (isApplication) {
+          [attributes setObject:belowFoldRankFlag
+                         forKey:kHGSObjectAttributeRankFlagsKey];
+        }
+      } else {
+        NSString *tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
+        CGFloat score
+          = HGSScoreTermForString(normalizedQueryString, tokenizedSubpath);
+        if (score < FLT_EPSILON) continue;
+        [attributes setObject:[NSNumber gtm_numberWithCGFloat:score] 
+                       forKey:kHGSObjectAttributeRankKey];
       }
 
-      subpath = [path stringByAppendingPathComponent:subpath];
-      
-      NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-      if (isApplication && ![normalizedQueryString length]) {
-        NSNumber *flags 
-          = [NSNumber numberWithUnsignedInteger:eHGSBelowFoldRankFlag];
-        [attributes setObject:flags
-                       forKey:kHGSObjectAttributeRankFlagsKey];
-      }
-      [attributes setObject:[NSNumber gtm_numberWithCGFloat:score] 
-                     forKey:kHGSObjectAttributeRankKey];
-                     
       NSError *error = nil;               
-      NSDate *modDate = [[fm attributesOfItemAtPath:subpath error:&error]
-                            fileModificationDate];
-                              
-      if (error) HGSLogDebug(@"Error fetching mod date %@", error);
+      NSDictionary *itemAttributes = [fm attributesOfItemAtPath:fullPath
+                                                          error:&error];
+      if (!error) {
+        NSDate *modDate = [itemAttributes fileModificationDate];
+        [attributes setObject:modDate
+                       forKey:kHGSObjectAttributeLastUsedDateKey];
+      } else {
+        HGSLogDebug(@"Error fetching mod date for '%@': %@.",
+                    fullPath, error);
+      }
       
-      [attributes setObject:modDate
-                     forKey:kHGSObjectAttributeLastUsedDateKey];
-                     
-      HGSResult *result = [HGSResult resultWithFilePath:subpath 
+      HGSResult *result = [HGSResult resultWithFilePath:fullPath 
                                                  source:self 
                                              attributes:attributes];
-  
       [results addObject:result];
     }
 
@@ -225,4 +222,5 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
   [operation finishQuery];
 }
+
 @end

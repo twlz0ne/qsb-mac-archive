@@ -76,7 +76,6 @@ NSString *const kHGSSearchOperationWasCancelledNotification
 
 - (void)dealloc {
   [source_ release];
-  [operation_ release];
   [query_ release];
   [super dealloc];
 }
@@ -92,6 +91,8 @@ NSString *const kHGSSearchOperationWasCancelledNotification
     // the queue would have a retain on it, so it won't get freed from under it.
     queryCancelled_ = YES;
     [operation_ cancel];
+    [operation_ release];
+    operation_ = nil;
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationWasCancelledNotification
                                       object:self];
@@ -131,15 +132,16 @@ NSString *const kHGSSearchOperationWasCancelledNotification
     runTime_ = mach_absolute_time();
     queueTime_ = runTime_ - queueTime_;
     if ([self isConcurrent]) {
-      // Concurrents were queued just to get things started, we bounce to the
-      // main loop to actually run them (and they have to call finished when
-      // done).
-      [self performSelectorOnMainThread:@selector(wrappedMain)
-                             withObject:nil
-                          waitUntilDone:NO];
-      // Drop the NSOperation, it was just here to get use into the queue.
-      [operation_ release];
-      operation_ = nil;
+      if ([NSThread currentThread] == [NSThread mainThread]) {
+        [self wrappedMain];
+      } else {
+        // Concurrents were queued just to get things started, we bounce to the
+        // main loop to actually run them (and they must call finishQuery
+        // when done).
+        [self performSelectorOnMainThread:@selector(wrappedMain)
+                               withObject:nil
+                            waitUntilDone:NO];
+      }
     } else {
       // Fire it
       @try {
@@ -158,6 +160,8 @@ NSString *const kHGSSearchOperationWasCancelledNotification
 }
 
 - (void)finishQuery {
+  [operation_ release];
+  operation_ = nil;
   if ([self isFinished]) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if ([defaults boolForKey:kHGSValidateSearchSourceBehaviorsPrefKey]) {
@@ -221,16 +225,18 @@ NSString *const kHGSSearchOperationWasCancelledNotification
 }
 
 - (NSOperation *)searchOperation {
-  return [[[NSInvocationOperation alloc] initWithTarget:self
-                                               selector:@selector(queryOperation:)
-                                                 object:nil] autorelease];
+  operation_ =
+    [[NSInvocationOperation alloc] initWithTarget:self
+                                         selector:@selector(queryOperation:)
+                                           object:nil];
+  return operation_;
 }
 
 - (void)run:(BOOL)onThread {
   NSOperation *operation = [self searchOperation];
   queueTime_ = mach_absolute_time();
   if (onThread) {
-    [operation start];
+    [self queryOperation:nil];
   } else {
     HGSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
     [operation setQueuePriority:NSOperationQueuePriorityVeryHigh];
