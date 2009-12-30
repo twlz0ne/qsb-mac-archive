@@ -672,6 +672,7 @@
 		8B3EFFA60EF31BC70036FFBD /* Shortcuts.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EFFA40EF31BC70036FFBD /* Shortcuts.m */; };
 		8B4099FF0F93DC0100DF540E /* GTMUILocalizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B4099FD0F93DC0100DF540E /* GTMUILocalizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B409A000F93DC0100DF540E /* GTMUILocalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4099FE0F93DC0100DF540E /* GTMUILocalizer.m */; };
+		8B445B0F10EBDF8500561E62 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8B627CD610D81B9700F166D1 /* Sparkle.framework */; };
 		8B453B390FB9EFA900C0E951 /* QSBWelcomeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62FB1E4E0FB39B1A0080B342 /* QSBWelcomeController.m */; };
 		8B459D890DA4417C001148C5 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		8B48109D1046345700BB6A2D /* GTMSenTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */; };
@@ -729,7 +730,7 @@
 		8B6128F90F4642C100E29B40 /* JSON.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
 		8B6129B30F46446D00E29B40 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
 		8B6129C30F46447A00E29B40 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
-		8B627CDF10D81BA900F166D1 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8B627CD610D81B9700F166D1 /* Sparkle.framework */; };
+		8B627CDF10D81BA900F166D1 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B627CD610D81B9700F166D1 /* Sparkle.framework */; };
 		8B62810010D8663E00F166D1 /* HGSSearchSourceRankerCalibration.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B6280FF10D8663E00F166D1 /* HGSSearchSourceRankerCalibration.plist */; };
 		8B637A250F27706A00997738 /* GTMAppKit+UnitTesting.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B55DAE50E78829300D39CB0 /* GTMAppKit+UnitTesting.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B637A260F27706A00997738 /* GTMCalculatedRange.h in Headers */ = {isa = PBXBuildFile; fileRef = 332AD8AB0DC93EB60009A7E9 /* GTMCalculatedRange.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1964,7 +1965,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				8B627CDF10D81BA900F166D1 /* Sparkle.framework in Copy Frameworks */,
+				8B445B0F10EBDF8500561E62 /* Sparkle.framework in Copy Frameworks */,
 				620CB3870FAA84060029801C /* QSBPluginUI.framework in Copy Frameworks */,
 				8B6128F90F4642C100E29B40 /* JSON.framework in Copy Frameworks */,
 				8B6C0D060F32C86100E51E5D /* GData.framework in Copy Frameworks */,
@@ -3750,6 +3751,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B627CDF10D81BA900F166D1 /* Sparkle.framework in Frameworks */,
 				620CB3920FAA84260029801C /* QSBPluginUI.framework in Frameworks */,
 				8B6129B30F46446D00E29B40 /* JSON.framework in Frameworks */,
 				8BD982BC0E63746200F5C83B /* GTM.framework in Frameworks */,
@@ -11669,6 +11671,7 @@
 					"\"$(SRCROOT)/../externals/GoogleBreakpad\"",
 					"\"$(SRCROOT)/../externals/Keystone\"",
 					"\"$(SRCROOT)/../externals/Growl\"",
+					"\"$(SRCROOT)/../externals/Sparkle\"",
 				);
 				INFOPLIST_FILE = Resources/Info.plist;
 				OTHER_LDFLAGS = (
@@ -11690,6 +11693,7 @@
 					"\"$(SRCROOT)/../externals/GoogleBreakpad\"",
 					"\"$(SRCROOT)/../externals/Keystone\"",
 					"\"$(SRCROOT)/../externals/Growl\"",
+					"\"$(SRCROOT)/../externals/Sparkle\"",
 				);
 				INFOPLIST_FILE = Resources/Info.plist;
 				OTHER_LDFLAGS = (
@@ -12132,6 +12136,7 @@
 					"\"$(SRCROOT)/../externals/GoogleBreakpad\"",
 					"\"$(SRCROOT)/../externals/Keystone\"",
 					"\"$(SRCROOT)/../externals/Growl\"",
+					"\"$(SRCROOT)/../externals/Sparkle\"",
 				);
 				INFOPLIST_FILE = Resources/Info.plist;
 				OTHER_LDFLAGS = (
