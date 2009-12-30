@@ -61,6 +61,8 @@
 //   NSNumber (BOOL)
 #define kQSBPathCellHiddenKey @"QSBPathCellHidden"
 
+// QSB Table result for a given HGSResult
+#define kQSBObjectTableResultAttributeKey @"QSBObjectTableResultAttributeKey"
 
 @class QSBPluginVerifyWindowController;
 
@@ -71,5 +73,6 @@
   NSArray *pluginPaths_;
   NSString *preferredLanguage_;  // The language our user prefers
   QSBPluginVerifyWindowController *pluginVerifyWindowController_;
+  NSMutableDictionary *cachedTableResults_;
 }
 @end

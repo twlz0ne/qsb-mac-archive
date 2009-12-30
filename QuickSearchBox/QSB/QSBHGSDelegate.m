@@ -35,6 +35,7 @@
 #import "FilesystemActions.h"
 #import "QSBPluginVerifyWindowController.h"
 #import "QSBActionSaveAsControllerProtocol.h"
+#import "QSBTableResult.h"
 
 // This constant is the name for the app that should be used w/in the a Google
 // folder (for w/in Application Support, etc.)
@@ -58,7 +59,13 @@ static NSString *const kWebURLsWithTitlesPboardType
     }
     if (!preferredLanguage_) {
       preferredLanguage_ = @"en";
-    }        
+    }
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self 
+           selector:@selector(queryControllerWillStart:) 
+               name:kHGSQueryControllerWillStartNotification 
+             object:nil];
+    cachedTableResults_ = [[NSMutableDictionary alloc] init];
   }
   return self;
 }
@@ -67,6 +74,8 @@ static NSString *const kWebURLsWithTitlesPboardType
   [preferredLanguage_ release];
   [pluginPaths_ release];
   [pluginVerifyWindowController_ release];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [cachedTableResults_ release];
   [super dealloc];
 }
 
@@ -206,6 +215,15 @@ static NSString *const kWebURLsWithTitlesPboardType
     }
     [pbValues setObject:[result displayName] forKey:NSStringPboardType];
     value = pbValues;
+  } else if ([key isEqualToString:kQSBObjectTableResultAttributeKey]) {
+    @synchronized (cachedTableResults_) {
+      QSBTableResult *tableResult = [cachedTableResults_ objectForKey:result];
+      if (!tableResult) {
+        tableResult = [QSBSourceTableResult tableResultWithResult:result];
+        [cachedTableResults_ setObject:tableResult forKey:result];
+      }
+      value = tableResult;
+    }
   }
   return value;
 }
@@ -440,6 +458,12 @@ static NSString *const kWebURLsWithTitlesPboardType
     }
   }
   return cellArray;
+}
+
+- (void)queryControllerWillStart:(NSNotification*)note {
+  @synchronized (cachedTableResults_) {
+    [cachedTableResults_ removeAllObjects];
+  }
 }
 
 @end

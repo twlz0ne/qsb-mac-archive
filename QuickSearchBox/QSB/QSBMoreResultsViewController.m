@@ -32,7 +32,6 @@
 
 #import "QSBMoreResultsViewController.h"
 #import "QSBApplicationDelegate.h"
-#import "QSBCategoryTextAttachment.h"
 #import "QSBSearchController.h"
 #import "QSBSearchViewController.h"
 #import "QSBPreferences.h"
@@ -44,8 +43,8 @@
 #import "GTMGarbageCollection.h"
 #import "GTMMethodCheck.h"
 #import "GTMNSNumber+64Bit.h"
-#import "QSBTableResult.h"
 #import "NSAttributedString+Attributes.h"
+#import "QSBHGSDelegate.h"
 
 // Extra space to allow for miscellaneous rows (such as fold) in the results table.
 static const NSUInteger kCategoryRowOverhead = 3;
@@ -54,50 +53,19 @@ static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 
 @interface QSBMoreResultsViewController ()
 
-// Get/set sorted array of localized category names, suitable
-// for use as keys to the dictionary returned by resultsByCategory.
-@property (readwrite, retain, nonatomic) NSArray *sortedCategoryNames;
-
-
-// Get/set an array, in one-to-one correspondence with the array returned
-// by sortedCategoryNames, containing the index of the first results in
-// our arrangedObjects for each category.
-@property (readwrite, retain, nonatomic) NSArray *sortedCategoryIndexes;
-
-
-// Get/set an array, in one-to-one correspondence with the array returned
-// by sortedCategoryNames, containing the counts of the number of results in
-// our arrangedObjects for each category.
-@property (readwrite, retain, nonatomic) NSArray *sortedCategoryCounts;
-
-// Set/get the 'show all' categories.
-@property (readwrite, retain, nonatomic) NSSet *showAllCategoriesSet;
-
-@property (readwrite, retain, nonatomic) NSAttributedString *categoriesString;
-
-- (void)updateCategoryNames;
-
-// Determines if 'show all' is indicated for the given category.
-- (BOOL)showAllForCategory:(NSString *)category;
-
+- (void)updateCategoryNames:(NSArray *)names counts:(NSArray *)counts;
 
 @end
-
 
 @implementation QSBMoreResultsViewController
 
 GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 
-@synthesize sortedCategoryNames = sortedCategoryNames_;
-@synthesize sortedCategoryIndexes = sortedCategoryIndexes_;
-@synthesize sortedCategoryCounts = sortedCategoryCounts_;
-@synthesize showAllCategoriesSet = showAllCategoriesSet_;
-@synthesize categoriesString = categoriesString_;
-
 - (id)initWithNibName:(NSString *)nibNameOrNil 
                bundle:(NSBundle *)nibBundleOrNil {
   if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
     rowHeightDict_ = [[NSMutableDictionary alloc] init];
+    showAllCategoriesSet_ = [[NSMutableSet alloc] init];
   }
   return self;
 }
@@ -133,10 +101,6 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 
 - (void)dealloc {
   [moreResults_ release];
-  [sortedCategoryNames_ release];
-  [sortedCategoryIndexes_ release];
-  [sortedCategoryCounts_ release];
-  [categoriesString_ release];
   [showAllCategoriesSet_ release];
   [moreResultsDict_ release];
   [rowHeightDict_ release];
@@ -160,23 +124,19 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   }
   return object;
 }
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
-  return [moreResults_ count];
-}
-
-- (CGFloat)tableView:(NSTableView *)tableView
-         heightOfRow:(NSInteger)row {
-  QSBTableResult *result = [self tableResultForRow:row];
-  Class resultClass = [result class];
-  NSNumber *nsHeight = [rowHeightDict_ objectForKey:resultClass];
-  if (!nsHeight) {
-    CGFloat rowHeight = [super tableView:tableView heightOfRow:row];
-    nsHeight = [NSNumber gtm_numberWithCGFloat:rowHeight];
-    [rowHeightDict_ setObject:nsHeight forKey:resultClass];
+ 
+- (NSDictionary *)localizedCategoryMap:(NSDictionary *)unlocalizedCategories {
+  // Compose a results dict with localized category
+  NSMutableDictionary *localizedDict
+    = [NSMutableDictionary dictionaryWithCapacity:[unlocalizedCategories count]];
+  NSBundle *bundle = [NSBundle mainBundle];
+  for (NSString *rawCategoryName in unlocalizedCategories) {
+    NSString *localizedCategoryName 
+      = [bundle localizedStringForKey:rawCategoryName value:nil table:nil];
+    id object = [unlocalizedCategories objectForKey:rawCategoryName];
+    [localizedDict setObject:object forKey:localizedCategoryName];
   }
-  CGFloat height = [nsHeight gtm_cgFloatValue];
-  return height;
+  return localizedDict;
 }
 
 - (void)setMoreResultsWithDict:(NSDictionary *)rawDict {
@@ -185,33 +145,21 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 
   // TODO(mrossetti): There may be a need to merge categories.
   BOOL firstCategory = YES;
-  NSUInteger categoryLimit = [[NSUserDefaults standardUserDefaults]
-                            integerForKey:kQSBMoreCategoryResultCountKey];
-  
-  // Compose a results dict with localized category as name then sort.
-  NSMutableDictionary *localizedDict
-    = [NSMutableDictionary dictionaryWithCapacity:[rawDict count]];
-  NSBundle *bundle = [NSBundle mainBundle];
-  for (NSString *rawCategoryName in [rawDict allKeys]) {
-    NSString *localizedCategoryName 
-      = [bundle localizedStringForKey:rawCategoryName 
-                                value:nil 
-                                table:nil];
-    [localizedDict setObject:[rawDict objectForKey:rawCategoryName]
-                      forKey:localizedCategoryName];
-  }
-  NSArray *sortedCategories = [[localizedDict allKeys]
-                               sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+  NSUInteger categoryLimit = [ud integerForKey:kQSBMoreCategoryResultCountKey];
+  NSDictionary *localizedDict = [self localizedCategoryMap:rawDict];
+  SEL caseInsensitiveCompare = @selector(caseInsensitiveCompare:);
+  NSArray *sortedCategories 
+    = [[localizedDict allKeys] sortedArrayUsingSelector:caseInsensitiveCompare];
   
   // Size allows for |categoryLimit| results, a show all, and a separator for 
   // each category plus the 'Top Results' fold.
   NSUInteger catCount = [sortedCategories count];
-  NSMutableArray *results = [NSMutableArray
-                             arrayWithCapacity:(catCount * categoryLimit)
-                                               + kCategoryRowOverhead];
-  NSMutableArray *sortedIndexes = [NSMutableArray arrayWithCapacity:catCount];
+  NSUInteger resultCount = (catCount * categoryLimit) + kCategoryRowOverhead;
+  NSMutableArray *results = [NSMutableArray arrayWithCapacity:resultCount];
   NSMutableArray *sortedCounts = [NSMutableArray arrayWithCapacity:catCount];
-
+  NSBundle *bundle = [NSBundle mainBundle];
+  
   for (NSString *categoryName in sortedCategories) {
     // Insert a separator if this is not the first category.
     if (firstCategory) {
@@ -220,74 +168,64 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
       [results addObject:[QSBSeparatorTableResult tableResult]];
     }
     
-    BOOL showAllInThisCategory = [self showAllForCategory:categoryName];
+    BOOL showAllInThisCategory 
+      = [showAllCategoriesSet_ containsObject:categoryName];
     NSArray *categoryArray = [localizedDict objectForKey:categoryName];
     NSUInteger categoryCount = [categoryArray count];
     [sortedCounts addObject:[NSNumber numberWithUnsignedInteger:categoryCount]];
     NSUInteger resultCounter = 0;
     
-    if ([categoryArray count] == categoryLimit + 1) showAllInThisCategory = YES;
+    if (categoryCount == categoryLimit + 1) {
+      showAllInThisCategory = YES;
+    }
+    
     for (HGSResult *result in categoryArray) {
       if (!showAllInThisCategory && resultCounter >= categoryLimit) {
         break;
       }
       QSBSourceTableResult *sourceResult 
-        = [QSBSourceTableResult tableResultWithResult:result];
+        = [result valueForKey:kQSBObjectTableResultAttributeKey];
+      NSString *localizedCategoryName = nil;
       if (resultCounter == 0) {
         // Tag this as the first row for a category so the title will show.
-        NSString *localizedCategoryName 
+        localizedCategoryName
           = GTMCFAutorelease(UTTypeCopyDescription((CFStringRef)categoryName));
         if (!localizedCategoryName) {
           localizedCategoryName = [bundle localizedStringForKey:categoryName
                                                           value:nil 
                                                           table:nil];
         }
-        [sourceResult setCategoryName:localizedCategoryName];
-        NSUInteger resultsCount = [results count];
-        NSNumber *resultsCountNum 
-          = [NSNumber numberWithUnsignedInteger:resultsCount];
-        [sortedIndexes addObject:resultsCountNum];
-        [results addObject:sourceResult];
-      } else {
-        [results addObject:sourceResult];
       }
+      [sourceResult setCategoryName:localizedCategoryName];
+      [results addObject:sourceResult];
       ++resultCounter;
     }
     
     categoryCount = [categoryArray count];
     if (resultCounter < categoryCount) {
       // Insert a 'Show all n...' cell.
-      [results addObject:[QSBShowAllTableResult tableResultWithCategory:categoryName
-                                                                  count:categoryCount]];
+      QSBShowAllTableResult *result
+        = [QSBShowAllTableResult tableResultWithCategory:categoryName
+                                                   count:categoryCount];
+      [results addObject:result];
     }
   }
-  
-  [self setSortedCategoryNames:sortedCategories];
-  [self setSortedCategoryIndexes:sortedIndexes];
-  [self setSortedCategoryCounts:sortedCounts];
-
   [moreResults_ autorelease];
   moreResults_ = [results retain];
   [[self resultsTableView] reloadData];
   [[self searchViewController] updateResultsView];
   
-  [self updateCategoryNames];
+  [self updateCategoryNames:sortedCategories counts:sortedCounts];
   
   // If we're setting to nil then we want to reset the expanded categories.
   if (!rawDict) {
-    [self setShowAllCategoriesSet:nil];  // Reset categories which 'show all'.
+    [showAllCategoriesSet_ removeAllObjects];
   }
 }
 
 - (void)addShowAllCategory:(NSString *)category {
-  NSSet *oldSet = [self showAllCategoriesSet];
-  if (oldSet) {
-    NSSet *newSet = [oldSet setByAddingObject:category];
-    [self setShowAllCategoriesSet:newSet];
-  } else {
-    NSSet *brandNewSet = [NSSet setWithObject:category];
-    [self setShowAllCategoriesSet:brandNewSet];
-  }
+  [showAllCategoriesSet_ addObject:category];
+
   // Force our category lists and indexes to be regenerated.
   // The selection gets lost so save/restore the selection.
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
@@ -303,7 +241,36 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
                   userInfo:userInfo];
 }
 
-#pragma mark NSTableView Delegate Methods
+- (void)updateCategoryNames:(NSArray *)names counts:(NSArray *)counts {
+  NSString *comma = nil;
+  NSMutableString *categorySummary = [NSMutableString string];
+  NSEnumerator *catCountEnum = [counts objectEnumerator];
+  for (NSString *catString in names) {
+    NSUInteger catCount = [[catCountEnum nextObject] unsignedIntValue];
+    if (catCount == 1) {
+      // Singularize the category string.
+      NSBundle *bundle = [NSBundle mainBundle];
+      catString = [bundle localizedStringForKey:catString 
+                                          value:nil 
+                                          table:@"CategorySingulars"];
+    }
+    if (!comma) {
+      comma = NSLocalizedString(@", ", nil);
+    } else {
+      [categorySummary appendString:comma];
+    }
+    [categorySummary appendFormat:@"%u %@", catCount, catString];
+  }
+
+  [[[self searchViewController] topResultsController]
+   setCategorySummaryString:categorySummary];
+}
+
+- (Class)rowViewControllerClassForResult:(QSBTableResult *)result {
+  return [result moreResultsRowViewControllerClass];
+}
+
+#pragma mark NSResponder Overrides
 
 - (void)moveUp:(id)sender {
   NSInteger row = [[self resultsTableView] selectedRow];
@@ -368,82 +335,23 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   [super moveDown:sender];
 }
 
-- (Class)rowViewControllerClassForResult:(QSBTableResult *)result {
-  return [result moreResultsRowViewControllerClass];
+#pragma mark NSTableViewDelegate Methods
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
+  return [moreResults_ count];
 }
 
-- (void)updateCategoryNames {
-  NSArray *categories = [self sortedCategoryNames];
-  NSArray *categoryIndexes = [self sortedCategoryIndexes];
-  NSArray *categoryCounts = [self sortedCategoryCounts];
-  
-  NSString *comma = NSLocalizedString(@", ", nil);
-  NSAttributedString *separator
-    = [[[NSAttributedString alloc] initWithString:comma] autorelease];
-  NSMutableAttributedString *categoryString
-    = [[[NSMutableAttributedString alloc] init] autorelease];
-  NSMutableString *categorySummary = [NSMutableString string];
-  BOOL first = YES;
-  NSEnumerator *catIndexEnum = [categoryIndexes objectEnumerator];
-  NSEnumerator *catCountEnum = [categoryCounts objectEnumerator];
-  NSEnumerator *catEnum = [categories objectEnumerator];
-  NSString *catString = nil;
-  while ((catString = [catEnum nextObject])) {
-    NSUInteger catIndex = [[catIndexEnum nextObject] unsignedIntValue];
-    NSUInteger catCount = [[catCountEnum nextObject] unsignedIntValue];
-    if (catCount == 1) {
-      // Singularize the category string.
-      NSBundle *bundle = [NSBundle mainBundle];
-      catString = [bundle localizedStringForKey:catString 
-                                          value:nil 
-                                          table:@"CategorySingulars"];
-    }
-    QSBCategoryTextAttachment *catAttachment
-      = [QSBCategoryTextAttachment categoryTextAttachmentWithString:catString
-                                                             index:catIndex];
-    if (first) {
-      first = NO;
-    } else {
-      [categoryString appendAttributedString:separator];
-      [categorySummary appendString:comma];
-    }
-    NSAttributedString *catTail
-      = [NSAttributedString attributedStringWithAttachment:catAttachment];
-    [categoryString appendAttributedString:catTail];
-    [categorySummary appendFormat:@"%u %@", catCount, catString];
+- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
+  QSBTableResult *result = [self tableResultForRow:row];
+  Class resultClass = [result class];
+  NSNumber *nsHeight = [rowHeightDict_ objectForKey:resultClass];
+  if (!nsHeight) {
+    CGFloat rowHeight = [super tableView:tableView heightOfRow:row];
+    nsHeight = [NSNumber gtm_numberWithCGFloat:rowHeight];
+    [rowHeightDict_ setObject:nsHeight forKey:resultClass];
   }
-  
-  // Set the line break attribute.
-  NSMutableParagraphStyle *lineBreakStyle
-    = [[[NSMutableParagraphStyle alloc] init] autorelease];
-  [lineBreakStyle setLineBreakMode:NSLineBreakByTruncatingTail];
-  NSDictionary *lineBreakAttributes
-    = [NSDictionary dictionaryWithObject:lineBreakStyle
-                                forKey:NSParagraphStyleAttributeName];
-  [categoryString addAttributes:lineBreakAttributes];
-  [self setCategoriesString:categoryString];
-  
-  [[[self searchViewController] topResultsController]
-   setCategorySummaryString:categorySummary];
-}
-
-- (void)textView:(NSTextView *)aTextView
-   clickedOnCell:(id<NSTextAttachmentCell>)cell
-          inRect:(NSRect)cellFrame
-         atIndex:(NSUInteger)idx {
-  QSBCategoryTextAttachmentCell *catCell = (QSBCategoryTextAttachmentCell *)cell;
-  NSUInteger catIndex = [catCell tableIndex];
-  QSBResultsViewTableView *resultsTableView = [self resultsTableView];
-  [resultsTableView selectRow:catIndex byExtendingSelection:NO];
-  if (![resultsTableView rowIsVisible:catIndex]) {
-    [resultsTableView scrollRowToVisible:[resultsTableView numberOfRows] - 1];
-    [resultsTableView scrollRowToVisible:catIndex];
-  }
-}
-
-- (BOOL)showAllForCategory:(NSString *)category {
-  BOOL showAll = ([showAllCategoriesSet_ containsObject:category]);
-  return showAll;
+  CGFloat height = [nsHeight gtm_cgFloatValue];
+  return height;
 }
 
 @end

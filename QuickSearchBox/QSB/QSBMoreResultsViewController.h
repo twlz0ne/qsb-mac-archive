@@ -36,15 +36,8 @@
 //
 @interface QSBMoreResultsViewController : QSBResultsViewBaseController {
  @private  
-  // The results we are presenting.
-  NSArray *moreResults_;
-  NSArray *sortedCategoryNames_;
-  NSArray *sortedCategoryIndexes_;
-  NSArray *sortedCategoryCounts_;
-  
-  // List of all category titles available for presentation in 'More' view.
-  NSAttributedString *categoriesString_;
-  NSSet *showAllCategoriesSet_;  // Category keys for which to 'show all'.
+  NSArray *moreResults_;  // The results we are presenting.
+  NSMutableSet *showAllCategoriesSet_;  // Category keys for which to 'show all'
 
   // Cache our results in case a category is fully exposed (Show All...)
   // and the indexes and counts need recalculating.
@@ -54,9 +47,6 @@
   NSMutableDictionary *rowHeightDict_;
   NSTimeInterval blockTime_; // Time we started blocking repeats
 }
-
-// Returns a list of all categories available for presentation.
-@property (readonly, retain, nonatomic) NSAttributedString *categoriesString;
 
 // Set the full more results.
 - (void)setMoreResultsWithDict:(NSDictionary *)value;

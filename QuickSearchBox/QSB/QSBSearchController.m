@@ -36,6 +36,7 @@
 #import "QSBApplicationDelegate.h"
 #import "QSBMoreResultsViewController.h"
 #import "QSBPreferences.h"
+#import "QSBHGSDelegate.h"
 #import "QSBTableResult.h"
 #import "QSBResultsViewBaseController.h"
 #import "GTMMethodCheck.h"
@@ -186,7 +187,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     }
     if (okayToAppend) {
       QSBSourceTableResult *sourceResult
-        = [QSBSourceTableResult tableResultWithResult:result];
+        = [result valueForKey:kQSBObjectTableResultAttributeKey];
       CGFloat resultScore = [result rank];
       if (pivotObject
           || resultScore > HGSCalibratedScore(kHGSCalibratedInsignificantScore)) {
@@ -241,8 +242,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       if (minSuggestCount && [hgsSuggestions count]) {
         NSMutableArray *target = suggestResults;
         for (HGSResult *suggest in hgsSuggestions) {
-          QSBTableResult *qsbSuggest = nil;
-          qsbSuggest = [QSBSourceTableResult tableResultWithResult:suggest];
+          QSBTableResult *qsbSuggest 
+            = [suggest valueForKey:kQSBObjectTableResultAttributeKey];
           [target addObject:qsbSuggest];
         }
       }

@@ -42,6 +42,17 @@
 			name = HeaderDoc;
 			productName = HeaderDoc;
 		};
+		8B53EB3410DC0E84007E6AF2 /* Open Build Folder */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 8B53EB3810DC0EB0007E6AF2 /* Build configuration list for PBXAggregateTarget "Open Build Folder" */;
+			buildPhases = (
+				8B53EB3310DC0E84007E6AF2 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "Open Build Folder";
+			productName = "Open Build Folder";
+		};
 		8B77DEFE0F284A4C00FA2A3C /* Release Notes */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 8B77E00A0F28C9AA00FA2A3C /* Build configuration list for PBXAggregateTarget "Release Notes" */;
@@ -363,7 +374,6 @@
 		6211C51D0F312E7E003A5122 /* HGSSimpleAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */; };
 		6219B5340E8C1DB3008643F4 /* BaseResultsViews.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */; };
 		621B1E3B0E4CD7B800EEF553 /* PreferencesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 621B1E390E4CD7B800EEF553 /* PreferencesWindow.xib */; };
-		621D21BB0E438F2000D739F2 /* QSBCategoryTextAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 621D21BA0E438F2000D739F2 /* QSBCategoryTextAttachment.m */; };
 		6223C9AD0E75B9CD00F61030 /* QSBMoreResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewController.m */; };
 		6223CBB30E761AEB00F61030 /* QSBResultsViewBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223CBB10E761AEB00F61030 /* QSBResultsViewBaseController.m */; };
 		6223CC890E76EC4E00F61030 /* QSBResultsViewTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6223CC870E76EC4E00F61030 /* QSBResultsViewTableView.m */; };
@@ -2155,8 +2165,6 @@
 		6219B5330E8C1DB3008643F4 /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/BaseResultsViews.xib; sourceTree = "<group>"; };
 		621B1E3A0E4CD7B800EEF553 /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/PreferencesWindow.xib; sourceTree = "<group>"; };
 		621BCE950F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSProtoExtensionFactoringTest.m; sourceTree = "<group>"; };
-		621D21B90E438F2000D739F2 /* QSBCategoryTextAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBCategoryTextAttachment.h; sourceTree = "<group>"; };
-		621D21BA0E438F2000D739F2 /* QSBCategoryTextAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCategoryTextAttachment.m; sourceTree = "<group>"; };
 		6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMoreResultsViewController.m; sourceTree = "<group>"; };
 		6223C9AC0E75B9CD00F61030 /* QSBMoreResultsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBMoreResultsViewController.h; sourceTree = "<group>"; };
 		6223CBB10E761AEB00F61030 /* QSBResultsViewBaseController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBResultsViewBaseController.m; sourceTree = "<group>"; };
@@ -4717,8 +4725,6 @@
 				8B5EC6480CEE61BE00AD3BBD /* QSBBackgroundView.h */,
 				8B5EC6490CEE61BE00AD3BBD /* QSBBackgroundView.m */,
 				62D14DFA0F15651B0053B99F /* QSBBooleanToColorTransformer.m */,
-				621D21B90E438F2000D739F2 /* QSBCategoryTextAttachment.h */,
-				621D21BA0E438F2000D739F2 /* QSBCategoryTextAttachment.m */,
 				8BF52F630EE2250600D981A0 /* QSBCustomPanel.h */,
 				8BF52F640EE2250600D981A0 /* QSBCustomPanel.m */,
 				8B21631D0EB9022300183DE4 /* QSBDetailedRowViewController.h */,
@@ -7184,6 +7190,7 @@
 				8BC6E3ED0FAABE71005A0F6F /* Build All */,
 				795F071909870215004C6BFE /* Test All */,
 				8BAB339110BC81A7002E1AC9 /* Delete Preferences */,
+				8B53EB3410DC0E84007E6AF2 /* Open Build Folder */,
 				F4EF8F740ECB3EFF008DD6DA /* QSB Application */,
 				8B77DEFE0F284A4C00FA2A3C /* Release Notes */,
 				8B2E2A400F99018600F80E11 /* HeaderDoc */,
@@ -8132,6 +8139,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/BuildScripts/PostBuild.sh\"";
 		};
+		8B53EB3310DC0E84007E6AF2 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "open \"${CONFIGURATION_BUILD_DIR}\"\nosascript -e \"tell app \\\"Finder\\\" to activate\"\n";
+		};
 		8B61289F0F4641BF00E29B40 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -9007,7 +9027,6 @@
 				7F9CDD810DD8D69B007C4BF4 /* QSBMenuButtonCell.m in Sources */,
 				7F3F758C0E152A57001AF34E /* QSBScrollView.m in Sources */,
 				7F3F75950E152BA5001AF34E /* QSBSmallScroller.m in Sources */,
-				621D21BB0E438F2000D739F2 /* QSBCategoryTextAttachment.m in Sources */,
 				8B58E9EE0E548F8C00A0E02E /* QSBGoogleSuggestURLHandler.m in Sources */,
 				625A2C980E5614F3008CA9BF /* QSBPreferenceWindowController.m in Sources */,
 				F487E3A90E59D4D0005B47E6 /* QSBPreferences.m in Sources */,
@@ -11762,6 +11781,34 @@
 			};
 			name = Release;
 		};
+		8B53EB3510DC0E85007E6AF2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "Open Build Folder";
+			};
+			name = Debug;
+		};
+		8B53EB3610DC0E85007E6AF2 /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "Open Build Folder";
+			};
+			name = "Debug-gcov";
+		};
+		8B53EB3710DC0E85007E6AF2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "Open Build Folder";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		8B6128A10F4641BF00E29B40 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
@@ -13121,6 +13168,16 @@
 				8B4810AA1046345700BB6A2D /* Debug */,
 				8B4810AB1046345700BB6A2D /* Debug-gcov */,
 				8B4810AC1046345700BB6A2D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8B53EB3810DC0EB0007E6AF2 /* Build configuration list for PBXAggregateTarget "Open Build Folder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B53EB3510DC0E85007E6AF2 /* Debug */,
+				8B53EB3610DC0E85007E6AF2 /* Debug-gcov */,
+				8B53EB3710DC0E85007E6AF2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
