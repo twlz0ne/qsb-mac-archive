@@ -414,8 +414,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     // This became a separate call because some sources come back before
     // this call returns and queryController_ must be set first
     [queryController_ startQuery];
-    [self startMixing];
     [self startDisplayTimer];
+    [self startMixing];
   }
 }
 
