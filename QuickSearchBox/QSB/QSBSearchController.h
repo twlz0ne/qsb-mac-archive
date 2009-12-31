@@ -56,6 +56,7 @@
   // used to update the UI at various times through the life of the query
   NSTimer *displayTimer_;
   BOOL queryIsInProcess_;  // Yes while a query is under way.
+  BOOL queryControllerFinished_;  // Yes if the results gathering has completed.
   NSUInteger pushModifierFlags_; // NSEvent Modifiers at pivot time
   NSUInteger totalResultDisplayCount_;
 }
