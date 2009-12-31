@@ -8194,7 +8194,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\nset -o errexit\nset -o nounset\nset -o verbose\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
+			shellScript = "# Run the unit tests in this test bundle.\n\nset -o errexit\nset -o nounset\nset -o verbose\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\n\nexport OTHER_TEST_FLAGS=\"-SUEnableAutomaticChecks 0\"\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
 		};
 		8B6870371017DEA800ADEA67 /* Strip Headers */ = {
 			isa = PBXShellScriptBuildPhase;

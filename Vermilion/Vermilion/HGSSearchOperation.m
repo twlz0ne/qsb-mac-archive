@@ -192,15 +192,18 @@ NSString *const kHGSSearchOperationWasCancelledNotification
 }
 
 - (NSArray *)sortedResultsInRange:(NSRange)range {
-  NSMutableArray *array = [NSMutableArray arrayWithCapacity:range.length];
-  [self disableUpdates];
-  for (NSUInteger i = range.location; i < NSMaxRange(range); ++i) {
-    HGSResult *result = [self sortedResultAtIndex:i];
-    if (result) {
-      [array addObject:result];
+  NSMutableArray *array = nil;
+  if (range.length > 0) {
+    array = [NSMutableArray arrayWithCapacity:range.length];
+    [self disableUpdates];
+    for (NSUInteger i = range.location; i < NSMaxRange(range); ++i) {
+      HGSResult *result = [self sortedResultAtIndex:i];
+      if (result) {
+        [array addObject:result];
+      }
     }
+    [self enableUpdates];
   }
-  [self enableUpdates];
   return array;
 }
 
