@@ -32,7 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import <GData/GData.h>
-#import "KeychainItem.h"
+#import "HGSKeychainItem.h"
 #import "NSNotificationCenter+MainThread.h"
 
 // Keys for properties passed along in the tickets and entry objects.
@@ -161,9 +161,9 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
   if ([imageResults count]) {
     GDataServiceGooglePhotos *picasaWebService = [self picasaWebService];
     if (!picasaWebService) {
-      KeychainItem* keychainItem 
-        = [KeychainItem keychainItemForService:[account_ identifier]
-                                      username:nil];
+      HGSKeychainItem* keychainItem 
+        = [HGSKeychainItem keychainItemForService:[account_ identifier]
+                                         username:nil];
       NSString *username = [keychainItem username];
       NSString *password = [keychainItem password];
       if ([username length]) {

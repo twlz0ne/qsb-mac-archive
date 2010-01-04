@@ -40,7 +40,6 @@
 #import "HGSCodeSignature.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
-#import "KeychainItem.h"
 #import "NSColor+Naming.h"
 #import "QSBPreferences.h"
 #import "QSBSearchWindowController.h"

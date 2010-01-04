@@ -35,7 +35,7 @@
 #import "HGSDelegate.h"
 #import "HGSCodeSignature.h"
 #import "HGSPluginBlacklist.h"
-#import "KeychainItem.h"
+#import "HGSKeychainItem.h"
 #import <openssl/aes.h>
 #import <openssl/evp.h>
 #import <openssl/x509.h>
@@ -572,14 +572,15 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
                                                    &keyMaterialLengthFromKeychain,
                                                    &keyMaterialFromKeychain,
                                                    NULL);
-  if (!reportIfKeychainError(status)) {
+  if (![HGSKeychainItem reportIfKeychainError:status]) {
     if (keyMaterialLengthFromKeychain == kEncryptionKeyLength) {
       // Keychain has an existing key, return that
       memcpy(key, keyMaterialFromKeychain, kEncryptionKeyLength);
       gotKey = YES;
     }
-    reportIfKeychainError(SecKeychainItemFreeContent(NULL,
-                                                     keyMaterialFromKeychain));
+    status = SecKeychainItemFreeContent(NULL,
+                                        keyMaterialFromKeychain);
+    [HGSKeychainItem reportIfKeychainError:status];
   }
   
   if (!gotKey) {
@@ -594,7 +595,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
                                              kEncryptionKeyLength,
                                              key,
                                              NULL);
-      if (!reportIfKeychainError(status)) {
+      if (![HGSKeychainItem reportIfKeychainError:status]) {
         gotKey = YES;
       }
     }
@@ -617,10 +618,12 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
                                                    &keyMaterialLengthFromKeychain,
                                                    &keyMaterialFromKeychain,
                                                    &itemRef);
-  if (!reportIfKeychainError(status)) {
-    reportIfKeychainError(SecKeychainItemFreeContent(NULL,
-                                                     keyMaterialFromKeychain));
-    reportIfKeychainError(SecKeychainItemDelete(itemRef));
+  if (![HGSKeychainItem reportIfKeychainError:status]) {
+    status = SecKeychainItemFreeContent(NULL,
+                                        keyMaterialFromKeychain);
+    [HGSKeychainItem reportIfKeychainError:status];
+    status = SecKeychainItemDelete(itemRef);
+    [HGSKeychainItem reportIfKeychainError:status];
     CFRelease(itemRef);
   }
 }

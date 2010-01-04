@@ -123,7 +123,6 @@
 				7F9417890EEF53CD0049AE06 /* PBXTargetDependency */,
 				7F94178B0EEF53CD0049AE06 /* PBXTargetDependency */,
 				622911BD0F2E8034005D34CE /* PBXTargetDependency */,
-				62A4AD580F2FCFC50007CD99 /* PBXTargetDependency */,
 				5AF0EC1C0F6075420041E0B9 /* PBXTargetDependency */,
 				5AF0EF3F0F61D33F0041E0B9 /* PBXTargetDependency */,
 				5AF0F53C0F671E750041E0B9 /* PBXTargetDependency */,
@@ -240,7 +239,6 @@
 /* End PBXAppleScriptBuildPhase section */
 
 /* Begin PBXBuildFile section */
-		337C2C890DCFDA9B00897EB3 /* KeychainItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 337C2C870DCFDA9B00897EB3 /* KeychainItem.m */; };
 		33A015BC0DD38E1900578DE5 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		33D2C65D0DD1080700C1FBDC /* gdocdocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 33D2C6550DD1080700C1FBDC /* gdocdocument.icns */; };
 		33D2C65E0DD1080700C1FBDC /* gdocpresentation.icns in Resources */ = {isa = PBXBuildFile; fileRef = 33D2C6560DD1080700C1FBDC /* gdocpresentation.icns */; };
@@ -347,7 +345,6 @@
 		6203586C100277CA008CAFB2 /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
 		6203586D100277D0008CAFB2 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		6203587410027821008CAFB2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
-		620CB3790FAA83D40029801C /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
 		620CB3870FAA84060029801C /* QSBPluginUI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
 		620CB3920FAA84260029801C /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
 		620CB39E0FAA844D0029801C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
@@ -363,7 +360,6 @@
 		620CB56F0FAA85160029801C /* QSBSetUpSimpleAccountViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 62F974C80F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		620CB5700FAA85160029801C /* QSBSetUpSimpleAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F974C90F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.m */; };
 		620EC2E10FF5BFD7008666B3 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
-		62115E670F3226F7007FEA2A /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		6211C51D0F312E7E003A5122 /* HGSSimpleAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */; };
 		6219B5340E8C1DB3008643F4 /* BaseResultsViews.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */; };
 		621B1E3B0E4CD7B800EEF553 /* PreferencesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 621B1E390E4CD7B800EEF553 /* PreferencesWindow.xib */; };
@@ -385,7 +381,7 @@
 		623ADD7B0EC0CC31001651D1 /* EmailURLAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 623ADD780EC0CC31001651D1 /* EmailURLAction.m */; };
 		623AFDBE0E9ABBEF002A8401 /* QSBTopResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 623AFDBC0E9ABBEF002A8401 /* QSBTopResultsViewController.m */; };
 		623B19251003E19C009B702D /* GTMNSScanner+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 623B19231003E19C009B702D /* GTMNSScanner+JSON.m */; };
-		623B19261003E19C009B702D /* GTMNSScanner+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 623B19241003E19C009B702D /* GTMNSScanner+JSON.h */; };
+		623B19261003E19C009B702D /* GTMNSScanner+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 623B19241003E19C009B702D /* GTMNSScanner+JSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		623BC8E00EFABC560004FAB7 /* NSAttributedString+Attributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 623BC8DE0EFABC560004FAB7 /* NSAttributedString+Attributes.m */; };
 		623CC13A0E79B94E00D32B75 /* MoreStandardResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 623CC1380E79B94E00D32B75 /* MoreStandardResultView.xib */; };
 		623CC13D0E79B97C00D32B75 /* MorePlaceHolderResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 623CC13B0E79B97C00D32B75 /* MorePlaceHolderResultView.xib */; };
@@ -421,14 +417,6 @@
 		62A16A900ED484DF0074F41B /* HGSPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A16A8E0ED484DF0074F41B /* HGSPlugin.m */; };
 		62A16A940ED485A60074F41B /* HGSProtoExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 62A16A930ED485A60074F41B /* HGSProtoExtension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62A16A970ED485C50074F41B /* HGSProtoExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A16A960ED485C50074F41B /* HGSProtoExtension.m */; };
-		62A4AC810F2FCD950007CD99 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
-		62A4AC830F2FCD950007CD99 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
-		62A4AC840F2FCD950007CD99 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
-		62A4AC850F2FCD950007CD99 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
-		62A4AD150F2FCE0E0007CD99 /* TwitterAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A4AD110F2FCE0E0007CD99 /* TwitterAccount.m */; };
-		62A4AD160F2FCE0E0007CD99 /* TwitterMessageAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A4AD120F2FCE0E0007CD99 /* TwitterMessageAction.m */; };
-		62A4ADAA0F2FD4890007CD99 /* Twitter.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 62A4AC8A0F2FCD950007CD99 /* Twitter.hgs */; };
-		62A4AEAC0F30DF9F0007CD99 /* GTMBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A4AEAB0F30DF9F0007CD99 /* GTMBase64.m */; };
 		62A5B283107E570200444AC9 /* GoogleAccountObjectSpecifiers.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A5B282107E570200444AC9 /* GoogleAccountObjectSpecifiers.m */; };
 		62A5B289107E576E00444AC9 /* GoogleAccountRegisterAccountCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A5B288107E576E00444AC9 /* GoogleAccountRegisterAccountCommand.m */; };
 		62AD18A60F16B034000D380C /* QSBPathControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 62AD18A50F16B034000D380C /* QSBPathControl.m */; };
@@ -440,7 +428,6 @@
 		62BFDDEA103CE02F00421C85 /* HGSSearchTermScorerTestData.plist in Resources */ = {isa = PBXBuildFile; fileRef = 62BFDDE9103CE02F00421C85 /* HGSSearchTermScorerTestData.plist */; };
 		62C051BA0F31307100DFBB1B /* HGSSimpleAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62C25E270F8BF17500DA57E7 /* PicasaPlaceholder.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */; };
-		62C5CAD60FA13197000896CD /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		62C8078F104770B5004B977A /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		62D0E96B0EF059B40028522C /* HGSAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D0E96A0EF059B40028522C /* HGSAccount.m */; };
 		62D0E96F0EF05D0E0028522C /* HGSAccountsExtensionPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D0E96D0EF05D0E0028522C /* HGSAccountsExtensionPoint.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -575,10 +562,10 @@
 		8B0E66700FD82C6300461C4A /* GTMHotKeyTextField.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B0E665E0FD82C6300461C4A /* GTMHotKeyTextField.strings */; };
 		8B0E67140FD8643900461C4A /* Command.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 8B0E67130FD8643900461C4A /* Command.pdf */; };
 		8B0F054A10C73BD400C1A6FD /* GTMUnitTestingUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B0F054910C73BD400C1A6FD /* GTMUnitTestingUtilities.m */; };
-		8B0F054C10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B0F054B10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h */; };
+		8B0F054C10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B0F054B10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B0F071910C745EA00C1A6FD /* NSArray+HGSCommonPrefixDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F5856E30DF83D85009EDEA5 /* NSArray+HGSCommonPrefixDetection.m */; };
 		8B0F073110C7465900C1A6FD /* NSString+CaseInsensitive.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7C373C0D78A415009885B4 /* NSString+CaseInsensitive.m */; };
-		8B0F073210C7465E00C1A6FD /* NSString+CaseInsensitive.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B7C373B0D78A415009885B4 /* NSString+CaseInsensitive.h */; };
+		8B0F073210C7465E00C1A6FD /* NSString+CaseInsensitive.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B7C373B0D78A415009885B4 /* NSString+CaseInsensitive.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B0FFC7010C6033800C1A6FD /* GTMSenTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */; };
 		8B0FFC7110C6033800C1A6FD /* GTMUnitTestDevLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */; };
 		8B0FFC7210C6033800C1A6FD /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
@@ -607,7 +594,7 @@
 		8B307B0F1051AB40006C4C7A /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
 		8B307C421051B606006C4C7A /* SampleEmail.emlx in Resources */ = {isa = PBXBuildFile; fileRef = 8B307BDE1051B5D4006C4C7A /* SampleEmail.emlx */; };
 		8B3082DD1056EE1F006C4C7A /* GTMNSNumber+64Bit.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3082DB1056EE1F006C4C7A /* GTMNSNumber+64Bit.m */; };
-		8B3082DE1056EE1F006C4C7A /* GTMNSNumber+64Bit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B3082DC1056EE1F006C4C7A /* GTMNSNumber+64Bit.h */; };
+		8B3082DE1056EE1F006C4C7A /* GTMNSNumber+64Bit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B3082DC1056EE1F006C4C7A /* GTMNSNumber+64Bit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B312E501057008C00D57495 /* libobjc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B312E4F1057008C00D57495 /* libobjc.dylib */; };
 		8B312E57105700A100D57495 /* libobjc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B312E4F1057008C00D57495 /* libobjc.dylib */; };
 		8B312E5E105700BB00D57495 /* libobjc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B312E4F1057008C00D57495 /* libobjc.dylib */; };
@@ -659,6 +646,14 @@
 		8B4099FF0F93DC0100DF540E /* GTMUILocalizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B4099FD0F93DC0100DF540E /* GTMUILocalizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B409A000F93DC0100DF540E /* GTMUILocalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4099FE0F93DC0100DF540E /* GTMUILocalizer.m */; };
 		8B445B0F10EBDF8500561E62 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8B627CD610D81B9700F166D1 /* Sparkle.framework */; };
+		8B44636710F2740100561E62 /* GTMBase64.h in Headers */ = {isa = PBXBuildFile; fileRef = 62A4AEAA0F30DF9F0007CD99 /* GTMBase64.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B44636A10F2740C00561E62 /* GTMUnitTestDevLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B95CCB30F6EDD8C003BDBDD /* GTMUnitTestDevLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B44638810F2769B00561E62 /* QSBPluginUI.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B44638710F2769B00561E62 /* QSBPluginUI.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B4463A310F2783200561E62 /* QSBActionSaveAsControllerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 62F595090FEB15DF0076CDDA /* QSBActionSaveAsControllerProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B4463F910F278FC00561E62 /* HGSKeychainItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4463F710F278FC00561E62 /* HGSKeychainItem.m */; };
+		8B4463FA10F278FC00561E62 /* HGSKeychainItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B4463F810F278FC00561E62 /* HGSKeychainItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B4463FD10F2790700561E62 /* HGSKeychainItemTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4463FC10F2790700561E62 /* HGSKeychainItemTest.m */; };
+		8B44661B10F2874C00561E62 /* GTMBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A4AEAB0F30DF9F0007CD99 /* GTMBase64.m */; };
 		8B453B390FB9EFA900C0E951 /* QSBWelcomeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62FB1E4E0FB39B1A0080B342 /* QSBWelcomeController.m */; };
 		8B459D890DA4417C001148C5 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		8B48109D1046345700BB6A2D /* GTMSenTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */; };
@@ -820,10 +815,6 @@
 		8B6EB53F101A0ACC006CFF7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB534101A0ACC006CFF7A /* InfoPlist.strings */; };
 		8B6EB5A8101A0AE0006CFF7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB592101A0AE0006CFF7A /* InfoPlist.strings */; };
 		8B6EB5A9101A0AE0006CFF7A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB594101A0AE0006CFF7A /* Localizable.strings */; };
-		8B6EB5C5101A0AED006CFF7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB5AB101A0AED006CFF7A /* InfoPlist.strings */; };
-		8B6EB5C6101A0AED006CFF7A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB5AD101A0AED006CFF7A /* Localizable.strings */; };
-		8B6EB5C7101A0AED006CFF7A /* EditTwitterAccount.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB5B1101A0AED006CFF7A /* EditTwitterAccount.xib */; };
-		8B6EB5C8101A0AED006CFF7A /* SetUpTwitterAccountView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB5B5101A0AED006CFF7A /* SetUpTwitterAccountView.xib */; };
 		8B6EB5E0101A0AFF006CFF7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB5CA101A0AFF006CFF7A /* InfoPlist.strings */; };
 		8B6EB5E1101A0AFF006CFF7A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB5CC101A0AFF006CFF7A /* Localizable.strings */; };
 		8B6EB5EE101A0B0F006CFF7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B6EB5E3101A0B0E006CFF7A /* InfoPlist.strings */; };
@@ -893,7 +884,6 @@
 		8B79111D0F9FCAD3006BFE1E /* HGSSQLiteBackedCacheTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */; };
 		8B79111E0F9FCAD3006BFE1E /* HGSStringUtilTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153370E9F9C5400C0EAA9 /* HGSStringUtilTest.m */; };
 		8B79111F0F9FCAD3006BFE1E /* HGSTokenizerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D1535A0E9F9E2900C0EAA9 /* HGSTokenizerTest.m */; };
-		8B7911200F9FCAD3006BFE1E /* KeychainItemTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6200571E0F7A909E00C806A1 /* KeychainItemTest.m */; };
 		8B7911210F9FCAD3006BFE1E /* NSString+ReadableURLTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D1491B0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m */; };
 		8B791D850FA1FC24006BFE1E /* HGSAppleScriptAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B791D810FA1FC24006BFE1E /* HGSAppleScriptAction.m */; };
 		8B791D860FA1FC24006BFE1E /* HGSAppleScriptAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B791D820FA1FC24006BFE1E /* HGSAppleScriptAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -979,7 +969,6 @@
 		8B95CD210F6EDF9D003BDBDD /* GTMRegex.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */; };
 		8B95CD840F6EE272003BDBDD /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8B98A2C80FA96ECF009DC652 /* WelcomeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8B98A2C70FA96ECF009DC652 /* WelcomeWindow.xib */; };
-		8B98A4550FAA0C6D009DC652 /* Twitter.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B98A4540FAA0C6D009DC652 /* Twitter.icns */; };
 		8BA019C40F14303400926923 /* GTMSQLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BA019C20F14303400926923 /* GTMSQLite.m */; };
 		8BA019C50F14303400926923 /* GTMSQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BA019C30F14303400926923 /* GTMSQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BA01A860F1431DD00926923 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BB275AB0D6F81EA008DC1CA /* libsqlite3.dylib */; };
@@ -1115,7 +1104,7 @@
 		8BE8488F0E9425C200C611B0 /* QSBKeyMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BE8488E0E9425C200C611B0 /* QSBKeyMap.m */; };
 		8BE848B40E94313A00C611B0 /* QSBKeyMapTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BE848B30E94313A00C611B0 /* QSBKeyMapTest.m */; };
 		8BE84A790E94575000C611B0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
-		8BF442D30FC74ED500C29AA1 /* GTMGoogleSearch.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BF442D10FC74ED500C29AA1 /* GTMGoogleSearch.h */; };
+		8BF442D30FC74ED500C29AA1 /* GTMGoogleSearch.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BF442D10FC74ED500C29AA1 /* GTMGoogleSearch.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BF442D40FC74ED500C29AA1 /* GTMGoogleSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BF442D20FC74ED500C29AA1 /* GTMGoogleSearch.m */; };
 		8BF517910EDBC11000D981A0 /* QSBHGSDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BF517900EDBC11000D981A0 /* QSBHGSDelegate.m */; };
 		8BF52D900EDFD52D00D981A0 /* HGSActionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA74AA0DA416B60052F620 /* HGSActionOperation.m */; };
@@ -1136,7 +1125,6 @@
 		F40FEC620EC4DDB700B32381 /* HGSGoogleWebResultsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F2207050DDA02B900737C26 /* HGSGoogleWebResultsSource.m */; };
 		F40FECA80EC4DE5C00B32381 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		F4170B440ECC8EDB00B9B276 /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F220B6B0DDB403800737C26 /* GTMNSString+HTML.m */; };
-		F427F4610E48E13600ADD2AA /* KeychainItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 337C2C860DCFDA9B00897EB3 /* KeychainItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F47D9DF20ED36C3A00A64007 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
 		F47DA7FA0EDB00F400A64007 /* TextInput.m in Sources */ = {isa = PBXBuildFile; fileRef = F47DA7F90EDB00F400A64007 /* TextInput.m */; };
 		F487E3A90E59D4D0005B47E6 /* QSBPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = F487E3A80E59D4D0005B47E6 /* QSBPreferences.m */; };
@@ -1316,13 +1304,6 @@
 			remoteGlobalIDString = 620CB3080FAA827E0029801C;
 			remoteInfo = QSBPluginUI;
 		};
-		620CB36F0FAA83AA0029801C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 620CB3080FAA827E0029801C;
-			remoteInfo = QSBPluginUI;
-		};
 		622911BC0F2E8034005D34CE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1357,13 +1338,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
-		};
-		62A4AD570F2FCFC50007CD99 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 62A4AC790F2FCD950007CD99;
-			remoteInfo = Twitter;
 		};
 		62B7CDE50E63743500299B23 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1998,7 +1972,6 @@
 				F4EF90D90ECB4529008DD6DA /* EmailURLAction.hgs in CopyFiles */,
 				F4EF90DA0ECB4529008DD6DA /* CorePlugin.hgs in CopyFiles */,
 				622911E60F2E805B005D34CE /* GoogleAccounts.hgs in CopyFiles */,
-				62A4ADAA0F2FD4890007CD99 /* Twitter.hgs in CopyFiles */,
 				F4EF90DC0ECB4529008DD6DA /* System.hgs in CopyFiles */,
 				F4EF90DD0ECB4529008DD6DA /* Volume.hgs in CopyFiles */,
 				F4EF90DE0ECB4529008DD6DA /* Networking.hgs in CopyFiles */,
@@ -2029,8 +2002,6 @@
 		332ADB090DCA38010009A7E9 /* GTMNSBezierPath+CGPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSBezierPath+CGPath.m"; sourceTree = "<group>"; };
 		332ADB8F0DCA65990009A7E9 /* GTMNSBezierPath+RoundRect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSBezierPath+RoundRect.h"; sourceTree = "<group>"; };
 		332ADB900DCA65990009A7E9 /* GTMNSBezierPath+RoundRect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSBezierPath+RoundRect.m"; sourceTree = "<group>"; };
-		337C2C860DCFDA9B00897EB3 /* KeychainItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeychainItem.h; sourceTree = "<group>"; };
-		337C2C870DCFDA9B00897EB3 /* KeychainItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeychainItem.m; sourceTree = "<group>"; };
 		33A016DD0DD3D00A00578DE5 /* GTMGarbageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMGarbageCollection.h; sourceTree = "<group>"; };
 		33D2C5F30DD1068000C1FBDC /* GoogleDocs.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleDocs.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		33D2C6550DD1080700C1FBDC /* gdocdocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = gdocdocument.icns; sourceTree = "<group>"; };
@@ -2114,7 +2085,6 @@
 		620055660F78595F00C806A1 /* GoogleAccountEditController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountEditController.m; sourceTree = "<group>"; };
 		620055670F78595F00C806A1 /* GoogleAccountSetUpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleAccountSetUpViewController.h; sourceTree = "<group>"; };
 		620055680F78595F00C806A1 /* GoogleAccountSetUpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountSetUpViewController.m; sourceTree = "<group>"; };
-		6200571E0F7A909E00C806A1 /* KeychainItemTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeychainItemTest.m; sourceTree = "<group>"; };
 		6200F9740E785F4400F046EC /* MoreSeparator.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MoreSeparator.png; sourceTree = "<group>"; };
 		6200F99C0E785FE700F046EC /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/MoreShowAllTableResultView.xib; sourceTree = "<group>"; };
 		6200F9DF0E78623500F046EC /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/MoreFoldResultView.xib; sourceTree = "<group>"; };
@@ -2192,11 +2162,6 @@
 		62A16A8E0ED484DF0074F41B /* HGSPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPlugin.m; sourceTree = "<group>"; };
 		62A16A930ED485A60074F41B /* HGSProtoExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSProtoExtension.h; sourceTree = "<group>"; };
 		62A16A960ED485C50074F41B /* HGSProtoExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSProtoExtension.m; sourceTree = "<group>"; };
-		62A4AC8A0F2FCD950007CD99 /* Twitter.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Twitter.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
-		62A4AD0F0F2FCE0E0007CD99 /* Twitter-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Twitter-Info.plist"; sourceTree = "<group>"; };
-		62A4AD100F2FCE0E0007CD99 /* TwitterAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwitterAccount.h; sourceTree = "<group>"; };
-		62A4AD110F2FCE0E0007CD99 /* TwitterAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwitterAccount.m; sourceTree = "<group>"; };
-		62A4AD120F2FCE0E0007CD99 /* TwitterMessageAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwitterMessageAction.m; sourceTree = "<group>"; };
 		62A4AEAA0F30DF9F0007CD99 /* GTMBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMBase64.h; sourceTree = "<group>"; };
 		62A4AEAB0F30DF9F0007CD99 /* GTMBase64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMBase64.m; sourceTree = "<group>"; };
 		62A5B282107E570200444AC9 /* GoogleAccountObjectSpecifiers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountObjectSpecifiers.m; sourceTree = "<group>"; };
@@ -2447,6 +2412,10 @@
 		8B3F7236101AD955004FACA9 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8B4099FD0F93DC0100DF540E /* GTMUILocalizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMUILocalizer.h; sourceTree = "<group>"; };
 		8B4099FE0F93DC0100DF540E /* GTMUILocalizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMUILocalizer.m; sourceTree = "<group>"; };
+		8B44638710F2769B00561E62 /* QSBPluginUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPluginUI.h; sourceTree = "<group>"; };
+		8B4463F710F278FC00561E62 /* HGSKeychainItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSKeychainItem.m; sourceTree = "<group>"; };
+		8B4463F810F278FC00561E62 /* HGSKeychainItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSKeychainItem.h; sourceTree = "<group>"; };
+		8B4463FC10F2790700561E62 /* HGSKeychainItemTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSKeychainItemTest.m; sourceTree = "<group>"; };
 		8B4810AD1046345700BB6A2D /* Spotlight Files Test.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Spotlight Files Test.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B48113F104635AD00BB6A2D /* SLFilesSourceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLFilesSourceTest.m; sourceTree = "<group>"; };
 		8B48115A1046368F00BB6A2D /* SLFilesSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLFilesSource.h; sourceTree = "<group>"; };
@@ -3001,28 +2970,6 @@
 		8B6EB5A5101A0AE0006CFF7A /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8B6EB5A6101A0AE0006CFF7A /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8B6EB5A7101A0AE0006CFF7A /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/Localizable.strings; sourceTree = "<group>"; };
-		8B6EB5AC101A0AED006CFF7A /* de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8B6EB5AE101A0AED006CFF7A /* de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		8B6EB5AF101A0AED006CFF7A /* en_GB */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_GB; path = en_GB.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8B6EB5B0101A0AED006CFF7A /* en_GB */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_GB; path = en_GB.lproj/Localizable.strings; sourceTree = "<group>"; };
-		8B6EB5B2101A0AED006CFF7A /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/EditTwitterAccount.xib; sourceTree = "<group>"; };
-		8B6EB5B3101A0AED006CFF7A /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = en_US.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8B6EB5B4101A0AED006CFF7A /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = en_US.lproj/Localizable.strings; sourceTree = "<group>"; };
-		8B6EB5B6101A0AED006CFF7A /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/SetUpTwitterAccountView.xib; sourceTree = "<group>"; };
-		8B6EB5B7101A0AED006CFF7A /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8B6EB5B8101A0AED006CFF7A /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
-		8B6EB5B9101A0AED006CFF7A /* fr */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8B6EB5BA101A0AED006CFF7A /* fr */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
-		8B6EB5BB101A0AED006CFF7A /* it */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8B6EB5BC101A0AED006CFF7A /* it */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
-		8B6EB5BD101A0AED006CFF7A /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8B6EB5BE101A0AED006CFF7A /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		8B6EB5BF101A0AED006CFF7A /* nl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8B6EB5C0101A0AED006CFF7A /* nl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
-		8B6EB5C1101A0AED006CFF7A /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8B6EB5C2101A0AED006CFF7A /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/Localizable.strings; sourceTree = "<group>"; };
-		8B6EB5C3101A0AED006CFF7A /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8B6EB5C4101A0AED006CFF7A /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8B6EB5CB101A0AFF006CFF7A /* de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8B6EB5CD101A0AFF006CFF7A /* de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8B6EB5CE101A0AFF006CFF7A /* en_GB */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_GB; path = en_GB.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -3218,7 +3165,6 @@
 		8B989F3A0FA7B93C009DC652 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8B989F3B0FA7B93C009DC652 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		8B98A2C50FA96EBB009DC652 /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/WelcomeWindow.xib; sourceTree = "<group>"; };
-		8B98A4540FAA0C6D009DC652 /* Twitter.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Twitter.icns; sourceTree = "<group>"; };
 		8BA019C20F14303400926923 /* GTMSQLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMSQLite.m; sourceTree = "<group>"; };
 		8BA019C30F14303400926923 /* GTMSQLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMSQLite.h; sourceTree = "<group>"; };
 		8BA01C000F147DB000926923 /* GTMNSWorkspace+Running.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSWorkspace+Running.h"; sourceTree = "<group>"; };
@@ -3548,18 +3494,6 @@
 				627FAEC30DF9D73500E3E765 /* Foundation.framework in Frameworks */,
 				627FAEC40DF9D73500E3E765 /* Vermilion.framework in Frameworks */,
 				627FAEC60DF9D73500E3E765 /* Cocoa.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		62A4AC820F2FCD950007CD99 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				620CB3790FAA83D40029801C /* QSBPluginUI.framework in Frameworks */,
-				62A4AC830F2FCD950007CD99 /* Foundation.framework in Frameworks */,
-				62A4AC840F2FCD950007CD99 /* Vermilion.framework in Frameworks */,
-				62A4AC850F2FCD950007CD99 /* Cocoa.framework in Frameworks */,
-				62C5CAD60FA13197000896CD /* GData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3948,7 +3882,6 @@
 				8B6F2EF90DA2BA260052CA40 /* SpotlightFiles.hgs */,
 				8BCCD26D0EC8E5EC00688D64 /* System.hgs */,
 				7FF019BD0EB089CB001A2C7B /* Terminal.hgs */,
-				62A4AC8A0F2FCD950007CD99 /* Twitter.hgs */,
 				8BCCD2DD0EC8F8C200688D64 /* Volume.hgs */,
 				F4E3B70B0EB66AA900CB713D /* Weather.hgs */,
 				5AF0EB630F60744E0041E0B9 /* Dictionary.hgs */,
@@ -4011,9 +3944,9 @@
 		331EE5120DC7BDE30091CC22 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				337C2C860DCFDA9B00897EB3 /* KeychainItem.h */,
-				337C2C870DCFDA9B00897EB3 /* KeychainItem.m */,
-				6200571E0F7A909E00C806A1 /* KeychainItemTest.m */,
+				8B4463FC10F2790700561E62 /* HGSKeychainItemTest.m */,
+				8B4463F710F278FC00561E62 /* HGSKeychainItem.m */,
+				8B4463F810F278FC00561E62 /* HGSKeychainItem.h */,
 				644161ED0DE362CC00AC646D /* NSString+ReadableURL.h */,
 				644161EE0DE362CC00AC646D /* NSString+ReadableURL.m */,
 				F4D1491B0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m */,
@@ -4201,6 +4134,7 @@
 		620CB5600FAA84970029801C /* QSBPluginUI */ = {
 			isa = PBXGroup;
 			children = (
+				8B44638710F2769B00561E62 /* QSBPluginUI.h */,
 				62F595090FEB15DF0076CDDA /* QSBActionSaveAsControllerProtocol.h */,
 				62D9B86C0F94E453005EF9BC /* QSBEditAccountWindowController.h */,
 				62D9B86B0F94E453005EF9BC /* QSBEditAccountWindowController.m */,
@@ -4258,19 +4192,6 @@
 				627FAEB50DF9D71D00E3E765 /* RecentDocumentsSource.m */,
 			);
 			path = RecentDocuments;
-			sourceTree = "<group>";
-		};
-		62A4AD0C0F2FCE0E0007CD99 /* Twitter */ = {
-			isa = PBXGroup;
-			children = (
-				8B6EB5AA101A0AED006CFF7A /* Resources */,
-				62A4AD100F2FCE0E0007CD99 /* TwitterAccount.h */,
-				62A4AD110F2FCE0E0007CD99 /* TwitterAccount.m */,
-				62A4AD120F2FCE0E0007CD99 /* TwitterMessageAction.m */,
-				8B98A4540FAA0C6D009DC652 /* Twitter.icns */,
-				62A4AD0F0F2FCE0E0007CD99 /* Twitter-Info.plist */,
-			);
-			path = Twitter;
 			sourceTree = "<group>";
 		};
 		62D5150710DAD701007ECA33 /* installer */ = {
@@ -5217,17 +5138,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		8B6EB5AA101A0AED006CFF7A /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				8B6EB5AB101A0AED006CFF7A /* InfoPlist.strings */,
-				8B6EB5AD101A0AED006CFF7A /* Localizable.strings */,
-				8B6EB5B1101A0AED006CFF7A /* EditTwitterAccount.xib */,
-				8B6EB5B5101A0AED006CFF7A /* SetUpTwitterAccountView.xib */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
 		8B6EB5C9101A0AFF006CFF7A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -5312,7 +5222,6 @@
 				7FF01A070EB08A1B001A2C7B /* Terminal */,
 				F47DA7F80EDB00BD00A64007 /* TextInput */,
 				5AF0EED80F61D1520041E0B9 /* Trash */,
-				62A4AD0C0F2FCE0E0007CD99 /* Twitter */,
 				7FD8F1A50E252CDE00E7E6A5 /* URLDetection */,
 				F4E3B6F60EB66A7100CB713D /* Weather */,
 				8B64A6B00FF419630000D893 /* WebBookmarks */,
@@ -6020,6 +5929,8 @@
 				620CB56B0FAA85160029801C /* QSBEditSimpleAccountWindowController.h in Headers */,
 				620CB56D0FAA85160029801C /* QSBSetUpAccountViewController.h in Headers */,
 				620CB56F0FAA85160029801C /* QSBSetUpSimpleAccountViewController.h in Headers */,
+				8B44638810F2769B00561E62 /* QSBPluginUI.h in Headers */,
+				8B4463A310F2783200561E62 /* QSBActionSaveAsControllerProtocol.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6037,7 +5948,6 @@
 				8B6F2D7F0DA2B8AF0052CA40 /* HGSSearchSource.h in Headers */,
 				E4617A900DC23BE300CE7C0F /* HGSMixer.h in Headers */,
 				33D2CBAD0DD2573100C1FBDC /* HGSMemorySearchSource.h in Headers */,
-				F427F4610E48E13600ADD2AA /* KeychainItem.h in Headers */,
 				F4D14F120E9BE9A200C0EAA9 /* HGSDelegate.h in Headers */,
 				F4D153380E9F9C5400C0EAA9 /* HGSStringUtil.h in Headers */,
 				F4D1535B0E9F9E2900C0EAA9 /* HGSTokenizer.h in Headers */,
@@ -6069,6 +5979,7 @@
 				62541753102C904A00808254 /* HGSSearchTermScorer.h in Headers */,
 				8B2B01911071813D00427404 /* HGSSimpleArraySearchOperation.h in Headers */,
 				8B53E13110D95393007E6AF2 /* HGSSearchSourceRanker.h in Headers */,
+				8B4463FA10F278FC00561E62 /* HGSKeychainItem.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6125,6 +6036,8 @@
 				8B3082DE1056EE1F006C4C7A /* GTMNSNumber+64Bit.h in Headers */,
 				8B0F054C10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h in Headers */,
 				8B0F073210C7465E00C1A6FD /* NSString+CaseInsensitive.h in Headers */,
+				8B44636710F2740100561E62 /* GTMBase64.h in Headers */,
+				8B44636A10F2740C00561E62 /* GTMUnitTestDevLog.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6396,25 +6309,6 @@
 			name = "Recent Documents";
 			productName = Files;
 			productReference = 627FAECA0DF9D73500E3E765 /* RecentDocuments.hgs */;
-			productType = "com.apple.product-type.bundle";
-		};
-		62A4AC790F2FCD950007CD99 /* Twitter */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 62A4AC870F2FCD950007CD99 /* Build configuration list for PBXNativeTarget "Twitter" */;
-			buildPhases = (
-				62A4AC7C0F2FCD950007CD99 /* Resources */,
-				62A4AC7E0F2FCD950007CD99 /* Sources */,
-				62A4AC820F2FCD950007CD99 /* Frameworks */,
-				62A4AC860F2FCD950007CD99 /* ShellScript */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				620CB3700FAA83AA0029801C /* PBXTargetDependency */,
-			);
-			name = Twitter;
-			productName = Files;
-			productReference = 62A4AC8A0F2FCD950007CD99 /* Twitter.hgs */;
 			productType = "com.apple.product-type.bundle";
 		};
 		62EA8BBD0F2E7DE200C92E0B /* GoogleAccounts */ = {
@@ -7131,7 +7025,6 @@
 				8BCCD2620EC8E5EC00688D64 /* System AppleScript */,
 				7FF019AA0EB089CB001A2C7B /* Terminal */,
 				5AF0EE210F61D0850041E0B9 /* Trash */,
-				62A4AC790F2FCD950007CD99 /* Twitter */,
 				8BCCD2C70EC8F8C200688D64 /* Volume AppleScript */,
 				F4E3B6FC0EB66AA900CB713D /* Weather */,
 				33EEA68A0DD0D9C0005766AB /* Web Bookmarks */,
@@ -7382,18 +7275,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B6EB48A101A018E006CFF7A /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		62A4AC7C0F2FCD950007CD99 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8B98A4550FAA0C6D009DC652 /* Twitter.icns in Resources */,
-				8B6EB5C5101A0AED006CFF7A /* InfoPlist.strings in Resources */,
-				8B6EB5C6101A0AED006CFF7A /* Localizable.strings in Resources */,
-				8B6EB5C7101A0AED006CFF7A /* EditTwitterAccount.xib in Resources */,
-				8B6EB5C8101A0AED006CFF7A /* SetUpTwitterAccountView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7885,22 +7766,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/BuildScripts/PostBuild.sh\"";
-		};
-		62A4AC860F2FCD950007CD99 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
-			);
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/PostBuild.sh\"";
 		};
 		62EA8BC90F2E7DE200C92E0B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8780,18 +8645,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		62A4AC7E0F2FCD950007CD99 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				62A4AD150F2FCE0E0007CD99 /* TwitterAccount.m in Sources */,
-				62A4AD160F2FCE0E0007CD99 /* TwitterMessageAction.m in Sources */,
-				62A4AC810F2FCD950007CD99 /* GTMMethodCheck.m in Sources */,
-				62A4AEAC0F30DF9F0007CD99 /* GTMBase64.m in Sources */,
-				62115E670F3226F7007FEA2A /* HGSBundle.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		62EA8BC10F2E7DE200C92E0B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -8991,7 +8844,6 @@
 				8B6F2E170DA2B9290052CA40 /* HGSSearchSource.m in Sources */,
 				64C385C60DBFDCF9005EBA69 /* GTMMethodCheck.m in Sources */,
 				E4617A910DC23BE300CE7C0F /* HGSMixer.m in Sources */,
-				337C2C890DCFDA9B00897EB3 /* KeychainItem.m in Sources */,
 				33D2CBAE0DD2573100C1FBDC /* HGSMemorySearchSource.m in Sources */,
 				F4D1494B0E9A438B00C0EAA9 /* NSString+ReadableURL.m in Sources */,
 				F4D153390E9F9C5400C0EAA9 /* HGSStringUtil.m in Sources */,
@@ -9023,6 +8875,7 @@
 				62541754102C904A00808254 /* HGSSearchTermScorer.m in Sources */,
 				8B2B01921071813D00427404 /* HGSSimpleArraySearchOperation.m in Sources */,
 				8B53E13010D95393007E6AF2 /* HGSSearchSourceRanker.m in Sources */,
+				8B4463F910F278FC00561E62 /* HGSKeychainItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9127,6 +8980,7 @@
 				8B3082DD1056EE1F006C4C7A /* GTMNSNumber+64Bit.m in Sources */,
 				8B0F054A10C73BD400C1A6FD /* GTMUnitTestingUtilities.m in Sources */,
 				8B0F073110C7465900C1A6FD /* NSString+CaseInsensitive.m in Sources */,
+				8B44661B10F2874C00561E62 /* GTMBase64.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9182,13 +9036,13 @@
 				8B79111D0F9FCAD3006BFE1E /* HGSSQLiteBackedCacheTest.m in Sources */,
 				8B79111E0F9FCAD3006BFE1E /* HGSStringUtilTest.m in Sources */,
 				8B79111F0F9FCAD3006BFE1E /* HGSTokenizerTest.m in Sources */,
-				8B7911200F9FCAD3006BFE1E /* KeychainItemTest.m in Sources */,
 				8B7911210F9FCAD3006BFE1E /* NSString+ReadableURLTest.m in Sources */,
 				8B791D890FA1FC35006BFE1E /* HGSAppleScriptActionTest.m in Sources */,
 				5A0BB67B0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m in Sources */,
 				62DDD6DA1035D7BF00C0EABD /* HGSSearchTermScorerTest.m in Sources */,
 				8B2B01961071815700427404 /* HGSSimpleArraySearchOperationTest.m in Sources */,
 				8B53E17D10D95790007E6AF2 /* HGSSearchSourceRankerTest.m in Sources */,
+				8B4463FD10F2790700561E62 /* HGSKeychainItemTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9288,11 +9142,6 @@
 			target = 620CB3080FAA827E0029801C /* QSBPluginUI */;
 			targetProxy = 620CB3620FAA838F0029801C /* PBXContainerItemProxy */;
 		};
-		620CB3700FAA83AA0029801C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 620CB3080FAA827E0029801C /* QSBPluginUI */;
-			targetProxy = 620CB36F0FAA83AA0029801C /* PBXContainerItemProxy */;
-		};
 		622911BD0F2E8034005D34CE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 62EA8BBD0F2E7DE200C92E0B /* GoogleAccounts */;
@@ -9317,11 +9166,6 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 627FAEBC0DF9D73500E3E765 /* PBXContainerItemProxy */;
-		};
-		62A4AD580F2FCFC50007CD99 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 62A4AC790F2FCD950007CD99 /* Twitter */;
-			targetProxy = 62A4AD570F2FCFC50007CD99 /* PBXContainerItemProxy */;
 		};
 		62B7CDE60E63743500299B23 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -10662,56 +10506,6 @@
 			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
-		8B6EB5AB101A0AED006CFF7A /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8B6EB5AC101A0AED006CFF7A /* de */,
-				8B6EB5AF101A0AED006CFF7A /* en_GB */,
-				8B6EB5B3101A0AED006CFF7A /* en_US */,
-				8B6EB5B7101A0AED006CFF7A /* es */,
-				8B6EB5B9101A0AED006CFF7A /* fr */,
-				8B6EB5BB101A0AED006CFF7A /* it */,
-				8B6EB5BD101A0AED006CFF7A /* ja */,
-				8B6EB5BF101A0AED006CFF7A /* nl */,
-				8B6EB5C1101A0AED006CFF7A /* zh_CN */,
-				8B6EB5C3101A0AED006CFF7A /* zh_TW */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		8B6EB5AD101A0AED006CFF7A /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8B6EB5AE101A0AED006CFF7A /* de */,
-				8B6EB5B0101A0AED006CFF7A /* en_GB */,
-				8B6EB5B4101A0AED006CFF7A /* en_US */,
-				8B6EB5B8101A0AED006CFF7A /* es */,
-				8B6EB5BA101A0AED006CFF7A /* fr */,
-				8B6EB5BC101A0AED006CFF7A /* it */,
-				8B6EB5BE101A0AED006CFF7A /* ja */,
-				8B6EB5C0101A0AED006CFF7A /* nl */,
-				8B6EB5C2101A0AED006CFF7A /* zh_CN */,
-				8B6EB5C4101A0AED006CFF7A /* zh_TW */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-		8B6EB5B1101A0AED006CFF7A /* EditTwitterAccount.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8B6EB5B2101A0AED006CFF7A /* en_US */,
-			);
-			name = EditTwitterAccount.xib;
-			sourceTree = "<group>";
-		};
-		8B6EB5B5101A0AED006CFF7A /* SetUpTwitterAccountView.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8B6EB5B6101A0AED006CFF7A /* en_US */,
-			);
-			name = SetUpTwitterAccountView.xib;
-			sourceTree = "<group>";
-		};
 		8B6EB5CA101A0AFF006CFF7A /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -11167,26 +10961,6 @@
 			buildSettings = {
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/RecentDocuments/RecentDocuments-Info.plist";
 				PRODUCT_NAME = RecentDocuments;
-				WRAPPER_EXTENSION = hgs;
-			};
-			name = Release;
-		};
-		62A4AC880F2FCD950007CD99 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
-			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Twitter/Twitter-Info.plist";
-				PRODUCT_NAME = Twitter;
-				WRAPPER_EXTENSION = hgs;
-			};
-			name = Debug;
-		};
-		62A4AC890F2FCD950007CD99 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
-			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Twitter/Twitter-Info.plist";
-				PRODUCT_NAME = Twitter;
 				WRAPPER_EXTENSION = hgs;
 			};
 			name = Release;
@@ -12303,16 +12077,6 @@
 			};
 			name = "Debug-gcov";
 		};
-		8B95CBDA0F6B1DEE003BDBDD /* Debug-gcov */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
-			buildSettings = {
-				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Twitter/Twitter-Info.plist";
-				PRODUCT_NAME = Twitter;
-				WRAPPER_EXTENSION = hgs;
-			};
-			name = "Debug-gcov";
-		};
 		8B95CBDB0F6B1DEE003BDBDD /* Debug-gcov */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
@@ -12791,16 +12555,6 @@
 				627FAEC80DF9D73500E3E765 /* Debug */,
 				8B95CBD00F6B1DEE003BDBDD /* Debug-gcov */,
 				627FAEC90DF9D73500E3E765 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		62A4AC870F2FCD950007CD99 /* Build configuration list for PBXNativeTarget "Twitter" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				62A4AC880F2FCD950007CD99 /* Debug */,
-				8B95CBDA0F6B1DEE003BDBDD /* Debug-gcov */,
-				62A4AC890F2FCD950007CD99 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

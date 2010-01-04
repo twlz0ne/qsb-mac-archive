@@ -32,7 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import <GData/GDataHTTPFetcher.h>
-#import "KeychainItem.h"
+#import "HGSKeychainItem.h"
 #import "GTMGoogleSearch.h"
 
 
@@ -111,9 +111,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
       if (!fetcher_) {
         HGSLog(@"Failed to allocate GDataAuthenticationFetcher.");
       }
-      KeychainItem* keychainItem 
-        = [KeychainItem keychainItemForService:[account_ identifier]
-                                      username:nil];
+      HGSKeychainItem* keychainItem 
+        = [HGSKeychainItem keychainItemForService:[account_ identifier]
+                                         username:nil];
       NSString *userName = [keychainItem username];
       NSString *password = [keychainItem password];
       [fetcher_ setCredential:

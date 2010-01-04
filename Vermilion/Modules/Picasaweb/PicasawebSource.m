@@ -32,7 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import <GData/GData.h>
-#import "KeychainItem.h"
+#import "HGSKeychainItem.h"
 #import "QSBHGSDelegate.h"
 
 static NSString *const kPhotosAlbumKey = @"kPhotosAlbumKey";
@@ -192,9 +192,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 - (void)startAlbumInfoFetch {
   if ([activeTickets_ count] == 0) {
     if (!picasawebService_) {
-      KeychainItem* keychainItem 
-        = [KeychainItem keychainItemForService:[account_ identifier]
-                                      username:nil];
+      HGSKeychainItem* keychainItem 
+        = [HGSKeychainItem keychainItemForService:[account_ identifier]
+                                         username:nil];
       NSString *username = [keychainItem username];
       NSString *password = [keychainItem password];
       if ([username length]) {

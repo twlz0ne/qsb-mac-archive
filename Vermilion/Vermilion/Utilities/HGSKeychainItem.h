@@ -1,5 +1,5 @@
 //
-//  KeychainItem.h
+//  HGSKeychainItem.h
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -32,7 +32,7 @@
 
 /*!
  @header
- @discussion KeychainItem
+ @discussion HGSKeychainItem
 */
 
 #import <Foundation/Foundation.h>
@@ -42,7 +42,7 @@
  Temporary shim code for accessing the keychain. The real product should use
  something along the lines of GMAuthCredential instead of this class.
 */
-@interface KeychainItem : NSObject
+@interface HGSKeychainItem : NSObject
 {
  @private
   SecKeychainItemRef mKeychainItemRef;
@@ -55,22 +55,22 @@
  Returns the first keychain item matching the service.
  If the username can be anything, pass nil for |username|.
 */
-+ (KeychainItem*)keychainItemForService:(NSString*)serviceName
-                               username:(NSString*)username;
++ (HGSKeychainItem*)keychainItemForService:(NSString*)serviceName
+                                  username:(NSString*)username;
 /*!
  Returns the first keychain item for the given host.
  If the username can be anything, pass nil for |username|.
  */
-+ (KeychainItem*)keychainItemForHost:(NSString*)host
-                            username:(NSString*)username;
++ (HGSKeychainItem*)keychainItemForHost:(NSString*)host
+                               username:(NSString*)username;
 
 /*! Returns all keychain items for the given service. */
 + (NSArray*)allKeychainItemsForService:(NSString*)serviceName;
 
 /*! Adds a new keychain item for |service|. */
-+ (KeychainItem*)addKeychainItemForService:(NSString*)serviceName
-                              withUsername:(NSString*)username
-                                  password:(NSString*)password;
++ (HGSKeychainItem*)addKeychainItemForService:(NSString*)serviceName
+                                 withUsername:(NSString*)username
+                                     password:(NSString*)password;
 
 /*! Returns the username associated with a keychain item. */
 - (NSString*)username;
@@ -84,11 +84,10 @@
 /*! Delete the keychain item from its keychain. */
 - (void)removeFromKeychain;
 
-@end
-
 /*!
  Check |status| and if not noErr then always log wrPermErr's otherwise
  only log other errors for debug builds.  The wrPermErr could indicate
  a corrupted keychain.
 */
-BOOL reportIfKeychainError(OSStatus status);
++ (BOOL)reportIfKeychainError:(OSStatus) status;
+@end

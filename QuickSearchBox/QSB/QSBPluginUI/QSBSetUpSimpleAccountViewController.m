@@ -32,7 +32,7 @@
 
 #import "QSBSetUpSimpleAccountViewController.h"
 #import <Vermilion/Vermilion.h>
-#import "KeychainItem.h"
+#import "HGSKeychainItem.h"
 
 
 @implementation QSBSetUpSimpleAccountViewController
@@ -98,15 +98,15 @@
       if (isGood) {
         // If there is not already a keychain item create one.  If there is
         // then update the password.
-        KeychainItem *keychainItem = [newAccount keychainItem];
+        HGSKeychainItem *keychainItem = [newAccount keychainItem];
         if (keychainItem) {
           [keychainItem setUsername:userName
                            password:password];
         } else {
           NSString *keychainServiceName = [newAccount identifier];
-          [KeychainItem addKeychainItemForService:keychainServiceName
-                                     withUsername:userName
-                                         password:password]; 
+          [HGSKeychainItem addKeychainItemForService:keychainServiceName
+                                        withUsername:userName
+                                            password:password]; 
         }
         
         // Install the account.

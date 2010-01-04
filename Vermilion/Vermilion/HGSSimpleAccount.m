@@ -31,7 +31,7 @@
 
 #import "HGSSimpleAccount.h"
 #import "HGSLog.h"
-#import "KeychainItem.h"
+#import "HGSKeychainItem.h"
 
 @implementation HGSSimpleAccount
 
@@ -61,29 +61,29 @@
 }
 
 - (void)remove {
-  KeychainItem *keychainItem = [self keychainItem];
+  HGSKeychainItem *keychainItem = [self keychainItem];
   [keychainItem removeFromKeychain];
   [super remove];
 }
 
 - (NSString *)password {
   // Retrieve the account's password from the keychain.
-  KeychainItem *keychainItem = [self keychainItem];
+  HGSKeychainItem *keychainItem = [self keychainItem];
   NSString *password = [keychainItem password];
   return password;
 }
 
 - (void)setPassword:(NSString *)password {
-  KeychainItem *keychainItem = [self keychainItem];
+  HGSKeychainItem *keychainItem = [self keychainItem];
   NSString *userName = [self userName];
   if (keychainItem) {
     [keychainItem setUsername:userName
                      password:password];
   } else {
     NSString *keychainServiceName = [self identifier];
-    [KeychainItem addKeychainItemForService:keychainServiceName
-                               withUsername:userName
-                                   password:password]; 
+    [HGSKeychainItem addKeychainItemForService:keychainServiceName
+                                  withUsername:userName
+                                      password:password]; 
   }
   [super setPassword:password];
 }
@@ -104,11 +104,11 @@
 
 #pragma mark HGSSimpleAccount Private Methods
 
-- (KeychainItem *)keychainItem {
+- (HGSKeychainItem *)keychainItem {
   NSString *keychainServiceName = [self identifier];
   NSString *userName = [self userName];
-  KeychainItem *item = [KeychainItem keychainItemForService:keychainServiceName 
-                                                   username:userName];
+  HGSKeychainItem *item = [HGSKeychainItem keychainItemForService:keychainServiceName 
+                                                         username:userName];
   return item;
 }
 

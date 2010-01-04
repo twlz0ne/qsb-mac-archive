@@ -32,7 +32,7 @@
 
 #import "GoogleDocsSource.h"
 #import <GData/GData.h>
-#import "KeychainItem.h"
+#import "HGSKeychainItem.h"
 #import "QSBHGSDelegate.h"
 #import "GoogleDocsConstants.h"
 #import "GTMNSEnumerator+Filter.h"
@@ -319,13 +319,13 @@ GTM_METHOD_CHECK(NSEnumerator,
 
 - (void)startAsynchronousDocsListFetch {
   [self clearResultIndex];
-  KeychainItem* keychainItem = nil;
+  HGSKeychainItem* keychainItem = nil;
   NSString *userName = nil;
   NSString *password = nil;
   if (!currentlyFetchingDocs_) {
     if (!docService_) {
-      keychainItem = [KeychainItem keychainItemForService:[account_ identifier]
-                                                 username:nil];
+      keychainItem = [HGSKeychainItem keychainItemForService:[account_ identifier]
+                                                    username:nil];
       userName = [keychainItem username];
       password = [keychainItem password];
       if (userName && password) {
@@ -357,8 +357,8 @@ GTM_METHOD_CHECK(NSEnumerator,
   if (!currentlyFetchingSpreadsheets_) {
     if (!spreadsheetService_) {
       if (!keychainItem) {
-        keychainItem = [KeychainItem keychainItemForService:[account_ identifier]
-                                                   username:nil];
+        keychainItem = [HGSKeychainItem keychainItemForService:[account_ identifier]
+                                                      username:nil];
         userName = [keychainItem username];
         password = [keychainItem password];
       }

@@ -1,5 +1,5 @@
 //
-//  TwitterAccount.h
+//  QSBPluginUI.h
 //
 //  Copyright (c) 2009 Google Inc. All rights reserved.
 //
@@ -30,47 +30,8 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-/*!
-  @header
-  @discussion
-*/
-
-#import <Vermilion/Vermilion.h>
-#import "QSBEditSimpleAccountWindowController.h"
-#import "QSBSetUpSimpleAccountViewController.h"
-
-@class TwitterAccountEditController;
-
-/*! A class which manages a Twitter account. */
-@interface TwitterAccount : HGSSimpleAccount {
- @private
-  // Set by and only useful within authentication.
-  BOOL authCompleted_;
-  BOOL authSucceeded_;
-}
-
-@end
-
-/*
- A controller which manages a window used to edit the passowrd
- for a Twitter account.  Exposed publicly so that Interface
- Builder can see the action.
-*/
-@interface EditTwitterAccountWindowController : QSBEditSimpleAccountWindowController
-
-/*! Open twitter.com in the user's preferred browser. */
-- (IBAction)openTwitterHomePage:(id)sender;
-
-@end
-
-/*
- A controller which manages a view used to specify a Twitter account
- name and password during the setup process.  Exposed publicly so that 
- Interface Builder can see the action.
-*/
-@interface SetUpTwitterAccountViewController : QSBSetUpSimpleAccountViewController
-
-/*! Open twitter.com in the user's preferred browser. */
-- (IBAction)openTwitterHomePage:(id)sender;
-
-@end
+#import <QSBPluginUI/QSBActionSaveAsControllerProtocol.h>
+#import <QSBPluginUI/QSBEditAccountWindowController.h>
+#import <QSBPluginUI/QSBEditSimpleAccountWindowController.h>
+#import <QSBPluginUI/QSBSetUpAccountViewController.h>
+#import <QSBPluginUI/QSBSetUpSimpleAccountViewController.h>

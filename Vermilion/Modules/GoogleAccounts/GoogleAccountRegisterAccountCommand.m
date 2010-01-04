@@ -33,7 +33,7 @@
 #import <Cocoa/Cocoa.h>
 #import <Vermilion/Vermilion.h>
 #import "GoogleAccount.h"
-#import "KeychainItem.h"
+#import "HGSKeychainItem.h"
 
 @interface GoogleAccountRegisterAccountCommand : NSScriptCommand
 @end
@@ -64,15 +64,15 @@
       if (isGood) {
         // If there is not already a keychain item create one.  If there is
         // then update the password.
-        KeychainItem *keychainItem = [newAccount keychainItem];
+        HGSKeychainItem *keychainItem = [newAccount keychainItem];
         if (keychainItem) {
           [keychainItem setUsername:accountName
                            password:password];
         } else {
           NSString *keychainServiceName = accountIdentifier;
-          [KeychainItem addKeychainItemForService:keychainServiceName
-                                     withUsername:accountName
-                                         password:password]; 
+          [HGSKeychainItem addKeychainItemForService:keychainServiceName
+                                        withUsername:accountName
+                                            password:password]; 
         }
         
         // Install the account.

@@ -37,7 +37,7 @@
 
 #import "HGSAccount.h"
 
-@class KeychainItem;
+@class HGSKeychainItem;
 
 /*!
  An abstract base class which manages an account with an account name
@@ -84,7 +84,7 @@
 /*!
  Retrieve the keychain item for our keychain service name, if any.
 */
-- (KeychainItem *)keychainItem;
+- (HGSKeychainItem *)keychainItem;
 
 /*!
  Test the account and password to see if they authenticate.

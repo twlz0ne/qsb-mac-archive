@@ -37,7 +37,7 @@
 #import "HGSGoogleAccountTypes.h"
 #import "HGSAccountsExtensionPoint.h"
 #import "HGSLog.h"
-#import "KeychainItem.h"
+#import "HGSKeychainItem.h"
 
 
 // The version of the preferences data stored in the dictionary (NSNumber).
@@ -253,17 +253,17 @@ NSString *const kHGSAccountIdentifierFormat = @"%@.%@";
         NSString *userName = [configuration objectForKey:kHGSAccountUserNameKey];
         NSString *keychainServiceName = [NSString stringWithFormat:@"%@.%@",
                                          oldKeychainPrefix, userName];
-        KeychainItem *keychainItem
-          = [KeychainItem keychainItemForService:keychainServiceName 
-                                        username:userName];
+        HGSKeychainItem *keychainItem
+          = [HGSKeychainItem keychainItemForService:keychainServiceName 
+                                           username:userName];
         if (keychainItem) {
           NSString *password = [keychainItem password];
           [keychainItem removeFromKeychain];
           keychainServiceName = [NSString stringWithFormat:@"%@.%@",
                                  newAccountType, userName];
-          [KeychainItem addKeychainItemForService:keychainServiceName
-                                     withUsername:userName
-                                         password:password]; 
+          [HGSKeychainItem addKeychainItemForService:keychainServiceName
+                                        withUsername:userName
+                                            password:password]; 
         }
       }
       NSNumber *updatedVersionNumber
