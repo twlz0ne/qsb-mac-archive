@@ -37,8 +37,8 @@
 #import "QSBActionSaveAsControllerProtocol.h"
 #import "QSBTableResult.h"
 
-// This constant is the name for the app that should be used w/in the a Google
-// folder (for w/in Application Support, etc.)
+// This constant is the name for the app that should be used w/in 
+// Application Support, etc.
 static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
 static NSString *const kWebURLsWithTitlesPboardType 
   = @"WebURLsWithTitlesPboardType";
@@ -90,10 +90,9 @@ static NSString *const kWebURLsWithTitlesPboardType
     if (folderURL) {
       NSString *folderPath = [folderURL path];
       
-      // we want Google/[App Name] with the folder
+      // we want[App Name] with the folder
       NSString *finalPath
-        = [[folderPath stringByAppendingPathComponent:@"Google"]
-           stringByAppendingPathComponent:kQSBFolderNameWithGoogleFolder];
+        = [folderPath stringByAppendingPathComponent:kQSBFolderNameWithGoogleFolder];
       
       // make sure it exists
       NSFileManager *fm = [NSFileManager defaultManager];
@@ -150,8 +149,7 @@ static NSString *const kWebURLsWithTitlesPboardType
         NSString *folderPath = [folderURL path];
         
         folderPath
-          = [[[folderPath stringByAppendingPathComponent:@"Google"]
-              stringByAppendingPathComponent:kQSBFolderNameWithGoogleFolder]
+          = [[folderPath stringByAppendingPathComponent:kQSBFolderNameWithGoogleFolder]
              stringByAppendingPathComponent:@"PlugIns"];
         
         if ([fm fileExistsAtPath:folderPath]) {

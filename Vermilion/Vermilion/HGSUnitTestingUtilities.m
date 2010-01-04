@@ -90,8 +90,7 @@
   NSString *workingDir = NSTemporaryDirectory();
   NSString *result = nil;    
   NSString *finalPath
-    = [[[workingDir stringByAppendingPathComponent:@"Google"]
-        stringByAppendingPathComponent:@"Quick Search Box Unit Testing"]
+    = [[workingDir stringByAppendingPathComponent:@"Quick Search Box Unit Testing"]
        stringByAppendingPathComponent:name];
   
   // make sure it exists
