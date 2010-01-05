@@ -120,7 +120,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   
   NSMutableDictionary *objectDict 
     = [NSMutableDictionary dictionaryWithDictionary:corpusDict];
-  NSString *identifier = [corpusDict objectForKey:kHGSCorporaSourceAttributeURIStringKey];
+  NSString *identifier 
+    = [corpusDict objectForKey:kHGSCorporaSourceAttributeURIStringKey];
   
   // Dasherize the URL and the web search template
   identifier = [NSString stringWithFormat:identifier, domain];
@@ -136,10 +137,11 @@ GTM_METHOD_CHECK(NSString, readableURLString);
                  forKey:kHGSObjectAttributeNameKey];
   
   
-  NSString *webTemplate = [objectDict objectForKey:kHGSObjectAttributeWebSearchTemplateKey];
+  NSString *webTemplate 
+    = [objectDict objectForKey:kHGSObjectAttributeWebSearchTemplateKey];
   if (webTemplate) {
     [objectDict setObject:[NSString stringWithFormat:webTemplate, domain]
-                                  forKey:kHGSObjectAttributeWebSearchTemplateKey];
+                   forKey:kHGSObjectAttributeWebSearchTemplateKey];
   }
   
   NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag];  
@@ -190,8 +192,9 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
   // Initialization code
   NSMutableArray *allCorpora = [NSMutableArray array];
-  NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"DefaultCorpora"
-                                                        ofType:@"plist"];
+  NSBundle *pluginBundle = HGSGetPluginBundle();
+  NSString *plistPath = [pluginBundle pathForResource:@"DefaultCorpora"
+                                               ofType:@"plist"];
   NSArray *corporaPlist = [NSArray arrayWithContentsOfFile:plistPath];
   
   for (NSDictionary *corpusDict in corporaPlist) {
@@ -200,8 +203,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     if (corpus) [allCorpora addObject:corpus];
   }
   
-  plistPath = [[NSBundle mainBundle] pathForResource:@"DasherCorpora"
-                                              ofType:@"plist"];
+  plistPath = [pluginBundle pathForResource:@"DasherCorpora"
+                                     ofType:@"plist"];
   corporaPlist = [NSArray arrayWithContentsOfFile:plistPath];
   
   
@@ -213,8 +216,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     }
   }
   
-  plistPath = [[NSBundle mainBundle] pathForResource:@"InternalCorpora"
-                                              ofType:@"plist"];
+  plistPath = [pluginBundle pathForResource:@"InternalCorpora"
+                                     ofType:@"plist"];
   corporaPlist = [NSArray arrayWithContentsOfFile:plistPath];
   
   for (NSDictionary *corpusDict in corporaPlist) {
