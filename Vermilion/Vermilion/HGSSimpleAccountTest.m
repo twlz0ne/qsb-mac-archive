@@ -33,7 +33,7 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSSimpleAccount.h"
-#import "KeychainItem.h"
+#import "HGSKeychainItem.h"
 #import <OCMock/OCMock.h>
 
 static NSString *const kServiceName
@@ -86,8 +86,8 @@ static NSString *const kServiceName
 @implementation SimpleAccountWithFakeKeychain
 
 // Fake having a keychainItem.
-- (KeychainItem *)keychainItem {
-  KeychainItem *item = [[[KeychainItem alloc] init] autorelease];
+- (HGSKeychainItem *)keychainItem {
+  HGSKeychainItem *item = [[[HGSKeychainItem alloc] init] autorelease];
   return item;
 }
 
@@ -153,8 +153,8 @@ static NSString *const kServiceName
 - (void)setUp {
   // Cleanse the keychain.
   NSArray *keychainItems
-    = [KeychainItem allKeychainItemsForService:kServiceName];
-  for (KeychainItem *keychainItem in keychainItems) {
+    = [HGSKeychainItem allKeychainItemsForService:kServiceName];
+  for (HGSKeychainItem *keychainItem in keychainItems) {
     [keychainItem removeFromKeychain];
   }
 }
@@ -234,7 +234,7 @@ static NSString *const kServiceName
     = [[[SimpleAccount alloc] initWithName:@"HGSSimpleAccount E"]
        autorelease];
   // Clean up any keychain item leftover from a previous run
-  KeychainItem *keychainItem = [account keychainItem];
+  HGSKeychainItem *keychainItem = [account keychainItem];
   [keychainItem removeFromKeychain];
   NSString *identifier = [account identifier];
   STAssertEqualObjects(identifier, @"SimpleAccountType.HGSSimpleAccount E", nil);
