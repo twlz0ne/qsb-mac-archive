@@ -32,13 +32,12 @@
 
 #import "QSBPathCell.h"
 #import <Vermilion/Vermilion.h>
+#import <QSBPluginUI/QSBPluginUI.h>
 
 #import "QSBPathComponentCell.h"
-
 #import "GTMLinearRGBShading.h"
 #import "GTMNSBezierPath+RoundRect.h"
 #import "GTMNSBezierPath+Shading.h"
-#import "QSBHGSDelegate.h"
 
 // TODO(mrossetti): Remove workaround once we get a fix from Apple.
 // This includes the declaration of _hoveredCell and _setHoveredCell

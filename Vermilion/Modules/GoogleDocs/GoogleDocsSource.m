@@ -32,8 +32,8 @@
 
 #import "GoogleDocsSource.h"
 #import <GData/GData.h>
+#import <QSBPluginUI/QSBPluginUI.h>
 #import "HGSKeychainItem.h"
-#import "QSBHGSDelegate.h"
 #import "GoogleDocsConstants.h"
 #import "GTMNSEnumerator+Filter.h"
 #import "GTMMethodCheck.h"

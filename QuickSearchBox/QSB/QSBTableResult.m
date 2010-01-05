@@ -32,6 +32,7 @@
 
 #import "QSBTableResult.h"
 #import <Vermilion/Vermilion.h>
+#import <QSBPluginUI/QSBPluginUI.h>
 #import "GTMMethodCheck.h"
 #import "GTMNSString+URLArguments.h"
 #import "NSAttributedString+Attributes.h"
@@ -43,7 +44,6 @@
 #import "QSBMoreResultsRowViewControllers.h"
 #import "GTMNSObject+KeyValueObserving.h"
 #import "GTMMethodCheck.h"
-#import "QSBHGSDelegate.h"
 #import "GTMGoogleSearch.h"
 #import "ClipboardSearchSource.h"
 

@@ -31,7 +31,7 @@
 //
 
 #import <Vermilion/Vermilion.h>
-#import "QSBHGSDelegate.h"
+#import <QSBPluginUI/QSBPluginUI.h>
 #import "GTMSystemVersion.h"
 
 // Private interface that we've borrowed.

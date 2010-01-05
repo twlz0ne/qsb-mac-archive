@@ -35,3 +35,4 @@
 #import <QSBPluginUI/QSBEditSimpleAccountWindowController.h>
 #import <QSBPluginUI/QSBSetUpAccountViewController.h>
 #import <QSBPluginUI/QSBSetUpSimpleAccountViewController.h>
+#import <QSBPluginUI/QSBHGSResultAttributeKeys.h>

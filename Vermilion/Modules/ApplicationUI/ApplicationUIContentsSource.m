@@ -30,11 +30,13 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
 #import "ApplicationUISource.h"
+
+#import <Vermilion/Vermilion.h>
+#import <QSBPluginUI/QSBPluginUI.h>
+
 #import "GTMAXUIElement.h"
 #import "ApplicationUIAction.h"
-#import "QSBHGSDelegate.h"
 #import "GTMNSWorkspace+Running.h"
 #import "GTMNSNumber+64Bit.h"
 #import "GTMMethodCheck.h"

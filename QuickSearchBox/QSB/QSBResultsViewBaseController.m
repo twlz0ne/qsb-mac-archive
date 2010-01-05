@@ -32,6 +32,8 @@
 
 #import "QSBResultsViewBaseController.h"
 #import <Vermilion/Vermilion.h>
+#import <QSBPluginUI/QSBPluginUI.h>
+
 #import "QSBApplicationDelegate.h"
 #import "QSBMoreResultsRowViewControllers.h"
 #import "QSBSearchViewController.h"
@@ -40,7 +42,6 @@
 #import "QSBSearchWindowController.h"
 #import "QSBTopResultsRowViewControllers.h"
 #import "GTMGeometryUtils.h"
-#import "QSBHGSDelegate.h"
 #import "QSBSearchController.h"
 
 static const CGFloat kScrollViewMinusTableHeight = 7.0;

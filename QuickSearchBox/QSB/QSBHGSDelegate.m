@@ -31,6 +31,7 @@
 //
 
 #import "QSBHGSDelegate.h"
+#import <QSBPluginUI/QSBPluginUI.h>
 #import "GTMGarbageCollection.h"
 #import "FilesystemActions.h"
 #import "QSBPluginVerifyWindowController.h"

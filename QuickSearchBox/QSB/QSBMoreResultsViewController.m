@@ -31,6 +31,8 @@
 //
 
 #import "QSBMoreResultsViewController.h"
+#import <QSBPluginUI/QSBPluginUI.h>
+
 #import "QSBApplicationDelegate.h"
 #import "QSBSearchController.h"
 #import "QSBSearchViewController.h"
@@ -44,7 +46,6 @@
 #import "GTMMethodCheck.h"
 #import "GTMNSNumber+64Bit.h"
 #import "NSAttributedString+Attributes.h"
-#import "QSBHGSDelegate.h"
 
 // Extra space to allow for miscellaneous rows (such as fold) in the results table.
 static const NSUInteger kCategoryRowOverhead = 3;

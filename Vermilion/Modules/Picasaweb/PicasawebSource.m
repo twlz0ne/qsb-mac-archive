@@ -31,9 +31,10 @@
 //
 
 #import <Vermilion/Vermilion.h>
+#import <QSBPluginUI/QSBPluginUI.h>
+
 #import <GData/GData.h>
 #import "HGSKeychainItem.h"
-#import "QSBHGSDelegate.h"
 
 static NSString *const kPhotosAlbumKey = @"kPhotosAlbumKey";
 

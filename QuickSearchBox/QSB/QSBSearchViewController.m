@@ -31,6 +31,8 @@
 //
 
 #import "QSBSearchViewController.h"
+#import <QSBPluginUI/QSBPluginUI.h>
+
 #import "QSBApplicationDelegate.h"
 #import "QSBMoreResultsViewController.h"
 #import "QSBSearchController.h"
@@ -38,7 +40,6 @@
 #import "QSBResultsViewBaseController.h"
 #import "QSBSearchWindowController.h"
 #import "QSBTopResultsViewController.h"
-#import "QSBHGSDelegate.h"
 
 NSString *const kScrollViewHiddenKeyPath = @"hidden";
 

@@ -30,10 +30,11 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
 #import "ClipboardSearchSource.h"
+#import <Vermilion/Vermilion.h>
+#import <QSBPluginUI/QSBPluginUI.h>
+
 #import "GTMNSString+URLArguments.h"
-#import "QSBHGSDelegate.h"
 
 static const NSTimeInterval kPasteboardPollInterval = 1.0;
 static const NSInteger kMaxDisplayNameLength = 256;

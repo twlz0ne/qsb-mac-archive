@@ -32,11 +32,11 @@
 //
 
 #import "QSBSearchController.h"
+#import <QSBPluginUI/QSBPluginUI.h>
 #import "QSBApplication.h"
 #import "QSBApplicationDelegate.h"
 #import "QSBMoreResultsViewController.h"
 #import "QSBPreferences.h"
-#import "QSBHGSDelegate.h"
 #import "QSBTableResult.h"
 #import "QSBResultsViewBaseController.h"
 #import "GTMMethodCheck.h"

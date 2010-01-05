@@ -32,11 +32,11 @@
 
 #import <Vermilion/Vermilion.h>
 #import <InstantMessage/IMService.h>
+#import <QSBPluginUI/QSBPluginUI.h>
 
 #import "GTMGarbageCollection.h"
 #import "GTMNSString+URLArguments.h"
 #import "GTMMethodCheck.h"
-#import "QSBHGSDelegate.h"
 
 static NSString* const kChatBuddyAttributeInformationKey 
   = @"ChatBuddyAttributeInformationKey";

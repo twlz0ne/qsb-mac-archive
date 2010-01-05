@@ -33,15 +33,15 @@
 #import <Vermilion/Vermilion.h>
 #import <AddressBook/AddressBook.h>
 #import <AddressBook/ABAddressBookC.h>
+#import <QSBPluginUI/QSBPluginUI.h>
+
 #if !TARGET_OS_IPHONE
 #import "GTMGarbageCollection.h"
 #endif
-
 #import "GTMGeometryUtils.h"
 #import "GTMNSString+URLArguments.h"
 #import "GTMNSImage+Scaling.h"
 #import "GTMNSBezierPath+CGPath.h"
-#import "QSBHGSDelegate.h"
 #import "GTMNSString+URLArguments.h"
 #import "GTMGoogleSearch.h"
 #import "GTMNSNumber+64Bit.h"
