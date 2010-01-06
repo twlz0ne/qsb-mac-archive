@@ -92,17 +92,35 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     
 - (NSDictionary*)getAppInfoFromResult:(HGSResult *)result {
   NSDictionary *appInfo = nil;
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+
   if (result && [result isOfType:kHGSTypeFileApplication]) {
     NSString *path = [result filePath];
     if (path) {
-      NSWorkspace *ws = [NSWorkspace sharedWorkspace];
       NSArray *runningApps = [ws gtm_launchedApplications];
       NSPredicate *pred 
-        = [NSPredicate predicateWithFormat:@"SELF.NSApplicationPath == %@", 
-           path];
+      = [NSPredicate predicateWithFormat:@"SELF.NSApplicationPath == %@", 
+         path];
       NSArray *results = [runningApps filteredArrayUsingPredicate:pred];
       if ([results count] > 0) {
         appInfo = [results objectAtIndex:0];
+      }
+    }
+  } else {
+    // Get the frontmost visible non qsb app.
+    ProcessSerialNumber psn;
+    ProcessSerialNumber currentProcess;
+    GetCurrentProcess(&currentProcess);
+    for (OSErr err = GetFrontProcess(&psn); 
+         err == noErr && !appInfo;
+         err = GetNextProcess(&psn)) {
+      Boolean same = false;
+      if (SameProcess(&psn, &currentProcess, &same) == noErr && !same) {
+        appInfo = [ws gtm_processInfoDictionaryForPSN:&psn];
+        if ([[appInfo objectForKey:@"LSUIElement"] boolValue] ||
+            [[appInfo objectForKey:@"LSBackgroundOnly"] boolValue]) {
+          appInfo = nil;
+        }
       }
     }
   }
@@ -139,8 +157,13 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         NSString *compareName 
           = [HGSTokenizer tokenizeString:name];
         
-        CGFloat score = HGSScoreTermForString(queryString, compareName);
-        if ([queryString length] && !(score > 0.0)) {
+        CGFloat score = 0;
+        if ([queryString length]) {
+          score = HGSScoreTermForString(queryString, compareName);
+        } else {
+          score = HGSCalibratedScore(kHGSCalibratedModerateScore);
+        }
+        if (!(score > 0.0)) {
           continue;
         }
         // TODO(dmaclach): deal with lower level UI elements such as 
@@ -202,6 +225,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     if (appData) {
       NSNumber *pid 
         = [appData objectForKey:@"NSApplicationProcessIdentifier"];
+      if (!pid) {
+        pid = [appData objectForKey:@"pid"];
+      }
       element = [GTMAXUIElement elementWithProcessIdentifier:[pid intValue]];
     }     
   }

@@ -39,20 +39,6 @@
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
-			<string>ApplicationUIContentsSource</string>
-			<key>HGSExtensionPoint</key>
-			<string>HGSSourcesExtensionPoint</string>
-			<key>HGSExtensionIdentifier</key>
-			<string>com.google.qsb.ui.contents.source</string>
-			<key>HGSExtensionUserVisibleName</key>
-			<string>^Application UI Content Source</string>
-			<key>HGSSearchSourceCannotArchive</key>
-			<true/>
-			<key>HGSExtensionIsEnabledByDefault</key>
-			<false/>
-		</dict>
-		<dict>
-			<key>HGSExtensionClass</key>
 			<string>ApplicationUIAction</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>

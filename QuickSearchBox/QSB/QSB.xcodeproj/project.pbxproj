@@ -470,11 +470,9 @@
 		62FF5B870F8D846F00B21B5D /* HGSAccountType.h in Headers */ = {isa = PBXBuildFile; fileRef = 62FF5B850F8D846F00B21B5D /* HGSAccountType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		64C385C60DBFDCF9005EBA69 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		64C3866D0DBFE247005EBA69 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
-		7F0415BC0EC9356A00B60A18 /* DasherCorpora.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7F0415BA0EC9356A00B60A18 /* DasherCorpora.plist */; };
 		7F1804F90F38F61500E687CA /* Search14Small.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F1804F70F38F61500E687CA /* Search14Small.png */; };
 		7F1804FA0F38F61500E687CA /* Search14.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F1804F80F38F61500E687CA /* Search14.png */; };
 		7F1A72750F26264700B44BEF /* gmail.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4730F17C7BF00896770 /* gmail.icns */; };
-		7F2206460DD9EE9F00737C26 /* DefaultCorpora.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7F2206450DD9EE9F00737C26 /* DefaultCorpora.plist */; };
 		7F220BC50DDB44F800737C26 /* imdb-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F220BC40DDB44F800737C26 /* imdb-icon.png */; };
 		7F3EB48E0E5F02B500A7A75E /* MenuArrowWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F3EB48C0E5F02B500A7A75E /* MenuArrowWhite.png */; };
 		7F3EB48F0E5F02B500A7A75E /* MenuArrowBlack.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F3EB48D0E5F02B500A7A75E /* MenuArrowBlack.png */; };
@@ -616,7 +614,6 @@
 		8B3D2A4D0EAFDB00004EA504 /* ApplicationUISource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3D2A4C0EAFDB00004EA504 /* ApplicationUISource.m */; };
 		8B3D2E340EB0C722004EA504 /* ApplicationUIAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3D2E330EB0C722004EA504 /* ApplicationUIAction.m */; };
 		8B3D33FE0EB23DFC004EA504 /* GTMAXUIElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3D33FD0EB23DFC004EA504 /* GTMAXUIElement.m */; };
-		8B3D35240EB27FAA004EA504 /* ApplicationUIContentsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3D35220EB27FAA004EA504 /* ApplicationUIContentsSource.m */; };
 		8B3E039D0EF39D7C0036FFBD /* ContactsActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EFAD50EF2D84A0036FFBD /* ContactsActions.m */; };
 		8B3E03AE0EF39DF70036FFBD /* GoogleCorpora.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F5626100EF31C060030E922 /* GoogleCorpora.hgs */; };
 		8B3E03CD0EF39E350036FFBD /* Shortcuts.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F5626110EF31C060030E922 /* Shortcuts.hgs */; };
@@ -750,6 +747,9 @@
 		8B64A6C30FF419A90000D893 /* CaminoBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B64A6B10FF419630000D893 /* CaminoBookmarksSource.m */; };
 		8B64A6C40FF419A90000D893 /* SafariBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B64A6B40FF419630000D893 /* SafariBookmarksSource.m */; };
 		8B64B1150FF98FE90000D893 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
+		8B67247F10F3F29600F62D01 /* DefaultCorpora.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7F2206450DD9EE9F00737C26 /* DefaultCorpora.plist */; };
+		8B67248010F3F29600F62D01 /* DasherCorpora.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7F0415BA0EC9356A00B60A18 /* DasherCorpora.plist */; };
+		8B6724F910F3F6CD00F62D01 /* QSBHGSResultAttributeKeys.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6724F810F3F6CD00F62D01 /* QSBHGSResultAttributeKeys.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6857EF100CCC0D00ADEA67 /* bookmarks.json.xml in Copy Firefox Test Data */ = {isa = PBXBuildFile; fileRef = 8B6857EE100CCC0400ADEA67 /* bookmarks.json.xml */; };
 		8B68589D100CFE6C00ADEA67 /* imdb.xml in Copy Firefox SearchPlugins Test Data */ = {isa = PBXBuildFile; fileRef = 8B68589B100CFE4100ADEA67 /* imdb.xml */; };
 		8B6858D9100D014000ADEA67 /* searchPluginsMaster.xml in Copy Firefox Test Data */ = {isa = PBXBuildFile; fileRef = 8B6858D4100D013700ADEA67 /* searchPluginsMaster.xml */; };
@@ -2398,7 +2398,6 @@
 		8B3D31280EB12F70004EA504 /* ApplicationUIAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApplicationUIAction.h; sourceTree = "<group>"; };
 		8B3D33FC0EB23DFC004EA504 /* GTMAXUIElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMAXUIElement.h; sourceTree = "<group>"; };
 		8B3D33FD0EB23DFC004EA504 /* GTMAXUIElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMAXUIElement.m; sourceTree = "<group>"; };
-		8B3D35220EB27FAA004EA504 /* ApplicationUIContentsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationUIContentsSource.m; sourceTree = "<group>"; };
 		8B3E06310EF6282C0036FFBD /* QSBLargeTypeCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBLargeTypeCommand.m; sourceTree = "<group>"; };
 		8B3E067F0EF630DE0036FFBD /* QSBSearchForCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSearchForCommand.m; sourceTree = "<group>"; };
 		8B3EED7C0CEA86A100D933C0 /* Quick Search Box.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Quick Search Box.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2502,6 +2501,7 @@
 		8B64A6B10FF419630000D893 /* CaminoBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaminoBookmarksSource.m; sourceTree = "<group>"; };
 		8B64A6B40FF419630000D893 /* SafariBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafariBookmarksSource.m; sourceTree = "<group>"; };
 		8B64A6B50FF419630000D893 /* WebBookmarks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "WebBookmarks-Info.plist"; sourceTree = "<group>"; };
+		8B6724F810F3F6CD00F62D01 /* QSBHGSResultAttributeKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBHGSResultAttributeKeys.h; sourceTree = "<group>"; };
 		8B6857EE100CCC0400ADEA67 /* bookmarks.json.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = bookmarks.json.xml; sourceTree = "<group>"; };
 		8B68589B100CFE4100ADEA67 /* imdb.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = imdb.xml; sourceTree = "<group>"; };
 		8B6858D4100D013700ADEA67 /* searchPluginsMaster.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = searchPluginsMaster.xml; sourceTree = "<group>"; };
@@ -4135,6 +4135,7 @@
 			isa = PBXGroup;
 			children = (
 				8B44638710F2769B00561E62 /* QSBPluginUI.h */,
+				8B6724F810F3F6CD00F62D01 /* QSBHGSResultAttributeKeys.h */,
 				62F595090FEB15DF0076CDDA /* QSBActionSaveAsControllerProtocol.h */,
 				62D9B86C0F94E453005EF9BC /* QSBEditAccountWindowController.h */,
 				62D9B86B0F94E453005EF9BC /* QSBEditAccountWindowController.m */,
@@ -4485,7 +4486,6 @@
 				8B3D2E330EB0C722004EA504 /* ApplicationUIAction.m */,
 				8B3D2E350EB0C7D1004EA504 /* ApplicationUISource.h */,
 				8B3D2A4C0EAFDB00004EA504 /* ApplicationUISource.m */,
-				8B3D35220EB27FAA004EA504 /* ApplicationUIContentsSource.m */,
 			);
 			path = ApplicationUI;
 			sourceTree = "<group>";
@@ -5931,6 +5931,7 @@
 				620CB56F0FAA85160029801C /* QSBSetUpSimpleAccountViewController.h in Headers */,
 				8B44638810F2769B00561E62 /* QSBPluginUI.h in Headers */,
 				8B4463A310F2783200561E62 /* QSBActionSaveAsControllerProtocol.h in Headers */,
+				8B6724F910F3F6CD00F62D01 /* QSBHGSResultAttributeKeys.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7358,7 +7359,6 @@
 				62F150040DD4EE3D00BCAE1A /* ResultsWindow.xib in Resources */,
 				7F9CDD040DD8C37F007C4BF4 /* SearchPulldown.png in Resources */,
 				7F9CDD050DD8C37F007C4BF4 /* SearchPulldownActive.png in Resources */,
-				7F2206460DD9EE9F00737C26 /* DefaultCorpora.plist in Resources */,
 				7F220BC50DDB44F800737C26 /* imdb-icon.png in Resources */,
 				7F947AE10E1447600042B638 /* RightArrow.png in Resources */,
 				7F95C7830E1D521E00CAB15D /* GoogleSmall.png in Resources */,
@@ -7381,7 +7381,6 @@
 				623A00330E9BC5A6002A8401 /* TopSeparatorResultView.xib in Resources */,
 				623A00340E9BC5A6002A8401 /* TopFoldResultView.xib in Resources */,
 				623A008F0E9BCA70002A8401 /* TopMessageResultView.xib in Resources */,
-				7F0415BC0EC9356A00B60A18 /* DasherCorpora.plist in Resources */,
 				7F73699E0EED975C00CE8FCC /* ShowAllButton.png in Resources */,
 				7FF711EB0EF24030000C2AE7 /* ChildArrow.png in Resources */,
 				7F79A24C0F0AA28A000D14CB /* TopSearchStatusResultView.xib in Resources */,
@@ -7477,6 +7476,8 @@
 			files = (
 				8B6EB4211019FDEC006CFF7A /* InfoPlist.strings in Resources */,
 				8B6EB4221019FDEC006CFF7A /* Localizable.strings in Resources */,
+				8B67247F10F3F29600F62D01 /* DefaultCorpora.plist in Resources */,
+				8B67248010F3F29600F62D01 /* DasherCorpora.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8713,7 +8714,6 @@
 				8B3D2A4D0EAFDB00004EA504 /* ApplicationUISource.m in Sources */,
 				8B3D2E340EB0C722004EA504 /* ApplicationUIAction.m in Sources */,
 				8B3D33FE0EB23DFC004EA504 /* GTMAXUIElement.m in Sources */,
-				8B3D35240EB27FAA004EA504 /* ApplicationUIContentsSource.m in Sources */,
 				8B8B13170EEBADE400E543D0 /* HGSBundle.m in Sources */,
 				8B31346D10581C1800D57495 /* GTMMethodCheck.m in Sources */,
 			);
