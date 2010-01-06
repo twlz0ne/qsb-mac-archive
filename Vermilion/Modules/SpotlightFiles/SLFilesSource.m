@@ -178,13 +178,27 @@ typedef enum {
   NSValue *key = [NSValue valueWithPointer:mdItem];
   result = [hgsResults_ objectForKey:key];
   if (!result) {
+    NSString *path = nil;
     NSDictionary *attributes 
       = GTMCFAutorelease(MDItemCopyAttributes(mdItem, 
                                               [SLFilesSource attributeArray]));
     NSString *name = GTMCFAutorelease(MDItemCopyAttribute(mdItem,
                                                           kMDItemDisplayName));
     if (!name) {
-      name = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemFSName));  // COV_NF_LINE
+      // COV_NF_START
+      // This can happen in cases where there isn't a lot of spotlight
+      // information like a read only disk image that doesn't have a spotlight
+      // database on it.
+      name = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemFSName));
+      if (!name) {
+        path = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemPath));
+        if (!path) {
+          return nil;
+        } else {
+          name = [[path lastPathComponent] stringByDeletingPathExtension];
+        }
+      }
+      // COV_NF_END
     }
     BOOL isURL = NO;
     NSString *contentType
@@ -249,7 +263,6 @@ typedef enum {
     }
     
     NSString *uri = nil;
-    NSString *path = nil;
     // We want to avoid getting the path if at all possible,
     // and we only really need the path if it isn't a URL.
     if (isURL) {
@@ -260,7 +273,9 @@ typedef enum {
       }
     }
     if (!uri) {
-      path = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemPath));
+      if (!path) {
+        path = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemPath));
+      }
       if (!path) {
         return nil;
       }
