@@ -192,9 +192,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       CGFloat resultScore = [result rank];
       if (pivotObject
           || resultScore > HGSCalibratedScore(kHGSCalibratedInsignificantScore)) {
-        if (pivotObject
-            || (([result rankFlags] & eHGSBelowFoldRankFlag) == 0
-                && resultScore > HGSCalibratedScore(kHGSCalibratedWeakScore))) {
+        if (([result rankFlags] & eHGSBelowFoldRankFlag) == 0
+            && resultScore > HGSCalibratedScore(kHGSCalibratedWeakScore)) {
           [mainResults addObject:sourceResult];
         } else {
           hasMoreStandardResults = YES;

@@ -141,7 +141,7 @@ static NSSet *CopyStringSetFromId(id value) {
   NSSet *directObjectTypes = [self directObjectTypes];
   if (directObjectTypes) {
     // Not a global-only action.
-    NSSet *allTypes = [NSSet setWithObject:@"*"];
+    NSSet *allTypes = [[self class] allObjectTypes];
     NSSet *excludedDirectObjectTypes = [self excludedDirectObjectTypes];
     if (([directObjectTypes isEqual:allTypes]
          || [results conformsToTypeSet:directObjectTypes])
@@ -197,4 +197,9 @@ static NSSet *CopyStringSetFromId(id value) {
   return [NSString stringWithFormat:@"%@<%p> name:%@", 
           [self class], self, [self displayName]];
 }
+
++ (NSSet *)allObjectTypes {
+  return [NSSet setWithObject:@"*"];
+}
+
 @end

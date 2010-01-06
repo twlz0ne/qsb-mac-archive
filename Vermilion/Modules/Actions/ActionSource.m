@@ -216,7 +216,16 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
       if (emptyQuery) {
         HGSMutableResult *mutable = [[actionResult mutableCopy] autorelease];
         [mutable addRankFlags:eHGSBelowFoldRankFlag];
-        [mutable setRank:HGSCalibratedScore(kHGSCalibratedModerateScore)];
+        
+        // This gives some ordering to actions, putting more specific actions
+        // first.
+        HGSCalibratedScoreType scoreType;
+        if ([[action directObjectTypes] isEqual:[HGSAction allObjectTypes]]) {
+          scoreType = kHGSCalibratedWeakScore;
+        } else {
+          scoreType = kHGSCalibratedModerateScore;
+        }
+        [mutable setRank:HGSCalibratedScore(scoreType)];
         actionResult = mutable;
       }
     }
