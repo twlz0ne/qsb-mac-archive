@@ -115,4 +115,6 @@
 // Respond to a click in the path control.
 - (void)pathControlClick:(id)sender;
 
+// Called when the results have been updated.
+- (void)searchControllerDidUpdateResults:(NSNotification *)notification;
 @end

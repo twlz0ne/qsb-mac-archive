@@ -119,13 +119,15 @@
   
   HGSResult *result1 = [HGSResult resultWithURI:@"applescript://test" 
                                            name:@"test1" 
-                                           type:kHGSTypeScript 
+                                           type:kHGSTypeScript
+                                           rank:kHGSResultUnknownRank
                                          source:nil 
                                      attributes:nil];
   STAssertNotNil(result1, nil);
   HGSResult *result2 = [HGSResult resultWithURI:@"applescript://test2" 
                                            name:@"test2" 
-                                           type:kHGSTypeScript 
+                                           type:kHGSTypeScript
+                                           rank:kHGSResultUnknownRank
                                          source:nil 
                                      attributes:nil];
   STAssertNotNil(result2, nil);
@@ -183,6 +185,7 @@
   HGSResult *result1 = [HGSResult resultWithURI:@"applescript://test" 
                                            name:@"test1" 
                                            type:kHGSTypeScript
+                                           rank:kHGSResultUnknownRank
                                          source:nil 
                                      attributes:nil];
   STAssertNotNil(result1, nil);
@@ -192,7 +195,8 @@
        nil];
   HGSResult *result2 = [HGSResult resultWithURI:@"applescript://test2"
                                            name:@"test2" 
-                                           type:kHGSTypeScript 
+                                           type:kHGSTypeScript
+                                           rank:kHGSResultUnknownRank
                                          source:nil 
                                      attributes:attributes];
   STAssertNotNil(result2, nil);

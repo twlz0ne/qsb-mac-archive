@@ -55,6 +55,8 @@ static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 @interface QSBMoreResultsViewController ()
 
 - (void)updateCategoryNames:(NSArray *)names counts:(NSArray *)counts;
+// Set the full more results.
+- (void)setMoreResultsWithDict:(NSDictionary *)value;
 
 @end
 
@@ -353,6 +355,15 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
   }
   CGFloat height = [nsHeight gtm_cgFloatValue];
   return height;
+}
+
+#pragma mark Notifications
+
+- (void)searchControllerDidUpdateResults:(NSNotification *)notification {
+  QSBSearchController *controller = [notification object];
+  NSDictionary *rankedResults = [controller rankedResultsByCategory];
+  [self setMoreResultsWithDict:rankedResults];
+  [super searchControllerDidUpdateResults:notification];
 }
 
 @end

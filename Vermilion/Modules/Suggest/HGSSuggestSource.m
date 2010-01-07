@@ -584,6 +584,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     NSString *urlString = nil;
     NSString *name = nil;
     NSString *type = nil;
+    CGFloat rank = 0;
+    NSString *normalizedQuery = [query normalizedQueryString];
     if (suggestionType == kHGSSuggestTypeSuggest) {
       NSString *escapedSuggestion 
         = [suggestionString gtm_stringByEscapingForURLArgument];
@@ -593,7 +595,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       //              should import the enums.
       //              if (row[2] == 'calc') HGSCompletionTypeCalc;
       //              if (row[2] is integer) HGSCompletionTypeSuggest;
-
+      rank = HGSScoreTermForString(normalizedQuery, suggestionString);
       attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                     suggestionString, kHGSObjectAttributeStringValueKey,
                     [self navIcon], kHGSObjectAttributeIconKey,
@@ -619,17 +621,14 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       }
       urlString = suggestionString;
       NSNumber *yesValue = [NSNumber numberWithBool:YES];
-      NSString *normalizedQuery = [query normalizedQueryString];
       NSString *urlPath = [urlString substringFromIndex:[@"http://" length]];
       CGFloat rank1 = HGSScoreTermForString(normalizedQuery, urlString);
       CGFloat rank2 = HGSScoreTermForString(normalizedQuery, urlPath);
-      CGFloat rank = MAX(rank1, rank2);
-      NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
+      rank = MAX(rank1, rank2);
       attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                     yesValue, kHGSObjectAttributeAllowSiteSearchKey,
                     yesValue, kHGSObjectAttributeIsSyntheticKey,
                     urlString, kHGSObjectAttributeSourceURLKey,
-                    nsRank, kHGSObjectAttributeRankKey,
                     nil];
       type = kHGSTypeGoogleNavSuggest;
     }
@@ -637,6 +636,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       HGSResult *navsuggestion = [HGSResult resultWithURI:urlString
                                                      name:name
                                                      type:type
+                                                     rank:rank
                                                    source:self
                                                attributes:attributes];
       if (navsuggestion) {
@@ -697,6 +697,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       HGSResult *urlResult = [HGSResult resultWithURL:url
                                                  name:suggestion
                                                  type:kHGSTypeWebpage
+                                                 rank:[result rank]
                                                source:self
                                            attributes:attributes];
       [results replaceObjectAtIndex:i withObject:urlResult];

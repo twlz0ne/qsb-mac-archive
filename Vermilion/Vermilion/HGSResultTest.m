@@ -47,6 +47,7 @@
   HGSResult* obj1 = [HGSResult resultWithURI:path 
                                         name:@"everything"
                                         type:@"text"
+                                        rank:kHGSResultUnknownRank
                                       source:nil
                                   attributes:nil];
   STAssertNotNil(obj1, @"can't create object");
@@ -64,6 +65,7 @@
   HGSResult* obj3 = [HGSResult resultWithURI:nil 
                                         name:nil
                                         type:NULL
+                                        rank:kHGSResultUnknownRank
                                       source:nil
                                   attributes:nil];
   STAssertNil(obj3, @"created object");
@@ -139,6 +141,7 @@
     HGSResult* obj = [HGSResult resultWithURI:url 
                                          name:@"name"
                                          type:data[i].theType
+                                         rank:kHGSResultUnknownRank
                                        source:nil
                                    attributes:nil];
     STAssertNotNil(obj, @"type %@", data[i].theType);

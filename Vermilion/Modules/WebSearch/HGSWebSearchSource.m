@@ -130,8 +130,6 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
           boolValue];
 #endif
       if (!searchInline) {
-        CGFloat perfectScore = HGSCalibratedScore(kHGSCalibratedPerfectScore);
-        NSNumber *perfectNumber = [NSNumber numberWithDouble:perfectScore];
         NSImage *icon = [NSImage imageNamed:kWebSourceIconName];
         NSString *itemLabel
           = HGSLocalizedString(@"for \"%@\"",
@@ -140,7 +138,6 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
         NSString *details = [NSString stringWithFormat:itemLabel, queryString];
         NSDictionary *attributes
           = [NSDictionary dictionaryWithObjectsAndKeys:
-             perfectNumber, kHGSObjectAttributeRankKey,
              icon, kHGSObjectAttributeIconKey,
              details, kHGSObjectAttributeSnippetKey,
              nil];
@@ -148,6 +145,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
           = [HGSResult resultWithURI:url
                                 name:searchName
                                 type:kHGSTypeSearchCorpus
+                                rank:HGSCalibratedScore(kHGSCalibratedPerfectScore)
                               source:self
                           attributes:attributes];
         [operation setResults:[NSArray arrayWithObject:placeholderItem]];

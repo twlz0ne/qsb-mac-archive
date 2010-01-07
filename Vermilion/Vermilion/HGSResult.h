@@ -145,6 +145,8 @@ extern NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey;  // NS
 #define kHGSTypeTextInstantMessage HGS_SUBTYPE(kHGSTypeText, @"instantmessage")
 #define kHGSTypeTextAddress      HGS_SUBTYPE(kHGSTypeText, @"address")
 
+#define kHGSResultUnknownRank -1000
+
 enum {
   eHGSNameMatchRankFlag = 1 << 0,
   eHGSUserPersistentPathRankFlag = 1 << 1,
@@ -241,16 +243,19 @@ typedef NSUInteger HGSRankFlags;
 + (id)resultWithURL:(NSURL *)url
                name:(NSString *)name
                type:(NSString *)typeStr
+               rank:(CGFloat)rank
              source:(HGSSearchSource *)source
          attributes:(NSDictionary *)attributes;
 
-+ (id)resultWithFilePath:(NSString *)path 
++ (id)resultWithFilePath:(NSString *)path
+                    rank:(CGFloat)rank
                   source:(HGSSearchSource *)source 
               attributes:(NSDictionary *)attributes;
 
 + (id)resultWithURI:(NSString *)uri
                name:(NSString *)name
                type:(NSString *)type
+               rank:(CGFloat)rank
              source:(HGSSearchSource *)source
          attributes:(NSDictionary *)attributes;
 
@@ -263,6 +268,7 @@ typedef NSUInteger HGSRankFlags;
 - (id)initWithURI:(NSString *)uri
              name:(NSString *)name
              type:(NSString *)typeStr
+             rank:(CGFloat)rank
            source:(HGSSearchSource *)source
        attributes:(NSDictionary *)attributes;
 

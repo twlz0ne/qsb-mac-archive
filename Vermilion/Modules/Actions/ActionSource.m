@@ -105,11 +105,9 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
        | eHGSSpecialUIRankFlag 
        | eHGSUnderHomeRankFlag 
        | eHGSHomeChildRankFlag];
-  NSNumber *nsRank = [NSNumber numberWithDouble:rank];
   NSMutableDictionary *attributes 
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        rankFlags, kHGSObjectAttributeRankFlagsKey,
-       nsRank, kHGSObjectAttributeRankKey,
        action, kHGSObjectAttributeDefaultActionKey,
        nil];
   NSImage *icon = [action displayIconForResults:array];
@@ -124,6 +122,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     = [HGSResult resultWithURI:urlStr
                           name:name
                           type:kHGSTypeAction
+                          rank:rank
                         source:self
                     attributes:attributes];
 

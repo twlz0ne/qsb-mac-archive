@@ -320,6 +320,7 @@
   STAssertNotNil(mailFilePath, nil);
   [self mdimportFile:mailFilePath];
   HGSResult *mailResult = [HGSResult resultWithFilePath:mailFilePath 
+                                                   rank:kHGSResultUnknownRank
                                                  source:source
                                              attributes:nil];
   STAssertNotNil(mailResult, nil);
@@ -336,7 +337,8 @@
                                                   ofType:@"emlx"];
   STAssertNotNil(mailFilePath, nil);
   [self mdimportFile:mailFilePath];
-  HGSResult *mailResult = [HGSResult resultWithFilePath:mailFilePath 
+  HGSResult *mailResult = [HGSResult resultWithFilePath:mailFilePath
+                                                   rank:kHGSResultUnknownRank
                                                  source:source
                                              attributes:nil];
   STAssertNotNil(mailResult, nil);
@@ -345,7 +347,8 @@
                                   forKey:kHGSObjectAttributeContactEmailKey];
   HGSResult *contactResult = [HGSResult resultWithURI:@"test:contact" 
                                                  name:@"Willy Wonka" 
-                                                 type:kHGSTypeContact 
+                                                 type:kHGSTypeContact
+                                                 rank:kHGSResultUnknownRank
                                                source:source 
                                            attributes:attributes];
   STAssertNotNil(contactResult, nil);

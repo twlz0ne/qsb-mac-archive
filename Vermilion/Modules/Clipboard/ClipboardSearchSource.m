@@ -80,6 +80,7 @@ static NSString *const kClipboardCopyAction
       = [[HGSResult alloc] initWithURI:urlString
                                   name:name
                                   type:kTypeClipboardGeneric
+                                  rank:kHGSResultUnknownRank
                                 source:self
                             attributes:attributes];
     recentResults_ = [[NSMutableArray alloc] init];

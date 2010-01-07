@@ -144,6 +144,7 @@
   HGSSearchSource *source = [HGSUnitTestingSource sourceWithBundle:bundle];
   STAssertNotNil(source, nil);
   HGSResult *result = [HGSResult resultWithFilePath:resultPath 
+                                               rank:kHGSResultUnknownRank
                                              source:source
                                          attributes:nil];
   STAssertNotNil(result, nil);

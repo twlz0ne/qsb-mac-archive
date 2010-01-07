@@ -331,13 +331,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if ([self isQueryControllerFinished]) {
     [desktopResults_ setArray:newResults];
   }
-  
-  NSDictionary *resultsByCategory = [queryController_ rankedResultsByCategory];
-  [moreResultsViewController_ setMoreResultsWithDict:resultsByCategory];  
 
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kQSBSearchControllerDidUpdateResultsNotification
                     object:self];
+}
+
+- (NSArray *)topResultsInRange:(NSRange)range {
+  return [desktopResults_ subarrayWithRange:range];
 }
 
 - (QSBTableResult *)topResultForIndex:(NSInteger)idx {
@@ -350,6 +351,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (NSUInteger)topResultCount {
   return [desktopResults_ count];
+}
+
+- (NSDictionary *)rankedResultsByCategory {
+  return [queryController_ rankedResultsByCategory];
 }
 
 - (void)setQueryString:(NSString*)queryString {
@@ -450,6 +455,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)displayTimerElapsed:(NSTimer*)timer {
   if (![self isQueryControllerFinished]) {
     [self startMixing];
+  } else {
+    [self cancelDisplayTimer];
   }
   [self updateResults];
 }
@@ -467,15 +474,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     if ([self isQueryControllerFinished]) {
       [self setQueryIsInProcess:NO];
       [self cancelDisplayTimer];
-    }    
-#if DEBUG
-    BOOL dumpTopResults = [[NSUserDefaults standardUserDefaults]
-                           boolForKey:@"dumpTopResults"];
-    if (dumpTopResults) {
-      HGSLog(@"QSB: Desktop Results:\n%@", desktopResults_);
-      HGSLog(@"QSB: More Results:\n%@", [mixer rankedResultsByCategory]);
     }
-#endif    
   }
 }
 

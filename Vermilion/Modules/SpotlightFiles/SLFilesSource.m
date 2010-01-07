@@ -327,17 +327,16 @@ typedef enum {
     CGFloat moderateScore = HGSCalibratedScore(kHGSCalibratedModerateScore);
     rank = MAX(rank, moderateScore);
     
-    NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
     NSDictionary *hgsAttributes 
       = [NSDictionary dictionaryWithObjectsAndKeys:
          lastUsedDate, kHGSObjectAttributeLastUsedDateKey,
-         nsRank, kHGSObjectAttributeRankKey,
          (isURL ? uri : nil), kHGSObjectAttributeSourceURLKey,
          iconFlagName, kHGSObjectAttributeFlagIconNameKey,
          nil];
     result = [HGSResult resultWithURI:uri 
                                  name:name
-                                 type:resultType 
+                                 type:resultType
+                                 rank:rank
                                source:[self source]
                            attributes:hgsAttributes];
     if (result) {

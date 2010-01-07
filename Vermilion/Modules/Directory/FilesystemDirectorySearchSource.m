@@ -107,7 +107,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     NSNumber *belowFoldRankFlag 
       = [NSNumber numberWithUnsignedInteger:eHGSBelowFoldRankFlag];
     CGFloat strongScore = HGSCalibratedScore(kHGSCalibratedStrongScore);
-    NSNumber *nsStrongScore = [NSNumber gtm_numberWithCGFloat:strongScore];
     for (NSString *subpath in contents) {
       NSString *fullPath = [path stringByAppendingPathComponent:subpath];
       if (!showInvisibles) {
@@ -126,21 +125,19 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       // Filter further based on the query string, or, if there is no
       // query string then boost the score of the folder's contents.
       NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+      CGFloat rank = kHGSResultUnknownRank;
       if (emptyQuery) {
         // TODO(mrossetti): Fix the following once issue 850 is addressed.
         // http://code.google.com/p/qsb-mac/issues/detail?id=850
-        [attributes setObject:nsStrongScore forKey:kHGSObjectAttributeRankKey];
+        rank = strongScore;
         if (isApplication) {
           [attributes setObject:belowFoldRankFlag
                          forKey:kHGSObjectAttributeRankFlagsKey];
         }
       } else {
         NSString *tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
-        CGFloat score
-          = HGSScoreTermForString(normalizedQueryString, tokenizedSubpath);
-        if (score < FLT_EPSILON) continue;
-        [attributes setObject:[NSNumber gtm_numberWithCGFloat:score] 
-                       forKey:kHGSObjectAttributeRankKey];
+        rank = HGSScoreTermForString(normalizedQueryString, tokenizedSubpath);
+        if (rank < FLT_EPSILON) continue;
       }
 
       NSError *error = nil;               
@@ -155,7 +152,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                     fullPath, error);
       }
       
-      HGSResult *result = [HGSResult resultWithFilePath:fullPath 
+      HGSResult *result = [HGSResult resultWithFilePath:fullPath
+                                                   rank:rank
                                                  source:self 
                                              attributes:attributes];
       [results addObject:result];
@@ -178,12 +176,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     if ([path hasPrefix:@"/"] || [path hasPrefix:@"~"]) {
       path = [path stringByStandardizingPath];
       if ([fm fileExistsAtPath:path]) {
-        NSDictionary *attributes
-          = [NSDictionary dictionaryWithObjectsAndKeys:
-             [NSNumber numberWithFloat:1000], kHGSObjectAttributeRankKey, nil];
-        HGSResult *result = [HGSResult resultWithFilePath:path 
+        CGFloat rank = HGSCalibratedScore(kHGSCalibratedPerfectScore);
+        HGSResult *result = [HGSResult resultWithFilePath:path
+                                                     rank:rank
                                                    source:self
-                                               attributes:attributes];
+                                               attributes:nil];
         [operation setResults:[NSArray arrayWithObject:result]]; 
       } else {
         NSString *container = [path stringByDeletingLastPathComponent];
@@ -208,8 +205,10 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                   continue;
                 }
               }
+              CGFloat rank = HGSScoreTermForString(partialPath, path);
               path = [container stringByAppendingPathComponent:path];
               HGSResult *result = [HGSResult resultWithFilePath:path
+                                                           rank:rank
                                                          source:self
                                                      attributes:nil];
               [contents addObject:result];

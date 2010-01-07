@@ -339,6 +339,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     HGSResult* result = [HGSResult resultWithURL:albumURL
                                             name:albumTitle
                                             type:kHGSTypeWebPhotoAlbum
+                                            rank:kHGSResultUnknownRank
                                           source:self
                                       attributes:attributes];
     [self indexResult:result
@@ -485,6 +486,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     HGSResult* result = [HGSResult resultWithURL:photoURL
                                             name:photoDescription
                                             type:kHGSTypeWebImage
+                                            rank:kHGSResultUnknownRank
                                           source:self
                                       attributes:attributes];
     

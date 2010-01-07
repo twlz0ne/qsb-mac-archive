@@ -143,16 +143,15 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       NSDictionary *pasteboardData
         = [NSDictionary dictionaryWithObject:answerString
                                       forKey:NSStringPboardType];
-      CGFloat rank = HGSCalibratedScore(kHGSCalibratedPerfectScore);
       NSDictionary *attributes
         = [NSDictionary dictionaryWithObjectsAndKeys:
-           [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
            pasteboardData, kHGSObjectAttributePasteboardValueKey,
            nil];
       HGSResult *hgsObject
         = [HGSResult resultWithURI:calculatorAppPath_
                               name:resultString
                               type:HGS_SUBTYPE(kHGSTypeOnebox, @"calculator")
+                              rank:HGSCalibratedScore(kHGSCalibratedPerfectScore)
                             source:self
                         attributes:attributes];
       NSArray *resultsArray = [NSArray arrayWithObject:hgsObject];

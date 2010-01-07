@@ -110,6 +110,7 @@ static NSString *const kClipboardTestString = @"Lazarus Long Text";
     = [HGSResult resultWithURI:@"userinput:text"
                           name:@"Lazarus Long"
                           type:kHGSTypeTextUserInput
+                          rank:kHGSResultUnknownRank
                         source:textSource
                     attributes:nil];
   STAssertNotNil(textResult, nil);

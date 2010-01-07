@@ -117,6 +117,7 @@
   STAssertNotNil(path, nil);
   id searchSourceMock = [OCMockObject mockForClass:[HGSSearchSource class]];
   HGSResult *result = [HGSResult resultWithFilePath:path
+                                               rank:kHGSResultUnknownRank
                                              source:searchSourceMock
                                          attributes:nil];
   STAssertNotNil(result, nil);

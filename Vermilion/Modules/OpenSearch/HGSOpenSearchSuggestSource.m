@@ -84,6 +84,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSEnumerator *suggestionsEnum = [jsonSuggestions objectEnumerator];
   NSString *suggestion = nil;
   HGSResult *pivotObject = [query pivotObject];
+  NSString *normalizedQuery = [query normalizedQueryString];
   id image = [pivotObject valueForKey:kHGSObjectAttributeIconKey];
   NSString *urlFormat = [pivotObject valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
   urlFormat = [urlFormat stringByReplacingOccurrencesOfString:@"{searchterms}" withString:@"%@"];
@@ -93,9 +94,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                            [suggestion gtm_stringByEscapingForURLArgument]];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                 image, kHGSObjectAttributeIconKey, nil];
+    CGFloat rank = HGSScoreTermForString(normalizedQuery, suggestion);
     HGSResult *result = [HGSResult resultWithURI:urlString
                                             name:suggestion
                                             type:HGS_SUBTYPE(kHGSTypeWebpage, @"opensearch") // TODO(alcor): more complete/better type
+                                            rank:rank
                                           source:self
                                       attributes:attributes];
     [suggestions addObject:result];

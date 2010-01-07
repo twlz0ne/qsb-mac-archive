@@ -100,6 +100,7 @@
     = [HGSResult resultWithURI:urlString
                           name:name
                           type:type
+                          rank:kHGSResultUnknownRank
                         source:self
                     attributes:attributes];
   [self indexResult:result];

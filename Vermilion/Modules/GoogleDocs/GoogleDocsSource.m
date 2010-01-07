@@ -528,6 +528,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   HGSResult* result = [HGSResult resultWithURL:docURL
                                           name:docTitle
                                           type:kHGSTypeGoogleDoc
+                                          rank:kHGSResultUnknownRank
                                         source:self
                                     attributes:attributes];
   
@@ -629,6 +630,7 @@ GTM_METHOD_CHECK(NSEnumerator,
       HGSResult* worksheetResult = [HGSResult resultWithURL:[docResult url]
                                                        name:@"Ignored"
                                                        type:kHGSTypeGoogleDoc
+                                                       rank:kHGSResultUnknownRank
                                                      source:self
                                                  attributes:attributes];
       docResult = [docResult mergeWith:worksheetResult];

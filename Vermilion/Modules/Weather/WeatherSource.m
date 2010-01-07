@@ -208,10 +208,8 @@ static NSString *const kWeatherResultURL
         // Cheat, force this result high in the list.
         // TODO(dmaclach): figure out a cleaner way to get results like this 
         // high in the results.
-        CGFloat weatherRank = HGSCalibratedScore(kHGSCalibratedPerfectScore);
         NSMutableDictionary *attributes
           = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-             [NSNumber numberWithFloat:weatherRank], kHGSObjectAttributeRankKey,
              details, kHGSObjectAttributeSnippetKey,
              nil];
         xPath = @"/xml_api_reply/weather/current_conditions/icon/@data";
@@ -231,6 +229,7 @@ static NSString *const kWeatherResultURL
           = [HGSResult resultWithURI:resultURLStr
                                 name:title
                                 type:HGS_SUBTYPE(kHGSTypeOnebox, @"weather")
+                                rank:HGSCalibratedScore(kHGSCalibratedPerfectScore)
                               source:self
                           attributes:attributes];
         NSArray *resultsArray = [NSArray arrayWithObject:hgsObject];

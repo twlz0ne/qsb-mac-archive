@@ -116,6 +116,7 @@
   HGSResult *result = [HGSResult resultWithURI:@"http://www.google.com/"
                                           name:@"Google"
                                           type:kHGSTypeWebBookmark
+                                          rank:kHGSResultUnknownRank
                                         source:source
                                     attributes:attributes];
   PyObject *results = PyList_New(1);

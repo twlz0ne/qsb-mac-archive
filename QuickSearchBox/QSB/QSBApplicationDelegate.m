@@ -56,6 +56,7 @@
 #import "GTMNSObject+KeyValueObserving.h"
 #import "QLUIPrivate.h"
 #import "PFMoveApplication.h"
+#import "QSBDebugWindowController.h"
 
 // Local pref set once we've been launched. Used to control whether or not we
 // show the help window at startup.
@@ -288,6 +289,20 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [statusShowSearchBoxItem_ setAction:@selector(showSearchWindow:)];
   [dockShowSearchBoxItem_ setTarget:searchWindowController_];
   [dockShowSearchBoxItem_ setAction:@selector(showSearchWindow:)];
+#if DEBUG
+  [statusItemMenu_ addItem:[NSMenuItem separatorItem]];
+  [statusItemMenu_ addItemWithTitle:@"Show Debug Window" 
+                             action:@selector(showDebugWindow:)  
+                      keyEquivalent:@""];
+  [dockMenu_ addItem:[NSMenuItem separatorItem]];
+  [dockMenu_ addItemWithTitle:@"Show Debug Window" 
+                       action:@selector(showDebugWindow:)  
+                keyEquivalent:@""];
+#endif
+}
+
+- (void)showDebugWindow:(id)sender {
+  [[QSBDebugWindowController sharedWindowController] showWindow:sender];
 }
 
 - (void)hotKeyValueChanged:(GTMKeyValueChangeNotification *)note {

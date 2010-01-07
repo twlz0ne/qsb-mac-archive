@@ -140,8 +140,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         = highRelevance ? kHGSCalibratedStrongScore 
                         : kHGSCalibratedInsignificantScore;
       CGFloat rank = HGSCalibratedScore(scoreType);
-      NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
-      [attributes setObject:nsRank forKey:kHGSObjectAttributeRankKey]; 
       
       HGSAction *action 
         = [[HGSExtensionPoint actionsPoint]
@@ -160,6 +158,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         = [HGSResult resultWithURI:urlString
                               name:name
                               type:kDictionaryResultType
+                              rank:rank
                             source:self
                         attributes:attributes];
       [results addObject:result];

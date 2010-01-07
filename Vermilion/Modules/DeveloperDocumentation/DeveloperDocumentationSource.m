@@ -156,6 +156,7 @@ static NSString *const kiPhoneReferenceDocSetPath
         = [HGSResult resultWithURL:url
                               name:name
                               type:HGS_SUBTYPE(kHGSTypeFile, @"developerdocs")
+                              rank:kHGSResultUnknownRank
                             source:self
                         attributes:attributes];  
       [self indexResult:result];

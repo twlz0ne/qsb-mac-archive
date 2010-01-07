@@ -189,6 +189,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                           name:([title length] > 0 ? title : url)
                           type:HGS_SUBTYPE(kHGSTypeWebBookmark,
                                            @"googlebookmarks")
+                          rank:kHGSResultUnknownRank
                         source:self
                     attributes:attributes];
   [self indexResult:result

@@ -63,6 +63,7 @@
   HGSResult *result = [HGSResult resultWithURI:@"http://www.google.com/"
                                           name:@"Google"
                                           type:kHGSTypeWebBookmark
+                                          rank:kHGSResultUnknownRank
                                         source:nil
                                     attributes:nil];
   STAssertNotNil(result, nil);

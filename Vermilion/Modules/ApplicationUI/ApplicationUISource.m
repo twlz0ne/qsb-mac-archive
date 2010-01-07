@@ -157,13 +157,13 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         NSString *compareName 
           = [HGSTokenizer tokenizeString:name];
         
-        CGFloat score = 0;
+        CGFloat rank = 0;
         if ([queryString length]) {
-          score = HGSScoreTermForString(queryString, compareName);
+          rank = HGSScoreTermForString(queryString, compareName);
         } else {
-          score = HGSCalibratedScore(kHGSCalibratedModerateScore);
+          rank = HGSCalibratedScore(kHGSCalibratedModerateScore);
         }
-        if (!(score > 0.0)) {
+        if (!(rank > 0.0)) {
           continue;
         }
         // TODO(dmaclach): deal with lower level UI elements such as 
@@ -190,7 +190,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              child, kAppUISourceAttributeElementKey,
              icon, kHGSObjectAttributeIconKey,
-             [NSNumber gtm_numberWithCGFloat:score], kHGSObjectAttributeRankKey,
              nil];
         HGSAction *defaultAction 
           = [ApplicationUIAction defaultActionForElement:child];
@@ -203,6 +202,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           = [HGSResult resultWithURI:uriString
                                 name:name
                                 type:kHGSTypeAppUIItem
+                                rank:rank
                               source:self
                           attributes:attributes];
         [array addObject:result];

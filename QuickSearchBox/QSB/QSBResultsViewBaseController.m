@@ -51,7 +51,7 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 
 // Return our main search window controller.
 - (QSBSearchWindowController *)searchWindowController;
-- (void)resultsUpdated:(NSNotification *)notification;
+
 @end
 
 
@@ -61,7 +61,7 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
   rowViewControllers_ = [[NSMutableDictionary dictionary] retain];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc addObserver:self 
-         selector:@selector(resultsUpdated:) 
+         selector:@selector(searchControllerDidUpdateResults:) 
              name:kQSBSearchControllerDidUpdateResultsNotification 
            object:nil];
 
@@ -266,7 +266,7 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
   return [searchViewController_ searchWindowController];
 }
 
-- (void)resultsUpdated:(NSNotification *)notification {
+- (void)searchControllerDidUpdateResults:(NSNotification *)notification {
   NSTableView *resultsTableView = [self resultsTableView];
   [resultsTableView reloadData];
   if ([resultsTableView selectedRow] == -1) {

@@ -202,6 +202,7 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
                                 nil];
     
     HGSResult *result = [HGSResult resultWithFilePath:path
+                                                 rank:kHGSResultUnknownRank
                                                source:self
                                            attributes:attributes];
     if (result) {

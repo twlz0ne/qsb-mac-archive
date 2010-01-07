@@ -624,6 +624,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return [HGSResult resultWithURI:identifier
                              name:displayName
                              type:HGS_SUBTYPE(kHGSTypeContact, @"ichat")
+                             rank:kHGSResultUnknownRank
                            source:source
                        attributes:attributes];
 }

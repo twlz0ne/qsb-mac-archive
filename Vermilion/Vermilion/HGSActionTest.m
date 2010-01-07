@@ -58,6 +58,7 @@
   return [super initWithURI:identifier
                        name:@"MyObject" 
                        type:@"test" 
+                       rank:kHGSResultUnknownRank
                      source:nil
                  attributes:nil];
 }
@@ -257,21 +258,25 @@
   HGSResult* acceptableText = [HGSResult resultWithURI:path 
                                                   name:@"acceptable"
                                                   type:kHGSTypeText
+                                                  rank:kHGSResultUnknownRank
                                                 source:nil
                                             attributes:nil];
   HGSResult* acceptableFile = [HGSResult resultWithURI:path 
                                                   name:@"acceptable"
                                                   type:kHGSTypeFile
+                                                  rank:kHGSResultUnknownRank
                                                 source:nil
                                             attributes:nil];
   HGSResult* unacceptableWebpage = [HGSResult resultWithURI:path 
                                                        name:@"not acceptable"
                                                        type:kHGSTypeWebpage
+                                                       rank:kHGSResultUnknownRank
                                                      source:nil
                                                  attributes:nil];
   HGSResult* unacceptableFrammy = [HGSResult resultWithURI:path 
                                                       name:@"not acceptable"
                                                       type:kHGSTypeWebFrammy
+                                                      rank:kHGSResultUnknownRank
                                                     source:nil
                                                 attributes:nil];
   

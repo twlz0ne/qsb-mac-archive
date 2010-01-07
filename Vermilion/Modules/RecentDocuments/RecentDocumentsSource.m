@@ -158,12 +158,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
             }
             
             if (rank > 0) {
-              NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
               NSDictionary *attributes 
                 = [NSDictionary dictionaryWithObjectsAndKeys:
-                   aliasData, kHGSObjectAttributeAliasDataKey,
-                   nsRank, kHGSObjectAttributeRankKey, nil];
+                   aliasData, kHGSObjectAttributeAliasDataKey, nil];
               HGSResult *result = [HGSResult resultWithFilePath:recentPath
+                                                           rank:rank
                                                          source:self
                                                      attributes:attributes];
               [finalResults addObject:result];

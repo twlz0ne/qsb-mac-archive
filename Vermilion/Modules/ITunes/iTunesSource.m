@@ -823,7 +823,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   NSMutableDictionary *attributes
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        [NSNumber numberWithInt:trackNumber], kITunesAttributeTrackIdKey,
-       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        nil];
   NSInteger artistLength = [artist length], albumLength = [album length];
@@ -854,6 +853,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return [HGSResult resultWithURI:location
                              name:track
                              type:kHGSTypeFileMusic
+                             rank:rank
                            source:self
                        attributes:attributes];
 }
@@ -872,7 +872,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        iconFilePath, kHGSObjectAttributeIconPreviewFileKey,
-       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        albumIcon_, kHGSObjectAttributeIconKey,
        nil];
   if ([artist length]) {
@@ -892,6 +891,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return [HGSResult resultWithURI:albumUrlString
                              name:album
                              type:kTypeITunesAlbum
+                             rank:rank
                            source:self
                        attributes:attributes];
 }
@@ -908,11 +908,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
        artist, kITunesAttributeArtistKey,
        artistIcon_, kHGSObjectAttributeIconKey,
        action, kHGSObjectAttributeDefaultActionKey,
-       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        nil];
   return [HGSResult resultWithURI:artistUrlString
                              name:artist
                              type:kTypeITunesArtist
+                             rank:rank
                            source:self
                        attributes:attributes];
 }
@@ -929,11 +929,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
        composer, kITunesAttributeComposerKey,
        composerIcon_, kHGSObjectAttributeIconKey,
        action, kHGSObjectAttributeDefaultActionKey,
-       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        nil];
   return [HGSResult resultWithURI:composerUrlString
                              name:composer
                              type:kTypeITunesComposer
+                             rank:rank
                            source:self
                        attributes:attributes];
 }
@@ -978,11 +978,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
        genre, kITunesAttributeGenreKey,
        icon, kHGSObjectAttributeIconKey,
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
-       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        nil];
   return [HGSResult resultWithURI:genreUrlString
                              name:genre
                              type:kTypeITunesGenre
+                             rank:rank
                            source:self
                        attributes:attributes];
 }
@@ -1000,11 +1000,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
        playlist, kITunesAttributePlaylistKey,
        playlistIcon_, kHGSObjectAttributeIconKey,
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
-       [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
        nil];
   return [HGSResult resultWithURI:playlistUrlString
                              name:playlist
                              type:kTypeITunesPlaylist
+                             rank:rank
                            source:self
                        attributes:attributes];
 }

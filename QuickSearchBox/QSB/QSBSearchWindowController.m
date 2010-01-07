@@ -689,7 +689,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   // Note that this subverts the parent's idea of what the pivot object is.
   [activeSearchViewController_ setResults:results];
   [self updatePivotToken];
-  [self showResultsWindow];
 }
 
 - (IBAction)grabSelection:(id)sender {

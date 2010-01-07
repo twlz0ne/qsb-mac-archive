@@ -787,9 +787,7 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
               
               if (rank > 0.0) {
                 NSMutableDictionary *attributes 
-                  = [NSMutableDictionary
-                     dictionaryWithObject:[NSNumber gtm_numberWithCGFloat:rank]
-                                   forKey:kHGSObjectAttributeRankKey];
+                  = [NSMutableDictionary dictionary];
                 NSString *urlString = [NSString stringWithUTF8String:identifier];
                 if (snippet && strlen(snippet) > 0) {
                   [attributes setObject:[NSString stringWithUTF8String:snippet]
@@ -817,6 +815,7 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                   = [HGSResult resultWithURI:urlString
                                         name:displayNameString
                                         type:type
+                                        rank:rank
                                       source:[self->operation_ source]
                                   attributes:attributes];
                 if (result) {

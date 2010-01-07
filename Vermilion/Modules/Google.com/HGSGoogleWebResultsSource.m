@@ -216,6 +216,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
 
   NSEnumerator *resultEnumerator = [googleResultArray objectEnumerator];
   NSDictionary *resultDict;
+  // TODO(mrossetti): better way to rank this stuff?
+  CGFloat rank = HGSCalibratedScore(kHGSCalibratedStrongScore);
   while ((resultDict  = [resultEnumerator nextObject])) {
     NSString *name = [resultDict objectForKey:@"titleNoFormatting"];
     name = [name gtm_stringByUnescapingFromHTML];
@@ -282,8 +284,10 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
     HGSResult *result = [HGSResult resultWithURI:urlString
                                             name:name
                                             type:kHGSTypeWebpage // TODO: more complete type?
+                                            rank:rank
                                           source:[self source]
                                       attributes:attributes];
+    rank *= 0.9;
     
     [results addObject:result];
 

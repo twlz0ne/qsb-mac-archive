@@ -590,6 +590,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   HGSResult *result = [HGSResult resultWithURI:urlString
                                           name:name
                                           type:kHGSTypeGoogleSearch
+                                          rank:kHGSResultUnknownRank
                                         source:nil
                                     attributes:attributes];
   return [super initWithResult:result];

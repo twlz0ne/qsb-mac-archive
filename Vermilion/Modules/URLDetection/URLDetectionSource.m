@@ -120,12 +120,12 @@
          [NSNumber numberWithBool:YES], kHGSObjectAttributeAllowSiteSearchKey,
          urlString, kHGSObjectAttributeSourceURLKey,
          [NSNumber numberWithBool:YES], kHGSObjectAttributeIsSyntheticKey,
-         [NSNumber numberWithFloat:rank], kHGSObjectAttributeRankKey,
          nil];
          
     HGSResult *result = [HGSResult resultWithURL:url
                                             name:queryString
                                             type:kHGSTypeWebpage
+                                            rank:rank
                                           source:self
                                       attributes:attributes];
     [operation setResults:[NSArray arrayWithObject:result]];

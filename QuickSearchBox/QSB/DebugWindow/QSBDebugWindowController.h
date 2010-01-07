@@ -1,7 +1,7 @@
 //
-//  QSBHGSResult+NSPasteboard.m
+//  QDBDebugWindowController.h
 //
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2006-2008 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -29,42 +29,20 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+//
 
-#import "QSBHGSResult+NSPasteboard.h"
+#import <Cocoa/Cocoa.h>
 
-@implementation HGSResultArray (HGSResultArrayPasteboard)
-
-+ (HGSResultArray *)resultsWithPasteboard:(NSPasteboard *)pb {
-  HGSResultArray *results = nil;  
-  
-  // TODO(alcor):keep track of the source of this copy/paste/service
-  //  NSString *source = @"com.apple.clipboard";
-  //  if (pasteboard == [NSPasteboard generalPasteboard]) {
-  //    source = [[[NSWorkspace sharedWorkspace] activeApplication]
-  //              objectForKey:@"NSApplicationBundleIdentifier"];
-  //  }
-
-  NSArray *paths = [pb propertyListForType:NSFilenamesPboardType];
-  NSMutableArray *array = [NSMutableArray arrayWithCapacity:[paths count]];
-  for (NSString *path in paths) {
-    HGSResult *result = [HGSResult resultWithFilePath:path
-                                                 rank:kHGSResultUnknownRank
-                                               source:nil
-                                           attributes:nil];
-    HGSAssert(result, @"Unable to create result with %@", path);
-    if (result) {
-      [array addObject:result];
-    }
-  }
-  if ([array count]) {
-    results = [HGSResultArray arrayWithResults:array];
-  }
-  return results;
+@interface QSBDebugWindowController : NSWindowController {
+ @private
+  IBOutlet NSBrowser *mixedResults_;
+  IBOutlet NSBrowser *operations_;
+  IBOutlet NSTextField *rawQuery_;
+  IBOutlet NSTextField *normalizedQuery_;
+  NSMutableArray *searchOperations_;
+  NSMutableArray *updatedResults_;
 }
 
-- (void)writeToPasteboard:(NSPasteboard *)pb {
-  //TODO(alcor): support copy and paste
-  NSBeep(); 
-}
++ (id)sharedWindowController;
 
 @end

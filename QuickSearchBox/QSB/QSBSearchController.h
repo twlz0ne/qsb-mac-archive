@@ -41,8 +41,6 @@
 // takes a query string and is responsible for turning it into results.
 @interface QSBSearchController : NSObject<HGSMixerDelegate> {
  @private
-  IBOutlet QSBMoreResultsViewController *moreResultsViewController_;
-
   NSMutableArray *desktopResults_;
   NSArray *lockedResults_;
   NSString *queryString_;  // Current query string entered by user.
@@ -73,13 +71,16 @@
 
 // Returns the top results
 - (QSBTableResult *)topResultForIndex:(NSInteger)idx;
+- (NSArray *)topResultsInRange:(NSRange)range;
 - (NSUInteger)topResultCount;
+
+- (NSDictionary *)rankedResultsByCategory;
 
 // Changes and restarts the query.
 - (void)setQueryString:(NSString *)queryString;
 
 // Returns the current query
-- (NSString*)queryString;
+- (NSString *)queryString;
 
 // Returns the maximum number of results to present.
 - (NSUInteger)maximumResultsToCollect;
@@ -89,6 +90,7 @@
 
 @end
 
-// Notification sent out when results have been updated
+// Notification sent out when results have been updated.
+// Object is QSBSearchController.
 extern NSString *const kQSBSearchControllerDidUpdateResultsNotification;
 

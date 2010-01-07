@@ -234,6 +234,7 @@ static NSString *const kApplicationSourcePredicateString
     // create a HGSResult to talk to the rest of the application
     HGSResult *hgsResult
       = [HGSResult resultWithFilePath:path
+                                 rank:kHGSResultUnknownRank
                           source:self
                       attributes:attributes];
 
@@ -269,6 +270,7 @@ static NSString *const kApplicationSourcePredicateString
       = [HGSResult resultWithURI:[url absoluteString]
                             name:name
                             type:kHGSTypeFileApplication
+                            rank:kHGSResultUnknownRank
                           source:self
                       attributes:regularAttributes];
 
@@ -348,6 +350,7 @@ static NSString *const kApplicationSourcePredicateString
             = [HGSResult resultWithURI:url
                                   name:[fm displayNameAtPath:fullPath]
                                   type:kHGSTypeFileApplication
+                                  rank:kHGSResultUnknownRank
                                 source:self
                             attributes:regularAttributes];
           

@@ -48,9 +48,6 @@
   NSTimeInterval blockTime_; // Time we started blocking repeats
 }
 
-// Set the full more results.
-- (void)setMoreResultsWithDict:(NSDictionary *)value;
-
 // Adds a category to the 'show all' list and then recalculates the
 // contents of the more results dictionary.
 - (void)addShowAllCategory:(NSString *)category;

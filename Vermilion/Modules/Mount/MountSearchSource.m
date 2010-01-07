@@ -190,6 +190,7 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
         HGSResult *hgsResult = [HGSResult resultWithURI:urlString
                                                    name:displayName
                                                    type:type
+                                                   rank:kHGSResultUnknownRank
                                                  source:self
                                              attributes:attributes];
         [self indexResult:hgsResult 

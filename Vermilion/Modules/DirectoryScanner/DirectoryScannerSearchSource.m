@@ -118,6 +118,7 @@
     
     
     HGSResult *result = [HGSResult resultWithFilePath:subpath
+                                                 rank:kHGSResultUnknownRank
                                                source:self
                                            attributes:nil];
     [self indexResult:result];

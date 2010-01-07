@@ -191,17 +191,15 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         [otherTermStrings addObject:companyName];
       }
       
-      //TODO(dmaclach): remove this once real ranking is in
-      NSNumber *rank = [NSNumber numberWithFloat:0.9f];
       NSDictionary *attributes
         = [NSDictionary dictionaryWithObjectsAndKeys:
            otherTermStrings, kHGSObjectAttributeUniqueIdentifiersKey,
-           rank, kHGSObjectAttributeRankKey,
            nil];
       HGSResult* hgsResult 
         = [HGSResult resultWithURI:urlString
                               name:name
                               type:kTypeContactAddressBook
+                              rank:kHGSResultUnknownRank
                             source:self
                         attributes:attributes];
       [newResults addObject:hgsResult];
@@ -325,19 +323,21 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                cleanURLValue];
         
         // We rank the primary identifiers higher so they show up better
-        CGFloat rank = [identifier isEqualToString:primary] ? 1.0 : 0.0;
-        NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
+        HGSCalibratedScoreType scoreType 
+          = [identifier isEqualToString:primary] ? kHGSCalibratedStrongScore 
+                                                 : kHGSCalibratedWeakScore;
+        CGFloat rank = HGSCalibratedScore(scoreType);
         // Snippets look like phone: home
         NSString *snippet = [NSString stringWithFormat:@"%@: %@",
                              localizedProperty, localizedLabel];
         // Need to get some decent icons
         NSDictionary *attr = [NSDictionary dictionaryWithObjectsAndKeys:
                               snippet, kHGSObjectAttributeSnippetKey,
-                              nsRank, kHGSObjectAttributeRankKey,
                               nil];
         HGSResult *result = [HGSResult resultWithURI:urlString
                                                 name:cleanValue 
-                                                type:type 
+                                                type:type
+                                                rank:rank
                                               source:self 
                                           attributes:attr];
         [results addObject:result];

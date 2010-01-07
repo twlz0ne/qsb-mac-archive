@@ -122,15 +122,12 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                 rank = HGSScoreTermForString(normalizedQueryString, file);
               }
               if (rank > 0) {
-                NSNumber *nsRank = [NSNumber gtm_numberWithCGFloat:rank];
-                NSDictionary *attributes 
-                  = [NSDictionary dictionaryWithObjectsAndKeys:
-                     nsRank, kHGSObjectAttributeRankKey, nil];
                 NSString *fullPath
                   = [basePath stringByAppendingPathComponent:file];
                 HGSResult *result = [HGSResult resultWithFilePath:fullPath
+                                                             rank:rank
                                                            source:self
-                                                       attributes:attributes];
+                                                       attributes:nil];
                 [results addObject:result];
               }
             }
@@ -144,13 +141,13 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     NSDictionary *attributes
       = [NSDictionary dictionaryWithObjectsAndKeys:
          trashIcon_, kHGSObjectAttributeIconKey,
-         [NSNumber gtm_numberWithCGFloat:rank], kHGSObjectAttributeRankKey,
          nil];
     
     HGSResult *result 
       = [HGSResult resultWithURI:kTrashResultUrl
                             name:trashName_
                             type:kTrashResultType
+                            rank:rank
                           source:self
                       attributes:attributes];
     [results addObject:result];

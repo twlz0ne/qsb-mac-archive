@@ -42,6 +42,7 @@
 #import "HGSDelegate.h"
 #import "HGSBundle.h"
 #import "GTMNSString+URLArguments.h"
+#import "GTMNSNumber+64Bit.h"
 
 // Notifications
 NSString *const kHGSResultDidPromoteNotification 
@@ -90,6 +91,8 @@ static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
 @implementation HGSResult
 
 GTM_METHOD_CHECK(NSString, readableURLString);
+GTM_METHOD_CHECK(NSNumber, gtm_cgFloatValue);
+
 @synthesize displayName = displayName_;
 @synthesize type = type_;
 @synthesize uri = uri_;
@@ -102,11 +105,13 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 + (id)resultWithURL:(NSURL*)url
                name:(NSString *)name
                type:(NSString *)typeStr
-             source:(HGSSearchSource *)source 
+               rank:(CGFloat)rank
+             source:(HGSSearchSource *)source
          attributes:(NSDictionary *)attributes {
   return [[[self alloc] initWithURI:[url absoluteString]
                                name:name
                                type:typeStr
+                               rank:rank
                              source:source
                          attributes:attributes] autorelease]; 
 }
@@ -114,16 +119,19 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 + (id)resultWithURI:(NSString*)uri
                name:(NSString *)name
                type:(NSString *)typeStr
+               rank:(CGFloat)rank
              source:(HGSSearchSource *)source 
          attributes:(NSDictionary *)attributes {
   return [[[self alloc] initWithURI:uri
                                name:name
                                type:typeStr
+                               rank:rank
                              source:source
                          attributes:attributes] autorelease]; 
 }
 
-+ (id)resultWithFilePath:(NSString *)path 
++ (id)resultWithFilePath:(NSString *)path
+                    rank:(CGFloat)rank
                   source:(HGSSearchSource *)source 
               attributes:(NSDictionary *)attributes {
   id result = nil;
@@ -140,6 +148,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     result = [self resultWithURI:uri
                             name:[fm displayNameAtPath:path]
                             type:type
+                            rank:rank
                           source:source
                       attributes:attributes];
   }
@@ -155,6 +164,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 - (id)initWithURI:(NSString *)uri
              name:(NSString *)name
              type:(NSString *)typeStr
+             rank:(CGFloat)rank
            source:(HGSSearchSource *)source 
        attributes:(NSDictionary *)attributes {
   if ((self = [super init])) {
@@ -180,22 +190,18 @@ GTM_METHOD_CHECK(NSString, readableURLString);
                                          kHGSObjectAttributeURIKey, 
                                          kHGSObjectAttributeNameKey, 
                                          kHGSObjectAttributeTypeKey,
+                                         kHGSObjectAttributeRankKey,
                                          nil]];
     uri_ = [uri retain];
     idHash_ = [uri_ hash];
     displayName_ = [name retain];
     type_ = [typeStr retain];
     source_ = [source retain];
+    rank_ = rank;
     conformsToContact_ = [self conformsToType:kHGSTypeContact];
     if ([self conformsToType:kHGSTypeWebpage]) {
       normalizedIdentifier_ 
         = [[uri_ readableURLString] retain];
-    }
-    NSNumber *rank 
-      = [abridgedAttrs objectForKey:kHGSObjectAttributeRankKey];
-    if (rank) {
-      rank_ = [rank floatValue];
-      [abridgedAttrs removeObjectForKey:kHGSObjectAttributeRankKey];
     }
     NSNumber *rankFlags 
       = [abridgedAttrs objectForKey:kHGSObjectAttributeRankFlagsKey];
@@ -250,9 +256,11 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   }
   NSString *name = [attributes objectForKey:kHGSObjectAttributeNameKey];
   NSString *type = [attributes objectForKey:kHGSObjectAttributeTypeKey];
+  CGFloat rank = [[attributes objectForKey:kHGSObjectAttributeRankKey] gtm_cgFloatValue];
   self = [self initWithURI:uri
                       name:name 
-                      type:type 
+                      type:type
+                      rank:rank
                     source:source
                 attributes:attributes];
   return self;
@@ -282,10 +290,10 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   HGSResult *newResult = [[cls alloc] initWithURI:[self uri]
                                              name:[self displayName]
                                              type:[self type]
+                                             rank:[self rank]
                                            source:source_
                                        attributes:attributes];
   if (newResult) {
-    newResult->rank_ = rank_;
     newResult->rankFlags_ = rankFlags_;
   }
   return newResult;
@@ -602,6 +610,7 @@ static BOOL TypeConformsToType(NSString *type1, NSString *type2) {
     = [NSMutableArray arrayWithCapacity:[filePaths count]];
   for (NSString *path in filePaths) {
     HGSResult *result = [HGSResult resultWithFilePath:path
+                                                 rank:kHGSResultUnknownRank
                                                source:nil 
                                            attributes:nil];
     HGSAssert(result, @"Unable to create result from %@", path);
