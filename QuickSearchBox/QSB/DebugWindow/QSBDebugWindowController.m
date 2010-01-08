@@ -69,6 +69,7 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
   [nc removeObserver:self];
   [searchOperations_ release];
   [updatedResults_ release];
+  [queryControllerStartTime_ release];
   [super dealloc];
 }
 
@@ -123,9 +124,17 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
   [updatedResults_ removeAllObjects];
   [operations_ loadColumnZero];
   [mixedResults_ loadColumnZero];
+  [queryControllerStartTime_ release];
+  queryControllerStartTime_ = [[NSDate date] retain];
+  [gatheringTime_ setStringValue:@"Gathering"];
+  [gatheringProgress_ startAnimation:self];
 }
 
 - (void)queryControllerDidFinish:(NSNotification *)notification {
+  NSTimeInterval elapsedTime = [queryControllerStartTime_ timeIntervalSinceNow];
+  NSString *value = [NSString stringWithFormat:@"%0.3f ms", elapsedTime * -1000];
+  [gatheringTime_ setStringValue:value];
+  [gatheringProgress_ stopAnimation:self];
 }
 
 - (void)searchControllerDidUpdateResults:(NSNotification *)notification {

@@ -59,7 +59,6 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 @end
 
 @implementation HGSQueryController
-@synthesize mixer = mixer_;
 
 + (void)initialize {
   if (self == [HGSQueryController class]) {
@@ -90,8 +89,6 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   [parsedQuery_ release];
   [pendingQueryOperations_ release];
   [queryOperationsWithResults_ release];
-  [mixer_ cancel];
-  [mixer_ release];
   [super dealloc];
 }
 
@@ -209,25 +206,13 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   return parsedQuery_;
 }
 
-- (void)startMixingCurrentResults:(id<HGSMixerDelegate>)delegate {
+- (HGSMixer *)mixerForCurrentResults {
   NSArray *currentOps = nil;
   @synchronized (queryOperationsWithResults_) {
     currentOps = [queryOperationsWithResults_ allObjects];
   }
-  [mixer_ cancel];
-  [mixer_ release];
-  mixer_ = [[HGSMixer alloc] initWithDelegate:delegate
-                             searchOperations:currentOps
-                               mainThreadTime:0.05];
-  [mixer_ start];
-}
-
-- (NSArray *)rankedResults {
-  return [mixer_ rankedResults];
-}
-
-- (NSDictionary *)rankedResultsByCategory {
-  return [mixer_ rankedResultsByCategory];
+  return [[[HGSMixer alloc] initWithSearchOperations:currentOps
+                              mainThreadTime:0.05] autorelease];
 }
 
 - (NSUInteger)totalResultsCount {

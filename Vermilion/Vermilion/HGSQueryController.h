@@ -64,20 +64,12 @@
   HGSQuery* parsedQuery_;
   __weak NSTimer* slowSourceTimer_;
   NSArray *rankedResults_;
-  HGSMixer *mixer_;
 }
-
-@property (readonly, retain) HGSMixer *mixer;
 
 - (id)initWithQuery:(HGSQuery*)query;
 
 - (HGSQuery *)query;
-
-- (void)startMixingCurrentResults:(id<HGSMixerDelegate>)delegate;
-
-- (NSArray *)rankedResults;
-- (NSDictionary *)rankedResultsByCategory;
-
+- (HGSMixer *)mixerForCurrentResults;
 
 /*!
   Ask information about the completion status for the queries to each source.

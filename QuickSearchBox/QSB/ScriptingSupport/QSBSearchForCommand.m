@@ -70,7 +70,7 @@
 //   doQuery()
 // end run
 
-@interface QSBSearchForCommand : NSScriptCommand<HGSMixerDelegate> {
+@interface QSBSearchForCommand : NSScriptCommand {
  @private 
   NSAppleEventDescriptor *returnAddress_;
   HGSQueryController *queryController_;
@@ -178,10 +178,16 @@
                 name:kHGSQueryControllerDidFinishNotification 
               object:queryController_];
   // Our query is finished.
-  [queryController_ startMixingCurrentResults:self];
+  HGSMixer *mixer = [queryController_ mixerForCurrentResults];
+  [nc addObserver:self 
+         selector:@selector(mixerDidFinish:) 
+             name:kHGSMixerDidFinishNotification 
+           object:mixer];
+  [mixer start];
 }
 
-- (void)mixerDidFinish:(HGSMixer *)mixer {
+- (void)mixerDidFinish:(NSNotification *)notification {
+  HGSMixer *mixer = [notification object];
   [self setMixingHasCompleted:YES];
   NSArray *results = [mixer rankedResults];
   NSUInteger count = [results count];

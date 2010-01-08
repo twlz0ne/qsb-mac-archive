@@ -39,7 +39,7 @@
 
 // Interface between QSB and the web suggestor and the desktop query
 // takes a query string and is responsible for turning it into results.
-@interface QSBSearchController : NSObject<HGSMixerDelegate> {
+@interface QSBSearchController : NSObject {
  @private
   NSMutableArray *desktopResults_;
   NSArray *lockedResults_;
@@ -57,6 +57,7 @@
   BOOL queryControllerFinished_;  // Yes if the results gathering has completed.
   NSUInteger pushModifierFlags_; // NSEvent Modifiers at pivot time
   NSUInteger totalResultDisplayCount_;
+  HGSMixer *mixer_;
 }
 
 // Sets/Gets NSEvent Modifiers at pivot time

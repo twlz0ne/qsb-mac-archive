@@ -39,8 +39,11 @@
   IBOutlet NSBrowser *operations_;
   IBOutlet NSTextField *rawQuery_;
   IBOutlet NSTextField *normalizedQuery_;
+  IBOutlet NSProgressIndicator *gatheringProgress_;
+  IBOutlet NSTextField *gatheringTime_;
   NSMutableArray *searchOperations_;
   NSMutableArray *updatedResults_;
+  NSDate *queryControllerStartTime_;
 }
 
 + (id)sharedWindowController;

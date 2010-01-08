@@ -41,6 +41,12 @@
 #import "HGSLog.h"
 #import "HGSBundle.h"
 #import "GTMDebugThreadValidation.h"
+#import "NSNotificationCenter+MainThread.h"
+
+NSString *const kHGSMixerWillStartNotification 
+  = @"HGSMixerWillStartNotification";
+NSString *const kHGSMixerDidFinishNotification 
+  = @"HGSMixerDidFinishNotification";
 
 inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
   HGSResult *a = (HGSResult *)resultA;
@@ -63,14 +69,12 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
 
 @implementation HGSMixer
 
-- (id)initWithDelegate:(id<HGSMixerDelegate>)delegate
-      searchOperations:(NSArray *)ops 
+- (id)initWithSearchOperations:(NSArray *)ops 
         mainThreadTime:(NSTimeInterval)mainThreadTime {
   if ((self = [super init])) {
     ops_ = [ops copy];
     AbsoluteTime absTime = DurationToAbsolute(mainThreadTime * durationSecond);
     mainThreadTime_ = UnsignedWideToUInt64(absTime);
-    delegate_ = delegate;
     NSUInteger opsCount = [ops_ count];
     opsIndices_ = calloc(sizeof(NSInteger), opsCount);
     opsMaxIndices_ = malloc(sizeof(NSInteger) * opsCount);
@@ -100,6 +104,9 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
 }
 
 - (void)start {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc hgs_postOnMainThreadNotificationName:kHGSMixerWillStartNotification
+                                    object:self];  
   if (mainThreadTime_) {
     [self mix:nil];
   }
@@ -207,15 +214,10 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
   }
   [ops_ makeObjectsPerformSelector:@selector(enableUpdates)];
   if (isFinished_) {
-    
     [operation_ autorelease];
-    if (![NSThread isMainThread]) {
-      [delegate_ performSelectorOnMainThread:@selector(mixerDidFinish:)
-                                  withObject:self
-                               waitUntilDone:NO];
-    } else {
-      [delegate_ mixerDidFinish:self];
-    }
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc hgs_postOnMainThreadNotificationName:kHGSMixerDidFinishNotification
+                                      object:self];
   }
   return nil;
 }

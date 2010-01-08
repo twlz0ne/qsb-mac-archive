@@ -1086,7 +1086,7 @@ doCommandBySelector:(SEL)commandSelector {
   [NSObject cancelPreviousPerformRequestsWithTarget:self
                                            selector:@selector(displayResults:)
                                              object:nil];
-  
+  [activeSearchViewController_ stopQuery];
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   if ([ud boolForKey:kQSBSearchWindowDimBackground]) {
     CGFloat fadeDuration 

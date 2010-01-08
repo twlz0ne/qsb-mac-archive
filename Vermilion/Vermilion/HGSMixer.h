@@ -39,7 +39,6 @@
 #import "GTMDefines.h"
 
 @class HGSQueryController;
-@protocol HGSMixerDelegate;
 
 /*!
  The mixer takes N arrays that are assumed to be internally sorted
@@ -53,7 +52,6 @@
   NSMutableArray *results_;
   NSMutableDictionary *resultsByCategory_;
   uint64_t mainThreadTime_;
-  id delegate_; // Weak.
   NSInteger *opsIndices_;
   NSInteger *opsMaxIndices_;
   NSUInteger currentIndex_;
@@ -65,15 +63,13 @@
 
 /*!
  Designated initializer.
- @param delegate - the delegate for the mixer (see HGSMixerDelegate protocol)
  @param ops - the ops that supply the results that the mixer mixes
  @param mainThreadTime - the amount of time that the mixer should run on the 
                          main thread (to optimize speed) before moving to a
                          background thread (to optimize user responsiveness)
 */
-- (id)initWithDelegate:(id<HGSMixerDelegate>)delegate
-      searchOperations:(NSArray *)ops
-        mainThreadTime:(NSTimeInterval)mainThreadTime;
+- (id)initWithSearchOperations:(NSArray *)ops
+                mainThreadTime:(NSTimeInterval)mainThreadTime;
         
 /*!
   A snapshot of the results. Safe to call from any thread. Calling this too
@@ -108,13 +104,11 @@
 NSInteger HGSMixerResultSort(id resultA, id resultB, void* context);
 
 /*!
- Protocol that mixer delegates must implement.
+ Called when the mixer will start.  Object is the mixer.
 */
-@protocol HGSMixerDelegate
+GTM_EXTERN NSString *const kHGSMixerWillStartNotification;
 
 /*!
- Called when mixing is finished, either due to completion or cancellation.
- Check the state by calling [mixer isCancelled].
+ Called when the mixer has completed. Object is the mixer.
 */
-- (void)mixerDidFinish:(HGSMixer *)mixer;
-@end
+GTM_EXTERN NSString *const kHGSMixerDidFinishNotification;

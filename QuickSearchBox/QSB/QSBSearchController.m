@@ -64,6 +64,8 @@ NSString *const kQSBSearchControllerDidUpdateResultsNotification
 // Perform the actual query.  
 - (void)performQuery;
 
+- (void)stopMixing;
+
 @property(nonatomic, assign) BOOL queryIsInProcess;
 @property(nonatomic, assign, getter=isQueryControllerFinished) BOOL queryControllerFinished;
 @end
@@ -96,6 +98,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)dealloc {
+  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+  [prefs gtm_removeObserver:self
+                 forKeyPath:kQSBResultCountKey
+                   selector:@selector(resultCountValueChanged:)];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self];
+
   // Cancel outstanding query requests and all timers.
   [self stopQuery];
   [self cancelAndReleaseQueryController];
@@ -106,12 +115,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [lockedResults_ release];
   [oldSuggestions_ release];
   [typeCategoryDict_ release];
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_removeObserver:self
-                 forKeyPath:kQSBResultCountKey
-                   selector:@selector(resultCountValueChanged:)];
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc removeObserver:self];
   [super dealloc];
 }
 
@@ -126,7 +129,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)startMixing {
-  [queryController_ startMixingCurrentResults:self];
+
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  mixer_ = [[queryController_ mixerForCurrentResults] retain];
+  [nc addObserver:self 
+         selector:@selector(mixerDidFinish:) 
+             name:kHGSMixerDidFinishNotification 
+           object:mixer_];
+  [mixer_ start];
 }
 
 
@@ -137,7 +147,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     HGSLog(@"updateDesktopResults called with display count still at 0!");
     return;
   }
-  NSArray *rankedResults = [queryController_ rankedResults];
+  NSArray *rankedResults = [mixer_ rankedResults];
   NSMutableArray *hgsResults = [NSMutableArray array];
   NSMutableArray *hgsMutableSuggestions = [NSMutableArray array];
   for (HGSResult *result in rankedResults) {
@@ -354,7 +364,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (NSDictionary *)rankedResultsByCategory {
-  return [queryController_ rankedResultsByCategory];
+  return [mixer_ rankedResultsByCategory];
 }
 
 - (void)setQueryString:(NSString*)queryString {
@@ -429,9 +439,20 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)stopQuery {
+  [self stopMixing];
   [self cancelDisplayTimer];
   [self cancelAndReleaseQueryController];
   [self setQueryIsInProcess:NO];
+}
+
+- (void)stopMixing {
+  if (mixer_) {
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc removeObserver:self name:kHGSMixerDidFinishNotification object:mixer_];
+    [mixer_ cancel];
+    [mixer_ release];
+    mixer_ = nil;
+  }
 }
 
 #pragma mark Notifications
@@ -446,19 +467,21 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   HGSQueryController *queryController = [notification object];
   HGSAssert([queryController isKindOfClass:[HGSQueryController class]], nil);
   if (![queryController isCancelled]) {
+    [self stopMixing];
     [self startMixing];
+  } else {
+    [self cancelDisplayTimer];
   }
 }
 
 // called when enough time has elapsed that we want to display some results
 // to the user.
 - (void)displayTimerElapsed:(NSTimer*)timer {
-  if (![self isQueryControllerFinished]) {
-    [self startMixing];
-  } else {
-    [self cancelDisplayTimer];
-  }
   [self updateResults];
+  if (![self isQueryControllerFinished]) {
+    [self stopMixing];
+    [self startMixing];
+  }
 }
 
 - (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification {
@@ -468,12 +491,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self performQuery];
 }
 
-- (void)mixerDidFinish:(HGSMixer *)mixer {
+- (void)mixerDidFinish:(NSNotification *)notification {
+  HGSMixer *mixer = [notification object];
+  HGSAssert(mixer == mixer_, nil);
   if (![mixer isCancelled]) {
     [self updateResults];
     if ([self isQueryControllerFinished]) {
       [self setQueryIsInProcess:NO];
-      [self cancelDisplayTimer];
     }
   }
 }
