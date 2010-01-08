@@ -31,11 +31,11 @@
 //
 
 #import "BeaconServer.h"
+#import <GTM/GTMTypeCasting.h>
 
 NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
 
-@interface TransferenceBeaconModule : HGSExtension <BeaconServerProtocol, 
-                                                    HGSMixerDelegate> {
+@interface TransferenceBeaconModule : HGSExtension <BeaconServerProtocol> {
  @private
   NSDate *startSearchDate_;
   NSDate *endSearchDate_;
@@ -275,7 +275,12 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
   [server_ setLastSearchTime:searchTime moduleInfo:moduleSearchTimes];
 
   HGSQueryController *object = [aNotification object];
-  [object startMixingCurrentResults:self];
+  HGSMixer *mixer = [object mixerForCurrentResults];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc addObserver:self 
+         selector:@selector(mixerDidFinish) 
+             name:kHGSMixerDidFinishNotification 
+           object:mixer];
 }
 
 #pragma mark -- HGSSearchOperation notification handlers --
@@ -296,11 +301,14 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
   }
 }
 
-#pragma mark -- HGSMixed Delegate Callbacks --
+#pragma mark -- HGSMixer notification handlers --
 
-- (void)mixerDidFinish:(HGSMixer *)mixer {
+- (void)mixerDidFinish:(NSNotification *)notification {
+  HGSMixer *mixer = GTM_STATIC_CAST(HGSMixer, [notification object]);
   NSArray *rankedResults = [mixer rankedResults];
   [server_ setLastRankedResults:rankedResults];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self name:kHGSMixerDidFinishNotification object:mixer];
 }
 
 @end
