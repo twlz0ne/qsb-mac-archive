@@ -214,7 +214,7 @@
 					"$(QSBBUILDROOT)",
 				);
 				GCC_PREFIX_HEADER = "___PROJECTNAMEASIDENTIFIER____Prefix.pch";
-				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = "___PROJECTNAME___";
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -229,7 +229,7 @@
 					"$(QSBBUILDROOT)",
 				);
 				GCC_PREFIX_HEADER = "___PROJECTNAMEASIDENTIFIER____Prefix.pch";
-				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = "___PROJECTNAME___";
 				WRAPPER_EXTENSION = hgs;
 			};
