@@ -123,7 +123,7 @@ static NSString *const kQSBResultViewControllerClassName
     // be expanded to support any type of represented object.
     if ([object isKindOfClass:[QSBSourceTableResult class]]) {
       QSBSourceTableResult *tableResult = object;
-      HGSResult *result = [tableResult representedResult];
+      HGSScoredResult *result = [tableResult representedResult];
       HGSSearchSource *source = [result source];
       NSBundle *sourceBundle = [source bundle];
       if (sourceBundle) {

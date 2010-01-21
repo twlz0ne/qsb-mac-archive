@@ -33,7 +33,6 @@
 #import "HGSCallbackSearchSource.h"
 #import "HGSLog.h"
 #import "HGSSearchOperation.h"
-#import "HGSStringUtil.h"
 #import "HGSTokenizer.h"
 
 @implementation HGSCallbackSearchSource

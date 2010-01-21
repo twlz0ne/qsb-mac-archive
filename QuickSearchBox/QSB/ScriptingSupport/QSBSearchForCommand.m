@@ -192,7 +192,7 @@
   NSArray *results = [mixer rankedResults];
   NSUInteger count = [results count];
   NSMutableArray *appleScriptResults = [NSMutableArray arrayWithCapacity:count];
-  for (HGSResult *hgsResult in results) {
+  for (HGSScoredResult *hgsResult in results) {
     NSURL *url = [hgsResult url];
     NSString *urlString = [url absoluteString];
     NSString *title = [hgsResult displayName];
@@ -231,7 +231,9 @@
        autorelease];
     NSAppleEventDescriptor *aeResults = [results_ gtm_appleEventDescriptor];
     [event setDescriptor:aeResults forKeyword:keyDirectObject];
-    NSString *query = [[queryController_ query] rawQueryString];
+    HGSTokenizedString *tokenString 
+      = [[queryController_ query] tokenizedQueryString];
+    NSString *query = [tokenString originalString];
     NSAppleEventDescriptor *aeQuery = [query gtm_appleEventDescriptor];
     [event setDescriptor:aeQuery forKeyword:'Fore'];
     NSDictionary *error = nil;

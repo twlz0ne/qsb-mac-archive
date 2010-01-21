@@ -33,6 +33,7 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSSearchTermScorer.h"
+#import "HGSTokenizer.h"
 #import <Vermilion/HGSBundle.h>
 #import <OCMock/OCMock.h>
 
@@ -49,115 +50,35 @@
 
 #define kHGSMaximumRelativeTermScoringTests 100
 
-// We consider any score to be a successful match, but a 'reasonable' score
-// is considered > 5.0, a 'good' score > 10, and an excellent score > 15.
-
-static const CGFloat kHGSTestNotAMatchScore = 0.0;
-static const CGFloat kHGSTestReasonableScore = 5.0;
-static const CGFloat kHGSTestGoodScore = 10.0;
-static const CGFloat kHGSTestExcellentScore = 15.0;
-static const CGFloat kHGSTestPerfectScore = 1000.0;
-
 @interface HGSSearchTermScorerTest : GTMTestCase
-
-// Insure that the scoring factors are set to the defaults.
-// Keep this coordinated with the values given at the top of
-// HGSSearchTermScorer.m.
-- (void)ResetScoringFactors;
 
 @end
 
 @implementation HGSSearchTermScorerTest
 
-- (void)ResetScoringFactors {
-  CGFloat characterMatchFactor = 1.0;
-  CGFloat firstCharacterInWordFactor = 3.0;
-  CGFloat adjacencyFactor = 3.8;
-  CGFloat startDistanceFactor = 0.8;
-  CGFloat wordPortionFactor = 5.0;
-  CGFloat itemPortionFactor = 0.8;
-  CGFloat matchSpreadFactor = 0.8;
-  NSUInteger maximumCharacterDistance = 22;
-  NSUInteger maximumItemCharactersScanned = 250;
-  BOOL enableBestWordScoring = YES;
-  CGFloat otherTermMultiplier = 0.5;
-  
-  HGSSetSearchTermScoringFactors(characterMatchFactor,
-                                 firstCharacterInWordFactor,
-                                 adjacencyFactor,
-                                 startDistanceFactor,
-                                 wordPortionFactor,
-                                 itemPortionFactor,
-                                 matchSpreadFactor,
-                                 maximumCharacterDistance,
-                                 maximumItemCharactersScanned,
-                                 enableBestWordScoring,
-                                 otherTermMultiplier);
-}
-
 #pragma mark Tests
 
-- (void)testBasicTermScoring {
-  [self ResetScoringFactors];
-  CGFloat score = HGSScoreTermForString(@"abc", @"abc");
-  STAssertEquals(score, kHGSTestPerfectScore, @"%f != %f",
-                 score, kHGSTestPerfectScore);
-  score = HGSScoreTermForString(@"abc", @"def");
-  STAssertEquals(score, kHGSTestNotAMatchScore, @"%f != %f",
-                 score, kHGSTestNotAMatchScore);
-  
-  // Test a few of what we'd consider excellent scores.
-  // Runs-of-characters matches
-  score = HGSScoreTermForString(@"abc", @"abcdef");
-  STAssertTrue(score > kHGSTestExcellentScore, @"%f !> %f",
-               score, kHGSTestExcellentScore);
-  score = HGSScoreTermForString(@"abcdef", @"xabcxdefx");
-  STAssertTrue(score > kHGSTestExcellentScore, @"%f !> %f",
-               score, kHGSTestExcellentScore);
-
-  // Abbreviations
-  score = HGSScoreTermForString(@"abc", @"a b c");
-  STAssertTrue(score > kHGSTestExcellentScore, @"%f !> %f",
-               score, kHGSTestExcellentScore);
-  score = HGSScoreTermForString(@"abc", @"american bandstand of canada");
-  STAssertTrue(score > kHGSTestExcellentScore, @"%f !> %f",
-               score, kHGSTestExcellentScore);
-  
-  // Test a few of what we'd consider good scores.
-  // Complete words
-  score = HGSScoreTermForString(@"abc", @"here is the abc of the matter");
-  STAssertTrue(score > kHGSTestGoodScore, @"%f !> %f",
-               score, kHGSTestGoodScore);
-  
-  // Perfect score.
-  CGFloat perfectScore = HGSCalibratedScore(kHGSCalibratedPerfectScore);
-  STAssertEquals(perfectScore, (CGFloat)1000.0, nil);
+static CGFloat HGSScoreTermForString(NSString *stringA, NSString *stringB) {
+  HGSTokenizedString *tokenA = [HGSTokenizer tokenizeString:stringA];
+  HGSTokenizedString *tokenB = [HGSTokenizer tokenizeString:stringB];
+  return HGSScoreTermForItem(tokenA, tokenB, nil);
 }
 
 - (void)testBasicRelativeTermScoring {
-  [self ResetScoringFactors];
   CGFloat scoreA = HGSScoreTermForString(@"abc", @"abcd");
   CGFloat scoreB = HGSScoreTermForString(@"abc", @"abcde");
   STAssertTrue(scoreA > scoreB,  @"%f !> %f", scoreA, scoreB);
-  scoreA = HGSScoreTermForString(@"abc", @"xxabcxx");
-  scoreB = HGSScoreTermForString(@"abc", @"xxxabcx");
-  STAssertTrue(scoreA > scoreB, @"%f !> %f", scoreA, scoreB);
   scoreA = HGSScoreTermForString(@"abc", @"american bandstand of canada");
-  scoreB = HGSScoreTermForString(@"abc", 
-                                     @"american candy bandstand of canada");
+  scoreB 
+    = HGSScoreTermForString(@"abc", @"american candy bandstand of canada");
   STAssertTrue(scoreA > scoreB, @"%f !> %f", scoreA, scoreB);
   scoreA = HGSScoreTermForString(@"canada", @"american bandstand of canada");
-  scoreB = HGSScoreTermForString(@"canada", 
-                                     @"american candy bandstand of canada");
-  STAssertTrue(scoreA > scoreB, @"%f !> %f", scoreA, scoreB);
-  scoreA = HGSScoreTermForString(@"can", 
-                                     @"american candy bandstand of canada");
-  scoreB = HGSScoreTermForString(@"can", @"american bandstand of canada");
+  scoreB 
+    = HGSScoreTermForString(@"canada", @"american candy bandstand of canada");
   STAssertTrue(scoreA > scoreB, @"%f !> %f", scoreA, scoreB);
 }
 
 - (void)testRelativeTermScoring {
-  [self ResetScoringFactors];
   // Pull in the test data.
   NSBundle *bundle = HGSGetPluginBundle();
   STAssertNotNil(bundle, nil);
@@ -235,31 +156,4 @@ static const CGFloat kHGSTestPerfectScore = 1000.0;
   }
 }
 
-- (void)testCalibratedScores {
-  HGSCalibratedScoreType scoreType[] = {
-    kHGSCalibratedPerfectScore,
-    kHGSCalibratedStrongScore,
-    kHGSCalibratedModerateScore,
-    kHGSCalibratedWeakScore,
-    kHGSCalibratedInsignificantScore
-  };
-  _GTMCompileAssert(sizeof(scoreType) / sizeof(scoreType[0]) ==
-                    kHGSCalibratedLastScore, UNEXPECTED_SCORE_SET_SIZE);
-  const CGFloat arbitraryMinimumSeparation = 5.0;
-  CGFloat higherScore = 9999999.0;
-  for (NSUInteger i = 0; i < kHGSCalibratedLastScore; ++i) {
-    CGFloat lowerScore = HGSCalibratedScore(scoreType[i]);
-    STAssertTrue(higherScore > (lowerScore + arbitraryMinimumSeparation), 
-                 @"Inadequate separation between calibrated scores %d and %d, "
-                 "with scores %0.2f and %0.2f.  Desired separation: %0.2f.", 
-                 i-1, i, higherScore, lowerScore, arbitraryMinimumSeparation);
-    higherScore = lowerScore;
-  }
-}
-
-- (void)testValidateTokenizedString {
-  STAssertTrue(HGSValidateTokenizedString(@"familyondock 2 jpg"), nil);
-  STAssertFalse(HGSValidateTokenizedString(@"familyondock 2;1 jpg"), nil);
-  STAssertFalse(HGSValidateTokenizedString(@"familyondock! 2 jpg"), nil);
-}
 @end

@@ -48,13 +48,14 @@
 
 NSString *const kQSBSearchControllerDidUpdateResultsNotification
   = @"QSBSearchControllerDidUpdateResultsNotification";
+NSString *const kQSBSearchControllerWillChangeQueryStringNotification
+  = @"QSBSearchControllerWillChangeQueryStringNotification";
+NSString *const kQSBSearchControllerDidChangeQueryStringNotification
+  = @"QSBSearchControllerDidChangeQueryStringNotification";
 
 @interface QSBSearchController ()
 
 - (void)displayTimerElapsed:(NSTimer*)timer;
-
-- (void)startDisplayTimer;
-- (void)cancelDisplayTimer;
 
 - (void)cancelAndReleaseQueryController;
 - (void)updateResults;
@@ -63,8 +64,6 @@ NSString *const kQSBSearchControllerDidUpdateResultsNotification
 
 // Perform the actual query.  
 - (void)performQuery;
-
-- (void)stopMixing;
 
 @property(nonatomic, assign) BOOL queryIsInProcess;
 @property(nonatomic, assign, getter=isQueryControllerFinished) BOOL queryControllerFinished;
@@ -108,7 +107,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // Cancel outstanding query requests and all timers.
   [self stopQuery];
   [self cancelAndReleaseQueryController];
-  [queryString_ release];
+  [tokenizedQueryString_ release];
   [results_ release];
   [parentSearchController_ release];
   [desktopResults_ release];
@@ -129,16 +128,18 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)startMixing {
-
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   mixer_ = [[queryController_ mixerForCurrentResults] retain];
+  [nc addObserver:self 
+         selector:@selector(mixerWillStart:) 
+             name:kHGSMixerWillStartNotification 
+           object:mixer_];
   [nc addObserver:self 
          selector:@selector(mixerDidFinish:) 
              name:kHGSMixerDidFinishNotification 
            object:mixer_];
   [mixer_ start];
 }
-
 
 - (void)updateResults {
   HGSAssert(queryController_, nil);
@@ -150,11 +151,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSArray *rankedResults = [mixer_ rankedResults];
   NSMutableArray *hgsResults = [NSMutableArray array];
   NSMutableArray *hgsMutableSuggestions = [NSMutableArray array];
-  for (HGSResult *result in rankedResults) {
-    if ([result conformsToType:kHGSTypeSuggest]) {
-      [hgsMutableSuggestions addObject:result];
+  for (HGSScoredResult *scoredResult in rankedResults) {
+    if ([scoredResult conformsToType:kHGSTypeSuggest]) {
+      [hgsMutableSuggestions addObject:scoredResult];
     } else {
-      [hgsResults addObject:result];
+      [hgsResults addObject:scoredResult];
     }
   }
   NSArray *hgsSuggestions = (NSArray*)hgsMutableSuggestions;
@@ -182,7 +183,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   BOOL hasMoreStandardResults 
     = [rankedResults count] > currentResultDisplayCount_;
   NSMutableArray *belowTheFoldResults = [NSMutableArray array];
-  for (HGSResult *result in hgsResults) {
+  for (HGSScoredResult *scoredResult in hgsResults) {
     if ([mainResults count] >= currentResultDisplayCount_) {
       hasMoreStandardResults = YES;
       break;
@@ -190,19 +191,19 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     // Simple de-dupe by looking for identical result matches.
     NSArray *mainHGSResults = [mainResults valueForKey:@"representedResult"];
     BOOL okayToAppend = YES;
-    for (HGSResult *currentResult in mainHGSResults) {
-      if ([currentResult isDuplicate:result]) {
+    for (HGSScoredResult *currentResult in mainHGSResults) {
+      if ([currentResult isDuplicate:scoredResult]) {
         okayToAppend = NO;
         break;
       }
     }
     if (okayToAppend) {
       QSBSourceTableResult *sourceResult
-        = [result valueForKey:kQSBObjectTableResultAttributeKey];
-      CGFloat resultScore = [result rank];
+        = [scoredResult valueForKey:kQSBObjectTableResultAttributeKey];
+      CGFloat resultScore = [scoredResult score];
       if (pivotObject
           || resultScore > HGSCalibratedScore(kHGSCalibratedInsignificantScore)) {
-        if (([result rankFlags] & eHGSBelowFoldRankFlag) == 0
+        if (([scoredResult rankFlags] & eHGSBelowFoldRankFlag) == 0
             && resultScore > HGSCalibratedScore(kHGSCalibratedWeakScore)) {
           [mainResults addObject:sourceResult];
         } else {
@@ -227,7 +228,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // Is this search a generic, global search? (No pivot set)
   // If so, there may be special items above and/or below the search results
   NSMutableArray *suggestResults = [NSMutableArray array];
-  NSUInteger queryLength = [[self queryString] length];
+  NSUInteger queryLength = [[self tokenizedQueryString] originalLength];
   
   if (!pivotObject) {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
@@ -251,7 +252,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
       if (minSuggestCount && [hgsSuggestions count]) {
         NSMutableArray *target = suggestResults;
-        for (HGSResult *suggest in hgsSuggestions) {
+        for (HGSScoredResult *suggest in hgsSuggestions) {
           QSBTableResult *qsbSuggest 
             = [suggest valueForKey:kQSBObjectTableResultAttributeKey];
           [target addObject:qsbSuggest];
@@ -294,13 +295,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     NSUInteger count = [newResults count];
     int searchItemsIndex = count;
     
-    // Only rank the google query if the length > 3
+    // Only score the google query if the length > 3
     if (queryLength > 3 && count) {
-      CGFloat moderateResultRank = HGSCalibratedScore(kHGSCalibratedModerateScore);
+      CGFloat moderateResultScore = HGSCalibratedScore(kHGSCalibratedModerateScore);
       for(searchItemsIndex = 0; searchItemsIndex < count; searchItemsIndex++) {
         QSBTableResult *item = [newResults objectAtIndex:searchItemsIndex];
         // List the google result lower if we have a moderate confidence result.
-        if ([item rank] <= moderateResultRank) break;
+        if ([item score] <= moderateResultScore) break;
       }
     }
     
@@ -311,7 +312,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     }
     
     QSBGoogleTableResult *googleItem = [QSBGoogleTableResult
-                                        tableResultForQuery:queryString_];
+                                        tableResultForQuery:tokenizedQueryString_];
     [newResults insertObject:googleItem atIndex:searchItemsIndex];
     
     [newResults insertObject:spacer atIndex:searchItemsIndex + 1];
@@ -367,32 +368,28 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return [mixer_ rankedResultsByCategory];
 }
 
-- (void)setQueryString:(NSString*)queryString {
-#if DEBUG
-  BOOL reportQueryStatusOnRestart = [[NSUserDefaults standardUserDefaults]
-                                     boolForKey:@"reportQueryStatusOnRestart"];
-  if (reportQueryStatusOnRestart) {
-    HGSLog(@"QSB: Query Controller status before restart.\n  %@.", 
-           queryController_);
-  }
-#endif
+- (void)setTokenizedQueryString:(HGSTokenizedString *)queryString {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:kQSBSearchControllerWillChangeQueryStringNotification
+                    object:self];
   [self stopQuery];
-  [queryString_ autorelease];
-  queryString_ = [queryString copy];
-  if ([queryString_ length] || parentSearchController_) {
+  [tokenizedQueryString_ autorelease];
+  tokenizedQueryString_ = [queryString retain];
+  if ([tokenizedQueryString_ tokenizedLength] || parentSearchController_) {
     [self performQuery];
   } else {
     [desktopResults_ removeAllObjects];
     [lockedResults_ release];
     lockedResults_ = nil;
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:kQSBSearchControllerDidUpdateResultsNotification
                       object:self];
-  }    
+  }
+  [nc postNotificationName:kQSBSearchControllerDidChangeQueryStringNotification
+                    object:self];
 }
 
-- (NSString*)queryString {
-  return queryString_;
+- (HGSTokenizedString *)tokenizedQueryString {
+  return tokenizedQueryString_;
 }
 
 - (NSUInteger)maximumResultsToCollect {
@@ -403,18 +400,18 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [lockedResults_ release];
   lockedResults_ = nil;
   currentResultDisplayCount_ = (0.8 * [self maximumResultsToCollect]);
-  [self cancelDisplayTimer];
 
-  if (queryString_ || results_) {
+  if (tokenizedQueryString_ || results_) {
 
     HGSQueryFlags flags = 0;
     if (pushModifierFlags_ & NSAlternateKeyMask) {
       flags |= eHGSQueryShowAlternatesFlag;
     }
 
-    HGSQuery *query = [[[HGSQuery alloc] initWithString:queryString_
-                                                results:results_
-                                             queryFlags:flags]
+    HGSQuery *query 
+      = [[[HGSQuery alloc] initWithTokenizedString:tokenizedQueryString_
+                                           results:results_
+                                        queryFlags:flags]
                        autorelease];
     [query setMaxDesiredResults:[self maximumResultsToCollect]];
 
@@ -431,28 +428,17 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     // This became a separate call because some sources come back before
     // this call returns and queryController_ must be set first
     [queryController_ startQuery];
-    [self startDisplayTimer];
     if (![self isQueryControllerFinished]) {
+      [mixer_ cancel];
       [self startMixing];
     }
   }
 }
 
 - (void)stopQuery {
-  [self stopMixing];
-  [self cancelDisplayTimer];
+  [mixer_ cancel];
   [self cancelAndReleaseQueryController];
   [self setQueryIsInProcess:NO];
-}
-
-- (void)stopMixing {
-  if (mixer_) {
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self name:kHGSMixerDidFinishNotification object:mixer_];
-    [mixer_ cancel];
-    [mixer_ release];
-    mixer_ = nil;
-  }
 }
 
 #pragma mark Notifications
@@ -466,11 +452,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self setQueryControllerFinished:YES];
   HGSQueryController *queryController = [notification object];
   HGSAssert([queryController isKindOfClass:[HGSQueryController class]], nil);
+  [mixer_ cancel];
   if (![queryController isCancelled]) {
-    [self stopMixing];
     [self startMixing];
-  } else {
-    [self cancelDisplayTimer];
   }
 }
 
@@ -479,7 +463,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)displayTimerElapsed:(NSTimer*)timer {
   [self updateResults];
   if (![self isQueryControllerFinished]) {
-    [self stopMixing];
+    [mixer_ cancel];
     [self startMixing];
   }
 }
@@ -491,18 +475,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self performQuery];
 }
 
-- (void)mixerDidFinish:(NSNotification *)notification {
-  HGSMixer *mixer = [notification object];
-  HGSAssert(mixer == mixer_, nil);
-  if (![mixer isCancelled]) {
-    [self updateResults];
-    if ([self isQueryControllerFinished]) {
-      [self setQueryIsInProcess:NO];
-    }
-  }
-}
-
-- (void)startDisplayTimer {
+- (void)mixerWillStart:(NSNotification *)notification {
   HGSAssert(!displayTimer_, nil);
   displayTimer_
     = [NSTimer scheduledTimerWithTimeInterval:1
@@ -512,10 +485,21 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                                       repeats:YES];
 }
 
-// cancels all timers and clears the member variables.
-- (void)cancelDisplayTimer {
+- (void)mixerDidFinish:(NSNotification *)notification {
+  HGSMixer *mixer = [notification object];
+  HGSAssert(mixer == mixer_, nil);
+  if (![mixer isCancelled]) {
+    [self updateResults];
+  }
+  if ([self isQueryControllerFinished]) {
+    [self setQueryIsInProcess:NO];
+  }  
   [displayTimer_ invalidate];
   displayTimer_ = nil;
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self name:kHGSMixerDidFinishNotification object:mixer_];
+  [mixer_ release];
+  mixer_ = nil;  
 }
 
 - (void)cancelAndReleaseQueryController {

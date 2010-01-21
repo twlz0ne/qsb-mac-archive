@@ -36,6 +36,8 @@
 #import "HGSQuery.h"
 #import "HGSResult.h"
 #import "HGSOperation.h"
+#import "HGSType.h"
+#import "HGSTokenizer.h"
 
 @interface HGSPythonSourceTest : GTMTestCase {
   NSArray *results_;
@@ -108,17 +110,18 @@
   PyObject *py = [sharedPython objectForQuery:query
                           withSearchOperation:nil];
   STAssertNotNULL(py, nil);
-  NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                              @"A Snippet", kHGSObjectAttributeSnippetKey,
-                              @"file:///icon.png", kHGSObjectAttributeIconPreviewFileKey,
-                              @"none.test", kHGSObjectAttributeDefaultActionKey,
-                              nil];
-  HGSResult *result = [HGSResult resultWithURI:@"http://www.google.com/"
-                                          name:@"Google"
-                                          type:kHGSTypeWebBookmark
-                                          rank:kHGSResultUnknownRank
-                                        source:source
-                                    attributes:attributes];
+  NSDictionary *attributes 
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       @"A Snippet", kHGSObjectAttributeSnippetKey,
+       @"file:///icon.png", kHGSObjectAttributeIconPreviewFileKey,
+       @"none.test", kHGSObjectAttributeDefaultActionKey,
+       nil];
+  HGSUnscoredResult *result 
+    = [HGSUnscoredResult resultWithURI:@"http://www.google.com/"
+                                  name:@"Google"
+                                  type:kHGSTypeWebBookmark
+                                source:source
+                            attributes:attributes];
   PyObject *results = PyList_New(1);
   STAssertNotNULL(results, nil);
   PyList_SetItem(results, 0, [sharedPython objectForResult:result]);
@@ -137,7 +140,7 @@
   }
   HGSSearchOperation *op = [note object];
   NSRange range = NSMakeRange(0, [op resultCount]);
-  results_ = [[op sortedResultsInRange:range] copy];
+  results_ = [[op sortedRankedResultsInRange:range] copy];
 }
 
 @end

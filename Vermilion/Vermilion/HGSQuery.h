@@ -40,6 +40,7 @@
 
 @class HGSResult;
 @class HGSResultArray;
+@class HGSTokenizedString;
 
 typedef enum {
   eHGSQueryShowAlternatesFlag = 1 << 0,
@@ -57,19 +58,12 @@ typedef enum {
  */
 @interface HGSQuery : NSObject {
  @private
-  NSString *rawQueryString_;
-  NSString *normalizedQueryString_;
+  HGSTokenizedString *tokenizedQueryString_;
   HGSResultArray *results_;
   HGSQuery *parent_;
   NSInteger maxDesiredResults_;
   HGSQueryFlags flags_;
 }
-
-/*!
-  The query string un-processed.  Most things doing matches should really be
-  using the uniqueWords api so they get consistent breaking of the query string.
-*/
-@property (readonly, copy) NSString *rawQueryString;
 
 /*! 
   Results is the current set of results that we have accumulated. 
@@ -77,10 +71,9 @@ typedef enum {
 @property (readonly, retain) HGSResultArray *results;
 
 /*!
-  Breaks the string with spaces. All diacriticals are removed, and everything
-  is lowercase.
+  The query string in it's original and tokenized forms.
 */
-@property (readonly, retain) NSString *normalizedQueryString;
+@property (readonly, retain) HGSTokenizedString *tokenizedQueryString;
 
 /*!
   A "parent" is a query that has asked for this one to be created.  Usually to
@@ -108,7 +101,14 @@ typedef enum {
 */
 @property (readonly, assign) HGSQueryFlags flags;
 
-- (id)initWithString:(NSString*)query 
+/*! 
+ Designated Initializer.
+*/
+- (id)initWithTokenizedString:(HGSTokenizedString *)query 
+                      results:(HGSResultArray *)results
+                   queryFlags:(HGSQueryFlags)flags;
+
+- (id)initWithString:(NSString *)query 
              results:(HGSResultArray *)results
           queryFlags:(HGSQueryFlags)flags;
 @end

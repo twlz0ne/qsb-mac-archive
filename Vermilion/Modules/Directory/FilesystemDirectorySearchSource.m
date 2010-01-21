@@ -72,8 +72,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   // use the raw query since we're trying to match paths to specific folders.
   HGSResult *pivotObject = [query pivotObject];
   BOOL isApplication = [pivotObject conformsToType:kHGSTypeFileApplication];
+  HGSTokenizedString *tokenizedQueryString = [query tokenizedQueryString];
   if (pivotObject) {
-    NSString *normalizedQueryString = [query normalizedQueryString];
     NSURL *url = [pivotObject url];
     NSString *path = [url path];
     NSMutableArray *results = [NSMutableArray array];
@@ -99,8 +99,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         }
       }
     }
-    
-    BOOL emptyQuery = [normalizedQueryString length] == 0;
+    BOOL emptyQuery = [tokenizedQueryString tokenizedLength] == 0;
     NSArray *contents = [fm directoryContentsAtPath:path];
     BOOL showInvisibles = ([query flags] & eHGSQueryShowAlternatesFlag) != 0;
     // Only construct these one time, rather than each time through the loop.
@@ -125,19 +124,28 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       // Filter further based on the query string, or, if there is no
       // query string then boost the score of the folder's contents.
       NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-      CGFloat rank = kHGSResultUnknownRank;
+      CGFloat score = 0;
+      HGSTokenizedString *tokenizedSubpath = nil;
+      NSIndexSet *matchedIndexes = nil;
       if (emptyQuery) {
         // TODO(mrossetti): Fix the following once issue 850 is addressed.
         // http://code.google.com/p/qsb-mac/issues/detail?id=850
-        rank = strongScore;
+        score = strongScore;
         if (isApplication) {
           [attributes setObject:belowFoldRankFlag
                          forKey:kHGSObjectAttributeRankFlagsKey];
         }
       } else {
-        NSString *tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
-        rank = HGSScoreTermForString(normalizedQueryString, tokenizedSubpath);
-        if (rank < FLT_EPSILON) continue;
+        // Strip out "." characters because it screws up the tokenizer and
+        // causes files like "NSArray.h" to tokenize as "nsarray h" instead
+        // of "ns array h"
+        subpath = [subpath stringByReplacingOccurrencesOfString:@"."
+                                                     withString:@" "];
+        tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
+        score = HGSScoreTermForItem(tokenizedQueryString, 
+                                    tokenizedSubpath, 
+                                    &matchedIndexes);
+        if (score < FLT_EPSILON) continue;
       }
 
       NSError *error = nil;               
@@ -152,18 +160,21 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                     fullPath, error);
       }
       
-      HGSResult *result = [HGSResult resultWithFilePath:fullPath
-                                                   rank:rank
-                                                 source:self 
-                                             attributes:attributes];
+      HGSScoredResult *result 
+        = [HGSScoredResult resultWithFilePath:fullPath
+                                       source:self 
+                                   attributes:attributes
+                                        score:score
+                                  matchedTerm:tokenizedSubpath
+                               matchedIndexes:matchedIndexes];
       [results addObject:result];
     }
 
-    [operation setResults:results];
+    [operation setRankedResults:results];
   } else {
     // use the raw query since we're trying to match paths to specific folders.
     // we treat the input as a raw path, so no tokenizing, etc.
-    NSString *path = [query rawQueryString];
+    NSString *path = [tokenizedQueryString originalString];
     
     // Convert file urls
     if ([path hasPrefix:@"file:"]) {
@@ -176,12 +187,15 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     if ([path hasPrefix:@"/"] || [path hasPrefix:@"~"]) {
       path = [path stringByStandardizingPath];
       if ([fm fileExistsAtPath:path]) {
-        CGFloat rank = HGSCalibratedScore(kHGSCalibratedPerfectScore);
-        HGSResult *result = [HGSResult resultWithFilePath:path
-                                                     rank:rank
-                                                   source:self
-                                               attributes:nil];
-        [operation setResults:[NSArray arrayWithObject:result]]; 
+        CGFloat score = HGSCalibratedScore(kHGSCalibratedPerfectScore);
+        HGSScoredResult *result 
+          = [HGSScoredResult resultWithFilePath:path
+                                         source:self
+                                     attributes:nil
+                                          score:score
+                                    matchedTerm:tokenizedQueryString
+                                 matchedIndexes:nil];
+        [operation setRankedResults:[NSArray arrayWithObject:result]]; 
       } else {
         NSString *container = [path stringByDeletingLastPathComponent];
         NSString *partialPath = [path lastPathComponent];
@@ -205,16 +219,19 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                   continue;
                 }
               }
-              CGFloat rank = HGSScoreTermForString(partialPath, path);
+              CGFloat score = HGSCalibratedScore(kHGSCalibratedModerateScore);
               path = [container stringByAppendingPathComponent:path];
-              HGSResult *result = [HGSResult resultWithFilePath:path
-                                                           rank:rank
-                                                         source:self
-                                                     attributes:nil];
+              HGSScoredResult *result 
+                = [HGSScoredResult resultWithFilePath:path
+                                               source:self
+                                           attributes:nil
+                                                score:score
+                                          matchedTerm:tokenizedQueryString
+                                       matchedIndexes:nil];
               [contents addObject:result];
             }
           }
-          [operation setResults:contents]; 
+          [operation setRankedResults:contents]; 
         }
       }
     }

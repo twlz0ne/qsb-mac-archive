@@ -46,9 +46,37 @@
  This tokenizer breaks all Roman languages and CZJK.
 */ 
 
+@interface HGSTokenizedString : NSObject <NSCopying> {
+ @private
+  NSString *originalString_;
+  NSString *tokenizedString_;
+  NSString *normalizedString_;
+  NSUInteger count_;
+  struct HGSRangeMapping *mappings_;
+}
+
+// The original string that was tokenized.
+@property (readonly, copy) NSString *originalString;
+// The tokenized string (intentionally retained vs copied to cut down on
+// unnecessary copying).
+@property (readonly, retain) NSString *tokenizedString;
+
+@property (readonly, assign) NSUInteger tokenizedLength;
+@property (readonly, assign) NSUInteger originalLength;
+
+- (NSUInteger)mapIndexFromTokenizedToOriginal:(NSUInteger)indx;
+
+@end
+
 /*!
  HGSTokenizer is thread safe.
 */
 @interface HGSTokenizer : NSObject
-+ (NSString *)tokenizeString:(NSString *)string;
+/*!
+ Tokenize a string.
+ @param string String to be tokenized
+ @result A tokenized string.
+*/
++ (HGSTokenizedString *)tokenizeString:(NSString *)string;
++ (NSArray *)tokenizeStrings:(NSArray *)strings;
 @end

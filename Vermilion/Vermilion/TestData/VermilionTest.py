@@ -41,6 +41,7 @@ from datetime import datetime
 try:
   import Vermilion
   import VermilionLocalize
+  import VermilionNotify
 except ImportError:
   # Vermilion is provided in native code by the Quick Search
   # runtime. Create a stub Result class here so that we
@@ -101,6 +102,8 @@ class VermilionAction(object):
     return True
 
   def Perform(self, result, pivot_object=None):
+    VermilionNotify.DisplayNotification("Message");
+    VermilionNotify.DisplayNotification("Message", "Description");
     return True
 
 

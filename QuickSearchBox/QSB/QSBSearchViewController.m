@@ -63,10 +63,6 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 @synthesize activeResultsViewController = activeResultsViewController_;
 @synthesize searchController = searchController_;
 @synthesize parentSearchViewController = parentSearchViewController_;
-@dynamic windowHeight;
-@dynamic results;
-@dynamic selectedTableResult;
-@dynamic queryString;
 
 - (id)initWithWindowController:(QSBSearchWindowController *)searchWindowController {
   if ((self = [super initWithNibName:@"BaseResultsViews" bundle:nil])) {
@@ -120,7 +116,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   HGSAssert(!selectedObject 
             || [selectedObject isKindOfClass:[QSBSourceTableResult class]],
             @"expected a QSBSourceTableResult and got %@", selectedObject);
-  HGSResult *result = [selectedObject representedResult];
+  HGSScoredResult *result = [selectedObject representedResult];
   HGSResultArray *results = [HGSResultArray arrayWithResult:result];
   [self setResults:results];
 }
@@ -148,6 +144,12 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 }
 
 - (void)setQueryString:(NSString *)queryString {
+  HGSTokenizedString *tokenizedString
+    = [HGSTokenizer tokenizeString:queryString];
+  [self setTokenizedQueryString:tokenizedString];
+}
+
+- (void)setTokenizedQueryString:(HGSTokenizedString *)queryString {
   if ([self activeResultsViewController] != topResultsController_) {
     [self showTopResults:self];
   } else {
@@ -156,12 +158,11 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
     // TODO(alcor): this causes the wrong size to be set. Fix
     //[self updateViewsWithAnimation:NO];
   }
-  [searchController_ setQueryString:queryString];
+  [searchController_ setTokenizedQueryString:queryString];
 }
 
-- (NSString*)queryString {
-  NSString *queryString = [searchController_ queryString];
-  return queryString;
+- (HGSTokenizedString *)tokenizedQueryString {
+  return [searchController_ tokenizedQueryString];
 }
 
 - (QSBTableResult *)selectedTableResult {
@@ -215,7 +216,8 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   QSBTableResult *tableResult = [self selectedTableResult];
   NSArray *cellValues = nil;
   if ([tableResult respondsToSelector:@selector(representedResult)]) {
-    HGSResult *result = [(QSBSourceTableResult *)tableResult representedResult];
+    HGSScoredResult *result 
+      = [(QSBSourceTableResult *)tableResult representedResult];
     cellValues = [result valueForKey:kQSBObjectAttributePathCellsKey];
   }
   [statusBar_ setObjectValue:cellValues];

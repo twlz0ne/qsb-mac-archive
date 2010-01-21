@@ -40,7 +40,7 @@ static NSString *kTrashResultUrl = @"gtrash://trash/result";
 @interface TrashSearchSource : HGSCallbackSearchSource {
  @private
   NSImage *trashIcon_;
-  NSString *trashNameNormalized_;
+  HGSTokenizedString *trashNameTokenized_;
   NSString *trashName_;
 }
 @end
@@ -58,7 +58,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                     @"The label for a result denoting the "
                                     @"trash can found on your dock.");
     [trashName_ retain];
-    trashNameNormalized_ = [[HGSTokenizer tokenizeString:trashName_] retain];
+    trashNameTokenized_ = [[HGSTokenizer tokenizeString:trashName_] retain];
   }
   return self;
 }
@@ -66,7 +66,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 - (void) dealloc {
   [trashIcon_ release];
   [trashName_ release];
-  [trashNameNormalized_ release];
+  [trashNameTokenized_ release];
   [super dealloc];
 }
 
@@ -83,8 +83,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   if (pivotObject) {
     isValid = [[pivotObject type] isEqual:kTrashResultType];
   } else {
-    NSString *queryString = [query normalizedQueryString];
-    isValid = [trashNameNormalized_ hasPrefix:queryString];
+    NSString *queryString = [[query tokenizedQueryString] tokenizedString];
+    isValid = [[trashNameTokenized_ tokenizedString] hasPrefix:queryString];
   }
   return isValid;
 }
@@ -93,7 +93,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   NSMutableArray *results = [NSMutableArray array];
   HGSQuery *query = [operation query];
   HGSResult *pivotObject = [query pivotObject];
-  NSString *normalizedQueryString = [query normalizedQueryString];
+  HGSTokenizedString *tokenizedQueryString = [query tokenizedQueryString];
   if (pivotObject) {
     OSErr err = noErr;
     for (ItemCount i = 1; err == noErr || err != nsvErr; ++i) {
@@ -113,22 +113,30 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
             NSArray *contents
               = [[NSFileManager defaultManager]
                  directoryContentsAtPath:basePath];
-            NSUInteger normalizedLength = [normalizedQueryString length];
+            NSUInteger tokenizedLength = [tokenizedQueryString tokenizedLength];
             for (NSString *file in contents) {
-              CGFloat rank = 0;
-              if (normalizedLength == 0) {
-                rank = HGSCalibratedScore(kHGSCalibratedPerfectScore);
+              CGFloat score = 0;
+              NSIndexSet *matchedIndexes = nil;
+              if (tokenizedLength == 0) {
+                score = HGSCalibratedScore(kHGSCalibratedPerfectScore);
               } else {
-                rank = HGSScoreTermForString(normalizedQueryString, file);
+                HGSTokenizedString *tokenizedFile 
+                  = [HGSTokenizer tokenizeString:file];
+                score = HGSScoreTermForItem(tokenizedQueryString, 
+                                            tokenizedFile, 
+                                            &matchedIndexes);
               }
-              if (rank > 0) {
+              if (score > 0) {
                 NSString *fullPath
                   = [basePath stringByAppendingPathComponent:file];
-                HGSResult *result = [HGSResult resultWithFilePath:fullPath
-                                                             rank:rank
-                                                           source:self
-                                                       attributes:nil];
-                [results addObject:result];
+                HGSScoredResult *scoredResult
+                  = [HGSScoredResult resultWithFilePath:fullPath
+                                                 source:self
+                                             attributes:nil
+                                                  score:score 
+                                            matchedTerm:tokenizedQueryString 
+                                         matchedIndexes:matchedIndexes];
+                [results addObject:scoredResult];
               }
             }
           }
@@ -136,24 +144,28 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       }
     }
   } else {
-    CGFloat rank 
-      = HGSScoreTermForString(normalizedQueryString, trashNameNormalized_);
+    NSIndexSet *matchedIndexes = nil;
+    CGFloat score = HGSScoreTermForItem(tokenizedQueryString, 
+                                       trashNameTokenized_, 
+                                       &matchedIndexes);
     NSDictionary *attributes
       = [NSDictionary dictionaryWithObjectsAndKeys:
          trashIcon_, kHGSObjectAttributeIconKey,
          nil];
     
-    HGSResult *result 
-      = [HGSResult resultWithURI:kTrashResultUrl
-                            name:trashName_
-                            type:kTrashResultType
-                            rank:rank
-                          source:self
-                      attributes:attributes];
-    [results addObject:result];
+    HGSScoredResult *scoredResult
+      = [HGSScoredResult resultWithURI:kTrashResultUrl 
+                                  name:trashName_ 
+                                  type:kTrashResultType 
+                                source:self 
+                            attributes:attributes 
+                                 score:score 
+                           matchedTerm:tokenizedQueryString 
+                        matchedIndexes:matchedIndexes];
+    [results addObject:scoredResult];
   }
 
-  [operation setResults:results];
+  [operation setRankedResults:results];
 }
 
 @end

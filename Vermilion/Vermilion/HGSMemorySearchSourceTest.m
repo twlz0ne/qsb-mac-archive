@@ -36,6 +36,7 @@
 #import "HGSResult.h"
 #import "HGSSearchOperation.h"
 #import "HGSQuery.h"
+#import "HGSTokenizer.h"
 #import <OCMock/OCMock.h>
 
 @interface HGSMemorySearchSourceTest : GTMTestCase 
@@ -106,8 +107,9 @@
        pathForResource:@"QSBInfo" ofType:@"plist"];
     }
   }
-  NSDictionary *config = [NSDictionary dictionaryWithObject:bundleMock 
-                                                     forKey:kHGSExtensionBundleKey];
+  NSDictionary *config 
+    = [NSDictionary dictionaryWithObject:bundleMock 
+                                  forKey:kHGSExtensionBundleKey];
   HGSMemorySearchSource *memSource 
     = [[[HGSMemorySearchSource alloc] initWithConfiguration:config] autorelease];
   STAssertNotNil(memSource, nil);
@@ -116,14 +118,17 @@
     = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
   STAssertNotNil(path, nil);
   id searchSourceMock = [OCMockObject mockForClass:[HGSSearchSource class]];
-  HGSResult *result = [HGSResult resultWithFilePath:path
-                                               rank:kHGSResultUnknownRank
-                                             source:searchSourceMock
-                                         attributes:nil];
+  HGSUnscoredResult *result 
+    = [HGSUnscoredResult resultWithFilePath:path
+                                     source:searchSourceMock
+                                 attributes:nil];
   STAssertNotNil(result, nil);
   [[[searchSourceMock stub] 
     andReturn:nil] 
    provideValueForKey:@"HGSObjectAttributeWordRangesKey" result:result];
+  [[[searchSourceMock stub] 
+    andReturn:nil] 
+   provideValueForKey:@"kHGSObjectAttributeRankFlags" result:result];
   [memSource indexResult:result
                     name:@"testName"
               otherTerms:[NSArray arrayWithObjects:@"foo", @"bar", @"bam", nil]];
@@ -132,7 +137,8 @@
   HGSCallbackSearchOperation *op 
     = [[[HGSCallbackSearchOperation alloc] initWithQuery:searchQueryMock
                                                   source:memSource] autorelease];
-  [[[searchQueryMock stub] andReturn:@"foo"] normalizedQueryString];
+  HGSTokenizedString *tokenString = [HGSTokenizer tokenizeString:@"foo"]; 
+  [[[searchQueryMock stub] andReturn:tokenString] tokenizedQueryString];
   [[[searchQueryMock stub] andReturn:nil] pivotObject];
   [memSource performSearchOperation:op];
 }

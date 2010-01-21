@@ -62,7 +62,7 @@ static NSString *const kDateTimeMarker = @"[DTS]";
   // TODO(thomasvl): support indirect w/o loading space
   
   // For top level, must start w/ our prefix.
-    NSString *rawQuery = [query rawQueryString];
+    NSString *rawQuery = [[query tokenizedQueryString] originalString];
     NSUInteger len = [rawQuery length];
     NSUInteger prefixLen = [kInputPrefix length];
     if (len > prefixLen) {
@@ -77,7 +77,9 @@ static NSString *const kDateTimeMarker = @"[DTS]";
 }
 
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
-  NSString *rawQuery = [[operation query] rawQueryString];
+  HGSTokenizedString *tokenizedQueryString 
+    = [[operation query] tokenizedQueryString];
+  NSString *rawQuery = [tokenizedQueryString originalString];
 
   // TODO(thomasvl): support indirect w/o loading space
   HGSAssert([rawQuery hasPrefix:kInputPrefix], nil);
@@ -98,16 +100,18 @@ static NSString *const kDateTimeMarker = @"[DTS]";
        image, kHGSObjectAttributeIconKey,
        largeTypeAction, kHGSObjectAttributeDefaultActionKey,
        nil];
-  HGSResult *hgsObject
-    = [HGSResult resultWithURI:@"userinput:text"
-                          name:userText
-                          type:kHGSTypeTextUserInput
-                          rank:HGSCalibratedScore(kHGSCalibratedPerfectScore)
-                        source:self
-                    attributes:attributes];
-
+  HGSScoredResult *hgsObject
+    = [HGSScoredResult resultWithURI:@"userinput:text"
+                                name:userText
+                                type:kHGSTypeTextUserInput
+                              source:self
+                          attributes:attributes
+                               score:HGSCalibratedScore(kHGSCalibratedPerfectScore)
+                         matchedTerm:tokenizedQueryString
+                      matchedIndexes:nil];
+  
   // See if we need a version w/ stamps
-  HGSResult *hgsObject2 = nil;
+  HGSScoredResult *hgsObject2 = nil;
   if (([userText rangeOfString:kDateMarker
                        options:NSCaseInsensitiveSearch].location != NSNotFound) ||
       ([userText rangeOfString:kTimeMarker
@@ -149,16 +153,24 @@ static NSString *const kDateTimeMarker = @"[DTS]";
                   image, kHGSObjectAttributeIconKey,
                   largeTypeAction, kHGSObjectAttributeDefaultActionKey,
                   nil];
-    hgsObject2 = [HGSResult resultWithURI:@"userinput:text/stamped"
-                                     name:worker
-                                     type:kHGSTypeTextUserInput
-                                     rank:HGSCalibratedScore(kHGSCalibratedPerfectScore) + 1
-                                   source:self
-                               attributes:attributes];
+    hgsObject2 = [HGSScoredResult resultWithURI:@"userinput:text/stamped"
+                                           name:worker
+                                           type:kHGSTypeTextUserInput
+                                         source:self
+                                     attributes:attributes
+                                          score:HGSCalibratedScore(kHGSCalibratedPerfectScore)
+                                    matchedTerm:tokenizedQueryString
+                                 matchedIndexes:nil];
   }
   
-  NSArray *resultsArray = [NSArray arrayWithObjects:hgsObject, hgsObject2, nil];
-  [operation setResults:resultsArray];
+  NSArray *resultsArray = nil;
+  if (hgsObject2) {
+    // Intentionally reversed so that stamped comes first.
+    [NSArray arrayWithObjects:hgsObject2, hgsObject, nil];
+  } else {
+    [NSArray arrayWithObject:hgsObject];
+  }
+  [operation setRankedResults:resultsArray];
 }
 
 @end

@@ -80,7 +80,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         NSString *path = [pivotObject filePath];
         NSBundle *bnd = [NSBundle bundleWithPath:path];
         if ([[bnd bundleIdentifier] isEqual:kDictionaryAppBundleId]) {
-          isValid = ([[query rawQueryString] length] > 0);
+          isValid = ([[query tokenizedQueryString] originalLength] > 0);
         }
       }
     } 
@@ -91,7 +91,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSMutableSet *results = [NSMutableSet set];
   HGSQuery *hgsQuery = [operation query];
-  NSString *query = [hgsQuery rawQueryString];
+  HGSTokenizedString *tokenizedQueryString = [hgsQuery tokenizedQueryString];
+  NSString *rawQuery = [tokenizedQueryString originalString];
   
   BOOL highRelevance = NO;
   NSString *dictionaryPrefix = HGSLocalizedString(@"define ",
@@ -102,29 +103,29 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                   @"suffix for explicit "
                                                   @"dictionary searches of the "
                                                   @"form 'foo define'");
-  NSString *lowerQuery = [query lowercaseString];
+  NSString *lowerQuery = [rawQuery lowercaseString];
   if ([lowerQuery hasPrefix:dictionaryPrefix]) {
-    query = [query substringFromIndex:[dictionaryPrefix length]];
+    rawQuery = [rawQuery substringFromIndex:[dictionaryPrefix length]];
     NSCharacterSet *set = [NSCharacterSet whitespaceCharacterSet];
-    query = [query stringByTrimmingCharactersInSet:set];
+    rawQuery = [rawQuery stringByTrimmingCharactersInSet:set];
     highRelevance = YES;
   } else if ([lowerQuery hasSuffix:dictionarySuffix]) {
-    query = [query substringToIndex:[query length] - [dictionarySuffix length]];
+    rawQuery = [rawQuery substringToIndex:[rawQuery length] - [dictionarySuffix length]];
     NSCharacterSet *set = [NSCharacterSet whitespaceCharacterSet];
-    query = [query stringByTrimmingCharactersInSet:set];
+    rawQuery = [rawQuery stringByTrimmingCharactersInSet:set];
     highRelevance = YES;
   } else if ([hgsQuery pivotObject]) {
     highRelevance = YES;
   }
-  CFRange range = DCSGetTermRangeInString(NULL, (CFStringRef)query, 0);
+  CFRange range = DCSGetTermRangeInString(NULL, (CFStringRef)rawQuery, 0);
   if (range.location != kCFNotFound 
       && range.length != kCFNotFound 
-      && range.length == [query length]) {
-    CFStringRef def = DCSCopyTextDefinition(NULL, (CFStringRef)query, range);
+      && range.length == [rawQuery length]) {
+    CFStringRef def = DCSCopyTextDefinition(NULL, (CFStringRef)rawQuery, range);
     if (def) {
       NSString *urlString 
         = [NSString stringWithFormat:kDictionaryUrlFormat,
-           [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+           [rawQuery stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
       NSRange nsRange = NSMakeRange(range.location, range.length);
       NSMutableDictionary *attributes
         = [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -133,13 +134,13 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
            [NSNumber numberWithUnsignedInteger:eHGSSpecialUIRankFlag], 
              kHGSObjectAttributeRankFlagsKey,
            [NSValue valueWithRange:nsRange], kDictionaryRangeKey,
-           [query substringWithRange:nsRange], kDictionaryTermKey,
+           [rawQuery substringWithRange:nsRange], kDictionaryTermKey,
            nil];
       
       HGSCalibratedScoreType scoreType 
         = highRelevance ? kHGSCalibratedStrongScore 
                         : kHGSCalibratedInsignificantScore;
-      CGFloat rank = HGSCalibratedScore(scoreType);
+      CGFloat score = HGSCalibratedScore(scoreType);
       
       HGSAction *action 
         = [[HGSExtensionPoint actionsPoint]
@@ -153,19 +154,21 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                              @"definition of the term represented by %@.");
       NSString *name
         = [NSString stringWithFormat:definitionFormat,
-           [query substringWithRange:NSMakeRange(range.location, range.length)]];
-      HGSResult *result 
-        = [HGSResult resultWithURI:urlString
-                              name:name
-                              type:kDictionaryResultType
-                              rank:rank
-                            source:self
-                        attributes:attributes];
-      [results addObject:result];
+           [rawQuery substringWithRange:NSMakeRange(range.location, range.length)]];
+      HGSScoredResult *scoredResult 
+        = [HGSScoredResult resultWithURI:urlString
+                                    name:name
+                                    type:kDictionaryResultType
+                                  source:self
+                              attributes:attributes
+                                   score:score 
+                             matchedTerm:tokenizedQueryString 
+                          matchedIndexes:nil];
+      [results addObject:scoredResult];
       CFRelease(def);
     }
   }
-  [operation setResults:[results allObjects]];
+  [operation setRankedResults:[results allObjects]];
   
   // Since we are concurent, finish the query ourselves.
   // TODO(hawk): if we go back to being non-concurrent, remove this

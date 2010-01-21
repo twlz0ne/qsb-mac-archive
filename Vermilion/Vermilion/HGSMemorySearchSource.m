@@ -39,7 +39,6 @@
 #import "HGSPluginLoader.h"
 #import "HGSLog.h"
 #import "HGSSearchTermScorer.h"
-#import "HGSMixer.h"
 
 static NSString* const kHGSMemorySourceResultKey = @"HGSMSResultObject";
 static NSString* const kHGSMemorySourceNameKey = @"HGSMSName";
@@ -54,15 +53,15 @@ static NSString* const kHGSMemorySourceVersion = @"1";
 @interface HGSMemorySearchSourceObject : NSObject {
  @private
   HGSResult *result_;
-  HGSScoreString *name_;
+  HGSTokenizedString *name_;
   NSArray *otherTerms_;
 }
 @property (nonatomic, retain, readonly) HGSResult *result;
-@property (nonatomic, copy, readonly) HGSScoreString *name;
+@property (nonatomic, copy, readonly) HGSTokenizedString *name;
 @property (nonatomic, retain, readonly) NSArray *otherTerms;
 
 - (id)initWithResult:(HGSResult *)result 
-                name:(NSString *)name 
+                name:(HGSTokenizedString *)name 
           otherTerms:(NSArray *)otherTerms;
 
 @end
@@ -73,14 +72,12 @@ static NSString* const kHGSMemorySourceVersion = @"1";
 @synthesize otherTerms = otherTerms_;
 
 - (id)initWithResult:(HGSResult *)result 
-                name:(NSString *)nameTerms 
+                name:(HGSTokenizedString *)name 
           otherTerms:(NSArray *)otherTerms {
   if ((self = [super init])) {
     result_ = [result retain];
-    name_ = [HGSScoreString scoreStringWithString:nameTerms];
-    otherTerms_ = [HGSScoreString scoreStringArrayWithStringArray:otherTerms];
-    [name_ retain];
-    [otherTerms_ retain];
+    name_ = [name retain];
+    otherTerms_ = [otherTerms retain];
   }
   return self;
 }
@@ -119,68 +116,81 @@ static NSString* const kHGSMemorySourceVersion = @"1";
 }
 
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
-  HGSQuery* query = [operation query];
-  NSMutableArray* results = [NSMutableArray array];
-  NSString *normalizedQuery = [query normalizedQueryString];
-  NSUInteger normalizedLength = [normalizedQuery length];
-  HGSResult *pivotObject = [query pivotObject];
+  NSArray *rankedResults = nil;
   @synchronized(resultsArray_) {
+  rankedResults = [self rankedResultsFromArray:resultsArray_ 
+                                  forOperation:operation];
+  }
+  [operation setRankedResults:rankedResults];
+}
 
-    if ((normalizedLength == 0) && pivotObject) {
-      // Per the note above this class in the header, if we get a pivot w/o
-      // any query terms, we match everything so the subclass can filter it
-      // w/in pre/postFilterResult:matchesForQuery:pivotObject
-
-      for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
-        if ([operation isCancelled]) break;
-        HGSResult* result = [self preFilterResult:[indexObject result] 
+- (NSArray *)rankedResultsFromArray:(NSArray *)results 
+                      forOperation:(HGSCallbackSearchOperation *)operation {
+  HGSQuery* query = [operation query];
+  NSMutableArray* rankedResults = [NSMutableArray array];
+  HGSTokenizedString *tokenizedQuery = [query tokenizedQueryString];
+  NSUInteger queryLength = [tokenizedQuery originalLength];
+  HGSResult *pivotObject = [query pivotObject];
+    
+  if ((queryLength == 0) && pivotObject) {
+    // Per the note above this class in the header, if we get a pivot w/o
+    // any query terms, we match everything so the subclass can filter it
+    // w/in pre/postFilterResult:matchesForQuery:pivotObject
+    
+    for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
+      if ([operation isCancelled]) break;
+      HGSResult* result = [self preFilterResult:[indexObject result] 
+                                matchesForQuery:query 
+                                    pivotObject:pivotObject];
+      if (!result) continue;
+      HGSScoredResult *scoredResult 
+        = [HGSScoredResult resultWithResult:result
+                                      score:HGSCalibratedScore(kHGSCalibratedModerateScore) 
+                                matchedTerm:tokenizedQuery 
+                             matchedIndexes:nil];
+      scoredResult = [self postFilterScoredResult:scoredResult 
                                   matchesForQuery:query 
                                       pivotObject:pivotObject];
-        if (!result) continue;
-        // Copy the result so any attributes looked up and cached don't stick.
-        // Also take care of any dup folding not leaving set attributes on other
-        // objects.
-        HGSMutableResult *resultCopy = [[result mutableCopy] autorelease];
-        result = [self postFilterResult:resultCopy 
-                        matchesForQuery:query 
-                            pivotObject:pivotObject];
-        if (result) {
-          [results addObject:result];
-        }
+      if (scoredResult) {
+        [rankedResults addObject:scoredResult];
       }
-    } else if (normalizedLength > 0) {
-      // Match the terms
-      NSArray *queryTerms
-        = [normalizedQuery componentsSeparatedByString:@" "];
-      for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
-        if ([operation isCancelled]) break;
-        HGSResult* result = [self preFilterResult:[indexObject result] 
-                                  matchesForQuery:query 
-                                      pivotObject:pivotObject];
-        if (!result) continue;
-        HGSScoreString* name = [indexObject name];
-        NSArray* otherItems = [indexObject otherTerms];
-        CGFloat rank = HGSScoreTermsForMainAndOtherItems(queryTerms,
-                                                         name,
-                                                         otherItems);        
-        if (rank > 0.0) {
-          // Copy the result so we can apply rank to it
-          HGSMutableResult *resultCopy = [[result mutableCopy] autorelease];
-          [resultCopy addRankFlags:eHGSNameMatchRankFlag];
-          [resultCopy setRank:rank];
-          
-          result = [self postFilterResult:resultCopy 
-                          matchesForQuery:query 
-                              pivotObject:pivotObject];
-          if (result) {
-            [results addObject:result];
-          }
+    }
+  } else if (queryLength > 0) {
+    for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
+      if ([operation isCancelled]) break;
+      HGSResult* result = [self preFilterResult:[indexObject result] 
+                                matchesForQuery:query 
+                                    pivotObject:pivotObject];
+      if (!result) continue;
+      HGSTokenizedString* name = [indexObject name];
+      NSArray* otherItems = [indexObject otherTerms];
+      HGSTokenizedString *matchedTerm = nil;
+      NSIndexSet *matchedIndexes = nil;
+      CGFloat score = HGSScoreTermForMainAndOtherItems(tokenizedQuery,
+                                                      name,
+                                                      otherItems,
+                                                      &matchedTerm,
+                                                      &matchedIndexes);        
+      if (score > 0.0) {
+        HGSRankFlags flagsToSet 
+          = [matchedTerm isEqual:name] ? eHGSNameMatchRankFlag : 0;
+        HGSScoredResult *scoredResult
+          = [HGSScoredResult resultWithResult:result 
+                                        score:score 
+                                   flagsToSet:flagsToSet 
+                                 flagsToClear:0 
+                                  matchedTerm:matchedTerm
+                               matchedIndexes:matchedIndexes];
+        scoredResult = [self postFilterScoredResult:scoredResult 
+                                    matchesForQuery:query 
+                                        pivotObject:pivotObject];
+        if (scoredResult) {
+          [rankedResults addObject:scoredResult];
         }
       }
     }
   }
-  [results sortUsingFunction:HGSMixerResultSort context:nil];
-  [operation setResults:results];
+  return rankedResults;
 }
 
 - (void)clearResultIndex {
@@ -190,9 +200,9 @@ static NSString* const kHGSMemorySourceVersion = @"1";
 }
 
 - (void)indexResult:(HGSResult *)hgsResult
-      tokenizedName:(NSString *)name
+      tokenizedName:(HGSTokenizedString *)name
          otherTerms:(NSArray *)otherTerms {
-  if ([name length] || otherTerms) {
+  if ([name tokenizedLength] || otherTerms) {
     HGSMemorySearchSourceObject *resultsArrayObject 
       = [[HGSMemorySearchSourceObject alloc] initWithResult:hgsResult
                                                        name:name
@@ -212,15 +222,10 @@ static NSString* const kHGSMemorySourceVersion = @"1";
          otherTerms:(NSArray *)otherTerms {
   // must have result and name string
   if (hgsResult) {
-    name = [HGSTokenizer tokenizeString:name];
-    NSUInteger count = [otherTerms count];
-    NSMutableArray *array = [NSMutableArray arrayWithCapacity:count];
-    for (NSString *term in otherTerms) {
-      term = [HGSTokenizer tokenizeString:term];
-      [array addObject:term];
-    }
+    HGSTokenizedString *tokenizedName = [HGSTokenizer tokenizeString:name];
+    NSArray *array = [HGSTokenizer tokenizeStrings:otherTerms];
     [self indexResult:hgsResult 
-        tokenizedName:name 
+        tokenizedName:tokenizedName 
            otherTerms:array];
   }
 }
@@ -259,17 +264,17 @@ static NSString* const kHGSMemorySourceVersion = @"1";
         HGSResult *result = [resultObject result];
         NSDictionary *archivedRep = [self archiveRepresentationForResult:result];
         if (archivedRep) {
-          HGSScoreString *name = [resultObject name];
+          HGSTokenizedString *name = [resultObject name];
           NSArray *otherTerms = [resultObject otherTerms];
           NSMutableArray *otherTermStrings
             = [NSMutableArray arrayWithCapacity:[otherTerms count]];
-          for (HGSScoreString *otherTerm in otherTerms) {
-            [otherTermStrings addObject:[otherTerm string]];
+          for (HGSTokenizedString *otherTerm in otherTerms) {
+            [otherTermStrings addObject:[otherTerm originalString]];
           }
           NSDictionary *cacheObject
             = [NSDictionary dictionaryWithObjectsAndKeys:
                                   archivedRep, kHGSMemorySourceResultKey,
-                                  [name string], kHGSMemorySourceNameKey,
+                                  [name originalString], kHGSMemorySourceNameKey,
                                   otherTermStrings, kHGSMemorySourceOtherTermsKey,
                                   nil];
           [archiveObjects addObject:cacheObject];
@@ -306,11 +311,20 @@ static NSString* const kHGSMemorySourceVersion = @"1";
           if (result) {
             NSString *name =
              [cacheObject objectForKey:kHGSMemorySourceNameKey];
+            HGSTokenizedString *tokenizedName 
+              = [HGSTokenizer tokenizeString:name];
             NSArray *otherTerms =
               [cacheObject objectForKey:kHGSMemorySourceOtherTermsKey];
+            NSMutableArray *tokenizedOtherTerms 
+              = [NSMutableArray arrayWithCapacity:[otherTerms count]];
+            for (NSString *term in otherTerms) {
+              HGSTokenizedString *tokenizedTerm 
+                = [HGSTokenizer tokenizeString:term];
+              [tokenizedOtherTerms addObject:tokenizedTerm];
+            }
             [self indexResult:result
-                tokenizedName:name
-                   otherTerms:otherTerms];
+                tokenizedName:tokenizedName
+                   otherTerms:tokenizedOtherTerms];
             cacheHash_ ^= [result hash];
           }
         }
@@ -337,9 +351,9 @@ static NSString* const kHGSMemorySourceVersion = @"1";
   return result;
 }
 
-- (HGSResult *)postFilterResult:(HGSMutableResult *)result 
-                matchesForQuery:(HGSQuery *)query
-                    pivotObject:(HGSResult *)pivotObject {
+- (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)result 
+                            matchesForQuery:(HGSQuery *)query
+                                pivotObject:(HGSResult *)pivotObject {
   // Do nothing. Subclasses can override.
   return result;
 }

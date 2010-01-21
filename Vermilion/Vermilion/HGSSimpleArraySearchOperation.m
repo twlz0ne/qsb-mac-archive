@@ -34,6 +34,7 @@
 #import "HGSLog.h"
 #import "NSNotificationCenter+MainThread.h"
 #import "GTMMethodCheck.h"
+#import "HGSMixer.h"
 
 @implementation HGSSimpleArraySearchOperation
 GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:object:userInfo:);
@@ -46,7 +47,7 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
 // call to replace the results of the operation with something more up to date.
 // Threadsafe, can be called from any thread. Tells observers about the
 // presence of new results on the main thread.
-- (void)setResults:(NSArray*)results {
+- (void)setRankedResults:(NSArray*)results {
   if ([self isCancelled]) return;
   HGSAssert(![self isFinished], @"setting results after the query is done?");
   // No point in telling the observers there weren't results.  The source
@@ -57,14 +58,15 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
   // and then go and mutate it underneath us.
   @synchronized (self) {
     [results_ autorelease];
-    results_ = [results copy];
+    results_ = [[results sortedArrayUsingFunction:HGSMixerScoredResultSort 
+                                          context:nil] retain];
   }
   [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationDidUpdateResultsNotification
                                     object:self
                                   userInfo:nil];
 }
 
-- (NSArray *)sortedResultsInRange:(NSRange)range {
+- (NSArray *)sortedRankedResultsInRange:(NSRange)range {
   NSArray *sortedResults = nil;
   @synchronized (self) {
     NSRange fullRange = NSMakeRange(0, [results_ count]);
@@ -76,8 +78,8 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
   return sortedResults;
 }
 
-- (HGSResult *)sortedResultAtIndex:(NSUInteger)idx {
-  HGSResult *result = nil;
+- (HGSScoredResult *)sortedRankedResultAtIndex:(NSUInteger)idx {
+  HGSScoredResult *result = nil;
   @synchronized (self) {
     result = [results_ objectAtIndex:idx];
   }

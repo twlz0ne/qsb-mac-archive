@@ -175,8 +175,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     }
     [objectDict removeObjectForKey:kHGSCorporaSourceAttributeIconNameKey];
   }
-  HGSResult *corpus = [HGSResult resultWithDictionary:objectDict
-                                              source:self];
+  HGSUnscoredResult *corpus = [HGSUnscoredResult resultWithDictionary:objectDict
+                                                               source:self];
   return corpus;  
 }
 
@@ -251,7 +251,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   return YES;
 }
 
-- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult *)result {
   return [NSMutableDictionary
             dictionaryWithObject:[result uri]
                           forKey:kHGSObjectAttributeURIKey];

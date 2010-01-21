@@ -46,7 +46,6 @@
 // first element in the array for a given key.
 
 #import <Vermilion/Vermilion.h>
-#import "HGSStringUtil.h"
 
 #if TARGET_OS_IPHONE
 #import "GMOSourceConfigProvider.h"
@@ -81,7 +80,6 @@ static const unsigned int kMaxEntriesPerShortcut = 3;
   // Each object in the array is an NSDictionary representing a single
   // HGSResult.
   NSMutableDictionary *shortcuts_;
-  NSArray *sortedKeys_;
   NSString *shortcutsFilePath_;
   BOOL dirty_;
   NSTimer *writeShortcutsTimer_;
@@ -90,14 +88,15 @@ static const unsigned int kMaxEntriesPerShortcut = 3;
 // Tell the database that "object" was selected for shortcut, and let it do its
 // magic internally to update itself.
 - (BOOL)updateShortcutFromController:(QSBSearchController *)searchController 
-                          withResult:(HGSResult *)result;
+                    withRankedResult:(HGSScoredResult *)result;
 
-- (NSArray *)rankedObjectsForShortcut:(NSString *)shortcut;
+- (NSArray *)rankedObjectsForShortcut:(HGSTokenizedString *)shortcut;
 
 // Remove the given identifier for the shortcut.
 - (void)removeIdentifier:(NSString *)identifier
-             forShortcut:(NSString *)shortcut;
+             forShortcut:(HGSTokenizedString *)shortcut;
 - (void)writeShortcuts:(NSTimer *)timer;
+- (NSDictionary *)readShortcuts:(NSString *)path;
 @end
 
 static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
@@ -133,14 +132,7 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
                name:kQSBQueryControllerWillPerformActionNotification
              object:nil];
 #endif
-    NSMutableDictionary *fileContents 
-      = [NSMutableDictionary dictionaryWithContentsOfFile:shortcutsFilePath_];
-    NSString *vers = [fileContents objectForKey:kHGSShortcutsVersionStringKey];
-    shortcuts_ = [fileContents objectForKey:kHGSShortcutsDictionaryKey];
-    if (![vers isEqualToString:kHGSShortcutsVersion] || !shortcuts_) {
-      shortcuts_ = [NSMutableDictionary dictionary];
-    }
-    [shortcuts_ retain];
+    shortcuts_ = [[self readShortcuts:shortcutsFilePath_] retain];
     writeShortcutsTimer_ 
       = [NSTimer scheduledTimerWithTimeInterval:300 
                                          target:self 
@@ -156,7 +148,6 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self];
   [shortcuts_ release];
-  [sortedKeys_ release];
   [shortcutsFilePath_ release];
   [super dealloc];
 }
@@ -201,7 +192,7 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   return result;
 }
 
-- (NSDictionary *)archiveResult:(HGSResult *)result {
+- (NSDictionary *)archiveResult:(HGSScoredResult *)result {
   NSMutableDictionary *archive = nil;
   HGSSearchSource *source = [result source];
   if (source) {
@@ -215,7 +206,7 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
 }
 
 - (BOOL)updateShortcutFromController:(QSBSearchController *)searchController  
-                          withResult:(HGSResult *)result {
+                    withRankedResult:(HGSScoredResult *)result {
   // Check to see if the args we got are reasonable
   if (!searchController || !result) {
     HGSLogDebug(@"Bad Args");
@@ -227,14 +218,8 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
     return NO;
   }
   
-  NSString *shortcut = [searchController queryString];
-  if (![shortcut length]) {
-    return NO;
-  }
-
-  NSString *normalizeShortcut
-    = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:shortcut];
-  if ([normalizeShortcut length] == 0) {
+  HGSTokenizedString *shortcut = [searchController tokenizedQueryString];
+  if (![shortcut tokenizedLength]) {
     return NO;
   }
   
@@ -248,9 +233,9 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   if (!archiveDict) {
     return NO;
   }
-    
+  
   @synchronized (shortcuts_) {
-    NSMutableArray *valueArray = [shortcuts_ objectForKey:normalizeShortcut];
+    NSMutableArray *valueArray = [shortcuts_ objectForKey:shortcut];
      // see if we have an array for the given shortcut
     NSUInteger currentIndex = [self indexOfResultWithIdentifier:identifier
                                                       fromArray:valueArray];
@@ -264,9 +249,7 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
     if (!valueArray || newIndex != currentIndex) {
       if (!valueArray) {
         valueArray = [NSMutableArray arrayWithObject:archiveDict];
-        [shortcuts_ setObject:valueArray forKey:normalizeShortcut];
-        [sortedKeys_ release];
-        sortedKeys_ = nil;
+        [shortcuts_ setObject:valueArray forKey:shortcut];
       } else {
         if (currentIndex < [valueArray count]) {
           [valueArray removeObjectAtIndex:currentIndex];
@@ -294,58 +277,44 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
 }
 
 - (void)removeIdentifier:(NSString *)identifier
-             forShortcut:(NSString *)shortcut {
-  NSString *normalizeShortcut
-    = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:shortcut];
+             forShortcut:(HGSTokenizedString *)shortcut {
+  NSString *tokenizedShortcut = [shortcut tokenizedString];
   @synchronized (shortcuts_) {
-    NSMutableArray *shortcutArray = [shortcuts_ objectForKey:normalizeShortcut];
+    NSMutableArray *shortcutArray = [shortcuts_ objectForKey:tokenizedShortcut];
     NSUInteger idx = [self indexOfResultWithIdentifier:identifier 
                                              fromArray:shortcutArray];
     if (idx != NSNotFound) {
         [shortcutArray removeObjectAtIndex:idx];
-        [sortedKeys_ release];
-        sortedKeys_ = nil;
         dirty_ = YES;
     }
   }
 }
 
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
-  // shortcuts start w/ the raw query so anything can get remembered.
   HGSQuery *query = [operation query];
-  NSString *queryString = [query rawQueryString];
-  NSArray *results = [self rankedObjectsForShortcut:queryString];
-  NSMutableArray *rankedResults 
-    = [NSMutableArray arrayWithCapacity:[results count]];
-  NSUInteger rank = 1000;
-  for (HGSResult *result in results) {
-    // Decrease the score for each
-    HGSMutableResult *mutableResult = [[result mutableCopy] autorelease];
-    [mutableResult setRank:rank];
-    rank -= 1;
-    [rankedResults addObject:mutableResult];
-  }
-  [operation setResults:rankedResults];
+  HGSTokenizedString *tokenizedString = [query tokenizedQueryString];
+  NSArray *rankedResults = [self rankedObjectsForShortcut:tokenizedString];
+  [operation setRankedResults:rankedResults];
 }
 
-- (NSArray *)rankedObjectsForShortcut:(NSString *)shortcut {
-  NSString *normalizedShortcut
-    = [HGSStringUtil stringByLowercasingAndStrippingDiacriticals:shortcut];
+- (NSArray *)rankedObjectsForShortcut:(HGSTokenizedString *)shortcut {
   NSMutableArray *results = [NSMutableArray array];
   @synchronized(shortcuts_) {
-    if (!sortedKeys_) {
-      NSArray *keyArray = [shortcuts_ allKeys];
-      sortedKeys_ = [[keyArray sortedArrayUsingFunction:KeyLength
-                                                context:NULL] retain];
-    }
-    for (NSString *key in sortedKeys_) {
-      if ([key hasPrefix:normalizedShortcut]) {
+    for (HGSTokenizedString *key in [shortcuts_ allKeys]) {
+      NSIndexSet *matchedIndexes = nil;
+      CGFloat score = HGSScoreTermForItem(shortcut, key, &matchedIndexes);
+      if (score > 0.0) {
         NSArray *resultArray = [shortcuts_ objectForKey:key];
         for (NSDictionary *resultDict in resultArray) {
           HGSResult *result = [self unarchiveResult:resultDict];
-          if (result) {
-            if ([results indexOfObject:result] == NSNotFound) {
-              [results addObject:result];
+          HGSScoredResult *scoredResult 
+            = [HGSScoredResult resultWithResult:result 
+                                          score:score 
+                                    matchedTerm:shortcut 
+                                 matchedIndexes:matchedIndexes];
+          if (scoredResult) {
+            if ([results indexOfObject:scoredResult] == NSNotFound) {
+              [results addObject:scoredResult];
             }
           } else {
             NSString *identifier 
@@ -380,10 +349,10 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
     = [userDict objectForKey:kQSBNotificationSearchControllerKey];
   id result = [notification object];
   if ([result respondsToSelector:@selector(representedResult)]) {
-    HGSResult *hgsResult = [result representedResult];
-    if ([hgsResult isKindOfClass:[HGSResult class]]) {
-      [self updateShortcutFromController:searchController withResult:hgsResult];
-    }
+    HGSScoredResult *hgsResult = [result representedResult];
+    HGSAssert([hgsResult isKindOfClass:[HGSScoredResult class]], nil);
+    [self updateShortcutFromController:searchController 
+                      withRankedResult:hgsResult];
   }  
 }
 
@@ -395,9 +364,9 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   HGSResultArray *directObjects 
     = [userDict objectForKey:kQSBNotificationDirectObjectsKey];
   if ([directObjects count] == 1) {
-    HGSResult *directObject = [directObjects objectAtIndex:0];
+    HGSScoredResult *directObject = [directObjects objectAtIndex:0];
     [self updateShortcutFromController:searchController 
-                            withResult:directObject];
+                      withRankedResult:directObject];
   }
 }
 
@@ -410,11 +379,36 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   [super uninstall];
 }
 
+- (NSDictionary *)readShortcuts:(NSString *)path {
+  NSMutableDictionary *fileContents 
+    = [NSMutableDictionary dictionaryWithContentsOfFile:shortcutsFilePath_];
+  NSString *vers = [fileContents objectForKey:kHGSShortcutsVersionStringKey];
+  NSDictionary *storedData = [fileContents objectForKey:kHGSShortcutsDictionaryKey];
+  NSMutableDictionary *shortcuts = [NSMutableDictionary dictionary];
+  if ([vers isEqualToString:kHGSShortcutsVersion] && storedData) {
+    for (NSString *identifier in storedData) {
+      HGSTokenizedString *tokenizedID = [HGSTokenizer tokenizeString:identifier];
+      NSArray *values = [storedData objectForKey:identifier];
+      [shortcuts setObject:values forKey:tokenizedID];
+    }
+  }
+  return shortcuts;
+}
+
 - (void)writeShortcuts:(NSTimer *)timer {
+  NSMutableDictionary *shortCutData = nil;
   @synchronized(shortcuts_) {
     if (dirty_) {
+      shortCutData = [NSMutableDictionary dictionary];
+      for (HGSTokenizedString *tokenizedString in shortcuts_) {
+        NSString *string = [tokenizedString tokenizedString];
+        NSArray *valueArray = [shortcuts_ objectForKey:tokenizedString];
+        [shortCutData setObject:valueArray forKey:string];
+      }
+    }
+    if (shortCutData) {
       NSDictionary *fileData = [NSDictionary dictionaryWithObjectsAndKeys:
-        shortcuts_, kHGSShortcutsDictionaryKey,
+        shortCutData, kHGSShortcutsDictionaryKey,
         kHGSShortcutsVersion, kHGSShortcutsVersionStringKey,
         nil];
       if (![fileData writeToFile:shortcutsFilePath_ atomically:YES]) {

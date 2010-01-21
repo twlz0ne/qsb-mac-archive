@@ -38,6 +38,7 @@
 #import <Foundation/Foundation.h>
 
 @class HGSSearchSource;
+@class HGSTokenizedString;
 
 // Support the icon property: the phone needs to treat this as a different class
 #if TARGET_OS_IPHONE
@@ -84,68 +85,9 @@ extern NSString* const kHGSObjectAttributePasteboardValueKey; // NSDictionary of
 
 // Keys for attribute dictionaries. Use accesors to get values.
 extern NSString* const kHGSObjectAttributeRankFlagsKey;  // NSNumber of HGSRankFlags
-extern NSString* const kHGSObjectAttributeRankKey;  // NSNumber 0-10... (estimated number of uses in 7 days?)
+extern NSString* const kHGSObjectAttributeMatchedTermKey;  // NSString the term we matched
 
 extern NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey;  // NSValue (NSInteger)
-
-/*!
-  The "type" system used for results is based on string hierarchies (similar to
-  reverse dns names).  The common bases are "contact", "file", "webpage", etc.
-  A source can then refine them to be more specific: "contact.addressbook",
-  "contact.google", "webpage.bookmark".  These strings are meant to be case
-  sensitive (to allow for faster compares).  There are two helpers (isOfType:
-  and conformsToType:) that allow the caller to check to see if a result is of
-  a certain type or refinement of that type.  The HGS_SUBTYPE macro is to be
-  used in the construction of string hierarchies with more than one segment.
-  Types can be made up of multiple segments to refine them as specifically as
-  needed.
-*/
-#define HGS_SUBTYPE(x,y) x @"." y
-/*!
-  Here are the current bases/common types. This DOES NOT mean that this is all 
-  the possible valid base types.  New sources are free to add new types.
-*/
-#define kHGSTypeContact @"contact"
-#define kHGSTypeFile    @"file"
-#define kHGSTypeEmail   @"email"
-#define kHGSTypeWebpage @"webpage"
-#define kHGSTypeOnebox  @"onebox"
-#define kHGSTypeAction  @"action"
-#define kHGSTypeText    @"text"
-#define kHGSTypeScript  @"script"
-#define kHGSTypeDateTime @"datetime"
-#define kHGSTypeGeolocation @"geolocation"
-#define kHGSTypeSearch           HGS_SUBTYPE(kHGSTypeText, @"search")
-#define kHGSTypeSuggest          HGS_SUBTYPE(kHGSTypeText, @"suggestion")
-#define kHGSTypeDirectory        HGS_SUBTYPE(kHGSTypeFile, @"directory")
-#define kHGSTypeTextFile         HGS_SUBTYPE(kHGSTypeFile, @"text")
-#define kHGSTypeFileApplication  HGS_SUBTYPE(kHGSTypeFile, @"application")
-#define kHGSTypeWebBookmark      HGS_SUBTYPE(kHGSTypeWebpage, @"bookmark")
-#define kHGSTypeWebHistory       HGS_SUBTYPE(kHGSTypeWebpage, @"history")
-#define kHGSTypeWebApplication   HGS_SUBTYPE(kHGSTypeWebpage, @"application")
-#define kHGSTypeGoogleSuggest    HGS_SUBTYPE(kHGSTypeSuggest, @"googlesuggest")
-#define kHGSTypeGoogleNavSuggest HGS_SUBTYPE(kHGSTypeWebpage, @"googlenavsuggest")
-#define kHGSTypeGoogleSearch     HGS_SUBTYPE(kHGSTypeSearch,  @"googlesearch")
-// Media splits into file. and webpage. because most actions will need to know
-// how to act on them based on how they are fetched.
-#define kHGSTypeFileMedia        HGS_SUBTYPE(kHGSTypeFile, @"media")
-#define kHGSTypeFileMusic        HGS_SUBTYPE(kHGSTypeFileMedia, @"music")
-#define kHGSTypeFileImage        HGS_SUBTYPE(kHGSTypeFileMedia, @"image")
-#define kHGSTypeFileMovie        HGS_SUBTYPE(kHGSTypeFileMedia, @"movie")
-#define kHGSTypeWebMedia         HGS_SUBTYPE(kHGSTypeWebpage, @"media")
-#define kHGSTypeWebMusic         HGS_SUBTYPE(kHGSTypeWebMedia, @"music")
-#define kHGSTypeWebImage         HGS_SUBTYPE(kHGSTypeWebMedia, @"image")
-#define kHGSTypeWebMovie         HGS_SUBTYPE(kHGSTypeWebMedia, @"movie")
-// TODO(dmaclach): should album inherit from image?
-#define kHGSTypeFilePhotoAlbum   HGS_SUBTYPE(kHGSTypeFileImage,   @"album") 
-#define kHGSTypeWebPhotoAlbum    HGS_SUBTYPE(kHGSTypeWebImage,   @"album") 
-#define kHGSTypeTextUserInput    HGS_SUBTYPE(kHGSTypeText, @"userinput")
-#define kHGSTypeTextPhoneNumber  HGS_SUBTYPE(kHGSTypeText, @"phonenumber")
-#define kHGSTypeTextEmailAddress HGS_SUBTYPE(kHGSTypeText, @"emailaddress")
-#define kHGSTypeTextInstantMessage HGS_SUBTYPE(kHGSTypeText, @"instantmessage")
-#define kHGSTypeTextAddress      HGS_SUBTYPE(kHGSTypeText, @"address")
-
-#define kHGSResultUnknownRank -1000
 
 enum {
   eHGSNameMatchRankFlag = 1 << 0,
@@ -173,139 +115,34 @@ typedef NSUInteger HGSRankFlags;
   no longer required (eg, the user has selected a different result or cleared
   the search).
 */
-@interface HGSResult : NSObject <NSCopying, NSMutableCopying> {
- @public
-  /*!
-    This is accessed by the mixer for speed.
-  */
 
-  NSUInteger idHash_;  
- @protected
-  /*!
-    Used for global ranking, set by the Search Source that creates it.
-  */
-  HGSRankFlags rankFlags_;
-  CGFloat rank_;
-  NSString *uri_;
-  NSString *displayName_;
-  NSString *type_;
-  HGSSearchSource *source_;
-  NSDictionary *attributes_;  
-  NSString *normalizedIdentifier_; // Only webpages have normalizedIdentifiers
-  NSDate *lastUsedDate_;
-  BOOL conformsToContact_;
-}
-
+@interface HGSResult : NSObject <NSCopying>
 /*!
- The display name for the result.
+ Get an attribute by name. |-valueForKey:| may return a placeholder value that
+ is to be updated later via KVO.
  */
-@property (readonly) NSString *displayName;
-/*!
- URI for the result.
- */
-@property (readonly) NSString *uri;
-/*!
- Is it a local file
-*/
-@property (readonly, getter=isFileResult) BOOL fileResult;
-/*!
- Filepath for the result
-*/
-@property (readonly) NSString *filePath;
-/*!
- URL for the result.
-*/
-@property (readonly) NSURL *url;
-/*!
-  Type of the result. See kHGSType constants.
-*/
-@property (readonly) NSString *type;
-/*!
-  Last time this result was used (if known)
-*/
-@property (readonly) NSDate *lastUsedDate;
-/*!
-  The relative rank of an item (from 0.0 to 1.0)
-*/
-@property (readonly) CGFloat rank;
-/*!
-  Information about the item that may change it's overall ranking
-*/
-@property (readonly) HGSRankFlags rankFlags;
-/*!
-  The source which supplied this result.
-*/
-@property (readonly) HGSSearchSource *source;
-
-/*!
-  Convenience methods
-*/
-+ (id)resultWithURL:(NSURL *)url
-               name:(NSString *)name
-               type:(NSString *)typeStr
-               rank:(CGFloat)rank
-             source:(HGSSearchSource *)source
-         attributes:(NSDictionary *)attributes;
-
-+ (id)resultWithFilePath:(NSString *)path
-                    rank:(CGFloat)rank
-                  source:(HGSSearchSource *)source 
-              attributes:(NSDictionary *)attributes;
-
-+ (id)resultWithURI:(NSString *)uri
-               name:(NSString *)name
-               type:(NSString *)type
-               rank:(CGFloat)rank
-             source:(HGSSearchSource *)source
-         attributes:(NSDictionary *)attributes;
-
-/*!
-  Create an result based on a dictionary of keys. 
-*/
-+ (id)resultWithDictionary:(NSDictionary *)dictionary 
-                    source:(HGSSearchSource *)source;
-
-- (id)initWithURI:(NSString *)uri
-             name:(NSString *)name
-             type:(NSString *)typeStr
-             rank:(CGFloat)rank
-           source:(HGSSearchSource *)source
-       attributes:(NSDictionary *)attributes;
-
-- (id)initWithDictionary:(NSDictionary*)dict
-                  source:(HGSSearchSource *)source;
-
-/*!
-  Return a new result by adding attributes to an old result.
-*/
-- (HGSResult *)resultByAddingAttributes:(NSDictionary *)attributes;
-
-/*!
-  Get an attribute by name. |-valueForKey:| may return a placeholder value that
-  is to be updated later via KVO.
-*/
 - (id)valueForKey:(NSString*)key;
 
 /*!
-  Merge the attributes of |result| with this one, and return a new object.
-  Single values that overlap are lost.
-*/
-- (HGSResult *)mergeWith:(HGSResult*)result;
+ Is it a local file
+ */
+- (BOOL)isFileResult;
 
 /*!
-  Is this result a "duplicate" of |compareTo|? Not using |-isEqual:| because
-  that impacts how the object gets put into collections.
-*/
-- (BOOL)isDuplicate:(HGSResult*)compareTo;
-
-/*!
-  Some helpers to check if this result is of a given type.  |isOfType| checks
-  for an exact match of the type.  |conformsToType{Set}| checks to see if this
-  object is of the specific type{s} or a refinement of it/them.
+ Some helpers to check if this result is of a given type.  |isOfType| checks
+ for an exact match of the type.  |conformsToType{Set}| checks to see if this
+ object is of the specific type{s} or a refinement of it/them.
 */
 - (BOOL)isOfType:(NSString *)typeStr;
 - (BOOL)conformsToType:(NSString *)typeStr;
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet;
+
+/*!
+ Is this result a "duplicate" of |compareTo|? Not using |-isEqual:| because
+ that impacts how the object gets put into collections.
+ */
+- (BOOL)isDuplicate:(HGSResult *)compareTo;
+
 /*!
  Mark this result as having been of interest to the user.
  Base implementation sends a promoteResult message to the result's source,
@@ -314,18 +151,165 @@ typedef NSUInteger HGSRankFlags;
 - (void)promote;
 
 /*!
- Given a path to a file, returns it's HGSType.
+ Return a new result by adding attributes from result to self.
 */
-+ (NSString *)hgsTypeForPath:(NSString*)path;
+- (id)resultByAddingAttributesFromResult:(HGSResult *)result;
+
+/*!
+ URL for the result.
+ */
+-(NSURL *)url;
+
+/*!
+ Filepath for the result.
+ */
+-(NSString *)filePath;
+
+/*!
+ The display name for the result. Must be implemented by subclass.
+*/
+- (NSString *)displayName;
+
+/*!
+ URI for the result. Must be implemented by subclass.
+ */
+- (NSString *)uri;
+
+/*!
+ Type of the result. See kHGSType constants. Must be implemented by subclass.
+ */
+- (NSString *)type;
+
+/*!
+ The source which supplied this result. Must be implemented by subclass.
+ */
+-(HGSSearchSource *)source;
+
+
+
+/*!
+ Return a new result by adding attributes to self. Must be implemented by subclass.
+ */
+- (id)resultByAddingAttributes:(NSDictionary *)attributes;
 
 @end
 
-@interface HGSMutableResult : HGSResult
-- (void)addRankFlags:(HGSRankFlags)flags;
-- (void)removeRankFlags:(HGSRankFlags)flags;
-- (void)setRank:(CGFloat)rank;
+@interface HGSUnscoredResult : HGSResult {
+ @private
+  NSUInteger uriHash_;
+  NSString *uri_;
+  NSString *displayName_;
+  NSString *type_;
+  HGSSearchSource *source_;
+  NSDictionary *attributes_;  
+}
+
+/*!
+ Designated initializer.
+*/
+- (id)initWithURI:(NSString *)uri
+             name:(NSString *)name
+             type:(NSString *)typeStr
+           source:(HGSSearchSource *)source 
+       attributes:(NSDictionary *)attributes;
+/*!
+ Convenience methods
+*/
++ (id)resultWithURL:(NSURL *)url
+               name:(NSString *)name
+               type:(NSString *)typeStr
+             source:(HGSSearchSource *)source
+         attributes:(NSDictionary *)attributes;
+
++ (id)resultWithFilePath:(NSString *)path
+                  source:(HGSSearchSource *)source 
+              attributes:(NSDictionary *)attributes;
+
++ (id)resultWithURI:(NSString *)uri
+               name:(NSString *)name
+               type:(NSString *)type
+             source:(HGSSearchSource *)source
+         attributes:(NSDictionary *)attributes;
+
+/*!
+ Create an result based on a dictionary of keys. 
+ */
++ (id)resultWithDictionary:(NSDictionary *)dictionary 
+                    source:(HGSSearchSource *)source;
+
+- (id)initWithDictionary:(NSDictionary*)dict
+                  source:(HGSSearchSource *)source;
+
 @end
 
+@interface HGSScoredResult : HGSResult  {
+@private
+  HGSResult *result_;
+  CGFloat score_;
+  HGSRankFlags rankFlags_;
+  HGSTokenizedString *matchedTerm_;
+  NSIndexSet *matchedIndexes_;
+}
+
+/*!
+ The relative score of an item (from 0.0 to 1.0)
+ */
+@property (readonly) CGFloat score;
+/*!
+ Information about the item that may change it's overall ranking
+ */
+@property (readonly) HGSRankFlags rankFlags;
+/*!
+ */
+@property (readonly, copy) HGSTokenizedString *matchedTerm;
+@property (readonly, assign) NSIndexSet *matchedIndexes;
+
+- (id)initWithResult:(HGSResult *)result 
+               score:(CGFloat)score
+          flagsToSet:(HGSRankFlags)setFlags
+        flagsToClear:(HGSRankFlags)clearFlags
+         matchedTerm:(HGSTokenizedString *)term
+      matchedIndexes:(NSIndexSet *)ranges;
+
++ (id)resultWithResult:(HGSResult *)result
+                 score:(CGFloat)score
+           matchedTerm:(HGSTokenizedString *)term
+        matchedIndexes:(NSIndexSet *)indexes;
+
++ (id)resultWithResult:(HGSResult *)result 
+                 score:(CGFloat)score
+            flagsToSet:(HGSRankFlags)setFlags
+          flagsToClear:(HGSRankFlags)clearFlags
+           matchedTerm:(HGSTokenizedString *)term
+        matchedIndexes:(NSIndexSet *)indexes;
+
++ (id)resultWithURI:(NSString *)uri
+               name:(NSString *)name
+               type:(NSString *)type
+             source:(HGSSearchSource *)source
+         attributes:(NSDictionary *)attributes
+              score:(CGFloat)score
+        matchedTerm:(HGSTokenizedString *)term
+     matchedIndexes:(NSIndexSet *)indexes;
+
++ (id)resultWithFilePath:(NSString *)path
+                  source:(HGSSearchSource *)source 
+              attributes:(NSDictionary *)attributes
+                   score:(CGFloat)score
+             matchedTerm:(HGSTokenizedString *)term
+          matchedIndexes:(NSIndexSet *)indexes;
+
+- (id)initWithURI:(NSString *)uri
+             name:(NSString *)name
+             type:(NSString *)type
+           source:(HGSSearchSource *)source
+       attributes:(NSDictionary *)attributes
+            score:(CGFloat)score
+      matchedTerm:(HGSTokenizedString *)term
+   matchedIndexes:(NSIndexSet *)indexes;
+
+@end
+  
 /*!
  A collection of HGSResults that acts very similar to NSArray.
 */
@@ -344,8 +328,8 @@ typedef NSUInteger HGSRankFlags;
 - (id)initWithFilePaths:(NSArray *)filePaths;
 - (NSArray *)urls;
 - (NSUInteger)count;
-- (HGSResult *)objectAtIndex:(NSUInteger)ind;
-- (HGSResult *)lastObject;
+- (id)objectAtIndex:(NSUInteger)ind;
+- (id)lastObject;
 /*!
   Will return nil if any of the results does not have a valid file path
 */
@@ -370,6 +354,6 @@ typedef NSUInteger HGSRankFlags;
 
 /*!
  Notification sent when a result is promoted.
- Object is the result.
+ Object is the HGSScoredResult.
 */
 extern NSString *const kHGSResultDidPromoteNotification;

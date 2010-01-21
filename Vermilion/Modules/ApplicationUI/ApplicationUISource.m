@@ -31,6 +31,7 @@
 //
 
 #import <Vermilion/Vermilion.h>
+#import <QSBPluginUI/QSBPluginUI.h>
 #import "ApplicationUISource.h"
 #import "GTMAXUIElement.h"
 #import "ApplicationUIAction.h"
@@ -127,85 +128,159 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return appInfo;
 }
 
+- (HGSScoredResult *)resultFromElement:(GTMAXUIElement *)element
+                                  role:(NSString *)role
+                           queryString:(HGSTokenizedString *)queryString
+                         pathCellArray:(NSArray *)pathCellArray {
+  NSNumber *enabled 
+    = [element accessibilityAttributeValue:NSAccessibilityEnabledAttribute];
+  if (enabled && [enabled boolValue] == NO) {
+    return nil;
+  }
+  NSString *name 
+    = [element stringValueForAttribute:NSAccessibilityTitleAttribute];
+  if (!name) {
+    name = [element stringValueForAttribute:NSAccessibilityRoleDescriptionAttribute];
+  }
+  if ([name length] == 0) return nil;
+  
+  // Filter out the ones we don't want.
+  HGSTokenizedString *compareName 
+    = [HGSTokenizer tokenizeString:name];
+  
+  CGFloat score = 0;
+  NSIndexSet *matchedIndexes = nil;
+  if ([queryString tokenizedLength]) {
+    score = HGSScoreTermForItem(queryString, compareName, &matchedIndexes);
+  } else {
+    score = HGSCalibratedScore(kHGSCalibratedModerateScore);
+  }
+  if (!(score > 0.0)) {
+    return nil;
+  }
+  // TODO(dmaclach): deal with lower level UI elements such as 
+  // buttons, splitters etc.
+  
+  NSString *nameString 
+    = [name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+  NSString *uriString 
+    = [NSString stringWithFormat:@"AppUISource://%@/%p", 
+       nameString, element];
+  NSImage *icon = nil;
+  if ([role isEqualToString:NSAccessibilityWindowRole]) {
+    icon = windowIcon_;
+  } else if ([role isEqualToString:NSAccessibilityMenuRole] 
+             || [role isEqualToString:(NSString*)kAXMenuBarItemRole]
+             || [role isEqualToString:NSAccessibilityMenuBarRole]) {
+    icon = menuIcon_;
+  } else if ([role isEqualToString:NSAccessibilityMenuItemRole]) {
+    icon = menuItemIcon_;
+  } else {
+    icon = viewIcon_;
+  }
+  NSDictionary *pathEntry 
+    = [NSDictionary dictionaryWithObject:name 
+                                forKey:kQSBPathCellDisplayTitleKey];
+  pathCellArray = [pathCellArray arrayByAddingObject:pathEntry];  
+  NSMutableDictionary *attributes
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       element, kAppUISourceAttributeElementKey,
+       icon, kHGSObjectAttributeIconKey,
+       pathCellArray, kQSBObjectAttributePathCellsKey,
+       nil];
+  HGSAction *defaultAction 
+    = [ApplicationUIAction defaultActionForElement:element];
+  if (defaultAction) {
+    [attributes setObject:defaultAction 
+                   forKey:kHGSObjectAttributeDefaultActionKey];
+  }
+  HGSScoredResult *result 
+    = [HGSScoredResult resultWithURI:uriString
+                                name:name
+                                type:kHGSTypeAppUIItem
+                              source:self
+                          attributes:attributes
+                               score:score
+                         matchedTerm:queryString
+                      matchedIndexes:matchedIndexes];
+  return result;
+}
+
+- (void)addMenuResultsFromElement:(GTMAXUIElement*)element 
+                          toArray:(NSMutableArray*)array
+                         matching:(HGSTokenizedString *)queryString
+                    pathCellArray:(NSArray *)pathCellArray {
+  if (!element) return;
+  NSArray *children 
+    = [element accessibilityAttributeValue:NSAccessibilityChildrenAttribute];
+  for (GTMAXUIElement *child in children) {
+    NSString *role 
+      = [child stringValueForAttribute:NSAccessibilityRoleAttribute];
+    NSString *name 
+      = [element stringValueForAttribute:NSAccessibilityTitleAttribute];
+    NSArray *newPathCellArray = nil;
+    if (name) {
+      NSDictionary *pathEntry 
+        = [NSDictionary dictionaryWithObject:name 
+                                      forKey:kQSBPathCellDisplayTitleKey];
+      newPathCellArray = [pathCellArray arrayByAddingObject:pathEntry];
+    } else {
+      newPathCellArray = pathCellArray;
+    }
+    
+    if ([role isEqual:NSAccessibilityMenuBarRole] ||
+      [role isEqual:NSAccessibilityMenuRole] ||
+      [role isEqualToString:(NSString*)kAXMenuBarItemRole]) {
+      [self addMenuResultsFromElement:child 
+                              toArray:array 
+                             matching:queryString
+                        pathCellArray:newPathCellArray];
+    } else if ([role isEqual:NSAccessibilityMenuItemRole]) {
+      NSUInteger currentCount = [array count];      
+      [self addMenuResultsFromElement:child 
+                              toArray:array 
+                             matching:queryString 
+                        pathCellArray:newPathCellArray];
+      if (currentCount == [array count]) {
+        HGSScoredResult *result = [self resultFromElement:child
+                                                     role:role
+                                              queryString:queryString
+                                            pathCellArray:pathCellArray];
+        if (result) {
+          [array addObject:result];
+        }
+      }
+    }
+  }
+}
+
 - (void)addResultsFromElement:(GTMAXUIElement*)element 
                       toArray:(NSMutableArray*)array
-                     matching:(NSString *)queryString {
+                     matching:(HGSTokenizedString *)queryString 
+                pathCellArray:(NSArray *)pathCellArray {
   if (element) {
     NSArray *children 
       = [element accessibilityAttributeValue:NSAccessibilityChildrenAttribute];
     NSArray *placeHolderRoles = [NSArray arrayWithObjects:
-                                 (NSString *)NSAccessibilityMenuRole, 
-                                 (NSString *)kAXMenuBarRole,
+                                 NSAccessibilityMenuRole, 
+                                 NSAccessibilityMenuBarRole,
                                  nil];
     for (GTMAXUIElement *child in children) {
       NSString *role 
         = [child stringValueForAttribute:NSAccessibilityRoleAttribute];
       if ([placeHolderRoles containsObject:role]) {
-        [self addResultsFromElement:child toArray:array matching:queryString];
+        [self addResultsFromElement:child 
+                            toArray:array 
+                           matching:queryString 
+                      pathCellArray:pathCellArray];
       } else {
-        NSNumber *enabled 
-          = [child accessibilityAttributeValue:NSAccessibilityEnabledAttribute];
-        if (enabled && [enabled boolValue] == NO) continue;
-        NSString *name 
-          = [child stringValueForAttribute:NSAccessibilityTitleAttribute];
-        if (!name) {
-          name = [child stringValueForAttribute:NSAccessibilityRoleDescriptionAttribute];
+        HGSScoredResult *result = [self resultFromElement:child
+                                                     role:role
+                                              queryString:queryString
+                                            pathCellArray:pathCellArray];
+        if (result) {
+          [array addObject:result];
         }
-        if ([name length] == 0) continue;
-        
-        // Filter out the ones we don't want.
-        NSString *compareName 
-          = [HGSTokenizer tokenizeString:name];
-        
-        CGFloat rank = 0;
-        if ([queryString length]) {
-          rank = HGSScoreTermForString(queryString, compareName);
-        } else {
-          rank = HGSCalibratedScore(kHGSCalibratedModerateScore);
-        }
-        if (!(rank > 0.0)) {
-          continue;
-        }
-        // TODO(dmaclach): deal with lower level UI elements such as 
-        // buttons, splitters etc.
-        
-        NSString *nameString 
-          = [name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        NSString *uriString 
-          = [NSString stringWithFormat:@"AppUISource://%@/%p", 
-             nameString, child];
-        NSImage *icon = nil;
-        if ([role isEqualToString:NSAccessibilityWindowRole]) {
-          icon = windowIcon_;
-        } else if ([role isEqualToString:NSAccessibilityMenuRole] 
-                   || [role isEqualToString:(NSString*)kAXMenuBarItemRole]
-                   || [role isEqualToString:(NSString*)kAXMenuBarRole]) {
-          icon = menuIcon_;
-        } else if ([role isEqualToString:NSAccessibilityMenuItemRole]) {
-          icon = menuItemIcon_;
-        } else {
-          icon = viewIcon_;
-        }
-        NSMutableDictionary *attributes
-          = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-             child, kAppUISourceAttributeElementKey,
-             icon, kHGSObjectAttributeIconKey,
-             nil];
-        HGSAction *defaultAction 
-          = [ApplicationUIAction defaultActionForElement:child];
-        if (defaultAction) {
-          [attributes setObject:defaultAction 
-                         forKey:kHGSObjectAttributeDefaultActionKey];
-        }
-        // TODO(dmaclach): Build up the path cells for the element
-        HGSResult *result 
-          = [HGSResult resultWithURI:uriString
-                                name:name
-                                type:kHGSTypeAppUIItem
-                                rank:rank
-                              source:self
-                          attributes:attributes];
-        [array addObject:result];
       }
     }
   }
@@ -218,8 +293,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   HGSResult *pivotObject = [[operation query] pivotObject];
-  GTMAXUIElement *element 
+  GTMAXUIElement *element
     = [pivotObject valueForKey:kAppUISourceAttributeElementKey];
+  NSMutableArray *results = [NSMutableArray array];
   if (!element) {
     NSDictionary *appData = [self getAppInfoFromResult:pivotObject];
     if (appData) {
@@ -232,12 +308,27 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     }     
   }
   if (element) {
-    NSMutableArray *results = [NSMutableArray array];
     HGSQuery* query = [operation query];
-    NSString *queryString = [query normalizedQueryString];
-    [self addResultsFromElement:element toArray:results matching:queryString];
-    [operation setResults:results];
+    HGSTokenizedString *queryString = [query tokenizedQueryString];
+    if (pivotObject) {
+      NSArray *pathCellArray 
+        = [pivotObject valueForKey:kQSBObjectAttributePathCellsKey];
+      if (!pathCellArray) {
+        pathCellArray = [NSArray array];
+      }
+      [self addResultsFromElement:element 
+                          toArray:results 
+                         matching:queryString
+                    pathCellArray:pathCellArray];
+    } else {
+      NSArray *pathCellArray = [NSArray array];
+      [self addMenuResultsFromElement:element 
+                              toArray:results 
+                             matching:queryString
+                        pathCellArray:pathCellArray];
+    }      
   }
+  [operation setRankedResults:results];
 }
 
 @end

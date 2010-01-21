@@ -85,7 +85,6 @@ static NSString * const kQSBSearchWindowFrameTopPrefKey
 static NSString * const kQSBSearchWindowFrameLeftPrefKey
   = @"QSBSearchWindow Left QSBSearchResultsWindow";
 static NSString * const kQSBUserPrefBackgroundColorKey = @"backgroundColor";
-static NSString * const kQSBQueryStringKey = @"queryString";
 
 static NSString * const kQSBMainInterfaceNibName = @"MainInterfaceNibName";
 static NSString * const kQSBWelcomeWindowNibName = @"WelcomeWindow";
@@ -321,6 +320,11 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
              name:kHGSPluginLoaderDidInstallPluginsNotification 
            object:sharedLoader];
   
+  [nc addObserver:self 
+         selector:@selector(queryStringDidChange:) 
+             name:kQSBSearchControllerDidChangeQueryStringNotification 
+           object:nil];
+  
   // Support spaces on Leopard. 
   // http://b/issue?id=648841
 
@@ -433,19 +437,19 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [self updateResultsView];
 }
 
-- (void)queryStringChanged:(GTMKeyValueChangeNotification *)notification {
+- (void)queryStringDidChange:(NSNotification *)notification {
   // The query text has changed so cancel any outstanding display
   // operations and kick off another or clear.
   [NSObject cancelPreviousPerformRequestsWithTarget:self
                                            selector:@selector(displayResults:)
                                              object:nil];
   
-  if ([activeSearchViewController_ queryString]
+  if ([activeSearchViewController_ tokenizedQueryString]
       || [activeSearchViewController_ results]) {
     // Dispose of the welcome window if it is being shown.
     [self closeWelcomeWindow];
 
-    BOOL likelyResult = [[self selectedTableResult] rank] > 1.0;
+    BOOL likelyResult = [[self selectedTableResult] score] > 1.0;
     NSTimeInterval delay 
       = likelyResult ? kQSBLongerAppearDelay : kQSBAppearDelay;
     [self performSelector:@selector(displayResults:)
@@ -563,7 +567,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   // Add our items.
   NSArray *corpora = [self corpora];
   for (unsigned int i = 0; i < [corpora count]; i++) {
-    HGSResult *corpus = [corpora objectAtIndex:i];
+    HGSScoredResult *corpus = [corpora objectAtIndex:i];
     NSString *key = [[NSNumber numberWithUnsignedInt:i] stringValue];
     NSMenuItem *item 
       = [[[NSMenuItem alloc] initWithTitle:[corpus displayName]
@@ -584,14 +588,15 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   // Hide the results window if it's showing.
   if ([resultsWindow_ isVisible]) {
     while ([self popViewControllerAnimate:NO]) { }
-    [activeSearchViewController_ setQueryString:nil];
+    [activeSearchViewController_ setTokenizedQueryString:nil];
     [searchTextField_ setStringValue:@""];
     [self hideResultsWindow];
   } else {
-    NSString *queryString = [activeSearchViewController_ queryString];
-    if ([queryString length]) {
+    NSUInteger queryStringLength 
+      = [[activeSearchViewController_ tokenizedQueryString] originalLength];
+    if (queryStringLength) {
       // Clear the text in the search box.
-      [activeSearchViewController_ setQueryString:nil];
+      [activeSearchViewController_ setTokenizedQueryString:nil];
       [searchTextField_ setStringValue:@""];
     } else {
       // Otherwise hide the query window.
@@ -605,23 +610,28 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   // for the pivot (either the existing one or the newly created one) to the
   // chosen corpus.  Don't alter the search text.
   
-  NSString *queryString = [activeSearchViewController_ queryString];
+  HGSTokenizedString *tokenizedQueryString 
+    = [activeSearchViewController_ tokenizedQueryString];
   
   NSInteger tag = [sender tag] - kBaseCorporaTagValue;
-  HGSResult *corpus = [[self corpora] objectAtIndex:tag];
+  HGSScoredResult *corpus = [[self corpora] objectAtIndex:tag];
   HGSResultArray *results = [HGSResultArray arrayWithResult:corpus];
   [self selectResults:results];
   
   // Restore the query string. The following also triggers a query refresh.
-  [activeSearchViewController_ setQueryString:queryString];
-  if (!queryString) queryString = @"";
+  [activeSearchViewController_ setTokenizedQueryString:tokenizedQueryString];
+  NSString *queryString = [tokenizedQueryString originalString];
+  if (!queryString) {
+    queryString = @"";
+  }
   [searchTextField_ setStringValue:queryString];
 }
 
 - (IBAction)performSearch:(id)sender {
   // For now we just blindly submit a google search. 
   // TODO(alcor): make this perform a contextual search depending on the pivot
-  NSString *queryString = [activeSearchViewController_ queryString];
+  HGSTokenizedString *queryString 
+    = [activeSearchViewController_ tokenizedQueryString];
   QSBGoogleTableResult *googleResult
     = [QSBGoogleTableResult tableResultForQuery:queryString];
   [googleResult performDefaultActionWithSearchViewController:activeSearchViewController_];
@@ -815,13 +825,14 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   BOOL handled = NO;
   if (![[NSApp currentEvent] isARepeat]) {
     if ([searchTextFieldEditor_ isAtBeginning]) {
-      NSString *currentQueryString = [activeSearchViewController_ queryString];
+      HGSTokenizedString *currentQueryString 
+        = [activeSearchViewController_ tokenizedQueryString];
       while([self popViewControllerAnimate:YES]) { }
       
       [searchTextField_ setStringValue:currentQueryString ? 
                    currentQueryString : @""];
       [searchTextFieldEditor_ setSelectedRange:NSMakeRange(0, 0)];
-      [activeSearchViewController_ setQueryString:currentQueryString];
+      [activeSearchViewController_ setTokenizedQueryString:currentQueryString];
       handled = YES;
     }
   }
@@ -1061,7 +1072,7 @@ doCommandBySelector:(SEL)commandSelector {
     [nc postNotificationName:kQSBSearchWindowDidShowNotification
                       object:[self window]
                     userInfo:visibilityChangedUserInfo];
-    if ([[activeSearchViewController_ queryString] length]) {
+    if ([[activeSearchViewController_ tokenizedQueryString] tokenizedLength]) {
       [self performSelector:@selector(displayResults:)
                  withObject:nil 
                  afterDelay:kQSBReshowResultsDelay];
@@ -1236,11 +1247,11 @@ doCommandBySelector:(SEL)commandSelector {
     NSArray *corpora = [self corpora];
     NSUInteger idx = [menuItem tag] - kBaseCorporaTagValue;
     if (idx < [corpora  count]) {
-      HGSResult *corpus = [corpora objectAtIndex:idx];
+      HGSScoredResult *corpus = [corpora objectAtIndex:idx];
       HGSResultArray *results 
         = [activeSearchViewController_ results];
       if ([results count] == 1) {
-        HGSResult *result = [results objectAtIndex:0];
+        HGSScoredResult *result = [results objectAtIndex:0];
         [menuItem setState:([corpus isEqual:result])];
       }
     } else {
@@ -1624,19 +1635,11 @@ doCommandBySelector:(SEL)commandSelector {
 - (void)setActiveSearchViewController:(QSBSearchViewController *)searchViewController {
   QSBSearchController *searchController
     = [activeSearchViewController_ searchController];
-  [searchController gtm_removeObserver:self
-                            forKeyPath:kQSBQueryStringKey
-                              selector:@selector(queryStringChanged:)];
   // We are no longer interested in the current controller producing results.
   [activeSearchViewController_ stopQuery];
   [activeSearchViewController_ autorelease];
   activeSearchViewController_ = [searchViewController retain];
   searchController = [activeSearchViewController_ searchController];
-  [searchController gtm_addObserver:self
-                         forKeyPath:kQSBQueryStringKey
-                           selector:@selector(queryStringChanged:)
-                           userInfo:nil
-                            options:0];
   [activeSearchViewController_ didMakeActiveSearchViewController];
   [self updatePivotToken];
 }

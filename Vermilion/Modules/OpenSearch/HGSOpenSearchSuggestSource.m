@@ -65,10 +65,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   HGSResult *pivotObject = [query pivotObject];
   NSString *urlFormat = [pivotObject valueForKey:kHGSObjectAttributeWebSuggestTemplateKey];
   urlFormat = [urlFormat stringByReplacingOccurrencesOfString:@"{searchterms}" withString:@"%@"];
-
+  HGSTokenizedString *tokenizedQueryString = [query tokenizedQueryString];
   // use the raw query so the server can do it's own parsing of it.
-  NSString *suggestUrlString = [NSString stringWithFormat:urlFormat,
-                                [[[operation query] rawQueryString] gtm_stringByEscapingForURLArgument]];
+  NSString *escapedToken 
+    = [[tokenizedQueryString originalString] gtm_stringByEscapingForURLArgument];
+  NSString *suggestUrlString 
+    = [NSString stringWithFormat:urlFormat, escapedToken];
   return [NSURL URLWithString:suggestUrlString];
 }
 
@@ -84,23 +86,27 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   NSEnumerator *suggestionsEnum = [jsonSuggestions objectEnumerator];
   NSString *suggestion = nil;
   HGSResult *pivotObject = [query pivotObject];
-  NSString *normalizedQuery = [query normalizedQueryString];
   id image = [pivotObject valueForKey:kHGSObjectAttributeIconKey];
   NSString *urlFormat = [pivotObject valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
   urlFormat = [urlFormat stringByReplacingOccurrencesOfString:@"{searchterms}" withString:@"%@"];
+  HGSTokenizedString *tokenizedQueryString = [query tokenizedQueryString];
 
   while ((suggestion = [suggestionsEnum nextObject])) {
     NSString *urlString = [NSString stringWithFormat:urlFormat,
                            [suggestion gtm_stringByEscapingForURLArgument]];
     NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                 image, kHGSObjectAttributeIconKey, nil];
-    CGFloat rank = HGSScoreTermForString(normalizedQuery, suggestion);
-    HGSResult *result = [HGSResult resultWithURI:urlString
-                                            name:suggestion
-                                            type:HGS_SUBTYPE(kHGSTypeWebpage, @"opensearch") // TODO(alcor): more complete/better type
-                                            rank:rank
-                                          source:self
-                                      attributes:attributes];
+    HGSTokenizedString *tokenizedSuggestion = [HGSTokenizer tokenizeString:suggestion];
+    NSIndexSet *matchedIndexes = nil;
+    CGFloat score = HGSScoreTermForItem(tokenizedQueryString, tokenizedSuggestion, &matchedIndexes);
+    HGSScoredResult *result = [HGSScoredResult resultWithURI:urlString
+                                                        name:suggestion
+                                                        type:HGS_SUBTYPE(kHGSTypeWebpage, @"opensearch") // TODO(alcor): more complete/better type
+                                                      source:self
+                                                  attributes:attributes
+                                                       score:score
+                                                 matchedTerm:tokenizedSuggestion
+                                              matchedIndexes:matchedIndexes];
     [suggestions addObject:result];
   }
   return suggestions;

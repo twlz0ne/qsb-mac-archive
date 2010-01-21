@@ -67,8 +67,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   HGSQuery *query = [operation query];
   HGSResult *pivotObject = [query pivotObject];
-  NSString *normalizedQuery = [query normalizedQueryString];
-  if (![normalizedQuery length]) normalizedQuery = nil;
+  HGSTokenizedString *tokenizedQuery = [query tokenizedQueryString];
+  if (![tokenizedQuery tokenizedLength]) tokenizedQuery = nil;
   if (pivotObject) {
     NSString *appPath = [pivotObject filePath];
     if (appPath) {
@@ -146,31 +146,38 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                          withUI:NO];
 
           if (recentPath && [manager fileExistsAtPath:recentPath]) {
-            CGFloat rank = 0;
+            CGFloat score = 0;
             // Sort by abbreviation if a query exists, else preserve ordering
             // which is usually by date modified
-            if (normalizedQuery) {
+            HGSTokenizedString *tokenizedName = nil;
+            NSIndexSet *matchedIndexes = nil;
+            if (tokenizedQuery) {
               NSString *basename = [recentPath lastPathComponent];
-              NSString *tokenizedName = [HGSTokenizer tokenizeString:basename];
-              rank = HGSScoreTermForString(normalizedQuery, tokenizedName);
+              tokenizedName = [HGSTokenizer tokenizeString:basename];
+              score = HGSScoreTermForItem(tokenizedQuery,
+                                         tokenizedName, 
+                                         &matchedIndexes);
             } else {
-              rank = count;
+              score = count;
             }
             
-            if (rank > 0) {
+            if (score > 0) {
               NSDictionary *attributes 
                 = [NSDictionary dictionaryWithObjectsAndKeys:
                    aliasData, kHGSObjectAttributeAliasDataKey, nil];
-              HGSResult *result = [HGSResult resultWithFilePath:recentPath
-                                                           rank:rank
-                                                         source:self
-                                                     attributes:attributes];
-              [finalResults addObject:result];
+              HGSScoredResult *scoredResult 
+                = [HGSScoredResult resultWithFilePath:recentPath
+                                               source:self
+                                           attributes:attributes
+                                                score:score 
+                                          matchedTerm:tokenizedName 
+                                       matchedIndexes:matchedIndexes];
+              [finalResults addObject:scoredResult];
             }
           }
           --count;
         }
-        [operation setResults:finalResults];
+        [operation setRankedResults:finalResults];
       }
     }
   }

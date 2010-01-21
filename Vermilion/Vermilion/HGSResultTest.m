@@ -44,12 +44,11 @@
 - (void)testStaticInit {
   NSString* path = @"file://url/to/path";
   // create an object with the full gamut and check the values
-  HGSResult* obj1 = [HGSResult resultWithURI:path 
-                                        name:@"everything"
-                                        type:@"text"
-                                        rank:kHGSResultUnknownRank
-                                      source:nil
-                                  attributes:nil];
+  HGSUnscoredResult* obj1 = [HGSUnscoredResult resultWithURI:path 
+                                                        name:@"everything"
+                                                        type:@"text"
+                                                      source:nil
+                                                  attributes:nil];
   STAssertNotNil(obj1, @"can't create object");
   STAssertEqualObjects(path, 
                        [obj1 uri], 
@@ -62,12 +61,11 @@
                        @"invalid type");
 
   // create an object with everything nil
-  HGSResult* obj3 = [HGSResult resultWithURI:nil 
-                                        name:nil
-                                        type:NULL
-                                        rank:kHGSResultUnknownRank
-                                      source:nil
-                                  attributes:nil];
+  HGSUnscoredResult* obj3 = [HGSUnscoredResult resultWithURI:nil 
+                                                        name:nil
+                                                        type:NULL
+                                                      source:nil
+                                                  attributes:nil];
   STAssertNil(obj3, @"created object");
 }
 
@@ -81,8 +79,8 @@
   [info setObject:@"foo" forKey:kHGSObjectAttributeNameKey];
   [info setObject:@"bar" forKey:kHGSObjectAttributeTypeKey];
   id searchSourceMock = [OCMockObject mockForClass:[HGSSearchSource class]];
-  HGSResult* infoObject = [HGSResult resultWithDictionary:info 
-                                                   source:searchSourceMock];
+  HGSUnscoredResult* infoObject 
+    = [HGSUnscoredResult resultWithDictionary:info source:searchSourceMock];
   STAssertNotNil(infoObject, @"can't create object from dict");
   STAssertEqualObjects([NSURL URLWithString:path], 
                        [infoObject url], 
@@ -101,19 +99,21 @@
   [info2 setObject:path forKey:kHGSObjectAttributeURIKey];
   [info2 setObject:@"foo" forKey:kHGSObjectAttributeNameKey];
   [info2 setObject:@"bar" forKey:kHGSObjectAttributeTypeKey];
-  HGSResult* infoObject2 = [HGSResult resultWithDictionary:info2 source:nil];
+  HGSUnscoredResult* infoObject2 = [HGSUnscoredResult resultWithDictionary:info2 
+                                                                    source:nil];
   STAssertNotNil(infoObject2, @"can't create object from dict");
   STAssertNil([infoObject2 valueForKey:kHGSObjectAttributeSnippetKey], 
               @"found a snippet");
  
   // create an object wil a nil dictionary
-  HGSResult* nilObject = [HGSResult resultWithDictionary:nil source:nil];
+  HGSUnscoredResult* nilObject = [HGSUnscoredResult resultWithDictionary:nil 
+                                                                  source:nil];
   STAssertNil(nilObject, @"created object from nil dict");
   
   // create an object with an empty dictionary
-  HGSResult* emptyObject 
-    = [HGSResult resultWithDictionary:[NSDictionary dictionary]
-                               source:nil];
+  HGSUnscoredResult* emptyObject 
+    = [HGSUnscoredResult resultWithDictionary:[NSDictionary dictionary]
+                                       source:nil];
   STAssertNil(emptyObject, @"created object from empty dict");
 }
 
@@ -138,12 +138,11 @@
   for (size_t i = 0; i < sizeof(data) / sizeof(TestData); i++) {
 
     // Create an object
-    HGSResult* obj = [HGSResult resultWithURI:url 
-                                         name:@"name"
-                                         type:data[i].theType
-                                         rank:kHGSResultUnknownRank
-                                       source:nil
-                                   attributes:nil];
+    HGSUnscoredResult* obj = [HGSUnscoredResult resultWithURI:url 
+                                                         name:@"name"
+                                                         type:data[i].theType
+                                                       source:nil
+                                                   attributes:nil];
     STAssertNotNil(obj, @"type %@", data[i].theType);
     STAssertEqualObjects(data[i].theType, 
                          [obj type], @"type %@", 

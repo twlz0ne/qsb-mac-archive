@@ -336,12 +336,11 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     albumDetail = [NSString stringWithFormat:albumDetail, photoCount],
     [attributes setObject:albumDetail forKey:kHGSObjectAttributeSnippetKey];
     
-    HGSResult* result = [HGSResult resultWithURL:albumURL
-                                            name:albumTitle
-                                            type:kHGSTypeWebPhotoAlbum
-                                            rank:kHGSResultUnknownRank
-                                          source:self
-                                      attributes:attributes];
+    HGSUnscoredResult* result = [HGSUnscoredResult resultWithURL:albumURL
+                                                            name:albumTitle
+                                                            type:kHGSTypeWebPhotoAlbum
+                                                          source:self
+                                                      attributes:attributes];
     [self indexResult:result
                  name:albumTitle
             otherTerm:albumDescription];
@@ -483,12 +482,11 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     
     photoSnippet = [photoSnippet stringByAppendingFormat:@"\r%@", photoTitle];
     [attributes setObject:photoSnippet forKey:kHGSObjectAttributeSnippetKey];
-    HGSResult* result = [HGSResult resultWithURL:photoURL
-                                            name:photoDescription
-                                            type:kHGSTypeWebImage
-                                            rank:kHGSResultUnknownRank
-                                          source:self
-                                      attributes:attributes];
+    HGSUnscoredResult* result = [HGSUnscoredResult resultWithURL:photoURL
+                                                            name:photoDescription
+                                                            type:kHGSTypeWebImage
+                                                          source:self
+                                                      attributes:attributes];
     
     [self indexResult:result
                  name:photoTitle

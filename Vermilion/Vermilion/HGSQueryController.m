@@ -44,6 +44,7 @@
 #import "HGSOperation.h"
 #import "HGSMemorySearchSource.h"
 #import "HGSBundle.h"
+#import "HGSTokenizer.h"
 #import "GTMObjectSingleton.h"
 #import <mach/mach_time.h>
 
@@ -259,7 +260,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
     HGSQuery *query = [operation query];
     NSString *ptr = [NSString stringWithFormat:@"%p", operation];
     VERMILION_SEARCH_START((char *)[[source identifier] UTF8String],
-                           (char *)[[query rawQueryString] UTF8String],
+                           (char *)[[[query tokenizedQueryString] originalString] UTF8String],
                            (char *)[ptr UTF8String]);
   }
 }
@@ -294,7 +295,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
     HGSQuery *query = [operation query];
     NSString *ptr = [NSString stringWithFormat:@"%p", operation];
     VERMILION_SEARCH_FINISH((char *)[[source identifier] UTF8String],
-                            (char *)[[query rawQueryString] UTF8String],
+                            (char *)[[[query tokenizedQueryString] originalString] UTF8String],
                             (char *)[ptr UTF8String]);
   }
 }

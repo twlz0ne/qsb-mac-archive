@@ -51,7 +51,7 @@ static NSString *const kClipboardCopyAction
   NSMutableArray *recentResults_;
   NSInteger lastChangeCount_;
   NSImage *clipboardIcon_;
-  HGSResult *clipboardResult_;
+  HGSUnscoredResult *clipboardResult_;
 }
 - (NSString *)nameFromStringValue:(NSString *)stringValue;
 - (NSString *)snippetFromStringValue:(NSString *)stringValue;
@@ -77,12 +77,11 @@ static NSString *const kClipboardCopyAction
          clipboardIcon_, kHGSObjectAttributeIconKey,
          nil];
     clipboardResult_
-      = [[HGSResult alloc] initWithURI:urlString
-                                  name:name
-                                  type:kTypeClipboardGeneric
-                                  rank:kHGSResultUnknownRank
-                                source:self
-                            attributes:attributes];
+      = [[HGSUnscoredResult alloc] initWithURI:urlString
+                                          name:name
+                                          type:kTypeClipboardGeneric
+                                        source:self
+                                    attributes:attributes];
     recentResults_ = [[NSMutableArray alloc] init];
     types_ = [[NSArray arrayWithObjects:NSRTFPboardType, NSURLPboardType,
                NSStringPboardType, NSTIFFPboardType, NSPDFPboardType,
@@ -265,8 +264,8 @@ static NSString *const kClipboardCopyAction
       NSString *nsIconType = NSFileTypeForHFSTypeCode(iconType);
       NSImage *image = [ws iconForFileType:nsIconType];
       [dictionary setObject:image forKey:kHGSObjectAttributeIconKey];
-      HGSResult *result = [HGSResult resultWithDictionary:dictionary 
-                                                   source:self];
+      HGSUnscoredResult *result = [HGSUnscoredResult resultWithDictionary:dictionary 
+                                                                   source:self];
       if (result) {
         // If the new pasteboard value is already in the list of results,
         // remove it so the new result replaces it at the top of the list

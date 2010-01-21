@@ -39,11 +39,11 @@
 #import "HGSBundle.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSPythonSource.h"
-#import "HGSTokenizer.h"    
+#import "HGSTokenizer.h" 
+#import "HGSType.h"
 #import "GTMObjectSingleton.h"
 #import "GTMNSNumber+64Bit.h"
 #import "GTMMethodCheck.h"
-
 #import <Python/structmember.h>
 
 const NSString *kHGSPythonPrivateValuesKey = @"kHGSPythonPrivateValuesKey";
@@ -74,10 +74,11 @@ NSString* const kHGSPythonResultOtherItemsStringKey
 
 typedef struct {
   PyObject_HEAD
-  PyObject  *rawQuery_;    // string
-  PyObject  *normalizedQuery_; // string
-  PyObject  *pivotObject_; // dictionary
+  PyObject *rawQuery_;    // string
+  PyObject *normalizedQuery_; // string
+  PyObject *pivotObject_; // dictionary
   HGSPythonSearchOperation  *operation_;
+  HGSQuery *query_;
 } Query;
 
 static PyObject *QueryNew(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -88,6 +89,7 @@ static int QuerySetAttr(Query *self, char *name, PyObject *value);
 static PyObject *QuerySetResults(Query *self, PyObject *args);
 static PyObject *QueryFinish(Query *self, PyObject *unused);
 static PyObject *LocalizeString(PyObject *self, PyObject *args);
+static PyObject *DisplayNotification(PyObject *self, PyObject *args);
 
 static PyMethodDef QueryMethods[] = {
   {
@@ -224,6 +226,14 @@ static PyMethodDef LocalizeMethods[] = {
   { NULL, NULL, 0, NULL }
 };
 
+static PyMethodDef NotificationMethods[] = {
+  { "DisplayNotification", DisplayNotification, METH_VARARGS,
+    "Displays a notification to the user. First argument is the message string. "
+    "Second optional argument is the description string."
+  },
+  { NULL, NULL, 0, NULL }
+};
+
 // A simple wrapper for PyObject which allows it to be used in
 // Objective-C containers
 @implementation HGSPythonObject
@@ -283,6 +293,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     Py_InitializeEx(0);
     PyEval_InitThreads();
     Py_InitModule("VermilionLocalize", LocalizeMethods);
+    Py_InitModule("VermilionNotify", NotificationMethods);
     
     // Release the global intepreter lock (which is automatically
     // locked by PyEval_InitThreads())
@@ -417,7 +428,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         PyObject *args = PyTuple_New(3);
         if (args) {
           // Create the normalized_query argument (ref stolen by PyTuple_SetItem
-          const char *utf8 = [[query normalizedQueryString] UTF8String];
+          HGSTokenizedString *tokenizedQuery = [query tokenizedQueryString];
+          const char *utf8 = [[tokenizedQuery tokenizedString] UTF8String];
           if (utf8) {
             PyTuple_SetItem(args, 0, PyString_FromString(utf8));
           } else {
@@ -425,7 +437,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           }
           
           // Create the raw_query argument (ref stolen by PyTuple_SetItem()
-          utf8 = [[query rawQueryString] UTF8String];
+          utf8 = [[tokenizedQuery originalString] UTF8String];
           if (utf8) {
             PyTuple_SetItem(args, 1, PyString_FromString(utf8));
           } else {
@@ -446,6 +458,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           if (result) {
             Query *pyquery = (Query *)result;
             pyquery->operation_ = [operation retain];
+            pyquery->query_ = [query retain];
           }
           
         } else {
@@ -601,6 +614,7 @@ static PyObject *QueryNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
   Query *self = (Query *)type->tp_alloc(type, 0);
   if (self) {
     self->operation_ = nil;
+    self->query_ = nil;
     self->rawQuery_ = PyString_FromString("");
     if (!self->rawQuery_) {
       Py_DECREF(self);
@@ -622,11 +636,12 @@ static PyObject *QueryNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 
 // Destructor
 static void QueryDealloc(Query *self) {
-    Py_XDECREF(self->rawQuery_);
-    Py_XDECREF(self->normalizedQuery_);
-    Py_XDECREF(self->pivotObject_);
-    [self->operation_ release];
-    self->ob_type->tp_free((PyObject *)self);
+  Py_XDECREF(self->rawQuery_);
+  Py_XDECREF(self->normalizedQuery_);
+  Py_XDECREF(self->pivotObject_);
+  [self->operation_ release];
+  [self->query_ release];
+  self->ob_type->tp_free((PyObject *)self);
 }
 
 // Like Obj-C, the Python C API uses a two step alloc/init process
@@ -761,31 +776,30 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
               }
               // Score the main term and then the other terms, giving the
               // other terms a 50% weight.
-              CGFloat rank = 0.0;
+              CGFloat score = 0.0;
+              HGSTokenizedString *matchedString = nil;
+              NSIndexSet *matchedIndexes = nil;
               if (mainItem) {
-                const char *queryCString
-                  = PyString_AsString(self->normalizedQuery_);
-                NSString *queryString
-                  = [NSString stringWithUTF8String:queryCString];
-                NSArray *queryTerms
-                  = [queryString componentsSeparatedByString:@" "];
                 NSString *itemString = [NSString stringWithUTF8String:mainItem];
-                NSString *mainItemString 
+                HGSTokenizedString *mainItemTokenized 
                   = [HGSTokenizer tokenizeString:itemString];
-                HGSScoreString *mainItemScoreString 
-                  = [HGSScoreString scoreStringWithString:mainItemString];
+
                 itemString = [NSString stringWithUTF8String:otherItems];
-                NSString *otherItemsString = [HGSTokenizer tokenizeString:itemString];
                 NSArray *otherItemsArray
-                  = [otherItemsString componentsSeparatedByString:@" "];
-                NSArray *otherItemsScoreStrings
-                  = [HGSScoreString scoreStringArrayWithStringArray:otherItemsArray];
-                rank = HGSScoreTermsForMainAndOtherItems(queryTerms, 
-                                                         mainItemScoreString,
-                                                         otherItemsScoreStrings);
+                  = [itemString componentsSeparatedByString:@" "];
+               
+                NSArray *otherItemsTokenized
+                  = [HGSTokenizer tokenizeStrings:otherItemsArray];
+                HGSTokenizedString *queryString 
+                  = [self->query_ tokenizedQueryString];
+                score = HGSScoreTermForMainAndOtherItems(queryString, 
+                                                         mainItemTokenized,
+                                                         otherItemsTokenized,
+                                                         &matchedString,
+                                                         &matchedIndexes);
               }
               
-              if (rank > 0.0) {
+              if (score > 0.0) {
                 NSMutableDictionary *attributes 
                   = [NSMutableDictionary dictionary];
                 NSString *urlString = [NSString stringWithUTF8String:identifier];
@@ -811,15 +825,17 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
                 }
                 [attributes setObject:privateValues 
                              forKey:kHGSPythonPrivateValuesKey];
-                HGSResult *result 
-                  = [HGSResult resultWithURI:urlString
-                                        name:displayNameString
-                                        type:type
-                                        rank:rank
-                                      source:[self->operation_ source]
-                                  attributes:attributes];
-                if (result) {
-                  [results addObject:result];
+                HGSScoredResult *scoredResult 
+                  = [HGSScoredResult resultWithURI:urlString
+                                              name:displayNameString
+                                              type:type
+                                            source:[self->operation_ source]
+                                        attributes:attributes
+                                             score:score 
+                                       matchedTerm:matchedString 
+                                    matchedIndexes:matchedIndexes];
+                if (scoredResult) {
+                  [results addObject:scoredResult];
                 }
               }
             }
@@ -828,7 +844,7 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
       }
       Py_DECREF(pythonResults);
     }
-    [self->operation_ setResults:results];
+    [self->operation_ setRankedResults:results];
   }
   
   [pool release];
@@ -862,4 +878,30 @@ static PyObject *LocalizeString(PyObject *self, PyObject *args) {
   }
   [pool release];
   return resultString;
+}
+
+static PyObject *DisplayNotification(PyObject *self, PyObject *args) {
+  char *message = NULL;
+  char *description = NULL;
+  if (!PyArg_ParseTuple(args, "s|s", &message, &description)) {
+    HGSLogDebug(@"VermilionNotify.DisplayNotification() requires an argument");
+    return PyString_FromString("");
+  }
+  NSString *nsMessage = [NSString stringWithUTF8String:message];
+  NSString *nsDescription = nil;
+  if (description) {
+    nsDescription = [NSString stringWithUTF8String:description];
+  }
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+                        nsMessage, kHGSSummaryMessageKey,
+                        nsDescription, kHGSDescriptionMessageKey,
+                        (void *)nil];
+  [nc postNotificationName:kHGSUserMessageNotification 
+                    object:NSApp 
+                  userInfo:info];
+  [pool release];     
+  Py_INCREF(Py_None);
+  return Py_None;
 }

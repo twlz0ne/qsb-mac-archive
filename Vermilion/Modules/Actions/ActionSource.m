@@ -97,8 +97,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 }
 
 - (HGSResult *)objectFromAction:(HGSAction *)action 
-                    resultArray:(HGSResultArray *)array
-                           rank:(CGFloat)rank {
+                    resultArray:(HGSResultArray *)array {
   // Set some of the flags to bump them up in the result's ranks
   NSNumber *rankFlags 
     = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag 
@@ -118,13 +117,12 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   NSString *extensionIdentifier = [action identifier];
   NSString *urlStr = [NSString stringWithFormat:@"action:%@", extensionIdentifier];
   
-  HGSResult *actionObject
-    = [HGSResult resultWithURI:urlStr
-                          name:name
-                          type:kHGSTypeAction
-                          rank:rank
-                        source:self
-                    attributes:attributes];
+  HGSUnscoredResult *actionObject
+    = [HGSUnscoredResult resultWithURI:urlStr
+                                  name:name
+                                  type:kHGSTypeAction
+                                source:self
+                            attributes:attributes];
 
   return actionObject;
 }
@@ -137,8 +135,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   for (HGSAction *action in [actionPoint extensions]) {
     // Create a result object that wraps our action
     HGSResult *actionObject = [self objectFromAction:action
-                                         resultArray:nil
-                                                rank:0];
+                                         resultArray:nil];
     // Index our result
     [self indexResult:actionObject];
   }
@@ -146,7 +143,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 
 #pragma mark -
 
-- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult *)result {
   // For action results, we pull out the action, and save off it's extension
   // identifier.
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -169,8 +166,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     if (action) {
       // We create a new result, but it should fold based out the url
       result = [self objectFromAction:action
-                          resultArray:nil
-                                 rank:0];
+                          resultArray:nil];
     }
   }
   
@@ -187,18 +183,16 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   [super performSearchOperation:operation];
 }
 
-- (HGSResult *)postFilterResult:(HGSMutableResult *)result 
-                matchesForQuery:(HGSQuery *)query
-                    pivotObject:(HGSResult *)pivotObject {
+- (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)scoredResult 
+                            matchesForQuery:(HGSQuery *)query
+                                pivotObject:(HGSResult *)pivotObject {
   HGSResultArray *queryResults = [query results];
-  HGSResult *actionResult = nil;
+  HGSScoredResult *rankedActionResult = nil;
   if (queryResults) {
-    BOOL emptyQuery = [[query rawQueryString] length] == 0;
-    
     // Pivot: filter to actions that support this object as the target of the
     // action.
     HGSAction *action
-      = [result valueForKey:kHGSObjectAttributeDefaultActionKey];
+      = [scoredResult valueForKey:kHGSObjectAttributeDefaultActionKey];
     if ([action appliesToResults:queryResults]) {
       // Now that it is all set up, let's wrap it up in our proxy action.
       // We do this so that we can sub in the query's pivot object
@@ -208,14 +202,13 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
                                                     query:query]
            autorelease];
       
-      actionResult = [self objectFromAction:(HGSAction *)proxy
-                                resultArray:queryResults
-                                       rank:[result rank]];
+      HGSResult *actionResult = [self objectFromAction:(HGSAction *)proxy
+                                           resultArray:queryResults];
+      CGFloat score = [scoredResult score];
+      HGSTokenizedString *matchedTerm = [scoredResult matchedTerm];
+      HGSRankFlags flagsToSet = 0;
       
-      if (emptyQuery) {
-        HGSMutableResult *mutable = [[actionResult mutableCopy] autorelease];
-        [mutable addRankFlags:eHGSBelowFoldRankFlag];
-        
+      if ([matchedTerm tokenizedLength] == 0) {        
         // This gives some ordering to actions, putting more specific actions
         // first.
         HGSCalibratedScoreType scoreType;
@@ -224,22 +217,28 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
         } else {
           scoreType = kHGSCalibratedModerateScore;
         }
-        [mutable setRank:HGSCalibratedScore(scoreType)];
-        actionResult = mutable;
+        score = HGSCalibratedScore(scoreType);
       }
+      NSIndexSet *matchedIndexes = [scoredResult matchedIndexes];
+      rankedActionResult = [HGSScoredResult resultWithResult:actionResult 
+                                                       score:score 
+                                                  flagsToSet:flagsToSet 
+                                                flagsToClear:0 
+                                                 matchedTerm:matchedTerm 
+                                              matchedIndexes:matchedIndexes];
     }
   } else {
     
     // No pivot: so just include the actions that are valid for a top level
     // query.
     HGSAction *action
-      = [result valueForKey:kHGSObjectAttributeDefaultActionKey];
+      = [scoredResult valueForKey:kHGSObjectAttributeDefaultActionKey];
     if ([action showInGlobalSearchResults]) {
-      actionResult = result;
+      rankedActionResult = scoredResult;
     }
   }
   
-  return actionResult;
+  return rankedActionResult;
 }
 
 @end

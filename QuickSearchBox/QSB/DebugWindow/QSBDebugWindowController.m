@@ -38,7 +38,7 @@
 
 static NSString *const kQSBDWTopResultsKey = @"Top Results";
 static NSString *const kQSBDWMoreResultsKey =@"More Results";
-static NSUInteger kQSBDWResultRowCount = 5;
+static NSUInteger kQSBDWResultRowCount = 7;
 
 static NSInteger QSBDWSortOperations(HGSSearchOperation *op1, 
                                      HGSSearchOperation *op2, 
@@ -118,8 +118,9 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
 - (void)queryControllerWillStart:(NSNotification *)notification {
   HGSQueryController *controller = [notification object];
   HGSQuery *query = [controller query];
-  [normalizedQuery_ setStringValue:[query normalizedQueryString]];
-  [rawQuery_ setStringValue:[query rawQueryString]];
+  HGSTokenizedString *tokenizedString = [query tokenizedQueryString];
+  [normalizedQuery_ setStringValue:[tokenizedString tokenizedString]];
+  [rawQuery_ setStringValue:[tokenizedString originalString]];
   [searchOperations_ removeAllObjects];
   [updatedResults_ removeAllObjects];
   [operations_ loadColumnZero];
@@ -238,7 +239,7 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
 }
 - (void)willDisplayCell:(id)cell 
                   atRow:(NSInteger)row 
-              forResult:(HGSResult *)result {
+              forResult:(HGSScoredResult *)result {
   NSString *cellData = nil;
   switch (row) {
     case 0:
@@ -250,7 +251,7 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
       break;
       
     case 2:
-      cellData = [NSString stringWithFormat:@"Rank: %0.3f", [result rank]];
+      cellData = [NSString stringWithFormat:@"Score: %0.3f", [result score]];
       break;
       
     case 3:
@@ -259,6 +260,16 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
       
     case 4:
       cellData = [[result url] absoluteString];
+      break;
+
+    case 5:
+      cellData = [NSString stringWithFormat:@"Below Fold: %@", 
+                  [result rankFlags] & eHGSBelowFoldRankFlag ? @"Yes" : @"No"];
+      break;
+
+    case 6:
+      cellData = [NSString stringWithFormat:@"Last Used: %@", 
+                  [result valueForKey:kHGSObjectAttributeLastUsedDateKey]];
       break;
   }
   [cell setStringValue:cellData];
@@ -286,14 +297,14 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
     NSInteger selectedOp = [operations_ selectedRowInColumn:0];
     HGSSearchOperation *operation = [searchOperations_ objectAtIndex:selectedOp];
     if (column == 1) {
-      HGSResult *result = [operation sortedResultAtIndex:row];
-      NSString *name = [result displayName];
+      HGSScoredResult *scoredResult = [operation sortedRankedResultAtIndex:row];
       NSString *cellData = [NSString stringWithFormat:@"%@ (%0.3f)", 
-                            name, [result rank]];
+                            [scoredResult displayName], [scoredResult score]];
       [cell setStringValue:cellData];
     } else if (column == 2) {
       NSInteger selectedResult = [operations_ selectedRowInColumn:1];
-      HGSResult *result = [operation sortedResultAtIndex:selectedResult];
+      HGSScoredResult *result 
+        = [operation sortedRankedResultAtIndex:selectedResult];
       [self willDisplayCell:cell atRow:row forResult:result];
     }
   }
@@ -327,7 +338,7 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
           NSUInteger selectedRow = [mixedResults_ selectedRowInColumn:2];
           QSBTableResult *tableResult = [results objectAtIndex:selectedRow];
           if ([tableResult respondsToSelector:@selector(representedResult)]) {
-            HGSResult *result = [(id)tableResult representedResult];
+            HGSScoredResult *result = [(id)tableResult representedResult];
             [self willDisplayCell:cell atRow:row forResult:result];
           } else {
             [cell setStringValue:NSStringFromClass([tableResult class])];
@@ -343,11 +354,11 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
           NSString *categoryName = [selectedCategory stringValue];
           NSArray *results = [rankedResultsByCategory objectForKey:categoryName];
           if (column == 3) {
-            HGSResult *result = [results objectAtIndex:row];
+            HGSScoredResult *result = [results objectAtIndex:row];
             [cell setStringValue:[result displayName]];
           } else {
             NSUInteger selectedResult = [mixedResults_ selectedRowInColumn:3];
-            HGSResult *result = [results objectAtIndex:selectedResult];
+            HGSScoredResult *result = [results objectAtIndex:selectedResult];
             [self willDisplayCell:cell atRow:row forResult:result];
           }
         }

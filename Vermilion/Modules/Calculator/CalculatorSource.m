@@ -82,7 +82,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   BOOL isValid = NO;
-  NSString *rawQuery = [query rawQueryString];
+  NSString *rawQuery = [[query tokenizedQueryString] originalString];
 
   // It takes atleast 3 chars to make an expression ie- 1+1
   if ([rawQuery length] > 2) {
@@ -105,7 +105,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 }
 
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
-  NSString *rawQuery = [[operation query] rawQueryString];
+  HGSTokenizedString *queryString = [[operation query] tokenizedQueryString];
+  NSString *rawQuery = [queryString originalString];
   if ([rawQuery length]) {
     // Fix up separators and decimals. The Calculator framework wants
     // '.' for decimals, and no grouping separators.
@@ -147,15 +148,17 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         = [NSDictionary dictionaryWithObjectsAndKeys:
            pasteboardData, kHGSObjectAttributePasteboardValueKey,
            nil];
-      HGSResult *hgsObject
-        = [HGSResult resultWithURI:calculatorAppPath_
-                              name:resultString
-                              type:HGS_SUBTYPE(kHGSTypeOnebox, @"calculator")
-                              rank:HGSCalibratedScore(kHGSCalibratedPerfectScore)
-                            source:self
-                        attributes:attributes];
-      NSArray *resultsArray = [NSArray arrayWithObject:hgsObject];
-      [operation setResults:resultsArray];
+      HGSScoredResult *rankedHGSObject
+        = [HGSScoredResult resultWithURI:calculatorAppPath_
+                                    name:resultString
+                                    type:HGS_SUBTYPE(kHGSTypeOnebox, @"calculator")
+                                  source:self
+                              attributes:attributes
+                                   score:HGSCalibratedScore(kHGSCalibratedPerfectScore) 
+                             matchedTerm:queryString
+                          matchedIndexes:nil];
+      NSArray *resultsArray = [NSArray arrayWithObject:rankedHGSObject];
+      [operation setRankedResults:resultsArray];
     }
   }
   // Since we are concurent, finish the query ourselves.

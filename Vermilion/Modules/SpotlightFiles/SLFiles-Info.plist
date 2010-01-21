@@ -31,6 +31,14 @@
 			<string>contact</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Spotlight Results</string>
+			<key>SLPathsToBlacklist</key>
+			<array>
+				<string>/Library/Application Support/</string>
+				<string>/Library/Caches/</string>
+				<string>Spam.imapmbox</string>
+				<string>Spam.mbox</string>
+				<string>/Library/PubSub/</string>
+			</array>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

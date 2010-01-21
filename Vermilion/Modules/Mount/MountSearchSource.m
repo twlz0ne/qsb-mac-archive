@@ -187,12 +187,12 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
         NSString *name = [service name];
         NSString *displayName = [NSString stringWithFormat:@"%@ (%@)", 
                                  name, scheme];
-        HGSResult *hgsResult = [HGSResult resultWithURI:urlString
-                                                   name:displayName
-                                                   type:type
-                                                   rank:kHGSResultUnknownRank
-                                                 source:self
-                                             attributes:attributes];
+        HGSUnscoredResult *hgsResult 
+          = [HGSUnscoredResult resultWithURI:urlString
+                                        name:displayName
+                                        type:type
+                                      source:self
+                                  attributes:attributes];
         [self indexResult:hgsResult 
                      name:name 
                otherTerms:otherTerms];

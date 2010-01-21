@@ -35,6 +35,7 @@
 #import "HGSAppleScriptAction.h"
 #import "HGSResult.h"
 #import "HGSActionOperation.h"
+#import "HGSType.h"
 
 @interface HGSAppleScriptActionTest : GTMTestCase {
  @protected
@@ -117,19 +118,19 @@
     = [[[HGSAppleScriptAction alloc] initWithConfiguration:config] autorelease];
   STAssertNotNil(action, nil);
   
-  HGSResult *result1 = [HGSResult resultWithURI:@"applescript://test" 
-                                           name:@"test1" 
-                                           type:kHGSTypeScript
-                                           rank:kHGSResultUnknownRank
-                                         source:nil 
-                                     attributes:nil];
+  HGSUnscoredResult *result1 
+    = [HGSUnscoredResult resultWithURI:@"applescript://test" 
+                                  name:@"test1" 
+                                  type:kHGSTypeScript
+                                source:nil 
+                            attributes:nil];
   STAssertNotNil(result1, nil);
-  HGSResult *result2 = [HGSResult resultWithURI:@"applescript://test2" 
-                                           name:@"test2" 
-                                           type:kHGSTypeScript
-                                           rank:kHGSResultUnknownRank
-                                         source:nil 
-                                     attributes:nil];
+  HGSUnscoredResult *result2 
+    = [HGSUnscoredResult resultWithURI:@"applescript://test2" 
+                                  name:@"test2" 
+                                  type:kHGSTypeScript
+                                source:nil 
+                            attributes:nil];
   STAssertNotNil(result2, nil);
   NSArray *results = [NSArray arrayWithObjects:result1, result2, nil];
   HGSResultArray *hgsResults = [HGSResultArray arrayWithResults:results];
@@ -182,23 +183,23 @@
     = [[[HGSAppleScriptAction alloc] initWithConfiguration:config] autorelease];
   STAssertNotNil(action, nil);
   
-  HGSResult *result1 = [HGSResult resultWithURI:@"applescript://test" 
-                                           name:@"test1" 
-                                           type:kHGSTypeScript
-                                           rank:kHGSResultUnknownRank
-                                         source:nil 
-                                     attributes:nil];
+  HGSUnscoredResult *result1 
+    = [HGSUnscoredResult resultWithURI:@"applescript://test" 
+                                  name:@"test1" 
+                                  type:kHGSTypeScript
+                                source:nil 
+                            attributes:nil];
   STAssertNotNil(result1, nil);
   NSDictionary *attributes 
     = [NSDictionary dictionaryWithObjectsAndKeys:
        @"com.apple.finder", kHGSObjectAttributeBundleIDKey,
        nil];
-  HGSResult *result2 = [HGSResult resultWithURI:@"applescript://test2"
-                                           name:@"test2" 
-                                           type:kHGSTypeScript
-                                           rank:kHGSResultUnknownRank
-                                         source:nil 
-                                     attributes:attributes];
+  HGSUnscoredResult *result2 
+    = [HGSUnscoredResult resultWithURI:@"applescript://test2"
+                                  name:@"test2" 
+                                  type:kHGSTypeScript
+                                source:nil 
+                            attributes:attributes];
   STAssertNotNil(result2, nil);
   NSArray *results = [NSArray arrayWithObjects:result1, result2, nil];
   HGSResultArray *hgsResults = [HGSResultArray arrayWithResults:results];

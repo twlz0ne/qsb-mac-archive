@@ -116,7 +116,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
 - (void)main {
   HGSQuery *query = [self query];
 
-  NSString *queryString = [query rawQueryString];
+  NSString *queryString = [[query tokenizedQueryString] originalString];
   if (![queryString length]) {
     [self finishQuery];
     return;
@@ -216,8 +216,9 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
 
   NSEnumerator *resultEnumerator = [googleResultArray objectEnumerator];
   NSDictionary *resultDict;
-  // TODO(mrossetti): better way to rank this stuff?
-  CGFloat rank = HGSCalibratedScore(kHGSCalibratedStrongScore);
+  // TODO(mrossetti): better way to score this stuff?
+  CGFloat score = HGSCalibratedScore(kHGSCalibratedStrongScore);
+  HGSTokenizedString *tokenizedQueryString = [[self query] tokenizedQueryString];
   while ((resultDict  = [resultEnumerator nextObject])) {
     NSString *name = [resultDict objectForKey:@"titleNoFormatting"];
     name = [name gtm_stringByUnescapingFromHTML];
@@ -281,13 +282,15 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
       name = [name substringToIndex:[name length] - [commonSuffix length]];
     }
     
-    HGSResult *result = [HGSResult resultWithURI:urlString
-                                            name:name
-                                            type:kHGSTypeWebpage // TODO: more complete type?
-                                            rank:rank
-                                          source:[self source]
-                                      attributes:attributes];
-    rank *= 0.9;
+    HGSScoredResult *result = [HGSScoredResult resultWithURI:urlString
+                                                        name:name
+                                                        type:kHGSTypeWebpage // TODO: more complete type?
+                                                      source:[self source]
+                                                  attributes:attributes
+                                                       score:score
+                                                 matchedTerm:tokenizedQueryString
+                                              matchedIndexes:nil];
+    score *= 0.9;
     
     [results addObject:result];
 
@@ -295,7 +298,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
     if (!pivotObject && ([results count] > 0)) break;
   }
 
-  [self setResults:results];
+  [self setRankedResults:results];
   [self finishQuery];
   [fetcher_ release];
   fetcher_ = nil;

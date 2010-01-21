@@ -37,6 +37,7 @@
 #import "HGSBundle.h"
 #import "HGSIconProvider.h"
 #import "HGSCoreExtensionPoints.h"
+#import "HGSTokenizer.h"
 
 // The result is already retained for you
 static NSSet *CopyStringSetFromId(id value) {
@@ -118,7 +119,7 @@ NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources
       }
     }
   } else {
-    isValid = [[query normalizedQueryString] length] > 0;
+    isValid = [[[query tokenizedQueryString] tokenizedString] length] > 0;
   }
   return isValid;
 }
@@ -205,7 +206,7 @@ NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources
 }
 
 - (Class)resultClass {
-  return [HGSResult class];
+  return [HGSUnscoredResult class];
 }
 
 @end

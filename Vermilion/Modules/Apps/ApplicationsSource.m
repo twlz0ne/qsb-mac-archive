@@ -232,11 +232,10 @@ static NSString *const kApplicationSourcePredicateString
     }
 
     // create a HGSResult to talk to the rest of the application
-    HGSResult *hgsResult
-      = [HGSResult resultWithFilePath:path
-                                 rank:kHGSResultUnknownRank
-                          source:self
-                      attributes:attributes];
+    HGSUnscoredResult *hgsResult
+      = [HGSUnscoredResult resultWithFilePath:path
+                                       source:self
+                                   attributes:attributes];
 
     // add it to the result array for searching
     // By adding the display name and the file system name this should help
@@ -266,14 +265,13 @@ static NSString *const kApplicationSourcePredicateString
     [regularAttributes setObject:@"com.apple.preference.network"
                           forKey:kHGSObjectAttributeBundleIDKey];
     NSURL *url = [NSURL fileURLWithPath:networkPath];
-    HGSResult *hgsResult
-      = [HGSResult resultWithURI:[url absoluteString]
-                            name:name
-                            type:kHGSTypeFileApplication
-                            rank:kHGSResultUnknownRank
-                          source:self
-                      attributes:regularAttributes];
-
+    HGSUnscoredResult *hgsResult
+      = [HGSUnscoredResult resultWithURI:[url absoluteString]
+                                    name:name
+                                    type:kHGSTypeFileApplication
+                                  source:self
+                              attributes:regularAttributes];
+    
     [self indexResult:hgsResult];
   } else {
     HGSLog(@"Unable to find Network.prefpane");
@@ -346,13 +344,12 @@ static NSString *const kApplicationSourcePredicateString
           NSString *uriPath 
             = [fullPath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
           NSString *url = [@"file://localhost" stringByAppendingString:uriPath];
-          HGSResult *hgsResult
-            = [HGSResult resultWithURI:url
-                                  name:[fm displayNameAtPath:fullPath]
-                                  type:kHGSTypeFileApplication
-                                  rank:kHGSResultUnknownRank
-                                source:self
-                            attributes:regularAttributes];
+          HGSUnscoredResult *hgsResult
+            = [HGSUnscoredResult resultWithURI:url
+                                          name:[fm displayNameAtPath:fullPath]
+                                          type:kHGSTypeFileApplication
+                                        source:self
+                                    attributes:regularAttributes];
           
           [self indexResult:hgsResult];
         }

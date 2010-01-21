@@ -152,13 +152,12 @@ static NSString *const kiPhoneReferenceDocSetPath
            docCells, kQSBObjectAttributePathCellsKey, 
            docSetIcon_, kHGSObjectAttributeIconKey,
            nil];
-      HGSResult *result 
-        = [HGSResult resultWithURL:url
-                              name:name
-                              type:HGS_SUBTYPE(kHGSTypeFile, @"developerdocs")
-                              rank:kHGSResultUnknownRank
-                            source:self
-                        attributes:attributes];  
+      HGSUnscoredResult *result 
+        = [HGSUnscoredResult resultWithURL:url
+                                      name:name
+                                      type:HGS_SUBTYPE(kHGSTypeFile, @"developerdocs")
+                                    source:self
+                                attributes:attributes];  
       [self indexResult:result];
       [url autorelease];
     }
@@ -207,8 +206,9 @@ static NSString *const kiPhoneReferenceDocSetPath
 #pragma mark -
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  NSString *queryString = [query rawQueryString];
-  return ([super isValidSourceForQuery:query] && [queryString length] >= 4);
+  HGSTokenizedString *queryString = [query tokenizedQueryString];
+  return ([super isValidSourceForQuery:query] 
+          && [queryString tokenizedLength] >= 4);
 }
 
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {

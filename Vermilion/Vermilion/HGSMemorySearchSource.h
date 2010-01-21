@@ -38,7 +38,6 @@
 */
 
 @class HGSQuery;
-@class HGSMutableResult;
 
 /*!
  Subclass of HGSCallbackSearchSource that handles the search logic for simple
@@ -47,7 +46,7 @@
  When a query comes in, all items will be passed through
  |preFilterResult:matchesForQuery:pivotObject:|, then they will be filtered
  by name  and then passed through
- |postFilterResult:matchesForQuery:pivotObject:| and returned. The default
+ |postFilterScoredResult:matchesForQuery:pivotObject:| and returned. The default
  implementations of the filters do nothing, so by default results will be
  returned unchanged.
  
@@ -82,6 +81,7 @@
 - (void)indexResult:(HGSResult *)hgsResult
                name:(NSString *)name
           otherTerm:(NSString *)otherTerm;
+
 /*!
  Add a result to the memory index. 
  
@@ -95,6 +95,7 @@
 - (void)indexResult:(HGSResult *)hgsResult
                name:(NSString *)name
          otherTerms:(NSArray *)otherTerms;
+
 /*!
  Add a result to the memory index. 
  Equivalent to calling 
@@ -103,6 +104,7 @@
  @param hgsResult the result to index
 */
 - (void)indexResult:(HGSResult *)hgsResult;
+
 /*!
  Save the contents of the memory index to disk. If the contents of the index
  haven't changed since the last call to saveResultsCache or loadResultsCache,
@@ -114,6 +116,7 @@
  @seealso //google_vermilion_ref/occ/instm/HGSMemorySearchSource/loadResultsCache loadResultsCache
 */
 - (void)saveResultsCache;
+
 /*!
  Load the results saved by a previous call to 
  saveResultsCache, populating
@@ -122,6 +125,15 @@
  @seealso //google_vermilion_ref/occ/instm/HGSMemorySearchSource/saveResultsCache saveResultsCache
 */
 - (BOOL)loadResultsCache;
+
+/*!
+ Return an array of HGSRankedResults that match query.
+ @param results Array of HGSResults
+ @param operation Operation to match
+ @result array of HGSRankedResults
+*/
+- (NSArray *)rankedResultsFromArray:(NSArray *)results 
+                       forOperation:(HGSCallbackSearchOperation *)operation;
 @end
 
 /*! These are methods subclasses can override to control behaviors. */
@@ -143,8 +155,8 @@
  ranking. (eg anything that hits the disk). Return nil to filter out the
  result. Default version just returns result.
 */
-- (HGSResult *)postFilterResult:(HGSMutableResult *)result 
-                matchesForQuery:(HGSQuery *)query
-                    pivotObject:(HGSResult *)pivotObject;
+- (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)result 
+                            matchesForQuery:(HGSQuery *)query
+                                pivotObject:(HGSResult *)pivotObject;
  
 @end

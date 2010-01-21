@@ -117,10 +117,9 @@
     if ([[subpath lastPathComponent] hasPrefix:@"."]) continue;
     
     
-    HGSResult *result = [HGSResult resultWithFilePath:subpath
-                                                 rank:kHGSResultUnknownRank
-                                               source:self
-                                           attributes:nil];
+    HGSUnscoredResult *result = [HGSUnscoredResult resultWithFilePath:subpath
+                                                               source:self
+                                                           attributes:nil];
     [self indexResult:result];
   }
   [self saveResultsCache];

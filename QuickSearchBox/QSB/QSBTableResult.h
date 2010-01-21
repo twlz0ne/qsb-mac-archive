@@ -37,8 +37,9 @@
  @discussion QSBTableResult
  */
 
-@class HGSResult;
+@class HGSScoredResult;
 @class QSBSearchViewController;
+@class HGSTokenizedString;
 
 /*!
   Abstract base class for showing results in our tables
@@ -99,9 +100,9 @@
 - (NSImage *)displayThumbnail;
 
 /*!
-  Return the rank of the result.
+  Return the score of the result.
 */
-- (CGFloat)rank;
+- (CGFloat)score;
 
 /*!
   Return the class of the view controller used to display the result at the top
@@ -131,15 +132,15 @@
 */
 @interface QSBSourceTableResult : QSBTableResult {
  @private
-  HGSResult *representedResult_;
+  HGSScoredResult *representedResult_;
   NSString *categoryName_;
 }
 
-@property (nonatomic, readonly) HGSResult *representedResult;
+@property (nonatomic, readonly) HGSScoredResult *representedResult;
 @property (nonatomic, readwrite, copy) NSString *categoryName;
 
-+ (id)tableResultWithResult:(HGSResult *)result;
-- (id)initWithResult:(HGSResult *)result;
++ (id)tableResultWithResult:(HGSScoredResult *)result;
+- (id)initWithResult:(HGSScoredResult *)result;
 
 @end
 
@@ -148,8 +149,8 @@
 */
 @interface QSBGoogleTableResult : QSBSourceTableResult
 
-+ (id)tableResultForQuery:(NSString*)query;
-- (id)initWithQuery:(NSString*)query;
++ (id)tableResultForQuery:(HGSTokenizedString *)query;
+- (id)initWithQuery:(HGSTokenizedString *)query;
 
 @end
 

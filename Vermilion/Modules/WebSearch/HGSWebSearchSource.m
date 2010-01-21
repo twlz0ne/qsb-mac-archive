@@ -109,7 +109,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
   HGSQuery *query = [operation query];
   HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
-    NSString *queryString = [query rawQueryString];
+    
     NSString *searchName
       = [pivotObject valueForKey:kHGSObjectAttributeWebSearchDisplayStringKey];
     if (!searchName) {
@@ -120,6 +120,8 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
       searchName = [NSString stringWithFormat:searchLabel,
                     [[pivotObject url] host]];
     }
+    HGSTokenizedString *tokenizedQuery = [query tokenizedQueryString];
+    NSString *queryString = [tokenizedQuery originalString];
     NSString *url = [[self class] urlStringForQuery:queryString 
                                        onSiteResult:pivotObject];
     if ([queryString length] && url) {
@@ -141,14 +143,16 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
              icon, kHGSObjectAttributeIconKey,
              details, kHGSObjectAttributeSnippetKey,
              nil];
-        HGSResult *placeholderItem 
-          = [HGSResult resultWithURI:url
-                                name:searchName
-                                type:kHGSTypeSearchCorpus
-                                rank:HGSCalibratedScore(kHGSCalibratedPerfectScore)
-                              source:self
-                          attributes:attributes];
-        [operation setResults:[NSArray arrayWithObject:placeholderItem]];
+        HGSScoredResult *placeholderItem 
+          = [HGSScoredResult resultWithURI:url
+                                      name:searchName
+                                      type:kHGSTypeSearchCorpus
+                                    source:self
+                                attributes:attributes
+                                     score:HGSCalibratedScore(kHGSCalibratedPerfectScore)
+                               matchedTerm:tokenizedQuery
+                            matchedIndexes:nil];
+        [operation setRankedResults:[NSArray arrayWithObject:placeholderItem]];
       }
     }
   }

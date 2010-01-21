@@ -182,7 +182,7 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
       showAllInThisCategory = YES;
     }
     
-    for (HGSResult *result in categoryArray) {
+    for (HGSScoredResult *result in categoryArray) {
       if (!showAllInThisCategory && resultCounter >= categoryLimit) {
         break;
       }

@@ -81,7 +81,7 @@ static NSString *const kClipboardTestString = @"Lazarus Long Text";
 - (void)gotResults:(NSNotification *)notification {
   HGSSearchOperation *op = [notification object];
   NSRange resultRange = NSMakeRange(0, [op resultCount]);
-  results_ = [op sortedResultsInRange:resultRange];
+  results_ = [op sortedRankedResultsInRange:resultRange];
   STAssertNotNil(results_, nil);
   [results_ retain];
   
@@ -106,13 +106,12 @@ static NSString *const kClipboardTestString = @"Lazarus Long Text";
                               extensionPointIdentifier:kHGSSourcesExtensionPoint
                                               delegate:nil];
   STAssertNotNil(textSource, nil);
-  HGSResult *textResult 
-    = [HGSResult resultWithURI:@"userinput:text"
-                          name:@"Lazarus Long"
-                          type:kHGSTypeTextUserInput
-                          rank:kHGSResultUnknownRank
-                        source:textSource
-                    attributes:nil];
+  HGSUnscoredResult *textResult 
+    = [HGSUnscoredResult resultWithURI:@"userinput:text"
+                                  name:@"Lazarus Long"
+                                  type:kHGSTypeTextUserInput
+                                source:textSource
+                            attributes:nil];
   STAssertNotNil(textResult, nil);
   HGSResultArray *array = [HGSResultArray arrayWithResult:textResult];
   STAssertNotNil(array, nil);

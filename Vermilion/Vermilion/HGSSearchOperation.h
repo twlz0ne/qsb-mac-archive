@@ -40,7 +40,7 @@
 
 @class HGSQuery;
 @class HGSSearchSource;
-@class HGSResult;
+@class HGSScoredResult;
 
 /*!
  Combines a search source and a query into an operation that will be executed
@@ -111,19 +111,19 @@
 
 /*!
  Return the sorted results in the given range.
- @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedResultAtIndex: sortedResultAtIndex:
+ @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedRankedResultAtIndex: sortedRankedResultAtIndex:
  @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/disableUpdates disableUpdates
  @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/enableUpdates enableUpdates
 */
-- (NSArray *)sortedResultsInRange:(NSRange)range;
+- (NSArray *)sortedRankedResultsInRange:(NSRange)range;
 
 /*!
  Return the result from the sorted results at idx.
- @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedResultsInRange: sortedResultsInRange:
+ @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedRankedResultsInRange: sortedRankedResultsInRange:
  @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/disableUpdates disableUpdates
  @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/enableUpdates enableUpdates
 */
-- (HGSResult *)sortedResultAtIndex:(NSUInteger)idx;
+- (HGSScoredResult *)sortedRankedResultAtIndex:(NSUInteger)idx;
 
 /*!
  Return the total number of results available.
@@ -134,8 +134,8 @@
  Disables updates to the operation result list. This should be called before 
  iterating through the list of results to prevent the result list from changing 
  during the iteration.
- @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedResultAtIndex: sortedResultAtIndex:
- @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedResultsInRange: sortedResultsInRange:
+ @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedRankedResultAtIndex: sortedRankedResultAtIndex:
+ @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedRankedResultsInRange: sortedRankedResultsInRange:
  @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/enableUpdates enableUpdates
 */
 - (void)disableUpdates;
@@ -144,8 +144,8 @@
  Re-enables updates to the query result list. This should be called when
  finished iterating through the list of results, to allow changes to the result
  list to occur.
- @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedResultAtIndex: sortedResultAtIndex:
- @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedResultsInRange: sortedResultsInRange:
+ @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedRankedResultAtIndex: sortedRankedResultAtIndex:
+ @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/sortedRankedResultsInRange: sortedRankedResultsInRange:
  @seealso //google_vermilion_ref/occ/instm/HGSSearchOperation(PureVirtualMethods)/disableUpdates disableUpdates
 */
 - (void)enableUpdates;

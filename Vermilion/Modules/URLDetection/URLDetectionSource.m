@@ -49,10 +49,8 @@
   // We use the raw query to see if it's url like
   BOOL isValid = [super isValidSourceForQuery:query];
   if (isValid) {
-
-    // No spaces (can't use [query uniqueWords] because that would split on
-    // punct in addition to spaces).
-    NSString *urlString = [query rawQueryString];
+    HGSTokenizedString *tokenizedQueryString = [query tokenizedQueryString];
+    NSString *urlString = [tokenizedQueryString originalString];
     if ([urlString rangeOfString:@" "].location != NSNotFound) {
       isValid = NO;
     } else {
@@ -74,8 +72,9 @@
 }
 
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
-  NSString *queryString = [[operation query] rawQueryString];
-  NSString *urlString = queryString;
+  HGSQuery *query = [operation query];
+  HGSTokenizedString *tokenizedQueryString = [query tokenizedQueryString];
+  NSString *urlString = [tokenizedQueryString originalString];
   NSURL *url = [NSURL URLWithString:urlString];
 
   if ([url scheme]) {
@@ -113,7 +112,7 @@
   }
 
   if (url) {
-    CGFloat rank = HGSCalibratedScore(kHGSCalibratedStrongScore);
+    CGFloat score = HGSCalibratedScore(kHGSCalibratedStrongScore);
     NSDictionary *attributes
       = [NSDictionary dictionaryWithObjectsAndKeys:
          [NSImage imageNamed:@"blue-nav"], kHGSObjectAttributeIconKey,
@@ -122,13 +121,16 @@
          [NSNumber numberWithBool:YES], kHGSObjectAttributeIsSyntheticKey,
          nil];
          
-    HGSResult *result = [HGSResult resultWithURL:url
-                                            name:queryString
-                                            type:kHGSTypeWebpage
-                                            rank:rank
-                                          source:self
-                                      attributes:attributes];
-    [operation setResults:[NSArray arrayWithObject:result]];
+    HGSScoredResult *scoredResult 
+      = [HGSScoredResult resultWithURI:[url absoluteString]
+                                  name:urlString
+                                  type:kHGSTypeWebpage
+                                source:self
+                            attributes:attributes
+                                 score:score 
+                           matchedTerm:tokenizedQueryString 
+                        matchedIndexes:nil];
+    [operation setRankedResults:[NSArray arrayWithObject:scoredResult]];
   }
 }
 

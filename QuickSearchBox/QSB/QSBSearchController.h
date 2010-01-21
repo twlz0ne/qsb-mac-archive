@@ -43,7 +43,7 @@
  @private
   NSMutableArray *desktopResults_;
   NSArray *lockedResults_;
-  NSString *queryString_;  // Current query string entered by user.
+  HGSTokenizedString *tokenizedQueryString_;  // Current query entered by user.
   HGSResultArray *results_;
   NSUInteger currentResultDisplayCount_;
   HGSQueryController *queryController_;
@@ -78,10 +78,10 @@
 - (NSDictionary *)rankedResultsByCategory;
 
 // Changes and restarts the query.
-- (void)setQueryString:(NSString *)queryString;
+- (void)setTokenizedQueryString:(HGSTokenizedString *)setTokenizedQueryString;
 
 // Returns the current query
-- (NSString *)queryString;
+- (HGSTokenizedString *)tokenizedQueryString;
 
 // Returns the maximum number of results to present.
 - (NSUInteger)maximumResultsToCollect;
@@ -94,4 +94,7 @@
 // Notification sent out when results have been updated.
 // Object is QSBSearchController.
 extern NSString *const kQSBSearchControllerDidUpdateResultsNotification;
+extern NSString *const kQSBSearchControllerWillChangeQueryStringNotification;
+extern NSString *const kQSBSearchControllerDidChangeQueryStringNotification;
+
 

@@ -264,7 +264,8 @@ extensionPointIdentifier:(NSString *)extensionPointIdentifier {
       NSDictionary *archive = [source archiveRepresentationForResult:result];
       STAssertNotNil(archive, nil);
       HGSResult *thawedResult = [source resultWithArchivedRepresentation:archive];
-      STAssertEqualObjects(result, thawedResult, nil);
+      STAssertTrue([result isDuplicate:thawedResult], 
+                   @"result: %@ thawedResult: %@", result, thawedResult);
     }
     
     // Expected failures

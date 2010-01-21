@@ -30,7 +30,7 @@
                                           type:kHGSTypeWebpage
                                         source:self
                                     attributes:nil];
-  [operation setResults:[NSArray arrayWithObject:result]];
+  [operation setRankedResults:[NSArray arrayWithObject:result]];
 }
 
 @end

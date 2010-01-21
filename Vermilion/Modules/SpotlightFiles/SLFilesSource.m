@@ -36,6 +36,7 @@
 #import "GTMNSNumber+64Bit.h"
 #import "GTMMethodCheck.h"
 #import "NSNotificationCenter+MainThread.h"
+#import "GTMTypeCasting.h"
 
 static NSString *const kSpotlightSourceReturnIntermediateResultsKey 
   = @"SLFilesSourceReturnIntermediateResults";
@@ -68,6 +69,7 @@ typedef enum {
 
 @interface SLFilesSource ()
 @property (readonly, nonatomic) NSString *utiFilter;
+@property (readonly, nonatomic, retain) NSArray *pathsToBlackList;
 @end
 
 @implementation SLFilesOperation
@@ -111,8 +113,7 @@ typedef enum {
     } 
     [predicateSegments addObject:predString];
   }
-  
-  NSString *rawQueryString = [query rawQueryString];
+  NSString *rawQueryString = [[query tokenizedQueryString] originalString];
   NSString *spotlightString
     = GTMCFAutorelease(_MDQueryCreateQueryString(NULL,
                                                  (CFStringRef)rawQueryString));
@@ -173,11 +174,11 @@ typedef enum {
   [super cancel];
 }
 
-- (HGSResult *)resultFromMDItem:(MDItemRef)mdItem {
-  HGSResult *result = nil;
+- (HGSScoredResult *)resultFromMDItem:(MDItemRef)mdItem {
+  HGSScoredResult *scoredResult = nil;
   NSValue *key = [NSValue valueWithPointer:mdItem];
-  result = [hgsResults_ objectForKey:key];
-  if (!result) {
+  scoredResult = [hgsResults_ objectForKey:key];
+  if (!scoredResult) {
     NSString *path = nil;
     NSDictionary *attributes 
       = GTMCFAutorelease(MDItemCopyAttributes(mdItem, 
@@ -272,6 +273,8 @@ typedef enum {
         uri = uriPath;
       }
     }
+    
+    SLFilesSource *source = GTM_STATIC_CAST(SLFilesSource, [self source]);
     if (!uri) {
       if (!path) {
         path = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemPath));
@@ -279,12 +282,18 @@ typedef enum {
       if (!path) {
         return nil;
       }
+      NSArray *pathsToBlackList = [source pathsToBlackList];
+      for (NSString *badPath in pathsToBlackList) {
+        if ([path rangeOfString:badPath].location != NSNotFound) {
+          return nil;
+        }
+      }
       NSURL *url = [NSURL fileURLWithPath:path];
       uri = [url absoluteString];
     }
     
     if (!resultType && path) {
-      resultType = [HGSResult hgsTypeForPath:path];
+      resultType = HGSTypeForPath(path);
       if ([resultType isEqual:kHGSTypeWebHistory]) {
         isURL = YES;
         NSString *uriPath 
@@ -310,22 +319,43 @@ typedef enum {
       lastUsedDate = [NSDate distantPast];  // COV_NF_LINE
     }
     
-    CGFloat rank = 0.0;
-    NSString *normalizedQuery = [[self query] normalizedQueryString];
-    if (normalizedQuery) {
-      NSString *tokenizedName = [HGSTokenizer tokenizeString:name];
-      rank = HGSScoreTermForString(normalizedQuery, tokenizedName);
+    CGFloat score = 0;
+    HGSTokenizedString *matchedTerm = nil;
+    NSIndexSet *matchedIndexes = nil;
+    HGSTokenizedString *tokenizedQueryString = [[self query] tokenizedQueryString];
+    if (tokenizedQueryString) {
+      HGSTokenizedString *tokenizedName = [HGSTokenizer tokenizeString:name];
+      NSIndexSet *tokenizedNameIndexes = nil;
+      CGFloat tokenizedNameRank = HGSScoreTermForItem(tokenizedQueryString, 
+                                                      tokenizedName, 
+                                                      &tokenizedNameIndexes);
+      HGSTokenizedString *tokenizedTitle = nil;
+      NSIndexSet *tokenizedTitleIndexes = nil;
+      CGFloat tokenizedTitleRank = 0;
       NSString *title = [attributes objectForKey:(NSString *)kMDItemTitle];
       if (title) {
-        NSString *tokenizedTitle = [HGSTokenizer tokenizeString:title];
-        CGFloat tokenizedRank = HGSScoreTermForString(normalizedQuery, 
-                                                    tokenizedTitle);
-        rank = MAX(rank, tokenizedRank);
+        tokenizedTitle = [HGSTokenizer tokenizeString:title];
+        tokenizedTitleRank = HGSScoreTermForItem(tokenizedQueryString, 
+                                                 tokenizedTitle,
+                                                 &tokenizedTitleIndexes);
+      }
+      if (tokenizedTitleRank > tokenizedNameRank) {
+        score = tokenizedTitleRank;
+        matchedTerm = tokenizedTitle;
+        matchedIndexes = tokenizedTitleIndexes;
+      } else {
+        score = tokenizedNameRank;
+        matchedTerm = tokenizedName;
+        matchedIndexes = tokenizedNameIndexes;
       }
     }
     
-    CGFloat moderateScore = HGSCalibratedScore(kHGSCalibratedModerateScore);
-    rank = MAX(rank, moderateScore);
+    CGFloat contentScore = HGSCalibratedScore(kHGSCalibratedInsignificantScore);
+    if (contentScore > score) {
+      score = contentScore;
+      matchedTerm = nil;
+      matchedIndexes = nil;
+    }
     
     NSDictionary *hgsAttributes 
       = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -333,17 +363,17 @@ typedef enum {
          (isURL ? uri : nil), kHGSObjectAttributeSourceURLKey,
          iconFlagName, kHGSObjectAttributeFlagIconNameKey,
          nil];
-    result = [HGSResult resultWithURI:uri 
-                                 name:name
-                                 type:resultType
-                                 rank:rank
-                               source:[self source]
-                           attributes:hgsAttributes];
-    if (result) {
-      [hgsResults_ setObject:result forKey:key];
-    }
+    scoredResult = [HGSScoredResult resultWithURI:uri 
+                                             name:name
+                                             type:resultType
+                                           source:[self source]
+                                       attributes:hgsAttributes
+                                            score:score 
+                                      matchedTerm:matchedTerm 
+                                   matchedIndexes:matchedIndexes];
+    [hgsResults_ setObject:scoredResult forKey:key];
   }
-  return result;
+  return scoredResult;
 }
 
 - (void)disableUpdates {
@@ -354,8 +384,8 @@ typedef enum {
   MDQueryEnableUpdates(mdQuery_);
 }
 
-- (HGSResult *)sortedResultAtIndex:(NSUInteger)idx {
-  HGSResult *result = nil;
+- (HGSScoredResult *)sortedRankedResultAtIndex:(NSUInteger)idx {
+  HGSScoredResult *result = nil;
   if (idx < [self resultCount]) {
     MDItemRef mdItem = (MDItemRef)MDQueryGetResultAtIndex(mdQuery_, idx);
     result = [self resultFromMDItem:mdItem];
@@ -375,6 +405,7 @@ typedef enum {
 
 @implementation SLFilesSource
 @synthesize utiFilter = utiFilter_;
+@synthesize pathsToBlackList = pathsToBlackList_;
 
 GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
@@ -403,7 +434,9 @@ static NSArray *sAttributeArray = nil;
                                   kSpotlightSourceReturnIntermediateResultsKey,
                                   nil];
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsDict];
-    
+    pathsToBlackList_ = [configuration objectForKey:@"SLPathsToBlacklist"];
+    HGSAssert(pathsToBlackList_, nil);
+    [pathsToBlackList_ retain];
     // we need to build the filter
     rebuildUTIFilter_ = YES;
     
@@ -423,6 +456,7 @@ static NSArray *sAttributeArray = nil;
 
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [pathsToBlackList_ release];
   [utiFilter_ release];
   [super dealloc];
 }
@@ -442,8 +476,8 @@ static NSArray *sAttributeArray = nil;
     isValid = [pivotObject conformsToType:kHGSTypeContact];
   } else {
     // Since Spotlight can return a lot of stuff, we only run the query if
-    // it is at least 5 characters long.
-    isValid = [[query rawQueryString] length] >= 3;
+    // it is at least 3 characters long.
+    isValid = [[query tokenizedQueryString] originalLength] >= 3;
   }
   return isValid;
 }
@@ -517,7 +551,7 @@ static NSArray *sAttributeArray = nil;
   return mdItem;
 }
 
-- (id)provideValueForKey:(NSString*)key result:(HGSResult*)result {
+- (id)provideValueForKey:(NSString*)key result:(HGSResult *)result {
   MDItemRef mdItemRef = nil;
   id value = nil;
 

@@ -195,13 +195,12 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         = [NSDictionary dictionaryWithObjectsAndKeys:
            otherTermStrings, kHGSObjectAttributeUniqueIdentifiersKey,
            nil];
-      HGSResult* hgsResult 
-        = [HGSResult resultWithURI:urlString
-                              name:name
-                              type:kTypeContactAddressBook
-                              rank:kHGSResultUnknownRank
-                            source:self
-                        attributes:attributes];
+      HGSUnscoredResult* hgsResult 
+        = [HGSUnscoredResult resultWithURI:urlString
+                                      name:name
+                                      type:kTypeContactAddressBook
+                                    source:self
+                                attributes:attributes];
       [newResults addObject:hgsResult];
       [self indexResult:hgsResult
                    name:name
@@ -291,13 +290,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
   ABMultiValue *multiValue = [person valueForProperty:property];
   if (multiValue) {
-    NSString *primary = [multiValue primaryIdentifier];
     NSUInteger count = [multiValue count];
     // Iterate through the multivalue getting all the subvalues
     for (NSUInteger i = 0; i < count; ++i) {
       id value = [multiValue valueAtIndex:i];
       NSString *label = [multiValue labelAtIndex:i];
-      NSString *identifier = [multiValue identifierAtIndex:i];
       if (label) {
         CFStringRef cfLabel = (CFStringRef)label;
         NSString *localizedLabel 
@@ -321,12 +318,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         }
         NSString *urlString = [NSString stringWithFormat:urlFormat, 
                                cleanURLValue];
-        
-        // We rank the primary identifiers higher so they show up better
-        HGSCalibratedScoreType scoreType 
-          = [identifier isEqualToString:primary] ? kHGSCalibratedStrongScore 
-                                                 : kHGSCalibratedWeakScore;
-        CGFloat rank = HGSCalibratedScore(scoreType);
+
         // Snippets look like phone: home
         NSString *snippet = [NSString stringWithFormat:@"%@: %@",
                              localizedProperty, localizedLabel];
@@ -334,12 +326,12 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         NSDictionary *attr = [NSDictionary dictionaryWithObjectsAndKeys:
                               snippet, kHGSObjectAttributeSnippetKey,
                               nil];
-        HGSResult *result = [HGSResult resultWithURI:urlString
-                                                name:cleanValue 
-                                                type:type
-                                                rank:rank
-                                              source:self 
-                                          attributes:attr];
+        
+        HGSUnscoredResult *result = [HGSUnscoredResult resultWithURI:urlString
+                                                                name:cleanValue 
+                                                                type:type
+                                                              source:self 
+                                                          attributes:attr];
         [results addObject:result];
       }
     }
@@ -458,18 +450,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   HGSResult *pivotObject = [query pivotObject];
   if ([pivotObject conformsToType:kTypeContactAddressBook]) {
     NSArray *results = [self explodeContactForSearchOperation:pivotObject];
-    NSString *queryString = [query rawQueryString];
-    if ([queryString length]) {
-      NSMutableArray *filteredResults = [NSMutableArray array];
-      for (HGSResult *result in results) {
-        NSString *stringValue = [result displayName];
-        if ([stringValue hasPrefix:queryString]) {
-          [filteredResults addObject:result];
-        }
-      }
-      results = filteredResults;
-    }
-    [operation setResults:results];
+    results = [self rankedResultsFromArray:results forOperation:operation];
+    [operation setRankedResults:results];
   } else {
     // Put a hold on queries while indexing
     [condition_ lock];
@@ -668,7 +650,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return isValidSource;
 }
 
-- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult *)result {
   // For address book contacts, we only need to store the Person's unique id
   // to be able to rebuild the result.
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];

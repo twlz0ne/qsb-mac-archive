@@ -120,7 +120,8 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
   NSImage *image = nil;
   QSBTableResult *qsbResult = [datasource tableResultForRow:row];
   if ([qsbResult isKindOfClass:[QSBSourceTableResult class]]) {
-    HGSResult *hgsResult = [(QSBSourceTableResult*)qsbResult representedResult];
+    HGSScoredResult *hgsResult 
+      = [(QSBSourceTableResult*)qsbResult representedResult];
     image = [hgsResult valueForKey:kHGSObjectAttributeImmediateIconKey];
     image = [[image copy] autorelease];
     [image setScalesWhenResized:YES];

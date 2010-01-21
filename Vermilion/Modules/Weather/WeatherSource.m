@@ -83,7 +83,7 @@ static NSString *const kWeatherResultURL
   if (isValid) {
     // Must be "weather [something]"
     // or a US zip code or a British or Canadian Postal Code.
-    NSString *rawQuery = [query rawQueryString];
+    NSString *rawQuery = [[query tokenizedQueryString] originalString];
     NSUInteger len = [rawQuery length];
     if (len == 5) {
       NSRange range = [rawQuery rangeOfCharacterFromSet:nonDigitSet_];
@@ -112,7 +112,8 @@ static NSString *const kWeatherResultURL
 }
 
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
-  NSString *rawQuery = [[operation query] rawQueryString];
+  HGSTokenizedString *tokenizedQueryString = [[operation query] tokenizedQueryString];
+  NSString *rawQuery = [tokenizedQueryString originalString];
   NSString *location;
   NSUInteger rawQueryLength = [rawQuery length];
   if (rawQueryLength >= 5 && rawQueryLength <= 8) {
@@ -225,15 +226,17 @@ static NSString *const kWeatherResultURL
             [attributes setObject:image forKey:kHGSObjectAttributeIconKey];
           }
         }
-        HGSResult *hgsObject
-          = [HGSResult resultWithURI:resultURLStr
-                                name:title
-                                type:HGS_SUBTYPE(kHGSTypeOnebox, @"weather")
-                                rank:HGSCalibratedScore(kHGSCalibratedPerfectScore)
-                              source:self
-                          attributes:attributes];
-        NSArray *resultsArray = [NSArray arrayWithObject:hgsObject];
-        [operation setResults:resultsArray];
+        HGSScoredResult *scoredResult
+          = [HGSScoredResult resultWithURI:resultURLStr
+                                      name:title
+                                      type:HGS_SUBTYPE(kHGSTypeOnebox, @"weather")
+                                    source:self
+                                attributes:attributes
+                                     score:HGSCalibratedScore(kHGSCalibratedPerfectScore) 
+                               matchedTerm:tokenizedQueryString 
+                            matchedIndexes:nil];
+        NSArray *resultsArray = [NSArray arrayWithObject:scoredResult];
+        [operation setRankedResults:resultsArray];
       }
     }
   }

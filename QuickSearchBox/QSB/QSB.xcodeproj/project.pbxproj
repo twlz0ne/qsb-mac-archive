@@ -14,6 +14,7 @@
 				8BAAA38C0F7D459D00DF4F12 /* ShellScript */,
 			);
 			dependencies = (
+				8BF25C5710F7A798000490C8 /* PBXTargetDependency */,
 			);
 			name = "Test All";
 			productName = "Test All";
@@ -446,7 +447,7 @@
 		62E190960EBA4A570002241B /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62E3FE571010D9A7005D77F2 /* PicasaWeb.icns in Resources */ = {isa = PBXBuildFile; fileRef = 62E3FE561010D9A7005D77F2 /* PicasaWeb.icns */; };
 		62E3FF4010112F5D005D77F2 /* NSNotificationCenter+MainThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 62E3FF3F10112F5D005D77F2 /* NSNotificationCenter+MainThread.m */; };
-		62E3FF4110112F5D005D77F2 /* NSNotificationCenter+MainThread.h in Headers */ = {isa = PBXBuildFile; fileRef = 62E3FF3E10112F5D005D77F2 /* NSNotificationCenter+MainThread.h */; };
+		62E3FF4110112F5D005D77F2 /* NSNotificationCenter+MainThread.h in Headers */ = {isa = PBXBuildFile; fileRef = 62E3FF3E10112F5D005D77F2 /* NSNotificationCenter+MainThread.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62E3FF4210112F5D005D77F2 /* NSNotificationCenter+MainThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 62E3FF3F10112F5D005D77F2 /* NSNotificationCenter+MainThread.m */; };
 		62E4967210694900001915DF /* GoogleAccounts.sdefsrc in Sources */ = {isa = PBXBuildFile; fileRef = 62DF2008105964A500AF1801 /* GoogleAccounts.sdefsrc */; };
 		62E72A7B0F4F4ADE00A68815 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62E72A7A0F4F4ADE00A68815 /* Growl.framework */; };
@@ -884,7 +885,6 @@
 		8B79111B0F9FCAD3006BFE1E /* HGSSearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CABA0F6B0A4A003BDBDD /* HGSSearchSourceTest.m */; };
 		8B79111C0F9FCAD3006BFE1E /* HGSSimpleAccountTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9D0F6B09FE003BDBDD /* HGSSimpleAccountTest.m */; };
 		8B79111D0F9FCAD3006BFE1E /* HGSSQLiteBackedCacheTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */; };
-		8B79111E0F9FCAD3006BFE1E /* HGSStringUtilTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153370E9F9C5400C0EAA9 /* HGSStringUtilTest.m */; };
 		8B79111F0F9FCAD3006BFE1E /* HGSTokenizerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D1535A0E9F9E2900C0EAA9 /* HGSTokenizerTest.m */; };
 		8B7911210F9FCAD3006BFE1E /* NSString+ReadableURLTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D1491B0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m */; };
 		8B791D850FA1FC24006BFE1E /* HGSAppleScriptAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B791D810FA1FC24006BFE1E /* HGSAppleScriptAction.m */; };
@@ -1107,6 +1107,9 @@
 		8BE848B40E94313A00C611B0 /* QSBKeyMapTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BE848B30E94313A00C611B0 /* QSBKeyMapTest.m */; };
 		8BE84A790E94575000C611B0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		8BF2573A10F67CBD000490C8 /* GTMTypeCasting.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BF2573910F67CBD000490C8 /* GTMTypeCasting.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8BF25C0510F7A5FD000490C8 /* HGSTokenizerExceptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BF25C0410F7A5FD000490C8 /* HGSTokenizerExceptions.plist */; };
+		8BF2607B10FB9DB9000490C8 /* HGSType.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BF2607A10FB9DB9000490C8 /* HGSType.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8BF2608410FB9F8F000490C8 /* HGSType.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BF2608310FB9F8F000490C8 /* HGSType.m */; };
 		8BF442D30FC74ED500C29AA1 /* GTMGoogleSearch.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BF442D10FC74ED500C29AA1 /* GTMGoogleSearch.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BF442D40FC74ED500C29AA1 /* GTMGoogleSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BF442D20FC74ED500C29AA1 /* GTMGoogleSearch.m */; };
 		8BF517910EDBC11000D981A0 /* QSBHGSDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BF517900EDBC11000D981A0 /* QSBHGSDelegate.m */; };
@@ -1135,10 +1138,8 @@
 		F4CC19680ED1B91800D6976A /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		F4D1494B0E9A438B00C0EAA9 /* NSString+ReadableURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 644161EE0DE362CC00AC646D /* NSString+ReadableURL.m */; };
 		F4D14F120E9BE9A200C0EAA9 /* HGSDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = F4D14F110E9BE9A200C0EAA9 /* HGSDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F4D153380E9F9C5400C0EAA9 /* HGSStringUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = F4D153350E9F9C5400C0EAA9 /* HGSStringUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F4D153390E9F9C5400C0EAA9 /* HGSStringUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153360E9F9C5400C0EAA9 /* HGSStringUtil.m */; };
 		F4D1535B0E9F9E2900C0EAA9 /* HGSTokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = F4D153580E9F9E2900C0EAA9 /* HGSTokenizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F4D1535C0E9F9E2900C0EAA9 /* HGSTokenizer.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153590E9F9E2900C0EAA9 /* HGSTokenizer.m */; };
+		F4D1535C0E9F9E2900C0EAA9 /* HGSTokenizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4D153590E9F9E2900C0EAA9 /* HGSTokenizer.mm */; };
 		F4E3B5820EB6573300CB713D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		F4E3B5830EB6573300CB713D /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		F4E3B5BC0EB6580E00CB713D /* CalculatorSource.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E3B5BB0EB6580900CB713D /* CalculatorSource.m */; };
@@ -1404,13 +1405,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = F4FEECCC0EC4BF99000758EC;
 			remoteInfo = CorePlugin;
-		};
-		8B0F07C110C7473B00C1A6FD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA;
-			remoteInfo = "QSB Application";
 		};
 		8B0FFD0810C6038300C1A6FD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1705,6 +1699,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8BD97D090E636D8C00F5C83B;
 			remoteInfo = GTM;
+		};
+		8BEB03BB10FD95D700034CE1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B3EECE20CEA86A100D933C0;
+			remoteInfo = "QSB Core";
+		};
+		8BF25C5610F7A798000490C8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA;
+			remoteInfo = "QSB Application";
 		};
 		E46932F70DDB7A0200C5A64A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -3308,6 +3316,9 @@
 		8BE9BFD109C5EFCE0074EFF3 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		8BEB40F40C34822800AA2572 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		8BF2573910F67CBD000490C8 /* GTMTypeCasting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GTMTypeCasting.h; path = DebugUtils/GTMTypeCasting.h; sourceTree = "<group>"; };
+		8BF25C0410F7A5FD000490C8 /* HGSTokenizerExceptions.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = HGSTokenizerExceptions.plist; sourceTree = "<group>"; };
+		8BF2607A10FB9DB9000490C8 /* HGSType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSType.h; sourceTree = "<group>"; };
+		8BF2608310FB9F8F000490C8 /* HGSType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSType.m; sourceTree = "<group>"; };
 		8BF442D10FC74ED500C29AA1 /* GTMGoogleSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMGoogleSearch.h; sourceTree = "<group>"; };
 		8BF442D20FC74ED500C29AA1 /* GTMGoogleSearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMGoogleSearch.m; sourceTree = "<group>"; };
 		8BF4A7360E07324300D49C0F /* QSB.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSB.pch; sourceTree = "<group>"; };
@@ -3337,11 +3348,8 @@
 		F49FBAE00EF02B440059DDFC /* GTMFileSystemKQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMFileSystemKQueue.m; sourceTree = "<group>"; };
 		F4D1491B0E9A41B900C0EAA9 /* NSString+ReadableURLTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+ReadableURLTest.m"; sourceTree = "<group>"; };
 		F4D14F110E9BE9A200C0EAA9 /* HGSDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSDelegate.h; sourceTree = "<group>"; };
-		F4D153350E9F9C5400C0EAA9 /* HGSStringUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSStringUtil.h; sourceTree = "<group>"; };
-		F4D153360E9F9C5400C0EAA9 /* HGSStringUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSStringUtil.m; sourceTree = "<group>"; };
-		F4D153370E9F9C5400C0EAA9 /* HGSStringUtilTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSStringUtilTest.m; sourceTree = "<group>"; };
 		F4D153580E9F9E2900C0EAA9 /* HGSTokenizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSTokenizer.h; sourceTree = "<group>"; };
-		F4D153590E9F9E2900C0EAA9 /* HGSTokenizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSTokenizer.m; sourceTree = "<group>"; };
+		F4D153590E9F9E2900C0EAA9 /* HGSTokenizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HGSTokenizer.mm; sourceTree = "<group>"; };
 		F4D1535A0E9F9E2900C0EAA9 /* HGSTokenizerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSTokenizerTest.m; sourceTree = "<group>"; };
 		F4D153660E9FA04400C0EAA9 /* HGSQueryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSQueryTest.m; sourceTree = "<group>"; };
 		F4E3B5890EB6573300CB713D /* Calculator.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Calculator.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -5180,6 +5188,7 @@
 				8B6EB648101A0D18006CFF7A /* Localizable.strings */,
 				8B6EB64C101A0D18006CFF7A /* TypeCategories.plist */,
 				62D570C61059E704002D086B /* ScoreCalibration.plist */,
+				8BF25C0410F7A5FD000490C8 /* HGSTokenizerExceptions.plist */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -5392,12 +5401,11 @@
 				7F3F75D80E152E6D001AF34E /* HGSSQLiteBackedCache.h */,
 				7F3F75D90E152E6D001AF34E /* HGSSQLiteBackedCache.m */,
 				7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */,
-				F4D153350E9F9C5400C0EAA9 /* HGSStringUtil.h */,
-				F4D153360E9F9C5400C0EAA9 /* HGSStringUtil.m */,
-				F4D153370E9F9C5400C0EAA9 /* HGSStringUtilTest.m */,
 				F4D153580E9F9E2900C0EAA9 /* HGSTokenizer.h */,
-				F4D153590E9F9E2900C0EAA9 /* HGSTokenizer.m */,
+				F4D153590E9F9E2900C0EAA9 /* HGSTokenizer.mm */,
 				F4D1535A0E9F9E2900C0EAA9 /* HGSTokenizerTest.m */,
+				8BF2607A10FB9DB9000490C8 /* HGSType.h */,
+				8BF2608310FB9F8F000490C8 /* HGSType.m */,
 				8B852E3F1007B1DE00880329 /* HGSUnitTestingUtilities.h */,
 				8B852E401007B1DE00880329 /* HGSUnitTestingUtilities.m */,
 				8B6F2D5E0DA2B88E0052CA40 /* Vermilion-Info.plist */,
@@ -5969,7 +5977,6 @@
 				E4617A900DC23BE300CE7C0F /* HGSMixer.h in Headers */,
 				33D2CBAD0DD2573100C1FBDC /* HGSMemorySearchSource.h in Headers */,
 				F4D14F120E9BE9A200C0EAA9 /* HGSDelegate.h in Headers */,
-				F4D153380E9F9C5400C0EAA9 /* HGSStringUtil.h in Headers */,
 				F4D1535B0E9F9E2900C0EAA9 /* HGSTokenizer.h in Headers */,
 				5AED32BA0EAFDF1F004C7187 /* HGSOperation.h in Headers */,
 				5AED35E70EB7D978004C7187 /* HGSIconProvider.h in Headers */,
@@ -6000,6 +6007,7 @@
 				8B2B01911071813D00427404 /* HGSSimpleArraySearchOperation.h in Headers */,
 				8B53E13110D95393007E6AF2 /* HGSSearchSourceRanker.h in Headers */,
 				8B4463FA10F278FC00561E62 /* HGSKeychainItem.h in Headers */,
+				8BF2607B10FB9DB9000490C8 /* HGSType.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6590,7 +6598,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				8B0F07C210C7473B00C1A6FD /* PBXTargetDependency */,
+				8BEB03BC10FD95D700034CE1 /* PBXTargetDependency */,
 			);
 			name = "QSB Core Test";
 			productName = WebServerTests;
@@ -7559,6 +7567,7 @@
 				8B6EB656101A0D18006CFF7A /* TypeCategories.plist in Resources */,
 				62D570C71059E704002D086B /* ScoreCalibration.plist in Resources */,
 				8B62810010D8663E00F166D1 /* HGSSearchSourceRankerCalibration.plist in Resources */,
+				8BF25C0510F7A5FD000490C8 /* HGSTokenizerExceptions.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8868,8 +8877,7 @@
 				E4617A910DC23BE300CE7C0F /* HGSMixer.m in Sources */,
 				33D2CBAE0DD2573100C1FBDC /* HGSMemorySearchSource.m in Sources */,
 				F4D1494B0E9A438B00C0EAA9 /* NSString+ReadableURL.m in Sources */,
-				F4D153390E9F9C5400C0EAA9 /* HGSStringUtil.m in Sources */,
-				F4D1535C0E9F9E2900C0EAA9 /* HGSTokenizer.m in Sources */,
+				F4D1535C0E9F9E2900C0EAA9 /* HGSTokenizer.mm in Sources */,
 				5AED32BB0EAFDF1F004C7187 /* HGSOperation.m in Sources */,
 				5AED35E80EB7D978004C7187 /* HGSIconProvider.m in Sources */,
 				5AF4E0B10EB91BC200B26194 /* HGSLRUCache.m in Sources */,
@@ -8898,6 +8906,7 @@
 				8B2B01921071813D00427404 /* HGSSimpleArraySearchOperation.m in Sources */,
 				8B53E13010D95393007E6AF2 /* HGSSearchSourceRanker.m in Sources */,
 				8B4463F910F278FC00561E62 /* HGSKeychainItem.m in Sources */,
+				8BF2608410FB9F8F000490C8 /* HGSType.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9056,7 +9065,6 @@
 				8B79111B0F9FCAD3006BFE1E /* HGSSearchSourceTest.m in Sources */,
 				8B79111C0F9FCAD3006BFE1E /* HGSSimpleAccountTest.m in Sources */,
 				8B79111D0F9FCAD3006BFE1E /* HGSSQLiteBackedCacheTest.m in Sources */,
-				8B79111E0F9FCAD3006BFE1E /* HGSStringUtilTest.m in Sources */,
 				8B79111F0F9FCAD3006BFE1E /* HGSTokenizerTest.m in Sources */,
 				8B7911210F9FCAD3006BFE1E /* NSString+ReadableURLTest.m in Sources */,
 				8B791D890FA1FC35006BFE1E /* HGSAppleScriptActionTest.m in Sources */,
@@ -9229,11 +9237,6 @@
 			target = F4FEECCC0EC4BF99000758EC /* CorePlugin */;
 			targetProxy = 8B0F072810C745FA00C1A6FD /* PBXContainerItemProxy */;
 		};
-		8B0F07C210C7473B00C1A6FD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
-			targetProxy = 8B0F07C110C7473B00C1A6FD /* PBXContainerItemProxy */;
-		};
 		8B0FFD0910C6038300C1A6FD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B3EF87F0EF2C8A80036FFBD /* Shortcuts */;
@@ -9383,6 +9386,16 @@
 			isa = PBXTargetDependency;
 			target = 8BD97D090E636D8C00F5C83B /* GTM */;
 			targetProxy = 8BD988250E645EFF00F5C83B /* PBXContainerItemProxy */;
+		};
+		8BEB03BC10FD95D700034CE1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B3EECE20CEA86A100D933C0 /* QSB Core */;
+			targetProxy = 8BEB03BB10FD95D700034CE1 /* PBXContainerItemProxy */;
+		};
+		8BF25C5710F7A798000490C8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
+			targetProxy = 8BF25C5610F7A798000490C8 /* PBXContainerItemProxy */;
 		};
 		E46932F60DDB7A0200C5A64A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

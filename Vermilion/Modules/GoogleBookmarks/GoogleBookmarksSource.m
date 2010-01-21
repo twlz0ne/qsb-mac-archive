@@ -184,14 +184,13 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
        icon, kHGSObjectAttributeIconKey,
        @"star-flag", kHGSObjectAttributeFlagIconNameKey,
        nil];
-  HGSResult* result 
-    = [HGSResult resultWithURI:url
-                          name:([title length] > 0 ? title : url)
-                          type:HGS_SUBTYPE(kHGSTypeWebBookmark,
+  HGSUnscoredResult* result 
+    = [HGSUnscoredResult resultWithURI:url
+                                  name:([title length] > 0 ? title : url)
+                                  type:HGS_SUBTYPE(kHGSTypeWebBookmark,
                                            @"googlebookmarks")
-                          rank:kHGSResultUnknownRank
-                        source:self
-                    attributes:attributes];
+                                source:self
+                            attributes:attributes];
   [self indexResult:result
                name:title
          otherTerms:otherTermStrings];

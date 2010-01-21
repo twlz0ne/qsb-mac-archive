@@ -191,13 +191,13 @@ NSString *const kHGSSearchOperationWasCancelledNotification
   [self doesNotRecognizeSelector:_cmd];
 }
 
-- (NSArray *)sortedResultsInRange:(NSRange)range {
+- (NSArray *)sortedRankedResultsInRange:(NSRange)range {
   NSMutableArray *array = nil;
   if (range.length > 0) {
     array = [NSMutableArray arrayWithCapacity:range.length];
     [self disableUpdates];
     for (NSUInteger i = range.location; i < NSMaxRange(range); ++i) {
-      HGSResult *result = [self sortedResultAtIndex:i];
+      HGSScoredResult *result = [self sortedRankedResultAtIndex:i];
       if (result) {
         [array addObject:result];
       }
@@ -207,7 +207,7 @@ NSString *const kHGSSearchOperationWasCancelledNotification
   return array;
 }
 
-- (HGSResult *)sortedResultAtIndex:(NSUInteger)idx {
+- (HGSScoredResult *)sortedRankedResultAtIndex:(NSUInteger)idx {
   [self doesNotRecognizeSelector:_cmd];
   return nil;
 }

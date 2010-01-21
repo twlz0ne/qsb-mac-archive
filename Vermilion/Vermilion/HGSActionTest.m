@@ -39,6 +39,7 @@
 
 #import "HGSAction.h"
 #import "HGSResult.h"
+#import "HGSType.h"
 
 // A special dummy subtype of the webpage type.
 #define kHGSTypeWebFrammy HGS_SUBTYPE(kHGSTypeWebpage, @"frammy")
@@ -49,7 +50,7 @@
 }
 @end
 
-@interface MyObject : HGSResult
+@interface MyObject : HGSUnscoredResult
 - (id)initWithIdentifier:(NSString*)identifier;
 @end
 
@@ -58,7 +59,6 @@
   return [super initWithURI:identifier
                        name:@"MyObject" 
                        type:@"test" 
-                       rank:kHGSResultUnknownRank
                      source:nil
                  attributes:nil];
 }
@@ -255,30 +255,30 @@
   
   // Various results with acceptable and unacceptable types.
   NSString* path = @"file:///path/to/file/is/irrelevant";
-  HGSResult* acceptableText = [HGSResult resultWithURI:path 
-                                                  name:@"acceptable"
-                                                  type:kHGSTypeText
-                                                  rank:kHGSResultUnknownRank
-                                                source:nil
-                                            attributes:nil];
-  HGSResult* acceptableFile = [HGSResult resultWithURI:path 
-                                                  name:@"acceptable"
-                                                  type:kHGSTypeFile
-                                                  rank:kHGSResultUnknownRank
-                                                source:nil
-                                            attributes:nil];
-  HGSResult* unacceptableWebpage = [HGSResult resultWithURI:path 
-                                                       name:@"not acceptable"
-                                                       type:kHGSTypeWebpage
-                                                       rank:kHGSResultUnknownRank
-                                                     source:nil
-                                                 attributes:nil];
-  HGSResult* unacceptableFrammy = [HGSResult resultWithURI:path 
-                                                      name:@"not acceptable"
-                                                      type:kHGSTypeWebFrammy
-                                                      rank:kHGSResultUnknownRank
-                                                    source:nil
-                                                attributes:nil];
+  HGSUnscoredResult* acceptableText 
+    = [HGSUnscoredResult resultWithURI:path 
+                                  name:@"acceptable"
+                                  type:kHGSTypeText
+                                source:nil
+                            attributes:nil];
+  HGSUnscoredResult* acceptableFile 
+    = [HGSUnscoredResult resultWithURI:path 
+                                  name:@"acceptable"
+                                  type:kHGSTypeFile
+                                source:nil
+                            attributes:nil];
+  HGSUnscoredResult* unacceptableWebpage 
+    = [HGSUnscoredResult resultWithURI:path 
+                                  name:@"not acceptable"
+                                  type:kHGSTypeWebpage
+                                source:nil
+                            attributes:nil];
+  HGSUnscoredResult* unacceptableFrammy 
+    = [HGSUnscoredResult resultWithURI:path 
+                                  name:@"not acceptable"
+                                  type:kHGSTypeWebFrammy
+                                source:nil
+                            attributes:nil];
   
   // Accept single result with type not webPage.
   HGSResultArray *results = [HGSResultArray arrayWithResult:acceptableText];

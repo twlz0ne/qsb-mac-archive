@@ -47,10 +47,9 @@
   NSArray *paths = [pb propertyListForType:NSFilenamesPboardType];
   NSMutableArray *array = [NSMutableArray arrayWithCapacity:[paths count]];
   for (NSString *path in paths) {
-    HGSResult *result = [HGSResult resultWithFilePath:path
-                                                 rank:kHGSResultUnknownRank
-                                               source:nil
-                                           attributes:nil];
+    HGSUnscoredResult *result = [HGSUnscoredResult resultWithFilePath:path
+                                                               source:nil
+                                                           attributes:nil];
     HGSAssert(result, @"Unable to create result with %@", path);
     if (result) {
       [array addObject:result];

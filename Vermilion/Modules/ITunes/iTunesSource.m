@@ -149,38 +149,40 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
                forTrackObject:(HGSResult *)pivotObject;
 - (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
                forAlbumObject:(HGSResult *)pivotObject
-                    withQuery:(NSString *)query ;
+                    withQuery:(HGSTokenizedString *)query ;
 - (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
             forPlaylistObject:(HGSResult *)pivotObject
-                    withQuery:(NSString *)query;
+                    withQuery:(HGSTokenizedString *)query;
 - (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
                     forObject:(HGSResult *)pivotObject
-                    withQuery:(NSString *)query;
-- (HGSResult *)trackResult:(NSString *)track
-           withTrackNumber:(int)trackNumber
-                   onAlbum:(NSString *)album
-                  byArtist:(NSString *)artist
-                byComposer:(NSString *)composer
-                   inGenre:(NSString *)genre
-                atLocation:(NSString *)location
-                playListID:(NSString *)playListID
-                 matchedBy:(NSString *)queryString;
-- (HGSResult *)albumResult:(NSString *)album
-                  byArtist:(NSString *)artist
-                byComposer:(NSString *)composer
-                   inGenre:(NSString *)genre
-              withIconFile:(NSString *)iconFilePath
-                 matchedBy:(NSString *)queryString;
-- (HGSResult *)artistResult:(NSString *)artist
-                  matchedBy:(NSString *)queryString;
-- (HGSResult *)composerResult:(NSString *)composer
-                    matchedBy:(NSString *)queryString;
-- (HGSResult *)genreResult:(NSString *)genre
-                 matchedBy:(NSString *)queryString;
-- (HGSResult *)playListResult:(NSString *)playlist
-                   playlistId:(NSString *)playlistId
-                    matchedBy:(NSString *)queryString;
-- (CGFloat)rankForString:(NSString *)string matchedBy:(NSString *)queryString;
+                    withQuery:(HGSTokenizedString *)query;
+- (HGSScoredResult *)trackResult:(NSString *)track
+                 withTrackNumber:(int)trackNumber
+                         onAlbum:(NSString *)album
+                        byArtist:(NSString *)artist
+                      byComposer:(NSString *)composer
+                         inGenre:(NSString *)genre
+                      atLocation:(NSString *)location
+                      playListID:(NSString *)playListID
+                       matchedBy:(HGSTokenizedString *)queryString;
+- (HGSScoredResult *)albumResult:(NSString *)album
+                        byArtist:(NSString *)artist
+                      byComposer:(NSString *)composer
+                         inGenre:(NSString *)genre
+                    withIconFile:(NSString *)iconFilePath
+                       matchedBy:(HGSTokenizedString *)queryString;
+- (HGSScoredResult *)artistResult:(NSString *)artist
+                        matchedBy:(HGSTokenizedString *)queryString;
+- (HGSScoredResult *)composerResult:(NSString *)composer
+                          matchedBy:(HGSTokenizedString *)queryString;
+- (HGSScoredResult *)genreResult:(NSString *)genre
+                       matchedBy:(HGSTokenizedString *)queryString;
+- (HGSScoredResult *)playListResult:(NSString *)playlist
+                         playlistId:(NSString *)playlistId
+                          matchedBy:(HGSTokenizedString *)queryString;
+- (CGFloat)scoreForString:(NSString *)string 
+                matchedBy:(HGSTokenizedString *)queryString
+           matchedIndexes:(NSIndexSet **)matchedIndexes;
 - (HGSAction *)defaultAction;
 - (NSImage *)iconForGenre:(NSString *)genre;
 @end
@@ -448,12 +450,12 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
   if ([album length]) {
     NSString *path = [pivotObject filePath];
-    HGSResult *newAlbum = [self albumResult:album
-                                   byArtist:artist
-                                 byComposer:composer
-                                    inGenre:genre
-                               withIconFile:path
-                                  matchedBy:nil];
+    HGSScoredResult *newAlbum = [self albumResult:album
+                                         byArtist:artist
+                                       byComposer:composer
+                                          inGenre:genre
+                                     withIconFile:path
+                                        matchedBy:nil];
     [results addObject:newAlbum];
   }
 
@@ -491,12 +493,12 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     [statement finalizeStatement];
   }
 
-  [operation setResults:results];
+  [operation setRankedResults:results];
 }
 
 - (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
                forAlbumObject:(HGSResult *)pivotObject
-                    withQuery:(NSString *)query  {
+                    withQuery:(HGSTokenizedString *)query  {
   // For albums, return tracks from the album
   NSString *pivotObjectAlbum
     = [pivotObject valueForKey:kITunesAttributeAlbumKey];
@@ -517,8 +519,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           break;
         }
         NSString *track = [statement resultStringAtPosition:1];
-        if (![query length]
-            || [track rangeOfString:query
+        if (![query tokenizedLength]
+            || [track rangeOfString:[query tokenizedString]
                             options:kResultStringCompareOptions].location
             != NSNotFound) {
           int trackId = [[statement resultStringAtPosition:0] intValue];
@@ -539,14 +541,14 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         }
       }
     }
-    [operation setResults:results];
+    [operation setRankedResults:results];
     [statement finalizeStatement];
   }
 }
 
 - (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
             forPlaylistObject:(HGSResult *)pivotObject
-                    withQuery:(NSString *)query {
+                    withQuery:(HGSTokenizedString *)query {
   // For playlists, return tracks from the playlist
   NSInteger pivotObjectPlaylistId
     = [[pivotObject valueForKey:kITunesAttributePlaylistIdKey] intValue];
@@ -566,8 +568,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           break;
         }
         NSString *track = [statement resultStringAtPosition:1];
-        if (![query length]
-            || [track rangeOfString:query
+        if (![query tokenizedLength]
+            || [track rangeOfString:[query tokenizedString]
                             options:kResultStringCompareOptions].location
             != NSNotFound) {
           int trackId = [[statement resultStringAtPosition:0] intValue];
@@ -578,27 +580,27 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           NSString *location = [statement resultStringAtPosition:6];
           NSString *playListID
             = [pivotObject valueForKey:kITunesAttributePlaylistIdKey];
-          HGSResult *result =  [self trackResult:track
-                                 withTrackNumber:trackId
-                                         onAlbum:album
-                                        byArtist:artist
-                                      byComposer:composer
-                                         inGenre:genre
-                                      atLocation:location
-                                        playListID:playListID
-                                       matchedBy:query];
+          HGSScoredResult *result =  [self trackResult:track
+                                       withTrackNumber:trackId
+                                               onAlbum:album
+                                              byArtist:artist
+                                            byComposer:composer
+                                               inGenre:genre
+                                            atLocation:location
+                                            playListID:playListID
+                                             matchedBy:query];
           [results addObject:result];
         }
       }
     }
-    [operation setResults:results];
+    [operation setRankedResults:results];
     [statement finalizeStatement];
   }
 }
 
 - (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
                     forObject:(HGSResult *)pivotObject
-                    withQuery:(NSString *)query {
+                    withQuery:(HGSTokenizedString *)query {
   NSString *sqlSelect = nil;
   if ([pivotObject isOfType:kTypeITunesArtist]) {
     // For artists, return albums by the artist
@@ -636,8 +638,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           break;
         }
         NSString *album = [statement resultStringAtPosition:0];
-        if (![query length]
-            || [album rangeOfString:query
+        if (![query tokenizedLength]
+            || [album rangeOfString:[query tokenizedString]
                             options:kResultStringCompareOptions].location
             != NSNotFound) {
           NSString *artist = [statement resultStringAtPosition:1];
@@ -653,7 +655,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         }
       }
     }
-    [operation setResults:results];
+    [operation setRankedResults:results];
     [statement finalizeStatement];
   }
 }
@@ -667,28 +669,30 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   //   -- in the helpers for pivots, handle multiple terms w/o doing matches
   //      in the middle of words (ie-segment), maybe also match all parts of
   //      a track instead of just single parts of the track metadata.
-  NSString *query = [[operation query] rawQueryString];
-  HGSResult *pivotObject = [[operation query] pivotObject];
+  HGSQuery *query = [operation query];
+  HGSTokenizedString *tokenizedQuery = [query tokenizedQueryString];
+  HGSResult *pivotObject = [query pivotObject];
   if (pivotObject) {
     if ([pivotObject isOfType:kHGSTypeFileMusic]) {
       [self performPivotOperation:operation forTrackObject:pivotObject];
     } else if ([pivotObject isOfType:kTypeITunesAlbum]) {
       [self performPivotOperation:operation
                    forAlbumObject:pivotObject
-                        withQuery:query];
+                        withQuery:tokenizedQuery];
     } else if ([pivotObject isOfType:kTypeITunesPlaylist]) {
       [self performPivotOperation:operation
                 forPlaylistObject:pivotObject
-                        withQuery:query];
+                        withQuery:tokenizedQuery];
     } else if ([pivotObject isOfType:kTypeITunesArtist] ||
                [pivotObject isOfType:kTypeITunesComposer] ||
                [pivotObject isOfType:kTypeITunesGenre]) {
       [self performPivotOperation:operation
                         forObject:pivotObject
-                        withQuery:query];
+                        withQuery:tokenizedQuery];
     }
   } else {
-    NSString *likeString = [NSString stringWithFormat:@"%%%@%%", query];
+    NSString *tokenizedString = [tokenizedQuery tokenizedString];
+    NSString *likeString = [NSString stringWithFormat:@"%%%@%%", tokenizedString];
     likeString = [GTMSQLiteStatement quoteAndEscapeString:likeString];
     sqlSelect = [NSString stringWithFormat:kSqlSelectStatement,
                  likeString, likeString, likeString, likeString, likeString];
@@ -716,7 +720,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
           // We matched at least one column, figure out which column(s) matched
           // and create an appropriate result object for it
-          if ([track rangeOfString:query
+          if ([track rangeOfString:tokenizedString
                            options:kResultStringCompareOptions].location
               != NSNotFound) {
             // Track name matched
@@ -729,15 +733,16 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                          inGenre:genre
                                       atLocation:location
                                       playListID:nil
-                                       matchedBy:query]];
+                                       matchedBy:tokenizedQuery]];
           }
-          NSRange range = [artist rangeOfString:query
+          NSRange range = [artist rangeOfString:tokenizedString
                                         options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Artist matched
-            [results addObject:[self artistResult:artist matchedBy:query]];
+            [results addObject:[self artistResult:artist 
+                                        matchedBy:tokenizedQuery]];
           }
-          range = [album rangeOfString:query
+          range = [album rangeOfString:tokenizedString
                                options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Album matched
@@ -746,19 +751,20 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                       byComposer:composer
                                          inGenre:genre
                                    withIconFile:location
-                                       matchedBy:query]];
+                                       matchedBy:tokenizedQuery]];
           }
-          range = [composer rangeOfString:query
+          range = [composer rangeOfString:tokenizedString
                                   options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Composer matched
-            [results addObject:[self composerResult:composer matchedBy:query]];
+            [results addObject:[self composerResult:composer 
+                                          matchedBy:tokenizedQuery]];
           }
-          range = [genre rangeOfString:query
+          range = [genre rangeOfString:tokenizedString
                                options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Genre matched
-            [results addObject:[self genreResult:genre matchedBy:query]];
+            [results addObject:[self genreResult:genre matchedBy:tokenizedQuery]];
           }
         }
       }
@@ -785,18 +791,18 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           NSString *playlist = [statement resultStringAtPosition:1];
           [results addObject:[self playListResult:playlist
                                        playlistId:playlistId
-                                        matchedBy:query]];
+                                        matchedBy:tokenizedQuery]];
         }
       }
 
       [statement finalizeStatement];
     }
 
-    [operation setResults:[results allObjects]];
+    [operation setRankedResults:[results allObjects]];
   }
 }
 
-- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult *)result {
   // Don't want itunes results remembered in shortcuts
   // TODO(hawk): revisit when we don't use a subclass and see if we can save a
   // few things to rebuild the real result.
@@ -810,16 +816,19 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return nil;
 }
 
-- (HGSResult *)trackResult:(NSString *)track
-           withTrackNumber:(int)trackNumber
-                   onAlbum:(NSString *)album
-                  byArtist:(NSString *)artist
-                byComposer:(NSString *)composer
-                   inGenre:(NSString *)genre
-                atLocation:(NSString *)location
-                playListID:(NSString *)playListID
-                 matchedBy:(NSString *)queryString {
-  CGFloat rank = [self rankForString:track matchedBy:queryString];
+- (HGSScoredResult *)trackResult:(NSString *)track
+                 withTrackNumber:(int)trackNumber
+                         onAlbum:(NSString *)album
+                        byArtist:(NSString *)artist
+                      byComposer:(NSString *)composer
+                         inGenre:(NSString *)genre
+                      atLocation:(NSString *)location
+                      playListID:(NSString *)playListID
+                       matchedBy:(HGSTokenizedString *)queryString {
+  NSIndexSet *matchedIndexes = nil;
+  CGFloat score = [self scoreForString:track 
+                             matchedBy:queryString 
+                        matchedIndexes:&matchedIndexes];
   NSMutableDictionary *attributes
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        [NSNumber numberWithInt:trackNumber], kITunesAttributeTrackIdKey,
@@ -849,25 +858,30 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   if ([playListID length]) {
     [attributes setObject:playListID forKey:kITunesAttributePlaylistIdKey];
   }
-
-  return [HGSResult resultWithURI:location
-                             name:track
-                             type:kHGSTypeFileMusic
-                             rank:rank
-                           source:self
-                       attributes:attributes];
+  HGSScoredResult *result = [HGSScoredResult resultWithURI:location
+                                                      name:track
+                                                      type:kHGSTypeFileMusic
+                                                    source:self
+                                                attributes:attributes
+                                                     score:score 
+                                               matchedTerm:queryString 
+                                            matchedIndexes:matchedIndexes];
+  return result;
 }
 
-- (HGSResult *)albumResult:(NSString *)album
-                  byArtist:(NSString *)artist
-                byComposer:(NSString *)composer
-                   inGenre:(NSString *)genre
-              withIconFile:(NSString *)iconFilePath
-                 matchedBy:(NSString *)queryString {
+- (HGSScoredResult *)albumResult:(NSString *)album
+                        byArtist:(NSString *)artist
+                      byComposer:(NSString *)composer
+                         inGenre:(NSString *)genre
+                    withIconFile:(NSString *)iconFilePath
+                       matchedBy:(HGSTokenizedString *)queryString {
   NSString *albumUrlString
     = [NSString stringWithFormat:kAlbumUrlFormat,
        [album stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-  CGFloat rank = [self rankForString:album matchedBy:queryString];
+  NSIndexSet *matchedIndexes = nil;
+  CGFloat score = [self scoreForString:album 
+                             matchedBy:queryString
+                        matchedIndexes:&matchedIndexes];
   NSMutableDictionary *attributes
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
@@ -888,54 +902,70 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     [attributes setObject:genre forKey:kITunesAttributeGenreKey];
   }
 
-  return [HGSResult resultWithURI:albumUrlString
-                             name:album
-                             type:kTypeITunesAlbum
-                             rank:rank
-                           source:self
-                       attributes:attributes];
+  HGSScoredResult *result = [HGSScoredResult resultWithURI:albumUrlString
+                                                      name:album
+                                                      type:kTypeITunesAlbum
+                                                    source:self
+                                                attributes:attributes
+                                                     score:score 
+                                               matchedTerm:queryString 
+                                            matchedIndexes:matchedIndexes];
+  return result;
+  
 }
 
-- (HGSResult *)artistResult:(NSString *)artist
-                  matchedBy:(NSString *)queryString {
+- (HGSScoredResult *)artistResult:(NSString *)artist
+                        matchedBy:(HGSTokenizedString *)queryString {
   NSString *artistUrlString
     = [NSString stringWithFormat:kArtistUrlFormat,
        [artist stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
   HGSAction *action = [self defaultAction];
-  CGFloat rank = [self rankForString:artist matchedBy:queryString];
+  NSIndexSet *matchedIndexes = nil;
+  CGFloat score = [self scoreForString:artist 
+                             matchedBy:queryString
+                        matchedIndexes:&matchedIndexes];
   NSDictionary *attributes
     = [NSDictionary dictionaryWithObjectsAndKeys:
        artist, kITunesAttributeArtistKey,
        artistIcon_, kHGSObjectAttributeIconKey,
        action, kHGSObjectAttributeDefaultActionKey,
        nil];
-  return [HGSResult resultWithURI:artistUrlString
-                             name:artist
-                             type:kTypeITunesArtist
-                             rank:rank
-                           source:self
-                       attributes:attributes];
+  HGSScoredResult *result = [HGSScoredResult resultWithURI:artistUrlString
+                                                      name:artist
+                                                      type:kTypeITunesArtist
+                                                    source:self
+                                                attributes:attributes
+                                                     score:score 
+                                               matchedTerm:queryString 
+                                            matchedIndexes:matchedIndexes];
+  return result;
 }
 
-- (HGSResult *)composerResult:(NSString *)composer
-                    matchedBy:(NSString *)queryString {
+- (HGSScoredResult *)composerResult:(NSString *)composer
+                          matchedBy:(HGSTokenizedString *)queryString {
   NSString *composerUrlString
     = [NSString stringWithFormat:kComposerUrlFormat,
        [composer stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
   HGSAction *action = [self defaultAction];
-  CGFloat rank = [self rankForString:composer matchedBy:queryString];
+  NSIndexSet *matchedIndexes = nil;
+  CGFloat score = [self scoreForString:composer 
+                             matchedBy:queryString
+                        matchedIndexes:&matchedIndexes];
   NSDictionary *attributes
     = [NSDictionary dictionaryWithObjectsAndKeys:
        composer, kITunesAttributeComposerKey,
        composerIcon_, kHGSObjectAttributeIconKey,
        action, kHGSObjectAttributeDefaultActionKey,
        nil];
-  return [HGSResult resultWithURI:composerUrlString
-                             name:composer
-                             type:kTypeITunesComposer
-                             rank:rank
-                           source:self
-                       attributes:attributes];
+  HGSScoredResult *result = [HGSScoredResult resultWithURI:composerUrlString
+                                                      name:composer
+                                                      type:kTypeITunesComposer
+                                                    source:self
+                                                attributes:attributes
+                                                     score:score 
+                                               matchedTerm:queryString 
+                                            matchedIndexes:matchedIndexes]; 
+  return result;
 }
 
 - (NSImage *)iconForGenre:(NSString *)genre {
@@ -964,36 +994,44 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return icon;
 }
 
-- (HGSResult *)genreResult:(NSString *)genre
-                 matchedBy:(NSString *)queryString {
+- (HGSScoredResult *)genreResult:(NSString *)genre
+                       matchedBy:(HGSTokenizedString *)queryString {
   NSString *genreUrlString
     = [NSString stringWithFormat:kGenreUrlFormat,
        [genre stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
 
   NSImage *icon = [self iconForGenre:genre];
-  CGFloat rank = [self rankForString:genre
-                           matchedBy:queryString] + kGenreMatchAdjustment;
+  NSIndexSet *matchedIndexes = nil;
+  CGFloat score = [self scoreForString:genre
+                             matchedBy:queryString
+                        matchedIndexes:&matchedIndexes] + kGenreMatchAdjustment;
   NSDictionary *attributes
     = [NSDictionary dictionaryWithObjectsAndKeys:
        genre, kITunesAttributeGenreKey,
        icon, kHGSObjectAttributeIconKey,
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        nil];
-  return [HGSResult resultWithURI:genreUrlString
-                             name:genre
-                             type:kTypeITunesGenre
-                             rank:rank
-                           source:self
-                       attributes:attributes];
+  HGSScoredResult *result = [HGSScoredResult resultWithURI:genreUrlString
+                                                      name:genre
+                                                      type:kTypeITunesGenre
+                                                    source:self
+                                                attributes:attributes      
+                                                     score:score 
+                                               matchedTerm:queryString 
+                                            matchedIndexes:matchedIndexes]; 
+  return result;
 }
 
-- (HGSResult *)playListResult:(NSString *)playlist
-                   playlistId:(NSString *)playlistId
-                    matchedBy:(NSString *)queryString {
+- (HGSScoredResult *)playListResult:(NSString *)playlist
+                         playlistId:(NSString *)playlistId
+                          matchedBy:(HGSTokenizedString *)queryString {
   NSString *playlistUrlString
     = [NSString stringWithFormat:kPlaylistUrlFormat,
        [playlist stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-  CGFloat rank = [self rankForString:playlist matchedBy:queryString];
+  NSIndexSet *matchedIndexes = nil;
+  CGFloat score = [self scoreForString:playlist 
+                             matchedBy:queryString
+                        matchedIndexes:&matchedIndexes];
   NSDictionary *attributes
     = [NSDictionary dictionaryWithObjectsAndKeys:
        playlistId, kITunesAttributePlaylistIdKey,
@@ -1001,12 +1039,15 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
        playlistIcon_, kHGSObjectAttributeIconKey,
        [self defaultAction], kHGSObjectAttributeDefaultActionKey,
        nil];
-  return [HGSResult resultWithURI:playlistUrlString
-                             name:playlist
-                             type:kTypeITunesPlaylist
-                             rank:rank
-                           source:self
-                       attributes:attributes];
+  HGSScoredResult *result = [HGSScoredResult resultWithURI:playlistUrlString
+                                                      name:playlist
+                                                      type:kTypeITunesPlaylist
+                                                    source:self
+                                                attributes:attributes
+                                                     score:score 
+                                               matchedTerm:queryString 
+                                            matchedIndexes:matchedIndexes]; 
+  return result;
 }
 
 - (HGSAction *)defaultAction {
@@ -1020,14 +1061,17 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return action;
 }
 
-- (CGFloat)rankForString:(NSString *)string matchedBy:(NSString *)queryString {
-  CGFloat rank = 0;
-  if (string && queryString) {
-    string = [HGSTokenizer tokenizeString:string];
-    queryString = [HGSTokenizer tokenizeString:queryString];
-    rank = HGSScoreTermForString(queryString, string);
+- (CGFloat)scoreForString:(NSString *)string 
+                matchedBy:(HGSTokenizedString *)queryString 
+           matchedIndexes:(NSIndexSet **)matchedIndexes {
+  CGFloat score = 0;
+  if ([string length] && [queryString tokenizedLength]) {
+    HGSTokenizedString *tokenizedString = [HGSTokenizer tokenizeString:string];
+    score = HGSScoreTermForItem(queryString, tokenizedString, matchedIndexes);
+  } else if ([queryString tokenizedLength] == 0) {
+    score = HGSCalibratedScore(kHGSCalibratedWeakScore);
   }
-  return rank;
+  return score;
 }
 
 @end

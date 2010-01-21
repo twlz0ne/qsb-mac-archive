@@ -34,8 +34,12 @@
 #import "GTMSenTestCase.h"
 #import "HGSPythonAction.h"
 #import "HGSResult.h"
+#import "HGSType.h"
 
-@interface HGSPythonActionTest : GTMTestCase 
+@interface HGSPythonActionTest : GTMTestCase {
+ @private
+  int notificationCount_;
+}
 @end
 
 @implementation HGSPythonActionTest
@@ -60,12 +64,15 @@
     = [[[HGSPythonAction alloc] initWithConfiguration:config] autorelease];
   STAssertNotNil(action, nil);
   
-  HGSResult *result = [HGSResult resultWithURI:@"http://www.google.com/"
-                                          name:@"Google"
-                                          type:kHGSTypeWebBookmark
-                                          rank:kHGSResultUnknownRank
-                                        source:nil
-                                    attributes:nil];
+  HGSScoredResult *result 
+    = [HGSScoredResult resultWithURI:@"http://www.google.com/"
+                                name:@"Google"
+                                type:kHGSTypeWebBookmark
+                              source:nil
+                          attributes:nil
+                               score:0
+                         matchedTerm:nil
+                      matchedIndexes:nil];
   STAssertNotNil(result, nil);
   HGSResultArray *results = [HGSResultArray arrayWithResult:result];
   STAssertNotNil(results, nil);
@@ -76,9 +83,30 @@
                         results, kHGSActionDirectObjectsKey, nil];
   STAssertNotNil(info, nil);
   
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];  
+  [nc addObserver:self 
+         selector:@selector(displayUserMessage:) 
+             name:kHGSUserMessageNotification 
+           object:nil];
+  notificationCount_ = 0;
   STAssertTrue([action performWithInfo:info], nil);
   
+  // We have 3 here, because we increment notificationCount_ by one for each
+  // argument passed to it. The first call we make only passes one arg, the
+  // second call passes two.
+  STAssertEquals(notificationCount_, 3, nil);
+  [nc removeObserver:self name:kHGSUserMessageNotification object:nil];
   STAssertNotNil([action directObjectTypes], nil);
 }
 
+- (void)displayUserMessage:(NSNotification *)notification {
+  NSDictionary *userInfo = [notification userInfo];
+  NSString *message = [userInfo objectForKey:kHGSSummaryMessageKey];
+  STAssertNotNil(message, nil);
+  NSString *description = [userInfo objectForKey:kHGSDescriptionMessageKey];
+  if (description) {
+    ++notificationCount_;
+  }
+  ++notificationCount_;
+}
 @end

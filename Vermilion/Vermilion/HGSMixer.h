@@ -39,6 +39,7 @@
 #import "GTMDefines.h"
 
 @class HGSQueryController;
+@class HGSScoredResult;
 
 /*!
  The mixer takes N arrays that are assumed to be internally sorted
@@ -97,11 +98,13 @@
 /*! 
  The standard HGS sort. Suitable for use with
  -[NSArray sortedArrayUsingFunction:context:].
- @param resultA an HGSResult*
- @param resultB are both HGSResults.
+ @param resultA a HGSScoredResult*
+ @param resultB a HGSScoredResult*
  @param context is ignored.
 */
-NSInteger HGSMixerResultSort(id resultA, id resultB, void* context);
+NSInteger HGSMixerScoredResultSort(HGSScoredResult *resultA, 
+                                   HGSScoredResult *resultB, 
+                                   void* context);
 
 /*!
  Called when the mixer will start.  Object is the mixer.
@@ -109,6 +112,6 @@ NSInteger HGSMixerResultSort(id resultA, id resultB, void* context);
 GTM_EXTERN NSString *const kHGSMixerWillStartNotification;
 
 /*!
- Called when the mixer has completed. Object is the mixer.
+ Called when the mixer has completed or was cancelled. Object is the mixer.
 */
 GTM_EXTERN NSString *const kHGSMixerDidFinishNotification;

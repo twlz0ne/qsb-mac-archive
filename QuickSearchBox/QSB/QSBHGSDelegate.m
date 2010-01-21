@@ -194,9 +194,11 @@ static NSString *const kWebURLsWithTitlesPboardType
   } else if ([key isEqualToString:kHGSObjectAttributePasteboardValueKey]) {
     NSMutableDictionary *pbValues = [NSMutableDictionary dictionary];
     if ([result conformsToType:kHGSTypeFile]) {
-      HGSResultArray *resultArray = [HGSResultArray arrayWithResult:result];
-      NSArray *filePaths = [resultArray filePaths];
-      [pbValues setObject:filePaths forKey:NSFilenamesPboardType];
+      NSString *filePath = [result filePath];
+      if ([filePath length]) {
+        NSArray *filePaths = [NSArray arrayWithObject:filePath];
+        [pbValues setObject:filePaths forKey:NSFilenamesPboardType];
+      }
     } else if ([result conformsToType:kHGSTypeWebpage]) {
       NSString *name = [result displayName];
       NSURL *url = [result url];
@@ -214,12 +216,15 @@ static NSString *const kWebURLsWithTitlesPboardType
     }
     [pbValues setObject:[result displayName] forKey:NSStringPboardType];
     value = pbValues;
-  } else if ([key isEqualToString:kQSBObjectTableResultAttributeKey]) {
+  } else if ([key isEqualToString:kQSBObjectTableResultAttributeKey]
+             && [result isKindOfClass:[HGSScoredResult class]]) {
     @synchronized (cachedTableResults_) {
-      QSBTableResult *tableResult = [cachedTableResults_ objectForKey:result];
+      HGSScoredResult *scoredResult = (HGSScoredResult *)result;
+      QSBTableResult *tableResult 
+        = [cachedTableResults_ objectForKey:scoredResult];
       if (!tableResult) {
-        tableResult = [QSBSourceTableResult tableResultWithResult:result];
-        [cachedTableResults_ setObject:tableResult forKey:result];
+        tableResult = [QSBSourceTableResult tableResultWithResult:scoredResult];
+        [cachedTableResults_ setObject:tableResult forKey:scoredResult];
       }
       value = tableResult;
     }

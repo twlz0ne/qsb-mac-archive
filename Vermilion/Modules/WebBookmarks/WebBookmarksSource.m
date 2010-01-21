@@ -96,13 +96,12 @@
   
   NSString* type = [NSString stringWithFormat:@"%@.%@", 
                     kHGSTypeWebBookmark, browserTypeName_];
-  HGSResult* result 
-    = [HGSResult resultWithURI:urlString
-                          name:name
-                          type:type
-                          rank:kHGSResultUnknownRank
-                        source:self
-                    attributes:attributes];
+  HGSUnscoredResult* result 
+    = [HGSUnscoredResult resultWithURI:urlString
+                                  name:name
+                                  type:type
+                                source:self
+                            attributes:attributes];
   [self indexResult:result];
 }
 

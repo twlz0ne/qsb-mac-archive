@@ -34,19 +34,11 @@
 #import <Foundation/Foundation.h>
 #import <Vermilion/Vermilion.h>
 
-#if TARGET_OS_IPHONE
-#define ENABLE_SUGGEST_SOURCE_SQLITE_CACHING 1
-#endif  // TARGET_OS_IPHONE
-
 @class HGSSQLiteBackedCache;
 
 @interface HGSSuggestSource : HGSCallbackSearchSource {
  @protected
-#if ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
-  HGSSQLiteBackedCache *cache_;
-#else
   NSMutableDictionary *cache_;
-#endif  // ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
  @private
   NSString *suggestBaseUrl_;
   // Stores the last full result returned by the source. Does not get set
@@ -56,8 +48,6 @@
   BOOL isReady_;
   BOOL continueRunning_;
   NSMutableArray *operationQueue_;
-  // Preferences
-  BOOL truncateSuggestions_;
 }
 
 // Designated Initializer
@@ -69,7 +59,9 @@
 // TODO(altse): Take the caching private headers out into a separate file
 //              so HGSNavSuggestSource can use it.
 //@protected
-- (void)cacheValue:(id)cacheValue forKey:(NSString *)key;
+// Cache a value by a key. It is expected that the key is not nil and
+// the key is the query submitted.
+- (void)cacheObject:(id)cacheValue forKey:(id)key;
 - (void)setLastResult:(NSArray *)lastResult;
 - (void)resetHistoryAndCache;
 

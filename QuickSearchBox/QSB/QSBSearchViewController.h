@@ -41,6 +41,7 @@
 @class QSBTableResult;
 @class HGSResultArray;
 @class HGSAction;
+@class HGSTokenizedString;
 
 // The controller associated with a particular query responsible for
 // managing the relationship between this query and any previous query
@@ -79,8 +80,6 @@
 @property(nonatomic, readwrite, retain) HGSResultArray *results;
 // Return the selected table result from the active results controller.
 @property(nonatomic, readonly, retain) QSBTableResult *selectedTableResult;
-// The search text string for our query
-@property(nonatomic, readwrite, retain) NSString *queryString;
 
 // Initialize and install into the search results window.  Designated initializer.
 - (id)initWithWindowController:(QSBSearchWindowController *)searchWindowController;
@@ -115,6 +114,10 @@
 // Change the selection, if acceptable, in the active results presentation.
 - (BOOL)performSelectionMovementSelector:(SEL)selector;
 
+// Setting/Getting the query string
+- (void)setQueryString:(NSString *)queryString;
+- (void)setTokenizedQueryString:(HGSTokenizedString *)queryString;
+- (HGSTokenizedString *)tokenizedQueryString;
 @end
 
 // Notification that an action will be performed.
@@ -125,9 +128,9 @@
 //   kQSBNotificationQueryKey - query that found the object that the action is 
 //                             being performed on (QSBQuery)
 //   kQSBNotificationDirectObjectKey - the direct object the action is being 
-//                                     performed on(HGSResult)
+//                                     performed on(HGSScoredResult)
 //   kQSBNotificationIndirectObjectKey - the indirect object the action is 
-//                                       being performed on(HGSResult)
+//                                       being performed on(HGSScoredResult)
 //   kQSBNotificationSuccessKey - did the action complete successfully (NSNumber)
 // object is the action being performed (HGSAction)
 #define kQSBQueryControllerWillPerformActionNotification \

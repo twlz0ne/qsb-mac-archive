@@ -38,13 +38,14 @@
   MDQueryRef mdQuery_;
   NSMutableDictionary *hgsResults_;
 }
-- (HGSResult *)resultFromMDItem:(MDItemRef)mdItem;
+- (HGSScoredResult *)resultFromMDItem:(MDItemRef)mdItem;
 @end
 
 @interface SLFilesSource : HGSSearchSource {
  @private
   NSString *utiFilter_;
   BOOL rebuildUTIFilter_;
+  NSArray *pathsToBlackList_;
 }
 + (CFArrayRef)attributeArray;
 - (void)operationReceivedNewResults:(SLFilesOperation *)operation

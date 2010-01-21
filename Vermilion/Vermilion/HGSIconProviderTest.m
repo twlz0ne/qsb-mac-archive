@@ -55,10 +55,10 @@
     = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
   STAssertNotNil(path, nil);
   id searchSourceMock = [OCMockObject mockForClass:[HGSSearchSource class]];
-  HGSResult *result = [HGSResult resultWithFilePath:path
-                                               rank:kHGSResultUnknownRank
-                                             source:searchSourceMock
-                                         attributes:nil];
+  HGSUnscoredResult *result 
+    = [HGSUnscoredResult resultWithFilePath:path
+                                     source:searchSourceMock
+                                 attributes:nil];
   STAssertNotNil(result, nil);
   HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
   [[[searchSourceMock stub] 
@@ -122,8 +122,9 @@
   [infoA setObject:pathA forKey:kHGSObjectAttributeURIKey];
   [infoA setObject:@"fooA" forKey:kHGSObjectAttributeNameKey];
   [infoA setObject:@"barA" forKey:kHGSObjectAttributeTypeKey];
-  HGSResult* resultA = [HGSResult resultWithDictionary:infoA
-                                                source:searchSourceMock];
+  HGSUnscoredResult* resultA 
+    = [HGSUnscoredResult resultWithDictionary:infoA
+                                       source:searchSourceMock];
   NSUInteger expectedHashA = [resultA hash];
   HGSIconOperation *operationA
     = [HGSIconOperation iconOperationForResult:resultA];
@@ -136,8 +137,9 @@
   [infoB setObject:pathB forKey:kHGSObjectAttributeURIKey];
   [infoB setObject:@"fooB" forKey:kHGSObjectAttributeNameKey];
   [infoB setObject:@"barB" forKey:kHGSObjectAttributeTypeKey];
-  HGSResult* resultB = [HGSResult resultWithDictionary:infoB
-                                                source:searchSourceMock];
+  HGSUnscoredResult* resultB 
+    = [HGSUnscoredResult resultWithDictionary:infoB
+                                       source:searchSourceMock];
   NSUInteger expectedHashB = [resultB hash];
   HGSIconOperation *operationB
     = [HGSIconOperation iconOperationForResult:resultB];

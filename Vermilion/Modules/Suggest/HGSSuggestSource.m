@@ -51,10 +51,6 @@
 #import "QSBPreferences.h"
 #endif
 
-#if ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
-#import "HGSSQLiteBackedCache.h"
-#endif  // ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
-
 static NSString* const kHGSGoogleSuggestBase 
   = @"http://clients1.google.com/complete/search?";
 
@@ -107,7 +103,7 @@ typedef enum {
 // We expect that these are less useful to the users and add to the cluster.
 // |results| will be modified by this method.
 - (void)filterShortResults:(NSMutableArray *)results
-                 withQueryString:(NSString *)query;
+           withQueryString:(HGSTokenizedString *)query;
 
 // Filter out duplicate Google suggest results. (Doesn't touch navsuggest).
 - (void)filterDuplicateSuggests:(NSMutableArray*)results;
@@ -116,10 +112,12 @@ typedef enum {
 - (void)filterResults:(NSMutableArray *)results
         withoutPrefix:(NSString *)prefix;
 
+#if TARGET_OS_IPHONE
 // Truncates the display name of the suggestions if they have a common prefix
 // with |query|.
 - (void)truncateDisplayNames:(NSMutableArray *)results
-             withQueryString:(NSString *)query;
+             withQueryString:(HGSTokenizedString *)query;
+#endif  // TARGET_OS_IPHONE
 
 // Replaces URL-like results with a kHGSUTTypeWebPage suggestion.
 - (void)replaceURLLikeResults:(NSMutableArray *)results;
@@ -132,17 +130,12 @@ typedef enum {
 // implemented a regular NSMutbaleDictionary and SQLite backed.
 @interface HGSSuggestSource (Caching)
 - (void)initializeCache;
-// Cache a value by a key. It is expected that the key is not nil and
-// the key is the query submitted.
-//
-// If using the SQLite cache backend, cacheValue should be a property-list-able
-// object (NSArray, NSDictionary, NSString, NSNumber, NSData).
-- (void)cacheValue:(id)cacheValue forKey:(NSString *)key;
+
 // Called by cacheValue:forKey: on the main thread as to not confuse SQLite
 // if we are using that for the cache backend.
 - (void)cacheKeyValuePair:(NSArray *)keyValue;
 // Returns the cached value of the key.
-- (id)cachedValueForKey:(NSString *)key;
+- (id)cachedObjectForKey:(id)key;
 @end
 
 // Methods to deal with the suggest fetching thread and the manipulation of the
@@ -177,7 +170,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     // Don't show suggestions for queries under 3 letters,
     // and anything over 20 is probably a tweet or a text append, so we
     // can stop showing suggestions there too.
-    NSUInteger length = [[query rawQueryString] length];
+    NSUInteger length = [[query tokenizedQueryString] originalLength];
     if (length < 3 || length > 20) {
       isValid = NO;
     } else if (suggestCount + navSuggestCount <= 0) {  
@@ -205,9 +198,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     operationQueue_ = [[NSMutableArray alloc] init];
     isReady_ = YES;
     continueRunning_ = YES;
-#if TARGET_OS_IPHONE
-    truncateSuggestions_ = YES;
-#endif
     lastResult_ = nil;
     [self initializeCache];
     [self startSuggestionFetchingThread];
@@ -235,37 +225,23 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 #pragma mark Caching
 
 - (void)initializeCache {
-#if ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
-  NSString* cachePath = [[GDSourceConfigProvider defaultConfig] suggestCacheDbPath];
-  if (cachePath) {
-    cache_ = [[HGSSQLiteBackedCache alloc] initWithPath:cachePath];
-  }
-#else
   cache_ = [[NSMutableDictionary alloc] init];  // Runtime cache only.
-#endif  // ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
 }
 
-- (void)cacheValue:(id)cacheValue forKey:(NSString *)key {
-#if ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
-  if (cache_ && cacheValue && key) {
-    [self performSelectorOnMainThread:@selector(cacheKeyValuePair:)
-                           withObject:[NSArray arrayWithObjects:key, cacheValue, nil]
-                        waitUntilDone:NO];
-  }
-#else
-  [cache_ setValue:cacheValue forKey:key];
-#endif  // ENABLE_SUGGEST_SOURCE_SQLITE_CACHING
+- (void)cacheObject:(id)cacheObject forKey:(id)key {
+  [cache_ setObject:cacheObject forKey:key];
 }
 
-- (void)cacheKeyValuePair:(NSArray *)keyValue {
-  [cache_ setValue:[keyValue objectAtIndex:1] forKey:[keyValue objectAtIndex:0]];
+- (void)cacheKeyObjectPair:(NSArray *)keyObject {
+  [cache_ setObject:[keyObject objectAtIndex:1] 
+             forKey:[keyObject objectAtIndex:0]];
 }
 
-- (id)cachedValueForKey:(NSString *)key {
-  // TODO(altse): Move this to main thread like the cacheValue:forKey: since
+- (id)cachedObjectForKey:(id)key {
+  // TODO(altse): Move this to main thread like the cacheObject:forKey: since
   //              SQLite does not seem to be thread-safe.
   if (cache_) {
-    id value = [cache_ valueForKey:key];
+    id value = [cache_ objectForKey:key];
 //    if (value && [value respondsToSelector:@selector(substringWithRange:)]) {
 //      HGSLogDebug(@"SuggestCache[%@] = %@", key, [value substringWithRange:NSMakeRange(0, 20)]);
 //    } else {
@@ -361,7 +337,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 - (NSURL *)suggestUrl:(HGSSearchOperation *)operation { 
   // use the raw query so the server can try to parse it.
   // This is escaped by the argument dictionary
-  NSString *string = [[operation query] rawQueryString];
+  NSString *string = [[[operation query] tokenizedQueryString] originalString];
 
   NSMutableDictionary *argumentDictionary =
     [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -461,7 +437,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (void)suggestionsRequestCompleted:(NSArray *)suggestions
                        forOperation:(HGSSearchOperation *)operation {
-  [operation performSelectorOnMainThread:@selector(setResults:)
+  [operation performSelectorOnMainThread:@selector(setRankedResults:)
                               withObject:suggestions
                            waitUntilDone:YES];
   [operation performSelectorOnMainThread:@selector(finishQuery)
@@ -487,7 +463,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   if ([response isKindOfClass:[NSArray class]]) {
     // Add parse response to the cache.
     if ([response count] > 0) {
-      [self cacheValue:response forKey:[query rawQueryString]];
+      [self cacheObject:response forKey:[query tokenizedQueryString]];
     }
     cachedResponse = [self filteredSuggestionsWithResponse:response 
                                                  withQuery:query];
@@ -506,11 +482,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   // [self replaceURLLikeResults:suggestions];
   // [self filterWebPageResults:suggestions];
   
-  NSString *queryString = [query rawQueryString];
+  HGSTokenizedString *queryString = [query tokenizedQueryString];
   [self filterShortResults:suggestions withQueryString:queryString];
-  if (truncateSuggestions_) {
-    [self truncateDisplayNames:suggestions withQueryString:queryString];
-  }
+#if TARGET_OS_IPHONE
+  [self truncateDisplayNames:suggestions withQueryString:queryString];
+#endif
 
   [self filterDuplicateSuggests:suggestions];
 
@@ -584,8 +560,10 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     NSString *urlString = nil;
     NSString *name = nil;
     NSString *type = nil;
-    CGFloat rank = 0;
-    NSString *normalizedQuery = [query normalizedQueryString];
+    CGFloat score = 0;
+    NSIndexSet *matchedIndexes = nil;
+    HGSTokenizedString *matchedTerm = nil;
+    HGSTokenizedString *tokenizedQueryString = [query tokenizedQueryString];
     if (suggestionType == kHGSSuggestTypeSuggest) {
       NSString *escapedSuggestion 
         = [suggestionString gtm_stringByEscapingForURLArgument];
@@ -595,7 +573,10 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       //              should import the enums.
       //              if (row[2] == 'calc') HGSCompletionTypeCalc;
       //              if (row[2] is integer) HGSCompletionTypeSuggest;
-      rank = HGSScoreTermForString(normalizedQuery, suggestionString);
+      matchedTerm = [HGSTokenizer tokenizeString:suggestionString];
+      score = HGSScoreTermForItem(tokenizedQueryString, 
+                                  matchedTerm,
+                                  &matchedIndexes);
       attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                     suggestionString, kHGSObjectAttributeStringValueKey,
                     [self navIcon], kHGSObjectAttributeIconKey,
@@ -615,16 +596,34 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         continue;
       }
 
-      if (!([suggestionString hasPrefix:@"http://"])) {
+      BOOL isSecure = [suggestionString hasPrefix:@"https://"];
+      if (!isSecure && ![suggestionString hasPrefix:@"http://"]) {
         suggestionString 
           = [NSString stringWithFormat:@"http://%@", suggestionString];
       }
       urlString = suggestionString;
+      HGSTokenizedString *tokenizedURL = [HGSTokenizer tokenizeString:urlString];
       NSNumber *yesValue = [NSNumber numberWithBool:YES];
-      NSString *urlPath = [urlString substringFromIndex:[@"http://" length]];
-      CGFloat rank1 = HGSScoreTermForString(normalizedQuery, urlString);
-      CGFloat rank2 = HGSScoreTermForString(normalizedQuery, urlPath);
-      rank = MAX(rank1, rank2);
+      NSUInteger idx = isSecure ? [@"https://" length] : [@"http://" length];
+      NSString *urlPath = [urlString substringFromIndex:idx];
+      HGSTokenizedString *tokenizedPath = [HGSTokenizer tokenizeString:urlPath];
+      NSIndexSet *matchedIndexes1 = nil;
+      NSIndexSet *matchedIndexes2 = nil;
+      CGFloat score1 = HGSScoreTermForItem(tokenizedQueryString, 
+                                           tokenizedURL, 
+                                           &matchedIndexes1);
+      CGFloat score2 = HGSScoreTermForItem(tokenizedQueryString, 
+                                           tokenizedPath, 
+                                           &matchedIndexes2);
+      if (score1 > score2) {
+        score = score1;
+        matchedIndexes = matchedIndexes1;
+        matchedTerm = tokenizedURL;
+      } else {
+        score = score2;
+        matchedIndexes = matchedIndexes2;
+        matchedTerm = tokenizedPath;
+      }
       attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                     yesValue, kHGSObjectAttributeAllowSiteSearchKey,
                     yesValue, kHGSObjectAttributeIsSyntheticKey,
@@ -633,12 +632,14 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       type = kHGSTypeGoogleNavSuggest;
     }
     if (urlString) {
-      HGSResult *navsuggestion = [HGSResult resultWithURI:urlString
-                                                     name:name
-                                                     type:type
-                                                     rank:rank
-                                                   source:self
-                                               attributes:attributes];
+      HGSScoredResult *navsuggestion = [HGSScoredResult resultWithURI:urlString
+                                                                 name:name
+                                                                 type:type
+                                                               source:self
+                                                           attributes:attributes
+                                                                score:score
+                                                          matchedTerm:matchedTerm
+                                                       matchedIndexes:matchedIndexes];
       if (navsuggestion) {
         [suggestionResults addObject:navsuggestion];
       } else {
@@ -677,7 +678,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 // Replaces suggestions that look like URLs
 - (void)replaceURLLikeResults:(NSMutableArray *)results {
   for (NSUInteger i = 0; i < [results count]; i++) {
-    HGSResult *result = [results objectAtIndex:i];
+    HGSScoredResult *result = [results objectAtIndex:i];
     if (![result isOfType:kHGSTypeGoogleSuggest])
       continue;
 
@@ -694,37 +695,44 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         = [NSDictionary dictionaryWithObjectsAndKeys:
            suggestion, kHGSObjectAttributeStringValueKey,
            nil];
-      HGSResult *urlResult = [HGSResult resultWithURL:url
-                                                 name:suggestion
-                                                 type:kHGSTypeWebpage
-                                                 rank:[result rank]
-                                               source:self
-                                           attributes:attributes];
+      HGSScoredResult *urlResult 
+        = [HGSScoredResult resultWithURI:[url absoluteString]
+                                    name:suggestion
+                                    type:kHGSTypeWebpage
+                                  source:self
+                              attributes:attributes
+                                   score:[result score]
+                             matchedTerm:[result matchedTerm]
+                          matchedIndexes:[result matchedIndexes]];
       [results replaceObjectAtIndex:i withObject:urlResult];
     }
   }
 }
 
 // Remove suggestions that are too short.
-- (void)filterShortResults:(NSMutableArray *)results withQueryString:(NSString *)query {
+- (void)filterShortResults:(NSMutableArray *)results 
+           withQueryString:(HGSTokenizedString *)query {
   NSMutableIndexSet *toRemove = [NSMutableIndexSet indexSet];
-  NSUInteger queryLength = [query length];
+  NSUInteger queryLength = [query originalLength];
   NSUInteger lengthThreshold = 2;
   NSEnumerator *enumerator = [results objectEnumerator];
   HGSResult *result;
   for (NSUInteger i = 0; (result = [enumerator nextObject]); ++i) {
     if ([result isOfType:kHGSTypeGoogleSuggest] &&
-        [[result valueForKey:kHGSObjectAttributeStringValueKey] length] < queryLength + lengthThreshold) {
+        ([[result valueForKey:kHGSObjectAttributeStringValueKey] length] 
+         < queryLength + lengthThreshold)) {
       [toRemove addIndex:i];
     }
   }
   [results removeObjectsAtIndexes:toRemove];
 }
 
+#if TARGET_OS_IPHONE 
 // Truncate the display name for suggestions that have a common prefix with
 // the query.
-- (void)truncateDisplayNames:(NSMutableArray *)results withQueryString:(NSString *)query {
-  NSUInteger queryLength = [query length];
+- (void)truncateDisplayNames:(NSMutableArray *)results 
+             withQueryString:(HGSTokenizedString *)query {
+  NSUInteger queryLength = [query originalLength];
   if (queryLength < 4) {
     return;
   }
@@ -774,6 +782,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     }
   }
 }
+
+#endif  // TARGET_OS_IPHONE
 
 // Filters out all the results that do not have suggestions with the same
 // prefix.
@@ -843,7 +853,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   HGSQuery *query = [operation query];
   _GTMDevAssert([operation isConcurrent],
                 @"Implementation expects the operation to be set to concurrent.");
-  NSString *queryTerm = [query rawQueryString];
+  HGSTokenizedString *queryTerm = [query tokenizedQueryString];
 
 #if TARGET_OS_IPHONE
   // iPhone lets more in during isValidSourceForQuery:
@@ -855,12 +865,12 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 #endif
 
   // Return a result from the cache if it exists.
-  NSArray *cachedResponse = [self cachedValueForKey:queryTerm];
+  NSArray *cachedResponse = [self cachedObjectForKey:queryTerm];
   if (cachedResponse) {
     NSArray *suggestions = [self filteredSuggestionsWithResponse:cachedResponse
                                                        withQuery:query];
     if ([suggestions count] > 0) {
-      [operation setResults:suggestions];
+      [operation setRankedResults:suggestions];
       [operation finishQuery];
       [self setLastResult:suggestions];
       return;
@@ -875,11 +885,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     NSMutableArray *suggestions = [NSMutableArray arrayWithArray:lastResult_];
     [self filterResults:suggestions withoutPrefix:queryTerm];
     [self filterShortResults:suggestions withQueryString:queryTerm];
-    if (truncateSuggestions_) {
-      [self truncateDisplayNames:suggestions withQueryString:queryTerm];
-    }
+    [self truncateDisplayNames:suggestions withQueryString:queryTerm];
     if ([suggestions count] > 0) {
-      [operation setResults:suggestions];
+      [operation setRankedResults:suggestions];
     }
   }
 #endif

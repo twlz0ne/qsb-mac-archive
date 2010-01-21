@@ -34,6 +34,7 @@
 #import "GTMSenTestCase.h"
 #import "HGSPython.h"
 #import "HGSQuery.h"
+#import "HGSTokenizer.h"
 
 @interface HGSPythonTest : GTMTestCase 
 @end
@@ -46,7 +47,6 @@
 - (void)testQuery {
   HGSPython *sharedPython = [HGSPython sharedPython];
   STAssertNotNil(sharedPython, nil);
-  
   HGSQuery *query = [[[HGSQuery alloc] initWithString:@"Hello world"
                                               results:nil
                                            queryFlags:0] autorelease];

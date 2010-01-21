@@ -221,7 +221,7 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
       Py_DECREF(query);
     } else {
       HGSLogDebug(@"could not create Python query for '%@'", 
-                  [hgsQuery rawQueryString]);
+                  [hgsQuery tokenizedQueryString]);
     }
   }
   

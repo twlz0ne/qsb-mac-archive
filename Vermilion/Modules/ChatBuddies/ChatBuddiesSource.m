@@ -41,7 +41,7 @@
 static NSString* const kChatBuddyAttributeInformationKey 
   = @"ChatBuddyAttributeInformationKey";
 
-// TODO(alcor): rank buddies by frequency of use, consider "RecentChats" default
+// TODO(alcor): score buddies by frequency of use, consider "RecentChats" default
 
 // Search our buddy list and return matches against screen name, first or
 // last name, email address, status message and service name.
@@ -393,7 +393,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   [super performSearchOperation:operation];
 }
 
-- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult*)result {
+- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult *)result {
   // Don't want chat buddy results remembered in shortcuts
   // TODO: revisit when we don't use a subclass and see if we can save a few
   // things to rebuild the real result.
@@ -621,12 +621,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
        uniqueIdentifiers, kHGSObjectAttributeUniqueIdentifiersKey,
        imBuddyInfo, kChatBuddyAttributeInformationKey,
        nil];
-  return [HGSResult resultWithURI:identifier
-                             name:displayName
-                             type:HGS_SUBTYPE(kHGSTypeContact, @"ichat")
-                             rank:kHGSResultUnknownRank
-                           source:source
-                       attributes:attributes];
+  return [HGSUnscoredResult resultWithURI:identifier
+                                     name:displayName
+                                     type:HGS_SUBTYPE(kHGSTypeContact, @"ichat")
+                                   source:source
+                               attributes:attributes];
 }
 
 @end

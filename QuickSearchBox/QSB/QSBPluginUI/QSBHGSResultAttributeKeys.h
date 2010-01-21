@@ -60,6 +60,6 @@
 //   NSNumber (BOOL)
 #define kQSBPathCellHiddenKey @"QSBPathCellHidden"
 
-// QSB Table result for a given HGSResult
+// QSB Table result for a given HGSScoredResult
 #define kQSBObjectTableResultAttributeKey @"QSBObjectTableResultAttributeKey"
 

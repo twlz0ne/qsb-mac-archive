@@ -159,7 +159,7 @@
   HGSSearchOperation *operation = [[self source] searchOperationForQuery:query];
   STAssertNotNil(operation, nil);
   [operation run:YES];
-  return [operation sortedResultsInRange:NSMakeRange(0, [operation resultCount])];
+  return [operation sortedRankedResultsInRange:NSMakeRange(0, [operation resultCount])];
 }
 
 - (HGSResult *)spotlightResultForQuery:(NSString *)queryString
@@ -287,8 +287,8 @@
        @"badTypeDict", kHGSObjectAttributeNameKey,
        kHGSTypeFile, kHGSObjectAttributeTypeKey,
        nil];
-  HGSResult *badTypeResult = [HGSResult resultWithDictionary:badTypeDict 
-                                                      source:source];
+  HGSUnscoredResult *badTypeResult 
+    = [HGSUnscoredResult resultWithDictionary:badTypeDict source:source];
   query 
     = [[[HGSQuery alloc] initWithString:@"happy" 
                                 results:[NSArray arrayWithObject:badTypeResult] 
@@ -302,8 +302,8 @@
        @"goodTypeDict", kHGSObjectAttributeNameKey,
        kHGSTypeContact, kHGSObjectAttributeTypeKey,
        nil];
-  HGSResult *goodTypeResult = [HGSResult resultWithDictionary:goodTypeDict 
-                                                       source:source];
+  HGSUnscoredResult *goodTypeResult = [HGSUnscoredResult resultWithDictionary:goodTypeDict 
+                                                                       source:source];
   query 
     = [[[HGSQuery alloc] initWithString:@"happy" 
                                 results:[NSArray arrayWithObject:goodTypeResult] 
@@ -319,10 +319,12 @@
                                                   ofType:@"emlx"];
   STAssertNotNil(mailFilePath, nil);
   [self mdimportFile:mailFilePath];
-  HGSResult *mailResult = [HGSResult resultWithFilePath:mailFilePath 
-                                                   rank:kHGSResultUnknownRank
-                                                 source:source
-                                             attributes:nil];
+  HGSScoredResult *mailResult = [HGSScoredResult resultWithFilePath:mailFilePath 
+                                                             source:source
+                                                         attributes:nil
+                                                              score:0 
+                                                        matchedTerm:nil 
+                                                     matchedIndexes:nil];
   STAssertNotNil(mailResult, nil);
   HGSResultArray *array = [HGSResultArray arrayWithResult:mailResult];
   STAssertNotNil(array, nil);
@@ -337,22 +339,28 @@
                                                   ofType:@"emlx"];
   STAssertNotNil(mailFilePath, nil);
   [self mdimportFile:mailFilePath];
-  HGSResult *mailResult = [HGSResult resultWithFilePath:mailFilePath
-                                                   rank:kHGSResultUnknownRank
-                                                 source:source
-                                             attributes:nil];
+  HGSUnscoredResult *mailResult 
+    = [HGSUnscoredResult resultWithFilePath:mailFilePath
+                                     source:source
+                                 attributes:nil];
   STAssertNotNil(mailResult, nil);
   NSDictionary *attributes 
     = [NSDictionary dictionaryWithObject:@"willy_wonka@wonkamail.com"
                                   forKey:kHGSObjectAttributeContactEmailKey];
-  HGSResult *contactResult = [HGSResult resultWithURI:@"test:contact" 
-                                                 name:@"Willy Wonka" 
-                                                 type:kHGSTypeContact
-                                                 rank:kHGSResultUnknownRank
-                                               source:source 
-                                           attributes:attributes];
+  HGSUnscoredResult *contactResult 
+    = [HGSUnscoredResult resultWithURI:@"test:contact" 
+                                  name:@"Willy Wonka" 
+                                  type:kHGSTypeContact
+                                source:source 
+                            attributes:attributes];
   STAssertNotNil(contactResult, nil);
-  HGSResultArray *array = [HGSResultArray arrayWithResult:contactResult];
+  HGSScoredResult *scoredResult 
+    = [HGSScoredResult resultWithResult:contactResult 
+                                  score:0 
+                            matchedTerm:nil 
+                         matchedIndexes:nil];
+  STAssertNotNil(scoredResult, nil);
+  HGSResultArray *array = [HGSResultArray arrayWithResult:scoredResult];
   STAssertNotNil(array, nil);
   NSArray *results = [self performSearchFor:@"vermicious" pivotingOn:array];
   STAssertNotNil(results, nil);

@@ -33,6 +33,7 @@
 #import <Vermilion/HGSLog.h>
 #import <Vermilion/HGSBundle.h>
 #import <Vermilion/HGSExtension.h>
+#import <Vermilion/HGSType.h>
 #import <Vermilion/HGSResult.h>
 #import <Vermilion/HGSAction.h>
 #import <Vermilion/HGSQuery.h>
@@ -56,6 +57,5 @@
 #import <Vermilion/HGSAccountsExtensionPoint.h>
 #import <Vermilion/HGSAccountType.h>
 #import <Vermilion/HGSSimpleAccount.h>
-#import <Vermilion/HGSStringUtil.h>
 #import <Vermilion/HGSSearchTermScorer.h>
 #import <Vermilion/HGSTokenizer.h>

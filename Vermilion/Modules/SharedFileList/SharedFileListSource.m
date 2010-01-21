@@ -201,10 +201,9 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
                                 item, kObjectAttributeSharedFileListItem,
                                 nil];
     
-    HGSResult *result = [HGSResult resultWithFilePath:path
-                                                 rank:kHGSResultUnknownRank
-                                               source:self
-                                           attributes:attributes];
+    HGSUnscoredResult *result = [HGSUnscoredResult resultWithFilePath:path
+                                                               source:self
+                                                           attributes:attributes];
     if (result) {
       [results addObject:result];
     }
@@ -239,17 +238,17 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
   return value;
 }
 
-- (HGSResult *)postFilterResult:(HGSMutableResult *)result 
-                matchesForQuery:(HGSQuery *)query
-                    pivotObject:(HGSResult *)pivotObject {
+- (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)scoredResult 
+                            matchesForQuery:(HGSQuery *)query
+                                pivotObject:(HGSResult *)pivotObject {
   // Filter out any documents that are no longer named or located where
   // we remembered them being.
   NSFileManager *fm = [NSFileManager defaultManager];
-  NSString *path = [result filePath];
+  NSString *path = [scoredResult filePath];
   if (!path || ![fm fileExistsAtPath:path isDirectory:NULL]) {
-    result = nil;
+    scoredResult = nil;
   }
-  return result;
+  return scoredResult;
 }
 
 // Reset our HGSMemorySource index with all of our values.

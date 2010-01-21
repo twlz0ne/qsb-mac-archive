@@ -49,8 +49,9 @@
  Call to replace the results of the operation with something more up to date.
  Threadsafe, can be called from any thread. Tells the observer about the
  presence of new results on the main thread.
+ Results will be sorted based on their score.
  */
-- (void)setResults:(NSArray*)results;
+- (void)setRankedResults:(NSArray*)results;
 
 @end
 

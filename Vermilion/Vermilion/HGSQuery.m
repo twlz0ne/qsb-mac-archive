@@ -35,30 +35,26 @@
 
 @implementation HGSQuery
 
-@synthesize normalizedQueryString = normalizedQueryString_;
-@synthesize rawQueryString = rawQueryString_;
+@synthesize tokenizedQueryString = tokenizedQueryString_;
 @synthesize results = results_;
 @synthesize parent = parent_;
 @synthesize maxDesiredResults = maxDesiredResults_;
 @synthesize flags = flags_;
-@dynamic pivotObject;
 
-- (id)initWithString:(NSString*)query 
-             results:(HGSResultArray *)results
-          queryFlags:(HGSQueryFlags)flags {
+- (id)initWithTokenizedString:(HGSTokenizedString *)query 
+                      results:(HGSResultArray *)results
+                   queryFlags:(HGSQueryFlags)flags {
   if ((self = [super init])) {
-    rawQueryString_ = [query copy];
     results_ = [results retain];
     maxDesiredResults_ = -1;
     flags_ = flags;
 
     // If we got nil for a query, but had a pivot, turn it into an empty query.
-    if (!rawQueryString_ && results_) {
-      rawQueryString_ = @"";
+    if (!query && results_) {
+      query = [HGSTokenizer tokenizeString:@""];
     }
-    normalizedQueryString_ 
-      = [[HGSTokenizer tokenizeString:rawQueryString_] retain];
-    if (!normalizedQueryString_) {
+    tokenizedQueryString_ = [query retain];
+    if (!tokenizedQueryString_) {
       [self release];
       self = nil;
     }
@@ -66,9 +62,17 @@
   return self;
 }
 
+- (id)initWithString:(NSString *)query 
+             results:(HGSResultArray *)results
+          queryFlags:(HGSQueryFlags)flags {
+  HGSTokenizedString *tokenizedQuery = [HGSTokenizer tokenizeString:query];
+  return [self initWithTokenizedString:tokenizedQuery 
+                               results:results 
+                            queryFlags:flags];
+}
+
 - (void)dealloc {
-  [rawQueryString_ release];
-  [normalizedQueryString_ release];
+  [tokenizedQueryString_ release];
   [results_ release];
   [parent_ release];
   [super dealloc];
@@ -86,7 +90,8 @@
 
 - (NSString*)description {
   return [NSString stringWithFormat:@"[%@ - Q='%@' Rs=%@ P=<%@>]",
-          [self class], rawQueryString_, results_, parent_];
+          [self class], [tokenizedQueryString_ originalString],
+          results_, parent_];
 }
 
 @end

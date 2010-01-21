@@ -40,6 +40,8 @@
 #import "HGSSearchOperation.h"
 #import "HGSLog.h"
 #import "HGSBundle.h"
+#import "HGSType.h"
+#import "HGSTokenizer.h"
 #import "GTMDebugThreadValidation.h"
 #import "NSNotificationCenter+MainThread.h"
 
@@ -48,16 +50,44 @@ NSString *const kHGSMixerWillStartNotification
 NSString *const kHGSMixerDidFinishNotification 
   = @"HGSMixerDidFinishNotification";
 
-inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
-  HGSResult *a = (HGSResult *)resultA;
-  HGSResult *b = (HGSResult *)resultB;
+inline NSInteger HGSMixerScoredResultSort(HGSScoredResult *resultA, 
+                                          HGSScoredResult *resultB, 
+                                          void* context) {
   NSInteger result = NSOrderedSame;
-  CGFloat rankA = [a rank];
-  CGFloat rankB = [b rank]; 
-  if (rankA > rankB) {
+  HGSRankFlags rankFlagsA = [resultA rankFlags];
+  HGSRankFlags rankFlagsB = [resultB rankFlags];
+  BOOL belowFoldA = rankFlagsA & eHGSBelowFoldRankFlag ? YES : NO;
+  BOOL belowFoldB = rankFlagsB & eHGSBelowFoldRankFlag ? YES : NO;
+  if (!belowFoldA && belowFoldB) {
     result = NSOrderedAscending;
-  } else if (rankA < rankB) {
+  } else if (belowFoldA && !belowFoldB) {
     result = NSOrderedDescending;
+  } else {
+    CGFloat scoreA = [resultA score];
+    CGFloat scoreB = [resultB score];
+    if (scoreA > scoreB) {
+      result = NSOrderedAscending;
+    } else if (scoreA < scoreB) {
+      result = NSOrderedDescending;
+    } else {
+      NSDate *lastUsedA = [resultA valueForKey:kHGSObjectAttributeLastUsedDateKey];
+      NSDate *lastUsedB = [resultB valueForKey:kHGSObjectAttributeLastUsedDateKey];
+      result = [lastUsedB compare:lastUsedA];
+      if (result == NSOrderedSame) {
+        NSString *normalizedA = [[resultA matchedTerm] tokenizedString];
+        NSString *normalizedB = [[resultB matchedTerm] tokenizedString];
+        result = [normalizedA compare:normalizedB];
+        if (result == NSOrderedSame) {
+          NSUInteger urlLengthA = [[resultA uri] length];
+          NSUInteger urlLengthB = [[resultB uri] length];
+          if (urlLengthA > urlLengthB) {
+            result = NSOrderedDescending;
+          } else if (urlLengthA < urlLengthB) {
+            result = NSOrderedAscending;
+          }
+        }
+      }
+    }
   }
   return result;
 }
@@ -122,6 +152,9 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
   if (!isFinished_) {
     [operation_ cancel];
   }
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc hgs_postOnMainThreadNotificationName:kHGSMixerDidFinishNotification
+                                    object:self];
 }
 
 - (BOOL)isCancelled {
@@ -139,17 +172,19 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
   // Perform merge sort where we take the top ranked result in each
   // queue and add it to the sorted results.
   while (YES) {
-    HGSResult *newResult = nil;
+    HGSScoredResult *newRankedResult = nil;
     NSUInteger indexToIncrement = 0;
     for (NSUInteger i = 0; i < opsCount; ++i) {
-      HGSResult *testResult = nil;
+      HGSScoredResult *testRankedResult = nil;
       while (opsIndices_[i] < opsMaxIndices_[i]) {
         // Operations can return nil results.
-        testResult = [[ops_ objectAtIndex:i] sortedResultAtIndex:opsIndices_[i]];
-        if (testResult) {
-          NSInteger compare = HGSMixerResultSort(testResult, newResult, nil);
+        HGSSearchOperation *op = [ops_ objectAtIndex:i];
+        testRankedResult = [op sortedRankedResultAtIndex:opsIndices_[i]];
+        if (testRankedResult) {
+          NSInteger compare = HGSMixerScoredResultSort(testRankedResult, 
+                                                       newRankedResult, nil);
           if (compare == NSOrderedAscending) {
-            newResult = testResult;
+            newRankedResult = testRankedResult;
             indexToIncrement = i;
           }
           break;
@@ -159,23 +194,25 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
       }
     }
     // If we have a result first check for duplicates and do a merge
-    if (newResult) {
+    if (newRankedResult) {
       NSUInteger resultIndex = 0;
       @synchronized (results_) {
-        for (HGSResult *result in results_) {
-          if ([result isDuplicate:newResult]) {
-            newResult = [result mergeWith:newResult];
-            [results_ replaceObjectAtIndex:resultIndex withObject:newResult];
-            newResult = nil;
+        for (HGSScoredResult *scoredResult in results_) {
+          if ([scoredResult isDuplicate:newRankedResult]) {
+            newRankedResult 
+              = [scoredResult resultByAddingAttributesFromResult:newRankedResult];
+             [results_ replaceObjectAtIndex:resultIndex 
+                                withObject:newRankedResult];
+            newRankedResult = nil;
             break;
           }
           ++resultIndex;
         }
         // or else add it.
-        if (newResult) {
-          [results_ addObject:newResult];
-          NSString *type = [newResult type];
-          if (type && ![newResult conformsToType:kHGSTypeSuggest]) {
+        if (newRankedResult) {
+          [results_ addObject:newRankedResult];
+          NSString *type = [newRankedResult type];
+          if (type && ![newRankedResult conformsToType:kHGSTypeSuggest]) {
             NSString *category = [[self class] categoryForType:type];
             // Fallback to type if necessary.
             if (!category) {
@@ -183,10 +220,10 @@ inline NSInteger HGSMixerResultSort(id resultA, id resultB, void* context) {
             }
             NSMutableArray *array = [resultsByCategory_ objectForKey:category];
             if (!array) {
-              array = [NSMutableArray arrayWithObject:newResult];
+              array = [NSMutableArray arrayWithObject:newRankedResult];
               [resultsByCategory_ setObject:array forKey:category];
             } else {
-              [array addObject:newResult];
+              [array addObject:newRankedResult];
             }
           }
           currentIndex_++;

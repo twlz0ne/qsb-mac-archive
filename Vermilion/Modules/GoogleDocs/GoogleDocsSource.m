@@ -525,12 +525,11 @@ GTM_METHOD_CHECK(NSEnumerator,
   if (flagName) {
     [attributes setObject:flagName forKey:kHGSObjectAttributeFlagIconNameKey];
   }
-  HGSResult* result = [HGSResult resultWithURL:docURL
-                                          name:docTitle
-                                          type:kHGSTypeGoogleDoc
-                                          rank:kHGSResultUnknownRank
-                                        source:self
-                                    attributes:attributes];
+  HGSUnscoredResult* result = [HGSUnscoredResult resultWithURL:docURL
+                                                          name:docTitle
+                                                          type:kHGSTypeGoogleDoc
+                                                        source:self
+                                                    attributes:attributes];
   
   // If this is a spreadsheet then we have to go off and fetch the worksheet
   // information in a spreadsheet feed.
@@ -627,13 +626,7 @@ GTM_METHOD_CHECK(NSEnumerator,
       NSDictionary *attributes
         = [NSDictionary dictionaryWithObject:worksheetNames
                                       forKey:kGoogleDocsWorksheetNamesKey];
-      HGSResult* worksheetResult = [HGSResult resultWithURL:[docResult url]
-                                                       name:@"Ignored"
-                                                       type:kHGSTypeGoogleDoc
-                                                       rank:kHGSResultUnknownRank
-                                                     source:self
-                                                 attributes:attributes];
-      docResult = [docResult mergeWith:worksheetResult];
+      docResult = [docResult resultByAddingAttributes:attributes];
     }
     // Add other search term helpers such as the type of the document,
     // the authors.
