@@ -104,6 +104,7 @@ class VermilionAction(object):
   def Perform(self, result, pivot_object=None):
     VermilionNotify.DisplayNotification("Message");
     VermilionNotify.DisplayNotification("Message", "Description");
+    VermilionNotify.DisplayNotification("Message", "Description", "Name");
     return True
 
 
