@@ -38,7 +38,7 @@
 
 static NSString *const kQSBDWTopResultsKey = @"Top Results";
 static NSString *const kQSBDWMoreResultsKey =@"More Results";
-static NSUInteger kQSBDWResultRowCount = 7;
+static NSUInteger kQSBDWResultRowCount = 8;
 
 static NSInteger QSBDWSortOperations(HGSSearchOperation *op1, 
                                      HGSSearchOperation *op2, 
@@ -271,6 +271,10 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
       cellData = [NSString stringWithFormat:@"Last Used: %@", 
                   [result valueForKey:kHGSObjectAttributeLastUsedDateKey]];
       break;
+      
+    case 7:
+      cellData = [NSString stringWithFormat:@"Matched Term: %@", 
+                  [[result matchedTerm] tokenizedString]];
   }
   [cell setStringValue:cellData];
   [cell setLeaf:YES];

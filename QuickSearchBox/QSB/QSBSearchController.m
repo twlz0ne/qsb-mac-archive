@@ -106,7 +106,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
   // Cancel outstanding query requests and all timers.
   [self stopQuery];
-  [self cancelAndReleaseQueryController];
   [tokenizedQueryString_ release];
   [results_ release];
   [parentSearchController_ release];
@@ -436,6 +435,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)stopQuery {
+  [displayTimer_ invalidate];
+  displayTimer_ = nil;
   [mixer_ cancel];
   [self cancelAndReleaseQueryController];
   [self setQueryIsInProcess:NO];

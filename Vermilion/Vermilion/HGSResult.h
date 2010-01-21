@@ -110,13 +110,13 @@ typedef NSUInteger HGSRankFlags;
   
   The source may provide results lazily and will send notifications to anyone
   registered with KVO.  Consumers of the attributes shouldn't need to concern
-  themselves with the details of pending loads or caching of results, but
-  should call |-cancelAllPendingAttributeUpdates| when details of an object are
-  no longer required (eg, the user has selected a different result or cleared
-  the search).
+  themselves with the details of pending loads or caching of results.
+ 
+  This is an abstract class. The concrete subclasses are HGSScoredResult, and
+  HGSUnscoredResult.
 */
-
 @interface HGSResult : NSObject <NSCopying>
+
 /*!
  Get an attribute by name. |-valueForKey:| may return a placeholder value that
  is to be updated later via KVO.
@@ -194,6 +194,9 @@ typedef NSUInteger HGSRankFlags;
 
 @end
 
+/*!
+ A result that hasn't been scored against a query.
+*/
 @interface HGSUnscoredResult : HGSResult {
  @private
   NSUInteger uriHash_;
@@ -242,6 +245,9 @@ typedef NSUInteger HGSRankFlags;
 
 @end
 
+/*!
+ A result that has been scored against a query.
+*/
 @interface HGSScoredResult : HGSResult  {
 @private
   HGSResult *result_;
@@ -260,8 +266,12 @@ typedef NSUInteger HGSRankFlags;
  */
 @property (readonly) HGSRankFlags rankFlags;
 /*!
- */
+  The term that |score| was matched against.
+*/
 @property (readonly, copy) HGSTokenizedString *matchedTerm;
+/*!
+ The indexes of charactes of term that |score| was matched against.
+*/
 @property (readonly, assign) NSIndexSet *matchedIndexes;
 
 - (id)initWithResult:(HGSResult *)result 

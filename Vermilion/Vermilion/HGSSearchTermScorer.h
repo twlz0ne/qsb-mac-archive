@@ -30,6 +30,11 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion HGSSearchTermScorer
+*/
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,17 +54,6 @@ extern "C" {
 CGFloat HGSScoreTermForItem(HGSTokenizedString *term, 
                             HGSTokenizedString *string, 
                             NSIndexSet **outHitIndexes);
-
-/*!
- Scores how well a given term comprised of a singe word matches to a
- string.  (Release version.)
- @param term The search term against which the candidate item will be
- searched.  This should be a single word.
- @param string The string against which to match the search term.
- @result an unbounded float representing the matching score of the best match.
- */
-//CGFloat HGSScoreTermForString(NSString *term, NSString *string);
-
 /*!
  Scores how well a one or more words match a string.  (Release version.)
  @param term A term to match against.
