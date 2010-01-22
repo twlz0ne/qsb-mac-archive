@@ -115,7 +115,10 @@ typedef NSUInteger HGSRankFlags;
   This is an abstract class. The concrete subclasses are HGSScoredResult, and
   HGSUnscoredResult.
 */
-@interface HGSResult : NSObject <NSCopying>
+@interface HGSResult : NSObject <NSCopying> {
+ @public
+  NSUInteger hash_;
+}
 
 /*!
  Get an attribute by name. |-valueForKey:| may return a placeholder value that

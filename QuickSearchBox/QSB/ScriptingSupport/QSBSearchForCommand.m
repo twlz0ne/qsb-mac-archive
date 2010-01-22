@@ -121,13 +121,12 @@
           selector:@selector(queryControllerDidFinish:) 
               name:kHGSQueryControllerDidFinishNotification 
             object:queryController_];
-  
+  [self setMixingHasCompleted:NO];
   [queryController_ startQuery];
   
   // if we don't have a handler, we'll just spin until the search
   // is done. This could take a while and may time out
   if (!handler_) {
-    [self setMixingHasCompleted:NO];
     NSRunLoop *rl = [NSRunLoop currentRunLoop];
     while (![self mixingHasCompleted]) {
       [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];

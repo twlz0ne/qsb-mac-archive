@@ -181,7 +181,7 @@ static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
 
 - (BOOL)isDuplicate:(HGSResult *)compareTo {
   BOOL isDupe = NO;
-  if ([self hash] == [compareTo hash]) {
+  if (self->hash_ == compareTo->hash_) {
     isDupe = [[self uri] isEqualTo:[compareTo uri]];
   }
   return isDupe;
@@ -220,6 +220,10 @@ static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
 
 - (NSString *)stringValue {
   return [self displayName];
+}
+
+- (NSUInteger)hash {
+  return hash_;
 }
 
 #pragma mark Methods that must be overridden.
@@ -310,7 +314,7 @@ static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
                           forKey:kHGSObjectAttributeLastUsedDateKey];
       }
       uri_ = [uri retain];
-      uriHash_ = [uri_ hash];
+      hash_ = [uri_ hash];
       displayName_ = [name retain];
       type_ = [typeStr retain];
       source_ = [source retain];
@@ -435,10 +439,6 @@ static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
 
 
 GTM_METHOD_CHECK(NSString, readableURLString);
-
-- (NSUInteger)hash {
-  return uriHash_;
-}
 
 #pragma mark HGSResult Overrides
 
@@ -631,6 +631,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
       matchedIndexes:(NSIndexSet *)indexes {
   if ((self = [super init])) {
     result_ = [result retain];
+    hash_ = [result hash];
     score_ = score;
     rankFlags_ = [[result valueForKey:kHGSObjectAttributeRankFlagsKey] unsignedIntegerValue];
     rankFlags_ |= setFlags;
@@ -672,11 +673,6 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   [result_ release];
   [super dealloc];
 }
-
-- (NSUInteger)hash {
-  return [result_ hash];
-}
-
 
 #pragma mark HGSResult Overrides
 
