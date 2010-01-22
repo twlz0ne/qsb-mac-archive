@@ -35,6 +35,7 @@
 
 #import <unistd.h>
 #import <Vermilion/Vermilion.h>
+#import <Sparkle/Sparkle.h>
 
 #import "QSBHGSObjectSpecifiers.h"
 #import "QSBKeyMap.h"
@@ -150,6 +151,8 @@ static NSString *const kGrowlNotificationName = @"QSB User Message";
 
 // Return the time required to count as a double click.
 - (NSTimeInterval)doubleClickTime;
+
+- (BOOL)suppressStartupDialogs;
 @end
 
 
@@ -697,6 +700,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
 }
 
+-(BOOL)suppressStartupDialogs {
+  NSDictionary *envVars = [[NSProcessInfo processInfo] environment];
+  NSString *value = [envVars objectForKey:@"QSBSuppressStartupDialogs"];
+  return [value boolValue] || [GTMUnitTestingUtilities areWeBeingUnitTested];
+}
+  
 #pragma mark Plugins & Extensions Management
 
 - (NSArray *)plugins {
@@ -820,7 +829,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 #pragma mark Application Delegate Methods
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
-  if (![GTMUnitTestingUtilities areWeBeingUnitTested]) {
+  if (![self suppressStartupDialogs]) {
     PFMoveToApplicationsFolderIfNecessary();
   }
 
@@ -1240,6 +1249,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
           array, GROWL_NOTIFICATIONS_DEFAULT,
           nil];
 }
+
+#pragma mark Sparkle Support
+- (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SUUpdater *)bundle {
+  BOOL suppress = [self suppressStartupDialogs];
+  return !suppress;
+}
+
 @end
 
 
