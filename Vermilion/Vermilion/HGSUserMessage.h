@@ -34,13 +34,13 @@
 
 /*!
  @enum HGSUserMessageType
- @constant kHGSUserMessageError Display as error
- @constant kHGSUserMessageWarning Display as warning
- @constant kHGSUserMessageNote Display as notification
+ @constant kHGSUserMessageErrorType Display as error
+ @constant kHGSUserMessageWarningType Display as warning
+ @constant kHGSUserMessageNoteType Display as notification
  */
 enum  {
   kHGSUserMessageErrorType = 1,
-  kHGSUserMessageWarning = 0,
+  kHGSUserMessageWarningType = 0,
   kHGSUserMessageNoteType = -1,
 };
 typedef NSInteger HGSUserMessageType;

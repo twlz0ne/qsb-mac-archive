@@ -1183,7 +1183,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       priority = 1;
       break;
       
-    case kHGSUserMessageWarning:
+    case kHGSUserMessageWarningType:
       priority = 0;
       break;
       
