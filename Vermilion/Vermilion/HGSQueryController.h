@@ -102,13 +102,18 @@
 #pragma mark Notifications
 
 /*!
-  Called when the query will start.  Object is the QueryController.
+  Sent when the query will start.  Object is the QueryController.
 */
 GTM_EXTERN NSString *const kHGSQueryControllerWillStartNotification;
 
 /*!
-  Called when the query has completed. May be called even when there are more
+  Sent when the query has completed. May be called even when there are more
   results that are possible, but the query has been stopped by the user or by
   the query reaching a time threshhold.  Object is the QueryController.
 */
 GTM_EXTERN NSString *const kHGSQueryControllerDidFinishNotification;
+
+/*!
+ Sent when there are new results available. Object is the QueryController.
+*/
+GTM_EXTERN NSString *const kHGSQueryControllerDidUpdateResultsNotification;

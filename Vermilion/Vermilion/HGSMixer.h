@@ -55,6 +55,7 @@
   uint64_t mainThreadTime_;
   NSInteger *opsIndices_;
   NSInteger *opsMaxIndices_;
+  NSUInteger maxResults_;
   NSUInteger currentIndex_;
   NSOperation *operation_;
   NSOperationQueue *opQueue_;
@@ -70,6 +71,7 @@
                          background thread (to optimize user responsiveness)
 */
 - (id)initWithSearchOperations:(NSArray *)ops
+                    maxResults:(NSUInteger)maxResults
                 mainThreadTime:(NSTimeInterval)mainThreadTime;
         
 /*!

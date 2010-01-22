@@ -100,9 +100,11 @@ inline NSInteger HGSMixerScoredResultSort(HGSScoredResult *resultA,
 @implementation HGSMixer
 
 - (id)initWithSearchOperations:(NSArray *)ops 
-        mainThreadTime:(NSTimeInterval)mainThreadTime {
+                    maxResults:(NSUInteger)maxResults
+                mainThreadTime:(NSTimeInterval)mainThreadTime {
   if ((self = [super init])) {
     ops_ = [ops copy];
+    maxResults_ = maxResults;
     AbsoluteTime absTime = DurationToAbsolute(mainThreadTime * durationSecond);
     mainThreadTime_ = UnsignedWideToUInt64(absTime);
     NSUInteger opsCount = [ops_ count];
@@ -226,10 +228,14 @@ inline NSInteger HGSMixerScoredResultSort(HGSScoredResult *resultA,
               [array addObject:newRankedResult];
             }
           }
-          currentIndex_++;
+          ++currentIndex_;
+          if (currentIndex_ >= maxResults_) {
+            isFinished_ = YES;
+            break;
+          }
         }
       }
-      opsIndices_[indexToIncrement]++;
+      ++opsIndices_[indexToIncrement];
     } else {
       isFinished_ = YES;
       break;

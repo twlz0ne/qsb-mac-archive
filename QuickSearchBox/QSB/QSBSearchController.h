@@ -39,6 +39,10 @@
 
 // Interface between QSB and the web suggestor and the desktop query
 // takes a query string and is responsible for turning it into results.
+// As far as QSBSearchController is concerned, a "query" is split up into two
+// distinct phases. We have the gathering phase, in which we collect all of
+// the valid results from the various sources, and the mixing phase in which
+// we sort all of the results from the sources. 
 @interface QSBSearchController : NSObject {
  @private
   NSMutableArray *desktopResults_;
@@ -53,8 +57,8 @@
 
   // used to update the UI at various times through the life of the query
   NSTimer *displayTimer_;
-  BOOL queryIsInProcess_;  // Yes while a query is under way.
-  BOOL queryControllerFinished_;  // Yes if the results gathering has completed.
+  BOOL queryInProcess_;  // Yes while a query is under way.
+  BOOL gatheringFinished_;  // Yes if the results gathering has completed.
   NSUInteger pushModifierFlags_; // NSEvent Modifiers at pivot time
   NSUInteger totalResultDisplayCount_;
   HGSMixer *mixer_;
@@ -66,9 +70,8 @@
 @property(nonatomic, retain) HGSResultArray *results;
 // Sets/Gets the parent query from which we were spawned.
 @property(nonatomic, retain) QSBSearchController *parentSearchController;
-// Set/Gets in-process indication for query.  Bound to the progress
-// indicator.
-@property(nonatomic, readonly, assign) BOOL queryIsInProcess;
+// Bound to the progress indicator in BaseResultsViews.xib
+@property(nonatomic, readonly, assign, getter=isQueryInProcess) BOOL queryInProcess;
 
 // Returns the top results
 - (QSBTableResult *)topResultForIndex:(NSInteger)idx;

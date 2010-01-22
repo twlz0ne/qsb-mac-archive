@@ -33,6 +33,8 @@
 #import "HGSQuery.h"
 #import "HGSTokenizer.h"
 
+const NSUInteger kHGSQueryMaximumResults = NSUIntegerMax;
+
 @implementation HGSQuery
 
 @synthesize tokenizedQueryString = tokenizedQueryString_;
@@ -46,7 +48,7 @@
                    queryFlags:(HGSQueryFlags)flags {
   if ((self = [super init])) {
     results_ = [results retain];
-    maxDesiredResults_ = -1;
+    maxDesiredResults_ = kHGSQueryMaximumResults;
     flags_ = flags;
 
     // If we got nil for a query, but had a pivot, turn it into an empty query.

@@ -52,6 +52,8 @@ NSString *const kHGSQueryControllerWillStartNotification
   = @"HGSQueryControllerWillStartNotification";
 NSString *const kHGSQueryControllerDidFinishNotification 
   = @"HGSQueryControllerDidFinishNotification";
+NSString *const kHGSQueryControllerDidUpdateResultsNotification
+  = @"HGSQueryControllerDidUpdateResultsNotification";
 
 NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 
@@ -212,8 +214,10 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   @synchronized (queryOperationsWithResults_) {
     currentOps = [queryOperationsWithResults_ allObjects];
   }
+  NSUInteger maxResults = [parsedQuery_ maxDesiredResults];
   return [[[HGSMixer alloc] initWithSearchOperations:currentOps
-                              mainThreadTime:0.05] autorelease];
+                                          maxResults:maxResults
+                                      mainThreadTime:0.05] autorelease];
 }
 
 - (NSUInteger)totalResultsCount {
@@ -310,6 +314,9 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   @synchronized (self) {
     [queryOperationsWithResults_ addObject:operation];
   }
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:kHGSQueryControllerDidUpdateResultsNotification 
+                    object:self];
 }
 
 - (NSArray *)pendingQueries {

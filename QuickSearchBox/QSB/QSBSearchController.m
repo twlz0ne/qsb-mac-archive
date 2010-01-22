@@ -65,8 +65,8 @@ NSString *const kQSBSearchControllerDidChangeQueryStringNotification
 // Perform the actual query.  
 - (void)performQuery;
 
-@property(nonatomic, assign) BOOL queryIsInProcess;
-@property(nonatomic, assign, getter=isQueryControllerFinished) BOOL queryControllerFinished;
+@property(nonatomic, assign, getter=isQueryInProcess) BOOL queryInProcess;
+@property(nonatomic, assign, getter=isGatheringFinished) BOOL gatheringFinished;
 @end
 
 @implementation QSBSearchController
@@ -74,8 +74,8 @@ NSString *const kQSBSearchControllerDidChangeQueryStringNotification
 @synthesize pushModifierFlags = pushModifierFlags_;
 @synthesize results = results_;
 @synthesize parentSearchController = parentSearchController_;
-@synthesize queryIsInProcess = queryIsInProcess_;
-@synthesize queryControllerFinished = queryControllerFinished_;
+@synthesize queryInProcess = queryInProcess_;
+@synthesize gatheringFinished = gatheringFinished_;
 
 GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
@@ -325,7 +325,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       }
       [newResults addObjectsFromArray:suggestResults];
     }
-    if (![self isQueryControllerFinished]) {
+    if (![self isGatheringFinished]) {
       [newResults addObject:[QSBSearchStatusTableResult tableResult]];
     }
     [newResults addObject:[QSBFoldTableResult tableResult]];
@@ -333,12 +333,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     if ([suggestResults count] > 0) {
       [newResults addObjectsFromArray:suggestResults];
     }
-    if (![self isQueryControllerFinished]) {
+    if (![self isGatheringFinished]) {
       [newResults addObject:[QSBSearchStatusTableResult tableResult]];
     }
   }
 
-  if ([self isQueryControllerFinished]) {
+  if ([self isGatheringFinished]) {
     [desktopResults_ setArray:newResults];
   }
 
@@ -412,37 +412,46 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                                            results:results_
                                         queryFlags:flags]
                        autorelease];
-    [query setMaxDesiredResults:[self maximumResultsToCollect]];
 
     [self cancelAndReleaseQueryController];
     queryController_ = [[HGSQueryController alloc] initWithQuery:query];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self
+           selector:@selector(queryControllerWillStart:)
+               name:kHGSQueryControllerWillStartNotification
+             object:queryController_];
+    [nc addObserver:self
            selector:@selector(queryControllerDidFinish:)
                name:kHGSQueryControllerDidFinishNotification
              object:queryController_];
-    [self setQueryIsInProcess:YES];
-    [self setQueryControllerFinished:NO];
+    [nc addObserver:self 
+           selector:@selector(queryControllerDidUpdateResults:) 
+               name:kHGSQueryControllerDidUpdateResultsNotification 
+             object:queryController_];
 
     // This became a separate call because some sources come back before
     // this call returns and queryController_ must be set first
     [queryController_ startQuery];
-    if (![self isQueryControllerFinished]) {
-      [mixer_ cancel];
-      [self startMixing];
-    }
   }
 }
 
 - (void)stopQuery {
-  [displayTimer_ invalidate];
-  displayTimer_ = nil;
-  [mixer_ cancel];
-  [self cancelAndReleaseQueryController];
-  [self setQueryIsInProcess:NO];
+  if ([self isQueryInProcess]) {
+    [displayTimer_ invalidate];
+    displayTimer_ = nil;
+    [mixer_ cancel];
+    [self cancelAndReleaseQueryController];
+    [self setQueryInProcess:NO];
+  }
 }
 
 #pragma mark Notifications
+
+- (void)queryControllerWillStart:(NSNotification *)notification { 
+  [self setQueryInProcess:YES];
+  [self setGatheringFinished:NO];
+
+}
 
 // Called when the last active query operation, and thus the query, has
 // completed.  May be called even when there are more results that are
@@ -450,7 +459,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 // reaching a time threshold.
 - (void)queryControllerDidFinish:(NSNotification *)notification { 
   currentResultDisplayCount_ = [self maximumResultsToCollect];
-  [self setQueryControllerFinished:YES];
+  [self setGatheringFinished:YES];
   HGSQueryController *queryController = [notification object];
   HGSAssert([queryController isKindOfClass:[HGSQueryController class]], nil);
   [mixer_ cancel];
@@ -459,11 +468,16 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
 }
 
+
+- (void)queryControllerDidUpdateResults:(NSNotification *)notification { 
+}
+
+
 // called when enough time has elapsed that we want to display some results
 // to the user.
 - (void)displayTimerElapsed:(NSTimer*)timer {
   [self updateResults];
-  if (![self isQueryControllerFinished]) {
+  if (![self isGatheringFinished]) {
     [mixer_ cancel];
     [self startMixing];
   }
@@ -492,13 +506,13 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if (![mixer isCancelled]) {
     [self updateResults];
   }
-  if ([self isQueryControllerFinished]) {
-    [self setQueryIsInProcess:NO];
+  if ([self isGatheringFinished]) {
+    [self setQueryInProcess:NO];
   }  
   [displayTimer_ invalidate];
   displayTimer_ = nil;
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc removeObserver:self name:kHGSMixerDidFinishNotification object:mixer_];
+  [nc removeObserver:self name:nil object:mixer_];
   [mixer_ release];
   mixer_ = nil;  
 }
