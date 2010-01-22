@@ -192,7 +192,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
   // Initialization code
   NSMutableArray *allCorpora = [NSMutableArray array];
-  NSBundle *pluginBundle = HGSGetPluginBundle();
+  NSBundle *pluginBundle = [self bundle];
   NSString *plistPath = [pluginBundle pathForResource:@"DefaultCorpora"
                                                ofType:@"plist"];
   NSArray *corporaPlist = [NSArray arrayWithContentsOfFile:plistPath];

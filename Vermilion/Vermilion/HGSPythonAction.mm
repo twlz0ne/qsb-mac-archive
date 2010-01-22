@@ -146,13 +146,15 @@ static const char *const kHGSPythonPerform = "Perform";
     PyObject *pyDirects = [sharedPython tupleForResults:directs];
     PyObject *pyIndirects = [sharedPython tupleForResults:indirects];
     if (pyDirects) {
-      [[[NSThread currentThread] threadDictionary]
-       setValue:[self bundle] forKey:kHGSPythonThreadBundleKey];
+      NSMutableDictionary *threadDict 
+        = [[NSThread currentThread] threadDictionary];
+      [threadDict setValue:self forKey:kHGSPythonThreadExtensionKey];
       PyObject *pythonResult =
         PyObject_CallMethodObjArgs(instance_,
                                    perform_,
                                    pyDirects,
                                    nil);
+      [threadDict removeObjectForKey:kHGSPythonThreadExtensionKey];
       if (pythonResult) {
         result = (pythonResult == Py_True);
         Py_DECREF(pythonResult);
@@ -175,13 +177,15 @@ static const char *const kHGSPythonPerform = "Perform";
     HGSPython *sharedPython = [HGSPython sharedPython];
     PyObject *pyResult = [sharedPython tupleForResults:results];
     if (pyResult) {
-      [[[NSThread currentThread] threadDictionary]
-       setValue:[self bundle] forKey:kHGSPythonThreadBundleKey];
+      NSMutableDictionary *threadDict 
+        = [[NSThread currentThread] threadDictionary];
+      [threadDict setValue:self forKey:kHGSPythonThreadExtensionKey];
       PyObject *pyApplies =
         PyObject_CallMethodObjArgs(instance_,
                                    appliesTo_,
                                    pyResult,
                                    nil);
+      [threadDict removeObjectForKey:kHGSPythonThreadExtensionKey];
       if (pyApplies) {
         if (PyBool_Check(pyApplies) && pyApplies == Py_True) {
           doesApply = YES;

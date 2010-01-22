@@ -152,6 +152,19 @@
   Called when an extension is being uninstalled.
 */
 - (void)uninstall;
+
+/*!
+  Returns an autoreleased image.
+  If nameOrPathOrExtension is absolute:
+    - If the path is to an image file, returns that file
+    - If the path is to a non-image file, returns its icon.
+  If not absolute, looks for an image in the bundle.
+    - If the path is to an image file, returns that file
+    - If the path is to a non-image file, returns its icon.
+  Attempts to get an image treating nameOrPathOrExtension as a fileType.
+  Finally calls standard imageNamed.
+*/
+- (NSImage *)imageNamed:(NSString *)nameOrPathOrExtension;
 @end
 
 #pragma mark Extension keys

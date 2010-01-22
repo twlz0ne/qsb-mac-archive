@@ -112,6 +112,9 @@
   if (name) {
     ++notificationCount_;
   }
+  NSImage *image = [userInfo objectForKey:kHGSImageMessageKey];
+  STAssertNotNil(image, nil);
+  
   ++notificationCount_;
 }
 @end

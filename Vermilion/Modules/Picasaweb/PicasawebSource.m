@@ -112,15 +112,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                object:account_];
 
       // Pick up a placeholder icon.
-      NSBundle *bundle = HGSGetPluginBundle();
-      NSString *path
-        = [bundle pathForResource:@"PicasaPlaceholder" ofType:@"icns"];
-      if (path) {
-        placeholderIcon_ = [[NSImage alloc] initByReferencingFile:path];
-      } else {
-        HGSLogDebug(@"PicasaPlaceholder.icns missing from . "
-                    @"The generic placeholder will be used instead.");
-      }
+      placeholderIcon_ = [[self imageNamed:@"PicasaPlaceholder.icns"] retain];
     } else {
       HGSLogDebug(@"Missing account identifier for PicasawebSource '%@'",
                   [self identifier]);

@@ -59,23 +59,10 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    NSBundle *bundle = HGSGetPluginBundle();
-    NSString *path = [bundle pathForResource:@"window" ofType:@"icns"];
-    HGSAssert(path, @"Icons for 'window' are missing from the "
-              @"ApplicationUISource bundle.");
-    windowIcon_ = [[NSImage alloc] initByReferencingFile:path];
-    path = [bundle pathForResource:@"menu" ofType:@"icns"];
-    HGSAssert(path, @"Icons for 'menu' are missing from the "
-              @"ApplicationUISource bundle.");
-    menuIcon_ = [[NSImage alloc] initByReferencingFile:path];
-    path = [bundle pathForResource:@"menuitem" ofType:@"icns"];
-    HGSAssert(path, @"Icons for 'menuitem' are missing from the "
-              @"ApplicationUISource bundle.");
-    menuItemIcon_ = [[NSImage alloc] initByReferencingFile:path];
-    path = [bundle pathForResource:@"view" ofType:@"icns"];
-    HGSAssert(path, @"Icons for 'view' are missing from the "
-              @"ApplicationUISource bundle.");
-    viewIcon_ = [[NSImage alloc] initByReferencingFile:path];
+    windowIcon_ = [[self imageNamed:@"window.icns"] retain];
+    menuIcon_ = [[self imageNamed:@"menu.icns"] retain];
+    menuItemIcon_ = [[self imageNamed:@"menuitem.icns"] retain];
+    viewIcon_ = [[self imageNamed:@"view.icns"] retain];
     if (!(windowIcon_ && menuIcon_ && menuItemIcon_ && viewIcon_)) {
       HGSLogDebug(@"Unable to get icons for %@", [self class]);
       [self release];
@@ -319,6 +306,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   GTMAXUIElement *element
     = [pivotObject valueForKey:kAppUISourceAttributeElementKey];
   NSMutableArray *results = [NSMutableArray array];
+  
   if (!element) {
     NSDictionary *appData = [self getAppInfoFromResult:pivotObject];
     if (appData) {
@@ -351,13 +339,14 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         [frontmostAppElement_ release];
         frontmostAppElement_ = nil;
         NSArray *pathCellArray = [NSArray array];
+        NSMutableArray *menuResults = [NSMutableArray array];
         [self addMenuResultsFromElement:element 
-                                toArray:results 
+                                toArray:menuResults 
                           pathCellArray:pathCellArray
                               operation:operation];
         if (![operation isCancelled]) {
           frontmostAppElement_ = [element retain];
-          frontmostMenuResults_ = [results retain];
+          frontmostMenuResults_ = [menuResults retain];
         }
       }
       for(HGSUnscoredResult *result in frontmostMenuResults_) {

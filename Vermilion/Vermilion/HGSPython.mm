@@ -48,7 +48,7 @@
 #import <Python/structmember.h>
 
 const NSString *kHGSPythonPrivateValuesKey = @"kHGSPythonPrivateValuesKey";
-const NSString *kHGSPythonThreadBundleKey = @"HGSPythonThreadBundleKey";
+const NSString *kHGSPythonThreadExtensionKey = @"HGSPythonThreadExtensionKey";
 
 NSString *const kPythonModuleNameKey = @"HGSPythonModule";
 NSString *const kPythonClassNameKey = @"HGSPythonClass";
@@ -231,7 +231,9 @@ static PyMethodDef NotificationMethods[] = {
   { "DisplayNotification", DisplayNotification, METH_VARARGS,
     "Displays a notification to the user. First argument is the message string. "
     "Second optional argument is the description string. "
-    "Third optional argument is the message name."
+    "Third optional argument is the message name. "
+    "Fourth optional argument is the image name. It can be an absolute path, "
+    "or a bundle relative image name"
   },
   { NULL, NULL, 0, NULL }
 };
@@ -868,10 +870,16 @@ static PyObject *LocalizeString(PyObject *self, PyObject *args) {
     return PyString_FromString("");
   }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSBundle *bundle = [[[NSThread currentThread] threadDictionary]
-                      valueForKey:kHGSPythonThreadBundleKey];
+  HGSExtension *extension = [[[NSThread currentThread] threadDictionary]
+                             valueForKey:kHGSPythonThreadExtensionKey];
+  if (!extension) {
+    HGSLog(@"No extension!");
+    return nil;
+  }
   NSString *key = [NSString stringWithUTF8String:str];
-  NSString *localized = [bundle localizedStringForKey:key value:@"" table:nil];
+  NSString *localized = [[extension bundle] localizedStringForKey:key 
+                                                            value:@"" 
+                                                            table:nil];
   PyObject *resultString = nil;
   if (localized) {
     resultString = PyString_FromString([localized UTF8String]);
@@ -886,10 +894,12 @@ static PyObject *DisplayNotification(PyObject *self, PyObject *args) {
   char *message = NULL;
   char *description = NULL;
   char *messageName = NULL;
+  char *imagePath = NULL;
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-  if (!PyArg_ParseTuple(args, "s|ss", &message, &description, &messageName)) {
+  if (!PyArg_ParseTuple(args, "s|sss", 
+                        &message, &description, &messageName, &imagePath)) {
     HGSLogDebug(@"VermilionNotify.DisplayNotification() requires an argument");
     return PyString_FromString("");
   }
@@ -902,10 +912,26 @@ static PyObject *DisplayNotification(PyObject *self, PyObject *args) {
   if (messageName) {
     nsName = [NSString stringWithUTF8String:messageName];
   }
+  NSImage *image = nil;
+  NSString *nsImagePath = nil;
+  HGSExtension *extension = [[[NSThread currentThread] threadDictionary]
+                             valueForKey:kHGSPythonThreadExtensionKey];
+  if (!extension) {
+    HGSLog(@"No extension!");
+    return nil;
+  }
+  
+  if (imagePath) {
+    nsImagePath = [NSString stringWithUTF8String:imagePath];
+    image = [extension imageNamed:nsImagePath];
+  }
+  if (!image) {
+    image = [extension icon];
+  }
   [HGSUserMessenger displayUserMessage:nsMessage 
                            description:nsDescription 
                                   name:nsName 
-                                 image:nil 
+                                 image:image 
                                   type:kHGSUserMessageNoteType];
   [pool release];     
   Py_INCREF(Py_None);

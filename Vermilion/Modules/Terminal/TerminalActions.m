@@ -67,10 +67,9 @@ static NSString *const kTerminalBundleID = @"com.apple.Terminal";
 - (NSAppleScript *)appleScript {
   @synchronized(self) {
     if (!script_) {
-      NSBundle *bundle = HGSGetPluginBundle();
-      NSString *path = [bundle pathForResource:@"Terminal"
-                                        ofType:@"scpt"
-                                   inDirectory:@"Scripts"];
+      NSString *path = [[self bundle] pathForResource:@"Terminal"
+                                               ofType:@"scpt"
+                                          inDirectory:@"Scripts"];
       NSURL *url = [NSURL fileURLWithPath:path];
       script_ = [[NSAppleScript alloc] initWithContentsOfURL:url
                                                        error:nil];

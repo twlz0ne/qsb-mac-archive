@@ -62,9 +62,7 @@ static NSString *const kClipboardCopyAction
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
     // Create the first result as a persistent, pivotable "clipboard" item
-    NSString *path = [HGSGetPluginBundle() pathForResource:@"clipboard"
-                                                    ofType:@"icns"];
-    clipboardIcon_ = [[NSImage alloc] initByReferencingFile:path];
+    clipboardIcon_ = [[self imageNamed:@"clipboard.icns"] retain];
     NSString *name
       = [HGSLocalizedString(@"Clipboard",
                             @"The generic search term used to bring up "

@@ -88,27 +88,10 @@ GTM_METHOD_CHECK(NSEnumerator,
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
     // Cache the Google Docs icons
-    NSBundle* sourceBundle = HGSGetPluginBundle();
-    NSString *docPath = [sourceBundle pathForImageResource:@"gdocdocument"];
-    HGSAssert(docPath, @"Icons for 'gdocdocument' are missing from the "
-              @"GoogleDocsSource bundle.");
-    NSString *ssPath = [sourceBundle pathForImageResource:@"gdocspreadsheet"];
-    HGSAssert(ssPath, @"Icons for 'gdocspreadsheet' are missing from the "
-              @"GoogleDocsSource bundle.");
-    NSString *presPath = [sourceBundle pathForImageResource:@"gdocpresentation"];
-    HGSAssert(presPath, @"Icons for 'gdocpresentation' are missing from the "
-              @"GoogleDocsSource bundle.");
-    NSString *pdfPath = [sourceBundle pathForImageResource:@"gdocpdfdocument"];
-    HGSAssert(pdfPath, @"Icons for 'gdocppdfdocument' are missing from the "
-              @"GoogleDocsSource bundle.");
-    NSImage *docImage 
-      = [[[NSImage alloc] initByReferencingFile:docPath] autorelease];
-    NSImage *ssImage
-       = [[[NSImage alloc] initByReferencingFile:ssPath] autorelease];
-    NSImage *presImage
-      = [[[NSImage alloc] initByReferencingFile:presPath] autorelease];
-    NSImage *pdfImage
-      = [[[NSImage alloc] initByReferencingFile:pdfPath] autorelease];
+    NSImage *docImage = [self imageNamed:@"gdocdocument"];
+    NSImage *ssImage = [self imageNamed:@"gdocspreadsheet"];
+    NSImage *presImage = [self imageNamed:@"gdocpresentation"];
+    NSImage *pdfImage = [self imageNamed:@"gdocpdfdocument"];
     docIcons_ = [[NSDictionary alloc] initWithObjectsAndKeys:
                  docImage, kDocCategoryDocument, 
                  ssImage, kDocCategorySpreadsheet, 

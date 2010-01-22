@@ -418,10 +418,7 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
 
 - (void)informUserWithDescription:(NSString *)description
                              type:(HGSUserMessageType)type {
-  NSBundle *bundle = HGSGetPluginBundle();
-  NSString *path = [bundle pathForResource:@"PicasaWeb" ofType:@"icns"];
-  NSImage *picasaIcon
-    = [[[NSImage alloc] initByReferencingFile:path] autorelease];
+  NSImage *picasaIcon = [self imageNamed:@"PicasaWeb.icns"];
   NSString *summary 
     = HGSLocalizedString(@"Picasa Web", 
                          @"A dialog title. Picasa Web is a product name");

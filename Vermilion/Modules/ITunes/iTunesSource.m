@@ -195,27 +195,13 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   if ((self = [super initWithConfiguration:configuration])) {
     // Create the initial in-memory database
     db_ = [[self createDatabase] retain];
-    NSBundle *bundle = HGSGetPluginBundle();
+
     // Preload our placeholder icons
-    NSString *path = [bundle pathForResource:@"iTunesAlbumBrowserIcon"
-                                    ofType:@"png"];
-    albumIcon_= [[NSImage alloc] initByReferencingFile:path];
-
-    path = [bundle pathForResource:@"iTunesArtistBrowserIcon"
-                            ofType:@"png"];
-    artistIcon_= [[NSImage alloc] initByReferencingFile:path];
-
-    path = [bundle pathForResource:@"iTunesComposerBrowserIcon"
-                            ofType:@"png"];
-    composerIcon_= [[NSImage alloc] initByReferencingFile:path];
-
-    path = [bundle pathForResource:@"iTunesGenreBrowserIcon"
-                            ofType:@"png"];
-    genreIcon_= [[NSImage alloc] initByReferencingFile:path];
-
-    path = [bundle pathForResource:@"iTunesPlaylistIcon"
-                            ofType:@"icns"];
-    playlistIcon_= [[NSImage alloc] initByReferencingFile:path];
+    albumIcon_ = [[self imageNamed:@"iTunesAlbumBrowserIcon.png"] retain];
+    artistIcon_ = [[self imageNamed:@"iTunesArtistBrowserIcon.png"] retain];
+    composerIcon_ = [[self imageNamed:@"iTunesComposerBrowserIcon.png"] retain];
+    genreIcon_ = [[self imageNamed:@"iTunesGenreBrowserIcon.png"] retain];
+    playlistIcon_ = [[self imageNamed:@"iTunesPlaylistIcon.icns"] retain];
 
     // Periodically update the index
     updateTimer_

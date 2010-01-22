@@ -141,13 +141,15 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
                                              withSearchOperation:nil];
       
     if (instance_ && isValidSourceForQuery_ && pyQuery) {
-      [[[NSThread currentThread] threadDictionary]
-       setValue:[self bundle] forKey:kHGSPythonThreadBundleKey];
+      NSMutableDictionary *threadDict 
+        = [[NSThread currentThread] threadDictionary];
+      [threadDict setValue:self forKey:kHGSPythonThreadExtensionKey];
       PyObject *pyValid =
         PyObject_CallMethodObjArgs(instance_,
                                    isValidSourceForQuery_,
                                    pyQuery,
                                    nil);
+      [threadDict removeObjectForKey:kHGSPythonThreadExtensionKey];
       if (pyValid) {
         if (PyBool_Check(pyValid)) {
           isValid = (pyValid == Py_True);
@@ -196,12 +198,15 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
       PythonStackLock gilLock;
       PyObject *performSearchString = PyString_FromString(kPerformSearch);
       if (performSearchString) {
-        [[[NSThread currentThread] threadDictionary]
-         setValue:[[self source] bundle] forKey:kHGSPythonThreadBundleKey];
+        NSMutableDictionary *threadDict 
+          = [[NSThread currentThread] threadDictionary];
+        HGSSearchSource *source = [self source];
+        [threadDict setValue:source forKey:kHGSPythonThreadExtensionKey];
         PyObject_CallMethodObjArgs(instance,
                                    performSearchString,
                                    query,
                                    nil);
+        [threadDict removeObjectForKey:kHGSPythonThreadExtensionKey];
         PyObject *err = PyErr_Occurred();
         if (!err) {
           running = YES;

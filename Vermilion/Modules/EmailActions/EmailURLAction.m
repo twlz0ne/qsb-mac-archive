@@ -55,20 +55,16 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     NSImage *icon = nil;
     CFURLRef url = (CFURLRef)[NSURL URLWithString:@"mailto:"];
     CFURLRef appURL = NULL;
+    NSString *path = nil;
     if (noErr == LSGetApplicationForURL(url,
                                         kLSRolesViewer,
                                         NULL, &appURL)) {
       GTMCFAutorelease(appURL);
-      icon = [[NSWorkspace sharedWorkspace] iconForFile:[(NSURL *)appURL path]];
+      path = [(NSURL *)appURL path];
     } else {
-      NSBundle *bundle = HGSGetPluginBundle();
-      NSString *path = [bundle pathForResource:@"emailURL" ofType:@"icns"];
-      icon = [[[NSImage alloc] initByReferencingFile:path] autorelease]; 
-      if (!icon) {
-        HGSLogDebug(@"Icon for EmailURL is missing from the EmailActions "
-                    @"bundle.");
-      }
+      path = @"emailURL.icns";
     }
+    icon = [self imageNamed:path];
     defaultObject = icon;
   }
   if (!defaultObject) {

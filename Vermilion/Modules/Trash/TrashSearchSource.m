@@ -51,9 +51,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    NSString *path = [HGSGetPluginBundle() pathForResource:@"MoveToTrash"
-                                                    ofType:@"icns"];
-    trashIcon_= [[NSImage alloc] initByReferencingFile:path];
+    trashIcon_= [[self imageNamed:@"MoveToTrash.icns"] retain];
     trashName_ = HGSLocalizedString(@"Trash", 
                                     @"The label for a result denoting the "
                                     @"trash can found on your dock.");

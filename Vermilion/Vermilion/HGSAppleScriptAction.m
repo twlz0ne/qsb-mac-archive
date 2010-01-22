@@ -66,7 +66,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
     if (!fileName) {
       fileName = @"main";
     }
-    NSBundle *bundle = [configuration objectForKey:kHGSExtensionBundleKey];
+    NSBundle *bundle = [self bundle];
     scriptPath_ = [bundle pathForResource:fileName 
                                    ofType:@"scpt" 
                               inDirectory:@"Scripts"];

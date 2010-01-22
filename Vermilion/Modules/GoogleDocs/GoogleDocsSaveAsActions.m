@@ -214,12 +214,8 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
   HGSResult *result = [fetcher propertyForKey:kHGSSaveAsHGSResultKey];
   NSString *category = [result valueForKey:kGoogleDocsDocCategoryKey];
   HGSAssert(category, nil);
-  category = [NSString stringWithFormat:@"gdoc%@", category];
-  NSBundle *bundle = HGSGetPluginBundle();
-  NSString *path = [bundle pathForResource:category ofType:@"icns"];
-  NSImage *categoryIcon
-    = [[[NSImage alloc] initByReferencingFile:path] autorelease];
-  HGSAssert(categoryIcon, @"Missing Google Doc category icon.");
+  category = [NSString stringWithFormat:@"gdoc%@.icns", category];
+  NSImage *categoryIcon = [self imageNamed:category];
   NSString *summary 
     = HGSLocalizedString(@"Google Docs", @"A dialog title.");
   [HGSUserMessenger displayUserMessage:summary 

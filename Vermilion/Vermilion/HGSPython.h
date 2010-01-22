@@ -81,7 +81,7 @@ public:
 @end
 
 extern const NSString *kHGSPythonPrivateValuesKey;
-extern const NSString *kHGSPythonThreadBundleKey;
+extern const NSString *kHGSPythonThreadExtensionKey;
 
 // The two keys for things we pull from the config dictionary
 extern NSString *const kPythonModuleNameKey;

@@ -275,6 +275,51 @@ NSString *const kHGSExtensionAccount = @"HGSExtensionAccount";
   return nil;
 }
 
+- (NSImage *)imageNamed:(NSString *)nameOrPathOrExtension {
+  NSImage *image = nil;
+  if ([nameOrPathOrExtension length]) {
+    NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+    if ([nameOrPathOrExtension characterAtIndex:0] == '/') {
+      // We have an absolute path
+      NSString *extension = [nameOrPathOrExtension pathExtension];
+      Class imageRepClass = [NSImageRep imageRepClassForFileType:extension];
+      if (imageRepClass) {
+        image = [[[NSImage alloc] initByReferencingFile:nameOrPathOrExtension] 
+                 autorelease];
+      }
+      if (!image) {
+        image = [workspace iconForFile:nameOrPathOrExtension];
+        if (!image) {
+          HGSLogDebug(@"Unable to load image at %@", nameOrPathOrExtension);
+        }
+      }
+    } else {
+      // Not an absolute path
+      NSBundle *bundle = [self bundle];
+      NSString *newPath = [bundle pathForImageResource:nameOrPathOrExtension];
+      if (newPath) {
+        image = [[[NSImage alloc] initByReferencingFile:newPath] autorelease];
+        if (!image) {
+          image = [workspace iconForFile:newPath];
+          if (!image) {
+            HGSLogDebug(@"Unable to load image at %@ relative to %@", 
+                        nameOrPathOrExtension, bundle);
+          }
+        }
+      } else {
+        image = [workspace iconForFileType:nameOrPathOrExtension];
+        if (!image) {
+          image = [NSImage imageNamed:nameOrPathOrExtension];
+          if (!image) {
+            HGSLogDebug(@"Unable to load image %@", nameOrPathOrExtension);
+          }
+        }
+      }
+    }
+  }
+  return image;
+}
+      
 - (NSString*)description {
   return [NSString stringWithFormat:@"%@<%p> identifier: %@, name: %@, "
           @"userVisible: %d", 
