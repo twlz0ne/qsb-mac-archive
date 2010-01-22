@@ -48,6 +48,8 @@ static NSString *const kSpreadsheetDownloadFormat
     @"key=%@&exportFormat=%@";
 static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
 
+static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName";
+
 // Information on exporting documents and spreadsheets can be found at:
 // http://code.google.com/apis/documents/docs/2.0/developers_guide_protocol.html#DownloadingDocs
 
@@ -67,7 +69,7 @@ static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
 
 // Send a user notification to the Vermilion client.
 - (void)informUserWithDescription:(NSString *)description
-                      successCode:(NSInteger)successCode
+                             type:(HGSUserMessageType)type
                           fetcher:(GDataHTTPFetcher *)fetcher;
 @end
 
@@ -185,7 +187,7 @@ static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
     NSString *errorString = [NSString stringWithFormat:errorFormat,
                              savePath, [error code]];
     [self informUserWithDescription:errorString
-                        successCode:kHGSSuccessCodeBadError
+                               type:kHGSUserMessageErrorType
                             fetcher:fetcher];
     HGSLog(@"GoogleDocsSaveAsActions failed to save file '%@': error=%d '%@'.",
            savePath, [error code], [error localizedDescription]);
@@ -200,14 +202,14 @@ static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
   NSString *errorString = [NSString stringWithFormat:errorFormat,
                            [error code]];
   [self informUserWithDescription:errorString
-                      successCode:kHGSSuccessCodeBadError
+                             type:kHGSUserMessageErrorType
                           fetcher:fetcher];
   HGSLog(@"GoogleDocsSaveAsActions download of file failed: error=%d '%@'.",
          [error code], [error localizedDescription]);
 }
 
 - (void)informUserWithDescription:(NSString *)description
-                      successCode:(NSInteger)successCode
+                             type:(HGSUserMessageType)type
                           fetcher:(GDataHTTPFetcher *)fetcher {
   HGSResult *result = [fetcher propertyForKey:kHGSSaveAsHGSResultKey];
   NSString *category = [result valueForKey:kGoogleDocsDocCategoryKey];
@@ -218,21 +220,13 @@ static NSString *const kWorksheetPageDownloadFormat = @"&gid=%u";
   NSImage *categoryIcon
     = [[[NSImage alloc] initByReferencingFile:path] autorelease];
   HGSAssert(categoryIcon, @"Missing Google Doc category icon.");
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  NSNumber *successNumber = [NSNumber numberWithInteger:successCode];
   NSString *summary 
     = HGSLocalizedString(@"Google Docs", @"A dialog title.");
-  NSDictionary *messageDict
-    = [NSDictionary dictionaryWithObjectsAndKeys:
-       summary, kHGSSummaryMessageKey,
-       categoryIcon, kHGSImageMessageKey,
-       successNumber, kHGSSuccessCodeMessageKey,
-       // Description last since it might be nil.
-       description, kHGSDescriptionMessageKey,
-       nil];
-  [nc postNotificationName:kHGSUserMessageNotification 
-                    object:self
-                  userInfo:messageDict];
-}
+  [HGSUserMessenger displayUserMessage:summary 
+                           description:description 
+                                  name:kGoogleDocsUserMessageName 
+                                 image:categoryIcon 
+                                  type:type];
+  }
 
 @end

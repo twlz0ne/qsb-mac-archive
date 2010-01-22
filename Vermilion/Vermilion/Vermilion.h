@@ -59,3 +59,4 @@
 #import <Vermilion/HGSSimpleAccount.h>
 #import <Vermilion/HGSSearchTermScorer.h>
 #import <Vermilion/HGSTokenizer.h>
+#import <Vermilion/HGSUserMessage.h>

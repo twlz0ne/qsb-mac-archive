@@ -57,16 +57,6 @@ NSString *const kHGSExtensionIsEnabledByDefault
   = @"HGSExtensionIsEnabledByDefault";
 NSString *const kHGSExtensionAccount = @"HGSExtensionAccount";
 
-// Notifications
-
-NSString *const kHGSUserMessageNotification = @"HGSUserMessageNotification";
-
-// Notification content keys
-NSString *const kHGSSummaryMessageKey = @"HGSTextMessageKey";
-NSString *const kHGSDescriptionMessageKey = @"HGSDescriptionMessageKey";
-NSString *const kHGSImageMessageKey = @"HGSImageMessageKey";
-NSString *const kHGSSuccessCodeMessageKey = @"HGSSuccessCodeMessageKey";
-
 @implementation HGSExtension
 
 @synthesize protoExtension = protoExtension_;

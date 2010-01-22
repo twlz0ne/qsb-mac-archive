@@ -466,7 +466,6 @@
 		62F594B70FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */; };
 		62F594B80FEB06A60076CDDA /* GoogleDocsSaveAsActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */; };
 		62F595B10FEB278A0076CDDA /* GoogleDocsConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */; };
-		62FDEA9D0F536A4A00A66631 /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = 62FDEA9C0F536A4A00A66631 /* Growl Registration Ticket.growlRegDict */; };
 		62FF5B860F8D846F00B21B5D /* HGSAccountType.m in Sources */ = {isa = PBXBuildFile; fileRef = 62FF5B840F8D846F00B21B5D /* HGSAccountType.m */; };
 		62FF5B870F8D846F00B21B5D /* HGSAccountType.h in Headers */ = {isa = PBXBuildFile; fileRef = 62FF5B850F8D846F00B21B5D /* HGSAccountType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		64C385C60DBFDCF9005EBA69 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
@@ -1116,6 +1115,8 @@
 		8BF52D900EDFD52D00D981A0 /* HGSActionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA74AA0DA416B60052F620 /* HGSActionOperation.m */; };
 		8BF52D910EDFD53500D981A0 /* HGSActionOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FEA74A90DA416B60052F620 /* HGSActionOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BF52F650EE2250600D981A0 /* QSBCustomPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BF52F640EE2250600D981A0 /* QSBCustomPanel.m */; };
+		8BF60FE811079035000AB941 /* HGSUserMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BF60FE611079035000AB941 /* HGSUserMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8BF60FE911079035000AB941 /* HGSUserMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BF60FE711079035000AB941 /* HGSUserMessage.m */; };
 		E4617A900DC23BE300CE7C0F /* HGSMixer.h in Headers */ = {isa = PBXBuildFile; fileRef = E4617A8E0DC23BE300CE7C0F /* HGSMixer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E4617A910DC23BE300CE7C0F /* HGSMixer.m in Sources */ = {isa = PBXBuildFile; fileRef = E4617A8F0DC23BE300CE7C0F /* HGSMixer.m */; };
 		E46932FD0DDB7A0200C5A64A /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
@@ -2226,7 +2227,6 @@
 		62F974C90F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSetUpSimpleAccountViewController.m; sourceTree = "<group>"; };
 		62FB1E4D0FB39B1A0080B342 /* QSBWelcomeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBWelcomeController.h; sourceTree = "<group>"; };
 		62FB1E4E0FB39B1A0080B342 /* QSBWelcomeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBWelcomeController.m; sourceTree = "<group>"; };
-		62FDEA9C0F536A4A00A66631 /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
 		62FF5B840F8D846F00B21B5D /* HGSAccountType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccountType.m; sourceTree = "<group>"; };
 		62FF5B850F8D846F00B21B5D /* HGSAccountType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAccountType.h; sourceTree = "<group>"; };
 		644161ED0DE362CC00AC646D /* NSString+ReadableURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+ReadableURL.h"; sourceTree = "<group>"; };
@@ -3328,6 +3328,8 @@
 		8BF517900EDBC11000D981A0 /* QSBHGSDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBHGSDelegate.m; sourceTree = "<group>"; };
 		8BF52F630EE2250600D981A0 /* QSBCustomPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBCustomPanel.h; sourceTree = "<group>"; };
 		8BF52F640EE2250600D981A0 /* QSBCustomPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCustomPanel.m; sourceTree = "<group>"; };
+		8BF60FE611079035000AB941 /* HGSUserMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSUserMessage.h; sourceTree = "<group>"; };
+		8BF60FE711079035000AB941 /* HGSUserMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSUserMessage.m; sourceTree = "<group>"; };
 		D408F9F00AEEDC2C007EE96D /* SecurityFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityFoundation.framework; path = System/Library/Frameworks/SecurityFoundation.framework; sourceTree = SDKROOT; };
 		D44652CE0AB643110077860B /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E429DF760AC1907A00E747D8 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -4699,7 +4701,6 @@
 				62D5150910DAD73B007ECA33 /* dsa_pub.pem */,
 				8B5EC6A70CEE61BF00AD3BBD /* GoogleLogo.png */,
 				7F95C7820E1D521E00CAB15D /* GoogleSmall.png */,
-				62FDEA9C0F536A4A00A66631 /* Growl Registration Ticket.growlRegDict */,
 				8B5EC6A90CEE61BF00AD3BBD /* Info.plist */,
 				8B687222101822AC00ADEA67 /* Localizable.strings */,
 				7F9238BF0D9424BD00D6510F /* MagnifyingGlassTemplate.png */,
@@ -5407,6 +5408,8 @@
 				8BF2607A10FB9DB9000490C8 /* HGSType.h */,
 				8BF2608310FB9F8F000490C8 /* HGSType.m */,
 				8B852E3F1007B1DE00880329 /* HGSUnitTestingUtilities.h */,
+				8BF60FE611079035000AB941 /* HGSUserMessage.h */,
+				8BF60FE711079035000AB941 /* HGSUserMessage.m */,
 				8B852E401007B1DE00880329 /* HGSUnitTestingUtilities.m */,
 				8B6F2D5E0DA2B88E0052CA40 /* Vermilion-Info.plist */,
 				8B6F2D5F0DA2B88E0052CA40 /* Vermilion.h */,
@@ -6008,6 +6011,7 @@
 				8B53E13110D95393007E6AF2 /* HGSSearchSourceRanker.h in Headers */,
 				8B4463FA10F278FC00561E62 /* HGSKeychainItem.h in Headers */,
 				8BF2607B10FB9DB9000490C8 /* HGSType.h in Headers */,
+				8BF60FE811079035000AB941 /* HGSUserMessage.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7472,7 +7476,6 @@
 				7F1804FA0F38F61500E687CA /* Search14.png in Resources */,
 				5ACEF2CB0F40EBFC007EA38B /* PluginVerifyWindow.xib in Resources */,
 				62E72ABF0F4F6EB900A68815 /* growl-bsd-license.html in Resources */,
-				62FDEA9D0F536A4A00A66631 /* Growl Registration Ticket.growlRegDict in Resources */,
 				7FE2542C0F5CE3E4004FE5A6 /* blue-nav.icns in Resources */,
 				8BC685570F5ED38C003B5C6A /* SetUpAccount.xib in Resources */,
 				8B98A2C80FA96ECF009DC652 /* WelcomeWindow.xib in Resources */,
@@ -8907,6 +8910,7 @@
 				8B53E13010D95393007E6AF2 /* HGSSearchSourceRanker.m in Sources */,
 				8B4463F910F278FC00561E62 /* HGSKeychainItem.m in Sources */,
 				8BF2608410FB9F8F000490C8 /* HGSType.m in Sources */,
+				8BF60FE911079035000AB941 /* HGSUserMessage.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

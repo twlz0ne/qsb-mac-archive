@@ -96,10 +96,16 @@
     plugins. The whitelist is stored in persistent form in an encrypted file.
   */
   NSMutableDictionary *pluginSignatureInfo_;
+  
+  /*!
+   An array of paths to SDEFs in plugins.
+  */
+  NSArray *pluginsSDEFPaths_;
 }
 
 @property (readwrite, assign, nonatomic) id<HGSDelegate> delegate;
 @property (readwrite, retain) NSArray *plugins;
+@property (readonly, retain) NSArray *pluginsSDEFPaths;
 
 /*!
   Return the shared plugin Loader.
@@ -110,13 +116,6 @@
   Registers a plugin class for a given set of extensions.
 */
 - (void)registerClass:(Class)cls forExtensions:(NSArray *)extensions;
-
-/*!
- Inventory all plugins which contain one or more sdef files.
- @result An NSArray containing all plugin bundles which contain
- sdef files.  nil if there were no sdef files found.
-*/
-- (NSArray *)scriptablePluginBundles;
 
 /*!
  Identify and load all plugins and their sources and actions.

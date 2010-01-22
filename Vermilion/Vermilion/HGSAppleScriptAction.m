@@ -33,6 +33,7 @@
 #import "HGSAppleScriptAction.h"
 #import "HGSLog.h"
 #import "HGSBundle.h"
+#import "HGSUserMessage.h"
 #import "GTMNSAppleScript+Handler.h"
 #import "HGSResult.h"
 #import "GTMNSWorkspace+Running.h"
@@ -46,7 +47,8 @@ NSString *const kHGSAppleScriptBundleIDKey = @"HGSAppleScriptBundleID";
 NSString *const kHGSAppleScriptMustBeRunningKey 
   = @"HGSAppleScriptMustBeRunning";
 static NSString *const kHGSOpenDocAppleEvent = @"aevtodoc";
-
+static NSString *const kHGSAppleScriptErrorUserMessageName 
+  = @"HGSAppleScriptErrorUserMessageName";
 @interface HGSAppleScriptAction ()
 - (BOOL)requiredAppsRunning:(HGSResultArray *)results;
 @end
@@ -267,15 +269,11 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
       NSString *description = [NSString stringWithFormat:@"%@\nError: %@", 
                                [error objectForKey:@"NSAppleScriptErrorMessage"],
                                [error objectForKey:@"NSAppleScriptErrorNumber"]];
-      NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-      NSDictionary *message 
-        = [NSDictionary dictionaryWithObjectsAndKeys:
-           summary, kHGSSummaryMessageKey,
-           description, kHGSDescriptionMessageKey,
-           nil];
-      [nc postNotificationName:kHGSUserMessageNotification 
-                        object:self
-                      userInfo:message];
+      [HGSUserMessenger displayUserMessage:summary 
+                               description:description 
+                                      name:kHGSAppleScriptErrorUserMessageName 
+                                     image:nil 
+                                      type:kHGSUserMessageErrorType];
     }
     [self uninstallLocalizedStringHandler];
   }

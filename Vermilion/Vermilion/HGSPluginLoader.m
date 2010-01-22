@@ -55,7 +55,9 @@
 - (BOOL)generateRandomBytes:(unsigned char *)bytes count:(NSUInteger)count;
 - (void)readPluginSignatureInfo;
 - (void)writePluginSignatureInfo;
-- (void)loadPluginsAtPath:(NSString*)pluginsPath errors:(NSArray **)errors;
+- (void)loadPluginsAtPath:(NSString*)pluginsPath 
+                sdefPaths:(NSMutableArray *)sdefPaths
+                   errors:(NSArray **)errors;
 @end
 
 static NSString *kPluginPathKey = @"PluginPathKey";
@@ -106,6 +108,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
 
 @synthesize delegate = delegate_;
 @synthesize plugins = plugins_;
+@synthesize pluginsSDEFPaths = pluginsSDEFPaths_;
 
 - (id)init {
   if ((self = [super init])) {
@@ -179,40 +182,14 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
   return bundlePaths;
 }
 
-- (NSArray *)scriptablePluginBundles {
-  NSMutableArray *plugins = nil;
-  NSArray *pluginPaths = [[self delegate] pluginFolders];
-  for (NSString *pluginPath in pluginPaths) {
-    NSArray *bundlePaths = [HGSPluginLoader bundlePathsForPluginPath:pluginPath];
-    for (NSString *bundlePath in bundlePaths) {
-      NSBundle *pluginBundle = [NSBundle bundleWithPath:bundlePath];
-      // Is it scriptable?
-      BOOL pluginScriptable 
-        = [[pluginBundle objectForInfoDictionaryKey:@"NSAppleScriptEnabled"]
-           boolValue];
-      if (pluginScriptable) {
-        // Does it have any sdefs?
-        NSArray *sdefResourcePaths
-          = [pluginBundle pathsForResourcesOfType:@"sdef" inDirectory:nil];
-        if ([sdefResourcePaths count]) {
-          if (!plugins) {
-            plugins = [NSMutableArray arrayWithObject:pluginBundle];
-          } else {
-            [plugins addObject:pluginBundle];
-          }
-        }
-      }
-    }
-  }
-  return plugins;
-}
-
 - (void)loadPluginsWithErrors:(NSArray **)errors {
   NSArray *pluginPaths = [[self delegate] pluginFolders];
   NSMutableArray *allErrors = nil;
+  NSMutableArray *sdefPaths = [NSMutableArray array];
+  
   for (NSString *pluginPath in pluginPaths) {
     NSArray *pluginErrors = nil;
-    [self loadPluginsAtPath:pluginPath errors:&pluginErrors];
+    [self loadPluginsAtPath:pluginPath sdefPaths:sdefPaths errors:&pluginErrors];
     if (pluginErrors) {
       if (!allErrors) {
         allErrors = [NSMutableArray array];
@@ -240,6 +217,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
   [factorablePlugins makeObjectsPerformSelector:@selector(installAccountTypes)];
   
   [self setPlugins:factorablePlugins];
+  pluginsSDEFPaths_ = [sdefPaths retain];
 }
 
 - (void)installAndEnablePluginsBasedOnPluginsState:(NSArray *)state {
@@ -348,7 +326,9 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
   return archivablePlugins;
 }
 
-- (void)loadPluginsAtPath:(NSString*)pluginPath errors:(NSArray **)errors {
+- (void)loadPluginsAtPath:(NSString*)pluginPath 
+                sdefPaths:(NSMutableArray *)sdefPaths
+                   errors:(NSArray **)errors {
   NSArray *bundlePaths = [HGSPluginLoader bundlePathsForPluginPath:pluginPath];
   if ([bundlePaths count]) {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -364,6 +344,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
       HGSPlugin *plugin = nil;
       if (pluginClass) {
         NSBundle *pluginBundle = [NSBundle bundleWithPath:fullPath];
+        // Get the name.
         NSString *betterPluginName 
           = [pluginBundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
         if (!betterPluginName) {
@@ -386,6 +367,18 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
             if (plugin) {
               HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
               [pluginsPoint extendWithObject:plugin];
+              // Is it scriptable?
+              BOOL pluginScriptable 
+                = [[pluginBundle objectForInfoDictionaryKey:@"NSAppleScriptEnabled"]
+                   boolValue];
+              if (pluginScriptable) {
+                // Does it have any sdefs?
+                NSArray *sdefResourcePaths
+                  = [pluginBundle pathsForResourcesOfType:@"sdef" inDirectory:nil];
+                if (sdefResourcePaths) {
+                  [sdefPaths addObjectsFromArray:sdefResourcePaths];
+                }
+              }
             } else {
               errorType = kHGSPluginLoaderPluginFailedInstantiation;
             }

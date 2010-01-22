@@ -41,6 +41,7 @@
 #import "HGSPythonSource.h"
 #import "HGSTokenizer.h" 
 #import "HGSType.h"
+#import "HGSUserMessage.h"
 #import "GTMObjectSingleton.h"
 #import "GTMNSNumber+64Bit.h"
 #import "GTMMethodCheck.h"
@@ -229,7 +230,8 @@ static PyMethodDef LocalizeMethods[] = {
 static PyMethodDef NotificationMethods[] = {
   { "DisplayNotification", DisplayNotification, METH_VARARGS,
     "Displays a notification to the user. First argument is the message string. "
-    "Second optional argument is the description string."
+    "Second optional argument is the description string. "
+    "Third optional argument is the message name."
   },
   { NULL, NULL, 0, NULL }
 };
@@ -883,7 +885,11 @@ static PyObject *LocalizeString(PyObject *self, PyObject *args) {
 static PyObject *DisplayNotification(PyObject *self, PyObject *args) {
   char *message = NULL;
   char *description = NULL;
-  if (!PyArg_ParseTuple(args, "s|s", &message, &description)) {
+  char *messageName = NULL;
+  
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+  if (!PyArg_ParseTuple(args, "s|ss", &message, &description, &messageName)) {
     HGSLogDebug(@"VermilionNotify.DisplayNotification() requires an argument");
     return PyString_FromString("");
   }
@@ -891,16 +897,16 @@ static PyObject *DisplayNotification(PyObject *self, PyObject *args) {
   NSString *nsDescription = nil;
   if (description) {
     nsDescription = [NSString stringWithUTF8String:description];
+  }  
+  NSString *nsName = nil;
+  if (messageName) {
+    nsName = [NSString stringWithUTF8String:messageName];
   }
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
-                        nsMessage, kHGSSummaryMessageKey,
-                        nsDescription, kHGSDescriptionMessageKey,
-                        (void *)nil];
-  [nc postNotificationName:kHGSUserMessageNotification 
-                    object:NSApp 
-                  userInfo:info];
+  [HGSUserMessenger displayUserMessage:nsMessage 
+                           description:nsDescription 
+                                  name:nsName 
+                                 image:nil 
+                                  type:kHGSUserMessageNoteType];
   [pool release];     
   Py_INCREF(Py_None);
   return Py_None;

@@ -41,6 +41,10 @@ static NSString *const kPicasaWebUploadImageActionAttemptNumberKey
 static NSString *const kPicasaWebUploadImageActionImageEntryKey
   = @"PicasaWebUploadImageActionImageEntryKey";
 
+// User Message Names
+static NSString *const kPicasaWebUserMessageName
+  = @"PicasaWebUserMessageName";
+
 // The maximum number of times an upload will be attempted.
 static NSUInteger const kMaxUploadAttempts = 3;
 
@@ -80,7 +84,7 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
 // Utility function to send notification so user can be notified of
 // success or failure.
 - (void)informUserWithDescription:(NSString *)description
-                      successCode:(NSInteger)successCode;
+                             type:(HGSUserMessageType)type;
 
 // Utility function used as a fall-back for determining the MIME
 // type for a file at the given path.
@@ -194,7 +198,7 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
       errorString = [NSString stringWithFormat:errorString,
                      [account_ identifier]];
       [self informUserWithDescription:errorString
-                          successCode:kHGSSuccessCodeError];
+                                 type:kHGSUserMessageErrorType];
       HGSLog(@"PicasaWebUploadAction upload to account '%@' failed due "
              @"to missing keychain item.", [account_ displayName]);
     }
@@ -272,7 +276,7 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
                                @"it was taking too long.");
         errorString = [NSString stringWithFormat:errorString, imageName];
         [self informUserWithDescription:errorString
-                            successCode:kHGSSuccessCodeError];
+                                   type:kHGSUserMessageErrorType];
         HGSLog(@"PicasaWebUploadAction timed out uploading image '%@' to "
                @"account '%@'.", imagePath, [account_ displayName]);
       }
@@ -348,7 +352,7 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
       NSString *successString = [NSString stringWithFormat:successFormat, 
                                  imageOrVideo, imageName];
       [self informUserWithDescription:successString
-                          successCode:kHGSSuccessCodeSuccess];
+                                 type:kHGSUserMessageNoteType];
     }
   } else {
     // We will retry a limited number of times before giving up.
@@ -395,7 +399,7 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
                                [imageEntry title],
                                [error localizedDescription], [error code]];
       [self informUserWithDescription:errorString
-                          successCode:kHGSSuccessCodeBadError];
+                                 type:kHGSUserMessageErrorType];
       HGSLog(@"PicasaWebUploadAction upload of image '%@' to account '%@' "
              @"failed: error=%d '%@'.",
              [imageEntry title], [account_ displayName], [error code],
@@ -413,27 +417,19 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
 #pragma mark Utility Methods
 
 - (void)informUserWithDescription:(NSString *)description
-                      successCode:(NSInteger)successCode {
+                             type:(HGSUserMessageType)type {
   NSBundle *bundle = HGSGetPluginBundle();
   NSString *path = [bundle pathForResource:@"PicasaWeb" ofType:@"icns"];
   NSImage *picasaIcon
     = [[[NSImage alloc] initByReferencingFile:path] autorelease];
-  NSNumber *successNumber = [NSNumber numberWithInteger:successCode];
   NSString *summary 
     = HGSLocalizedString(@"Picasa Web", 
                          @"A dialog title. Picasa Web is a product name");
-  NSDictionary *messageDict
-    = [NSDictionary dictionaryWithObjectsAndKeys:
-       summary, kHGSSummaryMessageKey,
-       picasaIcon, kHGSImageMessageKey,
-       successNumber, kHGSSuccessCodeMessageKey,
-       // Description last since it might be nil.
-       description, kHGSDescriptionMessageKey,
-       nil];
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc hgs_postOnMainThreadNotificationName:kHGSUserMessageNotification
-                                    object:self
-                                  userInfo:messageDict];
+  [HGSUserMessenger displayUserMessage:summary 
+                           description:description 
+                                  name:kPicasaWebUserMessageName 
+                                 image:picasaIcon 
+                                  type:type];
 }
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {

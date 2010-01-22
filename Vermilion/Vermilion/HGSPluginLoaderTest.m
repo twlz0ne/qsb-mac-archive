@@ -35,6 +35,9 @@
 #import "HGSPluginLoader.h"
 #import "HGSDelegate.h"
 
+@interface HGSTestLoaderPlugin : NSObject
+@end
+
 @interface HGSTestLoaderDelegate : NSObject <HGSDelegate> 
 @end
 
@@ -42,7 +45,7 @@
 
 - (NSArray *)pluginFolders {
   NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-  NSString *pluginsPath = [bundle bundlePath];
+  NSString *pluginsPath = [[bundle bundlePath] stringByDeletingLastPathComponent];
   NSArray *pluginsPaths = [NSArray arrayWithObject:pluginsPath];
   return pluginsPaths;
 }
@@ -82,15 +85,42 @@
 
 - (void)testBundlePathsForPluginPath {
   HGSPluginLoader *pluginLoader = [HGSPluginLoader sharedPluginLoader];
+  [pluginLoader registerClass:[HGSTestLoaderPlugin class] 
+                forExtensions:[NSArray arrayWithObject:@"octest"]];
   STAssertNotNil(pluginLoader, nil);
   HGSTestLoaderDelegate *loaderDelegate
     = [[[HGSTestLoaderDelegate alloc] init] autorelease];
   STAssertNotNil(loaderDelegate, nil);
   [pluginLoader setDelegate:loaderDelegate];
-  NSArray *bundles = [pluginLoader scriptablePluginBundles];
-  STAssertNotNil(bundles, nil);
-  STAssertEquals((NSUInteger)1, [bundles count], nil);
+  NSArray *errors;
+  NSMutableArray *unexpectedErrors = [NSMutableArray array];
+  [pluginLoader loadPluginsWithErrors:&errors];
+  for (NSDictionary *error in errors) {
+    NSString *errorString 
+      = [error objectForKey:kHGSPluginLoaderPluginFailureKey];
+    if (![errorString isEqual:kHGSPluginLoaderPluginFailedUnknownPluginType]) {
+      [unexpectedErrors addObject:error];
+    }
+  }
+  STAssertEquals([unexpectedErrors count], (NSUInteger)0, 
+                 @"Errors: %@", unexpectedErrors);
+  NSArray *paths = [pluginLoader pluginsSDEFPaths];
+  STAssertEquals([paths count], (NSUInteger)1, @"Paths: %@", paths);
   [pluginLoader setDelegate:nil];
 }
 
 @end
+
+@implementation HGSTestLoaderPlugin
++ (BOOL)isPluginBundleValidAPI:(NSBundle *)pluginBundle {
+  return YES;
+}
+- (id)initWithBundle:(NSBundle *)bundle {
+  self = [super init];
+  return self;
+}
+- (NSString *)identifier {
+  return NSStringFromClass([self class]);
+}
+@end
+

@@ -35,6 +35,7 @@
 #import "HGSPythonAction.h"
 #import "HGSResult.h"
 #import "HGSType.h"
+#import "HGSUserMessage.h"
 
 @interface HGSPythonActionTest : GTMTestCase {
  @private
@@ -91,10 +92,10 @@
   notificationCount_ = 0;
   STAssertTrue([action performWithInfo:info], nil);
   
-  // We have 3 here, because we increment notificationCount_ by one for each
+  // We have 6 here, because we increment notificationCount_ by one for each
   // argument passed to it. The first call we make only passes one arg, the
-  // second call passes two.
-  STAssertEquals(notificationCount_, 3, nil);
+  // second call passes two. The third call passes 3.
+  STAssertEquals(notificationCount_, 6, nil);
   [nc removeObserver:self name:kHGSUserMessageNotification object:nil];
   STAssertNotNil([action directObjectTypes], nil);
 }
@@ -105,6 +106,10 @@
   STAssertNotNil(message, nil);
   NSString *description = [userInfo objectForKey:kHGSDescriptionMessageKey];
   if (description) {
+    ++notificationCount_;
+  }
+  NSString *name = [userInfo objectForKey:kHGSNameMessageKey];
+  if (name) {
     ++notificationCount_;
   }
   ++notificationCount_;

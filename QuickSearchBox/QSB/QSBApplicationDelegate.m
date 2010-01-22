@@ -214,10 +214,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
     [NSApp setServicesProvider:self];
     NSUpdateDynamicServices();
-
-#if QSB_BUILD_WITH_GROWL
-    [GrowlApplicationBridge setGrowlDelegate:self];
-#endif  // QSB_BUILD_WITH_GROWL
   }
   return self;
 }
@@ -833,16 +829,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self updateMenuWithAppName:[NSApp mainMenu]];
   [self updateMenuWithAppName:dockMenu_];
   [self updateMenuWithAppName:statusItemMenu_];
-
-  // Inventory the application and plugin Apple Script sdef files.
-  [self composeApplicationAEDictionary];
-
-  // Install a custom scripting dictionary event handler.
-  NSAppleEventManager *aeManager = [NSAppleEventManager sharedAppleEventManager];
-  [aeManager setEventHandler:self
-                 andSelector:@selector(handleGetSDEFEvent:withReplyEvent:)
-               forEventClass:kASAppleScriptSuite
-                  andEventID:'gsdf'];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
@@ -878,6 +864,15 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
          selector:@selector(didAddOrRemoveAccount:)
              name:kHGSExtensionPointDidRemoveExtensionNotification
            object:accountsPoint];
+  // Inventory the application and plugin Apple Script sdef files.
+  [self composeApplicationAEDictionary];
+  
+  // Install a custom scripting dictionary event handler.
+  NSAppleEventManager *aeManager = [NSAppleEventManager sharedAppleEventManager];
+  [aeManager setEventHandler:self
+                 andSelector:@selector(handleGetSDEFEvent:withReplyEvent:)
+               forEventClass:kASAppleScriptSuite
+                  andEventID:'gsdf'];  
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication
@@ -999,6 +994,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                  userInfo:nil
                   options:(NSKeyValueObservingOptionPrior
                            | NSKeyValueObservingOptionInitial)];
+#if QSB_BUILD_WITH_GROWL
+  [GrowlApplicationBridge setGrowlDelegate:self];
+#endif  // QSB_BUILD_WITH_GROWL
+  
 }
 
 - (void)pluginsValueChanged:(GTMKeyValueChangeNotification *)notification {
@@ -1028,27 +1027,21 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)composeApplicationAEDictionary {
   // Inventory all .sdef files, including the app's and all plugins.
-  NSMutableArray *sdefPaths = [NSMutableArray array];
   NSArray *bundleSDEFPaths
     = [[NSBundle mainBundle] pathsForResourcesOfType:@"sdef" inDirectory:nil];
-  if (bundleSDEFPaths) {
-    [sdefPaths addObjectsFromArray:bundleSDEFPaths];
-  }
-  NSArray *pluginBundles
-    = [[HGSPluginLoader sharedPluginLoader] scriptablePluginBundles];
-  for (NSBundle *pluginBundle in pluginBundles) {
-    bundleSDEFPaths = [pluginBundle pathsForResourcesOfType:@"sdef"
-                                                inDirectory:nil];
-    if (bundleSDEFPaths) {
-      [sdefPaths addObjectsFromArray:bundleSDEFPaths];
-    }
-  }
+  HGSAssert([bundleSDEFPaths count] > 0, nil);
+  NSArray *pluginsSDEFPaths
+    = [[HGSPluginLoader sharedPluginLoader] pluginsSDEFPaths];
+  NSArray *sdefPaths 
+    = [bundleSDEFPaths arrayByAddingObjectsFromArray:pluginsSDEFPaths];
 
   if ([sdefPaths count]) {
     // load the first .sdef file's xml data.  All of the scripting definitions
     // from the app and the plugins will be combined into one NSXMLDocument and
     // then copied into the response Apple event descriptor as UTF-8 XML text.
     NSString *sdefPath = [sdefPaths objectAtIndex:0];
+    sdefPaths 
+      = [sdefPaths subarrayWithRange:NSMakeRange(1, [sdefPaths count] - 1)];
     NSURL *sdefURL = [NSURL fileURLWithPath:sdefPath];
     NSError *xmlError = nil;
     NSXMLDocument *sdefXML
@@ -1059,7 +1052,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       // Retrieve the root element which will be the root of the final
       // combined dictionary.
       NSXMLElement *rootElement = [sdefXML rootElement];
-      [sdefPaths removeObjectAtIndex:0];
       for (sdefPath in sdefPaths) {
         NSError *pluginXMLError = nil;
         sdefURL = [NSURL fileURLWithPath:sdefPath];
@@ -1170,15 +1162,34 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     NSAttributedString *attributedDescription = descriptiveMessage;
     descriptiveMessage = [attributedDescription string];
   }
+  NSString *name = [messageDict objectForKey:kHGSNameMessageKey];
+  if (!name) {
+    name = kGrowlNotificationName;
+  }
   NSData *imageData = [image TIFFRepresentation];
-  NSNumber *successCode = [messageDict objectForKey:kHGSSuccessCodeMessageKey];
-  signed int priority = 0;
-  if (successCode) {
-    priority = MIN(MAX(-[successCode intValue], -2), 2);
+  NSNumber *successCode = [messageDict objectForKey:kHGSTypeMessageKey];
+  signed int priority;
+  switch ([successCode intValue]) {
+    case kHGSUserMessageErrorType:
+      priority = 1;
+      break;
+      
+    case kHGSUserMessageWarning:
+      priority = 0;
+      break;
+      
+    case kHGSUserMessageNoteType:
+      priority = -1;
+      break;
+      
+    default:
+      HGSLogDebug(@"Unknown priority %d", [successCode intValue]);
+      priority = 0;
+      break;
   }
   [GrowlApplicationBridge notifyWithTitle:summaryMessage
                               description:descriptiveMessage
-                         notificationName:kGrowlNotificationName
+                         notificationName:name
                                  iconData:imageData
                                  priority:priority
                                  isSticky:NO
@@ -1221,6 +1232,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self didChangeValueForKey:@"growlIsInstalledAndRunning"];
 }
 
+- (NSDictionary *)registrationDictionaryForGrowl {
+  // TODO(dmaclach): pick up notification names from plugins
+  NSArray *array = [NSArray arrayWithObjects:kGrowlNotificationName, nil];
+  return [NSDictionary dictionaryWithObjectsAndKeys:
+          array, GROWL_NOTIFICATIONS_ALL,
+          array, GROWL_NOTIFICATIONS_DEFAULT,
+          nil];
+}
 @end
 
 
