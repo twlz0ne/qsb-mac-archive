@@ -290,6 +290,7 @@ static NSDictionary *gHGSTokenizerExceptions = nil;
 - (void)dealloc {
   [originalString_ release];
   [normalizedString_ release];
+  [tokenizedString_ release];
   free(mappings_);
   [super dealloc];
 }

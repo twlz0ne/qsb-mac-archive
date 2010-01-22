@@ -281,7 +281,9 @@ inline NSInteger HGSMixerScoredResultSort(HGSScoredResult *resultA,
       = [NSMutableArray arrayWithCapacity:[objects count]];
     for (id value in objects) {
       HGSAssert([value isKindOfClass:[NSArray class]], nil);
-      [newObjects addObject:[value copy]];
+      id newObject = [value copy];
+      [newObjects addObject:newObject];
+      [newObject release];
     }
     categoryResults = [NSDictionary dictionaryWithObjects:newObjects 
                                                   forKeys:keys];
