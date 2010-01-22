@@ -32,21 +32,6 @@
 
 #import "HGSSearchTermScorer.h"
 #import "HGSTokenizer.h"
-
-@implementation NSString (HGSScoreStringAdditions)
-+ (id)scoreStringWithString:(NSString *)string {
-  return string;
-}
-
-+ (id)scoreStringArrayWithStringArray:(NSArray *)array {
-  return array;
-}
-
-- (NSString *)string {
-  return self;
-}
-@end
-
 #import <AssertMacros.h>
 
 // TODO(dmaclach): possibly make these variables we can adjust?
@@ -67,6 +52,7 @@ CGFloat HGSScoreTermForItem(HGSTokenizedString *term,
                             NSIndexSet **outHitIndexes) {
   // TODO(dmaclach) add support for higher plane UTF16
   CGFloat score = kHGSNoMatchScore;
+  unichar termSeparator = [HGSTokenizer tokenizerSeparator];
   if (outHitIndexes) {
     *outHitIndexes = [NSMutableIndexSet indexSet];
   }
@@ -78,8 +64,6 @@ CGFloat HGSScoreTermForItem(HGSTokenizedString *term,
   CFIndex abbrLength = CFStringGetLength(abbr);
   if (abbrLength > strLength) return score;
   
-  CFCharacterSetRef whiteSpaceSet 
-    = CFCharacterSetGetPredefined(kCFCharacterSetWhitespace);
   Boolean ownStrChars = false;
   Boolean ownAbbrChars = false;
   
@@ -99,51 +83,40 @@ CGFloat HGSScoreTermForItem(HGSTokenizedString *term,
                           CFRangeMake(0, abbrLength), 
                           (UniChar *)abbrChars);
   }
-  CFRange *matchRanges = calloc(sizeof(CFRange), abbrLength);
-  require(matchRanges, CouldNotAllocateRanges);
   
   CFIndex stringIndex = 0;
   CFIndex abbrIndex = 0;
-  CFIndex whiteSpaceIndex = 0;
+  CFIndex separatorIndex = 0;
   CFIndex currMatchRange = 0;
-  BOOL isPrefix = YES;
   for (; stringIndex < strLength && abbrIndex < abbrLength; ++stringIndex) {
     UniChar abbrChar = abbrChars[abbrIndex];
     UniChar strChar = strChars[stringIndex];
     if (abbrChar == strChar) {
+      NSUInteger mappedIndex 
+        = [string mapIndexFromTokenizedToOriginal:stringIndex];
       if (outHitIndexes) {
-        NSUInteger mappedIndex 
-          = [string mapIndexFromTokenizedToOriginal:stringIndex];
         if (mappedIndex != NSNotFound) {
           [(NSMutableIndexSet *)(*outHitIndexes) addIndex:mappedIndex];
         }
       }
-      if (isPrefix) {
+      if (mappedIndex == abbrIndex) {
         score += kHGSIsPrefixMultiplier;
       } else {
-        isPrefix = NO;
-        if (stringIndex - 1 == whiteSpaceIndex) {
+        if (stringIndex - 1 == separatorIndex) {
           score += kHGSIsFrontOfWordMultiplier;
         } else {
           score += kHGSIsWeakHitMultipier;
         }
       }
-      if (matchRanges[currMatchRange].length == 0) {
-        matchRanges[currMatchRange].location = stringIndex;
-      }
-      matchRanges[currMatchRange].length += 1;
       abbrIndex += 1;
     } else {
-      isPrefix = NO;
       // We missed a character
-      if (matchRanges[currMatchRange].length > 0) {
-        currMatchRange += 1;
-      }
       // Scan forward to the next word
       for (; stringIndex < strLength; 
            ++stringIndex) {
         UniChar nextStrChar = strChars[stringIndex];
-        if (CFCharacterSetIsCharacterMember(whiteSpaceSet, nextStrChar)) {
+        if (nextStrChar == termSeparator) {
+          separatorIndex = stringIndex;
           break;
         }
       }
@@ -153,10 +126,8 @@ CGFloat HGSScoreTermForItem(HGSTokenizedString *term,
   if (abbrIndex != abbrLength) {
     score = kHGSNoMatchScore;
   } else {
-    score /= strLength;
+    score /= [[string originalString] length];
   }
-  free(matchRanges);
-CouldNotAllocateRanges:
   if (ownAbbrChars) {
     free((UniChar *)abbrChars);
   }

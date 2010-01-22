@@ -217,9 +217,10 @@ static NSDictionary *gHGSTokenizerExceptions = nil;
                                          capacity:tokenRangeCount] autorelease];
   HGSRangeMapping *mappings = [tokenizedString mappings];
   CFIndex i = 0;
+  NSString *tokenizerSeparator = [HGSTokenizer tokenizerSeparatorString];
   for (NSString *subString in subStrings) {
     if (i != 0) {
-      [finalString appendString:@" "];
+      [finalString appendString:tokenizerSeparator];
       codomainStart++;
     }
     HGSRangeMapping mapping;
@@ -239,6 +240,14 @@ static NSDictionary *gHGSTokenizerExceptions = nil;
 @end
 
 @implementation HGSTokenizer
+#if DEBUG
+// Verify that our separator string and our separator character are the same.
++ (void)load {
+  unichar stringChar = [[self tokenizerSeparatorString] characterAtIndex:0];
+  HGSAssert(stringChar == [self tokenizerSeparator], nil);
+}
+#endif
+
 + (HGSTokenizedString *)tokenizeString:(NSString *)string {
   HGSTokenizedString *tokenizedString = nil;
   if (string) {
@@ -266,6 +275,15 @@ static NSDictionary *gHGSTokenizerExceptions = nil;
   }
   return array;
 }
+
++ (NSString *)tokenizerSeparatorString {
+  return @"˽";
+}
+
++ (unichar)tokenizerSeparator {
+  return 0x02FD;
+}
+
 @end
 
 @implementation HGSTokenizedString

@@ -79,4 +79,6 @@
 */
 + (HGSTokenizedString *)tokenizeString:(NSString *)string;
 + (NSArray *)tokenizeStrings:(NSArray *)strings;
++ (NSString *)tokenizerSeparatorString;
++ (unichar)tokenizerSeparator;
 @end

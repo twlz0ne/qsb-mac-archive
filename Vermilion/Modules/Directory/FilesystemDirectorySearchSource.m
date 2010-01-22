@@ -137,10 +137,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         }
       } else {
         // Strip out "." characters because it screws up the tokenizer and
-        // causes files like "NSArray.h" to tokenize as "nsarray h" instead
-        // of "ns array h"
+        // causes files like "NSArray.h" to tokenize as "nsarray˽h" instead
+        // of "ns˽array˽h"
+        NSString *sepString = [HGSTokenizer tokenizerSeparatorString];
         subpath = [subpath stringByReplacingOccurrencesOfString:@"."
-                                                     withString:@" "];
+                                                     withString:sepString];
         tokenizedSubpath = [HGSTokenizer tokenizeString:subpath];
         score = HGSScoreTermForItem(tokenizedQueryString, 
                                     tokenizedSubpath, 

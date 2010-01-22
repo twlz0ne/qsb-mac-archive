@@ -50,7 +50,7 @@
   HGSTokenizedString *tokenizedString 
     = [HGSTokenizer tokenizeString:@"this, this is a test."];
   STAssertEqualObjects([tokenizedString tokenizedString], 
-                       @"this this is a test", nil);
+                       @"this˽this˽is˽a˽test", nil);
 
   // now bang through a few different cases
   struct {
@@ -64,33 +64,33 @@
     {
       // camelcase
       @"MacPython2.4",
-      @"mac python 2.4",
+      @"mac˽python˽2.4",
       { {0, 0 }, { 1, 1 }, { 5, 4 }, { 11, 9 }, { 3, NSNotFound } }
     },
     {
       @"NSStringFormatter",
-      @"ns string formatter",
+      @"ns˽string˽formatter",
       { {0, 0 }, { 1, 1 }, { 3 , 2 }, { 10, 8 }, { 9, NSNotFound } }
     },
     {
       // format: query, words, nil.  a final nil ends all tests.
       @"ABC 123 A1B2C3 ABC-123 ABC_123 A#B A1.2b",
-      @"abc 123 a 1 b 2 c 3 abc 123 abc 123 a b a 1.2 b",
+      @"abc˽123˽a˽1˽b˽2˽c˽3˽abc˽123˽abc˽123˽a˽b˽a˽1.2˽b",
       { {4, 4 }, { 8, 8 }, { 10, 9 }, { 12, 10 }, { 46, 39 } }
     },
     {
       @"  abc123  ",
-      @"abc 123",
+      @"abc˽123",
       { {0, 2 }, { 1, 3 }, { 3, NSNotFound }, { 4, 5 }, { 5, 6 } }
     },
     {
       @"_-+  abc123 &*#.",
-      @"abc 123",
+      @"abc˽123",
       { {0, 5 }, { 1, 6 }, { 5, 9 }, { 11, NSNotFound }, { 3, NSNotFound } }
     },
     {
       @"- - a -a- - ",
-      @"a a",
+      @"a˽a",
       { {0, 4 }, { 1, NSNotFound }, { 2, 7 }, { 3, NSNotFound }, { 4, NSNotFound } }
     },
     {
@@ -98,39 +98,39 @@
       // much to force the behavior, but so we realize when it changes and think
       // through any downstream effects.
       @"abc-xyz abc--xyz abc_xyz",
-      @"abc xyz abc xyz abc xyz",
+      @"abc˽xyz˽abc˽xyz˽abc˽xyz",
       { {0, 0 }, { 4, 4 }, { 8, 8 }, { 12, 13 }, { 20, 21 } }
     },
     {
       // test what we do w/ contractions for the same reason.
       @"can't say i'd like that. i''d?",
-      @"can't say i'd like that i d",
+      @"can't˽say˽i'd˽like˽that˽i˽d",
       { {0, 0 }, { 3, 3 }, { 24, 25 }, { 26, 28 }, { 5, NSNotFound } }
     },
     {
       // test what happens w/ colons also for the same reasons.
       @"abc:xyz abc::xyz",
-      @"abc xyz abc xyz",
+      @"abc˽xyz˽abc˽xyz",
       { {0, 0 }, { 1, 1 }, { 5, 5 }, { 11, NSNotFound }, { 3, NSNotFound } }
     },
     {
       @"Photoshop",
-      @"photo shop",
+      @"photo˽shop",
       { {0, 0 }, { 1, 1 }, { 5, NSNotFound }, { 6, 5 }, { 7, 6 } }
     },
     {
       @"I Love Firefox",
-      @"i love fire fox",
+      @"i˽love˽fire˽fox",
       { {0, 0 }, { 1, NSNotFound }, { 2, 2 }, { 6, NSNotFound }, { 12, 11 } }
     },
     {
       @"Thunderbird",
-      @"thunder bird",
+      @"thunder˽bird",
       { {0, 0 }, { 1, 1 }, { 7, NSNotFound }, { 8, 7 }, { 9, 8 } }
     },
     {
       @"http://https://addons.mozilla.org/firefox/addon/1865",
-      @"http https addons mozilla org fire fox addon 1865",
+      @"http˽https˽addons˽mozilla˽org˽fire˽fox˽addon˽1865",
       { {0, 0 }, { 1, 1 }, { 4, NSNotFound }, { 5, 7 }, { 31, 35 } }
     },
     {
@@ -139,16 +139,15 @@
       // source we preformat the string to strip out the '.'. See the next
       // test that verifies that case.
       @"NSArray.h",
-      @"nsarray h",
+      @"nsarray˽h",
       { {0, 0 }, { 1, 1 }, { 3, 3 }, { 7, NSNotFound }, { 8, 8 } }
     },
     {
       // Read the comment about this test in the test above.
       @"NSArray h",
-      @"ns array h",
+      @"ns˽array˽h",
       { {0, 0 }, { 1, 1 }, { 2, NSNotFound }, { 3, 2 }, { 8, NSNotFound } }
     }
-    
   };
   
   for (size_t i = 0; i < sizeof(testData) / sizeof(testData[0]); ++i) {

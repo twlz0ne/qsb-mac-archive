@@ -76,6 +76,10 @@ static CGFloat HGSScoreTermForString(NSString *stringA, NSString *stringB) {
   scoreB 
     = HGSScoreTermForString(@"canada", @"american candy bandstand of canada");
   STAssertTrue(scoreA > scoreB, @"%f !> %f", scoreA, scoreB);
+  scoreA = HGSScoreTermForString(@"ic", @"iChat");
+  scoreB 
+    = HGSScoreTermForString(@"ic", @"Icons");
+  STAssertEquals(scoreA, scoreB, nil);
 }
 
 - (void)testRelativeTermScoring {
