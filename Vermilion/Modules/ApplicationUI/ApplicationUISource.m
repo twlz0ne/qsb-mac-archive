@@ -48,6 +48,8 @@ NSString *const kAppUISourceAttributeElementKey
   NSImage *menuIcon_;
   NSImage *menuItemIcon_;
   NSImage *viewIcon_;
+  GTMAXUIElement *frontmostAppElement_;
+  NSArray *frontmostMenuResults_;
 }
 @end
 
@@ -88,6 +90,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   [menuIcon_ release];
   [menuItemIcon_ release];
   [viewIcon_ release];
+  [frontmostMenuResults_ release];
+  [frontmostAppElement_ release];
   [super dealloc];
 }
     
@@ -128,15 +132,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return appInfo;
 }
 
-- (HGSScoredResult *)resultFromElement:(GTMAXUIElement *)element
-                                  role:(NSString *)role
-                           queryString:(HGSTokenizedString *)queryString
-                         pathCellArray:(NSArray *)pathCellArray {
-  NSNumber *enabled 
-    = [element accessibilityAttributeValue:NSAccessibilityEnabledAttribute];
-  if (enabled && [enabled boolValue] == NO) {
-    return nil;
-  }
+- (HGSUnscoredResult *)resultFromElement:(GTMAXUIElement *)element
+                                    role:(NSString *)role
+                           pathCellArray:(NSArray *)pathCellArray {
   NSString *name 
     = [element stringValueForAttribute:NSAccessibilityTitleAttribute];
   if (!name) {
@@ -144,20 +142,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
   if ([name length] == 0) return nil;
   
-  // Filter out the ones we don't want.
-  HGSTokenizedString *compareName 
-    = [HGSTokenizer tokenizeString:name];
-  
-  CGFloat score = 0;
-  NSIndexSet *matchedIndexes = nil;
-  if ([queryString tokenizedLength]) {
-    score = HGSScoreTermForItem(queryString, compareName, &matchedIndexes);
-  } else {
-    score = HGSCalibratedScore(kHGSCalibratedModerateScore);
-  }
-  if (!(score > 0.0)) {
-    return nil;
-  }
   // TODO(dmaclach): deal with lower level UI elements such as 
   // buttons, splitters etc.
   
@@ -194,26 +178,63 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     [attributes setObject:defaultAction 
                    forKey:kHGSObjectAttributeDefaultActionKey];
   }
-  HGSScoredResult *result 
-    = [HGSScoredResult resultWithURI:uriString
+  HGSUnscoredResult *result 
+    = [HGSUnscoredResult resultWithURI:uriString
                                 name:name
                                 type:kHGSTypeAppUIItem
                               source:self
-                          attributes:attributes
-                               score:score
-                         matchedTerm:queryString
-                      matchedIndexes:matchedIndexes];
+                          attributes:attributes];
   return result;
+}
+
+- (HGSScoredResult *)scoredResultFromResult:(HGSUnscoredResult *)result
+                                queryString:(HGSTokenizedString *)queryString {
+  // Filter out the ones we don't want.
+  HGSTokenizedString *compareName 
+    = [HGSTokenizer tokenizeString:[result displayName]];
+  
+  CGFloat score = 0;
+  NSIndexSet *matchedIndexes = nil;
+  if ([queryString tokenizedLength]) {
+    score = HGSScoreTermForItem(queryString, compareName, &matchedIndexes);
+  } else {
+    score = HGSCalibratedScore(kHGSCalibratedModerateScore);
+  }
+  if (!(score > 0.0)) {
+    return nil;
+  }
+  HGSScoredResult *scoredResult 
+    = [HGSScoredResult resultWithResult:result
+                                  score:score
+                            matchedTerm:queryString
+                         matchedIndexes:matchedIndexes];
+  return scoredResult;
+}
+
+- (HGSScoredResult *)resultFromElement:(GTMAXUIElement *)element
+                                  role:(NSString *)role
+                           queryString:(HGSTokenizedString *)queryString
+                         pathCellArray:(NSArray *)pathCellArray {
+  NSNumber *enabled 
+    = [element accessibilityAttributeValue:NSAccessibilityEnabledAttribute];
+  if (enabled && [enabled boolValue] == NO) {
+    return nil;
+  }
+  HGSUnscoredResult *result = [self resultFromElement:element 
+                                                 role:role 
+                                        pathCellArray:pathCellArray];
+  return [self scoredResultFromResult:result queryString:queryString];
 }
 
 - (void)addMenuResultsFromElement:(GTMAXUIElement*)element 
                           toArray:(NSMutableArray*)array
-                         matching:(HGSTokenizedString *)queryString
-                    pathCellArray:(NSArray *)pathCellArray {
+                    pathCellArray:(NSArray *)pathCellArray 
+                        operation:(HGSSearchOperation *)operation {
   if (!element) return;
   NSArray *children 
     = [element accessibilityAttributeValue:NSAccessibilityChildrenAttribute];
   for (GTMAXUIElement *child in children) {
+    if ([operation isCancelled]) return;
     NSString *role 
       = [child stringValueForAttribute:NSAccessibilityRoleAttribute];
     NSString *name 
@@ -233,18 +254,17 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       [role isEqualToString:(NSString*)kAXMenuBarItemRole]) {
       [self addMenuResultsFromElement:child 
                               toArray:array 
-                             matching:queryString
-                        pathCellArray:newPathCellArray];
+                        pathCellArray:newPathCellArray
+                            operation:operation];
     } else if ([role isEqual:NSAccessibilityMenuItemRole]) {
       NSUInteger currentCount = [array count];      
       [self addMenuResultsFromElement:child 
                               toArray:array 
-                             matching:queryString 
-                        pathCellArray:newPathCellArray];
+                        pathCellArray:newPathCellArray
+                            operation:operation];
       if (currentCount == [array count]) {
-        HGSScoredResult *result = [self resultFromElement:child
+        HGSUnscoredResult *result = [self resultFromElement:child
                                                      role:role
-                                              queryString:queryString
                                             pathCellArray:pathCellArray];
         if (result) {
           [array addObject:result];
@@ -257,7 +277,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 - (void)addResultsFromElement:(GTMAXUIElement*)element 
                       toArray:(NSMutableArray*)array
                      matching:(HGSTokenizedString *)queryString 
-                pathCellArray:(NSArray *)pathCellArray {
+                pathCellArray:(NSArray *)pathCellArray
+                    operation:(HGSSearchOperation *)operation {
   if (element) {
     NSArray *children 
       = [element accessibilityAttributeValue:NSAccessibilityChildrenAttribute];
@@ -266,13 +287,15 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                  NSAccessibilityMenuBarRole,
                                  nil];
     for (GTMAXUIElement *child in children) {
+      if ([operation isCancelled]) return;
       NSString *role 
         = [child stringValueForAttribute:NSAccessibilityRoleAttribute];
       if ([placeHolderRoles containsObject:role]) {
         [self addResultsFromElement:child 
                             toArray:array 
                            matching:queryString 
-                      pathCellArray:pathCellArray];
+                      pathCellArray:pathCellArray
+                          operation:operation];
       } else {
         HGSScoredResult *result = [self resultFromElement:child
                                                      role:role
@@ -319,14 +342,36 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       [self addResultsFromElement:element 
                           toArray:results 
                          matching:queryString
-                    pathCellArray:pathCellArray];
+                    pathCellArray:pathCellArray
+                        operation:operation];
     } else {
-      NSArray *pathCellArray = [NSArray array];
-      [self addMenuResultsFromElement:element 
-                              toArray:results 
-                             matching:queryString
-                        pathCellArray:pathCellArray];
+      if (![element isEqual:frontmostAppElement_]) {
+        [frontmostMenuResults_ release];
+        frontmostMenuResults_ = nil;
+        [frontmostAppElement_ release];
+        frontmostAppElement_ = nil;
+        NSArray *pathCellArray = [NSArray array];
+        [self addMenuResultsFromElement:element 
+                                toArray:results 
+                          pathCellArray:pathCellArray
+                              operation:operation];
+        if (![operation isCancelled]) {
+          frontmostAppElement_ = [element retain];
+          frontmostMenuResults_ = [results retain];
+        }
+      }
+      for(HGSUnscoredResult *result in frontmostMenuResults_) {
+        if ([operation isCancelled]) break;
+        HGSScoredResult *scoredResult 
+          = [self scoredResultFromResult:result queryString:queryString];
+        if (scoredResult) {
+          [results addObject:scoredResult];
+        }
+      }
     }      
+  }
+  if (![operation isCancelled]) {
+    [results sortUsingFunction:HGSMixerScoredResultSort context:NULL];
   }
   [operation setRankedResults:results];
 }
