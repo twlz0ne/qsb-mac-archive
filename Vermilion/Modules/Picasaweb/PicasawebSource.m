@@ -521,20 +521,23 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 - (void)reportErrorForFetchType:(NSString *)fetchType
                           error:(NSError *)error {
   NSInteger errorCode = [error code];
-  NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
-  NSTimeInterval timeSinceLastErrorReport
-    = currentTime - previousErrorReportingTime_;
-  if (timeSinceLastErrorReport > kErrorReportingInterval) {
-    previousErrorReportingTime_ = currentTime;
-    NSString *errorString = nil;
-    if (errorCode == 404) {
-      errorString = @"might not be enabled";
-    } else {
-      errorString = @"fetch failed";
+  // Don't report not-connected errors.
+  if (errorCode != NSURLErrorNotConnectedToInternet) {
+    NSTimeInterval currentTime = [[NSDate date] timeIntervalSinceReferenceDate];
+    NSTimeInterval timeSinceLastErrorReport
+      = currentTime - previousErrorReportingTime_;
+    if (timeSinceLastErrorReport > kErrorReportingInterval) {
+      previousErrorReportingTime_ = currentTime;
+      NSString *errorString = nil;
+      if (errorCode == 404) {
+        errorString = @"might not be enabled";
+      } else {
+        errorString = @"fetch failed";
+      }
+      HGSLog(@"PicasawebSource (%@InfoFetcher) %@ for account '%@': "
+             @"error=%d '%@'.", fetchType, errorString, [account_ displayName],
+             errorCode, [error localizedDescription]);
     }
-    HGSLog(@"PicasawebSource (%@InfoFetcher) %@ for account '%@': "
-           @"error=%d '%@'.", fetchType, errorString, [account_ displayName],
-           errorCode, [error localizedDescription]);
   }
 }
 

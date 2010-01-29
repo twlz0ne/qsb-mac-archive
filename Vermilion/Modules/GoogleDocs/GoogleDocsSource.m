@@ -248,28 +248,31 @@ GTM_METHOD_CHECK(NSEnumerator,
 
 - (void)reportError:(NSError *)error {
   NSInteger errorCode = [error code];
-  if (errorCode == kGDataBadAuthentication) {
-    // If the login credentials are bad, don't keep trying.
-    [updateTimer_ invalidate];
-    updateTimer_ = nil;
-    // Tickle the account so that if the preferences window is showing
-    // the user will see the proper account status.
-    [account_ authenticate];
-  }
-  NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
-  NSTimeInterval timeSinceLastErrorReport
-    = currentTime - previousErrorReportingTime_;
-  if (timeSinceLastErrorReport > kErrorReportingInterval) {
-    previousErrorReportingTime_ = currentTime;
-    NSString *errorString = nil;
+  // Don't report not-connected errors.
+  if (errorCode != NSURLErrorNotConnectedToInternet) {
     if (errorCode == kGDataBadAuthentication) {
-      errorString = @"authentication failed (possible bad password)";
-    } else {
-      errorString = @"fetch failed";
+      // If the login credentials are bad, don't keep trying.
+      [updateTimer_ invalidate];
+      updateTimer_ = nil;
+      // Tickle the account so that if the preferences window is showing
+      // the user will see the proper account status.
+      [account_ authenticate];
     }
-    HGSLog(@"GoogleDocSource %@ for account '%@': error=%d '%@'.",
-           errorString, [account_ displayName], [error code],
-           [error localizedDescription]);
+    NSTimeInterval currentTime = [[NSDate date] timeIntervalSinceReferenceDate];
+    NSTimeInterval timeSinceLastErrorReport
+      = currentTime - previousErrorReportingTime_;
+    if (timeSinceLastErrorReport > kErrorReportingInterval) {
+      previousErrorReportingTime_ = currentTime;
+      NSString *errorString = nil;
+      if (errorCode == kGDataBadAuthentication) {
+        errorString = @"authentication failed (possible bad password)";
+      } else {
+        errorString = @"fetch failed";
+      }
+      HGSLog(@"GoogleDocSource %@ for account '%@': error=%d '%@'.",
+             errorString, [account_ displayName], [error code],
+             [error localizedDescription]);
+    }
   }
 }
 
