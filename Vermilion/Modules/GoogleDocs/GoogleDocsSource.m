@@ -629,11 +629,11 @@ GTM_METHOD_CHECK(NSEnumerator,
                  name:[[doc title] stringValue]
            otherTerms:otherTerms];
   } else if ([error code] != 403) {
-    // Ignore access privilege errors.
-    HGSLog(@"GoogleDocSource worksheet fetch failed for account '%@', "
-           @"spreadsheet '%@': error=%d '%@'.",
-           [account_ displayName], [docResult displayName], [error code],
-           [error localizedDescription]);
+    // Ignore access privilege errors (403s).
+    HGSLogDebug(@"GoogleDocSource worksheet fetch failed for account '%@', "
+                @"spreadsheet '%@': error=%d '%@'.",
+                [account_ displayName], [docResult displayName], [error code],
+                [error localizedDescription]);
   }
 }
 
