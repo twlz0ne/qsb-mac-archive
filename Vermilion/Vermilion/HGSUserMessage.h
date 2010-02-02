@@ -33,6 +33,11 @@
 #import <Foundation/Foundation.h>
 
 /*!
+ @header
+ @discussion HGSUserMessage
+*/
+
+/*!
  @enum HGSUserMessageType
  @constant kHGSUserMessageErrorType Display as error
  @constant kHGSUserMessageWarningType Display as warning
