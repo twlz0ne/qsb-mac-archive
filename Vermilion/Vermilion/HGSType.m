@@ -31,6 +31,7 @@
 //
 
 #import "HGSType.h"
+#import "HGSLog.h"
 
 NSString *HGSTypeForPath(NSString *path) {
   // TODO(dmaclach): probably need some way for third parties to muscle their
@@ -62,6 +63,7 @@ NSString *HGSTypeForPath(NSString *path) {
     { kUTTypeAudio, kHGSTypeFileMusic },
     { kUTTypeImage, kHGSTypeFileImage },
     { kUTTypeMovie, kHGSTypeFileMovie },
+    { kUTTypePDF, kHGSTypeFilePDF },
     { kUTTypePlainText, kHGSTypeTextFile },
     { kUTTypePackage, kHGSTypeFile },
     { kUTTypeDirectory, kHGSTypeDirectory },
@@ -85,6 +87,7 @@ NSString *HGSTypeForPath(NSString *path) {
 
 BOOL HGSTypeConformsToType(NSString *type1, NSString *type2) {
   // Must have the exact prefix
+  HGSAssert([type1 length], nil);
   NSUInteger type2Len = [type2 length];
   BOOL result = type2Len > 0 && [type1 hasPrefix:type2];
   if (result &&
@@ -96,3 +99,34 @@ BOOL HGSTypeConformsToType(NSString *type1, NSString *type2) {
   }
   return result;
 }
+
+BOOL HGSTypeConformsToTypeSet(NSString *type1, NSSet *types) {
+  BOOL conforms = NO;
+  if ([type1 length]) {
+    if ([types count] == 0) {
+      conforms = YES;
+    } else {
+      for (NSString *type in types) {
+        if (HGSTypeConformsToType(type1, type)) {
+          conforms = YES;
+          break;
+        }
+      }
+    }
+  }
+  return conforms;
+}
+
+BOOL HGSTypeDoesNotConformToTypeSet(NSString *type1, NSSet *types) {
+  BOOL doesNotConform = YES;
+  if ([type1 length] && [types count] != 0) {
+    for (NSString *type in types) {
+      if (HGSTypeConformsToType(type1, type)) {
+        doesNotConform = NO;
+        break;
+      }
+    }
+  }
+  return doesNotConform;
+}
+

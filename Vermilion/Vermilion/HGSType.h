@@ -40,10 +40,10 @@
  reverse dns names).  The common bases are "contact", "file", "webpage", etc.
  A source can then refine them to be more specific: "contact.addressbook",
  "contact.google", "webpage.bookmark".  These strings are meant to be case
- sensitive (to allow for faster compares).  There are two helpers (isOfType:
- and conformsToType:) that allow the caller to check to see if a result is of
- a certain type or refinement of that type.  The HGS_SUBTYPE macro is to be
- used in the construction of string hierarchies with more than one segment.
+ sensitive (to allow for faster compares).  There are helper functions below
+ that allow the caller to check to see if a result is of a certain type or 
+ refinement of that type.  The HGS_SUBTYPE macro is to be used in the 
+ construction of string hierarchies with more than one segment.
  Types can be made up of multiple segments to refine them as specifically as
  needed.
 */
@@ -80,6 +80,10 @@
 #define kHGSTypeFileMusic        HGS_SUBTYPE(kHGSTypeFileMedia, @"music")
 #define kHGSTypeFileImage        HGS_SUBTYPE(kHGSTypeFileMedia, @"image")
 #define kHGSTypeFileMovie        HGS_SUBTYPE(kHGSTypeFileMedia, @"movie")
+#define kHGSTypeFilePDF          HGS_SUBTYPE(kHGSTypeFile, @"pdf")
+#define kHGSTypeFilePresentation HGS_SUBTYPE(kHGSTypeFile, @"presentation")
+#define kHGSTypeFileFont         HGS_SUBTYPE(kHGSTypeFile, @"font")
+#define kHGSTypeFileCalendar     HGS_SUBTYPE(kHGSTypeFile, @"calendar")
 #define kHGSTypeWebMedia         HGS_SUBTYPE(kHGSTypeWebpage, @"media")
 #define kHGSTypeWebMusic         HGS_SUBTYPE(kHGSTypeWebMedia, @"music")
 #define kHGSTypeWebImage         HGS_SUBTYPE(kHGSTypeWebMedia, @"image")
@@ -94,7 +98,34 @@
 #define kHGSTypeTextAddress      HGS_SUBTYPE(kHGSTypeText, @"address")
 
 /*! 
- Return an HGSType for a given path.
+ Get an HGSType for a given path.
+ @param path Path to get the HGSType for.
+ @result HGSType of path.
 */
 NSString *HGSTypeForPath(NSString *path);
+
+/*!
+ Check to see if one type conforms to another.
+ @param type1 Type to check.
+ @param type2 Type to conform to.
+ @result YES if type1 conforms to type2
+*/
 BOOL HGSTypeConformsToType(NSString *type1, NSString *type2);
+
+/*!
+ Check to see if one type conforms to a set of types.
+ @param type1 Type to check.
+ @param type2 Set of types to conform to.
+ @result YES if type1 conforms to any of the types in types.
+         If types is nil, will return YES.
+*/
+BOOL HGSTypeConformsToTypeSet(NSString *type1, NSSet *types);
+
+/*!
+ Check to see if one type does not conform to a set of types.
+ @param type1 Type to check.
+ @param type2 Set of types to check lack of conformity to.
+ @result YES if type1 does not conform to any of the types in types.
+         If types is nil, will return YES.
+ */
+BOOL HGSTypeDoesNotConformToTypeSet(NSString *type1, NSSet *types);

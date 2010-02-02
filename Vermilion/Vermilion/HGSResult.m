@@ -107,6 +107,11 @@ static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
   return [self retain];
 }
 
+- (void)dealloc {
+  [[HGSIconProvider sharedIconProvider] cancelOperationsForResult:self];
+  [super dealloc];
+}
+
 // if the value isn't present, ask the result source to satisfy the
 // request.
 - (id)valueForKey:(NSString*)key {
@@ -168,15 +173,13 @@ static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
 }
 
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet {
-  BOOL conforms = NO;
   NSString *myType = [self type];
-  for (NSString *aType in typeSet) {
-    if (HGSTypeConformsToType(myType, aType)) {
-      conforms = YES;
-      break;
-    }
-  }
-  return conforms;
+  return HGSTypeConformsToTypeSet(myType, typeSet);
+}
+
+- (BOOL)doesNotConformToTypeSet:(NSSet *)typeSet {
+  NSString *myType = [self type];
+  return HGSTypeDoesNotConformToTypeSet(myType, typeSet);
 }
 
 - (BOOL)isDuplicate:(HGSResult *)compareTo {
@@ -428,7 +431,6 @@ static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
 }
 
 - (void)dealloc {
-  [[HGSIconProvider sharedIconProvider] cancelOperationsForResult:self];
   [source_ release];
   [attributes_ release];
   [uri_ release];

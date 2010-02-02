@@ -132,13 +132,14 @@ typedef NSUInteger HGSRankFlags;
 - (BOOL)isFileResult;
 
 /*!
- Some helpers to check if this result is of a given type.  |isOfType| checks
- for an exact match of the type.  |conformsToType{Set}| checks to see if this
+ Some helpers to check if this result is of a given type.  -[isOfType:] checks
+ for an exact match of the type.  -[conformsToType{Set}:] checks to see if this
  object is of the specific type{s} or a refinement of it/them.
 */
 - (BOOL)isOfType:(NSString *)typeStr;
 - (BOOL)conformsToType:(NSString *)typeStr;
 - (BOOL)conformsToTypeSet:(NSSet *)typeSet;
+- (BOOL)doesNotConformToTypeSet:(NSSet *)typeSet;
 
 /*!
  Is this result a "duplicate" of |compareTo|? Not using |-isEqual:| because
