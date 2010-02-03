@@ -115,7 +115,7 @@ BOOL HGSTypeConformsToType(NSString *type1, NSString *type2);
 /*!
  Check to see if one type conforms to a set of types.
  @param type1 Type to check.
- @param type2 Set of types to conform to.
+ @param types Set of types to conform to.
  @result YES if type1 conforms to any of the types in types.
          If types is nil, will return YES.
 */
@@ -124,7 +124,7 @@ BOOL HGSTypeConformsToTypeSet(NSString *type1, NSSet *types);
 /*!
  Check to see if one type does not conform to a set of types.
  @param type1 Type to check.
- @param type2 Set of types to check lack of conformity to.
+ @param types Set of types to check lack of conformity to.
  @result YES if type1 does not conform to any of the types in types.
          If types is nil, will return YES.
  */
