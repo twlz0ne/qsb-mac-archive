@@ -272,6 +272,14 @@ static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
              type:(NSString *)typeStr
            source:(HGSSearchSource *)source 
        attributes:(NSDictionary *)attributes {
+  
+  if (!uri || !name || !typeStr) {
+    HGSLogDebug(@"Must have an uri, name and typestr for %@ of %@ (%@)", 
+                name, source, uri);
+    [self release];
+    return nil;
+  }
+  
   Class concreteClass = nil;
   if (HGSTypeConformsToType(typeStr, kHGSTypeContact) 
       && ![self isKindOfClass:[HGSUnscoredContactResult class]]) {
@@ -289,12 +297,6 @@ static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
                                    attributes:attributes];
   } else {
     if ((self = [super init])) {
-      if (!uri || !name || !typeStr) {
-        HGSLogDebug(@"Must have an uri, name and typestr for %@ of %@ (%@)", 
-                    name, source, uri);
-        [self release];
-        return nil;
-      }
 #if DEBUG
       // This is a debug runtime check to make sure our URIs are valid URLs.
       // We do allow "some" invalid URLS. search urls with %s in them for example.
