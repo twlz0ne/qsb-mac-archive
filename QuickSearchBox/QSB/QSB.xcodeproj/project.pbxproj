@@ -418,6 +418,7 @@
 		62A16A900ED484DF0074F41B /* HGSPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A16A8E0ED484DF0074F41B /* HGSPlugin.m */; };
 		62A16A940ED485A60074F41B /* HGSProtoExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 62A16A930ED485A60074F41B /* HGSProtoExtension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62A16A970ED485C50074F41B /* HGSProtoExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A16A960ED485C50074F41B /* HGSProtoExtension.m */; };
+		62A55E021118FA3700F441A5 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		62A5B283107E570200444AC9 /* GoogleAccountObjectSpecifiers.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A5B282107E570200444AC9 /* GoogleAccountObjectSpecifiers.m */; };
 		62A5B289107E576E00444AC9 /* GoogleAccountRegisterAccountCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A5B288107E576E00444AC9 /* GoogleAccountRegisterAccountCommand.m */; };
 		62AD18A60F16B034000D380C /* QSBPathControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 62AD18A50F16B034000D380C /* QSBPathControl.m */; };
@@ -8666,6 +8667,7 @@
 				8B8B131A0EEBADE400E543D0 /* HGSBundle.m in Sources */,
 				62906DAD100D046400A09A0E /* PicasaWebUploadImageAction.m in Sources */,
 				62E3FF4010112F5D005D77F2 /* NSNotificationCenter+MainThread.m in Sources */,
+				62A55E021118FA3700F441A5 /* GTMMethodCheck.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

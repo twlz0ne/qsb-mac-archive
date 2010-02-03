@@ -172,19 +172,19 @@ GTM_METHOD_CHECK(NSEnumerator,
 }
 
 - (NSArray*)authorArrayForGDataPeople:(NSArray*)people {
-  NSMutableArray* peopleTerms 
+  NSMutableArray *peopleTerms 
   = [NSMutableArray arrayWithCapacity:(2 * [people count])];
   NSCharacterSet *wsSet = [NSCharacterSet whitespaceCharacterSet];
-  NSEnumerator* enumerator = [people objectEnumerator];
-  GDataPerson* person;
+  NSEnumerator *enumerator = [people objectEnumerator];
+  GDataPerson *person;
   while ((person = [enumerator nextObject])) {
     
-    NSString* authorName = [[person name] stringByTrimmingCharactersInSet:wsSet];
+    NSString *authorName = [[person name] stringByTrimmingCharactersInSet:wsSet];
     if ([authorName length] > 0) {
       [peopleTerms addObject:authorName];
     }
     // Grab the author's email username as well
-    NSString* authorEmail = [person email];
+    NSString *authorEmail = [person email];
     NSUInteger atSignLocation = [authorEmail rangeOfString:@"@"].location;
     if (atSignLocation != NSNotFound) {
       authorEmail = [authorEmail substringToIndex:atSignLocation];
@@ -305,7 +305,7 @@ GTM_METHOD_CHECK(NSEnumerator,
 
 - (void)startAsynchronousDocsListFetch {
   [self clearResultIndex];
-  HGSKeychainItem* keychainItem = nil;
+  HGSKeychainItem *keychainItem = nil;
   NSString *userName = nil;
   NSString *password = nil;
   if (!currentlyFetchingDocs_) {
@@ -331,7 +331,7 @@ GTM_METHOD_CHECK(NSEnumerator,
     // during a fetch we don't destroy the service out from under ourselves.
     currentlyFetchingDocs_ = YES;
     // If the doc feed is attempting an http request then upgrade it to https.
-    NSURL* docURL = [GDataServiceGoogleDocs docsFeedURLUsingHTTPS:YES];
+    NSURL *docURL = [GDataServiceGoogleDocs docsFeedURLUsingHTTPS:YES];
     docServiceTicket_
       = [[docService_ fetchFeedWithURL:docURL
                               delegate:self
@@ -372,7 +372,7 @@ GTM_METHOD_CHECK(NSEnumerator,
                                       options:NSLiteralSearch
                                               | NSAnchoredSearch
                                         range:NSMakeRange(0, 5)];
-    NSURL* spreadsheetURL = [NSURL URLWithString:spreadsheetURLString];
+    NSURL *spreadsheetURL = [NSURL URLWithString:spreadsheetURLString];
     spreadsheetServiceTicket_
       = [[spreadsheetService_ fetchFeedWithURL:spreadsheetURL
                                       delegate:self
@@ -405,8 +405,8 @@ GTM_METHOD_CHECK(NSEnumerator,
 }
 
 - (void)indexDoc:(GDataEntryBase *)doc {
-  NSString* docTitle = [[doc title] stringValue];
-  NSURL* docURL = [[doc HTMLLink] URL];
+  NSString *docTitle = [[doc title] stringValue];
+  NSURL *docURL = [[doc HTMLLink] URL];
   if (!docURL) {
     return;
   }
@@ -418,7 +418,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   NSArray *categories = [doc categories];
   BOOL isStarred = [GDataCategory categories:categories
                     containsCategoryWithLabel:kGDataCategoryLabelStarred];
-  NSImage* icon = nil;
+  NSImage *icon = nil;
   NSString *categoryLabel = nil;
   if (isSpreadsheet) {
     categoryLabel = kDocCategorySpreadsheet;
@@ -443,25 +443,32 @@ GTM_METHOD_CHECK(NSEnumerator,
   }
   
   // Compose the contents of the path control.  First cell will be 'Google Docs',
-  // last cell will be the document name.  A middle cell may be added if there
-  // is a folder, but note that only the immediately containing folder will
-  // be shown even if there are higher-level containing folders.
-  NSURL *baseURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/",
-                                         [docURL scheme],
-                                         [docURL host]]];
+  // followed by the account name in the second cell, with the last cell being
+  // the document name.  A middle cell may be added if there is a folder, but
+  // note that only the immediately containing folder will be shown even if
+  // there are higher-level containing folders.
+  NSURL *baseURL = [[[NSURL alloc] initWithScheme:[docURL scheme]
+                                             host:[docURL host]
+                                             path:@"/"]
+                    autorelease];
   NSMutableArray *cellArray = [NSMutableArray array];
   NSString *docsString = HGSLocalizedString(@"Google Docs", 
                                             @"A label denoting a Google Docs "
                                             @"result");
   NSDictionary *googleDocsCell 
-    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+    = [NSDictionary dictionaryWithObjectsAndKeys:
        docsString, kQSBPathCellDisplayTitleKey,
        baseURL, kQSBPathCellURLKey,
        nil];
   [cellArray addObject:googleDocsCell];
   
-  // See if there's an intervening folder.
   NSString *userName = [docService_ username];
+  NSDictionary *userCell = [NSDictionary dictionaryWithObjectsAndKeys:
+                            userName, kQSBPathCellDisplayTitleKey,
+                            nil];
+  [cellArray addObject:userCell];
+
+  // See if there's an intervening folder.
   NSString *folderScheme = [kGDataNamespaceDocuments
                             stringByAppendingFormat:@"/folders/%@",
                             userName];
@@ -469,13 +476,13 @@ GTM_METHOD_CHECK(NSEnumerator,
                                           fromCategories:categories];
   if (folders && [folders count]) {
     NSString *label = [[folders objectAtIndex:0] label];
-    NSDictionary *folderCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+    NSDictionary *folderCell = [NSDictionary dictionaryWithObjectsAndKeys:
                                 label, kQSBPathCellDisplayTitleKey,
                                 nil];
     [cellArray addObject:folderCell];
   }
   
-  NSDictionary *resultDocCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+  NSDictionary *resultDocCell = [NSDictionary dictionaryWithObjectsAndKeys:
                                  docTitle, kQSBPathCellDisplayTitleKey,
                                  docURL, kQSBPathCellURLKey,
                                  nil];
@@ -511,7 +518,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   if (flagName) {
     [attributes setObject:flagName forKey:kHGSObjectAttributeFlagIconNameKey];
   }
-  HGSUnscoredResult* result = [HGSUnscoredResult resultWithURL:docURL
+  HGSUnscoredResult *result = [HGSUnscoredResult resultWithURL:docURL
                                                           name:docTitle
                                                           type:kHGSTypeGoogleDoc
                                                         source:self
@@ -542,7 +549,7 @@ GTM_METHOD_CHECK(NSEnumerator,
                              @"A search term indicating that this document "
                              @"is a word processing document.");
     }
-    NSMutableArray* otherTerms
+    NSMutableArray *otherTerms
       = [NSMutableArray arrayWithObject:localizedCategory];
     [otherTerms addObjectsFromArray:[self authorArrayForGDataPeople:
                                      [doc authors]]];
@@ -567,7 +574,7 @@ GTM_METHOD_CHECK(NSEnumerator,
 - (void)startAsyncWorksheetFetchForSpreadsheet:(GDataEntrySpreadsheet *)spreadsheet
                                         result:(HGSResult *)spreadsheetResult {
   HGSAssert([spreadsheet isKindOfClass:[GDataEntrySpreadsheet class]], nil);
-  NSURL* spreadsheetFeedURL = [spreadsheet worksheetsFeedURL];
+  NSURL *spreadsheetFeedURL = [spreadsheet worksheetsFeedURL];
   GDataServiceTicket *worksheetServiceTicket
     = [spreadsheetService_
        fetchFeedWithURL:spreadsheetFeedURL
@@ -621,7 +628,7 @@ GTM_METHOD_CHECK(NSEnumerator,
       = HGSLocalizedString(@"spreadsheet",
                            @"A search term indicating that this document "
                            @"is a spreadsheet.");
-    NSMutableArray* otherTerms
+    NSMutableArray *otherTerms
       = [NSMutableArray arrayWithObject:localizedCategory];
     [otherTerms addObjectsFromArray:[self authorArrayForGDataPeople:
                                      [doc authors]]];

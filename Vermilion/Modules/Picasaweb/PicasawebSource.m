@@ -34,6 +34,8 @@
 #import <QSBPluginUI/QSBPluginUI.h>
 
 #import <GData/GData.h>
+#import "GTMMethodCheck.h"
+#import "GTMNSString+URLArguments.h"
 #import "HGSKeychainItem.h"
 
 static NSString *const kPhotosAlbumKey = @"kPhotosAlbumKey";
@@ -74,6 +76,10 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 - (void)reportErrorForFetchType:(NSString *)fetchType
                           error:(NSError *)error;
 
+// Utility function to fetch an encoded string containing just the user
+// name without the trailing "@gmail.com".
+- (NSString *)encodedUserName;
+
 + (void)setBestFitThumbnailFromMediaGroup:(GDataMediaGroup *)mediaGroup
                              inAttributes:(NSMutableDictionary *)attributes;
 
@@ -90,6 +96,8 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 
 @implementation PicasawebSource
+
+GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -177,6 +185,18 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     }
   }
   return result;
+}
+
+- (NSString *)encodedUserName {
+  // Strip off the domain from the user name.
+  NSString *userNameEncoded = [picasawebService_ username];
+  NSRange atRange = [userNameEncoded rangeOfString:@"@"];
+  if (atRange.location != NSNotFound) {
+    userNameEncoded = [userNameEncoded substringToIndex:atRange.location];
+  }
+  userNameEncoded = [userNameEncoded gtm_stringByEscapingForURLArgument];
+  userNameEncoded = [@"/" stringByAppendingString:userNameEncoded];
+  return userNameEncoded;
 }
 
 #pragma mark -
@@ -285,25 +305,25 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                              @"A label denoting the picasaweb "
                                              @"service.");
     NSDictionary *picasawebCell 
-      = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+      = [NSDictionary dictionaryWithObjectsAndKeys:
          picasaWeb, kQSBPathCellDisplayTitleKey,
          baseURL, kQSBPathCellURLKey,
          nil];
     [cellArray addObject:picasawebCell];
-    
-    NSURL *userURL 
-      = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/%@/",
-                              [albumURL scheme],
-                              [albumURL host],
-                              [picasawebService_ username]]];
+
+    NSString *userNameEncoded = [self encodedUserName];
+    NSURL *userURL = [[[NSURL alloc] initWithScheme:[albumURL scheme]
+                                               host:[albumURL host]
+                                               path:userNameEncoded]
+                      autorelease];
     NSDictionary *userCell 
-      = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+      = [NSDictionary dictionaryWithObjectsAndKeys:
          [picasawebService_ username], kQSBPathCellDisplayTitleKey,
          userURL, kQSBPathCellURLKey,
          nil];
     [cellArray addObject:userCell];
     
-    NSDictionary *albumCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+    NSDictionary *albumCell = [NSDictionary dictionaryWithObjectsAndKeys:
                                    albumTitle, kQSBPathCellDisplayTitleKey,
                                    albumURL, kQSBPathCellURLKey,
                                    nil];
@@ -404,18 +424,18 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                              @"A label denoting the picasaweb "
                                              @"service.");
     NSDictionary *picasawebCell 
-      = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+      = [NSDictionary dictionaryWithObjectsAndKeys:
          picasaWeb, kQSBPathCellDisplayTitleKey,
          baseURL, kQSBPathCellURLKey,
          nil];
     [cellArray addObject:picasawebCell];
-    NSString *urlString = [NSString stringWithFormat:@"%@://%@/%@/",
-                           [photoURL scheme],
-                           [photoURL host],
-                           [picasawebService_ username]];
-    NSURL *userURL  = [NSURL URLWithString:urlString];
+    NSString *userNameEncoded = [self encodedUserName];
+    NSURL *userURL = [[[NSURL alloc] initWithScheme:[photoURL scheme]
+                                               host:[photoURL host]
+                                               path:userNameEncoded]
+                      autorelease];
     NSDictionary *userCell 
-      = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+      = [NSDictionary dictionaryWithObjectsAndKeys:
          [picasawebService_ username], kQSBPathCellDisplayTitleKey,
          userURL, kQSBPathCellURLKey,
          nil];
@@ -423,18 +443,17 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     
     NSString* albumTitle = [[album title] stringValue];
     NSURL* albumURL = [[album HTMLLink] URL];
-    NSDictionary *albumCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+    NSDictionary *albumCell = [NSDictionary dictionaryWithObjectsAndKeys:
                                albumTitle, kQSBPathCellDisplayTitleKey,
                                albumURL, kQSBPathCellURLKey,
                                nil];
     [cellArray addObject:albumCell];
-    [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
     
     NSString* photoTitle = [[photo title] stringValue];
     if ([photoDescription length] == 0) {
       photoDescription = photoTitle;
     }
-    NSDictionary *photoCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+    NSDictionary *photoCell = [NSDictionary dictionaryWithObjectsAndKeys:
                                photoTitle, kQSBPathCellDisplayTitleKey,
                                photoURL, kQSBPathCellURLKey,
                                nil];
