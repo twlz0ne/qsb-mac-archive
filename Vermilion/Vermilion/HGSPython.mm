@@ -73,53 +73,7 @@ NSString* const kHGSPythonResultMainItemStringKey
 NSString* const kHGSPythonResultOtherItemsStringKey
   = @"kHGSPythonResultOtherItemsStringKey";
 
-typedef struct {
-  PyObject_HEAD
-  PyObject *rawQuery_;    // string
-  PyObject *normalizedQuery_; // string
-  PyObject *pivotObject_; // dictionary
-  HGSPythonSearchOperation  *operation_;
-  HGSQuery *query_;
-} Query;
-
-static PyObject *QueryNew(PyTypeObject *type, PyObject *args, PyObject *kwds);
-static void QueryDealloc(Query *self);
-static int QueryInit(Query *self, PyObject *args, PyObject *kwds);
-static PyObject *QueryGetAttr(Query *self, char *name);
-static int QuerySetAttr(Query *self, char *name, PyObject *value);
-static PyObject *QuerySetResults(Query *self, PyObject *args);
-static PyObject *QueryFinish(Query *self, PyObject *unused);
-static PyObject *LocalizeString(PyObject *self, PyObject *args);
-static PyObject *DisplayNotification(PyObject *self, PyObject *args);
-
-static PyMethodDef QueryMethods[] = {
-  {
-    "SetResults", (PyCFunction)QuerySetResults, METH_VARARGS,
-    "Append a set of results to the query."
-  },
-  {
-    "Finish", (PyCFunction)QueryFinish, METH_NOARGS,
-    "Indicate that query processing has completed."
-  },
-  { NULL, NULL, 0, NULL  }
-};
-
-static PyMemberDef QueryMembers[] = {
-  { const_cast<char*>(kHGSPythonNormalizedQueryMemberName), 
-    T_OBJECT_EX, offsetof(Query, normalizedQuery_), 0,
-    const_cast<char*>("The raw query broken into tokens delimited by spaces. "
-                      "It has also been normalized to having no diacriticals "
-                      "or excess punctuation, and has been converted to "
-                      "lowercase.")},
-  { const_cast<char*>(kHGSPythonRawQueryMemberName), 
-    T_OBJECT_EX, offsetof(Query, rawQuery_), 0,
-    const_cast<char*>("The unprocessed query entered by the user.") },
-  { const_cast<char*>(kHGSPythonPivotObjectMemberName),
-    T_OBJECT_EX, offsetof(Query, pivotObject_), 0,
-    const_cast<char*>("If present, the original search result from which this "
-                      "query is pivoting.") },
-  { NULL, 0, 0,0, NULL }
-};
+#pragma mark Class Defines
 
 // The standard definitions for Py_TPFLAGS produce warnings on 64 bit
 
@@ -168,6 +122,62 @@ static PyMemberDef QueryMembers[] = {
   HGS_Py_TPFLAGS_HAVE_STACKLESS_EXTENSION_64BIT | \
   HGS_Py_TPFLAGS_HAVE_INDEX_64BIT | \
   0L)
+
+#pragma mark Query Class
+
+typedef struct {
+  PyObject_HEAD
+  PyObject *rawQuery_;    // string
+  PyObject *normalizedQuery_; // string
+  PyObject *pivotObject_; // dictionary
+  HGSPythonSearchOperation  *operation_;
+  HGSQuery *query_;
+} Query;
+
+static PyObject *QueryNew(PyTypeObject *type, PyObject *args, PyObject *kwds);
+static void QueryDealloc(Query *self);
+static int QueryInit(Query *self, PyObject *args, PyObject *kwds);
+static PyObject *QueryGetAttr(Query *self, char *name);
+static int QuerySetAttr(Query *self, char *name, PyObject *value);
+static PyObject *QuerySetResults(Query *self, PyObject *args);
+static PyObject *QueryFinish(Query *self, PyObject *unused);
+static PyObject *LocalizeString(PyObject *self, PyObject *args);
+static PyObject *DisplayNotification(PyObject *self, PyObject *args);
+
+// Utility dealloc function for releasing an NSObject when the
+// containing Python object goes out of scope. Used in calls
+// to PyCObject_FromVoidPtr.
+static void OpaqueObjCObjectDealloc(void *rawObjCObject);
+
+
+static PyMethodDef QueryMethods[] = {
+  {
+    "SetResults", (PyCFunction)QuerySetResults, METH_VARARGS,
+    "Append a set of results to the query."
+  },
+  {
+    "Finish", (PyCFunction)QueryFinish, METH_NOARGS,
+    "Indicate that query processing has completed."
+  },
+  { NULL, NULL, 0, NULL  }
+};
+
+static PyMemberDef QueryMembers[] = {
+  { const_cast<char*>(kHGSPythonNormalizedQueryMemberName), 
+    T_OBJECT_EX, offsetof(Query, normalizedQuery_), 0,
+    const_cast<char*>("The raw query broken into tokens delimited by spaces. "
+                      "It has also been normalized to having no diacriticals "
+                      "or excess punctuation, and has been converted to "
+                      "lowercase.")},
+  { const_cast<char*>(kHGSPythonRawQueryMemberName), 
+    T_OBJECT_EX, offsetof(Query, rawQuery_), 0,
+    const_cast<char*>("The unprocessed query entered by the user.") },
+  { const_cast<char*>(kHGSPythonPivotObjectMemberName),
+    T_OBJECT_EX, offsetof(Query, pivotObject_), 0,
+    const_cast<char*>("If present, the original search result from which this "
+                      "query is pivoting.") },
+  { NULL, 0, 0,0, NULL }
+};
 
 
 static PyTypeObject QueryType = {
@@ -422,12 +432,12 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (PyObject *)objectForQuery:(HGSQuery *)query
          withSearchOperation:(HGSSearchOperation *)operation {
-  PyObject *result = nil;  
+  PyObject *result = NULL;  
   if (vermilionModule_) {
     PythonStackLock gilLock;
     PyObject *moduleDict = PyModule_GetDict(vermilionModule_);
     if (moduleDict) {
-      PyObject *func = PyDict_GetItemString(moduleDict, "Query");
+      PyObject *func = PyDict_GetItemString(moduleDict, kQueryClassName);
       if (func) {
         PyObject *args = PyTuple_New(3);
         if (args) {
@@ -493,13 +503,13 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (PyObject *)loadModule:(NSString *)moduleName {
   PythonStackLock gilLock;
-  PyObject *pythonModuleName, *module = nil;
+  PyObject *pythonModuleName, *module = NULL;
   pythonModuleName = PyString_FromString([moduleName UTF8String]);
   if (!pythonModuleName) {
     NSString *error = [HGSPython lastErrorString];
     HGSLogDebug(@"could not create Python string for %@\n%@", 
                 moduleName, error);
-    return nil;
+    return NULL;
   }
   module = PyImport_Import(pythonModuleName);
   if (!module) {
@@ -609,6 +619,15 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return result;
 }
 
+- (PyObject *)objectForExtension:(HGSExtension *)extension {
+  PyObject *opaqueExtension = NULL;
+  if (extension) {
+    opaqueExtension = PyCObject_FromVoidPtr([extension retain],
+                                            &OpaqueObjCObjectDealloc);
+  }
+  return opaqueExtension;
+}
+
 @end // HGSPython
 
 #pragma mark Python Query Object
@@ -622,17 +641,17 @@ static PyObject *QueryNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     self->rawQuery_ = PyString_FromString("");
     if (!self->rawQuery_) {
       Py_DECREF(self);
-      return nil;
+      return NULL;
     }
     self->normalizedQuery_ = PyString_FromString("");
     if (!self->normalizedQuery_) {
       Py_DECREF(self);
-      return nil;
+      return NULL;
     }
     self->pivotObject_ = PyDict_New();
     if (!self->pivotObject_) {
       Py_DECREF(self);
-      return nil;
+      return NULL;
     }
   }
   return (PyObject *)self;
@@ -654,9 +673,9 @@ static int QueryInit(Query *self, PyObject *args, PyObject *kwds) {
     kHGSPythonNormalizedQueryMemberName,
     kHGSPythonRawQueryMemberName,
     kHGSPythonPivotObjectMemberName,
-    nil
+    NULL
   };
-  PyObject *normalizedQuery = nil, *rawQuery = nil, *pivotObject = nil, *tmp;
+  PyObject *normalizedQuery = NULL, *rawQuery = NULL, *pivotObject = NULL, *tmp;
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", 
                                    const_cast<char**>(kwlist), &normalizedQuery, 
                                    &rawQuery, &pivotObject)) {
@@ -684,7 +703,7 @@ static int QueryInit(Query *self, PyObject *args, PyObject *kwds) {
 }
 
 static PyObject *QueryGetAttr(Query *self, char *name) {
-  PyObject *result = nil;
+  PyObject *result = NULL;
 
   if (!strcmp(name, kHGSPythonNormalizedQueryMemberName)) {
     result = self->normalizedQuery_;
@@ -711,7 +730,7 @@ static int QuerySetAttr(Query *self, char *name, PyObject *value) {
 static PyObject *QuerySetResults(Query *self, PyObject *args) {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
-  PyObject *pythonResults = nil;
+  PyObject *pythonResults = NULL;
   if (PyArg_ParseTuple(args, "O", &pythonResults)) {
     NSMutableArray *results = [NSMutableArray array];
     // Generate a "real" result from each of the Python results
@@ -720,9 +739,9 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
         Py_ssize_t resultCount = PyList_Size(pythonResults);
         for (Py_ssize_t i = 0; i < resultCount; ++i) {
           PyObject *dict = PyList_GET_ITEM(pythonResults, i);
-          char *identifier = nil, *displayName = nil, *snippet = nil;
-          char *mainItem = nil, *otherItems = nil;
-          char *image = nil, *defaultAction = nil;
+          char *identifier = NULL, *displayName = NULL, *snippet = NULL;
+          char *mainItem = NULL, *otherItems = NULL;
+          char *image = NULL, *defaultAction = NULL;
           NSString *type = kHGSTypePython;
           if (PyDict_Check(dict)) {
             NSMutableDictionary *privateValues 
@@ -865,25 +884,35 @@ static PyObject *QueryFinish(Query *self, PyObject *unused) {
 
 static PyObject *LocalizeString(PyObject *self, PyObject *args) {
   char *str;
-  if (!PyArg_ParseTuple(args, "s", &str)) {
-    HGSLogDebug(@"VermilionLocalize.String() requires an argument");
+  PyObject *pyExtension = NULL;
+  if (!PyArg_ParseTuple(args, "sO", &str, &pyExtension)) {
+    HGSLogDebug(@"VermilionLocalize.String() requires a string and an opaque"
+                @"extension argument.");
     return PyString_FromString("");
   }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  HGSExtension *extension = [[[NSThread currentThread] threadDictionary]
-                             valueForKey:kHGSPythonThreadExtensionKey];
-  if (!extension) {
-    HGSLog(@"No extension!");
-    return nil;
-  }
-  NSString *key = [NSString stringWithUTF8String:str];
-  NSString *localized = [[extension bundle] localizedStringForKey:key 
-                                                            value:@"" 
-                                                            table:nil];
-  PyObject *resultString = nil;
-  if (localized) {
-    resultString = PyString_FromString([localized UTF8String]);
+  PyObject *resultString = NULL;
+  if (pyExtension && PyCObject_Check(pyExtension)) {
+    HGSExtension *extension
+      = static_cast<HGSExtension *>(PyCObject_AsVoidPtr(pyExtension));
+    NSBundle *pluginBundle = [extension bundle];
+    if (pluginBundle) {
+      NSString *key = [NSString stringWithUTF8String:str];
+      NSString *localized = [pluginBundle localizedStringForKey:key 
+                                                          value:@"" 
+                                                          table:nil];
+      if (localized) {
+        resultString = PyString_FromString([localized UTF8String]);
+      } else {
+        resultString = PyString_FromString(str);
+      }
+    } else {
+      HGSLogDebug(@"No bundle was found for Python source!");
+    }
   } else {
+    HGSLogDebug(@"No extension was found for Python source!");
+  }
+  if (!resultString) {
     resultString = PyString_FromString(str);
   }
   [pool release];
@@ -891,49 +920,60 @@ static PyObject *LocalizeString(PyObject *self, PyObject *args) {
 }
 
 static PyObject *DisplayNotification(PyObject *self, PyObject *args) {
+  PyObject *result = NULL;
   char *message = NULL;
   char *description = NULL;
   char *messageName = NULL;
   char *imagePath = NULL;
+  PyObject *pyExtension = NULL;
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
-  if (!PyArg_ParseTuple(args, "s|sss", 
-                        &message, &description, &messageName, &imagePath)) {
-    HGSLogDebug(@"VermilionNotify.DisplayNotification() requires an argument");
-    return PyString_FromString("");
+  if (PyArg_ParseTuple(args, "sO|sss", &message, &pyExtension, &description,
+                        &messageName, &imagePath)) {
+    HGSExtension *extension = nil;
+    if (pyExtension && PyCObject_Check(pyExtension)) {
+      extension = static_cast<HGSExtension *>(PyCObject_AsVoidPtr(pyExtension));
+    }
+    if (extension) {
+      NSString *nsMessage = [NSString stringWithUTF8String:message];
+      NSString *nsDescription = nil;
+      if (description) {
+        nsDescription = [NSString stringWithUTF8String:description];
+      }  
+      NSString *nsName = nil;
+      if (messageName) {
+        nsName = [NSString stringWithUTF8String:messageName];
+      }
+      NSImage *image = nil;
+      if (imagePath) {
+        NSString *nsImagePath = [NSString stringWithUTF8String:imagePath];
+        image = [extension imageNamed:nsImagePath];
+      }
+      if (!image) {
+        image = [extension icon];
+      }
+      [HGSUserMessenger displayUserMessage:nsMessage 
+                               description:nsDescription 
+                                      name:nsName 
+                                     image:image 
+                                      type:kHGSUserMessageNoteType];
+      Py_INCREF(Py_None);
+      result = Py_None;
+    } else {
+      HGSLog(@"VermilionNotify.DisplayNotification() requires an extension!");
+    }
+  } else {
+    HGSLogDebug(@"VermilionNotify.DisplayNotification() requires at least"
+                @"a message and an extension.");
+    result = PyString_FromString("");
   }
-  NSString *nsMessage = [NSString stringWithUTF8String:message];
-  NSString *nsDescription = nil;
-  if (description) {
-    nsDescription = [NSString stringWithUTF8String:description];
-  }  
-  NSString *nsName = nil;
-  if (messageName) {
-    nsName = [NSString stringWithUTF8String:messageName];
-  }
-  NSImage *image = nil;
-  NSString *nsImagePath = nil;
-  HGSExtension *extension = [[[NSThread currentThread] threadDictionary]
-                             valueForKey:kHGSPythonThreadExtensionKey];
-  if (!extension) {
-    HGSLog(@"No extension!");
-    return nil;
-  }
-  
-  if (imagePath) {
-    nsImagePath = [NSString stringWithUTF8String:imagePath];
-    image = [extension imageNamed:nsImagePath];
-  }
-  if (!image) {
-    image = [extension icon];
-  }
-  [HGSUserMessenger displayUserMessage:nsMessage 
-                           description:nsDescription 
-                                  name:nsName 
-                                 image:image 
-                                  type:kHGSUserMessageNoteType];
   [pool release];     
-  Py_INCREF(Py_None);
-  return Py_None;
+  return result;
+}
+
+#pragma mark OpaqueExtension Object
+
+static void OpaqueObjCObjectDealloc(void *rawObjCObject) {
+  NSObject *objCObject = static_cast<NSObject *>(rawObjCObject);
+  [objCObject release];
 }

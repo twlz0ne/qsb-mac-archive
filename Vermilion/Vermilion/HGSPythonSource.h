@@ -42,6 +42,7 @@
   PyObject *module_;
   PyObject *instance_;
   PyObject *isValidSourceForQuery_;
+  PyObject *updateResult_;
 }
 - (id)initWithConfiguration:(NSDictionary *)configuration;
 @end

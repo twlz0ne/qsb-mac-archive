@@ -55,6 +55,7 @@ public:
 @class HGSSearchOperation;
 @class HGSResult;
 @class HGSResultArray;
+@class HGSExtension;
 
 @interface HGSPythonObject : NSObject {
  @private
@@ -78,6 +79,7 @@ public:
          withSearchOperation:(HGSSearchOperation *)operation;
 - (PyObject *)loadModule:(NSString *)moduleName;
 - (void)appendPythonPath:(NSString *)path;
+- (PyObject *)objectForExtension:(HGSExtension *)extension;
 @end
 
 extern const NSString *kHGSPythonPrivateValuesKey;

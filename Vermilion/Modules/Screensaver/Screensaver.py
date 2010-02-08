@@ -16,38 +16,64 @@ import os
 import sys
 import thread
 import time
+import traceback
 import urllib
 from datetime import datetime
 
 try:
   import Vermilion
-  import VermilionLocalize
 except ImportError:
-  # Vermilion is provided in native code by the Quick Search
-  # runtime. Create a stub Result class here so that we
-  # can develop and test outside of Quick Search
   class Vermilion(object):
+    """A mock implementation of the Vermilion class.
+
+    Vermilion is provided in native code by the QSB
+    runtime. We create a stub Result class here so that we
+    can develop and test outside of QSB from the command line.
+    """
+    
     IDENTIFIER = 'IDENTIFIER'
     DISPLAY_NAME = 'DISPLAY_NAME'
+    MAIN_ITEM = 'MAIN_ITEM'
+    OTHER_ITEMS = 'OTHER_ITEMS'
     SNIPPET = 'SNIPPET'
     IMAGE = 'IMAGE'
-    DEFAULT_ACTION = "DEFAULT_ACTION"
+    DEFAULT_ACTION = 'DEFAULT_ACTION'
+    TYPE = 'TYPE'
+
     class Query(object):
       def __init__(self, phrase):
         self.raw_query = phrase
-        self.normalized_query = query
+        self.normalized_query = phrase
         self.pivot_object = None
         self.finished = False
         self.results = []
+
       def SetResults(self, results):
         self.results = results
+
       def Finish(self):
         self.finished = True
 
+try:
+  import VermilionLocalize
+except ImportError:
+  class VermilionLocalizeStubClass(object):	
+    """Stub class used when running from the command line.	
+
+    Required when this script is run outside of the Quick Search Box.  This	
+    class is not needed when Vermilion is provided in native code by the	
+    Quick Search runtime.	
+    """	
+
+    def String(self, string, extension):	
+      return string
+  
+  VermilionLocalize = VermilionLocalizeStubClass()
 
 MIN_QUERY_LENGTH = 3
 DEFAULT_ACTION = "com.google.qsb.screensavers.action.set"
 SCREEN_SAVER_TYPE = "script.python.screensaver"
+debugging_is_enabled = False
 
 class ScreensaverBase(object):
   """Shared base class for the screensaver source and action.
@@ -56,8 +82,10 @@ class ScreensaverBase(object):
   locations in the filesystem, indexing them at startup.
   """
 
-  def __init__(self):
-    """Initializes the plugin by indexing the various screen saver
+  def __init__(self, extension=None):
+    """Initializes the plugin.
+    
+    Initializes the plugin by indexing the various screen saver
     folders. While we index everything here at launch time, the 
     plugin could be enhanced by periodically re-indexing or
     watching the folders for changes to catch newly added
@@ -73,7 +101,11 @@ class ScreensaverBase(object):
     save each of the screen saver names in a dictionary, with the name
     converted to lower-case so that we can do quick case-insensitive
     matching when we receive queries.
+
+    Args:
+      extension: An opaque instance of the extension.
     """
+    self.extension = extension
     self.folders = [
       "/System/Library/Screen Savers",
       "/Library/Screen Savers",
@@ -95,10 +127,17 @@ class ScreensaverBase(object):
               self._savers[name.lower()] = "%s/%s" % (folder, bundle), name
 
   def SaverForPath(self, path):
-    """Returns a tuple of (path, name) of the indexed screensaver, or
-    None if the screensaver cannot be found. The input path may be either
-    an absolute path or a file:// URL, but the returned path is always the
-    absolute path the screensaver"""
+    """Returns a tuple of (path, name) of the indexed screensaver.
+    
+    Returns a tuple of (path, name) of the indexed screensaver, or
+    None if the screensaver cannot be found.
+    
+    Args:
+      path: The input path may be either an absolute path or a file:// URL,
+          but the returned path is always the absolute path the screensaver.
+    """
+    if debugging_is_enabled:
+      print "Checking path '%s' to see if it is a screensaver." % path
     if path.startswith("file://localhost"):
       path = urllib.unquote(path[16:])
     if path.startswith("file://"):
@@ -109,12 +148,25 @@ class ScreensaverBase(object):
         name = name[0:len(name) - len(extension)]
         key = name.lower()
         if self._savers.has_key(key):
+          if debugging_is_enabled:
+            print "Path was screensaver; given key: '%s'" % key
           return self._savers[key]
+    if debugging_is_enabled:
+      print "Didn't find screensaver at path: '%s'" % path
     return None
 
   def IsScreensaver(self, path):
-    """Returns a boolean value indicating whether or not the given
-    path points to one of our indexed screensavers."""
+    """Does the path point to a screen saver.
+    
+    Returns a boolean value indicating whether or not the given
+    path points to one of our indexed screensavers.
+    
+    Args:
+      path: The input path may be either an absolute path or a file:// URL.
+    
+    Returns:
+      True if the path resolves to a screensaver, otherwise False.
+    """
     return self.SaverForPath(path) != None
 
 
@@ -126,8 +178,8 @@ class Screensaver(ScreensaverBase):
   IsValidSourceForQuery method.
   """
 
-  def __init__(self):
-    super(Screensaver, self).__init__()
+  def __init__(self, extension=None):
+    super(Screensaver, self).__init__(extension)
 
   def PerformSearch(self, query):
     """Searches for screensavers
@@ -150,6 +202,8 @@ class Screensaver(ScreensaverBase):
     try:
       results = []
       term = query.normalized_query
+      if debugging_is_enabled:
+        print "PerformSearch for query with term: %s" % term
       if query.pivot_object is not None:
           for key in self._savers.iterkeys():
             if len(term) == 0 or key.startswith(term):
@@ -157,8 +211,8 @@ class Screensaver(ScreensaverBase):
       else:
         # If the user is searching for "screen saver" or "screensaver",
         # return all of the screen savers
-        screensaver = VermilionLocalize.String("screensaver")
-        screen_saver = VermilionLocalize.String("screen saver")
+        screensaver = VermilionLocalize.String("screensaver", self.extension)
+        screen_saver = VermilionLocalize.String("screen saver", self.extension)
         raw_query = query.raw_query.lower()
         if (screensaver.startswith(raw_query) or
             screen_saver.startswith(raw_query)):
@@ -170,10 +224,15 @@ class Screensaver(ScreensaverBase):
             if key.startswith(term):
               results.append(self.CreateResult(self._savers[key]))
       query.SetResults(results)
-    except:
+    except Exception, exception:
       # Catch everything to make sure that we never pass up the
       # call to query.Finish()
+      if debugging_is_enabled:
+        print "An exception was thrown. %s" % exception
+        traceback.print_exc()
       pass
+    if debugging_is_enabled:
+      print "PerformSearch gave results: %s" % results
     query.Finish()
 
   def IsValidSourceForQuery(self, query):
@@ -199,13 +258,13 @@ class Screensaver(ScreensaverBase):
   def CreateResult(self, entry):
     result = {}
     path, name = entry
+    format = VermilionLocalize.String("%s Screen Saver", self.extension)
+    screensaver = VermilionLocalize.String("screensaver", self.extension)
+    screen_saver = VermilionLocalize.String("screen saver", self.extension)
     result[Vermilion.IDENTIFIER] = "file://%s" % urllib.quote(path)
-    format = VermilionLocalize.String("%s Screen Saver")
     result[Vermilion.DISPLAY_NAME] = format % name
     result[Vermilion.TYPE] = SCREEN_SAVER_TYPE
     result[Vermilion.MAIN_ITEM] = name
-    screensaver = VermilionLocalize.String("screensaver")
-    screen_saver = VermilionLocalize.String("screen saver")
     result[Vermilion.OTHER_ITEMS] = '%s %s' % (screensaver, screen_saver)
 
     return result
@@ -217,20 +276,38 @@ class SetScreensaverAction(ScreensaverBase):
   providing the mandatory AppliesToResults and Perform methods.
   """
 
-  def __init__(self):
-    super(SetScreensaverAction, self).__init__()
+  def __init__(self, extension=None):
+    super(SetScreensaverAction, self).__init__(extension)
     
   def AppliesToResults(self, results):  
-    """Determines if the result is one returned by our search source by
+    """Determine the applicability of the result for the action.
+    
+    Determines if the result is one returned by our search source by
     verifying that our search result identifier points to one of our
-    indexed screen savers."""
+    indexed screen savers.
+    
+    Args:
+      results: An array of result objects for which to determine the
+          action's applicability.
+
+    Returns:
+      A boolean indicating if the action is appropriate for ALL of the
+      results contained in the results array.
+    """
     for result in results:
       return self.IsScreensaver(result[Vermilion.IDENTIFIER])
     return False
 
-  def Perform(self, results, pivot_objects=None):
-    """Sets the selected screen saver as the user's current screen saver
-    by using the "defaults" command line tool."""
+  def Perform(self, results, indirect_objects=None):
+    """Set the screen saver.
+    
+    Sets the selected screen saver as the user's current screen saver
+    by using the "defaults" command line tool.
+
+    Args:
+      results: An array of result objects for with which to perform the action.
+      indirect_objects: The indirect object associated with the action.
+    """
     for result in results:
       path, name = self.SaverForPath(result[Vermilion.IDENTIFIER])
       if path and name:
@@ -250,13 +327,17 @@ class SetScreensaverAction(ScreensaverBase):
 
 def main(argv=None):
   """Command line interface for easier testing."""
+  global debugging_is_enabled
   if argv is None:
     argv = sys.argv[1:]
 
   if len(argv) < 1:
-    print 'Usage: Screensaver <query>'
+    print 'Usage: Screensaver <query> [-d]'
     return 1
   
+  if argv[1:].count('-d'):
+    debugging_is_enabled = True
+
   query = Vermilion.Query(argv[0])
   search = Screensaver()
   if not search.IsValidSourceForQuery(Vermilion.Query(argv[0])):
@@ -268,7 +349,10 @@ def main(argv=None):
     time.sleep(1)
 
   for result in query.results:
-    print result
+    if debugging_is_enabled:
+      print "Result: %s." % result
+    else:
+      print result
 
 
 if __name__ == '__main__':

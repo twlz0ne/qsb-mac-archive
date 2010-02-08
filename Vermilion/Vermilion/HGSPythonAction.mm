@@ -47,23 +47,22 @@ static const char *const kHGSPythonPerform = "Perform";
     if ([moduleName length] == 0) {
       moduleName = className;
     }
-    NSBundle *bundle = [configuration objectForKey:kHGSExtensionBundleKey];
-    if (!bundle || !moduleName || !className) {
+    if (!moduleName || !className) {
       HGSLogDebug(@"Can't instantiate python action. "
-                  @"Missing %@ or %@ or %@ in %@", kPythonModuleNameKey,
-                  kPythonClassNameKey, kHGSExtensionBundleKey, configuration);
+                  @"Missing %@ or %@ in %@", kPythonModuleNameKey,
+                  kPythonClassNameKey, configuration);
       [self release];
       return nil;
     }
-    HGSPython *pythonContext = [HGSPython sharedPython];
-    NSString *resourcePath = [bundle resourcePath];
+    NSString *resourcePath = [[self bundle] resourcePath];
+    HGSPython *sharedPython = [HGSPython sharedPython];
     if (resourcePath) {
-      [pythonContext appendPythonPath:resourcePath];
+      [sharedPython appendPythonPath:resourcePath];
     }
     
     PythonStackLock gilLock;
     
-    module_ = [pythonContext loadModule:moduleName];
+    module_ = [sharedPython loadModule:moduleName];
     if (!module_) {
       HGSLogDebug(@"failed to load Python module %@", moduleName);
       [self release];
@@ -85,7 +84,11 @@ static const char *const kHGSPythonPerform = "Perform";
       [self release];
       return nil;
     }
-    instance_ = PyObject_CallObject(pythonClass, NULL);
+    PyObject *args = PyTuple_New(1);
+    PyObject *opaqueExtension = [sharedPython objectForExtension:self];
+    PyTuple_SetItem(args, 0, opaqueExtension);
+    instance_ = PyObject_CallObject(pythonClass, args);
+    Py_DECREF(opaqueExtension);
     if (!instance_) {
       NSString *error = [HGSPython lastErrorString];
       HGSLogDebug(@"could instantiate Python class %@.\n%@", className, error);
@@ -146,15 +149,11 @@ static const char *const kHGSPythonPerform = "Perform";
     PyObject *pyDirects = [sharedPython tupleForResults:directs];
     PyObject *pyIndirects = [sharedPython tupleForResults:indirects];
     if (pyDirects) {
-      NSMutableDictionary *threadDict 
-        = [[NSThread currentThread] threadDictionary];
-      [threadDict setValue:self forKey:kHGSPythonThreadExtensionKey];
-      PyObject *pythonResult =
-        PyObject_CallMethodObjArgs(instance_,
-                                   perform_,
-                                   pyDirects,
-                                   nil);
-      [threadDict removeObjectForKey:kHGSPythonThreadExtensionKey];
+      PyObject *pythonResult = PyObject_CallMethodObjArgs(instance_,
+                                                          perform_,
+                                                          pyDirects,
+                                                          pyIndirects,
+                                                          NULL);
       if (pythonResult) {
         result = (pythonResult == Py_True);
         Py_DECREF(pythonResult);
@@ -174,18 +173,12 @@ static const char *const kHGSPythonPerform = "Perform";
   if (doesApply) {
     PythonStackLock gilLock;
     doesApply = NO;
-    HGSPython *sharedPython = [HGSPython sharedPython];
-    PyObject *pyResult = [sharedPython tupleForResults:results];
+    PyObject *pyResult = [[HGSPython sharedPython] tupleForResults:results];
     if (pyResult) {
-      NSMutableDictionary *threadDict 
-        = [[NSThread currentThread] threadDictionary];
-      [threadDict setValue:self forKey:kHGSPythonThreadExtensionKey];
-      PyObject *pyApplies =
-        PyObject_CallMethodObjArgs(instance_,
-                                   appliesTo_,
-                                   pyResult,
-                                   nil);
-      [threadDict removeObjectForKey:kHGSPythonThreadExtensionKey];
+      PyObject *pyApplies = PyObject_CallMethodObjArgs(instance_,
+                                                       appliesTo_,
+                                                       pyResult,
+                                                       NULL);
       if (pyApplies) {
         if (PyBool_Check(pyApplies) && pyApplies == Py_True) {
           doesApply = YES;

@@ -40,6 +40,7 @@
 
 static const char *const kPerformSearch = "PerformSearch";
 static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
+static const char *const kHGSPythonUpdateResult = "UpdateResult";
 
 @implementation HGSPythonSource
 
@@ -59,15 +60,15 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
       [self release];
       return nil;
     }
-    HGSPython *pythonContext = [HGSPython sharedPython];
+    HGSPython *sharedPython = [HGSPython sharedPython];
     NSString *resourcePath = [bundle resourcePath];
     if (resourcePath) {
-      [pythonContext appendPythonPath:resourcePath];
+      [sharedPython appendPythonPath:resourcePath];
     }
     
     PythonStackLock gilLock;
     
-    module_ = [pythonContext loadModule:moduleName];
+    module_ = [sharedPython loadModule:moduleName];
     if (!module_) {
       HGSLogDebug(@"failed to load Python module %@", moduleName);
       [self release];
@@ -75,6 +76,14 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
     }
     
     // Instantiate the class
+    updateResult_ = PyString_FromString(kHGSPythonUpdateResult);
+    if (!updateResult_) {
+      NSString *error = [HGSPython lastErrorString];
+      HGSLogDebug(@"could not create Python string %s.\n%@", 
+                  kHGSPythonUpdateResult, error);
+      [self release];
+      return nil;
+    }
     PyObject *dict = PyModule_GetDict(module_);
     PyObject *pythonClass = PyDict_GetItemString(dict, [className UTF8String]);
     if (!pythonClass) {
@@ -89,7 +98,17 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
       [self release];
       return nil;
     }
-    instance_ = PyObject_CallObject(pythonClass, NULL);
+    PyObject *args = PyTuple_New(1);
+    PyObject *opaqueExtension = [sharedPython objectForExtension:self];
+    if (PyTuple_SetItem(args, 0, opaqueExtension) != 0) {
+      Py_DECREF(opaqueExtension);
+      NSString *error = [HGSPython lastErrorString];
+      HGSLogDebug(@"PyTuple_SetItem failed.\n%@", error);
+      [self release];
+      return nil;
+    }
+    instance_ = PyObject_CallObject(pythonClass, args);
+    Py_DECREF(opaqueExtension);
     if (!instance_) {
       NSString *error = [HGSPython lastErrorString];
       HGSLogDebug(@"could not instantiate Python class %@.\n%@", 
@@ -121,6 +140,9 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
     if (module_) {
       Py_DECREF(module_);
     }
+    if (updateResult_) {
+      Py_DECREF(updateResult_);
+    }
   }
   [super dealloc];
 }
@@ -148,7 +170,7 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
         PyObject_CallMethodObjArgs(instance_,
                                    isValidSourceForQuery_,
                                    pyQuery,
-                                   nil);
+                                   NULL);
       [threadDict removeObjectForKey:kHGSPythonThreadExtensionKey];
       if (pyValid) {
         if (PyBool_Check(pyValid)) {
@@ -176,6 +198,49 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
   return archiveKeys;
 }
 
+- (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
+  // Do we allow archiving?
+  HGSResult *result = [super resultWithArchivedRepresentation:representation];
+  if (result) {
+    // Give the plug-in a chance to update the reanimated result.
+    PythonStackLock gilLock;
+    HGSPython *sharedPython = [HGSPython sharedPython];
+    PyObject *pyOriginalResult = [sharedPython objectForResult:result];
+    PyObject *pyUpdatedAttributes
+      = PyObject_CallMethodObjArgs(instance_, updateResult_, pyOriginalResult,
+                                   NULL);
+    // A NULL result indicates that the given Python source does not implement
+    // the UpdateResult method and so the result is acceptable/fresh by default.
+    NSUInteger attributeCount = PyDict_Size(pyUpdatedAttributes);
+    if (pyUpdatedAttributes
+        && pyUpdatedAttributes != Py_None
+        && attributeCount) {
+      // updateResult_ returns a dictionary with attributes and values that
+      // are substituted or inserted into the original result.
+      NSMutableDictionary *updatedAttributes
+        = [NSMutableDictionary dictionaryWithCapacity:attributeCount];
+      PyObject *pyKey;
+      PyObject *pyValue;
+      Py_ssize_t pos = 0;
+      while (PyDict_Next(pyUpdatedAttributes, &pos, &pyKey, &pyValue)) {
+        // TODO(itsMikro): Determine the actual type to be poked into the
+        // attribute dictionary. It is expected that the Python plug-in will
+        // return a PyObject of the proper type but for now we assume
+        // everything is a string.
+        NSString *key
+          = [NSString stringWithUTF8String:PyString_AsString(pyKey)];
+        NSString *value
+          = [NSString stringWithUTF8String:PyString_AsString(pyValue)];
+        [updatedAttributes setObject:value forKey:key];
+      }
+      if ([updatedAttributes count]) {
+        result = [result resultByAddingAttributes:updatedAttributes];
+      }
+    }
+  }
+  return result;
+}
+
 @end
 
 
@@ -189,24 +254,21 @@ static const char *const kIsValidSourceForQuery = "IsValidSourceForQuery";
 
 - (void)main {
   BOOL running = NO;
-  PyObject *instance = [(HGSPythonSource*)[self source] instance];
+  HGSPythonSource *source = (HGSPythonSource *)[self source];
+  PyObject *instance = [source instance];
   if (instance) {
     HGSQuery *hgsQuery = [self query];
-    PyObject *query = [[HGSPython sharedPython] objectForQuery:hgsQuery
-                                           withSearchOperation:self];
+    HGSPython *sharedPython = [HGSPython sharedPython];
+    PyObject *query = [sharedPython objectForQuery:hgsQuery
+                               withSearchOperation:self];
     if (query) {
       PythonStackLock gilLock;
       PyObject *performSearchString = PyString_FromString(kPerformSearch);
       if (performSearchString) {
-        NSMutableDictionary *threadDict 
-          = [[NSThread currentThread] threadDictionary];
-        HGSSearchSource *source = [self source];
-        [threadDict setValue:source forKey:kHGSPythonThreadExtensionKey];
         PyObject_CallMethodObjArgs(instance,
                                    performSearchString,
                                    query,
-                                   nil);
-        [threadDict removeObjectForKey:kHGSPythonThreadExtensionKey];
+                                   NULL);
         PyObject *err = PyErr_Occurred();
         if (!err) {
           running = YES;

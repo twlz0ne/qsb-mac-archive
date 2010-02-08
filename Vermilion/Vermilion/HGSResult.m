@@ -54,6 +54,7 @@ NSString* const kHGSObjectAttributeNameKey = @"kHGSObjectAttributeName";
 NSString* const kHGSObjectAttributeURIKey = @"kHGSObjectAttributeURI";
 NSString* const kHGSObjectAttributeUniqueIdentifiersKey = @"kHGSObjectAttributeUniqueIdentifiers";  // NSString
 NSString* const kHGSObjectAttributeTypeKey = @"kHGSObjectAttributeType";
+NSString* const kHGSObjectAttributeStatusKey = @"kHGSObjectAttributeStatus";
 NSString* const kHGSObjectAttributeLastUsedDateKey = @"kHGSObjectAttributeLastUsedDate";
 NSString* const kHGSObjectAttributeSnippetKey = @"kHGSObjectAttributeSnippet";
 NSString* const kHGSObjectAttributeSourceURLKey = @"kHGSObjectAttributeSourceURL";
@@ -84,6 +85,9 @@ NSString* const kHGSObjectAttributeAlternateActionURIKey = @"kHGSObjectAttribute
 NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey = @"kHGSObjectAttributeAddressBookRecordIdentifier";
 
 static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
+
+NSString* const kHGSObjectStatusStaleValue = @"kHGSObjectStatusStaleValue";
+
 
 @interface HGSResult ()
 -(NSDictionary *)attributes;

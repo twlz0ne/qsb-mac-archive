@@ -53,6 +53,7 @@ extern NSString* const kHGSObjectAttributeNameKey;  // NSString
 extern NSString* const kHGSObjectAttributeURIKey;  // NSString
 extern NSString* const kHGSObjectAttributeUniqueIdentifiersKey; // NSArray (of NSStrings)
 extern NSString* const kHGSObjectAttributeTypeKey;  // NSString
+extern NSString* const kHGSObjectAttributeStatusKey;  // NSString
 
 // Last Used Date can be set using the key, but should be retrieved using
 // the [HGSResult lastUsedDate] method. It will not be in the value dictionary.
@@ -102,6 +103,11 @@ enum {
   eHGSBelowFoldRankFlag = 1 << 9,
 };
 typedef NSUInteger HGSRankFlags;
+
+// String constants indicating a result's status as stored in the result
+// attribute with the kHGSObjectAttributeStatusKey key. The lack of this
+// attribute indicates a status of 'valid'.
+extern NSString* const kHGSObjectStatusStaleValue;
 
 /*!
   Encapsulates a search result. May not directly contain all information about

@@ -313,7 +313,12 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
                                     matchedTerm:shortcut 
                                  matchedIndexes:matchedIndexes];
           if (scoredResult) {
-            if ([results indexOfObject:scoredResult] == NSNotFound) {
+            // We are not interested in stale results, but we also do not
+            // want to remove them from our shortcuts.
+            NSString *status
+              = [result valueForKey:kHGSObjectAttributeStatusKey];
+            if (![status isEqualToString:kHGSObjectStatusStaleValue]
+                && [results indexOfObject:scoredResult] == NSNotFound) {
               [results addObject:scoredResult];
             }
           } else {
