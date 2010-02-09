@@ -200,7 +200,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   // Kick off a timer if one is not already running.
   [updateTimer_ invalidate];
   // We add 5 minutes worth of random jitter.
-  NSTimeInterval jitter = random() / (LONG_MAX / (NSTimeInterval)300.0);
+  NSTimeInterval jitter = arc4random() / (LONG_MAX / (NSTimeInterval)300.0);
   updateTimer_
     = [NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
                                        target:self
@@ -216,8 +216,8 @@ GTM_METHOD_CHECK(NSEnumerator,
 }
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
-  HGSAccount *account = [notification object];
-  HGSAssert(account == account_, @"Notification from bad account!");
+  HGSAssert([notification object] == account_, 
+            @"Notification from bad account!");
   
   // Make sure we aren't in the middle of waiting for results; if we are, try
   // again later instead of changing things in the middle of the fetch.

@@ -250,7 +250,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (void)setUpPeriodicRefresh {
   [updateTimer_ invalidate];
   // We add 5 minutes worth of random jitter.
-  NSTimeInterval jitter = random() / (LONG_MAX / (NSTimeInterval)300.0);
+  NSTimeInterval jitter = arc4random() / (LONG_MAX / (NSTimeInterval)300.0);
   updateTimer_
     = [NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
                                        target:self
@@ -266,8 +266,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
-  HGSAccount *account = [notification object];
-  HGSAssert(account == account_, @"Notification from unexpected account!");
+  HGSAssert([notification object] == account_, 
+            @"Notification from unexpected account!");
   // If we're in the middle of a fetch then cancel it first.
   [self cancelAllTickets];
   

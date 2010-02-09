@@ -65,8 +65,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginBlacklist, sharedPluginBlacklist);
 - (id)init {
   self = [super init];
   if (self) {
-    NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
-    srand((int)now);
+    arc4random_stir();
     id<HGSDelegate> delegate = [[HGSPluginLoader sharedPluginLoader] delegate];
     NSString *appSupportPath = [delegate userCacheFolderForApp];
     blacklistPath_
@@ -93,6 +92,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginBlacklist, sharedPluginBlacklist);
         HGSLog(@"Unable to load blacklist for %@ (%@)", self, e);
       }
     }
+    NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
     if (lastUpdate < now - (int)kHGSPluginBlacklistUpdateInterval) {
       [self updateBlacklist:self];
     } else {
@@ -229,7 +229,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginBlacklist, sharedPluginBlacklist);
 }
 
 - (NSTimeInterval)jitter {
-  return (NSTimeInterval)(rand() % (int)kHGSPluginBlacklistJitterRange);
+  return (NSTimeInterval)(arc4random() % (int)kHGSPluginBlacklistJitterRange);
 }
 
 - (void)blacklistFetcher:(GDataHTTPFetcher *)fetcher
