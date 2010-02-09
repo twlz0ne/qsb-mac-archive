@@ -47,7 +47,6 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   HGSSimpleAccount *account_;
   GDataHTTPFetcher *fetcher_;
   BOOL currentlyFetching_;
-  NSUInteger previousFailureCount_;
 }
 
 - (void)setUpPeriodicRefresh;
@@ -215,8 +214,8 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 #pragma mark Authentication & Refresh
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
-  HGSAccount *account = [notification object];
-  HGSAssert(account == account_, @"Notification from bad account!");
+  HGSAssert([notification object] == account_, 
+            @"Notification from bad account!");
   // Make sure we aren't in the middle of waiting for results; if we are, try
   // again later instead of changing things in the middle of the fetch.
   if (currentlyFetching_) {
@@ -235,7 +234,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 - (void)setUpPeriodicRefresh {
   [updateTimer_ invalidate];
   // We add 5 minutes worth of random jitter.
-  NSTimeInterval jitter = random() / (LONG_MAX / (NSTimeInterval)300.0);
+  NSTimeInterval jitter = arc4random() / (LONG_MAX / (NSTimeInterval)300.0);
   updateTimer_ 
     = [NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
                                        target:self
