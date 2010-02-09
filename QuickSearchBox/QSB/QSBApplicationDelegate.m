@@ -1054,9 +1054,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     NSURL *sdefURL = [NSURL fileURLWithPath:sdefPath];
     NSError *xmlError = nil;
     NSXMLDocument *sdefXML
-      = [[NSXMLDocument alloc] initWithContentsOfURL:sdefURL
-                                             options:NSXMLNodePreserveWhitespace
-                                               error:&xmlError];
+      = [[[NSXMLDocument alloc] initWithContentsOfURL:sdefURL
+                                              options:NSXMLNodePreserveWhitespace
+                                                error:&xmlError] autorelease];
     if (sdefXML) {
       // Retrieve the root element which will be the root of the final
       // combined dictionary.
