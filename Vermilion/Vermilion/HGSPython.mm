@@ -963,7 +963,7 @@ static PyObject *DisplayNotification(PyObject *self, PyObject *args) {
       HGSLog(@"VermilionNotify.DisplayNotification() requires an extension!");
     }
   } else {
-    HGSLogDebug(@"VermilionNotify.DisplayNotification() requires at least"
+    HGSLogDebug(@"VermilionNotify.DisplayNotification() requires at least "
                 @"a message and an extension.");
     result = PyString_FromString("");
   }

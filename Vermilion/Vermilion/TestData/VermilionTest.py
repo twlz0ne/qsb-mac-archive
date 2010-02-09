@@ -40,7 +40,6 @@ from datetime import datetime
 
 try:
   import Vermilion
-  import VermilionLocalize
   import VermilionNotify
 except ImportError:
   # Vermilion is provided in native code by the Quick Search
@@ -65,11 +64,27 @@ except ImportError:
       def Finish(self):
         self.finished = True
 
+try:
+  import VermilionLocalize
+except ImportError:
+  class VermilionLocalizeStubClass(object):	
+    """Stub class used when running from the command line.	
+
+    Required when this script is run outside of the Quick Search Box.  This	
+    class is not needed when Vermilion is provided in native code by the	
+    Quick Search runtime.	
+    """	
+
+    def String(self, string, extension):	
+      return string
+  
+  VermilionLocalize = VermilionLocalizeStubClass()
+
+
 class VermilionTest(object):
 
-  def __init__(self):
-    pass
-              
+  def __init__(self, extension=None):
+    self.extension = extension              
 
   def PerformSearch(self, query):
     try:
@@ -78,7 +93,8 @@ class VermilionTest(object):
       result[Vermilion.IDENTIFIER] = "file:///dev/null"
       result[Vermilion.DISPLAY_NAME] = "%s Result" % query.normalized_query
       result[Vermilion.TYPE] = "python.test.type"
-      result[Vermilion.SNIPPET] = VermilionLocalize.String("Localized Value")
+      result[Vermilion.SNIPPET] = VermilionLocalize.String("Localized Value",
+                                                           self.extension)
       result[Vermilion.MAIN_ITEM] = query.normalized_query
       result[Vermilion.OTHER_ITEMS] = ""
       result["CustomKey"] = "CustomValue"
@@ -93,18 +109,21 @@ class VermilionTest(object):
   def IsValidSourceForQuery(self, query):
     return True
 
+
 class VermilionAction(object):
 
-  def __init__(self):
-    pass
+  def __init__(self, extension=None):
+    self.extension = extension
     
   def AppliesToResults(self, result):
     return True
 
   def Perform(self, result, pivot_object=None):
-    VermilionNotify.DisplayNotification("Message");
-    VermilionNotify.DisplayNotification("Message", "Description");
-    VermilionNotify.DisplayNotification("Message", "Description", "Name");
+    VermilionNotify.DisplayNotification("Message", self.extension);
+    VermilionNotify.DisplayNotification("Message", self.extension,
+                                        "Description");
+    VermilionNotify.DisplayNotification("Message", self.extension,
+                                        "Description", "Name");
     return True
 
 
