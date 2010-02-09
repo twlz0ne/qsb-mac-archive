@@ -37,4 +37,4 @@ set -o nounset
 set -o verbose
 
 rm -rf "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
-"${SRCROOT}/BuildScripts/Localization.sh"
+"${QSBSRCROOT}/QSB/BuildScripts/Localization.sh"
