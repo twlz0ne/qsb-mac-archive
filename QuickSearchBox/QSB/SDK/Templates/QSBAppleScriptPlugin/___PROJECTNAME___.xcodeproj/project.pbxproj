@@ -119,7 +119,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${QSBSRCROOT}/..//Vermilion/Modules/AppleScriptPlugins/Scripts/Common/AppleScriptPluginBuildCommon.sh\"";
+			shellScript = "\"${QSBSRCROOT}/../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/AppleScriptPluginBuildCommon.sh\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
