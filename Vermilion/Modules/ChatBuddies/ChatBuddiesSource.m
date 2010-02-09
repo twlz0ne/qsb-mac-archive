@@ -87,35 +87,36 @@ static NSString* const kChatBuddyAttributeInformationKey
 GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
-  if ((self = [super initWithConfiguration:configuration])) {
-    // Collect and cache information about our buddies and set of
-    // logged-in services.
-    availableServices_ = [[NSMutableSet alloc] init];
-    buddyResults_ = [[NSMutableArray alloc] init];
-    IMPersonStatus myStatus = [IMService myStatus];
-    iWasOnline_ = (myStatus == IMPersonStatusIdle
-                   || myStatus == IMPersonStatusAway
-                   || myStatus == IMPersonStatusAvailable);
-    NSArray *services = [IMService allServices];
-    for (IMService *service in services) {
-      NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-      if ([service status] == IMServiceStatusLoggedIn) {
-        [availableServices_ addObject:[service name]];
-      }
-      NSArray *buddiesForService = [service infoForAllScreenNames];
-      NSEnumerator *buddyEnum = [buddiesForService objectEnumerator];
-      NSDictionary *buddy = nil;
-      while ((buddy = [buddyEnum nextObject])) {
-        HGSResult *newBuddy
-          = [self contactResultFromIMBuddy:buddy
-                                   service:service
-                                    source:self];
-        [buddyResults_ addObject:newBuddy];
-      }
-      [pool release];
+  self = [super initWithConfiguration:configuration];
+  if (!self) return self;
+  
+  // Collect and cache information about our buddies and set of
+  // logged-in services.
+  availableServices_ = [[NSMutableSet alloc] init];
+  buddyResults_ = [[NSMutableArray alloc] init];
+  IMPersonStatus myStatus = [IMService myStatus];
+  iWasOnline_ = (myStatus == IMPersonStatusIdle
+                 || myStatus == IMPersonStatusAway
+                 || myStatus == IMPersonStatusAvailable);
+  NSArray *services = [IMService allServices];
+  for (IMService *service in services) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    if ([service status] == IMServiceStatusLoggedIn) {
+      [availableServices_ addObject:[service name]];
     }
-    [self updateIndex];
+    NSArray *buddiesForService = [service infoForAllScreenNames];
+    NSEnumerator *buddyEnum = [buddiesForService objectEnumerator];
+    NSDictionary *buddy = nil;
+    while ((buddy = [buddyEnum nextObject])) {
+      HGSResult *newBuddy
+        = [self contactResultFromIMBuddy:buddy
+                                 service:service
+                                  source:self];
+      [buddyResults_ addObject:newBuddy];
+    }
+    [pool release];
   }
+  [self updateIndex];
 
   // Register for notifications about changes to buddy information.
   NSNotificationCenter *nc = [IMService notificationCenter];
