@@ -88,7 +88,6 @@
           [self setScriptErrorString:errorString];
           [self setScriptErrorNumber:errOSAScriptError];
           newAccount = nil;
-          newAccount = nil;
         }
       } else {
         NSString *errorString
