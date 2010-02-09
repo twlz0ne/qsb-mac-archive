@@ -95,10 +95,6 @@ static NSString* const kHGSMemorySourceVersion = @"1";
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
     resultsArray_ = [[NSMutableArray alloc] init];
-    if (!resultsArray_) {
-      [self release];
-      self = nil;
-    }
     id<HGSDelegate> delegate = [[HGSPluginLoader sharedPluginLoader] delegate];
     NSString *appSupportPath = [delegate userCacheFolderForApp];
     NSString *filename =
