@@ -1,4 +1,7 @@
-This template builds a basic AppleScript plugin for Quick Search Box.
+This template builds a basic AppleScript action plugin for Quick Search Box.
+AppleScript plugins may provide action extensions only. AppleScript plugins can
+not provide search sources as currently the performance of an AppleScript-based
+search source would is too slow.
 
 It requires that you set up two source trees in Xcode to compile. You will have 
 to have the QuickSearchBox source tree downloaded to your machine. Instructions 
