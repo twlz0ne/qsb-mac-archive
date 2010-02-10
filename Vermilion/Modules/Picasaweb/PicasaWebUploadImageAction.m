@@ -76,7 +76,9 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
 - (void)uploadImages:(HGSResultArray *)imageResults;
 
 // Bottleneck function to upload a single image.
-- (void)uploadImage:(HGSResult *)image;
+- (void)uploadImage:(HGSResult *)image
+               item:(NSUInteger)item
+                 of:(NSUInteger)count;
 
 // Bottleneck function for retrying the upload a single image.
 - (void)retryUploadImageEntry:(GDataEntryPhoto *)imageEntry;
@@ -85,6 +87,10 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
 // success or failure.
 - (void)informUserWithDescription:(NSString *)description
                              type:(HGSUserMessageType)type;
+
+// Utility function to return the name for a mimeType: either 'image'
+// or 'video'.
++ (NSString *)typeStringForMIMEType:(NSString *)mimeType;
 
 // Utility function used as a fall-back for determining the MIME
 // type for a file at the given path.
@@ -185,8 +191,11 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
       }
     }
     if (picasaWebService) {
+      NSUInteger imageCount = [imageResults count];
+      NSUInteger item = 0;
       for (HGSResult *imageResult in imageResults) {
-        [self uploadImage:imageResult];
+        [self uploadImage:imageResult item:item of:imageCount];
+        ++item;
       }
     } else {
       NSString *errorString
@@ -205,7 +214,9 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
   }
 }
 
-- (void)uploadImage:(HGSResult *)imageResult {
+- (void)uploadImage:(HGSResult *)imageResult
+               item:(NSUInteger)item
+                 of:(NSUInteger)count {
   GDataEntryPhoto *imageEntry = [GDataEntryPhoto photoEntry];
   NSString *imageName = [imageResult displayName];
   [imageEntry setTitleWithString:imageName];
@@ -228,6 +239,8 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
       mimeType = @"image/jpeg";
     }
     [imageEntry setPhotoMIMEType:mimeType];
+    NSString *typeName
+      = [PicasaWebUploadImageAction typeStringForMIMEType:mimeType];
     // Run the upload on our thread. Sleep for a second and then check 
     // to see if an upload has completed or if we've recorded some progress
     // in an upload byte-wise.  Give up if there has been no progress for
@@ -249,6 +262,41 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
     @synchronized (activeTickets_) {
       [activeTickets_ addObject:uploadImageTicket];
     }
+    
+    // Let the user know that the upload has started, but only for the first.
+    if (item == 0) {
+      NSString *formattedString = nil;
+      if (count == 1) {
+        NSString *format
+          = HGSLocalizedString(@"Uploading %1$@ '%2$@' to your Drop Box at "
+                               @"Picasa Web.", 
+                               @"A message explaining to the user that an "
+                               @"image is being uploaded. %1$@ "
+                               @"is either 'image' or 'movie' and %2$@ "
+                               @"is the name of the image or movie that was "
+                               @"uploaded.  If the order of %1$@/%2$@ is "
+                               @"changed you may need to change the "
+                               @"capitalization of 'Image' and 'Video'.");
+        formattedString
+          = [NSString stringWithFormat:format, typeName, imageName];
+      } else {
+        NSString *format
+          = HGSLocalizedString(@"Uploading %1$@ '%2$@' (the first of %3$d) "
+                               @"to your Drop Box at Picasa Web.", 
+                               @"A message explaining to the user that an "
+                               @"image is being uploaded. %1$@ "
+                               @"is either 'image' or 'movie' and %2$@ "
+                               @"is the name of the image or movie that was "
+                               @"uploaded.  If the order of %1$@/%2$@ is "
+                               @"changed you may need to change the "
+                               @"capitalization of 'Image' and 'Video'.");
+        formattedString
+          = [NSString stringWithFormat:format, typeName, imageName, count];
+      }
+      [self informUserWithDescription:formattedString
+                                 type:kHGSUserMessageNoteType];
+    }
+    
     unsigned long long lastBytesSent = 0;
     do {
       // Reset endTime if some progress occurred.  While |bytesSent| may be
@@ -268,17 +316,18 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
           [activeTickets_ removeObject:uploadImageTicket];
         }
         NSString *errorString
-          = HGSLocalizedString(@"Upload of image '%@' timed out and could not "
+          = HGSLocalizedString(@"Upload of %1$@ '%2$@' timed out and could not "
                                @"be completed. Please check your connection to "
                                @"the Internet.", 
                                @"A message explaining that an image could "
                                @"not be uploaded to Picasa Web albums because "
                                @"it was taking too long.");
-        errorString = [NSString stringWithFormat:errorString, imageName];
+        errorString = [NSString stringWithFormat:errorString, typeName,
+                       imageName];
         [self informUserWithDescription:errorString
                                    type:kHGSUserMessageErrorType];
-        HGSLog(@"PicasaWebUploadAction timed out uploading image '%@' to "
-               @"account '%@'.", imagePath, [account_ displayName]);
+        HGSLog(@"PicasaWebUploadAction timed out uploading %@ '%@' to "
+               @"account '%@'.", typeName, imagePath, [account_ displayName]);
       }
     } while ([activeTickets_ containsObject:uploadImageTicket]);
     [uploadImageTicket release];
@@ -313,33 +362,13 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
     = [ticket propertyForKey:kPicasaWebUploadImageActionImageEntryKey];
   NSString *imageName = [[imageEntry title] stringValue];
   NSString *mimeType = [imageEntry photoMIMEType];
+  NSString *typeName
+    = [PicasaWebUploadImageAction typeStringForMIMEType:mimeType];
   if (!error) {
     // Only notify the user for the first success.
     if (![self userWasNoticed]) {
       [self setUserWasNoticed:YES];
-      NSString *imageOrVideo = nil;
-      if ([mimeType hasPrefix:@"image"]) {
-        imageOrVideo
-          = HGSLocalizedString(@"Image",
-                               @"Used to specify that an image has been "
-                               @"uploaded.  Note that the capitalization "
-                               @"may need to be adjusted based on placement "
-                               @"with the \"%1$@ '%2$@' uploaded to your Drop Box "
-                               @"at Picasa Web.\" string.");
-      } else {
-        imageOrVideo
-          = HGSLocalizedString(@"Video",
-                               @"Used to specify that a video has been "
-                               @"uploaded.  Note that the capitalization "
-                               @"may need to be adjusted based on placement "
-                               @"with the \"%1$@ '%2$@' uploaded to your Drop Box "
-                               @"at Picasa Web.\" string.");
-      }
-      imageOrVideo
-        = HGSLocalizedString(imageOrVideo,
-                             @"Either 'Image' or 'Video' specifying the type "
-                             @"of object being uploaded.");
-      NSString *successFormat
+      NSString *format
         = HGSLocalizedString(@"%1$@ '%2$@' uploaded to your Drop Box at "
                              @"Picasa Web.", 
                              @"A message explaining to the user that an "
@@ -349,17 +378,19 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
                              @"uploaded.  If the order of %1$@/%2$@ is "
                              @"changed you may need to change the "
                              @"capitalization of 'Image' and 'Video'.");
-      NSString *successString = [NSString stringWithFormat:successFormat, 
-                                 imageOrVideo, imageName];
+      NSString *successString
+        = [NSString stringWithFormat:format, typeName, imageName];
       [self informUserWithDescription:successString
                                  type:kHGSUserMessageNoteType];
     }
   } else {
-    // We will retry a limited number of times before giving up.
+    // We will retry a limited number of times before giving up unless we
+    // experienced a serious error.
     NSNumber *attemptNumber
       = [imageEntry propertyForKey:kPicasaWebUploadImageActionAttemptNumberKey];
     NSUInteger attempt = [attemptNumber unsignedIntValue];
-    if (attempt < kMaxUploadAttempts) {
+    NSInteger errorCode = [error code];
+    if (errorCode != 400 && attempt < kMaxUploadAttempts) {
       attemptNumber = [NSNumber numberWithUnsignedInteger:++attempt];
       [imageEntry setProperty:attemptNumber
                        forKey:kPicasaWebUploadImageActionAttemptNumberKey];
@@ -389,20 +420,21 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
       }
     } else {
       NSString *errorFormat
-        = HGSLocalizedString(@"Could not upload image '%1$@'. \"%2$@\" (%3$d)", 
+        = HGSLocalizedString(@"Could not upload %1@ '%2$@'. \"%3$@\" (%4$d)", 
                              @"A message explaining to the user that we "
-                             @"could not upload an image. %1$@ is the "
-                             @"name of the image to be uploaded.  %2$@ is "
-                             @"the error description. And %3$d is the "
+                             @"could not upload an image. %1$@ is the type "
+                             @"(image or video), %2$@ is the name of the "
+                             @"image to be uploaded.  %3$@ is "
+                             @"the error description. And %4$d is the "
                              @"error code.");
-      NSString *errorString = [NSString stringWithFormat:errorFormat,
-                               [imageEntry title],
-                               [error localizedDescription], [error code]];
+      NSString *errorString = [NSString stringWithFormat:errorFormat, typeName,
+                               imageName, [error localizedDescription],
+                               errorCode];
       [self informUserWithDescription:errorString
                                  type:kHGSUserMessageErrorType];
       HGSLog(@"PicasaWebUploadAction upload of image '%@' to account '%@' "
              @"failed: error=%d '%@'.",
-             [imageEntry title], [account_ displayName], [error code],
+             [imageEntry title], [account_ displayName], errorCode,
              [error localizedDescription]);
     }
   }
@@ -415,6 +447,23 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
 }
 
 #pragma mark Utility Methods
+
++ (NSString *)typeStringForMIMEType:(NSString *)mimeType {
+  NSString *typeString = nil;
+  if ([mimeType hasPrefix:@"image"]) {
+    typeString
+      = HGSLocalizedString(@"image",
+                           @"Used to specify that an image is being or has "
+                           @"been uploaded.");
+  } else {
+    typeString
+      = HGSLocalizedString(@"video",
+                           @"Used to specify that a video is being or has "
+                           @"been uploaded.");
+  }
+  return typeString;
+}
+
 
 - (void)informUserWithDescription:(NSString *)description
                              type:(HGSUserMessageType)type {

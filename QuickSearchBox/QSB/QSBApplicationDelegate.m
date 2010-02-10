@@ -1171,10 +1171,16 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     NSAttributedString *attributedDescription = descriptiveMessage;
     descriptiveMessage = [attributedDescription string];
   }
+#if USE_PLUGIN_PROVIDED_NOTIFICATION_NAME_WHEN_THEY_ARE_REGISTERED
+  // TODO(itsmikro): Re-enable the following once registrationDictionaryForGrowl
+  // has been changed to pull in notification names from plugins.
   NSString *name = [messageDict objectForKey:kHGSNameMessageKey];
   if (!name) {
     name = kGrowlNotificationName;
   }
+#else
+  NSString *name = kGrowlNotificationName;
+#endif  // USE_PLUGIN_PROVIDED_NOTIFICATION_NAME_WHEN_THEY_ARE_REGISTERED
   NSData *imageData = [image TIFFRepresentation];
   NSNumber *successCode = [messageDict objectForKey:kHGSTypeMessageKey];
   signed int priority;
