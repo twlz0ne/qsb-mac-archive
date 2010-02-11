@@ -275,12 +275,12 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
   [server_ setLastSearchTime:searchTime moduleInfo:moduleSearchTimes];
 
   HGSQueryController *object = [aNotification object];
-  HGSMixer *mixer = [object mixerForCurrentResults];
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self 
-         selector:@selector(mixerDidFinish) 
-             name:kHGSMixerDidFinishNotification 
-           object:mixer];
+  HGSTypeFilter *allFilter = [HGSTypeFilter filterAllowingAllTypes];
+  NSUInteger count = [object resultCountForFilter:allFilter];
+  NSArray *rankedResults = [object rankedResultsInRange:NSMakeRange(0, count)
+                                             typeFilter:allFilter
+                                       removeDuplicates:NO];
+  [server_ setLastRankedResults:rankedResults];
 }
 
 #pragma mark -- HGSSearchOperation notification handlers --
@@ -299,16 +299,6 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
   if (dict) {
     [completedSearchSources_ addObject:dict];
   }
-}
-
-#pragma mark -- HGSMixer notification handlers --
-
-- (void)mixerDidFinish:(NSNotification *)notification {
-  HGSMixer *mixer = GTM_STATIC_CAST(HGSMixer, [notification object]);
-  NSArray *rankedResults = [mixer rankedResults];
-  [server_ setLastRankedResults:rankedResults];
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc removeObserver:self name:kHGSMixerDidFinishNotification object:mixer];
 }
 
 @end
