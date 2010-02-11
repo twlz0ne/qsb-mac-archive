@@ -31,13 +31,12 @@
 			<string>contact</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Spotlight Results</string>
-			<key>SLPathsToBlacklist</key>
+			<key>HGSSearchSourceSupportedTypes</key>
 			<array>
-				<string>/Library/Application Support/</string>
-				<string>/Library/Caches/</string>
-				<string>Spam.imapmbox</string>
-				<string>Spam.mbox</string>
-				<string>/Library/PubSub/</string>
+				<string>file</string>
+				<string>contact</string>
+				<string>email</string>
+				<string>webpage</string>
 			</array>
 		</dict>
 	</array>

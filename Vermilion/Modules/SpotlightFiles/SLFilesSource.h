@@ -31,25 +31,28 @@
 //
 
 #import <Vermilion/Vermilion.h>
+#import "MDItemPrivate.h"
 
 // SLFilesOperation is for use by unittesting only.
 @interface SLFilesOperation : HGSSearchOperation {
-@private
-  MDQueryRef mdQuery_;
+ @private
+  MDQueryRef mdTopQuery_;
+  MDQueryRef mdCategoryQuery_;
   NSMutableDictionary *hgsResults_;
+  NSDictionary *resultCountByFilter_;
+  NSUInteger *groupToCategoryIndexMap_;
 }
-- (HGSScoredResult *)resultFromMDItem:(MDItemRef)mdItem;
 @end
 
 @interface SLFilesSource : HGSSearchSource {
  @private
   NSString *utiFilter_;
   BOOL rebuildUTIFilter_;
-  NSArray *pathsToBlackList_;
+  NSArray *valueListAttributes_;
+  NSUInteger groupToCategoryIndexMap_[MDItemPrivateGroupLast];
+  NSDictionary *filterToCategoryIndexMap_;
+  NSArray *categories_;
 }
-+ (CFArrayRef)attributeArray;
-- (void)operationReceivedNewResults:(SLFilesOperation *)operation
-                   withNotification:(NSNotification *)notification;
 - (void)extensionPointSourcesChanged:(NSNotification *)notification;
 @end
 

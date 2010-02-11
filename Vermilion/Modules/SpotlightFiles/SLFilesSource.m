@@ -31,45 +31,23 @@
 //
 
 #import "SLFilesSource.h"
+#import <QSBPluginUI/QSBPluginUI.h>
+
 #import "GTMMethodCheck.h"
 #import "GTMGarbageCollection.h"
-#import "GTMNSNumber+64Bit.h"
-#import "GTMMethodCheck.h"
 #import "NSNotificationCenter+MainThread.h"
 #import "GTMTypeCasting.h"
-
-static NSString *const kSpotlightSourceReturnIntermediateResultsKey 
-  = @"SLFilesSourceReturnIntermediateResults";
-
-// Borrowing some private stuff from spotlight here.
-static CFStringRef kSpotlightGroupIdAttribute 
-  = CFSTR("_kMDItemGroupId");
-extern CFStringRef _MDQueryCreateQueryString(CFAllocatorRef allocator, 
-                                             CFStringRef query);
-
-static NSString *const kSpotlightSourceMDItemPathKey 
-  = @"SpotlightSourceMDItemPath";
-
-typedef enum {
-  SpotlightGroupMessage = 1,
-  SpotlightGroupContact = 2,
-  SpotlightGroupSystemPref = 3,
-  SpotlightGroupFont = 4,
-  SpotlightGroupWeb = 5,
-  SpotlightGroupCalendar = 6,
-  SpotlightGroupMovie = 7,
-  SpotlightGroupApplication = 8,
-  SpotlightGroupDirectory = 9,
-  SpotlightGroupMusic = 10,
-  SpotlightGroupPDF = 11,
-  SpotlightGroupPresentation = 12,
-  SpotlightGroupImage = 13,
-  SpotlightGroupDocument = 14
-} SpotlightGroup;
+#import "MDItemPrivate.h"
+#import "MDQueryPrivate.h"
 
 @interface SLFilesSource ()
 @property (readonly, nonatomic) NSString *utiFilter;
-@property (readonly, nonatomic, retain) NSArray *pathsToBlackList;
+@property (readonly, nonatomic) NSArray *valueListAttributes;
+@property (readonly, nonatomic) NSDictionary *filterToCategoryIndexMap;
+@property (readonly, nonatomic) NSArray *categories;
+
+- (NSString*)typeFromGroup:(MDItemPrivateGroup)group;
+- (NSUInteger *)groupToCategoryIndexMap;
 @end
 
 @implementation SLFilesOperation
@@ -77,23 +55,40 @@ typedef enum {
 - (id)initWithQuery:(HGSQuery*)query source:(HGSSearchSource *)source {
   if ((self = [super initWithQuery:query source:source])) {
     hgsResults_ = [[NSMutableDictionary alloc] init];
+    groupToCategoryIndexMap_ = [(SLFilesSource *)source groupToCategoryIndexMap];
   }
   return self;
 }
 
 - (void)dealloc {
-  if (mdQuery_) {
-    CFRelease(mdQuery_);
+  if (mdTopQuery_) {
+    CFRelease(mdTopQuery_);
+  }
+  if (mdCategoryQuery_) {
+    CFRelease(mdCategoryQuery_);
   }
   [hgsResults_ release];
+  [resultCountByFilter_ release];
   [super dealloc];
 }
 
-- (void)main {
+CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
+  NSInteger idx = 0;
+  BOOL isGood = CFNumberGetValue(attrs[0], kCFNumberNSIntegerType, &idx);
+  HGSAssert(isGood, nil);
+  HGSAssert(context, nil);
+  HGSAssert(idx < MDItemPrivateGroupLast && idx >= MDItemPrivateGroupFirst, nil);
+  NSUInteger *groupToCategoryIndexMap = (NSUInteger *)context;
+  NSUInteger categoryIndex = groupToCategoryIndexMap[idx];
+  return categoryIndex;
+}
+
+- (void)main {    
   NSMutableArray *predicateSegments = [NSMutableArray array];
   
   HGSQuery* query = [self query];
   HGSResult *pivotObject = [query pivotObject];
+  SLFilesSource *slSource = (SLFilesSource *)[self source];
   if (pivotObject) {
     HGSAssert([pivotObject conformsToType:kHGSTypeContact], 
               @"Bad pivotObject: %@", pivotObject);
@@ -120,7 +115,7 @@ typedef enum {
   [predicateSegments addObject:spotlightString];
   
   // if we have a uti filter, add it
-  NSString *utiFilter = [(SLFilesSource*)[self source] utiFilter];
+  NSString *utiFilter = [slSource utiFilter];
   if (utiFilter) {
     [predicateSegments addObject:utiFilter];
   }
@@ -130,38 +125,50 @@ typedef enum {
     = [predicateSegments componentsJoinedByString:@" && "];
   
   // Build the query
-  mdQuery_ = MDQueryCreate(kCFAllocatorDefault,
+  NSArray *valueListAttrs = [slSource valueListAttributes];
+  mdTopQuery_ = MDQueryCreate(kCFAllocatorDefault,
                            (CFStringRef)predicateString,
-                           NULL,
-                           // We must not sort here because it means that the
-                           // result indexing will be stable (we leverage this
-                           // behavior elsewhere)
-                           NULL);
-  if (!mdQuery_) return;
-  
-  
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self
-         selector:@selector(queryNotification:)
-             name:(NSString *)kMDQueryProgressNotification
-           object:(id)mdQuery_];
-  if (!MDQueryExecute(mdQuery_, kMDQuerySynchronous)) {
+                           (CFArrayRef)valueListAttrs,
+                           (CFArrayRef)[NSArray arrayWithObject:(id)kMDItemLastUsedDate]);
+  if (!mdTopQuery_) return;
+  mdCategoryQuery_ = MDQueryCreate(kCFAllocatorDefault,
+                                   (CFStringRef)predicateString,
+                                   (CFArrayRef)valueListAttrs,
+                                   (CFArrayRef)[NSArray arrayWithObject:(id)kMDItemLastUsedDate]);
+  if (!mdCategoryQuery_) return;
+  MDQuerySetMatchesSupportFiles(mdTopQuery_, NO);
+  MDQuerySetMatchesSupportFiles(mdCategoryQuery_, NO);
+  _MDQuerySetGroupComparator(mdCategoryQuery_, SLFilesCategoryIndexForItem, groupToCategoryIndexMap_);
+  BOOL goodQuery = MDQueryExecute(mdTopQuery_, kMDQuerySynchronous);
+  if (goodQuery) {
+    goodQuery = MDQueryExecute(mdCategoryQuery_, kMDQuerySynchronous);
+  }
+  if (!goodQuery) {
     // COV_NF_START
-    CFStringRef queryString = MDQueryCopyQueryString(mdQuery_);
+    CFStringRef queryString = MDQueryCopyQueryString(mdTopQuery_);
     // If something goes wrong, let the handler think we just completed with
     // no results so that we get cleaned up correctly.
     HGSLog(@"Failed to start mdquery: %@", queryString);
     CFRelease(queryString);
     // COV_NF_END
-  }
-  [nc removeObserver:self
-                name:nil
-              object:(id)mdQuery_];
-}
-
-- (void)queryNotification:(NSNotification*)notification {
-  NSString *name = [notification name];
-  if ([name isEqualToString:(NSString *)kMDQueryProgressNotification]) {
+  } else {
+    CFIndex groupCount = _MDQueryGetGroupCount(mdCategoryQuery_);
+    NSMutableDictionary *resultCountByFilter = [NSMutableDictionary dictionary];
+    NSArray *categories = [slSource categories];
+    for (CFIndex i = 0; i < groupCount; ++i) {
+      CFIndex count = _MDQueryGetResultCountForGroup(mdCategoryQuery_, i);
+      if (count) {
+        QSBCategory *category = [categories objectAtIndex:i];
+        HGSTypeFilter *filter = [category typeFilter];
+        [resultCountByFilter setObject:[NSNumber numberWithUnsignedInteger:count]
+                                forKey:filter];
+      }
+    }
+    NSUInteger count = MDQueryGetResultCount(mdTopQuery_);
+    HGSTypeFilter *filter = [HGSTypeFilter filterWithDoesNotConformTypes:[NSSet setWithObject:kHGSTypeSuggest]];
+    [resultCountByFilter setObject:[NSNumber numberWithUnsignedInteger:count]
+                            forKey:filter];
+    resultCountByFilter_ = [resultCountByFilter retain];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationDidUpdateResultsNotification
                                       object:self
@@ -170,21 +177,50 @@ typedef enum {
 }
 
 - (void)cancel {
-  MDQueryStop(mdQuery_);
+  MDQueryStop(mdTopQuery_);
+  MDQueryStop(mdCategoryQuery_);
   [super cancel];
 }
 
-- (HGSScoredResult *)resultFromMDItem:(MDItemRef)mdItem {
-  HGSScoredResult *scoredResult = nil;
+- (id)getAttribute:(CFStringRef)attribute 
+             query:(MDQueryRef)query
+              item:(MDItemRef)item
+             index:(NSUInteger)idx 
+             group:(NSUInteger)group {
+  id value = nil;
+  if (query) {
+    if (group == 0) {
+      value = MDQueryGetAttributeValueOfResultAtIndex(query, attribute, idx);
+    } else {
+      value = _MDQueryGetAttributeValueOfResultAtIndexForGroup(query, attribute, idx, group);
+    }
+  } else {
+    value = GTMCFAutorelease(MDItemCopyAttribute(item, attribute));
+  }
+#if DEBUG
+  // Some objects don't have dates and display names.
+  if (attribute != kMDItemLastUsedDate && attribute != kMDItemDisplayName) {
+    HGSAssert(value, @"Query: %@ item: %@ idx: %d group %d attr: %@", 
+              query, item, idx, group, attribute);
+#endif // Debug
+  }
+  return value;
+}
+
+- (HGSScoredResult *)resultFromQuery:(MDQueryRef)query
+                                item:(MDItemRef)mdItem
+                               group:(NSUInteger)group
+                               index:(NSUInteger)idx {
   NSValue *key = [NSValue valueWithPointer:mdItem];
-  scoredResult = [hgsResults_ objectForKey:key];
+  HGSScoredResult *scoredResult = [hgsResults_ objectForKey:key];
   if (!scoredResult) {
+    HGSAssert(mdItem, @"Query: %@ idx: %d group %d", query, idx, group);
     NSString *path = nil;
-    NSDictionary *attributes 
-      = GTMCFAutorelease(MDItemCopyAttributes(mdItem, 
-                                              [SLFilesSource attributeArray]));
-    NSString *name = GTMCFAutorelease(MDItemCopyAttribute(mdItem,
-                                                          kMDItemDisplayName));
+    NSString *name = [self getAttribute:kMDItemDisplayName 
+                                  query:query
+                                   item:mdItem
+                                  index:idx 
+                                  group:group];
     if (!name) {
       // COV_NF_START
       // This can happen in cases where there isn't a lot of spotlight
@@ -202,62 +238,75 @@ typedef enum {
       // COV_NF_END
     }
     BOOL isURL = NO;
-    NSString *contentType
-      = [attributes objectForKey:(NSString *)kMDItemContentType];
+    NSString *contentType = [self getAttribute:kMDItemContentType 
+                                         query:query
+                                          item:mdItem
+                                         index:idx 
+                                         group:group];
     NSString *resultType = nil;
     if (contentType) {
-      NSNumber *typeGroupNumber
-        = [attributes objectForKey:(NSString *)kSpotlightGroupIdAttribute];
+      NSNumber *typeGroupNumber = [self getAttribute:kMDItemPrivateAttributeGroupId 
+                                               query:query
+                                                item:mdItem
+                                               index:idx 
+                                               group:group];
       if (typeGroupNumber) {
         int typeGroup = [typeGroupNumber intValue];
         
         // TODO: further subdivide the result types.
         switch (typeGroup) {
-          case SpotlightGroupApplication:
+          case MDItemPrivateGroupApplication:
+          case MDItemPrivateGroupSystemPref:
             // TODO: do we want a different type for prefpanes?
             resultType = kHGSTypeFileApplication; 
             break;
-          case SpotlightGroupMessage:
+          case MDItemPrivateGroupMessage:
             resultType = kHGSTypeEmail;
             break;
-          case SpotlightGroupContact:
+          case MDItemPrivateGroupContact:
             resultType = kHGSTypeContact;
             break;
-          case SpotlightGroupWeb:
+          case MDItemPrivateGroupWeb:
             resultType = kHGSTypeWebHistory;
             isURL = YES;
             break;
-          case SpotlightGroupPDF:
-            resultType = kHGSTypeFile;
-            break;
-          case SpotlightGroupImage:
+          case MDItemPrivateGroupImage:
             resultType = kHGSTypeFileImage;
             break;
-          case SpotlightGroupMovie:
+          case MDItemPrivateGroupMovie:
             resultType = kHGSTypeFileMovie;
             break;
-          case SpotlightGroupMusic:
+          case MDItemPrivateGroupMusic:
             resultType = kHGSTypeFileMusic;
             break;
-          case SpotlightGroupDirectory:
+          case MDItemPrivateGroupDirectory:
             resultType = kHGSTypeDirectory;
             break;
-          case SpotlightGroupDocument:
-          case SpotlightGroupPresentation:
-          case SpotlightGroupFont:
-          case SpotlightGroupCalendar:
+          case MDItemPrivateGroupPDF:
+            resultType = kHGSTypeFilePDF;
+            break;
+          case MDItemPrivateGroupPresentation:
+            resultType = kHGSTypeFilePresentation;
+            break;
+          case MDItemPrivateGroupFont:
+            resultType = kHGSTypeFileFont;
+            break;
+          case MDItemPrivateGroupCalendar:
+            resultType = kHGSTypeFileCalendar;
+            break;
+          case MDItemPrivateGroupDocument:
           default: 
-            {
-              if ([[name pathExtension] caseInsensitiveCompare:@"webloc"] 
-                  == NSOrderedSame) {
-                resultType = kHGSTypeWebBookmark;
-              } else if (UTTypeConformsTo((CFStringRef)contentType, 
-                                          kUTTypePlainText)) {
-                resultType = kHGSTypeTextFile;
-              } else {
-                resultType = kHGSTypeFile;
-              }
+          {
+            if ([[name pathExtension] caseInsensitiveCompare:@"webloc"] 
+                == NSOrderedSame) {
+              resultType = kHGSTypeWebBookmark;
+            } else if (UTTypeConformsTo((CFStringRef)contentType, 
+                                        kUTTypePlainText)) {
+              resultType = kHGSTypeTextFile;
+            } else {
+              resultType = kHGSTypeFile;
             }
+          }
             break;
         }
       } 
@@ -267,14 +316,12 @@ typedef enum {
     // We want to avoid getting the path if at all possible,
     // and we only really need the path if it isn't a URL.
     if (isURL) {
-      NSString *uriPath 
-        = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemURL));
+      NSString *uriPath = GTMCFAutorelease(MDItemCopyAttribute(mdItem, 
+                                                               kMDItemURL));
       if (uriPath) {
         uri = uriPath;
       }
     }
-    
-    SLFilesSource *source = GTM_STATIC_CAST(SLFilesSource, [self source]);
     if (!uri) {
       if (!path) {
         path = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemPath));
@@ -282,22 +329,17 @@ typedef enum {
       if (!path) {
         return nil;
       }
-      NSArray *pathsToBlackList = [source pathsToBlackList];
-      for (NSString *badPath in pathsToBlackList) {
-        if ([path rangeOfString:badPath].location != NSNotFound) {
-          return nil;
-        }
-      }
-      NSURL *url = [NSURL fileURLWithPath:path];
-      uri = [url absoluteString];
+      NSString *escaped 
+        = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+      uri = [@"file://localhost" stringByAppendingString:escaped];
     }
     
     if (!resultType && path) {
       resultType = HGSTypeForPath(path);
       if ([resultType isEqual:kHGSTypeWebHistory]) {
         isURL = YES;
-        NSString *uriPath 
-          = GTMCFAutorelease(MDItemCopyAttribute(mdItem, kMDItemURL));
+        NSString *uriPath = GTMCFAutorelease(MDItemCopyAttribute(mdItem, 
+                                                                 kMDItemURL));
         if (uriPath) {
           uri = uriPath;
         }
@@ -313,56 +355,42 @@ typedef enum {
     HGSAssert(resultType != 0, nil);
     
     // Cache values the query has already copied
-    NSDate *lastUsedDate 
-      = [attributes objectForKey:(NSString *)kMDItemLastUsedDate];
+    NSDate *lastUsedDate = [self getAttribute:kMDItemLastUsedDate 
+                                        query:query
+                                         item:mdItem
+                                        index:idx 
+                                        group:group];
     if (!lastUsedDate) {
       lastUsedDate = [NSDate distantPast];  // COV_NF_LINE
     }
-    
-    CGFloat score = 0;
-    HGSTokenizedString *matchedTerm = nil;
-    NSIndexSet *matchedIndexes = nil;
-    HGSTokenizedString *tokenizedQueryString = [[self query] tokenizedQueryString];
-    if (tokenizedQueryString) {
-      HGSTokenizedString *tokenizedName = [HGSTokenizer tokenizeString:name];
-      NSIndexSet *tokenizedNameIndexes = nil;
-      CGFloat tokenizedNameRank = HGSScoreTermForItem(tokenizedQueryString, 
-                                                      tokenizedName, 
-                                                      &tokenizedNameIndexes);
-      HGSTokenizedString *tokenizedTitle = nil;
-      NSIndexSet *tokenizedTitleIndexes = nil;
-      CGFloat tokenizedTitleRank = 0;
-      NSString *title = [attributes objectForKey:(NSString *)kMDItemTitle];
-      if (title) {
-        tokenizedTitle = [HGSTokenizer tokenizeString:title];
-        tokenizedTitleRank = HGSScoreTermForItem(tokenizedQueryString, 
-                                                 tokenizedTitle,
-                                                 &tokenizedTitleIndexes);
-      }
-      if (tokenizedTitleRank > tokenizedNameRank) {
-        score = tokenizedTitleRank;
-        matchedTerm = tokenizedTitle;
-        matchedIndexes = tokenizedTitleIndexes;
-      } else {
-        score = tokenizedNameRank;
-        matchedTerm = tokenizedName;
-        matchedIndexes = tokenizedNameIndexes;
-      }
+    const NSTimeInterval kSLOneMonth = 60 * 60 * 24 * 31;
+    CGFloat insignificantScore 
+      = HGSCalibratedScore(kHGSCalibratedInsignificantScore);
+    NSDate *nowDate = [NSDate date];
+    NSTimeInterval timeSinceLastUsed 
+      = [nowDate timeIntervalSinceDate:lastUsedDate];
+    CGFloat score = insignificantScore;
+    if (timeSinceLastUsed < kSLOneMonth) {
+      CGFloat highScore = HGSCalibratedScore(kHGSCalibratedModerateScore);
+      CGFloat addOn = highScore - insignificantScore;
+      addOn *= 1 - (timeSinceLastUsed / kSLOneMonth);
+      score += addOn;
     }
-    
-    CGFloat contentScore = HGSCalibratedScore(kHGSCalibratedInsignificantScore);
-    if (contentScore > score) {
-      score = contentScore;
-      matchedTerm = nil;
-      matchedIndexes = nil;
-    }
-    
-    NSDictionary *hgsAttributes 
-      = [NSDictionary dictionaryWithObjectsAndKeys:
+    NSMutableDictionary *hgsAttributes 
+      = [NSMutableDictionary dictionaryWithObjectsAndKeys:
          lastUsedDate, kHGSObjectAttributeLastUsedDateKey,
-         (isURL ? uri : nil), kHGSObjectAttributeSourceURLKey,
-         iconFlagName, kHGSObjectAttributeFlagIconNameKey,
-         nil];
+         contentType, kHGSObjectAttributeUTTypeKey, nil];
+    if (iconFlagName) {
+      [hgsAttributes setObject:iconFlagName 
+                        forKey:kHGSObjectAttributeFlagIconNameKey];
+    }
+    if (isURL) {
+      [hgsAttributes setObject:uri forKey:kHGSObjectAttributeSourceURLKey];
+    }
+    HGSTokenizedString *matchedTerm = [[self query] tokenizedQueryString];
+    NSRange matchRange = NSMakeRange(0, [matchedTerm originalLength]);
+    NSIndexSet *matchedIndexes 
+      = [NSIndexSet indexSetWithIndexesInRange:matchRange];
     scoredResult = [HGSScoredResult resultWithURI:uri 
                                              name:name
                                              type:resultType
@@ -376,67 +404,46 @@ typedef enum {
   return scoredResult;
 }
 
-- (void)disableUpdates {
-  MDQueryDisableUpdates(mdQuery_);
-}
-
-- (void)enableUpdates {
-  MDQueryEnableUpdates(mdQuery_);
-}
-
-- (HGSScoredResult *)sortedRankedResultAtIndex:(NSUInteger)idx {
-  HGSScoredResult *result = nil;
-  if (idx < [self resultCount]) {
-    MDItemRef mdItem = (MDItemRef)MDQueryGetResultAtIndex(mdQuery_, idx);
-    result = [self resultFromMDItem:mdItem];
+- (HGSScoredResult *)resultFromGroup:(NSUInteger)group
+                               index:(NSUInteger)idx {
+  MDItemRef mdItem = NULL;
+  MDQueryRef query = NULL;
+  if (group == 0) {
+    query = mdTopQuery_;
+    mdItem = (MDItemRef)MDQueryGetResultAtIndex(query, idx);
+  } else {
+    query = mdCategoryQuery_;
+    mdItem = (MDItemRef)_MDQueryGetResultAtIndexForGroup(query, idx, group);
   }
+  return [self resultFromQuery:query item:mdItem group:group index:idx];
+}
+
+- (HGSScoredResult *)sortedRankedResultAtIndex:(NSUInteger)idx
+                                    typeFilter:(HGSTypeFilter *)typeFilter {
+  SLFilesSource *slSource = (SLFilesSource *)[self source];
+  NSDictionary *filterToCategoryIndexMap = [slSource filterToCategoryIndexMap];
+  NSNumber *nsCategoryIndex = [filterToCategoryIndexMap objectForKey:typeFilter];
+  HGSAssert(nsCategoryIndex, @"Unknown category for filter: %@", typeFilter);
+  NSUInteger categoryIndex = [nsCategoryIndex unsignedIntegerValue];
+  HGSScoredResult *result = [self resultFromGroup:categoryIndex index:idx];
   return result;
 }
 
-- (NSUInteger)resultCount {
-  NSUInteger results = 0;
-  if (mdQuery_) {
-    results = MDQueryGetResultCount(mdQuery_);
-  }
-  return results;
+- (NSUInteger)resultCountForFilter:(HGSTypeFilter *)filter {
+  NSNumber *value = [resultCountByFilter_ objectForKey:filter];
+  return [value unsignedIntegerValue];
 }
 
 @end
 
 @implementation SLFilesSource
 @synthesize utiFilter = utiFilter_;
-@synthesize pathsToBlackList = pathsToBlackList_;
-
-GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
-
-static NSArray *sAttributeArray = nil;
-
-+ (void)initialize {
-  if (!sAttributeArray) {
-    sAttributeArray = [[NSArray alloc] initWithObjects:
-                       (NSString *)kMDItemPath,
-                       (NSString *)kMDItemTitle,
-                       (NSString *)kMDItemLastUsedDate,
-                       (NSString *)kMDItemContentType,
-                       (NSString *)kSpotlightGroupIdAttribute,
-                       nil];
-  }
-}
-
-+ (CFArrayRef)attributeArray {
-  return (CFArrayRef)sAttributeArray;
-}
+@synthesize valueListAttributes = valueListAttributes_;
+@synthesize filterToCategoryIndexMap = filterToCategoryIndexMap_;
+@synthesize categories = categories_;
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    NSDictionary *defaultsDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  [NSNumber numberWithBool:NO],
-                                  kSpotlightSourceReturnIntermediateResultsKey,
-                                  nil];
-    [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsDict];
-    pathsToBlackList_ = [configuration objectForKey:@"SLPathsToBlacklist"];
-    HGSAssert(pathsToBlackList_, nil);
-    [pathsToBlackList_ retain];
     // we need to build the filter
     rebuildUTIFilter_ = YES;
     
@@ -450,15 +457,80 @@ static NSArray *sAttributeArray = nil;
            selector:@selector(extensionPointSourcesChanged:)
                name:kHGSExtensionPointDidRemoveExtensionNotification
              object:sourcesPoint];
+    valueListAttributes_ 
+      = [[NSArray alloc] initWithObjects:(id)kMDItemPrivateAttributeGroupId, 
+         kMDItemLastUsedDate, kMDItemDisplayName, kMDItemContentType, nil];
+    QSBCategoryManager *mgr = [QSBCategoryManager sharedManager];
+    categories_ = [[mgr categories] copy];
+    NSMutableDictionary *filterToCategoryIndexMap 
+      = [NSMutableDictionary dictionary];
+    for (CFIndex i = 1; i <  MDItemPrivateGroupLast; ++i) {
+      NSString *type = [self typeFromGroup:i];
+      HGSAssert(type, nil);
+      QSBCategory *category = [mgr categoryForType:type];
+      NSUInteger categoryIndex 
+        = [categories_ indexOfObjectIdenticalTo:category];
+      groupToCategoryIndexMap_[i] = categoryIndex;
+      HGSTypeFilter *typeFilter = [category typeFilter];
+      NSNumber *nsCategoryIndex 
+        = [NSNumber numberWithUnsignedInteger:categoryIndex];
+      [filterToCategoryIndexMap setObject:nsCategoryIndex
+                                   forKey:typeFilter];
+    }
+    NSSet *suggestSet = [NSSet setWithObject:kHGSTypeSuggest];
+    HGSTypeFilter *filter 
+      = [HGSTypeFilter filterWithDoesNotConformTypes:suggestSet];
+    NSNumber *zero = [NSNumber numberWithUnsignedInt:0];
+    [filterToCategoryIndexMap setObject:zero forKey:filter];
+    filter = [HGSTypeFilter filterAllowingAllTypes];
+    [filterToCategoryIndexMap setObject:zero forKey:filter];
+    filterToCategoryIndexMap_ = [filterToCategoryIndexMap retain];
   }
   return self;
 }
 
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [pathsToBlackList_ release];
   [utiFilter_ release];
+  [categories_ release];
+  [valueListAttributes_ release];
   [super dealloc];
+}
+  
+- (NSString*)typeFromGroup:(MDItemPrivateGroup)group {
+  struct {
+    MDItemPrivateGroup group;
+    NSString *type;
+  } groupToTypeMap[] = {
+    { MDItemPrivateGroupApplication, kHGSTypeFileApplication },
+    { MDItemPrivateGroupSystemPref, kHGSTypeFileApplication },
+    { MDItemPrivateGroupMessage, kHGSTypeEmail },
+    { MDItemPrivateGroupContact, kHGSTypeContact },
+    { MDItemPrivateGroupWeb, kHGSTypeWebpage },
+    { MDItemPrivateGroupImage, kHGSTypeFileImage },
+    { MDItemPrivateGroupMovie, kHGSTypeFileMovie },
+    { MDItemPrivateGroupMusic, kHGSTypeFileMusic },
+    { MDItemPrivateGroupDirectory, kHGSTypeDirectory },
+    { MDItemPrivateGroupPDF, kHGSTypeFilePDF },
+    { MDItemPrivateGroupPresentation, kHGSTypeFilePresentation },
+    { MDItemPrivateGroupFont, kHGSTypeFileFont },
+    { MDItemPrivateGroupCalendar, kHGSTypeFileCalendar },
+    { MDItemPrivateGroupDocument, kHGSTypeFile }
+  };
+  NSString *type = nil;
+  for (size_t i = 0; 
+       i < sizeof(groupToTypeMap) / sizeof(groupToTypeMap[0]); 
+       ++i) {
+    if (group == groupToTypeMap[i].group) {
+      type = groupToTypeMap[i].type;
+      break;
+    }
+  }
+  return type;
+}
+
+- (NSUInteger *)groupToCategoryIndexMap {
+  return groupToCategoryIndexMap_;
 }
 
 // returns an operation to search this source for |query| and posts notifs
@@ -478,17 +550,15 @@ static NSArray *sAttributeArray = nil;
     // Since Spotlight can return a lot of stuff, we only run the query if
     // it is at least 3 characters long.
     isValid = [[query tokenizedQueryString] originalLength] >= 3;
+    if (isValid) {
+      if (MDQueryPrivateIsSpotlightIndexing()) {
+        HGSLog(@"Unable to use spotlight because it is indexing.");
+        isValid = NO;
+      }
+    }
   }
   return isValid;
 }
-
-- (void)operationReceivedNewResults:(SLFilesOperation*)operation
-                   withNotification:(NSNotification*)notification {
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationDidUpdateResultsNotification
-                                    object:self
-                                  userInfo:nil];
-}  
 
 - (void)extensionPointSourcesChanged:(NSNotification*)notification {
   // since the notifications can come in batches as we load things (and if/when
@@ -513,7 +583,8 @@ static NSArray *sAttributeArray = nil;
       }
     }
     // make the filter string
-    NSMutableArray *utiFilterArray = [NSMutableArray arrayWithCapacity:[utiSet count]];
+    NSMutableArray *utiFilterArray 
+      = [NSMutableArray arrayWithCapacity:[utiSet count]];
     for (NSString *uti in utiSet) {
       NSString *utiFilterStr
         = [NSString stringWithFormat:@"( kMDItemContentTypeTree != '%@' )", uti];
@@ -606,8 +677,9 @@ static NSArray *sAttributeArray = nil;
   if (!value) {
     value = [super provideValueForKey:key result:result];
   }
-  
   return value;
 }
 
 @end
+
+

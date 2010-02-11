@@ -35,6 +35,15 @@
 #import "GTMNSAppleScript+Handler.h"
 #import <OCMock/OCMock.h>
 
+@interface SLFilesOperation (SLFilesOperationTesting)
+
+- (HGSScoredResult *)resultFromQuery:(MDQueryRef)query
+                                item:(MDItemRef)mdItem
+                               group:(NSUInteger)group
+                               index:(NSUInteger)idx;
+
+@end
+
 @interface SLFilesSourceTest : HGSSearchSourceAbstractTestCase {
  @private
   NSString *testFolderPath_;
@@ -151,7 +160,8 @@
                  [mdimport terminationStatus]);
 }
 
-- (NSArray *)performSearchFor:(NSString *)value pivotingOn:(HGSResultArray *)pivots {
+- (NSArray *)performSearchFor:(NSString *)value 
+                   pivotingOn:(HGSResultArray *)pivots {
   HGSQuery *query = [[[HGSQuery alloc] initWithString:value 
                                               results:pivots 
                                            queryFlags:0] autorelease];
@@ -159,7 +169,12 @@
   HGSSearchOperation *operation = [[self source] searchOperationForQuery:query];
   STAssertNotNil(operation, nil);
   [operation run:YES];
-  return [operation sortedRankedResultsInRange:NSMakeRange(0, [operation resultCount])];
+  NSSet *suggestSet = [NSSet setWithObject:kHGSTypeSuggest];
+  HGSTypeFilter *filter
+    = [HGSTypeFilter filterWithDoesNotConformTypes:suggestSet];
+  NSUInteger count = [operation resultCountForFilter:filter];
+  return [operation sortedRankedResultsInRange:NSMakeRange(0, count)
+                                    typeFilter:filter];
 }
 
 - (HGSResult *)spotlightResultForQuery:(NSString *)queryString
@@ -173,7 +188,7 @@
   MDItemRef mdItem = MDItemCreate(kCFAllocatorDefault, (CFStringRef)path);
   STAssertNotNULL(mdItem, @"Unable to create mdItem for %@", path);  
   SLFilesOperation *slOp = (SLFilesOperation*)op;
-  HGSResult *result = [slOp resultFromMDItem:mdItem];
+  HGSResult *result = [slOp resultFromQuery:NULL item:mdItem group:0 index:0];
   STAssertNotNil(result, nil);
   CFRelease(mdItem);
   return result;
@@ -432,10 +447,10 @@
     { @"SampleMusic", @"mid", kHGSTypeFileMusic },
     { @"SampleMovie", @"mov", kHGSTypeFileMovie },
     { @"SampleImage", @"jpeg", kHGSTypeFileImage },
-    { @"SamplePDF", @"pdf", kHGSTypeFile },
+    { @"SamplePDF", @"pdf", kHGSTypeFilePDF },
     { @"SampleContact", @"abcdp", kHGSTypeContact },
     { @"SampleWeb", @"webhistory", kHGSTypeWebHistory },
-    { @"SampleCal", @"ics", kHGSTypeFile },
+    { @"SampleCal", @"ics", kHGSTypeFileCalendar },
     { @"SampleText", @"txt", kHGSTypeTextFile },
     { @"SampleEmail", @"emlx", kHGSTypeEmail },
     { @"SampleBookmark", @"webloc", kHGSTypeWebBookmark }
@@ -456,7 +471,7 @@
   STAssertNotNil(finderPath, nil);
   [filePaths addObject:finderPath];
   [expectedTypes addObject:kHGSTypeFileApplication];
-  [filePaths addObject:@"/System"];
+  [filePaths addObject:@"/Applications"];
   [expectedTypes addObject:kHGSTypeDirectory];
   [filePaths addObject:@"/System/Library/Extensions.mkext"];
   [expectedTypes addObject:kHGSTypeFile];
