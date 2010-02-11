@@ -537,13 +537,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       NSUInteger primaryIndex = [emails indexForIdentifier:primaryID];
       value = [emails valueAtIndex:primaryIndex];
     }
-  } else if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
+  } else if ([key isEqualToString:kHGSObjectAttributeIconKey] ||
+             [key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
     value = [self loadImageForObject:result];
-  } else if ([key isEqualToString:kHGSObjectAttributeImmediateIconKey]) {
-    value = [[HGSIconProvider sharedIconProvider] cachedIconForResult:result];
-    if (!value) {
-      value = [self genericContactImage];
-    }
   } else if ([key isEqualToString:kHGSObjectAttributeSnippetKey]) {
     ABRecord *person = [self personForResult:result];
     

@@ -29,6 +29,8 @@
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Firefox Bookmarks</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>webpage</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -41,6 +43,8 @@
 			<string>^Camino Bookmarks</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<string>com.apple.safari.bookmark</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>webpage</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -53,6 +57,8 @@
 			<string>^Safari Bookmarks</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<string>com.apple.safari.bookmark</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>webpage</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

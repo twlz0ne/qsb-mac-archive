@@ -36,6 +36,10 @@
 				<string>email</string>
 				<string>contact.addressbook</string>
 			</array>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<array>
+				<string>contact.addressbook</string>
+			</array>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>

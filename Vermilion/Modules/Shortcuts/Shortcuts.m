@@ -307,11 +307,13 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
         NSArray *resultArray = [shortcuts_ objectForKey:key];
         for (NSDictionary *resultDict in resultArray) {
           HGSResult *result = [self unarchiveResult:resultDict];
-          HGSScoredResult *scoredResult 
-            = [HGSScoredResult resultWithResult:result 
-                                          score:score 
-                                    matchedTerm:shortcut 
-                                 matchedIndexes:matchedIndexes];
+          HGSScoredResult *scoredResult = nil;
+          if (result) {
+            scoredResult = [HGSScoredResult resultWithResult:result 
+                                                       score:score 
+                                                 matchedTerm:shortcut 
+                                              matchedIndexes:matchedIndexes];
+          }
           if (scoredResult) {
             // We are not interested in stale results, but we also do not
             // want to remove them from our shortcuts.
