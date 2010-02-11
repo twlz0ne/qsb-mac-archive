@@ -18,19 +18,25 @@
 //}
 
 // Collect results for a search operation. You can use the pivot object
-// and unique words to perform your search
+// and the query's tokenized string to perform your search
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
-  // The query
-  // HGSQuery *query = [operation query];
+  HGSQuery *query = [operation query];
   // The pivot object (if any)
   // HGSResult *pivotObject = [query pivotObject];
-  // NSArray *words = [query uniqueWords];
-  HGSResult *result = [HGSResult resultWithURI:@"http://localhost"
-                                          name:NSStringFromClass([self class])
-                                          type:kHGSTypeWebpage
-                                        source:self
-                                    attributes:nil];
-  [operation setRankedResults:[NSArray arrayWithObject:result]];
+  HGSTokenizedString *term = [query tokenizedQueryString];
+  if ([[term tokenizedString] isEqual:@"localhost"]) {
+    CGFloat score = HGSCalibratedScore(kHGSCalibratedPerfectScore);
+    HGSScoredResult *result
+      = [HGSScoredResult resultWithURI:@"http://localhost"
+                                  name:NSStringFromClass([self class])
+                                  type:kHGSTypeWebpage
+                                source:self
+                            attributes:nil
+                                 score:score
+                           matchedTerm:term
+                        matchedIndexes:nil];
+    [operation setRankedResults:[NSArray arrayWithObject:result]];
+  }
 }
 
 @end
