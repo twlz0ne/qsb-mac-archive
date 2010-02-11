@@ -34,6 +34,7 @@
 #import <Vermilion/HGSBundle.h>
 #import <Vermilion/HGSExtension.h>
 #import <Vermilion/HGSType.h>
+#import <Vermilion/HGSTypeFilter.h>
 #import <Vermilion/HGSResult.h>
 #import <Vermilion/HGSAction.h>
 #import <Vermilion/HGSQuery.h>
