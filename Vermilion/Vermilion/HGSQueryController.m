@@ -40,6 +40,7 @@
 #import "HGSSearchSourceRanker.h"
 #import "HGSMixer.h"
 #import "HGSLog.h"
+#import "HGSTypeFilter.h"
 #import "HGSDTrace.h"
 #import "HGSOperation.h"
 #import "HGSMemorySearchSource.h"
@@ -56,6 +57,22 @@ NSString *const kHGSQueryControllerDidUpdateResultsNotification
   = @"HGSQueryControllerDidUpdateResultsNotification";
 
 NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
+
+// These are stored in an NSDictionary keyed by HGSTypeFilters.
+// There is one per type filter.
+// It caches the results that we have already found for that particular filter,
+// as well as the maximum index that we have checked for each source.
+// The indexes are in the same order as 
+@interface HGSConformingResultCache : NSObject {
+ @private
+  NSMutableArray *results_;
+  NSMutableData *indexes_;
+}
++ (id)cacheWithIndexCount:(NSUInteger)count;
+- (id)initWithIndexCount:(NSUInteger)count;
+- (NSMutableArray *)results;
+- (NSUInteger *)indexes;
+@end
 
 @interface HGSQueryController()
 - (void)cancelPendingSearchOperations:(NSTimer*)timer;
@@ -79,6 +96,8 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
     pendingQueryOperations_ = [[NSMutableArray alloc] init];
     queryOperationsWithResults_ = [[NSMutableSet alloc] init];
     parsedQuery_ = [query retain];
+    conformingResultsCache_ = [[NSMutableDictionary alloc] init];
+    emptySet_ = [[NSSet alloc] init];
   }
   return self;
 }
@@ -87,11 +106,12 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self];
   [self cancel];
-  [rankedResults_ release];
+  [conformingResultsCache_ release];
   [queryOperations_ release];
   [parsedQuery_ release];
   [pendingQueryOperations_ release];
   [queryOperationsWithResults_ release];
+  [emptySet_ release];
   [super dealloc];
 }
 
@@ -209,27 +229,6 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   return parsedQuery_;
 }
 
-- (HGSMixer *)mixerForCurrentResults {
-  NSArray *currentOps = nil;
-  @synchronized (queryOperationsWithResults_) {
-    currentOps = [queryOperationsWithResults_ allObjects];
-  }
-  NSUInteger maxResults = [parsedQuery_ maxDesiredResults];
-  return [[[HGSMixer alloc] initWithSearchOperations:currentOps
-                                          maxResults:maxResults
-                                      mainThreadTime:0.05] autorelease];
-}
-
-- (NSUInteger)totalResultsCount {
-  NSUInteger count = 0;
-  @synchronized (queryOperationsWithResults_) {
-    for (HGSSearchOperation *op in queryOperationsWithResults_) {
-      count += [op resultCount];
-    }
-  }
-  return count;
-}
-
 // stops the query
 - (void)cancel {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -250,6 +249,121 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   return cancelled_;
 }  
 
+- (NSUInteger)resultCountForFilter:(HGSTypeFilter *)typeFilter {
+  NSUInteger count = 0;
+  for(HGSSearchOperation *op in queryOperationsWithResults_) {
+    HGSSearchSource *source = [op source];
+    HGSTypeFilter *sourceFilter = [source resultTypeFilter];
+    if ([sourceFilter intersectsWithFilter:typeFilter]) {
+      NSUInteger opCount = [op resultCountForFilter:typeFilter];
+      count += opCount;
+    } 
+  }
+  return count;
+}
+
+- (HGSConformingResultCache *)cachedResultsForFilter:(HGSTypeFilter *)filter {
+  HGSConformingResultCache *cache 
+    = [conformingResultsCache_ objectForKey:filter];
+  if (!cache) {
+    NSUInteger opsCount = [queryOperationsWithResults_ count];
+    cache = [HGSConformingResultCache cacheWithIndexCount:opsCount];
+    [conformingResultsCache_ setObject:cache forKey:filter];
+  }
+  return cache;
+}
+
+- (NSArray *)rankedResultsInRange:(NSRange)range
+                       typeFilter:(HGSTypeFilter *)typeFilter
+                 removeDuplicates:(BOOL)removeDuplicates {
+  NSArray *finalRankedResults = nil;
+  NSUInteger maxRange = NSMaxRange(range);
+  @synchronized (conformingResultsCache_) {
+    HGSConformingResultCache *cache = [self cachedResultsForFilter:typeFilter];
+    NSMutableArray *rankedResults = [cache results];
+    NSUInteger *opsIndexes = [cache indexes];
+    NSUInteger rankedCount = [rankedResults count];
+    if (maxRange > rankedCount) {
+      NSArray *queryOperationsWithResults 
+        = [queryOperationsWithResults_ allObjects];
+      NSUInteger opsCount = [queryOperationsWithResults count];
+      NSUInteger *opsMaxIndexes = malloc(sizeof(NSUInteger) * opsCount);
+      NSUInteger j = 0;
+      for (HGSSearchOperation *op in queryOperationsWithResults) {
+        HGSSearchSource *source = [op source];
+        HGSTypeFilter *sourceFilter = [source resultTypeFilter];
+        NSUInteger maxIndex = 0;
+        if ([sourceFilter intersectsWithFilter:typeFilter]) {
+          maxIndex = [op resultCountForFilter:typeFilter];
+        } 
+        opsMaxIndexes[j] = maxIndex;
+        j = j + 1;
+      }
+      while (maxRange > rankedCount) {
+        HGSScoredResult *newRankedResult = nil;
+        NSUInteger indexToIncrement = 0;
+        for (NSUInteger i = 0; i < opsCount; ++i) {
+          HGSScoredResult *testRankedResult = nil;
+          NSUInteger opMaxIndex = opsMaxIndexes[i];
+          for (NSUInteger opIndex = opsIndexes[i]; 
+               opIndex < opMaxIndex; 
+               ++opIndex) {
+            // Operations can return nil results.
+            HGSSearchOperation *op 
+              = [queryOperationsWithResults objectAtIndex:i];
+            testRankedResult = [op sortedRankedResultAtIndex:opIndex
+                                                  typeFilter:typeFilter];
+            if (testRankedResult) {  
+              NSInteger compare = NSOrderedAscending;
+              if (newRankedResult) {
+                compare = HGSMixerScoredResultSort(testRankedResult, 
+                                                   newRankedResult, nil);
+              }
+              if (compare == NSOrderedAscending) {
+                newRankedResult = testRankedResult;
+                indexToIncrement = i;
+              }
+              break;
+            }
+          }
+        }
+        // If we have a result first check for duplicates and do a merge
+        if (newRankedResult) {
+          if (removeDuplicates) {
+            NSUInteger resultIndex = 0;
+            for (HGSScoredResult *scoredResult in rankedResults) {
+              if ([scoredResult isDuplicate:newRankedResult]) {
+                newRankedResult 
+                  = [scoredResult resultByAddingAttributesFromResult:newRankedResult];
+                [rankedResults replaceObjectAtIndex:resultIndex 
+                                         withObject:newRankedResult];
+                newRankedResult = nil;
+                break;
+              }
+              ++resultIndex;
+            }
+          }
+          // or else add it.
+          if (newRankedResult) {
+            [rankedResults addObject:newRankedResult];
+            ++rankedCount;
+          }
+          ++opsIndexes[indexToIncrement];
+        } else {
+          break;
+        }
+      }
+      free(opsMaxIndexes);
+    }
+    if (range.location < rankedCount) {
+      NSUInteger totalLength = rankedCount - range.location;
+      range.length = MIN(totalLength, range.length);
+      finalRankedResults = [rankedResults subarrayWithRange:range];
+    }
+  }
+  return finalRankedResults;  
+}
+
 - (NSString*)description {
   return [NSString stringWithFormat:@"%@ - Predicate:%@ Operations:%@", 
           [super description], parsedQuery_, queryOperations_];
@@ -263,8 +377,9 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
     HGSSearchSource *source = [operation source];
     HGSQuery *query = [operation query];
     NSString *ptr = [NSString stringWithFormat:@"%p", operation];
+    NSString *queryString = [[query tokenizedQueryString] originalString];
     VERMILION_SEARCH_START((char *)[[source identifier] UTF8String],
-                           (char *)[[[query tokenizedQueryString] originalString] UTF8String],
+                           (char *)[queryString UTF8String],
                            (char *)[ptr UTF8String]);
   }
 }
@@ -298,8 +413,9 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   if (VERMILION_SEARCH_FINISH_ENABLED()) {
     HGSQuery *query = [operation query];
     NSString *ptr = [NSString stringWithFormat:@"%p", operation];
+    NSString *queryString = [[query tokenizedQueryString] originalString];
     VERMILION_SEARCH_FINISH((char *)[[source identifier] UTF8String],
-                            (char *)[[[query tokenizedQueryString] originalString] UTF8String],
+                            (char *)[queryString UTF8String],
                             (char *)[ptr UTF8String]);
   }
 }
@@ -314,12 +430,41 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   @synchronized (self) {
     [queryOperationsWithResults_ addObject:operation];
   }
+  @synchronized (conformingResultsCache_) {
+    [conformingResultsCache_ removeAllObjects];
+  }
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kHGSQueryControllerDidUpdateResultsNotification 
                     object:self];
 }
 
-- (NSArray *)pendingQueries {
-  return [[pendingQueryOperations_ copy] autorelease];
+@end
+
+@implementation HGSConformingResultCache
++ (id)cacheWithIndexCount:(NSUInteger)count {
+  return [[[[self class] alloc] initWithIndexCount:count] autorelease];
 }
+
+- (id)initWithIndexCount:(NSUInteger)count {
+  if ((self = [super init])) {
+    results_ = [[NSMutableArray alloc] init];
+    indexes_ = [[NSMutableData alloc] initWithLength:count * sizeof(NSUInteger)];
+  }
+  return self;
+}
+
+- (void)dealloc {
+  [results_ release];
+  [indexes_ release];
+  [super dealloc];
+}
+
+- (NSMutableArray *)results {
+  return results_;
+}
+
+- (NSUInteger *)indexes {
+  return (NSUInteger *)[indexes_ mutableBytes];
+}
+
 @end

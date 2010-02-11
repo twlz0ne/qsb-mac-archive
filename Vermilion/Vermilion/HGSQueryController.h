@@ -35,8 +35,7 @@
 #import "GTMDefines.h"
 
 @class HGSQuery;
-@class HGSMixer;
-@protocol HGSMixerDelegate;
+@class HGSTypeFilter;
 
 /*!
  @header
@@ -63,13 +62,13 @@
   BOOL cancelled_;
   HGSQuery* parsedQuery_;
   __weak NSTimer* slowSourceTimer_;
-  NSArray *rankedResults_;
+  NSMutableDictionary *conformingResultsCache_;
+  NSSet *emptySet_;
 }
 
 - (id)initWithQuery:(HGSQuery*)query;
 
 - (HGSQuery *)query;
-- (HGSMixer *)mixerForCurrentResults;
 
 /*!
   Ask information about the completion status for the queries to each source.
@@ -93,10 +92,20 @@
 - (void)cancel;
 
 /*!
-  Outstanding searches
+ Returns the number of results for filter typeFilter.
 */
-- (NSArray *)pendingQueries;
+- (NSUInteger)resultCountForFilter:(HGSTypeFilter *)typeFilter;
 
+/*!
+ Returns a set of results based on the current results we have from the query.
+ @param range The range of results to return
+ @param typeFilter The filter to apply to the results
+ @param removeDuplicates Do we want duplicates removed. This takes considerably
+        more time.
+*/
+- (NSArray *)rankedResultsInRange:(NSRange)range
+                       typeFilter:(HGSTypeFilter *)typeFilter
+                 removeDuplicates:(BOOL)removeDuplicates;
 @end
 
 #pragma mark Notifications
