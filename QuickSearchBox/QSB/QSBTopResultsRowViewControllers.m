@@ -142,12 +142,6 @@
 }
 @end
 
-@implementation QSBTopSearchStatusRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller {
-  QSBVIEWCONTROLLER_INIT(@"TopSearchStatusResultView")
-}
-@end
-
 @implementation QSBTopMessageRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
   QSBVIEWCONTROLLER_INIT(@"TopMessageResultView")

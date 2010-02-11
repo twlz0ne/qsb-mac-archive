@@ -60,26 +60,8 @@
 }
 @end
 
-@implementation QSBMoreSeparatorRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller {
-  QSBVIEWCONTROLLER_INIT(@"MoreSeparatorResultView")
-}
-@end
-
-@implementation QSBMoreFoldRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller {
-  QSBVIEWCONTROLLER_INIT(@"MoreFoldResultView")
-}
-@end
-
 @implementation QSBMoreShowAllTableRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller {
   QSBVIEWCONTROLLER_INIT(@"MoreShowAllTableResultView")
-}
-@end
-
-@implementation QSBMorePlaceHolderRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller {
-  QSBVIEWCONTROLLER_INIT(@"MorePlaceHolderResultView")
 }
 @end

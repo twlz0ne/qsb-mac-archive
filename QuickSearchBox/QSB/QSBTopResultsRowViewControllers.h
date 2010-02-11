@@ -89,10 +89,6 @@
 - (id)initWithController:(QSBSearchViewController *)controller;
 @end
 
-@interface QSBTopSearchStatusRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
 @interface QSBTopMessageRowViewController : QSBResultRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller;
 @end

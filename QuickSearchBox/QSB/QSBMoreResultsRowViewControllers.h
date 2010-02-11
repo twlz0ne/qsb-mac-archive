@@ -47,20 +47,6 @@
 - (id)initWithController:(QSBSearchViewController *)controller;
 @end
 
-@interface QSBMoreSeparatorRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
-@interface QSBMoreFoldRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
 @interface QSBMoreShowAllTableRowViewController : QSBResultRowViewController
 - (id)initWithController:(QSBSearchViewController *)controller;
 @end
-
-@interface QSBMorePlaceHolderRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
-
