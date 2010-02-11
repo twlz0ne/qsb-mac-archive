@@ -202,8 +202,8 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
   if (attribute != kMDItemLastUsedDate && attribute != kMDItemDisplayName) {
     HGSAssert(value, @"Query: %@ item: %@ idx: %d group %d attr: %@", 
               query, item, idx, group, attribute);
-#endif // Debug
   }
+#endif // DEBUG
   return value;
 }
 
