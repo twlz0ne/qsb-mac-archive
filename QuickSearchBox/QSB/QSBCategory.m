@@ -55,30 +55,29 @@ static NSString *const kQSBCategoryOthersType
 
 @implementation QSBCategory 
 
-@synthesize conformTypes = conformTypes_;
-@synthesize doesNotConformTypes = doesNotConformTypes_;
 @synthesize name = name_;
+@synthesize typeFilter = typeFilter_;
 @synthesize localizedName = localizedName_;
 @synthesize localizedSingularName = localizedSingularName_;
 
 - (id)initWithName:(NSString *)name dictionary:(NSDictionary *)dictionary {
   if ((self = [super init])) {
-    if (dictionary) {
-      NSArray *array = [dictionary objectForKey:kQSBCategoryConformToTypesKey];
-      if ([array count]) {
-        conformTypes_ = [[NSSet alloc] initWithArray:array];
-      }
-      array = [dictionary objectForKey:kQSBCategoryDoesNotConformToTypesKey];
-      if ([array count]) {
-        doesNotConformTypes_ = [[NSSet alloc] initWithArray:array];
-      }
-#if DEBUG
-      // Debug runtime check to make sure our types are sane.
-      if ([conformTypes_ count] && [doesNotConformTypes_ count]) {
-        HGSAssert(![conformTypes_ intersectsSet:doesNotConformTypes_], nil);
-      }
-#endif  // DEBUG
+    NSSet *conformTypes = nil;
+    NSSet *doesNotConformTypes = nil;
+    NSArray *array = [dictionary objectForKey:kQSBCategoryConformToTypesKey];
+    if ([array count]) {
+      conformTypes = [[[NSSet alloc] initWithArray:array] autorelease];
     }
+    HGSAssert(conformTypes, nil);
+    
+    array = [dictionary objectForKey:kQSBCategoryDoesNotConformToTypesKey];
+    if ([array count]) {
+      doesNotConformTypes = [[[NSSet alloc] initWithArray:array] autorelease];
+    }
+
+    typeFilter_ 
+      = [[HGSTypeFilter alloc] initWithConformTypes:conformTypes
+                                doesNotConformTypes:doesNotConformTypes];
     name_ = [name copy];
     HGSAssert(name_, nil);
     NSBundle *bundle = [NSBundle mainBundle];
@@ -97,8 +96,7 @@ static NSString *const kQSBCategoryOthersType
 
 - (void)dealloc {
   [name_ release];
-  [conformTypes_ release];
-  [doesNotConformTypes_ release];
+  [typeFilter_ release];
   [localizedName_ release];
   [localizedSingularName_ release];
   [super dealloc];
@@ -109,9 +107,13 @@ static NSString *const kQSBCategoryOthersType
 }
 
 - (BOOL)isResultMember:(HGSResult *)result {
-  return [result conformsToTypeSet:[self conformTypes]] 
-    && [result doesNotConformToTypeSet:[self doesNotConformTypes]];
+  return [self isValidType:[result type]];
 }
+
+- (BOOL)isValidType:(NSString *)type {
+  return [typeFilter_ isValidType:type];
+}
+
 
 - (NSComparisonResult)compare:(QSBCategory *)category {
   return [[self localizedName] compare:[category localizedName]];
@@ -144,6 +146,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(QSBCategoryManager, sharedManager);
   // loading and parsing of the category file to screw up timings on first
   // searches.
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  HGSInitPluginBundle();
   [self sharedManager];
   [pool release];
 }
@@ -151,7 +154,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(QSBCategoryManager, sharedManager);
 - (id)init {
   if ((self = [super init])) {
     NSMutableSet *othersDoesNotConformTo = [NSMutableSet set];
-    NSBundle *bundle = [NSBundle mainBundle];
+    NSBundle *bundle = HGSGetPluginBundle();
     NSString *path = [bundle pathForResource:@"Categories" ofType:@"plist"];
     HGSAssert(path, @"Unable to find Categories.plist");
     NSDictionary *categories = [NSDictionary dictionaryWithContentsOfFile:path];
@@ -163,11 +166,17 @@ GTMOBJECT_SINGLETON_BOILERPLATE(QSBCategoryManager, sharedManager);
         = [[[QSBCategory alloc] initWithName:name 
                                   dictionary:definition] autorelease];
       [tempCategories addObject:category];
-      [othersDoesNotConformTo unionSet:[category conformTypes]];
+      NSArray *array = [definition objectForKey:kQSBCategoryConformToTypesKey];
+      if (array) {
+        NSSet *conformTypes = [NSSet setWithArray:array];
+        [othersDoesNotConformTo unionSet:conformTypes];
+      }
     }
     NSDictionary *otherDict 
-      = [NSDictionary dictionaryWithObject:[othersDoesNotConformTo allObjects]
-                                    forKey:kQSBCategoryDoesNotConformToTypesKey];
+      = [NSDictionary dictionaryWithObjectsAndKeys:
+         [[HGSTypeFilter allTypesSet] allObjects], kQSBCategoryConformToTypesKey,
+         [othersDoesNotConformTo allObjects],kQSBCategoryDoesNotConformToTypesKey,
+         nil];
     otherCategory_ = [[QSBCategory alloc] initWithName:kQSBCategoryOthersType
                                              dictionary:otherDict];
     [tempCategories addObject:otherCategory_];
@@ -185,12 +194,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(QSBCategoryManager, sharedManager);
 - (QSBCategory *)categoryForType:(NSString *)type {
   QSBCategory *category = nil;
   for (category in categories_) {
-    NSSet *conformTypes = [category conformTypes];
-    if (HGSTypeConformsToTypeSet(type, conformTypes)) {
-      NSSet *doesNotConformTypes = [category doesNotConformTypes];
-      if (HGSTypeDoesNotConformToTypeSet(type, doesNotConformTypes)) {
-        break;
-      }
+    if ([category isValidType:type]) {
+      break;
     }
   }
   if (!category) {

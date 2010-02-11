@@ -33,25 +33,25 @@
 #import <Foundation/Foundation.h>
 
 @class HGSResult;
+@class HGSTypeFilter;
 
 // Describes a category in terms of the types that it conforms to.
 // Also contains it's name (localized, unlocalized and singular).
 @interface QSBCategory : NSObject <NSCopying> {
  @private
-  NSSet *conformTypes_;
-  NSSet *doesNotConformTypes_;
+  HGSTypeFilter *typeFilter_;
   NSString *name_;
   NSString *localizedName_;
   NSString *localizedSingularName_;
 }
 
 @property (readonly, retain) NSString *name;
+@property (readonly, retain) HGSTypeFilter *typeFilter;
 @property (readonly, retain) NSString *localizedName;
 @property (readonly, retain) NSString *localizedSingularName;
-@property (readonly, retain) NSSet *conformTypes;
-@property (readonly, retain) NSSet *doesNotConformTypes;
 
 - (BOOL)isResultMember:(HGSResult *)result;
+- (BOOL)isValidType:(NSString *)type;
 - (NSComparisonResult)compare:(QSBCategory *)category;
 @end
 
