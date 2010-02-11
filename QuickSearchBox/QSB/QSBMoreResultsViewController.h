@@ -32,25 +32,28 @@
 
 #import "QSBResultsViewBaseController.h"
 
+@class QSBCategory;
+
 // A controller that manages the view-based 'More' results view.
 //
 @interface QSBMoreResultsViewController : QSBResultsViewBaseController {
  @private  
-  NSArray *moreResults_;  // The results we are presenting.
   NSMutableSet *showAllCategoriesSet_;  // Category keys for which to 'show all'
-
-  // Cache our results in case a category is fully exposed (Show All...)
-  // and the indexes and counts need recalculating.
-  NSDictionary *moreResultsDict_;
-  
-  // Dictionary of cached row heights for various classes of result views.
-  NSMutableDictionary *rowHeightDict_;
   NSTimeInterval blockTime_; // Time we started blocking repeats
+  NSUInteger moreCategoryResultCount_;  // How many "more" results the user wants
+  NSArray *sortedCategories_;  // The categories we are going to display.
+  
+  // How many rows will we show before we start to abridge results.
+  NSUInteger maxMoreResultCountBeforeAbridging_;
+  NSUInteger rowCount_;  // Number of rows in table
+  NSIndexSet *separatorRows_;  // Indexes of rows that are separators
+  NSDictionary *resultCountByCategory_;  // Current count by category.
+  NSUInteger resultCount_;  // Current count.
 }
 
-// Adds a category to the 'show all' list and then recalculates the
-// contents of the more results dictionary.
-- (void)addShowAllCategory:(NSString *)category;
+// Adds a category to the 'show all' list and then updates the contents
+// appropriately.
+- (void)addShowAllCategory:(QSBCategory *)category;
 
 @end
 
@@ -60,4 +63,4 @@
 // kQSBMoreResultsCategoryKey
 #define kQSBMoreResultsDidShowCategoryNotification @"QSBMoreResultsDidShowCategoryNotification"
 
-#define kQSBMoreResultsCategoryKey @"QSBMoreResultsCategoryKey"  // NSString *
+#define kQSBMoreResultsCategoryKey @"QSBMoreResultsCategoryKey"  // QSBCategory *

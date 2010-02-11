@@ -355,7 +355,7 @@
 								<double key="NSIntercellSpacingHeight">2.000000e+00</double>
 								<reference key="NSBackgroundColor" ref="918543327"/>
 								<reference key="NSGridColor" ref="308443737"/>
-								<double key="NSRowHeight">8.000000e+00</double>
+								<double key="NSRowHeight">2.200000e+01</double>
 								<int key="NSTvFlags">306184192</int>
 								<int key="NSColumnAutoresizingStyle">4</int>
 								<int key="NSDraggingSourceMaskForLocal">15</int>
@@ -397,6 +397,7 @@
 				<reference key="NSVScroller" ref="604040381"/>
 				<reference key="NSHScroller" ref="678789010"/>
 				<reference key="NSContentView" ref="1072380100"/>
+				<bytes key="NSScrollAmts">QSAAAEEgAABBwAAAQcAAAA</bytes>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -1167,7 +1168,6 @@
 							<string>hideSearchWindow:</string>
 							<string>hitHotKey:</string>
 							<string>openResultsTableItem:</string>
-							<string>performSearch:</string>
 							<string>resetSearchOrHideQuery:</string>
 							<string>selectCorpus:</string>
 							<string>selectResults:</string>
@@ -1175,7 +1175,6 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
