@@ -125,9 +125,6 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   // Mark all results controllers as needing to be updated.
   [topResultsController_ setResultsNeedUpdating:YES];
   [moreResultsController_ setResultsNeedUpdating:YES];
-  
-  // Immediately update the active controller and determine window height.
-  [[self activeResultsViewController] updateResultsView];
 }
 
 - (void)updateResultsView {
@@ -139,7 +136,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
 }
 
 - (CGFloat)windowHeight {
-  return [[self activeResultsViewController] windowHeight]
+  return [[self activeResultsViewController] tableHeight]
     + NSHeight([statusBar_ bounds]);
 }
 
@@ -260,7 +257,7 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
     = [self searchWindowController];
   QSBResultsViewBaseController *activeResultsViewController
     = [self activeResultsViewController];
-  CGFloat newHeight = [activeResultsViewController windowHeight];
+  CGFloat newHeight = [activeResultsViewController tableHeight];
   newHeight += [searchWindowController resultsViewOffsetFromTop];
   
   int resizingMask = NSViewWidthSizable | NSViewHeightSizable;
@@ -327,13 +324,11 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
                                animate:(BOOL)animate {
   
   if (activeResultsViewController_ != newController) {
-    [newController updateResultsView];
-     
-    // Swap out the old view while swapping in the top results view.
-    [newController setSwapSelection];
-    
     [self willChangeValueForKey:@"activeResultsViewController"];
+    [activeResultsViewController_ setShowing:NO];
     activeResultsViewController_ = newController;
+    [activeResultsViewController_ setShowing:YES];
+
     [self didChangeValueForKey:@"activeResultsViewController"];
     [self updateViewsWithAnimation:animate];
     [self tableViewSelectionDidChange:nil];
