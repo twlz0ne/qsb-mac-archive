@@ -212,7 +212,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
         // This gives some ordering to actions, putting more specific actions
         // first.
         HGSCalibratedScoreType scoreType;
-        if ([[action directObjectTypes] isEqual:[HGSAction allObjectTypes]]) {
+        if ([[action directObjectTypes] isEqual:[HGSTypeFilter allTypesSet]]) {
           scoreType = kHGSCalibratedWeakScore;
         } else {
           scoreType = kHGSCalibratedModerateScore;
