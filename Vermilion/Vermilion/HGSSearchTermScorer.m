@@ -87,7 +87,6 @@ CGFloat HGSScoreTermForItem(HGSTokenizedString *term,
   CFIndex stringIndex = 0;
   CFIndex abbrIndex = 0;
   CFIndex separatorIndex = 0;
-  CFIndex currMatchRange = 0;
   for (; stringIndex < strLength && abbrIndex < abbrLength; ++stringIndex) {
     UniChar abbrChar = abbrChars[abbrIndex];
     UniChar strChar = strChars[stringIndex];
@@ -122,7 +121,6 @@ CGFloat HGSScoreTermForItem(HGSTokenizedString *term,
       }
     }
   }
-  currMatchRange += 1;
   if (abbrIndex != abbrLength) {
     score = kHGSNoMatchScore;
   } else {
