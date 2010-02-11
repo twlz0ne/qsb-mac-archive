@@ -129,11 +129,7 @@
 // work the other way, and this is a common pattern for working with
 // NSTableView. NSTableView shouldn't cache the value, and instead should check
 // before calculating rowheights whether the delegate supports
-// tableView:heightOfRow like all the other delegate methods in NSTableView. b)
-// client calls [FooTable setDelegate:clientDelegate]; and behind the scenes I
-// create a proxy delegate and call [NSTableView setDelegate:proxyDelegate].
-// Proxydelegate intercepts or reroutes certain messages enroute out to
-// clientDelegate.
+// tableView:heightOfRow like all the other delegate methods in NSTableView.
 // -----------------
 // So what we do to work around this is implement a respondsToSelector so
 // that when we are asked whether or not we support tableView:heightOfRow: we
