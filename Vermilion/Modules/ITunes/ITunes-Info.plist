@@ -330,6 +330,11 @@
 			<string>^iTunes Music</string>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<string>itunes</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<array>
+				<string>itunes</string>
+				<string>file.media.music</string>
+			</array>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
