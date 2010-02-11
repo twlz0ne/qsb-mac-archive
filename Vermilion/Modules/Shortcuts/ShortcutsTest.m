@@ -184,8 +184,10 @@
 
 - (void)singleResult:(NSNotification *)notification {
   HGSSearchOperation *op = [notification object];
-  STAssertEquals([op resultCount], 1U, nil);
-  HGSScoredResult *scoredResult = [op sortedRankedResultAtIndex:0];
+  HGSTypeFilter *filter = [HGSTypeFilter filterAllowingAllTypes];
+  STAssertEquals([op resultCountForFilter:filter], 1U, nil);
+  HGSScoredResult *scoredResult = [op sortedRankedResultAtIndex:0
+                                                     typeFilter:filter];
   STAssertEqualObjects([scoredResult displayName], @"SampleContact.abcdp", nil);
 }
 

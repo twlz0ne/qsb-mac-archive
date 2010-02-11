@@ -36,6 +36,7 @@
 #import "HGSQuery.h"
 #import "HGSResult.h"
 #import "HGSOperation.h"
+#import "HGSTypeFilter.h"
 #import "HGSType.h"
 #import "HGSTokenizer.h"
 
@@ -139,8 +140,11 @@
     [results_ release];
   }
   HGSSearchOperation *op = [note object];
-  NSRange range = NSMakeRange(0, [op resultCount]);
-  results_ = [[op sortedRankedResultsInRange:range] copy];
+  HGSTypeFilter *filter = [HGSTypeFilter filterAllowingAllTypes];
+  NSUInteger resultCount = [op resultCountForFilter:filter];
+  NSRange range = NSMakeRange(0, resultCount);
+  results_ = [[op sortedRankedResultsInRange:range
+                                  typeFilter:filter] copy];
 }
 
 @end

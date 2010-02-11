@@ -80,8 +80,10 @@ static NSString *const kClipboardTestString = @"Lazarus Long Text";
 
 - (void)gotResults:(NSNotification *)notification {
   HGSSearchOperation *op = [notification object];
-  NSRange resultRange = NSMakeRange(0, [op resultCount]);
-  results_ = [op sortedRankedResultsInRange:resultRange];
+  HGSTypeFilter *filter = [HGSTypeFilter filterAllowingAllTypes];
+  NSRange resultRange = NSMakeRange(0, [op resultCountForFilter:filter]);
+  results_ = [op sortedRankedResultsInRange:resultRange
+                                 typeFilter:filter];
   STAssertNotNil(results_, nil);
   [results_ retain];
   
