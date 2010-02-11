@@ -32,10 +32,10 @@
 
 #import "Vermilion/Vermilion.h"
 
-#import "GTMDefines.h"
-#import "GTMGarbageCollection.h"
-#import "GTMNSString+URLArguments.h"
-#import "GTMGoogleSearch.h"
+#import <GTM/GTMDefines.h>
+#import <GTM/GTMGarbageCollection.h>
+#import <GTM/GTMNSString+URLArguments.h>
+#import <GTM/GTMGoogleSearch.h>
 
 // TODO(dmaclach): should this be off webpage?
 #define kHGSTypeSearchCorpus @"searchcorpus"
@@ -62,10 +62,15 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
   if (isValid) {
     // We are a valid source for any web page
     HGSResult *pivotObject = [query pivotObject];
-    NSString *template
-      = [pivotObject valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
-    BOOL allowsSearchSite = [pivotObject conformsToType:kHGSTypeWebpage];
-    isValid = (template!= nil) || allowsSearchSite;
+    if (pivotObject) {
+      NSString *template
+        = [pivotObject valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
+      BOOL allowsSearchSite = [pivotObject conformsToType:kHGSTypeWebpage];
+      isValid = (template!= nil) || allowsSearchSite;
+    } else {
+      HGSTokenizedString *tokenizedQueryString = [query tokenizedQueryString];
+      isValid = [tokenizedQueryString originalLength] > 3;
+    }
   }
   return isValid;
 }
@@ -155,8 +160,31 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
         [operation setRankedResults:[NSArray arrayWithObject:placeholderItem]];
       }
     }
+  } else {
+    HGSTokenizedString *tokenizedQueryString = [query tokenizedQueryString];
+    NSString *name = [tokenizedQueryString originalString];
+    GTMGoogleSearch *googleSearch = [GTMGoogleSearch sharedInstance];
+    NSString *cleanedQuery = [name gtm_stringByEscapingForURLArgument];
+    NSString *urlString = [googleSearch searchURLFor:cleanedQuery
+                                              ofType:GTMGoogleSearchWeb
+                                           arguments:nil];
+    NSImage *blueIcon = [self imageNamed:@"blue-google-white.icns"];
+    HGSAssert(blueIcon, nil);
+    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                blueIcon, kHGSObjectAttributeIconKey,
+                                nil];
+    HGSScoredResult *result 
+      = [HGSScoredResult resultWithURI:urlString
+                                  name:name
+                                  type:kHGSTypeGoogleSearch
+                                source:nil
+                            attributes:attributes
+                                 score:HGSCalibratedScore(kHGSCalibratedModerateScore)
+                           matchedTerm:tokenizedQueryString
+                        matchedIndexes:nil];
+    [operation setRankedResults:[NSArray arrayWithObject:result]];
   }
-
+      
   [operation finishQuery];
 }
 
