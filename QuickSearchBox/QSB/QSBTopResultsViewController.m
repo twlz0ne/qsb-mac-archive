@@ -39,9 +39,15 @@
 #import "QSBResultsViewTableView.h"
 #import "QSBSearchWindowController.h"
 #import "QSBSearchController.h"
+#import "QSBCategory.h"
+
+@interface QSBTopResultsViewController ()
+@property (readwrite, copy) NSString *categorySummaryString;
+@end
 
 @implementation QSBTopResultsViewController
 
+@synthesize categorySummaryString = categorySummaryString_;
 
 - (void)awakeFromNib {  
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
@@ -74,13 +80,28 @@
   [self scrollToEndOfDocument:self];
 }
 
-- (NSString *)categorySummaryString {
-  return [[categorySummaryString_ retain] autorelease];
-}
-
-- (void)setCategorySummaryString:(NSString *)value {
-  [categorySummaryString_ release];
-  categorySummaryString_ = [value copy];
+- (void)updateCategorySummaryString:(NSDictionary *)resultCountByCategory {
+  NSMutableString *categorySummary = [NSMutableString string];
+  NSString *comma = nil;
+  for (QSBCategory *category in resultCountByCategory) {
+    NSNumber *nsValue = [resultCountByCategory objectForKey:category];
+    NSUInteger catCount = [nsValue unsignedIntValue];
+    if (catCount) {
+      NSString *catString = nil;
+      if (catCount == 1) {
+        catString = [category localizedSingularName];
+      } else {
+        catString = [category localizedName];
+      }
+      if (!comma) {
+        comma = NSLocalizedString(@", ", nil);
+      } else {
+        [categorySummary appendString:comma];
+      }
+      [categorySummary appendFormat:@"%u %@", catCount, catString];
+    }
+  }
+  [self setCategorySummaryString:categorySummary];
 }
 
 #pragma mark NSTableView Delegate Methods
@@ -111,6 +132,23 @@
   return [[[self searchViewController] searchController] topResultCount];
 }
 
+- (CGFloat)tableView:(NSTableView *)tableView
+         heightOfRow:(NSInteger)row {
+  NSArray *columns = [tableView tableColumns];
+  NSTableColumn *column = [columns objectAtIndex:0];
+  NSView *colView = [self tableView:tableView viewForColumn:column row:row];
+  CGFloat rowHeight = NSHeight([colView frame]);
+  return rowHeight;
+}
+
+#pragma mark Notifications
+- (void)searchControllerDidUpdateResults:(NSNotification *)notification {
+  NSDictionary *userInfo = [notification userInfo];
+  NSDictionary *resultCountByCategory 
+    = [userInfo objectForKey:kQSBSearchControllerResultCountByCategoryKey];
+  [self updateCategorySummaryString:resultCountByCategory];
+  [super searchControllerDidUpdateResults:notification];
+}
 
 @end
 

@@ -30,21 +30,14 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Cocoa/Cocoa.h>
 #import "QSBResultsViewBaseController.h"
 
-// TODO(mrossetti): The behavior here can be abstracted and shared with the
-// similar QSBMoreResultsViewController.
-
 // A controller that manages the view-based 'More' results view.
-//
 @interface QSBTopResultsViewController : QSBResultsViewBaseController {
  @private
   NSString *categorySummaryString_;
 }
 
-// Update the category summary for the 'More' fold line.
-- (NSString *)categorySummaryString;
-- (void)setCategorySummaryString:(NSString *)value;
+@property (readonly, copy) NSString *categorySummaryString;
 
 @end
