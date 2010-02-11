@@ -32,7 +32,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
-
+// QSBDebugWindow is a window that only appears in debug builds and is useful
+// for debugging queries. It gives some basic data on queries, results and
+// timings.
 @interface QSBDebugWindowController : NSWindowController {
  @private
   IBOutlet NSBrowser *mixedResults_;

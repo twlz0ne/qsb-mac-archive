@@ -44,8 +44,9 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
                                      HGSSearchOperation *op2, 
                                      void* context) {
   NSInteger value = NSOrderedSame;
-  NSUInteger resultCount1 = [op1 resultCount];
-  NSUInteger resultCount2 = [op2 resultCount];
+  HGSTypeFilter *filter = [HGSTypeFilter filterAllowingAllTypes];
+  NSUInteger resultCount1 = [op1 resultCountForFilter:filter];
+  NSUInteger resultCount2 = [op2 resultCountForFilter:filter];
   if (resultCount1 > resultCount2) {
     value = NSOrderedAscending;
   } else  if (resultCount1 < resultCount2) {
@@ -105,7 +106,8 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
            object:nil];
   
   NSFont *font = [NSFont systemFontOfSize:[NSFont smallSystemFontSize]];
-  NSBrowserCell *browserCell = [[NSBrowserCell alloc] initTextCell:@""];
+  NSBrowserCell *browserCell 
+    = [[[NSBrowserCell alloc] initTextCell:@""] autorelease];
   [browserCell setFont:font];
   [mixedResults_ setCellPrototype:browserCell];
   [operations_ setCellPrototype:browserCell];
@@ -142,7 +144,9 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
   QSBSearchController *controller = [notification object];
   NSRange range = NSMakeRange(0, [controller topResultCount]);
   NSArray *topResults = [controller topResultsInRange:range];
-  NSDictionary *moreResults = [controller rankedResultsByCategory];
+  NSDictionary *moreResults = nil;
+  // TODO(dmaclach): fix this up somehow.
+  // [controller rankedResultsByCategory];
   NSDictionary *dictionary 
     = [NSDictionary dictionaryWithObjectsAndKeys:
        topResults, kQSBDWTopResultsKey, 
@@ -219,7 +223,8 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
   } else if (column == 1) {
     NSInteger selectedOp = [operations_ selectedRowInColumn:0];
     HGSSearchOperation *operation = [searchOperations_ objectAtIndex:selectedOp];
-    rowCount = [operation resultCount];
+    HGSTypeFilter *filter = [HGSTypeFilter filterAllowingAllTypes];
+    rowCount = [operation resultCountForFilter:filter];
   } else if (column == 2) {
     rowCount = kQSBDWResultRowCount;
   }
@@ -287,28 +292,34 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
     HGSSearchOperation *operation = [searchOperations_ objectAtIndex:row];
     NSString *name = [operation displayName];
     NSString *cellData = nil;
+    HGSTypeFilter *filter = [HGSTypeFilter filterAllowingAllTypes];
     if ([operation isCancelled]) {
       cellData = [NSString stringWithFormat:@"%@ (Cancelled)", name];
     } else if ([operation isFinished]) {
       cellData = [NSString stringWithFormat:@"%@ (%d - %0.3fms)", 
-                  name, [operation resultCount], [operation runTime] / 10e6];
+                  name, [operation resultCountForFilter:filter], 
+                  [operation runTime] / 10e5];
     } else {
       cellData = [NSString stringWithFormat:@"%@ (%d)", 
-                  name, [operation resultCount]];
+                  name, [operation resultCountForFilter:filter]];
     }
     [cell setStringValue:cellData];
   } else {
     NSInteger selectedOp = [operations_ selectedRowInColumn:0];
     HGSSearchOperation *operation = [searchOperations_ objectAtIndex:selectedOp];
+    HGSTypeFilter *allFilter = [HGSTypeFilter filterAllowingAllTypes];
     if (column == 1) {
-      HGSScoredResult *scoredResult = [operation sortedRankedResultAtIndex:row];
+      HGSScoredResult *scoredResult 
+        = [operation sortedRankedResultAtIndex:row
+                                    typeFilter:allFilter];
       NSString *cellData = [NSString stringWithFormat:@"%@ (%0.3f)", 
                             [scoredResult displayName], [scoredResult score]];
       [cell setStringValue:cellData];
     } else if (column == 2) {
       NSInteger selectedResult = [operations_ selectedRowInColumn:1];
       HGSScoredResult *result 
-        = [operation sortedRankedResultAtIndex:selectedResult];
+        = [operation sortedRankedResultAtIndex:selectedResult
+                                    typeFilter:allFilter];
       [self willDisplayCell:cell atRow:row forResult:result];
     }
   }
