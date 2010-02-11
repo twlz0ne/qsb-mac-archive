@@ -223,7 +223,13 @@ static NSString *const kWebURLsWithTitlesPboardType
       QSBTableResult *tableResult 
         = [cachedTableResults_ objectForKey:scoredResult];
       if (!tableResult) {
-        tableResult = [QSBSourceTableResult tableResultWithResult:scoredResult];
+        Class resultClass = Nil;
+        if ([scoredResult conformsToType:kHGSTypeGoogleSearch]) {
+          resultClass = [QSBGoogleTableResult class];
+        } else {
+          resultClass = [QSBSourceTableResult class];
+        }
+        tableResult = [resultClass tableResultWithResult:scoredResult];
         [cachedTableResults_ setObject:tableResult forKey:scoredResult];
       }
       value = tableResult;
