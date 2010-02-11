@@ -36,5 +36,8 @@ set -o errexit
 set -o nounset
 set -o verbose
 
+# If QSBSRCROOT isn't set, then we'll make it relative to our current SRCROOT.
+QSBSRCROOT=${QSBSRCROOT:="${SRCROOT}/../"}
+
 rm -rf "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}"
 "${QSBSRCROOT}/QSB/BuildScripts/Localization.sh"
