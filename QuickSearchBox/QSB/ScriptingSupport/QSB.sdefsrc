@@ -107,7 +107,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <direct-parameter type="text" description="The string to search for."/>
       <parameter name="handler" code="Hand" type="script" optional="yes"
                  description="Callback handling script for search.">
-        <cocoa key="Handler"/>
+        <cocoa key="handler"/>
+      </parameter>
+      <parameter name="maximum number of results" code="MaxX" type="integer" optional="yes"
+                 description="The maximum number of results to return. Defaults to 100.">
+        <cocoa key="maxResults"/>
       </parameter>
       <result>
         <type type="search result" list="yes"/>

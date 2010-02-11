@@ -76,10 +76,11 @@
   HGSQueryController *queryController_;
   NSAppleScript *handler_;
   NSArray *results_;
-  BOOL mixingHasCompleted_;
+  NSRange resultRange_;
+  BOOL queryHasFinished_;
 }
 
-@property BOOL mixingHasCompleted;
+@property BOOL queryHasFinished;
 
 @end
 
@@ -91,7 +92,7 @@
 
 @implementation QSBSearchForCommand
 
-@synthesize mixingHasCompleted = mixingHasCompleted_;
+@synthesize queryHasFinished = queryHasFinished_;
 
 - (id)performDefaultImplementation {
   // Store off our return address so we can call back below in finished.
@@ -106,14 +107,18 @@
   HGSQuery *query = [[[HGSQuery alloc] initWithString:text 
                                               results:nil
                                            queryFlags:0] autorelease];
-  [query setMaxDesiredResults:100];
   
   HGSAssert(!queryController_, @"QueryController should be nil");
   queryController_ = [[HGSQueryController alloc] initWithQuery:query];
 
   // store off the handler if there is one. Optional arg.
   NSDictionary *args = [self evaluatedArguments];
-  handler_ = [[args objectForKey:@"Handler"] retain];
+  handler_ = [[args objectForKey:@"handler"] retain];
+  
+  // Set up the range of results to find.
+  NSInteger maxResults = [[args objectForKey:@"maxResults"] integerValue];
+  if (maxResults <= 0) maxResults = 100;
+  resultRange_ = NSMakeRange(0, maxResults);
   
   // Set up notifications and start the query
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -121,14 +126,14 @@
           selector:@selector(queryControllerDidFinish:) 
               name:kHGSQueryControllerDidFinishNotification 
             object:queryController_];
-  [self setMixingHasCompleted:NO];
+  [self setQueryHasFinished:NO];
   [queryController_ startQuery];
   
   // if we don't have a handler, we'll just spin until the search
   // is done. This could take a while and may time out
   if (!handler_) {
     NSRunLoop *rl = [NSRunLoop currentRunLoop];
-    while (![self mixingHasCompleted]) {
+    while (![self queryHasFinished]) {
       [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     }
   } else {
@@ -172,23 +177,19 @@
 }
  
 - (void)queryControllerDidFinish:(NSNotification *)notification {
+  HGSQueryController *controller = [notification object];
+  HGSAssert(controller == queryController_, nil);
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self 
                 name:kHGSQueryControllerDidFinishNotification 
               object:queryController_];
   // Our query is finished.
-  HGSMixer *mixer = [queryController_ mixerForCurrentResults];
-  [nc addObserver:self 
-         selector:@selector(mixerDidFinish:) 
-             name:kHGSMixerDidFinishNotification 
-           object:mixer];
-  [mixer start];
-}
+  [self setQueryHasFinished:YES];
 
-- (void)mixerDidFinish:(NSNotification *)notification {
-  HGSMixer *mixer = [notification object];
-  [self setMixingHasCompleted:YES];
-  NSArray *results = [mixer rankedResults];
+  NSArray *results 
+    = [controller rankedResultsInRange:resultRange_
+                            typeFilter:[HGSTypeFilter filterAllowingAllTypes]
+                      removeDuplicates:NO];
   NSUInteger count = [results count];
   NSMutableArray *appleScriptResults = [NSMutableArray arrayWithCapacity:count];
   for (HGSScoredResult *hgsResult in results) {
