@@ -627,16 +627,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [searchTextField_ setStringValue:queryString];
 }
 
-- (IBAction)performSearch:(id)sender {
-  // For now we just blindly submit a google search. 
-  // TODO(alcor): make this perform a contextual search depending on the pivot
-  HGSTokenizedString *queryString 
-    = [activeSearchViewController_ tokenizedQueryString];
-  QSBGoogleTableResult *googleResult
-    = [QSBGoogleTableResult tableResultForQuery:queryString];
-  [googleResult performDefaultActionWithSearchViewController:activeSearchViewController_];
-}
-
 - (void)pivotOnObject:(QSBTableResult *)pivotObject {
   // Use the currently selected results item as a pivot and clear the search 
   // text by setting up a new query by instantiating a pivot view and creating
@@ -1278,10 +1268,6 @@ doCommandBySelector:(SEL)commandSelector {
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   [ud setDouble:topLeft.x forKey:kQSBSearchWindowFrameLeftPrefKey];
   [ud setDouble:topLeft.y forKey:kQSBSearchWindowFrameTopPrefKey];
-  CGFloat newWindowHeight = windowFrame.size.height;
-  if ([resultsWindow_ isVisible]) {
-    newWindowHeight = [activeSearchViewController_ windowHeight];
-  }
 }
 
 #pragma mark NSWindow Notification Methods
@@ -1633,13 +1619,10 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (void)setActiveSearchViewController:(QSBSearchViewController *)searchViewController {
-  QSBSearchController *searchController
-    = [activeSearchViewController_ searchController];
   // We are no longer interested in the current controller producing results.
   [activeSearchViewController_ stopQuery];
   [activeSearchViewController_ autorelease];
   activeSearchViewController_ = [searchViewController retain];
-  searchController = [activeSearchViewController_ searchController];
   [activeSearchViewController_ didMakeActiveSearchViewController];
   [self updatePivotToken];
 }

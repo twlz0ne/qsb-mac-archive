@@ -99,9 +99,6 @@ extern const NSTimeInterval kQSBAppearDelay;
 // Take a corpus from a menu item
 - (IBAction)selectCorpus:(id)sender;
 
-// Search for current string - usually google, except in search contexts
-- (IBAction)performSearch:(id)sender;
-
 // Open a table item.
 - (void)openResultsTableItem:(id)sender;
 
