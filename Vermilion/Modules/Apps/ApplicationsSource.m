@@ -32,6 +32,10 @@
 
 #import <Vermilion/Vermilion.h>
 
+// Private LSInfo attribute. Returns a CFArray with valid architectures 
+// (i386, ppc, etc.).
+extern const CFStringRef kLSItemArchitecturesValidOnCurrentSystem;
+
 // Indexes Applications and Preference Panes. Allows pivoting on the
 // System Preferences to find preference panes inside it.
 
@@ -100,6 +104,28 @@ static NSString *const kApplicationSourcePredicateString
            object:query_];
 
   [query_ startQuery];
+}
+
+- (BOOL)pathIsLaunchable:(NSString *)path {
+  // Check to see if we can actually execute this file
+  BOOL launchable = NO;
+  NSURL *url = [NSURL fileURLWithPath:path];
+  if (url) {
+    FSRef fsRef;
+    if (CFURLGetFSRef((CFURLRef)url, &fsRef)) {
+      CFTypeRef archs;
+      if (LSCopyItemAttribute(&fsRef, 
+                              kLSRolesAll, 
+                              kLSItemArchitecturesValidOnCurrentSystem, 
+                              &archs) == noErr) {
+        if (archs) {
+          launchable = CFArrayGetCount(archs) > 0;
+          CFRelease(archs);
+        }
+      }
+    }
+  }
+  return launchable;
 }
 
 - (BOOL)pathIsPrefPane:(NSString *)path {
@@ -198,6 +224,12 @@ static NSString *const kApplicationSourcePredicateString
       if (fileAttrs) {
         // We have the exact same file on our system drive. Most likely an
         // alternate drive, or backup drive.
+        attributes = belowFoldAttributes;
+      }
+    }
+    
+    if (attributes != belowFoldAttributes) {
+      if (![self pathIsLaunchable:path]) {
         attributes = belowFoldAttributes;
       }
     }
