@@ -32,6 +32,7 @@
 
 #import "HGSResult.h"
 #import "HGSType.h"
+#import "HGSTypeFilter.h"
 #import "HGSExtensionPoint.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSLog.h"
@@ -61,7 +62,6 @@ NSString* const kHGSObjectAttributeSourceURLKey = @"kHGSObjectAttributeSourceURL
 NSString* const kHGSObjectAttributeIconKey = @"kHGSObjectAttributeIcon";
 NSString* const kHGSObjectAttributeImmediateIconKey = @"kHGSObjectAttributeImmediateIconKey";
 NSString* const kHGSObjectAttributeIconPreviewFileKey = @"kHGSObjectAttributeIconPreviewFileKey";
-NSString *const kHGSObjectAttributeCompoundIconPreviewFileKey = @"kHGSObjectAttributeCompoundIconPreviewFileKey";
 NSString* const kHGSObjectAttributeFlagIconNameKey = @"kHGSObjectAttributeFlagIconName";
 NSString* const kHGSObjectAttributeAliasDataKey = @"kHGSObjectAttributeAliasData";
 NSString* const kHGSObjectAttributeIsSyntheticKey = @"kHGSObjectAttributeIsSynthetic";
@@ -76,6 +76,7 @@ NSString* const kHGSObjectAttributeAllowSiteSearchKey = @"kHGSObjectAttributeAll
 NSString* const kHGSObjectAttributeWebSuggestTemplateKey = @"kHGSObjectAttributeWebSuggestTemplate";
 NSString* const kHGSObjectAttributeStringValueKey = @"kHGSObjectAttributeStringValue";
 NSString* const kHGSObjectAttributePasteboardValueKey = @"kHGSObjectAttributePasteboardValue";
+NSString* const kHGSObjectAttributeUTTypeKey = @"kHGSObjectAttributeUTType";
 
 // Contact related keys
 NSString* const kHGSObjectAttributeContactEmailKey = @"kHGSObjectAttributeContactEmail";  
@@ -174,16 +175,6 @@ NSString* const kHGSObjectStatusStaleValue = @"kHGSObjectStatusStaleValue";
 - (BOOL)conformsToType:(NSString *)typeStr {
   NSString *myType = [self type];
   return HGSTypeConformsToType(myType, typeStr);
-}
-
-- (BOOL)conformsToTypeSet:(NSSet *)typeSet {
-  NSString *myType = [self type];
-  return HGSTypeConformsToTypeSet(myType, typeSet);
-}
-
-- (BOOL)doesNotConformToTypeSet:(NSSet *)typeSet {
-  NSString *myType = [self type];
-  return HGSTypeDoesNotConformToTypeSet(myType, typeSet);
 }
 
 - (BOOL)isDuplicate:(HGSResult *)compareTo {
@@ -472,8 +463,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
 - (id)resultByAddingAttributes:(NSDictionary *)attributes {
   NSMutableDictionary *newAttributes 
-    = [NSMutableDictionary dictionaryWithDictionary:[self attributes]];
-  [newAttributes addEntriesFromDictionary:attributes];
+    = [NSMutableDictionary dictionaryWithDictionary:attributes];
+  [newAttributes addEntriesFromDictionary:[self attributes]];
   HGSUnscoredResult *newResult 
     = [HGSUnscoredResult resultWithURI:[self uri]
                                   name:[self displayName]
@@ -646,10 +637,12 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     rankFlags_ &= ~clearFlags;
     matchedTerm_ = [term retain];
     matchedIndexes_ = [indexes retain];
-  }
-  if (!result_) {
-    [self release];
-    self = nil;
+    
+    HGSAssert(result_, @"Must have a result argument");
+    if (!result_) {
+      [self release];
+      self = nil;
+    }
   }
   return self;
 }
@@ -708,7 +701,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
 - (id)resultByAddingAttributes:(NSDictionary *)attributes {
   NSMutableDictionary *newAttributes 
-    = [NSMutableDictionary dictionaryWithDictionary:[self attributes]];
+    = [NSMutableDictionary dictionaryWithDictionary:attributes];
   [newAttributes addEntriesFromDictionary:[self attributes]];
   HGSScoredResult *newResult = [HGSScoredResult resultWithURI:[self uri]
                                                          name:[self displayName]
@@ -808,27 +801,6 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     if (!isOfType) break;
   }
   return isOfType;
-}
-
-- (BOOL)conformsToTypeSet:(NSSet *)typeSet {
-  BOOL isOfType = YES;
-  for (HGSScoredResult *result in self) {
-    isOfType = [result conformsToTypeSet:typeSet];
-    if (!isOfType) break;
-  }
-  return isOfType;
-}
-
-- (BOOL)doesNotConformToTypeSet:(NSSet *)typeSet {
-  // Returns YES if all of the results do not conform.
-  BOOL doesNotConform = YES;
-  for (HGSScoredResult *result in self) {
-    if ([result conformsToTypeSet:typeSet]) {
-      doesNotConform = NO;
-      break;
-    }
-  }
-  return doesNotConform;
 }
 
 - (void)promote {

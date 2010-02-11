@@ -65,7 +65,6 @@ extern NSString* const kHGSObjectAttributeSourceURLKey;  // NSString
 extern NSString* const kHGSObjectAttributeIconKey;  // NSImage
 extern NSString* const kHGSObjectAttributeImmediateIconKey;  // NSImage
 extern NSString* const kHGSObjectAttributeIconPreviewFileKey;  // NSString - either an URL or a filepath
-extern NSString* const kHGSObjectAttributeCompoundIconPreviewFileKey;  // NSURL
 extern NSString* const kHGSObjectAttributeFlagIconNameKey;  // NSString
 extern NSString* const kHGSObjectAttributeAliasDataKey;  // NSData
 extern NSString* const kHGSObjectAttributeIsSyntheticKey;  // NSNumber (BOOL)
@@ -76,6 +75,7 @@ extern NSString* const kHGSObjectAttributeEmailAddressesKey; // NSArray of NSStr
 extern NSString* const kHGSObjectAttributeContactsKey;  // NSArray of NSString - Names of related people
 extern NSString* const kHGSObjectAttributeBundleIDKey;  // NSString - Bundle ID
 extern NSString* const kHGSObjectAttributeAlternateActionURIKey; // NSURL - url to be opened for accessory cell in mobile
+extern NSString* const kHGSObjectAttributeUTTypeKey;  // NSString - UTType
 
 extern NSString* const kHGSObjectAttributeWebSearchDisplayStringKey; // Display string to replace "Search %@" when it doesn't make sense
 extern NSString* const kHGSObjectAttributeWebSearchTemplateKey; // NSString
@@ -139,13 +139,10 @@ extern NSString* const kHGSObjectStatusStaleValue;
 
 /*!
  Some helpers to check if this result is of a given type.  -[isOfType:] checks
- for an exact match of the type.  -[conformsToType{Set}:] checks to see if this
- object is of the specific type{s} or a refinement of it/them.
+ for an exact match of the type.
 */
 - (BOOL)isOfType:(NSString *)typeStr;
 - (BOOL)conformsToType:(NSString *)typeStr;
-- (BOOL)conformsToTypeSet:(NSSet *)typeSet;
-- (BOOL)doesNotConformToTypeSet:(NSSet *)typeSet;
 
 /*!
  Is this result a "duplicate" of |compareTo|? Not using |-isEqual:| because
@@ -162,7 +159,9 @@ extern NSString* const kHGSObjectStatusStaleValue;
 
 /*!
  Return a new result by adding attributes from result to self.
-*/
+ If both self and result contain a value for an attribute, self is not changed
+ for that attribute.
+ */
 - (id)resultByAddingAttributesFromResult:(HGSResult *)result;
 
 /*!
@@ -198,7 +197,10 @@ extern NSString* const kHGSObjectStatusStaleValue;
 
 
 /*!
- Return a new result by adding attributes to self. Must be implemented by subclass.
+ Return a new result by adding attributes to self. 
+ If both self and attributes contain a value for an attribute, self is not
+ changed for that attribute.
+ Must be implemented by subclass.
  */
 - (id)resultByAddingAttributes:(NSDictionary *)attributes;
 
@@ -209,7 +211,6 @@ extern NSString* const kHGSObjectStatusStaleValue;
 */
 @interface HGSUnscoredResult : HGSResult {
  @private
-  NSUInteger uriHash_;
   NSString *uri_;
   NSString *displayName_;
   NSString *type_;
@@ -357,13 +358,11 @@ extern NSString* const kHGSObjectStatusStaleValue;
 - (NSImage *)icon;
 /*!
   Some helpers to check if this result is of a given type.  |isOfType| checks
-  for an exact match of the type.  |conformsToType{Set}| checks to see if this
-  object is of the specific type{s} or a refinement of it/them.
+  for an exact match of the type.
 */
 - (BOOL)isOfType:(NSString *)typeStr;
 - (BOOL)conformsToType:(NSString *)typeStr;
-- (BOOL)conformsToTypeSet:(NSSet *)typeSet;
-- (BOOL)doesNotConformToTypeSet:(NSSet *)typeSet;
+
 /*!
  Mark these results as having been of interest to the user.
  Base implementation sends a promoteResult message to the result's source.

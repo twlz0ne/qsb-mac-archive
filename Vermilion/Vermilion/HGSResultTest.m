@@ -175,24 +175,6 @@
     STAssertEquals(data[i].tests[7],
                    [obj conformsToType:@"bar"],
                    @"type %@", data[i].theType);
-
-    // Test conformsToTypeSet:
-    NSSet *testSet = [NSSet setWithObjects:@"spam", @"test", @"mumble", nil];
-    STAssertNotNil(testSet, nil);
-    STAssertEquals(data[i].tests[4], [obj conformsToTypeSet:testSet],
-                   @"type %@", data[i].theType);
-    testSet = [NSSet setWithObjects:@"spam", @"test.bar", @"mumble", nil];
-    STAssertNotNil(testSet, nil);
-    STAssertEquals(data[i].tests[5], [obj conformsToTypeSet:testSet],
-                   @"type %@", data[i].theType);
-    testSet = [NSSet setWithObjects:@"testbar", @"spam" @"mumble", nil];
-    STAssertNotNil(testSet, nil);
-    STAssertEquals(data[i].tests[6], [obj conformsToTypeSet:testSet],
-                   @"type %@", data[i].theType);
-    testSet = [NSSet setWithObjects:@"spam", @"mumble", @"bar", nil];
-    STAssertNotNil(testSet, nil);
-    STAssertEquals(data[i].tests[7], [obj conformsToTypeSet:testSet],
-                   @"type %@", data[i].theType);
   }
 }
 
