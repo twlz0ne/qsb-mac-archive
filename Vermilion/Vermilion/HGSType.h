@@ -50,6 +50,11 @@
 #define HGS_SUBTYPE(x,y) x @"." y
 
 /*!
+ The "all types" meta type. Everything conforms to this.
+*/
+#define kHGSTypeAllTypes @"*"
+
+/*!
  Here are the current bases/common types. This DOES NOT mean that this is all 
  the possible valid base types.  New sources are free to add new types.
 */
@@ -96,36 +101,3 @@
 #define kHGSTypeTextEmailAddress HGS_SUBTYPE(kHGSTypeText, @"emailaddress")
 #define kHGSTypeTextInstantMessage HGS_SUBTYPE(kHGSTypeText, @"instantmessage")
 #define kHGSTypeTextAddress      HGS_SUBTYPE(kHGSTypeText, @"address")
-
-/*! 
- Get an HGSType for a given path.
- @param path Path to get the HGSType for.
- @result HGSType of path.
-*/
-NSString *HGSTypeForPath(NSString *path);
-
-/*!
- Check to see if one type conforms to another.
- @param type1 Type to check.
- @param type2 Type to conform to.
- @result YES if type1 conforms to type2
-*/
-BOOL HGSTypeConformsToType(NSString *type1, NSString *type2);
-
-/*!
- Check to see if one type conforms to a set of types.
- @param type1 Type to check.
- @param types Set of types to conform to.
- @result YES if type1 conforms to any of the types in types.
-         If types is nil, will return YES.
-*/
-BOOL HGSTypeConformsToTypeSet(NSString *type1, NSSet *types);
-
-/*!
- Check to see if one type does not conform to a set of types.
- @param type1 Type to check.
- @param types Set of types to check lack of conformity to.
- @result YES if type1 does not conform to any of the types in types.
-         If types is nil, will return YES.
- */
-BOOL HGSTypeDoesNotConformToTypeSet(NSString *type1, NSSet *types);
