@@ -52,6 +52,8 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 // Return our main search window controller.
 - (QSBSearchWindowController *)searchWindowController;
 
+// Update the metrics of our results presentation and propose a new table height.
+- (void)updateTableHeight;
 @end
 
 
@@ -63,7 +65,7 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
   [nc addObserver:self 
          selector:@selector(searchControllerDidUpdateResults:) 
              name:kQSBSearchControllerDidUpdateResultsNotification 
-           object:nil];
+           object:[searchViewController_ searchController]];
 
   resultsNeedUpdating_ = YES;
   [resultsTableView_ setDoubleAction:@selector(openResultsTableItem:)];
@@ -103,19 +105,21 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 
 - (void)setResultsNeedUpdating:(BOOL)value {
   resultsNeedUpdating_ = value;
+  [self updateTableHeight];
 }
 
 - (BOOL)resultsNeedUpdating {
   return resultsNeedUpdating_;
 }
 
-- (CGFloat)setIsShowing:(BOOL)value {
+- (void)setShowing:(BOOL)value {
   if (value) {
     // See if we're about to be shown and we need updating.
     if ([self resultsNeedUpdating] && ![self isShowing]) {
-      [self updateResultsView];
+      [self updateTableHeight];
     }
-    
+    [self scrollToBeginningOfDocument:self];
+
     // Set origin to 0,0 and return previously calculated lastWindowHeight_.
     [resultsView_ setHidden:NO];
     [[resultsView_ animator] setFrameOrigin:NSMakePoint(0.0, 0.0)];
@@ -131,17 +135,10 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
     [[resultsView_ animator] setHidden:YES];
   }
   isShowing_ = value;
-  return lastWindowHeight_;
 }
 
 - (BOOL)isShowing {
   return isShowing_;
-}
-
-- (void)setSwapSelection {
-  // The default behavior is to select the first row of the to-be-swapped-in
-  // results view.
-  [self scrollToBeginningOfDocument:self];
 }
 
 - (QSBTableResult *)selectedTableResult {
@@ -153,7 +150,7 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
   [self scrollToBeginningOfDocument:self];
 }
 
-- (CGFloat)updateResultsView {
+- (void)updateTableHeight {
   // All of the view components have a fixed height relationship.  Base all
   // calculations on the change in the scrollview's height.  The scrollview's
   // height is determined from the tableview's height but within limits.
@@ -171,13 +168,11 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
   CGFloat maxTableHeight = [self maximumTableHeight];
   newTableHeight = MAX(newTableHeight, minTableHeight);
   newTableHeight = MIN(newTableHeight, maxTableHeight);
-  lastWindowHeight_ = newTableHeight;
-  
-  return lastWindowHeight_;
+  lastTableHeight_ = newTableHeight;
 }
 
-- (CGFloat)windowHeight {
-  return lastWindowHeight_;
+- (CGFloat)tableHeight {
+  return lastTableHeight_;
 }
 
 - (BOOL)performSelectionMovementSelector:(SEL)selector {
@@ -314,7 +309,6 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
       [rowViewControllers_ setObject:newController
                               forKey:[NSNumber numberWithInteger:row]];
       [newController loadView];
-      oldController = nil;
     } else {
       newController = oldController;
     }
@@ -373,15 +367,6 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   BOOL isMessage = [object isKindOfClass:[QSBMessageTableResult class]]; 
   BOOL isSelectable = object && !(isSeparator || isMessage);
   return isSelectable;
-}
-
-- (CGFloat)tableView:(NSTableView *)tableView
-         heightOfRow:(NSInteger)row {
-  NSArray *columns = [tableView tableColumns];
-  NSTableColumn *column = [columns objectAtIndex:0];
-  NSView *colView = [self tableView:tableView viewForColumn:column row:row];
-  CGFloat rowHeight = NSHeight([colView frame]);
-  return rowHeight;
 }
 
 #pragma mark NSDataSource protocol methods

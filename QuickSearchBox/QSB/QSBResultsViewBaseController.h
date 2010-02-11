@@ -52,7 +52,7 @@
   
   BOOL isShowing_;  // YES when our results section is showing.
   BOOL resultsNeedUpdating_;
-  CGFloat lastWindowHeight_;  // Remember last calculated window height.
+  CGFloat lastTableHeight_;  // Remember last calculated table height.
 }
 
 // Returns the query controller.
@@ -73,13 +73,8 @@
 
 // Show or hide the results view.  Return the previously calculated
 // window height if our results view is showing.
-- (CGFloat)setIsShowing:(BOOL)value;
+- (void)setShowing:(BOOL)value;
 - (BOOL)isShowing;
-
-// Call this when swapping in this view so that the proper selection
-// is made in the result table.  The default behavior is to select
-// the first selectable row.
-- (void)setSwapSelection;
 
 // Return the last selected table item.
 - (QSBTableResult *)selectedTableResult;
@@ -91,11 +86,8 @@
 // first row of the results table.
 - (void)reset;
 
-// Update the metrics of our results presentation and propose a new window height.
-- (CGFloat)updateResultsView;
-
-// Return the most recently calculated window height to properly show ourself.
-- (CGFloat)windowHeight;
+// Return the most recently calculated table height to properly show ourself.
+- (CGFloat)tableHeight;
 
 // Determines if the provided selector is a selection movement selector,
 // performs it if so, and returns whether it was performed.
