@@ -37,9 +37,12 @@ set -o errexit
 set -o nounset
 set -o verbose
 
+# If QSBSRCROOT isn't set, then we'll make it relative to our current SRCROOT.
+QSBSRCROOT=${QSBSRCROOT:="${SRCROOT}/../"}
+
 cd "${SRCROOT}/SDK/Templates/QSBAppleScriptPlugin"
-xcodebuild -project "___PROJECTNAME___.xcodeproj" -target "___PROJECTNAME___" -configuration "${CONFIGURATION}" OBJROOT="${OBJROOT}" SYMROOT="${SYMROOT}" CACHE_ROOT="${CACHE_ROOT}" || true
+xcodebuild -project "___PROJECTNAME___.xcodeproj" -target "___PROJECTNAME___" -configuration "${CONFIGURATION}" OBJROOT="${OBJROOT}" SYMROOT="${SYMROOT}" CACHE_ROOT="${CACHE_ROOT}" QSBSRCROOT="${QSBSRCROOT}" || true
 cd "${SRCROOT}/SDK/Templates/QSBPlugin"
-xcodebuild -project "___PROJECTNAME___.xcodeproj" -target "___PROJECTNAME___" -configuration "${CONFIGURATION}" OBJROOT="${OBJROOT}" SYMROOT="${SYMROOT}" CACHE_ROOT="${CACHE_ROOT}" || true
+xcodebuild -project "___PROJECTNAME___.xcodeproj" -target "___PROJECTNAME___" -configuration "${CONFIGURATION}" OBJROOT="${OBJROOT}" SYMROOT="${SYMROOT}" CACHE_ROOT="${CACHE_ROOT}" QSBSRCROOT="${QSBSRCROOT}"  || true
 cd "${SRCROOT}/SDK/Templates/QSBPythonPlugin"
-xcodebuild -project "___PROJECTNAME___.xcodeproj" -target "___PROJECTNAME___" -configuration "${CONFIGURATION}" OBJROOT="${OBJROOT}" SYMROOT="${SYMROOT}" CACHE_ROOT="${CACHE_ROOT}" || true
+xcodebuild -project "___PROJECTNAME___.xcodeproj" -target "___PROJECTNAME___" -configuration "${CONFIGURATION}" OBJROOT="${OBJROOT}" SYMROOT="${SYMROOT}" CACHE_ROOT="${CACHE_ROOT}" QSBSRCROOT="${QSBSRCROOT}"  || true
