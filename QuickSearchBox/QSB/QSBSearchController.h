@@ -36,7 +36,8 @@
 
 @class QSBMoreResultsViewController;
 @class QSBTableResult;
-
+@class QSBCategory;
+@class QSBSourceTableResult;
 // Interface between QSB and the web suggestor and the desktop query
 // takes a query string and is responsible for turning it into results.
 // As far as QSBSearchController is concerned, a "query" is split up into two
@@ -45,23 +46,23 @@
 // we sort all of the results from the sources. 
 @interface QSBSearchController : NSObject {
  @private
-  NSMutableArray *desktopResults_;
+  NSMutableArray *topResults_;
   NSArray *lockedResults_;
   HGSTokenizedString *tokenizedQueryString_;  // Current query entered by user.
   HGSResultArray *results_;
   NSUInteger currentResultDisplayCount_;
   HGSQueryController *queryController_;
   QSBSearchController *parentSearchController_;
-  NSArray *oldSuggestions_; // The last suggestions seen
-  NSMutableDictionary *typeCategoryDict_;  // type->category conversion.
 
   // used to update the UI at various times through the life of the query
   NSTimer *displayTimer_;
+  NSUInteger displayTimerStage_;
   BOOL queryInProcess_;  // Yes while a query is under way.
   BOOL gatheringFinished_;  // Yes if the results gathering has completed.
   NSUInteger pushModifierFlags_; // NSEvent Modifiers at pivot time
   NSUInteger totalResultDisplayCount_;
-  HGSMixer *mixer_;
+  BOOL resultsNeedUpdating_;
+  NSDictionary *moreResults_;
 }
 
 // Sets/Gets NSEvent Modifiers at pivot time
@@ -77,8 +78,8 @@
 - (QSBTableResult *)topResultForIndex:(NSInteger)idx;
 - (NSArray *)topResultsInRange:(NSRange)range;
 - (NSUInteger)topResultCount;
-
-- (NSDictionary *)rankedResultsByCategory;
+- (QSBSourceTableResult *)rankedResultForCategory:(QSBCategory *)category 
+                                          atIndex:(NSInteger)idx;
 
 // Changes and restarts the query.
 - (void)setTokenizedQueryString:(HGSTokenizedString *)setTokenizedQueryString;
@@ -96,7 +97,12 @@
 
 // Notification sent out when results have been updated.
 // Object is QSBSearchController.
+// Keys are kQSBSearchControllerResultCountByCategoryKey and
+//          kQSBSearchControllerResultCountKey
 extern NSString *const kQSBSearchControllerDidUpdateResultsNotification;
+extern NSString *const kQSBSearchControllerResultCountByCategoryKey;  // NSDictionary *
+extern NSString *const kQSBSearchControllerResultCountKey; // NSNumber *
+
 extern NSString *const kQSBSearchControllerWillChangeQueryStringNotification;
 extern NSString *const kQSBSearchControllerDidChangeQueryStringNotification;
 
