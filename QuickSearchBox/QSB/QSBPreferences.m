@@ -45,6 +45,9 @@
      // QSB more category result count
      [NSNumber numberWithInteger:kQSBMoreCategoryResultCountDefault],
      kQSBMoreCategoryResultCountKey,
+     // QSB number of more "results" to show before breaking with "show all"s
+     [NSNumber numberWithInteger:kQSBMaxMoreResultCountBeforeAbridgingDefault],
+     kQSBMaxMoreResultCountBeforeAbridgingKey,
      // QSB snippets
      [NSNumber numberWithBool:kQSBSnippetsDefault],
      kQSBSnippetsKey,

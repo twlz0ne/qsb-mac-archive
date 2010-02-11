@@ -58,6 +58,11 @@
 #define kQSBMoreCategoryResultCountMax        5
 #define kQSBMoreCategoryResultCountDefault    3
 
+// int - QSB number of more results shown before we will "abridge" the results
+//       by adding "show all <category>" results.
+#define kQSBMaxMoreResultCountBeforeAbridgingKey @"kQSBMaxMoreResultCountBeforeAbridging"
+#define kQSBMaxMoreResultCountBeforeAbridgingDefault    20
+
 // BOOL - QSB snippet display
 #define kQSBSnippetsKey                       @"QSBSnippets"
 #define kQSBSnippetsDefault                   YES
