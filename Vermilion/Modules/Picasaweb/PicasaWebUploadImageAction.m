@@ -479,8 +479,8 @@ static const NSTimeInterval kUploadGiveUpInterval = 30.0;
 }
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
-  HGSAccount *account = [notification object];
-  HGSAssert(account == account_, @"Notification from bad account!");
+  HGSAssert([notification object] == account_, 
+            @"Notification from bad account!");
   // Halt any outstanding uploads and reset the service so that it
   // will get rebuilt with the new credentials.
   [self cancelAllTickets];
