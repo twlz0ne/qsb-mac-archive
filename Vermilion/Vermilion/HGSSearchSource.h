@@ -40,6 +40,7 @@
 @class HGSResult;
 @class HGSQuery;
 @class HGSSearchOperation;
+@class HGSTypeFilter;
 
 /*!
   An abstraction for searching a particular collection of data. There will be
@@ -57,6 +58,7 @@
  @protected
   NSSet *pivotableTypes_;
   NSSet *utisToExcludeFromDiskSources_;
+  HGSTypeFilter *resultTypeFilter_;
   BOOL cannotArchive_;
 }
 
@@ -101,6 +103,13 @@
   Defaults to NO.
 */
 @property (readonly) BOOL providesIconsForResults;
+
+/*!
+ A definition of the types that this source will provide. It is made up of
+ the value of "HGSSearchSourceSupportedTypes" and 
+ "HGSSearchSourceUnsupportedTypes" from the configuration dictionary.
+*/
+@property (readonly) HGSTypeFilter *resultTypeFilter;
 
 /*!
   Returns whether this source is valid for the query string/terms.

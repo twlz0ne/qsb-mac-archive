@@ -38,6 +38,7 @@
 #import "HGSIconProvider.h"
 #import "HGSCoreExtensionPoints.h"
 #import "HGSTokenizer.h"
+#import "HGSTypeFilter.h"
 
 // The result is already retained for you
 static NSSet *CopyStringSetFromId(id value) {
@@ -56,10 +57,15 @@ static NSSet *CopyStringSetFromId(id value) {
 
 NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources 
   = @"HGSSearchSourceUTIsToExcludeFromDiskSources";
+NSString *const kHGSSearchSourceSupportedTypes
+  = @"HGSSearchSourceSupportedTypes";
+NSString *const kHGSSearchSourceUnsupportedTypes
+  = @"HGSSearchSourceUnsupportedTypes";
 
 @implementation HGSSearchSource
 @synthesize pivotableTypes = pivotableTypes_;
 @synthesize cannotArchive = cannotArchive_;
+@synthesize resultTypeFilter = resultTypeFilter_;
 @synthesize utisToExcludeFromDiskSources = utisToExcludeFromDiskSources_;
 
 + (void)initialize {
@@ -89,6 +95,19 @@ NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources
     
     value = [configuration objectForKey:@"HGSSearchSourceCannotArchive"];
     cannotArchive_ = [value boolValue];
+    
+    value = [configuration objectForKey:@"HGSSearchSourceSupportedTypes"];
+    NSSet *supportedTypes = [CopyStringSetFromId(value) autorelease];
+    if (!supportedTypes) {
+      HGSLogDebug(@"Source: %@ does not have a HGSSearchSourceSupportedTypes key", 
+                  self);
+      supportedTypes = [HGSTypeFilter allTypesSet];
+    }
+    value = [configuration objectForKey:@"HGSSearchSourceUnsupportedTypes"];
+    NSSet *unsupportedTypes = [CopyStringSetFromId(value) autorelease];
+    resultTypeFilter_ 
+      = [[HGSTypeFilter alloc] initWithConformTypes:supportedTypes
+                                doesNotConformTypes:unsupportedTypes];
   }
   return self;
 }
@@ -96,7 +115,7 @@ NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources
 - (void)dealloc {
   [pivotableTypes_ release];
   [utisToExcludeFromDiskSources_ release];
-
+  [resultTypeFilter_ release];
   [super dealloc];
 }
 
