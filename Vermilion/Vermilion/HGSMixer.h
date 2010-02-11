@@ -36,66 +36,7 @@
 */
 
 #import <Foundation/Foundation.h>
-#import "GTMDefines.h"
-
-@class HGSQueryController;
 @class HGSScoredResult;
-
-/*!
- The mixer takes N arrays that are assumed to be internally sorted
- and mixes them all together into a single array whose ranking is based
- on global (cross-provider) heuristics. The mixer also handles merging
- duplicate results together (lower ranked into higher ranked).
-*/
-@interface HGSMixer : NSObject {
- @private
-  NSArray *ops_;
-  NSMutableArray *results_;
-  NSMutableDictionary *resultsByCategory_;
-  uint64_t mainThreadTime_;
-  NSInteger *opsIndices_;
-  NSInteger *opsMaxIndices_;
-  NSUInteger maxResults_;
-  NSUInteger currentIndex_;
-  NSOperation *operation_;
-  NSOperationQueue *opQueue_;
-  volatile BOOL isFinished_;
-  volatile BOOL isCancelled_;
-}
-
-/*!
- Designated initializer.
- @param ops - the ops that supply the results that the mixer mixes
- @param mainThreadTime - the amount of time that the mixer should run on the 
-                         main thread (to optimize speed) before moving to a
-                         background thread (to optimize user responsiveness)
-*/
-- (id)initWithSearchOperations:(NSArray *)ops
-                    maxResults:(NSUInteger)maxResults
-                mainThreadTime:(NSTimeInterval)mainThreadTime;
-        
-/*!
-  A snapshot of the results. Safe to call from any thread. Calling this too
-  often will slow down the mixing.
-*/
-- (NSArray *)rankedResults;
-
-/*!
-  A snapshot of the results sorted by categories. Safe to call from any thread. 
-  Calling this too often will slow down the mixing.
-*/
-- (NSDictionary *)rankedResultsByCategory;
-
-/*!
-  Start the mixing operation.
-*/
-- (void)start;
-
-- (BOOL)isCancelled;
-- (void)cancel;
-- (BOOL)isFinished;
-@end
-
 
 /*! 
  The standard HGS sort. Suitable for use with
@@ -107,13 +48,3 @@
 NSInteger HGSMixerScoredResultSort(HGSScoredResult *resultA, 
                                    HGSScoredResult *resultB, 
                                    void* context);
-
-/*!
- Called when the mixer will start.  Object is the mixer.
-*/
-GTM_EXTERN NSString *const kHGSMixerWillStartNotification;
-
-/*!
- Called when the mixer has completed or was cancelled. Object is the mixer.
-*/
-GTM_EXTERN NSString *const kHGSMixerDidFinishNotification;
