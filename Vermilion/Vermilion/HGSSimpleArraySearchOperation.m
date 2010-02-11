@@ -35,6 +35,8 @@
 #import "NSNotificationCenter+MainThread.h"
 #import "GTMMethodCheck.h"
 #import "HGSMixer.h"
+#import "HGSResult.h"
+#import "HGSTypeFilter.h"
 
 @implementation HGSSimpleArraySearchOperation
 GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:object:userInfo:);
@@ -66,32 +68,60 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
                                   userInfo:nil];
 }
 
-- (NSArray *)sortedRankedResultsInRange:(NSRange)range {
-  NSArray *sortedResults = nil;
+- (NSUInteger)resultCountForFilter:(HGSTypeFilter *)filter {
+  NSUInteger count = 0;
   @synchronized (self) {
-    NSRange fullRange = NSMakeRange(0, [results_ count]);
-    NSRange newRange = NSIntersectionRange(fullRange, range);
-    if (newRange.length) {
-      sortedResults = [results_ subarrayWithRange:newRange];
+    if ([filter allowsAllTypes]) {
+      count = [results_ count];
+    } else {
+      for(HGSResult *result in results_) {
+        if ([filter isValidType:[result type]]) {
+          count += 1;
+        }
+      } 
     }
+  }
+  return count;
+}
+
+- (NSArray *)sortedRankedResultsInRange:(NSRange)range
+                             typeFilter:(HGSTypeFilter *)typeFilter {
+  NSArray *sortedResults = nil;
+  if ([typeFilter allowsAllTypes]) {
+    @synchronized (self) {
+      NSRange fullRange = NSMakeRange(0, [results_ count]);
+      NSRange newRange = NSIntersectionRange(fullRange, range);
+      if (newRange.length) {
+        sortedResults = [results_ subarrayWithRange:newRange];
+      }
+    }
+  } else {
+    sortedResults = [super sortedRankedResultsInRange:range 
+                                           typeFilter:typeFilter];
   }
   return sortedResults;
 }
 
-- (HGSScoredResult *)sortedRankedResultAtIndex:(NSUInteger)idx {
+- (HGSScoredResult *)sortedRankedResultAtIndex:(NSUInteger)idx
+                                    typeFilter:(HGSTypeFilter *)typeFilter  {
   HGSScoredResult *result = nil;
-  @synchronized (self) {
-    result = [results_ objectAtIndex:idx];
-  }
-  return result;
-}
-  
-- (NSUInteger)resultCount {
   NSUInteger count = 0;
   @synchronized (self) {
-    count = [results_ count];
+    if ([typeFilter allowsAllTypes]) {
+      result = [results_ objectAtIndex:idx];
+    } else {
+      for (result in results_) {
+        if ([typeFilter isValidType:[result type]]) {
+          if (count == idx) {
+            break;
+          } else {
+            ++count;
+          }
+        }
+      }
+    }
   }
-  return count;
+  return result;
 }
 
 @end
