@@ -40,6 +40,7 @@
 @class HGSScoredResult;
 @class QSBSearchViewController;
 @class HGSTokenizedString;
+@class QSBCategory;
 
 /*!
   Abstract base class for showing results in our tables
@@ -148,10 +149,6 @@
   A "search google" result.
 */
 @interface QSBGoogleTableResult : QSBSourceTableResult
-
-+ (id)tableResultForQuery:(HGSTokenizedString *)query;
-- (id)initWithQuery:(HGSTokenizedString *)query;
-
 @end
 
 /*!
@@ -167,15 +164,6 @@
   A fold (eg Show more results or Show Top Results).
 */
 @interface QSBFoldTableResult : QSBTableResult
-
-+ (id)tableResult;
-
-@end
-
-/*!
-  A search status row "Searching Spotlight, Ganesh, etc...".
-*/
-@interface QSBSearchStatusTableResult : QSBTableResult
 
 + (id)tableResult;
 
@@ -200,13 +188,13 @@
 */
 @interface QSBShowAllTableResult : QSBTableResult {
  @private
-  NSString *categoryName_;
+  QSBCategory *category_;
   NSUInteger categoryCount_;
 }
 
-+ (id)tableResultWithCategory:(NSString *)categoryName
++ (id)tableResultWithCategory:(QSBCategory *)category
                         count:(NSUInteger)categoryCount;
-- (id)initWithCategory:(NSString *)categoryName
+- (id)initWithCategory:(QSBCategory *)category
                  count:(NSUInteger)categoryCount;
 - (NSString *)categoryName;
 

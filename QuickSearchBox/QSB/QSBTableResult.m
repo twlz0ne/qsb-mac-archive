@@ -410,16 +410,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (Class)moreResultsRowViewControllerClass {
   Class rowViewClass = Nil;
-  HGSScoredResult *result = [self representedResult];
-  if (!([result conformsToType:kHGSTypeSuggest]
-        || [result conformsToType:kHGSTypeSearch])) {
-    if ([self categoryName]) {
-      rowViewClass = [QSBMoreCategoryRowViewController class];
-    } else {
-      rowViewClass = [QSBMoreStandardRowViewController class];
-    }
+  if ([self categoryName]) {
+    rowViewClass = [QSBMoreCategoryRowViewController class];
   } else {
-    rowViewClass = [QSBMorePlaceHolderRowViewController class];
+    rowViewClass = [QSBMoreStandardRowViewController class];
   }
   return rowViewClass;
 }
@@ -559,48 +553,17 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 @implementation QSBGoogleTableResult
 
-GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
-
-+ (id)tableResultForQuery:(HGSTokenizedString *)query {
-  return [[[[self class] alloc] initWithQuery:query] autorelease];
-}
-
 - (id)init {
   [NSException raise:NSIllegalSelectorException format:@"Call initWithQuery"];
   return nil;
 }
 
-- (id)initWithQuery:(HGSTokenizedString*)tokenizedQuery {
-  NSString *name = nil;
-  NSString *urlString = nil;
-  GTMGoogleSearch *googleSearch = [GTMGoogleSearch sharedInstance];
-  NSString *query = [tokenizedQuery originalString];
-  if (![query length]) {
-    name = NSLocalizedString(@"Google Search", @"");
-    urlString = [googleSearch searchURLFor:nil ofType:@"webhp" arguments:nil];
-  } else {
-    name = query;
-    NSString *cleanedQuery = [query gtm_stringByEscapingForURLArgument];
-    urlString = [googleSearch searchURLFor:cleanedQuery
-                                    ofType:GTMGoogleSearchWeb
-                                 arguments:nil];
-  }
-  NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                              [self displayIcon], kHGSObjectAttributeIconKey,
-                              nil];
-  HGSScoredResult *result = [HGSScoredResult resultWithURI:urlString
-                                                      name:name
-                                                      type:kHGSTypeGoogleSearch
-                                                    source:nil
-                                                attributes:attributes
-                                                     score:0
-                                               matchedTerm:tokenizedQuery
-                                            matchedIndexes:nil];
-  return [super initWithResult:result];
-}
-
 - (Class)topResultsRowViewControllerClass {
   return [QSBTopSearchForRowViewController class];
+}
+
+- (Class)moreResultsRowViewControllerClass {
+  return [QSBMoreStandardRowViewController class];
 }
 
 // We want to inherit the google logo, so don't return an icon
@@ -648,10 +611,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return [QSBTopSeparatorRowViewController class];
 }
 
-- (Class)moreResultsRowViewControllerClass {
-  return [QSBMoreSeparatorRowViewController class];
-}
-
 @end
 
 
@@ -665,32 +624,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return [QSBTopFoldRowViewController class];
 }
 
-- (Class)moreResultsRowViewControllerClass {
-  return [QSBMoreFoldRowViewController class];
-}
-
-- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
-  [controller toggleTopMoreViews];
-  return YES;
-}
-
-@end
-
-@implementation QSBSearchStatusTableResult
-
-+ (id)tableResult {
-  return [[[[self class] alloc] init] autorelease];
-}
-
-- (Class)topResultsRowViewControllerClass {
-  return [QSBTopSearchStatusRowViewController class];
-}
-
-- (Class)moreResultsRowViewControllerClass {
-  // Yes, we are using QSBTopSearchStatusRowViewController intentionally here
-  return [QSBTopSearchStatusRowViewController class];
-}
-
 - (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
   [controller toggleTopMoreViews];
   return YES;
@@ -700,28 +633,28 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 @implementation QSBShowAllTableResult
 
-+ (id)tableResultWithCategory:(NSString *)categoryName
++ (id)tableResultWithCategory:(QSBCategory *)category
                         count:(NSUInteger)categoryCount {
-  return [[[[self class] alloc] initWithCategory:categoryName
+  return [[[[self class] alloc] initWithCategory:category
                                            count:categoryCount] autorelease];
 }
 
-- (id)initWithCategory:(NSString *)categoryName
+- (id)initWithCategory:(QSBCategory *)category
                  count:(NSUInteger)categoryCount {
   if ((self = [super init])) {
     categoryCount_ = categoryCount;
-    categoryName_ = [categoryName copy];
+    category_ = [category retain];
   }
   return self;
 }
 
 - (void)dealloc {
-  [categoryName_ release];
+  [category_ release];
   [super dealloc];
 }
 
 - (NSString *)categoryName {
-  return [[categoryName_ retain] autorelease];
+  return [category_ localizedName];
 }
 
 - (NSString*)stringValue {
@@ -737,10 +670,9 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
-  NSString *categoryName = [self categoryName];
   QSBMoreResultsViewController *viewController
     = [controller moreResultsController];
-  [viewController addShowAllCategory:categoryName];
+  [viewController addShowAllCategory:category_];
   return YES;
 }
 
