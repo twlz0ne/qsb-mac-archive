@@ -47,21 +47,27 @@
         <!-- Optional Extension keys -->
         <key name="HGSIsEnabledByDefault" class="Boolean" localizedString="Extension Enabled By Default" use="optional"/>
         <key name="HGSIsUserVisible" class="Boolean" localizedString="Extension Is User Visible" use="optional"/>
+        <key name="HGSExtensionUserVisibleName" class="String" localizedString="Extension Display Name" use="optional"/>
         <key name="HGSExtensionIconImagePath" class="String" localizedString="Extension Icon Path" use="optional"/>
         
         <!-- Account Keys -->
         <key name="HGSExtensionDesiredAccountType" class="String" localizedString="Account Type Required" use="optional"/>
         <key name="HGSExtensionOfferedAccountType" class="String" localizedString="Account Type Supplied" use="optional"/>
+        <key name="HGSExtensionOfferedAccountClass" class="String" localizedString="Account Class Name" use="optional"/>
 
         <!-- Action Keys -->
         <key name="HGSActionDirectObjectTypes" class="StringArray" localizedString="Action Direct Object Types" use="optional"/>
+        <key name="HGSActionExcludedDirectObjectTypesKey" class="StringArray" localizedString="Action Excluded Direct Object Types" use="optional"/>
         <key name="HGSActionIndirectObjectTypes" class="StringArray" localizedString="Action Indirect Object Types" use="optional"/>
+        <key name="HGSActionOtherTerms" class="StringArray" localizedString="Action Search Synonyms" use="optional"/>
         <key name="HGSActionIndirectObjectOptional" class="Boolean" localizedString="Action Account Type Required" use="optional"/>
         <key name="HGSActionShowActionInGlobalSearchResults" class="Boolean" localizedString="Action Account Type Supplied" use="optional"/>
         <key name="HGSActionDoesActionCauseUIContextChange" class="Boolean" localizedString="Action Causes UI Context Change" use="optional"/>
         <key name="HGSActionMustRunOnMainThread" class="Boolean" localizedString="Action Supports Compound Results" use="optional"/>
 
-        <!-- Source Keys -->
+        <!-- Search Source Keys -->
+        <key name="HGSSearchSourceSupportedTypes" class="StringArray" localizedString="Types That Source Returns" use="required"/>
+        <key name="HGSSearchSourceUnsupportedTypes" class="StringArray" localizedString="Types That Source Does Not Return" use="optional"/>
         <key name="HGSSearchSourcePivotableTypes" class="StringArray" localizedString="Source Pivotable Object Type " use="optional"/>
         <key name="HGSSearchSourceUTIsToExcludeFromDiskSources" class="StringArray" localizedString="Source UTIs To Exclude From Disk Sources" use="optional"/>
         <key name="HGSSearchSourceCannotArchive" class="Boolean" localizedString="Source Cannot Be Archived" use="optional"/>
