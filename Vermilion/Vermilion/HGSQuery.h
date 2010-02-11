@@ -42,8 +42,6 @@
 @class HGSResultArray;
 @class HGSTokenizedString;
 
-extern const NSUInteger kHGSQueryMaximumResults;
-
 typedef enum {
   eHGSQueryShowAlternatesFlag = 1 << 0,
 } HGSQueryFlags;
@@ -63,7 +61,6 @@ typedef enum {
   HGSTokenizedString *tokenizedQueryString_;
   HGSResultArray *results_;
   HGSQuery *parent_;
-  NSUInteger maxDesiredResults_;
   HGSQueryFlags flags_;
 }
 
@@ -84,12 +81,6 @@ typedef enum {
   object.
 */
 @property (readwrite, retain) HGSQuery *parent;
-
-/*!
-  Maximum number of results that we are interested in receiving. -1 indicates
-  no limit.
-*/
-@property (readwrite, assign) NSUInteger maxDesiredResults;
 
 /*!
   A pivot object in the context is any result currently set to filter search
