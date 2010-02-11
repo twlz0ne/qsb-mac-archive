@@ -33,6 +33,7 @@
 #import "HGSAction.h"
 #import "HGSResult.h"
 #import "HGSLog.h"
+#import "HGSTypeFilter.h"
 
 NSString *const kHGSActionDirectObjectsKey = @"HGSActionDirectObjects";
 NSString *const kHGSActionIndirectObjectsKey = @"HGSActionIndirectObjects";
@@ -141,17 +142,15 @@ static NSSet *CopyStringSetFromId(id value) {
   NSSet *directObjectTypes = [self directObjectTypes];
   if (directObjectTypes) {
     // Not a global-only action.
-    NSSet *allTypes = [[self class] allObjectTypes];
     NSSet *excludedDirectObjectTypes = [self excludedDirectObjectTypes];
-    if (([directObjectTypes isEqual:allTypes]
-         || [results conformsToTypeSet:directObjectTypes])
-        && (!excludedDirectObjectTypes
-            || [results doesNotConformToTypeSet:excludedDirectObjectTypes])) {
-      // All results must apply to the action for the action to show.
-      for (HGSResult *result in results) {
-        doesApply = [self appliesToResult:result];
-        if (!doesApply) break;
-      }
+    // All results must apply to the action for the action to show.
+    HGSTypeFilter *filter 
+      = [HGSTypeFilter filterWithConformTypes:directObjectTypes
+                          doesNotConformTypes:excludedDirectObjectTypes];
+    for (HGSResult *result in results) {
+      doesApply = [filter isValidType:[result type]] 
+        && [self appliesToResult:result];
+      if (!doesApply) break;
     }
   }
   return doesApply;
@@ -196,10 +195,6 @@ static NSSet *CopyStringSetFromId(id value) {
 - (NSString*)description {
   return [NSString stringWithFormat:@"%@<%p> name:%@", 
           [self class], self, [self displayName]];
-}
-
-+ (NSSet *)allObjectTypes {
-  return [NSSet setWithObject:@"*"];
 }
 
 @end

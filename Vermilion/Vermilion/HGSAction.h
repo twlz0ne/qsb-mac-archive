@@ -175,10 +175,6 @@
 */
 - (BOOL)performWithInfo:(NSDictionary*)info;
 
-/*!
- Returns a set representing all object types.
-*/
-+ (NSSet *)allObjectTypes;
 @end
 
 /*!
