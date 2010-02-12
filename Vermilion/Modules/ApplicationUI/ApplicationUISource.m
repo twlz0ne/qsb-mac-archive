@@ -210,7 +210,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   HGSUnscoredResult *result = [self resultFromElement:element 
                                                  role:role 
                                         pathCellArray:pathCellArray];
-  return [self scoredResultFromResult:result queryString:queryString];
+  HGSScoredResult *scoredResult = nil;
+  if (result) {
+    scoredResult = [self scoredResultFromResult:result queryString:queryString];
+  }
+  return scoredResult;
 }
 
 - (void)addMenuResultsFromElement:(GTMAXUIElement*)element 
