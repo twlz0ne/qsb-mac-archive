@@ -682,7 +682,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     likeString = [GTMSQLiteStatement quoteAndEscapeString:likeString];
     sqlSelect = [NSString stringWithFormat:kSqlSelectStatement,
                  likeString, likeString, likeString, likeString, likeString];
-    NSMutableSet *results = [NSMutableSet set];
+    NSMutableArray *results = [NSMutableArray array];
     @synchronized (self) {
       // Synchronized because sqlite allows only single thread access to an
       // in-memory db
@@ -784,7 +784,24 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       [statement finalizeStatement];
     }
 
-    [operation setRankedResults:[results allObjects]];
+    // We can get a pile of dupes from above, and our mixer assumes
+    // that a source does not return dupes in itself, so we must dedupe here.
+    NSMutableArray *dedupedResults 
+      = [NSMutableArray arrayWithCapacity:[results count]];
+    for (HGSResult *result in results) {
+      BOOL isDupe = NO;
+      for (HGSResult *goodResult in dedupedResults) {
+        if ([result isDuplicate:goodResult]) {
+          isDupe = YES;
+          break;
+        }
+      }
+      if (!isDupe) {
+        [dedupedResults addObject:result];
+      }
+    }
+    
+    [operation setRankedResults:dedupedResults];
   }
 }
 
