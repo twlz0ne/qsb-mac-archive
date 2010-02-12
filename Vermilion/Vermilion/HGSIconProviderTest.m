@@ -44,7 +44,8 @@
 @end
 
 @interface HGSIconOperation
-+ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result;
++ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result
+                                   skipBasic:(BOOL)skipBasic;
 - (NSUInteger)hash;
 @end
 
@@ -61,12 +62,14 @@
                                  attributes:nil];
   STAssertNotNil(result, nil);
   HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
-  [[[searchSourceMock stub] 
-    andReturn:nil]
+  [[[searchSourceMock stub] andReturn:nil]
    provideValueForKey:kHGSObjectAttributeIconPreviewFileKey result:result];
   [[[searchSourceMock stub] 
     andReturn:nil]
    provideValueForKey:kHGSObjectAttributeImmediateIconKey result:result];
+  [[[searchSourceMock stub] andReturn:@"Display Name"] displayName];
+  [[[searchSourceMock stub] andReturn:nil] 
+   provideValueForKey:kHGSObjectAttributeUTTypeKey result:result];
   NSImage *icon = [provider provideIconForResult:result 
                                  skipPlaceholder:YES];
   // Not using GTMAssertObjectImageEqualToImageNamed because it appears there
@@ -127,7 +130,7 @@
                                        source:searchSourceMock];
   NSUInteger expectedHashA = [resultA hash];
   HGSIconOperation *operationA
-    = [HGSIconOperation iconOperationForResult:resultA];
+    = [HGSIconOperation iconOperationForResult:resultA skipBasic:NO];
   [iconOperations addObject:operationA];
   NSUInteger hashA = [operationA hash];
   STAssertEquals(expectedHashA, hashA, nil);
@@ -142,7 +145,7 @@
                                        source:searchSourceMock];
   NSUInteger expectedHashB = [resultB hash];
   HGSIconOperation *operationB
-    = [HGSIconOperation iconOperationForResult:resultB];
+    = [HGSIconOperation iconOperationForResult:resultB skipBasic:NO];
   [iconOperations addObject:operationB];
   NSUInteger hashB = [operationB hash];
   STAssertEquals(hashB, expectedHashB, nil);

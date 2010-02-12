@@ -51,47 +51,9 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   NSInteger     memoryOperations_;
   NSInteger     normalOperations_;
 }
-- (void)diskCounterOperation:(id)obj;
 @end
 
 @implementation HGSOperationTest
-
-- (void)diskCounterOperation:(id)obj {
-  static NSInteger expectOpNum;
-  static NSInteger counter;
-  
-  STAssertNotNil([HGSInvocationOperation currentOperation],
-                 @"currentOperation not present");
-  STAssertTrue([obj isKindOfClass:[NSNumber class]],
-               @"incorrect argument passed to disk operation");
-  
-  @synchronized(self) {
-    // Ensure that we are running sequentially
-    STAssertEquals(expectOpNum, [obj integerValue],
-                   @"disk operation ran out of order");
-    if (expectOpNum == 3) {
-      // Op 4 is cancelled
-      expectOpNum = 5;
-    } else {
-      expectOpNum++;
-    }
-    // Ensure that we are not running simultaneously
-    STAssertEquals(counter, (NSInteger)0, @"disk operation is already running");
-    counter++;
-  }
-  
-  // Sleep long enough to allow the operation queue to do some more work (that
-  // is, give us some confidence that our test results are accurate because
-  // the class is correctly implemented, not because the operation ran so
-  // quickly that the next queued-up operation didn't have time to start)
-  usleep(kDiskOperationLength);
-  
-  @synchronized(self) {
-    // Ensure that we are still not running simultaneously
-    STAssertEquals(counter, (NSInteger)1, @"disk operation started while one was running");
-    counter--;
-  }
-}
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData {
@@ -169,52 +131,6 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   @synchronized(self) {
     normalOperations_++;
   }
-}
-
-- (void)testDiskOperations {
-  NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
-  
-  // Queue up a bunch of long disk operations
-  [queue addOperation:[HGSInvocationOperation
-   diskInvocationOperationWithTarget:self
-                            selector:@selector(diskCounterOperation:)
-                              object:[NSNumber numberWithInt:0]]];
-  [queue addOperation:[HGSInvocationOperation
-   diskInvocationOperationWithTarget:self
-                            selector:@selector(diskCounterOperation:)
-                              object:[NSNumber numberWithInt:1]]];
-  [queue addOperation:[HGSInvocationOperation
-   diskInvocationOperationWithTarget:self
-                            selector:@selector(diskCounterOperation:)
-                              object:[NSNumber numberWithInt:2]]];
-  [queue addOperation:[HGSInvocationOperation
-   diskInvocationOperationWithTarget:self
-                            selector:@selector(diskCounterOperation:)
-                              object:[NSNumber numberWithInt:3]]];
-  NSInvocationOperation *op4 = [HGSInvocationOperation
-    diskInvocationOperationWithTarget:self
-                             selector:@selector(diskCounterOperation:)
-                               object:[NSNumber numberWithInt:4]];
-  [queue addOperation:op4];
-  [queue addOperation:[HGSInvocationOperation
-   diskInvocationOperationWithTarget:self
-                            selector:@selector(diskCounterOperation:)
-                              object:[NSNumber numberWithInt:5]]];
-  [queue addOperation:[HGSInvocationOperation
-   diskInvocationOperationWithTarget:self
-                            selector:@selector(diskCounterOperation:)
-                              object:[NSNumber numberWithInt:6]]];
-  [queue addOperation:[HGSInvocationOperation
-   diskInvocationOperationWithTarget:self
-                            selector:@selector(diskCounterOperation:)
-                              object:[NSNumber numberWithInt:7]]];
-  // Cancel one in the middle to make sure 1) it doesn't run; 2) we
-  // continue to run in order; and 3) we continue to run non-
-  // simultaneously
-  [op4 cancel];
-  STAssertTrue([op4 isCancelled],
-               @"cancelled disk operation didn't end up that way");
-  [queue waitUntilAllOperationsAreFinished];
 }
 
 - (void)testNetworkOperations {

@@ -192,7 +192,7 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
 @implementation HGSIconOperation
 
 + (HGSIconOperation *)iconOperationForResult:(HGSResult*)result 
-                                   skipBasic:(BOOL)skipBasic{
+                                   skipBasic:(BOOL)skipBasic {
   return [[[HGSIconOperation alloc] initWithResult:result 
                                          skipBasic:skipBasic] autorelease];
 }
