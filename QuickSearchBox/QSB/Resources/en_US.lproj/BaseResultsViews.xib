@@ -8,8 +8,8 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="142"/>
-			<integer value="302"/>
+			<integer value="244"/>
+			<integer value="145"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -181,7 +181,7 @@
 													<int key="NSCellFlags2">0</int>
 													<string key="NSContents"/>
 													<reference key="NSSupport" ref="26"/>
-													<object class="NSColor" key="NSBackgroundColor" id="1012357383">
+													<object class="NSColor" key="NSBackgroundColor">
 														<int key="NSColorSpace">6</int>
 														<string key="NSCatalogName">System</string>
 														<string key="NSColorName">headerColor</string>
@@ -195,7 +195,7 @@
 												<object class="NSImageCell" key="NSDataCell" id="502021287">
 													<int key="NSCellFlags">67239424</int>
 													<int key="NSCellFlags2">33685504</int>
-													<object class="NSCustomResource" key="NSContents" id="653691780">
+													<object class="NSCustomResource" key="NSContents">
 														<string key="NSClassName">NSImage</string>
 														<string key="NSResourceName">ChildArrow</string>
 													</object>
@@ -297,7 +297,7 @@
 								<object class="NSMutableArray" key="NSTableColumns">
 									<bool key="EncodedWithXMLCoder">YES</bool>
 									<object class="NSTableColumn" id="254946887">
-										<double key="NSWidth">2.320000e+02</double>
+										<double key="NSWidth">2.590000e+02</double>
 										<double key="NSMinWidth">4.000000e+01</double>
 										<double key="NSMaxWidth">1.000000e+03</double>
 										<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -323,31 +323,6 @@
 										<int key="NSResizingMask">3</int>
 										<bool key="NSIsResizeable">YES</bool>
 										<bool key="NSIsEditable">YES</bool>
-										<reference key="NSTableView" ref="732561302"/>
-									</object>
-									<object class="NSTableColumn" id="1004629168">
-										<string key="NSIdentifier">PivotArrows</string>
-										<double key="NSWidth">2.400000e+01</double>
-										<double key="NSMinWidth">1.600000e+01</double>
-										<double key="NSMaxWidth">3.200000e+01</double>
-										<object class="NSTableHeaderCell" key="NSHeaderCell">
-											<int key="NSCellFlags">75628032</int>
-											<int key="NSCellFlags2">0</int>
-											<string key="NSContents"/>
-											<reference key="NSSupport" ref="26"/>
-											<reference key="NSBackgroundColor" ref="1012357383"/>
-											<reference key="NSTextColor" ref="597180409"/>
-										</object>
-										<object class="NSImageCell" key="NSDataCell" id="569905949">
-											<int key="NSCellFlags">67239424</int>
-											<int key="NSCellFlags2">33685504</int>
-											<reference key="NSContents" ref="653691780"/>
-											<reference key="NSSupport" ref="26"/>
-											<int key="NSAlign">0</int>
-											<int key="NSScale">2</int>
-											<int key="NSStyle">0</int>
-											<bool key="NSAnimates">NO</bool>
-										</object>
 										<reference key="NSTableView" ref="732561302"/>
 									</object>
 								</object>
@@ -531,6 +506,14 @@
 					</object>
 					<int key="connectionID">340</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="732561302"/>
+						<reference key="destination" ref="378526056"/>
+					</object>
+					<int key="connectionID">341</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -683,7 +666,6 @@
 						<reference key="object" ref="732561302"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="1004629168"/>
 							<reference ref="254946887"/>
 						</object>
 						<reference key="parent" ref="717884256"/>
@@ -699,15 +681,6 @@
 						<reference key="parent" ref="717884256"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">300</int>
-						<reference key="object" ref="1004629168"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="569905949"/>
-						</object>
-						<reference key="parent" ref="732561302"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">146</int>
 						<reference key="object" ref="254946887"/>
 						<object class="NSMutableArray" key="children">
@@ -720,11 +693,6 @@
 						<int key="objectID">147</int>
 						<reference key="object" ref="866427824"/>
 						<reference key="parent" ref="254946887"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">301</int>
-						<reference key="object" ref="569905949"/>
-						<reference key="parent" ref="1004629168"/>
 					</object>
 				</object>
 			</object>
@@ -746,8 +714,8 @@
 					<string>144.IBPluginDependency</string>
 					<string>145.CustomClassName</string>
 					<string>145.IBPluginDependency</string>
-					<string>146.CustomClassName</string>
 					<string>146.IBPluginDependency</string>
+					<string>147.CustomClassName</string>
 					<string>147.IBPluginDependency</string>
 					<string>240.IBPluginDependency</string>
 					<string>240.ImportedFromIB2</string>
@@ -774,8 +742,6 @@
 					<string>249.IBPluginDependency</string>
 					<string>296.IBPluginDependency</string>
 					<string>299.IBPluginDependency</string>
-					<string>300.IBPluginDependency</string>
-					<string>301.IBPluginDependency</string>
 					<string>302.IBEditorWindowLastContentRect</string>
 					<string>302.IBPluginDependency</string>
 					<string>302.IBViewEditorWindowController.showingLayoutRectangles</string>
@@ -788,7 +754,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1" id="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{169, 786}, {262, 70}}</string>
+					<string>{{170, 886}, {262, 70}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>QSBSmallScroller</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -796,8 +762,8 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>QSBResultsViewTableView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>QSBViewTableViewColumn</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>QSBMoreResultsResultCell</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
@@ -820,8 +786,6 @@
 					<string>QSBPathControl</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>QSBPathCell</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -851,7 +815,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">340</int>
+			<int key="maxID">341</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -970,6 +934,14 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">QSBMoreResultsResultCell</string>
+					<string key="superclassName">NSTextFieldCell</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">QSBMoreResultsResultCell.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

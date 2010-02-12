@@ -266,4 +266,20 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
                                     startingAt:rowToSelect];
 }
 
+- (NSRect)adjustScroll:(NSRect)newVisible {
+  NSRect adjustRect = [super adjustScroll:newVisible];
+  NSRange visibleRows = [self visibleRows];
+  if (!NSEqualRanges(visibleRowRange_, visibleRows)) {
+    id delegate = [self delegate];
+    SEL changedVisibleRows = @selector(qsbTableView:changedVisibleRowsFrom:to:);
+    if ([delegate respondsToSelector:changedVisibleRows]) {
+      [delegate qsbTableView:self 
+      changedVisibleRowsFrom:visibleRowRange_ 
+                          to:visibleRows];
+    }
+    visibleRowRange_ = visibleRows;
+  }
+  return adjustRect;
+}
+                                                                                                                 
 @end

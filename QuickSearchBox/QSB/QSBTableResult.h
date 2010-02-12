@@ -45,7 +45,7 @@
 /*!
   Abstract base class for showing results in our tables
 */
-@interface QSBTableResult : NSObject
+@interface QSBTableResult : NSObject <NSCopying>
 
 /*!
   Determine if the result can be pivoted on.
@@ -110,12 +110,6 @@
   level.
 */
 - (Class)topResultsRowViewControllerClass;
-
-/*!
-  Return the class of the view controller used to display the result at the
-  more level.
-*/
-- (Class)moreResultsRowViewControllerClass;
 
 /*!
   Attempt to perform the default action on the item.

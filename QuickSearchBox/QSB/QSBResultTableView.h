@@ -33,7 +33,10 @@
 #import <Cocoa/Cocoa.h>
 
 // The table view that displays our results.
-@interface QSBResultTableView : NSTableView
+@interface QSBResultTableView : NSTableView {
+ @private
+  NSRange visibleRowRange_;
+}
 
 // Select first or last selectable rows in the table.
 - (NSInteger)selectFirstSelectableRow;
@@ -55,4 +58,10 @@
 
 // Determine a row's visibility.
 - (BOOL)rowIsVisible:(NSInteger)row;
+@end
+
+@interface NSObject (QSBResultTableViewDelegateMethods)
+- (void)qsbTableView:(NSTableView*)view
+  changedVisibleRowsFrom:(NSRange)oldVisible 
+                  to:(NSRange)newVisible;
 @end

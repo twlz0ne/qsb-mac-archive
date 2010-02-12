@@ -46,6 +46,7 @@
 #import "GTMMethodCheck.h"
 #import "GTMNSNumber+64Bit.h"
 #import "NSAttributedString+Attributes.h"
+#import "QSBMoreResultsResultCell.h"
 
 // Extra space to allow for miscellaneous rows (such as fold) in the results table.
 static const NSUInteger kCategoryRowOverhead = 3;
@@ -55,6 +56,10 @@ static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 @interface QSBMoreResultsViewController ()
 // Given a category, should we show a "Show all" result for it?
 - (BOOL)shouldDisplayShowAllResultForCategory:(QSBCategory *)category;
+- (QSBTableResult *)cachedTableResultForRow:(NSInteger)row;
+- (void)cacheTableResult:(QSBTableResult *)result forRow:(NSInteger)row;
+- (void)uncacheTableResultForRow:(NSInteger)row;
+- (void)uncacheAllTableResults;
 @end
 
 @implementation QSBMoreResultsViewController
@@ -66,6 +71,7 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
                bundle:(NSBundle *)nibBundleOrNil {
   if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
     showAllCategoriesSet_ = [[NSMutableSet alloc] init];
+    cachedRows_ = [[NSMutableDictionary alloc] init];
   }
   return self;
 }
@@ -119,6 +125,7 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   [separatorRows_ release];
   [resultCountByCategory_ release];
   [sortedCategories_ release];
+  [cachedRows_ release];
   [super dealloc];
 }
 
@@ -183,47 +190,52 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   }
   [separatorRows_ release];
   separatorRows_ = [mutableSeparators retain];
+  [self uncacheAllTableResults];
 }
 
 // Determine an actual result for a row index.
-- (QSBTableResult *)tableResultForRow:(NSInteger)row { 
+- (QSBTableResult *)tableResultForRow:(NSInteger)row {
   QSBTableResult *object = nil;
   if (row >= 0) {
-    // Determine what row our category is in by comparing to our
-    // "separator" indexes.
-    NSUInteger endRow = [separatorRows_ indexGreaterThanOrEqualToIndex:row];
-    NSRange range = NSMakeRange(0, row);
-    NSUInteger categoryIndex = [separatorRows_ countOfIndexesInRange:range];
-
-    QSBCategory *category = [sortedCategories_ objectAtIndex:categoryIndex];
-    
-    // Determine if we should add a showall.
-    if (endRow == row
-        && [self shouldDisplayShowAllResultForCategory:category]) {
-      NSUInteger count = [self resultCountForCategory:category];
-      object = [QSBShowAllTableResult tableResultWithCategory:category
-                                                        count:count];
-    }
+    object = [self cachedTableResultForRow:row];
     if (!object) {
-      QSBSearchViewController *searchViewController 
-        = [self searchViewController];
-      QSBSearchController *searchController 
-        = [searchViewController searchController];
-      NSUInteger startRow = [separatorRows_ indexLessThanIndex:endRow];
-      if (startRow == NSNotFound) {
-        startRow = 0;
-      } else {
-        startRow += 1;
+      // Determine what row our category is in by comparing to our
+      // "separator" indexes.
+      NSUInteger endRow = [separatorRows_ indexGreaterThanOrEqualToIndex:row];
+      NSRange range = NSMakeRange(0, row);
+      NSUInteger categoryIndex = [separatorRows_ countOfIndexesInRange:range];
+
+      QSBCategory *category = [sortedCategories_ objectAtIndex:categoryIndex];
+      
+      // Determine if we should add a showall.
+      if (endRow == row
+          && [self shouldDisplayShowAllResultForCategory:category]) {
+        NSUInteger count = [self resultCountForCategory:category];
+        object = [QSBShowAllTableResult tableResultWithCategory:category
+                                                          count:count];
       }
-      object = [searchController rankedResultForCategory:category
-                                                 atIndex:row - startRow];
-      if (object) {
-        if (row == startRow) {
-          NSString *localizedName = [category localizedName];
-          [(QSBSourceTableResult *)object setCategoryName:localizedName];
+      if (!object) {
+        QSBSearchViewController *searchViewController 
+          = [self searchViewController];
+        QSBSearchController *searchController 
+          = [searchViewController searchController];
+        NSUInteger startRow = [separatorRows_ indexLessThanIndex:endRow];
+        if (startRow == NSNotFound) {
+          startRow = 0;
+        } else {
+          startRow += 1;
+        }
+        object = [searchController rankedResultForCategory:category
+                                                   atIndex:row - startRow];
+        if (object) {
+          if (row == startRow) {
+            NSString *localizedName = [category localizedName];
+            [(QSBSourceTableResult *)object setCategoryName:localizedName];
+          }
         }
       }
     }
+    [self cacheTableResult:object forRow:row];
   }
   return object;
 }
@@ -253,8 +265,57 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
                   userInfo:userInfo];
 }
 
-- (Class)rowViewControllerClassForResult:(QSBTableResult *)result {
-  return [result moreResultsRowViewControllerClass];
+- (void)displayIconUpdated:(GTMKeyValueChangeNotification *)notification {
+  NSNumber *rowNumber = [notification userInfo];
+  NSInteger row = [rowNumber integerValue];
+  NSTableView *view = [self resultsTableView];
+  NSRect rect = [view rectOfRow:row];
+  [view setNeedsDisplayInRect:rect];
+}
+
+- (QSBTableResult *)cachedTableResultForRow:(NSInteger)row {
+  NSNumber *key = [NSNumber numberWithInteger:row];
+  return [cachedRows_ objectForKey:key];
+}
+
+- (void)removeCachedTableResultObserver:(NSNumber *)key {
+  QSBTableResult *result = [cachedRows_ objectForKey:key];
+  if (result) {
+    if ([result isKindOfClass:[QSBSourceTableResult class]]) {
+      HGSResult *hgsResult = [(QSBSourceTableResult *)result representedResult];
+      HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
+      [provider cancelOperationsForResult:hgsResult];
+      [result gtm_removeObserver:self 
+                      forKeyPath:@"displayIcon" 
+                        selector:@selector(displayIconUpdated:)];
+    }
+  }
+}
+
+- (void)cacheTableResult:(QSBTableResult *)result forRow:(NSInteger)row {
+  NSNumber *key = [NSNumber numberWithInteger:row];
+  [self removeCachedTableResultObserver:key];
+  if ([result isKindOfClass:[QSBSourceTableResult class]]) {
+    [result gtm_addObserver:self forKeyPath:@"displayIcon" 
+                   selector:@selector(displayIconUpdated:) 
+                   userInfo:key 
+                    options:0];
+  }
+  [cachedRows_ setObject:result forKey:key];
+}
+
+
+- (void)uncacheTableResultForRow:(NSInteger)row {
+  NSNumber *key = [NSNumber numberWithInteger:row];
+  [self removeCachedTableResultObserver:key];
+  [cachedRows_ removeObjectForKey:key];
+}
+
+- (void)uncacheAllTableResults {
+  for (NSNumber *key in cachedRows_) {
+    [self removeCachedTableResultObserver:key];
+  }
+  [cachedRows_ removeAllObjects];
 }
 
 #pragma mark NSResponder Overrides
@@ -326,6 +387,42 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
   return rowCount_;
+}
+
+- (id)tableView:(NSTableView *)aTableView 
+objectValueForTableColumn:(NSTableColumn *)aTableColumn 
+            row:(NSInteger)rowIndex {
+  // Need to return something here because NSTableView requires we override
+  // this method as a datasource. We actually set our cell's data in
+  // tableView:willDisplayCell:forTableColumn:row
+  return @"";
+}
+
+- (void)tableView:(NSTableView *)aTableView 
+  willDisplayCell:(id)aCell 
+   forTableColumn:(NSTableColumn *)aTableColumn 
+              row:(NSInteger)rowIndex {
+  QSBTableResult *result = [self tableResultForRow:rowIndex];
+  [aCell setRepresentedObject:result];
+}
+
+- (void)qsbTableView:(NSTableView*)view
+changedVisibleRowsFrom:(NSRange)oldVisible 
+                  to:(NSRange)newVisible {
+  // Remove the rows that are no longer visible from our cache.
+  NSRange indexesToRemove;
+  if (oldVisible.location < newVisible.location) {
+    indexesToRemove.location = oldVisible.location;
+    indexesToRemove.length = newVisible.location - oldVisible.location;
+  } else {
+    indexesToRemove.location = NSMaxRange(newVisible);
+    indexesToRemove.length = NSMaxRange(oldVisible) - NSMaxRange(newVisible);
+  }
+  for (NSUInteger i = indexesToRemove.location; 
+       i < NSMaxRange(indexesToRemove); 
+       ++i) {
+    [self uncacheTableResultForRow:i];
+  }
 }
 
 #pragma mark Notifications

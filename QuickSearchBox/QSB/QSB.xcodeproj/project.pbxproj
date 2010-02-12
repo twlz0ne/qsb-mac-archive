@@ -351,9 +351,6 @@
 		5AF4E0B10EB91BC200B26194 /* HGSLRUCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4E0AF0EB91BC200B26194 /* HGSLRUCache.m */; };
 		620055690F78595F00C806A1 /* GoogleAccountEditController.m in Sources */ = {isa = PBXBuildFile; fileRef = 620055660F78595F00C806A1 /* GoogleAccountEditController.m */; };
 		6200556A0F78595F00C806A1 /* GoogleAccountSetUpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 620055680F78595F00C806A1 /* GoogleAccountSetUpViewController.m */; };
-		6200F9750E785F4400F046EC /* MoreSeparator.png in Resources */ = {isa = PBXBuildFile; fileRef = 6200F9740E785F4400F046EC /* MoreSeparator.png */; };
-		6200F99D0E785FE700F046EC /* MoreShowAllTableResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200F99B0E785FE700F046EC /* MoreShowAllTableResultView.xib */; };
-		6200FC100E78896A00F046EC /* MoreCategoryResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6200FC0E0E78896A00F046EC /* MoreCategoryResultView.xib */; };
 		6203586C100277CA008CAFB2 /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
 		6203586D100277D0008CAFB2 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		6203587410027821008CAFB2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
@@ -395,8 +392,6 @@
 		623B19251003E19C009B702D /* GTMNSScanner+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 623B19231003E19C009B702D /* GTMNSScanner+JSON.m */; };
 		623B19261003E19C009B702D /* GTMNSScanner+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 623B19241003E19C009B702D /* GTMNSScanner+JSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		623BC8E00EFABC560004FAB7 /* NSAttributedString+Attributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 623BC8DE0EFABC560004FAB7 /* NSAttributedString+Attributes.m */; };
-		623CC13A0E79B94E00D32B75 /* MoreStandardResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 623CC1380E79B94E00D32B75 /* MoreStandardResultView.xib */; };
-		623CC1400E79B99E00D32B75 /* MoreSeparatorResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 623CC13E0E79B99E00D32B75 /* MoreSeparatorResultView.xib */; };
 		623FA3660E5C8DC1003630C1 /* ChatBuddiesSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 623FA33F0E5C8C8C003630C1 /* ChatBuddiesSource.m */; };
 		624137530F2A657B009229E6 /* QSBSetUpAccountWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 624137520F2A657B009229E6 /* QSBSetUpAccountWindowController.m */; };
 		6242D0C10DC78E7300EFEF22 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6242D0BF0DC78E7300EFEF22 /* MainMenu.xib */; };
@@ -471,7 +466,6 @@
 		62ED5EE50E8AADB200C9C2C3 /* QSBSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62ED5EE40E8AADB200C9C2C3 /* QSBSearchViewController.m */; };
 		62EFB4C71018F35500F984C7 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		62F150040DD4EE3D00BCAE1A /* ResultsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 62F150020DD4EE3C00BCAE1A /* ResultsWindow.xib */; };
-		62F380F90EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F380F80EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.m */; };
 		62F594B70FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */; };
 		62F594B80FEB06A60076CDDA /* GoogleDocsSaveAsActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */; };
 		62F595B10FEB278A0076CDDA /* GoogleDocsConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */; };
@@ -773,6 +767,7 @@
 		8B6AE77711222D2300D5D636 /* HGSTypeFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B6AE77511222D2300D5D636 /* HGSTypeFilter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B6AE77A11222D2B00D5D636 /* HGSTypeFilterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AE77911222D2B00D5D636 /* HGSTypeFilterTest.m */; };
 		8B6AE880112231F400D5D636 /* HGSSearchTermScorerTestData.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B6AE87F112231F400D5D636 /* HGSSearchTermScorerTestData.plist */; };
+		8B6AF52311248A5600D5D636 /* QSBMoreResultsResultCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AF52211248A5600D5D636 /* QSBMoreResultsResultCell.m */; };
 		8B6C0D060F32C86100E51E5D /* GData.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		8B6C0D3C0F32C8E500E51E5D /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
 		8B6C0D430F32C90200E51E5D /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
@@ -2200,9 +2195,6 @@
 		620055660F78595F00C806A1 /* GoogleAccountEditController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountEditController.m; sourceTree = "<group>"; };
 		620055670F78595F00C806A1 /* GoogleAccountSetUpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleAccountSetUpViewController.h; sourceTree = "<group>"; };
 		620055680F78595F00C806A1 /* GoogleAccountSetUpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountSetUpViewController.m; sourceTree = "<group>"; };
-		6200F9740E785F4400F046EC /* MoreSeparator.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MoreSeparator.png; sourceTree = "<group>"; };
-		6200F99C0E785FE700F046EC /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/MoreShowAllTableResultView.xib; sourceTree = "<group>"; };
-		6200FC0F0E78896A00F046EC /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/MoreCategoryResultView.xib; sourceTree = "<group>"; };
 		620CB3090FAA827E0029801C /* QSBPluginUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = QSBPluginUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSimpleAccount.h; sourceTree = "<group>"; };
 		6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleAccount.m; sourceTree = "<group>"; };
@@ -2231,8 +2223,6 @@
 		623B19241003E19C009B702D /* GTMNSScanner+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSScanner+JSON.h"; sourceTree = "<group>"; };
 		623BC8DE0EFABC560004FAB7 /* NSAttributedString+Attributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+Attributes.m"; sourceTree = "<group>"; };
 		623BC8DF0EFABC560004FAB7 /* NSAttributedString+Attributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+Attributes.h"; sourceTree = "<group>"; };
-		623CC1390E79B94E00D32B75 /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/MoreStandardResultView.xib; sourceTree = "<group>"; };
-		623CC13F0E79B99E00D32B75 /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/MoreSeparatorResultView.xib; sourceTree = "<group>"; };
 		623FA33B0E5C8C8C003630C1 /* ChatBuddies-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ChatBuddies-Info.plist"; sourceTree = "<group>"; };
 		623FA33F0E5C8C8C003630C1 /* ChatBuddiesSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatBuddiesSource.m; sourceTree = "<group>"; };
 		623FA35F0E5C8D97003630C1 /* ChatBuddies.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChatBuddies.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2312,8 +2302,6 @@
 		62ED5EE30E8AADA800C9C2C3 /* QSBSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSearchViewController.h; sourceTree = "<group>"; };
 		62ED5EE40E8AADB200C9C2C3 /* QSBSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSearchViewController.m; sourceTree = "<group>"; };
 		62F150030DD4EE3D00BCAE1A /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/ResultsWindow.xib; sourceTree = "<group>"; };
-		62F380F70EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBMoreResultsRowViewControllers.h; sourceTree = "<group>"; };
-		62F380F80EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMoreResultsRowViewControllers.m; sourceTree = "<group>"; };
 		62F594B40FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDocsSaveAsAccessoryController.h; sourceTree = "<group>"; };
 		62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSaveAsAccessoryController.m; sourceTree = "<group>"; };
 		62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSaveAsActions.m; sourceTree = "<group>"; };
@@ -2628,6 +2616,8 @@
 		8B6AE77511222D2300D5D636 /* HGSTypeFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSTypeFilter.h; sourceTree = "<group>"; };
 		8B6AE77911222D2B00D5D636 /* HGSTypeFilterTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSTypeFilterTest.m; sourceTree = "<group>"; };
 		8B6AE87F112231F400D5D636 /* HGSSearchTermScorerTestData.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = HGSSearchTermScorerTestData.plist; sourceTree = "<group>"; };
+		8B6AF52111248A5600D5D636 /* QSBMoreResultsResultCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBMoreResultsResultCell.h; sourceTree = "<group>"; };
+		8B6AF52211248A5600D5D636 /* QSBMoreResultsResultCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMoreResultsResultCell.m; sourceTree = "<group>"; };
 		8B6C172E0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSObject+KeyValueObserving.h"; sourceTree = "<group>"; };
 		8B6C172F0F373FA200E51E5D /* GTMNSObject+KeyValueObserving.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSObject+KeyValueObserving.m"; sourceTree = "<group>"; };
 		8B6EB1F41019F9B8006CFF7A /* en_GB */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en_GB; path = Resources/en_GB.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -4774,8 +4764,8 @@
 				7F9CDD800DD8D69B007C4BF4 /* QSBMenuButtonCell.m */,
 				6223C9AC0E75B9CD00F61030 /* QSBMoreResultsViewController.h */,
 				6223C9AB0E75B9CD00F61030 /* QSBMoreResultsViewController.m */,
-				62F380F70EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.h */,
-				62F380F80EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.m */,
+				8B6AF52111248A5600D5D636 /* QSBMoreResultsResultCell.h */,
+				8B6AF52211248A5600D5D636 /* QSBMoreResultsResultCell.m */,
 				8B9248A40EE65A2A00F3DF32 /* QSBPathCell.h */,
 				8B9248A70EE65A2A00F3DF32 /* QSBPathCell.m */,
 				8B9248A50EE65A2A00F3DF32 /* QSBPathComponentCell.h */,
@@ -4870,11 +4860,6 @@
 				6242D0BF0DC78E7300EFEF22 /* MainMenu.xib */,
 				7F3EB48D0E5F02B500A7A75E /* MenuArrowBlack.png */,
 				7F3EB48C0E5F02B500A7A75E /* MenuArrowWhite.png */,
-				6200FC0E0E78896A00F046EC /* MoreCategoryResultView.xib */,
-				6200F9740E785F4400F046EC /* MoreSeparator.png */,
-				623CC13E0E79B99E00D32B75 /* MoreSeparatorResultView.xib */,
-				6200F99B0E785FE700F046EC /* MoreShowAllTableResultView.xib */,
-				623CC1380E79B94E00D32B75 /* MoreStandardResultView.xib */,
 				7F838BF60DB79DB200530EAE /* NewButton.png */,
 				5ACEF2C90F40EBFC007EA38B /* PluginVerifyWindow.xib */,
 				621B1E390E4CD7B800EEF553 /* PreferencesWindow.xib */,
@@ -7649,11 +7634,6 @@
 				621B1E3B0E4CD7B800EEF553 /* PreferencesWindow.xib in Resources */,
 				7F3EB48E0E5F02B500A7A75E /* MenuArrowWhite.png in Resources */,
 				7F3EB48F0E5F02B500A7A75E /* MenuArrowBlack.png in Resources */,
-				6200F9750E785F4400F046EC /* MoreSeparator.png in Resources */,
-				6200F99D0E785FE700F046EC /* MoreShowAllTableResultView.xib in Resources */,
-				6200FC100E78896A00F046EC /* MoreCategoryResultView.xib in Resources */,
-				623CC13A0E79B94E00D32B75 /* MoreStandardResultView.xib in Resources */,
-				623CC1400E79B99E00D32B75 /* MoreSeparatorResultView.xib in Resources */,
 				6219B5340E8C1DB3008643F4 /* BaseResultsViews.xib in Resources */,
 				623A002E0E9BC534002A8401 /* TopStandardResultView.xib in Resources */,
 				623A00330E9BC5A6002A8401 /* TopSeparatorResultView.xib in Resources */,
@@ -9059,7 +9039,6 @@
 				624DD9ED0E9EA5D90029EF72 /* QSBResultRowViewController.m in Sources */,
 				624DD9F90E9EAA150029EF72 /* QSBTopResultsRowViewControllers.m in Sources */,
 				7F4BE5350EA7A9CC0025D57D /* NSColor+Naming.m in Sources */,
-				62F380F90EA7EB0C00370F6F /* QSBMoreResultsRowViewControllers.m in Sources */,
 				8B21631F0EB9022300183DE4 /* QSBDetailedRowViewController.m in Sources */,
 				8BF517910EDBC11000D981A0 /* QSBHGSDelegate.m in Sources */,
 				8B9248A80EE65A2A00F3DF32 /* QSBPathComponentCell.m in Sources */,
@@ -9092,6 +9071,7 @@
 				8BAB307B10BC4C84002E1AC9 /* PFMoveApplication.m in Sources */,
 				8B67278A10F502C500F62D01 /* QSBDebugWindowController.m in Sources */,
 				8BF62F0C110E5EC6000AB941 /* Categories.plistsrc in Sources */,
+				8B6AF52311248A5600D5D636 /* QSBMoreResultsResultCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9881,22 +9861,6 @@
 			name = PluginVerifyWindow.xib;
 			sourceTree = "<group>";
 		};
-		6200F99B0E785FE700F046EC /* MoreShowAllTableResultView.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6200F99C0E785FE700F046EC /* en_US */,
-			);
-			name = MoreShowAllTableResultView.xib;
-			sourceTree = "<group>";
-		};
-		6200FC0E0E78896A00F046EC /* MoreCategoryResultView.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6200FC0F0E78896A00F046EC /* en_US */,
-			);
-			name = MoreCategoryResultView.xib;
-			sourceTree = "<group>";
-		};
 		6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -9943,22 +9907,6 @@
 				623A008E0E9BCA70002A8401 /* en_US */,
 			);
 			name = TopMessageResultView.xib;
-			sourceTree = "<group>";
-		};
-		623CC1380E79B94E00D32B75 /* MoreStandardResultView.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				623CC1390E79B94E00D32B75 /* en_US */,
-			);
-			name = MoreStandardResultView.xib;
-			sourceTree = "<group>";
-		};
-		623CC13E0E79B99E00D32B75 /* MoreSeparatorResultView.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				623CC13F0E79B99E00D32B75 /* en_US */,
-			);
-			name = MoreSeparatorResultView.xib;
 			sourceTree = "<group>";
 		};
 		6242D0BF0DC78E7300EFEF22 /* MainMenu.xib */ = {

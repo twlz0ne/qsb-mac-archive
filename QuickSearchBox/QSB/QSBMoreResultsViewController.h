@@ -49,6 +49,7 @@
   NSIndexSet *separatorRows_;  // Indexes of rows that are separators
   NSDictionary *resultCountByCategory_;  // Current count by category.
   NSUInteger resultCount_;  // Current count.
+  NSMutableDictionary *cachedRows_;  // A cache of the currently visible rows
 }
 
 // Adds a category to the 'show all' list and then updates the contents

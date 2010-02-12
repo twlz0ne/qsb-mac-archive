@@ -41,7 +41,6 @@
 #import "QSBMoreResultsViewController.h"
 #import "NSString+ReadableURL.h"
 #import "QSBTopResultsRowViewControllers.h"
-#import "QSBMoreResultsRowViewControllers.h"
 #import "GTMNSObject+KeyValueObserving.h"
 #import "GTMMethodCheck.h"
 #import "GTMGoogleSearch.h"
@@ -121,6 +120,10 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   }
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+  return [self retain];
+}
+
 - (BOOL)isPivotable {
   return NO;
 }
@@ -176,11 +179,6 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 }
 
 - (Class)topResultsRowViewControllerClass {
-  HGSLogDebug(@"Need to handle [%@ %s] result %@.", [self class], _cmd, self);
-  return nil;
-}
-
-- (Class)moreResultsRowViewControllerClass {
   HGSLogDebug(@"Need to handle [%@ %s] result %@.", [self class], _cmd, self);
   return nil;
 }
@@ -408,16 +406,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return rowViewClass;
 }
 
-- (Class)moreResultsRowViewControllerClass {
-  Class rowViewClass = Nil;
-  if ([self categoryName]) {
-    rowViewClass = [QSBMoreCategoryRowViewController class];
-  } else {
-    rowViewClass = [QSBMoreStandardRowViewController class];
-  }
-  return rowViewClass;
-}
-
 - (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
   HGSScoredResult *scoredResult = [self representedResult];
   HGSAction *action
@@ -562,10 +550,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return [QSBTopSearchForRowViewController class];
 }
 
-- (Class)moreResultsRowViewControllerClass {
-  return [QSBMoreStandardRowViewController class];
-}
-
 // We want to inherit the google logo, so don't return an icon
 - (NSImage *)displayIcon {
   return [NSImage imageNamed:@"blue-google-white"];
@@ -657,16 +641,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return [category_ localizedName];
 }
 
-- (NSString*)stringValue {
+- (NSMutableAttributedString *)genericTitleLine {
   NSString *format = NSLocalizedString(@"Show all %u %@…",
                                        @"A table result label for an item that "
                                        @"will show the user all x things where "
                                        @"x is %u and the things are %@.");
-  return [NSString stringWithFormat:format, categoryCount_, [self categoryName]];
-}
-
-- (Class)moreResultsRowViewControllerClass {
-  return [QSBMoreShowAllTableRowViewController class];
+  NSString *title 
+    = [NSString stringWithFormat:format, categoryCount_, [self categoryName]];
+  return [self mutableAttributedStringWithString:title];
 }
 
 - (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
@@ -678,7 +660,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (NSString *)description {
   return [NSString stringWithFormat:@"%@: %p - %@",
-          [self class], self, [self stringValue]];
+          [self class], self, [[self genericTitleLine] string]];
 }
 @end
 

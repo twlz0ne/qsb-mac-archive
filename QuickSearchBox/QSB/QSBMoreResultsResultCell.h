@@ -1,7 +1,7 @@
 //
-//  QSBMoreResultsRowViewControllers.h
+//  QSBMoreResultsResultCell.h
 //
-//  Copyright (c) 2008 Google Inc. All rights reserved.
+//  Copyright (c) 2010 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,23 +30,8 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "QSBDetailedRowViewController.h"
+#import <Cocoa/Cocoa.h>
 
-@class QSBTableResult;
-
-@interface QSBMoreDetailedRowViewController : QSBDetailedRowViewController
-// return the detail string for a given result.
-- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result;
-@end
-
-@interface QSBMoreStandardRowViewController : QSBMoreDetailedRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
-@interface QSBMoreCategoryRowViewController : QSBMoreDetailedRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
-@end
-
-@interface QSBMoreShowAllTableRowViewController : QSBResultRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller;
+// The cell for the more results table.
+@interface QSBMoreResultsResultCell : NSTextFieldCell
 @end

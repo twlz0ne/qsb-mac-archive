@@ -141,6 +141,22 @@
   return rowHeight;
 }
 
+- (BOOL)tableView:(NSTableView *)aTableView
+  shouldSelectRow:(NSInteger)rowIndex {
+  QSBTableResult *object = [self tableResultForRow:rowIndex];
+  BOOL isSeparator = [object isKindOfClass:[QSBSeparatorTableResult class]];
+  BOOL isMessage = [object isKindOfClass:[QSBMessageTableResult class]]; 
+  BOOL isSelectable = object && !(isSeparator || isMessage);
+  return isSelectable;
+}
+
+- (id)tableView:(NSTableView *)tableView
+objectValueForTableColumn:(NSTableColumn *)tableColumn
+            row:(NSInteger)row {
+  QSBTableResult *result = [self tableResultForRow:row];
+  return [result isPivotable] ? [NSImage imageNamed:@"ChildArrow"] : nil;
+}
+
 #pragma mark Notifications
 - (void)searchControllerDidUpdateResults:(NSNotification *)notification {
   NSDictionary *userInfo = [notification userInfo];
