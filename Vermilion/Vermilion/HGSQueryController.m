@@ -122,7 +122,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   [nc postNotificationName:kHGSQueryControllerWillStartNotification object:self];
   HGSSearchSourceRanker *sourceRanker 
     = [HGSSearchSourceRanker sharedSearchSourceRanker];
-  for (HGSSearchSource *source in [sourceRanker orderedSources]) {
+  for (HGSSearchSource *source in [sourceRanker orderedSourcesByPerformance]) {
     // Check if the source likes the query string
     if ([source isValidSourceForQuery:parsedQuery_]) {
       HGSSearchOperation* operation;

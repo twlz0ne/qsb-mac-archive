@@ -48,6 +48,7 @@
 @interface HGSSearchSourceRanker : NSObject {
  @private
   NSMutableDictionary *rankDictionary_;
+  UInt64 promotionCount_;
   BOOL dirty_;
 }
 
@@ -76,12 +77,23 @@
 - (id)rankerData;
 
 /*!
- Returns the list of source in priority order.
+ Returns the list of source in order from fastest to slowest.
 */
-- (NSArray *)orderedSources;
+- (NSArray *)orderedSourcesByPerformance;
 
 /*!
  Returns the average amount of absolute time it takes for a source to run.
 */
 - (UInt64)averageTimeForSource:(HGSSearchSource *)source;
+
+/*!
+ Total number of promotions.
+*/
+- (UInt64)promotionCount;
+
+/*!
+ Promotion count for a given source
+*/
+- (UInt64)promotionCountForSource:(HGSSearchSource *)source;
+
 @end

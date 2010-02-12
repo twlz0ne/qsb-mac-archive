@@ -45,6 +45,7 @@
 #import "HGSBundle.h"
 #import "GTMNSString+URLArguments.h"
 #import "GTMTypeCasting.h"
+#import "HGSSearchSourceRanker.h"
 
 // Notifications
 NSString *const kHGSResultDidPromoteNotification 
@@ -666,6 +667,22 @@ GTM_METHOD_CHECK(NSString, readableURLString);
                  flagsToClear:0 
                   matchedTerm:term 
                matchedIndexes:indexes];
+}
+
+- (CGFloat)score {
+  // Change the score based on the source's promotion count.
+  // We can't calculate this in initially because some sources could create
+  // HGSScoredResults that they keep around, and they wouldn't be updated
+  // dynamically.
+  HGSSearchSource *source = [self source];
+  HGSSearchSourceRanker *ranker = [HGSSearchSourceRanker sharedSearchSourceRanker];
+  UInt64 promotionCount = [ranker promotionCount];
+  UInt64 promotionForSource = [ranker promotionCountForSource:source];
+  CGFloat promotionMultiplier 
+    = ((CGFloat)promotionForSource / (CGFloat)promotionCount);
+  CGFloat score = score_ + 1.0 * promotionMultiplier;
+  if (score > 1.0) score = 1.0;
+  return score;
 }
 
 - (void)dealloc {

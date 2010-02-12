@@ -51,7 +51,7 @@ static NSString *const kHGSSearchSourceRankerSourceIDKey
 @interface HGSSearchSourceRankerDataPoint : NSObject {
  @private
   UInt64 averageTime_;
-  UInt32 promotions_;
+  UInt64 promotions_;
   BOOL firstRunCompleted_;
 }
 - (id)initWithDictionary:(NSDictionary *)dict;
@@ -160,6 +160,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
            autorelease];
         if (dp) {
           [rankDictionary_ setObject:dp forKey:key];
+          promotionCount_ += [dp promotionCount];
         }
       }
     } 
@@ -229,7 +230,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
   return avgTime;
 }
 
-- (NSArray *)orderedSources {
+- (NSArray *)orderedSourcesByPerformance {
   HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
   NSMutableArray *sources 
     = [NSMutableArray arrayWithArray:[sourcesPoint extensions]];
@@ -240,8 +241,19 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
   return sources;
 }
 
+- (UInt64)promotionCount {
+  return promotionCount_;
+}
+
+- (UInt64)promotionCountForSource:(HGSSearchSource *)source {
+  NSString *identifier = [source identifier];
+  HGSSearchSourceRankerDataPoint *dp 
+    = [rankDictionary_ objectForKey:identifier];
+  return [dp promotionCount];
+}
+
 - (NSString *)description {
-  NSArray *orderedSources = [self orderedSources];
+  NSArray *orderedSources = [self orderedSourcesByPerformance];
   NSMutableString *desc 
     = [NSMutableString stringWithString:[super description]];
   for(HGSSearchSource *source in orderedSources) {
@@ -272,6 +284,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
       = [rankDictionary_ objectForKey:sourceID];
     [dp promote];
     [self setDirty:YES];
+    promotionCount_ += 1;
   }
 }
 
@@ -292,7 +305,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
       = [dict objectForKey:kHGSSearchSourceRankerDataPointRunTimeKey];
     averageTime_ = [number unsignedLongLongValue];
     number = [dict objectForKey:kHGSSearchSourceRankerDataPointPromotionsKey];
-    promotions_ = [number unsignedLongValue];
+    promotions_ = [number unsignedLongLongValue];
   }
   return self;
 }
@@ -300,7 +313,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
 - (void)encodeToDictionary:(NSMutableDictionary *)dict {
   [dict setObject:[NSNumber numberWithUnsignedLongLong:[self averageTime]] 
            forKey:kHGSSearchSourceRankerDataPointRunTimeKey];
-  [dict setObject:[NSNumber numberWithUnsignedLong:promotions_] 
+  [dict setObject:[NSNumber numberWithUnsignedLongLong:promotions_] 
            forKey:kHGSSearchSourceRankerDataPointPromotionsKey];
  }
 
