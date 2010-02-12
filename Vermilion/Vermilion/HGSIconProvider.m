@@ -69,54 +69,60 @@ static NSString *const kHGSIconProviderURIKey = @"HGSIconProviderURIKey";
 static NSString *const kHGSIconProviderThumbnailURLFormat 
   = @"HGSIconProviderThumbnailURLFormat";
 
-static NSURL* IconURLForResult(HGSResult *result) {
-  NSURL *url = nil;
+// Give us an URL for the icon for a result. First we check to see if the
+// result has a kHGSObjectAttributeIconPreviewFileKey, if not we use the 
+// results uri to get the icon. We create the file URLs by hand to avoid the
+// disk hits required by [NSURL fileURLWithPath].
+static NSString* IconURLStringForResult(HGSResult *result) {
   NSString *urlPath = [result valueForKey:kHGSObjectAttributeIconPreviewFileKey];
   if (!urlPath) {
-    url = [result url];
-    
+    urlPath = [result uri];
+  }
+  if ([urlPath hasPrefix:@"http:"]) {
     // For urls, we can specify a thumbnail provider for web sites.
     // HTTPS sites are usually locked down, so ignore it for those
-    if ([[url scheme] isEqualToString:@"http"]) {
-      NSString *thumbnailURL = [[NSUserDefaults standardUserDefaults]
-                               stringForKey:kHGSIconProviderThumbnailURLFormat]; 
-      NSURL *newURL = nil;
-      if (thumbnailURL) {
-        thumbnailURL
-          = [NSString stringWithFormat:thumbnailURL,[url absoluteString]];
-        newURL = [NSURL URLWithString:thumbnailURL];
-      } else {
-        newURL = [NSURL URLWithString:@"/favicon.ico" relativeToURL:url];
-      }
-      if (newURL) {
-        url = newURL;
-      }
+    NSString *thumbnailURL = [[NSUserDefaults standardUserDefaults]
+                              stringForKey:kHGSIconProviderThumbnailURLFormat]; 
+    if (thumbnailURL) {
+      urlPath
+        = [NSString stringWithFormat:thumbnailURL, urlPath];
+    } else {
+      urlPath = [urlPath stringByAppendingPathComponent:@"favicon.ico"];
     }
-  } else {
-    url = [NSURL URLWithString:urlPath];
-    if (![url scheme]) {
-      url = [NSURL fileURLWithPath:urlPath];
-      if (url) {
-        urlPath = [url relativePath];
-        if ([urlPath characterAtIndex:0] != '/') {
-          // If we have a relative path, look for the icon in the source
-          // bundle.
-          NSString *dir = [urlPath stringByDeletingLastPathComponent];
-          if ([dir length] == 0) dir = nil;
-          NSString *file = [urlPath lastPathComponent];
-          NSString *extension = [file pathExtension];
-          file = [file stringByDeletingPathExtension];
-          NSString *path = [[[result source] bundle] pathForResource:file
-                                                              ofType:extension 
-                                                         inDirectory:dir];
-          if (path) {
-            url = [NSURL fileURLWithPath:path];
-          }
-        }
-      }
+  } else if ([urlPath rangeOfString:@"://"].location == NSNotFound) {
+    urlPath 
+      = [urlPath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    urlPath = [@"file://" stringByAppendingString:urlPath];
+  }
+  return urlPath;
+}
+
+// The URI is the key that we will store a result in the advancedCache_ under.
+static NSString* IconAdvancedURIStringForResult(HGSResult *result) {
+  NSString *urlString = IconURLStringForResult(result);
+  if ([urlString hasPrefix:@"file://"] &&
+      ![urlString hasPrefix:@"file:///"] ) {
+    // We have a relative path. We prepend the source name on here to
+    // uniquefy relative paths per source.
+    NSString *sourceName = [[result source] displayName];
+    urlString = [NSString stringWithFormat:@"%@-%@", sourceName, urlString];
+  }
+  return urlString;
+}
+
+// The URI is the key that we will store a result in the basicCache_ under.
+// If a result does not return a basic URI we will not cache anything for it.
+static NSString *IconBasicURIStringForResult(HGSResult *result) {
+  NSString *uttypeURI = nil;
+  // If we have a preview file key, we can't cache a basic icon.
+  NSString *urlPath = [result valueForKey:kHGSObjectAttributeIconPreviewFileKey];
+  if (!urlPath) {
+    NSString *uttype = [result valueForKey:kHGSObjectAttributeUTTypeKey];
+    if (uttype) {
+      uttypeURI = [NSString stringWithFormat:@"uttype:%@", uttype];
     }
   }
-  return url;
+  return uttypeURI;
 }
 
 static NSImage *FileSystemImageForURL(NSURL *url) {
@@ -149,11 +155,20 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
 
 @class HGSIconOperation;
 
+// Right now we cache up to two different icons per result. A basic version for 
+// results that give us a UTType, and the "custom" advanced version. 
+// Since the spotlight source gives us the majority of results, and it supplies
+// us with a  UTType, the basic cache cuts down the number of icon operations we
+// perform by almost 50%.
 @interface HGSIconProvider()
 // Remove an operation from our list of pending icon fetch operations.
 - (void)removeOperation:(HGSIconOperation *)operation;
 - (void)setValueOnMainThread:(NSDictionary *)args;
-
+- (NSImage *)cachedIconForKey:(NSString *)key fromCache:(HGSLRUCache *)cache;
+- (void)cacheIcon:(NSImage *)icon 
+           forKey:(NSString *)key 
+            cache:(HGSLRUCache *)cache;
+- (void)cacheBasicIcon:(NSImage *)icon forResult:(HGSResult *)result;
 @end
 
 
@@ -164,8 +179,9 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
   HGSResult *result_;    // WEAK
   BOOL skipBasic_;
 }
-+ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result;
-- (id)initWithResult:(HGSResult*)result;
++ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result
+                                   skipBasic:(BOOL)skipBasic;
+- (id)initWithResult:(HGSResult*)result skipBasic:(BOOL)skipBasic;
 - (void)beginLoading;
 - (void)cancel;
 - (NSImage *)basicDiskLoad:(HGSResult *)result;
@@ -175,14 +191,17 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
 
 @implementation HGSIconOperation
 
-+ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result {
-  return [[[HGSIconOperation alloc] initWithResult:result] autorelease];
++ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result 
+                                   skipBasic:(BOOL)skipBasic{
+  return [[[HGSIconOperation alloc] initWithResult:result 
+                                         skipBasic:skipBasic] autorelease];
 }
 
-- (id)initWithResult:(HGSResult*)result {
+- (id)initWithResult:(HGSResult*)result skipBasic:(BOOL)skipBasic {
   self = [super init];
   if (self) {
     result_ = result;
+    skipBasic_ = skipBasic;
   }
   return self;
 }
@@ -209,8 +228,8 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
 
 - (void)beginLoading {
   if (!advancedOperation_) {
-    NSURL *url = IconURLForResult(result_);
-    if ([url isFileURL]) {
+    NSString *urlString = IconURLStringForResult(result_);
+    if ([urlString hasPrefix:@"file:"]) {
       if (!skipBasic_) {
         basicOperation_ 
           = [HGSInvocationOperation diskInvocationOperationWithTarget:self
@@ -224,13 +243,13 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
     } else {
       if (!skipBasic_) {
         basicOperation_ 
-        = [HGSInvocationOperation diskInvocationOperationWithTarget:self
-                                                           selector:@selector(basicDiskLoad:)
-                                                             object:result_];
-        [basicOperation_ setQueuePriority:NSOperationQueuePriorityHigh];
+          = [HGSInvocationOperation diskInvocationOperationWithTarget:self
+                                                             selector:@selector(basicDiskLoad:)
+                                                               object:result_];
       }
-      NSString *scheme = [url scheme];
-      if ([scheme hasPrefix:@"http"]) {
+      // Explicitly without the colon, as we will take https as well.
+      if ([urlString hasPrefix:@"http"]) {
+        NSURL *url = [NSURL URLWithString:urlString];
         NSURLRequest *request = [NSURLRequest requestWithURL:url];
         GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
         advancedOperation_ 
@@ -238,17 +257,15 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
                                                               forFetcher:fetcher
                                                        didFinishSelector:@selector(httpFetcher:finishedWithData:)
                                                          didFailSelector:@selector(httpFetcher:failedWithError:)];
-        [advancedOperation_ setQueuePriority:NSOperationQueuePriorityLow];
       }
-    }
-    if (basicOperation_ && advancedOperation_) {
-      [advancedOperation_ addDependency:basicOperation_];
     }
     HGSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
     if (basicOperation_) {
+      [basicOperation_ setQueuePriority:NSOperationQueuePriorityHigh];
       [queue addOperation:basicOperation_];
     }
     if (advancedOperation_) {
+      [advancedOperation_ setQueuePriority:NSOperationQueuePriorityLow];
       [queue addOperation:advancedOperation_];
     }
   }
@@ -268,17 +285,25 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
     basicOperation_ = nil;
   }
   skipBasic_ = YES;
-  NSURL *url = IconURLForResult(result);
-  if (!url) return nil;
+  NSString *urlString = IconURLStringForResult(result);
+  if (!urlString) return nil;
   NSImage *icon = nil;
-  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-  if ([url isFileURL]) {
-    icon = [ws iconForFile:[url path]];
+  if ([urlString hasPrefix:@"file://"]) {
+    if (!icon) {
+      NSUInteger fromIndex = [urlString hasPrefix:@"file://localhost"] ? 16 : 7;
+      NSString *urlPath = [urlString substringFromIndex:fromIndex]; 
+      urlPath 
+        = [urlPath stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+      NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+      icon = [ws iconForFile:urlPath];
+    }
   } else {
+    NSURL *url = [NSURL URLWithString:urlString];
     icon = FileSystemImageForURL(url);
   }
   if (icon) {
     HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
+    [sharedIconProvider cacheBasicIcon:icon forResult:result];
     [sharedIconProvider setIcon:icon 
                       forResult:result];
   }
@@ -290,15 +315,18 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
     advancedOperation_ = nil;
   }
   HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
-  NSURL *url = IconURLForResult(result);
+  NSString *urlString = IconURLStringForResult(result);
   NSImage *icon = nil;
-  if (url) {
-    NSString *extension = [[[url path] pathExtension] lowercaseString];
+  if (urlString) {
+    NSString *extension = [[urlString pathExtension] lowercaseString];
     NSArray *ignoreArray 
       = [NSArray arrayWithObjects:@"prefpane", @"app", @"framework", nil];
     BOOL ignoreQuickLook = [ignoreArray containsObject:extension];
+    ignoreQuickLook &= ![urlString hasPrefix:@"file:///"];
     
     if (!ignoreQuickLook) {
+      NSURL *url = [NSURL URLWithString:urlString];
+      
       NSDictionary *dict 
         = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] 
                                       forKey:(NSString *)kQLThumbnailOptionIconModeKey];
@@ -433,9 +461,12 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   self = [super init];
   if (self) {
     iconOperations_ = [[NSMutableSet alloc] init];
-    cache_ = [[HGSLRUCache alloc] initWithCacheSize:kIconCacheSize
-                                          callBacks:&kLRUCacheCallbacks
-                                       evictContext:self];
+    advancedCache_ = [[HGSLRUCache alloc] initWithCacheSize:kIconCacheSize
+                                                  callBacks:&kLRUCacheCallbacks
+                                               evictContext:self];
+    basicCache_ = [[HGSLRUCache alloc] initWithCacheSize:kIconCacheSize
+                                               callBacks:&kLRUCacheCallbacks
+                                            evictContext:self];
     placeHolderIcon_ = [[NSImage imageNamed:@"blue-placeholder"] retain];
     compoundPlaceHolderIcon_ 
       = [[NSImage imageNamed:NSImageNameMultipleDocuments] retain];
@@ -451,6 +482,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
       [op cancel];
     }
   }
+  [advancedCache_ release];
+  [basicCache_ release];
   [iconOperations_ release];
   [placeHolderIcon_ release];
   [super dealloc];
@@ -466,12 +499,14 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 }
 
 - (NSImage *)cachedIconForResult:(HGSResult *)result {
-  NSImage *icon = nil;
-  NSURL *url = IconURLForResult(result);
-  if (url) {
-    NSString *urlString = [url absoluteString];
-    icon = [self cachedIconForKey:urlString];
-  }
+  NSString *urlString = IconAdvancedURIStringForResult(result);
+  NSImage *icon = [self cachedIconForKey:urlString fromCache:advancedCache_];
+  return icon;
+}
+
+- (NSImage *)cachedBasicIconForResult:(HGSResult *)result {
+  NSString *urlString = IconBasicURIStringForResult(result);
+  NSImage *icon = [self cachedIconForKey:urlString fromCache:basicCache_];
   return icon;
 }
 
@@ -479,12 +514,17 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
                   skipPlaceholder:(BOOL)skipPlaceholder {
   NSImage *icon = [self cachedIconForResult:result];
   if (!icon) { 
-    HGSIconOperation *operation 
-      = [HGSIconOperation iconOperationForResult:result];
-    if (skipPlaceholder) {
-      icon = [operation basicDiskLoad:result];
-    } else {
-      icon = [self placeHolderIcon];
+    icon = [self cachedBasicIconForResult:result];
+    BOOL skipBasic = icon != nil;
+    HGSIconOperation *operation
+      = [HGSIconOperation iconOperationForResult:result 
+                                       skipBasic:skipBasic];
+    if (!skipBasic) {
+      if (skipPlaceholder) {
+        icon = [operation basicDiskLoad:result];
+      } else {
+        icon = [self placeHolderIcon];
+      }
     }
     @synchronized(self) {
       // Don't add if we're already doing a load for this object
@@ -499,7 +539,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 
 - (void)cancelOperationsForResult:(HGSResult*)result {
   HGSIconOperation *operation
-    = [HGSIconOperation iconOperationForResult:result];
+    = [HGSIconOperation iconOperationForResult:result skipBasic:NO];
   @synchronized(self) {
     HGSIconOperation *original = [iconOperations_ member:operation];
     if (original) {
@@ -515,15 +555,21 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   }
 }
 
-- (NSImage *)cachedIconForKey:(NSString *)key {
+- (NSImage *)cachedIconForKey:(NSString *)key fromCache:(HGSLRUCache *)cache {
   NSImage *icon = nil;
-  @synchronized(cache_) {
-    icon = (NSImage *)[cache_ valueForKey:key];
+  @synchronized(cache) {
+    icon = (NSImage *)[cache valueForKey:key];
   }
   return [[icon retain] autorelease];
 }
 
-- (void)cacheIcon:(NSImage *)icon forKey:(NSString *)key {
+- (NSImage *)cachedIconForKey:(NSString *)key {
+  return [self cachedIconForKey:key fromCache:advancedCache_];
+}
+
+- (void)cacheIcon:(NSImage *)icon 
+           forKey:(NSString *)key 
+            cache:(HGSLRUCache *)cache {
   if (icon) {
     // Figure out rough size of image
     size_t size = 0;
@@ -535,9 +581,20 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
                         * [rep bitsPerSample] * 4 / 8);
       size += repSize;
     }
-    @synchronized(cache_) {
-      [cache_ setValue:icon forKey:key size:size];
+    @synchronized(cache) {
+      [cache setValue:icon forKey:key size:size];
     }
+  }
+}
+
+- (void)cacheIcon:(NSImage *)icon forKey:(NSString *)key {
+  [self cacheIcon:icon forKey:key cache:advancedCache_];
+}
+
+- (void)cacheBasicIcon:(NSImage *)icon forResult:(HGSResult *)result {
+  NSString *basicURI = IconBasicURIStringForResult(result);
+  if (basicURI) {
+     [self cacheIcon:icon forKey:basicURI cache:basicCache_];
   }
 }
 
@@ -622,12 +679,12 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
 
 - (void)setIcon:(NSImage *)icon 
       forResult:(HGSResult *)result {
-  NSURL *url = IconURLForResult(result);
+  NSString *uriString = IconAdvancedURIStringForResult(result);
   NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
                         result, kHGSIconProviderResultKey,
                         icon, kHGSIconProviderValueKey,
                         kHGSObjectAttributeIconKey, kHGSIconProviderAttrKey,
-                        [url absoluteString], kHGSIconProviderURIKey,
+                        uriString, kHGSIconProviderURIKey,
                         nil];
   [self performSelectorOnMainThread:@selector(setValueOnMainThread:)
                          withObject:args
@@ -644,8 +701,8 @@ static void LRURelease(CFAllocatorRef allocator, const void *value) {
   // actual dealloc of the item to occur outside the "cache" lock.
   // We had a bug where dealloc'ing an image caused us to deadlock
   // because we had the NSAppKitLock in thread 1 and were waiting 
-  // on the HGSIconProvider cache_ lock, and in thread 2 we had the 
-  // HGSIconProvider cache_ lock and were waiting on NSAppKitLock.
+  // on the HGSIconProvider advancedCache_ lock, and in thread 2 we had the 
+  // HGSIconProvider advancedCache_ lock and were waiting on NSAppKitLock.
   // By switching the release to an autorelease, we should get out of the
   // cache lock on thread 2, before attempting to release the image which
   // acquires the NSAppKitLock.

@@ -447,25 +447,4 @@ static void HGSFetcherThreadPerformCallBack(void *info) {
 
 GTMOBJECT_SINGLETON_BOILERPLATE(HGSOperationQueue, sharedOperationQueue);
 
-- (void)addOperation:(NSOperation *)operation {
-  @synchronized(kHGSOperationQueueLockObject) {
-    // Make disk operations sequential by making the added disk
-    // operation a dependency of the last disk operation in the current
-    // queue
-    if ([operation isDiskOperation]) {
-      NSArray *operations = [self operations];
-      NSEnumerator *enumerator = [operations reverseObjectEnumerator];
-      id op;
-      while ((op = [enumerator nextObject])) {
-        if ([op isDiskOperation]) {
-          [operation addDependency:op];
-          break;
-        }
-      }
-    }
-    
-    [super addOperation:operation];
-  }
-}
-
 @end

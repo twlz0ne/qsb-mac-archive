@@ -46,7 +46,8 @@
 @interface HGSIconProvider : NSObject {
  @private
   NSMutableSet *iconOperations_;
-  HGSLRUCache *cache_;
+  HGSLRUCache *advancedCache_;
+  HGSLRUCache *basicCache_;
   NSImage *placeHolderIcon_;
   NSImage *compoundPlaceHolderIcon_;
 }
