@@ -307,9 +307,9 @@ NSString *const kHGSExtensionAccount = @"HGSExtensionAccount";
           }
         }
       } else {
-        image = [workspace iconForFileType:nameOrPathOrExtension];
+        image = [NSImage imageNamed:nameOrPathOrExtension];
         if (!image) {
-          image = [NSImage imageNamed:nameOrPathOrExtension];
+          image = [workspace iconForFileType:nameOrPathOrExtension];
           if (!image) {
             HGSLogDebug(@"Unable to load image %@", nameOrPathOrExtension);
           }

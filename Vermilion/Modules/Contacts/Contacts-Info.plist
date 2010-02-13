@@ -39,6 +39,7 @@
 			<key>HGSSearchSourceSupportedTypes</key>
 			<array>
 				<string>contact.addressbook</string>
+				<string>text</string>
 			</array>
 		</dict>
 		<dict>

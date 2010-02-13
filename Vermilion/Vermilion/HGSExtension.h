@@ -161,8 +161,8 @@
   If not absolute, looks for an image in the bundle.
     - If the path is to an image file, returns that file
     - If the path is to a non-image file, returns its icon.
-  Attempts to get an image treating nameOrPathOrExtension as a fileType.
-  Finally calls standard imageNamed.
+  Calls standard imageNamed.
+  Finally attempts to get an image treating nameOrPathOrExtension as a fileType.
 */
 - (NSImage *)imageNamed:(NSString *)nameOrPathOrExtension;
 @end

@@ -81,7 +81,8 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
                                      type:(NSString *)type 
                          valueCleanMethod:(SEL)valueCleaner
                                 urlFormat:(NSString *)urlFormat 
-                           urlCleanMethod:(SEL)urlCleaner;
+                           urlCleanMethod:(SEL)urlCleaner
+                                 iconName:(NSString *)name;
 
 // Given an HGSResult we "explode" it into it's internal HGSObjects
 // i.e. phone numbers, addressess, email, etc.
@@ -281,7 +282,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                      type:(NSString *)type 
                          valueCleanMethod:(SEL)valueCleaner
                                 urlFormat:(NSString *)urlFormat 
-                           urlCleanMethod:(SEL)urlCleaner {
+                           urlCleanMethod:(SEL)urlCleaner
+                                 iconName:(NSString *)iconName {
   NSMutableArray *results = [NSMutableArray array];
   NSString *localizedProperty
     = GTMCFAutorelease(ABCopyLocalizedPropertyOrLabel((CFStringRef)property));
@@ -322,11 +324,15 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         // Snippets look like phone: home
         NSString *snippet = [NSString stringWithFormat:@"%@: %@",
                              localizedProperty, localizedLabel];
-        // Need to get some decent icons
-        NSDictionary *attr = [NSDictionary dictionaryWithObjectsAndKeys:
-                              snippet, kHGSObjectAttributeSnippetKey,
-                              nil];
         
+        NSMutableDictionary *attr 
+          = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+             snippet, kHGSObjectAttributeSnippetKey,
+             nil];
+        if (iconName) {
+          NSImage *image = [self imageNamed:iconName];
+          [attr setObject:image forKey:kHGSObjectAttributeIconKey];
+        }
         HGSUnscoredResult *result = [HGSUnscoredResult resultWithURI:urlString
                                                                 name:cleanValue 
                                                                 type:type
@@ -346,6 +352,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     NSString *urlFormat_;
     NSString *urlCleanerSel_;
     NSString *valueCleanerSel_;
+    NSString *iconName_;
   };
   
   struct ContactMap contactMap[] = {
@@ -354,63 +361,72 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       kHGSTypeTextAddress, 
       @"http://maps.google.com/maps?q=%@", 
       @"cleanMapURL:", 
-      @"cleanMapValue:" 
+      @"cleanMapValue:",
+      @"maps.icns"
     },
     {
       kABPhoneProperty,
       kHGSTypeTextPhoneNumber, 
       @"callto:+%@", 
       @"cleanPhoneNumber:", 
-      nil 
+      nil,
+      @"goog411.icns"
     },
     { 
       kABEmailProperty, 
       kHGSTypeTextEmailAddress, 
       @"mailto:%@", 
       nil, 
-      nil 
+      nil,
+      @"gmail.icns"
     },
     { 
       kABJabberInstantProperty, 
       kHGSTypeTextInstantMessage, 
       @"xmpp:%@", 
       nil,
-      nil
+      nil,
+      @"talk.icns"
     },
     { 
       kABAIMInstantProperty, 
       kHGSTypeTextInstantMessage, 
       @"aim:goim?screenname=%@", 
       nil, 
-      nil
+      nil,
+      @"talk.icns"
     },
     { 
       kABICQInstantProperty, 
       kHGSTypeTextInstantMessage, 
       @"icq:%@", 
       nil, 
-      nil 
+      nil,
+      @"talk.icns" 
     },
     { 
       kABYahooInstantProperty, 
       kHGSTypeTextInstantMessage, 
       @"ymsgr:sendim?%@", 
       nil, 
-      nil 
+      nil,
+      @"talk.icns" 
     },
     { 
       kABMSNInstantProperty, 
       kHGSTypeTextInstantMessage, 
       @"msn:chat?contact=%@", 
       nil, 
-      nil
+      nil,
+      @"talk.icns"
     },
     { 
       kABURLsProperty, 
       kHGSTypeWebpage, 
       @"%@", 
       @"cleanURL:", 
-      nil 
+      nil,
+      @"blue-nav.icns"
     },
   };
   NSString *tempQuery = [[GTMGoogleSearch sharedInstance] searchURLFor:@"Query" 
@@ -439,7 +455,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                       type:contactMap[i].type_
                           valueCleanMethod:valueCleaner
                                  urlFormat:contactMap[i].urlFormat_
-                            urlCleanMethod:urlCleaner];
+                            urlCleanMethod:urlCleaner
+                                  iconName:contactMap[i].iconName_];
     [results addObjectsFromArray:objectResults];
   }
   return results;
