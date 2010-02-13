@@ -66,6 +66,11 @@ static NSString* const kHGSMemorySourceVersion = @"1";
 
 @end
 
+@interface HGSMemorySearchSource ()
+- (NSArray *)rankedResultsFromPreparedArray:(NSArray *)results 
+                               forOperation:(HGSCallbackSearchOperation *)operation;
+@end
+
 @implementation HGSMemorySearchSourceObject
 @synthesize result = result_;
 @synthesize name = name_;
@@ -114,14 +119,38 @@ static NSString* const kHGSMemorySourceVersion = @"1";
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSArray *rankedResults = nil;
   @synchronized(resultsArray_) {
-  rankedResults = [self rankedResultsFromArray:resultsArray_ 
-                                  forOperation:operation];
+  rankedResults = [self rankedResultsFromPreparedArray:resultsArray_ 
+                                          forOperation:operation];
   }
   [operation setRankedResults:rankedResults];
 }
 
 - (NSArray *)rankedResultsFromArray:(NSArray *)results 
-                      forOperation:(HGSCallbackSearchOperation *)operation {
+                       forOperation:(HGSCallbackSearchOperation *)operation {
+  NSMutableArray *preparedResults 
+    = [NSMutableArray arrayWithCapacity:[results count]];
+  for (HGSResult *result in results) {
+    NSString *name = [result displayName];
+    HGSTokenizedString *tokenizedName = [HGSTokenizer tokenizeString:name];
+    NSString *snippet = [result valueForKey:kHGSObjectAttributeSnippetKey];
+    NSArray *otherTerms = nil;
+    if (snippet) {
+      HGSTokenizedString *tokenizedSnippet = [HGSTokenizer tokenizeString:snippet];
+      otherTerms = [NSArray arrayWithObject:tokenizedSnippet];
+    }
+    HGSMemorySearchSourceObject *resultsArrayObject 
+      = [[HGSMemorySearchSourceObject alloc] initWithResult:result
+                                                       name:tokenizedName
+                                                 otherTerms:otherTerms];
+    [preparedResults addObject:resultsArrayObject];
+    [resultsArrayObject release];
+  }
+  return [self rankedResultsFromPreparedArray:preparedResults
+                                 forOperation:operation];
+}
+
+- (NSArray *)rankedResultsFromPreparedArray:(NSArray *)results 
+                               forOperation:(HGSCallbackSearchOperation *)operation {
   HGSQuery* query = [operation query];
   NSMutableArray* rankedResults = [NSMutableArray array];
   HGSTokenizedString *tokenizedQuery = [query tokenizedQueryString];
@@ -133,7 +162,7 @@ static NSString* const kHGSMemorySourceVersion = @"1";
     // any query terms, we match everything so the subclass can filter it
     // w/in pre/postFilterResult:matchesForQuery:pivotObject
     
-    for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
+    for (HGSMemorySearchSourceObject *indexObject in results) {
       if ([operation isCancelled]) break;
       HGSResult* result = [self preFilterResult:[indexObject result] 
                                 matchesForQuery:query 
@@ -152,7 +181,7 @@ static NSString* const kHGSMemorySourceVersion = @"1";
       }
     }
   } else if (queryLength > 0) {
-    for (HGSMemorySearchSourceObject *indexObject in resultsArray_) {
+    for (HGSMemorySearchSourceObject *indexObject in results) {
       if ([operation isCancelled]) break;
       HGSResult* result = [self preFilterResult:[indexObject result] 
                                 matchesForQuery:query 
