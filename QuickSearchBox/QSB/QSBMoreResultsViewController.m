@@ -121,6 +121,7 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
 }
 
 - (void)dealloc {
+  [self uncacheAllTableResults];
   [showAllCategoriesSet_ release];
   [separatorRows_ release];
   [resultCountByCategory_ release];
