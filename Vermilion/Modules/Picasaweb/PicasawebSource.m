@@ -173,8 +173,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (HGSResult *)preFilterResult:(HGSResult *)result 
                matchesForQuery:(HGSQuery*)query
-                   pivotObject:(HGSResult *)pivotObject {
+                  pivotObjects:(HGSResultArray *)pivotObjects {
   // Remove things that aren't from this album.
+  // if we had a pivot object, we filter the results w/ the pivot info
+  HGSAssert([pivotObjects count] <= 1, @"%@", pivotObjects);
+  HGSResult *pivotObject = [pivotObjects objectAtIndex:0];
   if ([pivotObject conformsToType:kHGSTypeWebPhotoAlbum]) {
     NSURL *albumURL = [pivotObject url];
     NSString *albumURLString = [albumURL absoluteString];

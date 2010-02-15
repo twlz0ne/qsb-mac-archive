@@ -76,8 +76,8 @@
 @property(nonatomic, readwrite, retain) QSBSearchViewController *parentSearchViewController;
 // The height of the results window necessary to accommodate the active view.
 @property(nonatomic, readonly, assign) CGFloat windowHeight;
-// The current results for the query.
-@property(nonatomic, readwrite, retain) HGSResultArray *results;
+// The current pivotObjects for the query.
+@property(nonatomic, readwrite, retain) HGSResultArray *pivotObjects;
 // Return the selected table result from the active results controller.
 @property(nonatomic, readonly, retain) QSBTableResult *selectedTableResult;
 

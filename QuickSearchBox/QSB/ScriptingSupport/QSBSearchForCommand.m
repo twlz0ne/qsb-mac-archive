@@ -105,7 +105,7 @@
   
   // set up our internals
   HGSQuery *query = [[[HGSQuery alloc] initWithString:text 
-                                              results:nil
+                                         pivotObjects:nil
                                            queryFlags:0] autorelease];
   
   HGSAssert(!queryController_, @"QueryController should be nil");

@@ -445,7 +445,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
                                              object:nil];
   
   if ([activeSearchViewController_ tokenizedQueryString]
-      || [activeSearchViewController_ results]) {
+      || [activeSearchViewController_ pivotObjects]) {
     // Dispose of the welcome window if it is being shown.
     [self closeWelcomeWindow];
 
@@ -687,7 +687,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   
   // Set the existing pivot to the indicated corpus.
   // Note that this subverts the parent's idea of what the pivot object is.
-  [activeSearchViewController_ setResults:results];
+  [activeSearchViewController_ setPivotObjects:results];
   [self updatePivotToken];
 }
 
@@ -1238,10 +1238,10 @@ doCommandBySelector:(SEL)commandSelector {
     NSUInteger idx = [menuItem tag] - kBaseCorporaTagValue;
     if (idx < [corpora  count]) {
       HGSScoredResult *corpus = [corpora objectAtIndex:idx];
-      HGSResultArray *results 
-        = [activeSearchViewController_ results];
-      if ([results count] == 1) {
-        HGSScoredResult *result = [results objectAtIndex:0];
+      HGSResultArray *pivotObjects 
+        = [activeSearchViewController_ pivotObjects];
+      if ([pivotObjects count] == 1) {
+        HGSScoredResult *result = [pivotObjects objectAtIndex:0];
         [menuItem setState:([corpus isEqual:result])];
       }
     } else {
@@ -1585,10 +1585,10 @@ doCommandBySelector:(SEL)commandSelector {
 
 - (void)updatePivotToken {
   // Place a text box with the pivot term into the query search box.
-  HGSResultArray *results = [activeSearchViewController_ results];
-  NSString *pivotString = [results displayName];
+  HGSResultArray *pivotObjects = [activeSearchViewController_ pivotObjects];
+  NSString *pivotString = [pivotObjects displayName];
   [searchMenu_ setTitle:pivotString];
-  NSImage *image = [results icon];
+  NSImage *image = [pivotObjects icon];
   NSRect frame;
   if (image) {
     // We go through this instead of copying the image so we don't

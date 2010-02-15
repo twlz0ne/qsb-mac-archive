@@ -36,19 +36,19 @@
 @implementation HGSQuery
 
 @synthesize tokenizedQueryString = tokenizedQueryString_;
-@synthesize results = results_;
+@synthesize pivotObjects = pivotObjects_;
 @synthesize parent = parent_;
 @synthesize flags = flags_;
 
 - (id)initWithTokenizedString:(HGSTokenizedString *)query 
-                      results:(HGSResultArray *)results
+                 pivotObjects:(HGSResultArray *)pivotObjects
                    queryFlags:(HGSQueryFlags)flags {
   if ((self = [super init])) {
-    results_ = [results retain];
+    pivotObjects_ = [pivotObjects retain];
     flags_ = flags;
 
     // If we got nil for a query, but had a pivot, turn it into an empty query.
-    if (!query && results_) {
+    if (!query && pivotObjects) {
       query = [HGSTokenizer tokenizeString:@""];
     }
     tokenizedQueryString_ = [query retain];
@@ -61,35 +61,44 @@
 }
 
 - (id)initWithString:(NSString *)query 
-             results:(HGSResultArray *)results
+        pivotObjects:(HGSResultArray *)pivotObjects
           queryFlags:(HGSQueryFlags)flags {
   HGSTokenizedString *tokenizedQuery = [HGSTokenizer tokenizeString:query];
   return [self initWithTokenizedString:tokenizedQuery 
-                               results:results 
+                          pivotObjects:pivotObjects 
                             queryFlags:flags];
 }
 
 - (void)dealloc {
   [tokenizedQueryString_ release];
-  [results_ release];
+  [pivotObjects_ release];
   [parent_ release];
   [super dealloc];
 }
 
-- (HGSResult *)pivotObject {
-  HGSResult *result = nil;
+- (HGSResultArray *)pivotObjects {
+  HGSResultArray *pivotObjects = nil;
   @synchronized(self) {
-    result = [[self results] lastObject];
+    pivotObjects = pivotObjects_;
     // make sure it ends up in any local pool so the caller is safe threading wise
-    [[result retain] autorelease];
+    [[pivotObjects retain] autorelease];
+  }
+  return pivotObjects;
+}
+
+- (HGSResult *)pivotObject {
+  HGSResultArray *pivotObjects = [self pivotObjects];
+  HGSResult *result = nil;
+  if ([pivotObjects count] == 1) {
+    result = [pivotObjects objectAtIndex:0];
   }
   return result;
 }
 
 - (NSString*)description {
-  return [NSString stringWithFormat:@"[%@ - Q='%@' Rs=%@ P=<%@>]",
+  return [NSString stringWithFormat:@"[%@ - Q='%@' POs=%@ P=<%@>]",
           [self class], [tokenizedQueryString_ originalString],
-          results_, parent_];
+          pivotObjects_, parent_];
 }
 
 @end

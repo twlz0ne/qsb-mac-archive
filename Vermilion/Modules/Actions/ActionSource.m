@@ -185,15 +185,15 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 
 - (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)scoredResult 
                             matchesForQuery:(HGSQuery *)query
-                                pivotObject:(HGSResult *)pivotObject {
-  HGSResultArray *queryResults = [query results];
+                               pivotObjects:(HGSResultArray *)pivotObjects {
+  HGSResultArray *queryPivotObjects = [query pivotObjects];
   HGSScoredResult *rankedActionResult = nil;
-  if (queryResults) {
+  if (queryPivotObjects) {
     // Pivot: filter to actions that support this object as the target of the
     // action.
     HGSAction *action
       = [scoredResult valueForKey:kHGSObjectAttributeDefaultActionKey];
-    if ([action appliesToResults:queryResults]) {
+    if ([action appliesToResults:queryPivotObjects]) {
       // Now that it is all set up, let's wrap it up in our proxy action.
       // We do this so that we can sub in the query's pivot object
       // when our action is called.
@@ -203,7 +203,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
            autorelease];
       
       HGSResult *actionResult = [self objectFromAction:(HGSAction *)proxy
-                                           resultArray:queryResults];
+                                           resultArray:queryPivotObjects];
       CGFloat score = [scoredResult score];
       HGSTokenizedString *matchedTerm = [scoredResult matchedTerm];
       HGSRankFlags flagsToSet = 0;
@@ -272,7 +272,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   
   // We sub in the pivot object as the primary object, ignoring whatever
   // info we got from above.
-  HGSResultArray *directObjects = [query_ results];
+  HGSResultArray *directObjects = [query_ pivotObjects];
   NSDictionary *newInfo 
     = [NSDictionary dictionaryWithObject:directObjects
                                   forKey:kHGSActionDirectObjectsKey];

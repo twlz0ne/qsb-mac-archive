@@ -43,16 +43,16 @@
 
 - (void)testInit {
   STAssertNil([[[HGSQuery alloc] initWithTokenizedString:nil
-                                                 results:nil
+                                            pivotObjects:nil
                                               queryFlags:0] autorelease],
               nil);
   STAssertNotNil([[[HGSQuery alloc] initWithString:@""
-                                                    results:nil
-                                                 queryFlags:0] autorelease],
+                                      pivotObjects:nil
+                                        queryFlags:0] autorelease],
                  nil);
   STAssertNotNil([[[HGSQuery alloc] initWithString:@"a"
-                                                    results:nil
-                                                 queryFlags:0] autorelease],
+                                      pivotObjects:nil
+                                        queryFlags:0] autorelease],
                  nil);
 }
 
@@ -62,13 +62,13 @@
   HGSQuery *query2;
   
   query1 = [[[HGSQuery alloc] initWithString:@"abc"
-                                              results:nil
-                                           queryFlags:0] autorelease];
+                                pivotObjects:nil
+                                  queryFlags:0] autorelease];
   STAssertNotNil(query1, nil);
   
   query2 = [[[HGSQuery alloc] initWithString:@"xyz"
-                                              results:nil
-                                           queryFlags:0] autorelease];
+                                pivotObjects:nil
+                                  queryFlags:0] autorelease];
   STAssertNotNil(query2, nil);
   
   STAssertNil([query1 parent], nil);

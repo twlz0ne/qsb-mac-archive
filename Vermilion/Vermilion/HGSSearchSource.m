@@ -121,19 +121,20 @@ NSString *const kHGSSearchSourceUnsupportedTypes
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   // Must have a pivot or something we parse as a word
-  BOOL isValid = YES;
-  HGSResult *pivotObject = [query pivotObject];
-  if (pivotObject) {
-    NSSet *allPivots = [NSSet setWithObject:@"*"];
+  BOOL isValid = NO;
+  HGSResultArray *pivotObjects = [query pivotObjects];
+  if (pivotObjects) {
     NSSet *pivotTypes = [self pivotableTypes];
-    if ([pivotTypes isEqual:allPivots]) {
+    if (pivotTypes) {
       isValid = YES;
-    } else {
-      isValid = NO;
-      for (NSString *pivotType in pivotTypes) {
-        if ([pivotObject conformsToType:pivotType]) {
-          isValid = YES;
-          break;
+      NSSet *allPivots = [NSSet setWithObject:@"*"];
+      if (![pivotTypes isEqual:allPivots]) {
+        for (NSString *pivotType in pivotTypes) {
+          for (HGSResult *pivotObject in pivotObjects) {
+            if (![pivotObject conformsToType:pivotType]) {
+              return NO;
+            }
+          }
         }
       }
     }

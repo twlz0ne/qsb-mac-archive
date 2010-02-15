@@ -104,8 +104,8 @@ static NSString *const kClipboardCopyAction
 
 - (HGSResult *)preFilterResult:(HGSResult *)result 
                matchesForQuery:(HGSQuery*)query
-                   pivotObject:(HGSResult *)pivotObject {
-  if (pivotObject) {
+                  pivotObjects:(HGSResultArray *)pivotObjects {
+  if (pivotObjects) {
     // We're pivoting off the persistent "Clipboard" result. 
     // Remove the persistent result from the array
     if ([result isEqual:clipboardResult_]) {

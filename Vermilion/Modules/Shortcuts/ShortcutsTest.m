@@ -117,7 +117,7 @@
 - (void)testEmptySource {
   HGSSearchSource *source = [self source];
   HGSQuery *query = [[HGSQuery alloc] initWithString:@"i" 
-                                             results:nil 
+                                        pivotObjects:nil 
                                           queryFlags:0];
   HGSSearchOperation *op = [source searchOperationForQuery:query];
   NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -167,7 +167,7 @@
                         object:tableResult 
                       userInfo:userInfo];
   HGSQuery *query = [[[HGSQuery alloc] initWithTokenizedString:queryString
-                                                       results:nil 
+                                                  pivotObjects:nil 
                                                     queryFlags:0] autorelease];
   HGSSearchOperation *op = [[self source] searchOperationForQuery:query];
   [center addObserver:self

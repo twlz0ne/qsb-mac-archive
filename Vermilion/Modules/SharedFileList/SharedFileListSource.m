@@ -240,7 +240,7 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
 
 - (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)scoredResult 
                             matchesForQuery:(HGSQuery *)query
-                                pivotObject:(HGSResult *)pivotObject {
+                               pivotObjects:(HGSResultArray *)pivotObjects {
   // Filter out any documents that are no longer named or located where
   // we remembered them being.
   NSFileManager *fm = [NSFileManager defaultManager];

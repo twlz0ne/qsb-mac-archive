@@ -344,8 +344,8 @@ static NSString *const kApplicationSourcePredicateString
 
 - (HGSResult *)preFilterResult:(HGSResult *)result
                matchesForQuery:(HGSQuery*)query
-                   pivotObject:(HGSResult *)pivotObject {
-  if (pivotObject) {
+                  pivotObjects:(HGSResultArray *)pivotObjects {
+  if (pivotObjects) {
     // Remove things that aren't preference panes
     NSString *absolutePath = [result filePath];
     if (![self pathIsPrefPane:absolutePath]) {

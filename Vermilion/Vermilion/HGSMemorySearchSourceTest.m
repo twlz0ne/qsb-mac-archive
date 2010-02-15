@@ -139,7 +139,7 @@
                                                   source:memSource] autorelease];
   HGSTokenizedString *tokenString = [HGSTokenizer tokenizeString:@"foo"]; 
   [[[searchQueryMock stub] andReturn:tokenString] tokenizedQueryString];
-  [[[searchQueryMock stub] andReturn:nil] pivotObject];
+  [[[searchQueryMock stub] andReturn:nil] pivotObjects];
   [memSource performSearchOperation:op];
 }
 @end

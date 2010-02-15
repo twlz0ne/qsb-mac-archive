@@ -73,7 +73,7 @@
   STAssertNotNil(source, nil);
 
   HGSQuery *query = [[[HGSQuery alloc] initWithString:@"Hello world"
-                                              results:nil
+                                         pivotObjects:nil
                                            queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
 

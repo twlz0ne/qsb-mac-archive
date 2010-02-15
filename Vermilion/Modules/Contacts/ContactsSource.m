@@ -238,8 +238,10 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 #pragma mark -
 - (HGSResult *)preFilterResult:(HGSResult *)result 
                matchesForQuery:(HGSQuery*)query
-                   pivotObject:(HGSResult *)pivotObject {
+                  pivotObjects:(HGSResultArray *)pivotObjects {
   // if we had a pivot object, we filter the results w/ the pivot info
+  HGSAssert([pivotObjects count] <= 1, @"%@", pivotObjects);
+  HGSResult *pivotObject = [pivotObjects objectAtIndex:0];
   if (pivotObject && ![pivotObject isOfType:kTypeContactAddressBook]) {
     // To survive the pivot, the contact has to have our a matching email
     // address.

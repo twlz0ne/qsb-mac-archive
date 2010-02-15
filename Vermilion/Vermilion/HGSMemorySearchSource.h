@@ -38,6 +38,7 @@
 */
 
 @class HGSQuery;
+@class HGSResultArray;
 
 /*!
  Subclass of HGSCallbackSearchSource that handles the search logic for simple
@@ -148,7 +149,7 @@
 */
 - (HGSResult *)preFilterResult:(HGSResult *)result 
                matchesForQuery:(HGSQuery*)query
-                   pivotObject:(HGSResult *)pivotObject;
+                  pivotObjects:(HGSResultArray *)pivotObjects;
 /*!
  Called for each result after HGSMemorySearchSource does it's default
  name matching. Use it to filter our results that cost more than our name 
@@ -157,6 +158,6 @@
 */
 - (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)result 
                             matchesForQuery:(HGSQuery *)query
-                                pivotObject:(HGSResult *)pivotObject;
+                               pivotObjects:(HGSResultArray *)pivotObjects;
  
 @end

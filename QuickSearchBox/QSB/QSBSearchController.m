@@ -80,7 +80,7 @@ const NSTimeInterval kQSBDisplayTimerStages[] = { 0.1, 0.3, 0.7 };
 @implementation QSBSearchController
 
 @synthesize pushModifierFlags = pushModifierFlags_;
-@synthesize results = results_;
+@synthesize pivotObjects = pivotObjects_;
 @synthesize parentSearchController = parentSearchController_;
 @synthesize queryInProcess = queryInProcess_;
 @synthesize gatheringFinished = gatheringFinished_;
@@ -127,7 +127,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // Cancel outstanding query requests and all timers.
   [self stopQuery];
   [tokenizedQueryString_ release];
-  [results_ release];
+  [pivotObjects_ release];
   [parentSearchController_ release];
   [topResults_ release];
   [moreResults_ release];
@@ -374,7 +374,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   lockedResults_ = nil;
   currentResultDisplayCount_ = (0.8 * [self maximumResultsToCollect]);
 
-  if (tokenizedQueryString_ || results_) {
+  if (tokenizedQueryString_ || pivotObjects_) {
 
     HGSQueryFlags flags = 0;
     if ([self pushModifierFlags] & NSAlternateKeyMask) {
@@ -383,7 +383,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
     HGSQuery *query 
       = [[[HGSQuery alloc] initWithTokenizedString:tokenizedQueryString_
-                                           results:results_
+                                      pivotObjects:pivotObjects_
                                         queryFlags:flags]
                        autorelease];
 

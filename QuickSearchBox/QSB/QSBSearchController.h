@@ -49,7 +49,7 @@
   NSMutableArray *topResults_;
   NSArray *lockedResults_;
   HGSTokenizedString *tokenizedQueryString_;  // Current query entered by user.
-  HGSResultArray *results_;
+  HGSResultArray *pivotObjects_;
   NSUInteger currentResultDisplayCount_;
   HGSQueryController *queryController_;
   QSBSearchController *parentSearchController_;
@@ -67,8 +67,8 @@
 
 // Sets/Gets NSEvent Modifiers at pivot time
 @property(nonatomic, assign) NSUInteger pushModifierFlags;
-// Sets/Gets a context (pivot object) for the current query.
-@property(nonatomic, retain) HGSResultArray *results;
+// Sets/Gets a context (pivot objects) for the current query.
+@property(nonatomic, retain) HGSResultArray *pivotObjects;
 // Sets/Gets the parent query from which we were spawned.
 @property(nonatomic, retain) QSBSearchController *parentSearchController;
 // Bound to the progress indicator in BaseResultsViews.xib

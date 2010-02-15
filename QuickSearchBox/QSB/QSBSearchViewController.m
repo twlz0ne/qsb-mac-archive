@@ -116,9 +116,9 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   HGSAssert(!selectedObject 
             || [selectedObject isKindOfClass:[QSBSourceTableResult class]],
             @"expected a QSBSourceTableResult and got %@", selectedObject);
-  HGSScoredResult *result = [selectedObject representedResult];
-  HGSResultArray *results = [HGSResultArray arrayWithResult:result];
-  [self setResults:results];
+  HGSScoredResult *pivotObject = [selectedObject representedResult];
+  HGSResultArray *pivotObjects = [HGSResultArray arrayWithResult:pivotObject];
+  [self setPivotObjects:pivotObjects];
 }
 
 - (void)updateResultsViewNow {
@@ -168,12 +168,12 @@ NSString *const kScrollViewHiddenKeyPath = @"hidden";
   return result;
 }
 
-- (void)setResults:(HGSResultArray *)results {
-  [searchController_ setResults:results];
+- (void)setPivotObjects:(HGSResultArray *)pivotObjects {
+  [searchController_ setPivotObjects:pivotObjects];
 }
 
-- (HGSResultArray *)results {
-  return [searchController_ results];
+- (HGSResultArray *)pivotObjects {
+  return [searchController_ pivotObjects];
 }
 
 - (void)performAction:(HGSAction *)action

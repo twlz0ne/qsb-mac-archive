@@ -155,9 +155,9 @@ static NSString* const kHGSMemorySourceVersion = @"1";
   NSMutableArray* rankedResults = [NSMutableArray array];
   HGSTokenizedString *tokenizedQuery = [query tokenizedQueryString];
   NSUInteger queryLength = [tokenizedQuery originalLength];
-  HGSResult *pivotObject = [query pivotObject];
+  HGSResultArray *pivotObjects = [query pivotObjects];
     
-  if ((queryLength == 0) && pivotObject) {
+  if ((queryLength == 0) && [pivotObjects count]) {
     // Per the note above this class in the header, if we get a pivot w/o
     // any query terms, we match everything so the subclass can filter it
     // w/in pre/postFilterResult:matchesForQuery:pivotObject
@@ -166,7 +166,7 @@ static NSString* const kHGSMemorySourceVersion = @"1";
       if ([operation isCancelled]) break;
       HGSResult* result = [self preFilterResult:[indexObject result] 
                                 matchesForQuery:query 
-                                    pivotObject:pivotObject];
+                                   pivotObjects:pivotObjects];
       if (!result) continue;
       HGSScoredResult *scoredResult 
         = [HGSScoredResult resultWithResult:result
@@ -175,7 +175,7 @@ static NSString* const kHGSMemorySourceVersion = @"1";
                              matchedIndexes:nil];
       scoredResult = [self postFilterScoredResult:scoredResult 
                                   matchesForQuery:query 
-                                      pivotObject:pivotObject];
+                                     pivotObjects:pivotObjects];
       if (scoredResult) {
         [rankedResults addObject:scoredResult];
       }
@@ -185,7 +185,7 @@ static NSString* const kHGSMemorySourceVersion = @"1";
       if ([operation isCancelled]) break;
       HGSResult* result = [self preFilterResult:[indexObject result] 
                                 matchesForQuery:query 
-                                    pivotObject:pivotObject];
+                                   pivotObjects:pivotObjects];
       if (!result) continue;
       HGSTokenizedString* name = [indexObject name];
       NSArray* otherItems = [indexObject otherTerms];
@@ -208,7 +208,7 @@ static NSString* const kHGSMemorySourceVersion = @"1";
                                matchedIndexes:matchedIndexes];
         scoredResult = [self postFilterScoredResult:scoredResult 
                                     matchesForQuery:query 
-                                        pivotObject:pivotObject];
+                                       pivotObjects:pivotObjects];
         if (scoredResult) {
           [rankedResults addObject:scoredResult];
         }
@@ -371,14 +371,14 @@ static NSString* const kHGSMemorySourceVersion = @"1";
 
 - (HGSResult *)preFilterResult:(HGSResult *)result 
                matchesForQuery:(HGSQuery*)query
-                   pivotObject:(HGSResult *)pivotObject {
+                  pivotObjects:(HGSResultArray *)pivotObjects {
   // Do nothing. Subclasses can override.
   return result;
 }
 
 - (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)result 
                             matchesForQuery:(HGSQuery *)query
-                                pivotObject:(HGSResult *)pivotObject {
+                               pivotObjects:(HGSResultArray *)pivotObjects {
   // Do nothing. Subclasses can override.
   return result;
 }

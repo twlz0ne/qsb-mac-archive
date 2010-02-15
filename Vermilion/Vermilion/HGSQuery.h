@@ -59,15 +59,23 @@ typedef enum {
 @interface HGSQuery : NSObject {
  @private
   HGSTokenizedString *tokenizedQueryString_;
-  HGSResultArray *results_;
+  HGSResultArray *pivotObjects_;
   HGSQuery *parent_;
   HGSQueryFlags flags_;
 }
 
 /*! 
-  Results is the current set of results that we have accumulated. 
+  A pivot object in the context is any result currently set to filter search
+  this could  a directory (filtering to its contents) or a website (searching
+  data there) or many other types of searchable items.
 */
-@property (readonly, retain) HGSResultArray *results;
+@property (readonly, retain) HGSResultArray *pivotObjects;
+
+/*!
+ pivotObject will return the first value of pivotObjects if and only if
+ [pivotObjects count] == 1. Otherwise it will return nil.
+*/
+@property (readonly, retain) HGSResult *pivotObject;
 
 /*!
   The query string in it's original and tokenized forms.
@@ -82,13 +90,6 @@ typedef enum {
 */
 @property (readwrite, retain) HGSQuery *parent;
 
-/*!
-  A pivot object in the context is any result currently set to filter search
-  this could  a directory (filtering to its contents) or a website (searching
-  data there) or many other types of searchable items.
-*/
-@property (readonly, retain) HGSResult *pivotObject;
-
 /*! 
   Various flags that modify some queries.
 */
@@ -98,10 +99,10 @@ typedef enum {
  Designated Initializer.
 */
 - (id)initWithTokenizedString:(HGSTokenizedString *)query 
-                      results:(HGSResultArray *)results
+                 pivotObjects:(HGSResultArray *)pivots
                    queryFlags:(HGSQueryFlags)flags;
 
 - (id)initWithString:(NSString *)query 
-             results:(HGSResultArray *)results
+        pivotObjects:(HGSResultArray *)pivots
           queryFlags:(HGSQueryFlags)flags;
 @end

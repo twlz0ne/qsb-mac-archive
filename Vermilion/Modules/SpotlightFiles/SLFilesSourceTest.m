@@ -163,7 +163,7 @@
 - (NSArray *)performSearchFor:(NSString *)value 
                    pivotingOn:(HGSResultArray *)pivots {
   HGSQuery *query = [[[HGSQuery alloc] initWithString:value 
-                                              results:pivots 
+                                         pivotObjects:pivots 
                                            queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   HGSSearchOperation *operation = [[self source] searchOperationForQuery:query];
@@ -180,7 +180,7 @@
 - (HGSResult *)spotlightResultForQuery:(NSString *)queryString
                                   path:(NSString *)path {
   HGSQuery *query = [[[HGSQuery alloc] initWithString:queryString 
-                                              results:nil 
+                                         pivotObjects:nil 
                                            queryFlags:0] autorelease];
   HGSSearchOperation *op = [[self source] searchOperationForQuery:query];
   Class cls = NSClassFromString(@"SLFilesOperation");
@@ -286,12 +286,12 @@
 - (void)testValidSourceForQuery {
   HGSSearchSource *source = [self source];
   HGSQuery *query = [[[HGSQuery alloc] initWithString:@"ha" 
-                                              results:nil 
+                                         pivotObjects:nil 
                                            queryFlags:0] autorelease]; 
   STAssertFalse([source isValidSourceForQuery:query], 
                 @"Queries < 3 characters should be ignored");
   query = [[[HGSQuery alloc] initWithString:@"hap" 
-                                    results:nil 
+                               pivotObjects:nil 
                                  queryFlags:0] autorelease]; 
   STAssertTrue([source isValidSourceForQuery:query], 
                 @"Queries >= 3 characters should be accepted");
@@ -306,7 +306,7 @@
     = [HGSUnscoredResult resultWithDictionary:badTypeDict source:source];
   query 
     = [[[HGSQuery alloc] initWithString:@"happy" 
-                                results:[NSArray arrayWithObject:badTypeResult] 
+                           pivotObjects:[NSArray arrayWithObject:badTypeResult] 
                              queryFlags:0] autorelease]; 
   STAssertFalse([source isValidSourceForQuery:query],
                 @"Queries with pivot of type kHGSTypeFile should fail.");
@@ -321,7 +321,7 @@
                                                                        source:source];
   query 
     = [[[HGSQuery alloc] initWithString:@"happy" 
-                                results:[NSArray arrayWithObject:goodTypeResult] 
+                           pivotObjects:[NSArray arrayWithObject:goodTypeResult] 
                              queryFlags:0] autorelease]; 
   STAssertTrue([source isValidSourceForQuery:query],
                @"Queries with pivot of type kHGSTypeContact should succeed.");
