@@ -31,6 +31,8 @@
 			<string>___PROJECTNAME___ Source</string>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<array/>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>*</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>

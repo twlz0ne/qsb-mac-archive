@@ -37,6 +37,8 @@
 			<array>
 				<string>file.application</string>
 			</array>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>onebox.dictionary_definition</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>

@@ -31,6 +31,8 @@
 			<true/>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Weather</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>onebox.weather</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

@@ -37,7 +37,7 @@
 
 static NSString *kDictionaryUrlFormat = @"qsbdict://%@";
 static NSString *kDictionaryResultType
-  = HGS_SUBTYPE(@"dictionary", @"definition");
+  = HGS_SUBTYPE(@"onebox", @"dictionary_definition");
 NSString *kDictionaryRangeKey = @"DictionaryRange";
 NSString *kDictionaryTermKey = @"DictionaryTerm";
 static NSString *kShowInDictionaryAction

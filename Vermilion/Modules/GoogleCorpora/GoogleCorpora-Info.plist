@@ -29,6 +29,8 @@
 			<string>^Google Apps</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.googlecorpora.source</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>webpage.application</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

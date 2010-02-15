@@ -41,6 +41,8 @@
 				<string>com.googlecode.precpitate.docs.spreadsheet</string>
 				<string>com.googlecode.precpitate.docs.document</string>
 			</array>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>webpage.googledoc</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>

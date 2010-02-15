@@ -33,6 +33,8 @@
 			<false/>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<string>file.application</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>*</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

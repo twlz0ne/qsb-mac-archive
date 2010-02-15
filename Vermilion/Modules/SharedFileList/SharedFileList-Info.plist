@@ -29,6 +29,8 @@
 			<string>com.google.qsb.sharedFileList.source</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Recent Applications and Documents</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>*</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

@@ -83,6 +83,8 @@
 			<string>^Mount</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>share</string>
 		</dict>
 	</array>
 </dict>

@@ -31,6 +31,8 @@
 			<string>^Developer Documentation</string>
 			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
 			<string>com.apple.xcode.docset</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>file.developerdocs</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

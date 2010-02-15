@@ -33,6 +33,8 @@
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSSearchSourceCannotArchive</key>
 			<true/>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>*</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>

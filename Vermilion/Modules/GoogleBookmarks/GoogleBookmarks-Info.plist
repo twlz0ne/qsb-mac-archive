@@ -35,6 +35,8 @@
 			<array>
 				<string>com.googlecode.precipitate.bookmark</string>
 			</array>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>webpage.bookmark.googlebookmarks</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

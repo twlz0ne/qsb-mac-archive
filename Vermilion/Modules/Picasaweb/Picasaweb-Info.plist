@@ -36,6 +36,11 @@
 				<string>com.googlecode.precipitate.pwa.album</string>
 				<string>com.googlecode.precipitate.pwa.photo</string>
 			</array>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<array>
+				<string>webpage.image</string>
+				<string>webpage.image.album</string>
+			</array>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
