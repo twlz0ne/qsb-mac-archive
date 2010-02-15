@@ -33,6 +33,8 @@
 			<string>com.apple.application</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Applications Source</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>file.application</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>

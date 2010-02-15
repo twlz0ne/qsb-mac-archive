@@ -31,6 +31,8 @@
 			<string>^URL Detection</string>
 			<key>HGSExtensionIsUserVisible</key>
 			<false/>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>webpage</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -48,6 +50,8 @@
 				<string>file.directory</string>
 				<string>file.application</string>
 			</array>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>file</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -61,6 +65,8 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Web Search</string>
 			<key>HGSSearchSourcePivotableTypes</key>
+			<string>webpage</string>
+			<key>HGSSearchSourceSupportedTypes</key>
 			<string>webpage</string>
 		</dict>
 		<dict>
@@ -76,6 +82,8 @@
 			<string>^Google Search</string>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<string>webpage</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>webpage</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -88,6 +96,8 @@
 			<string>com.google.qsb.core.suggest.source</string>
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Search Suggestions</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>text.suggestion</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -101,7 +111,9 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Open Search Suggestions</string>
 			<key>HGSSearchSourcePivotableTypes</key>
-			<string>suggestion</string>
+			<string>text.suggestion</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>text.suggestion</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -116,6 +128,8 @@
 			<string>^Text Input</string>
 			<key>HGSSearchSourceCannotArchive</key>
 			<true/>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>text.userinput</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -214,6 +228,20 @@
 			<string>^Open Again</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>FileSystemOpenWithAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Open With…</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>*</string>
+			<key>HGSActionIndirectObjectTypes</key>
+			<string>file.application</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.filesystem.action.openwith</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

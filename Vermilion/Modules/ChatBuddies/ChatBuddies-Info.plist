@@ -33,6 +33,8 @@
 			<array>
 				<string>file.application</string>
 			</array>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>contact.ichat</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

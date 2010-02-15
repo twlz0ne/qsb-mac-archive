@@ -36,6 +36,8 @@
 				<string>file.application</string>
 				<string>appui</string>
 			</array>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>appui.item</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>

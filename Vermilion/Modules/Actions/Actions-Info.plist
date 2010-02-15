@@ -33,6 +33,8 @@
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSSearchSourcePivotableTypes</key>
 			<string>*</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>action</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

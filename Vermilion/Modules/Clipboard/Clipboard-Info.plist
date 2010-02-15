@@ -37,6 +37,8 @@
 			<array>
 				<string>clipboard.generic</string>
 			</array>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>clipboard</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>

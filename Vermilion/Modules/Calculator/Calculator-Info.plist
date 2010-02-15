@@ -31,6 +31,8 @@
 			<string>^Calculator Source</string>
 			<key>HGSSearchSourceCannotArchive</key>
 			<true/>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>onebox.calculator</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>
