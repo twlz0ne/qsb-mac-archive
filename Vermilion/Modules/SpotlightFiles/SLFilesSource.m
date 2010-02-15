@@ -143,7 +143,7 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
   if (goodQuery) {
     goodQuery = MDQueryExecute(mdCategoryQuery_, kMDQuerySynchronous);
   }
-  if (!goodQuery) {
+  if (!goodQuery && ![self isCancelled]) {
     // COV_NF_START
     CFStringRef queryString = MDQueryCopyQueryString(mdTopQuery_);
     // If something goes wrong, let the handler think we just completed with
@@ -177,9 +177,9 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
 }
 
 - (void)cancel {
+  [super cancel];
   MDQueryStop(mdTopQuery_);
   MDQueryStop(mdCategoryQuery_);
-  [super cancel];
 }
 
 - (id)getAttribute:(CFStringRef)attribute 
