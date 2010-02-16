@@ -16,9 +16,9 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>QSBPlugin</string>
 			<key>CFBundleTypeName</key>
-			<string>${PRODUCT_NAME}  Plugin</string>
+			<string>${PRODUCT_NAME} Plugin</string>
 			<key>CFBundleTypeRole</key>
-			<string>None</string>
+			<string>Viewer</string>
 			<key>LSTypeIsPackage</key>
 			<true/>
 		</dict>

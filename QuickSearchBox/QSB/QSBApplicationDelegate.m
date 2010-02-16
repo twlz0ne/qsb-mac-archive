@@ -720,6 +720,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   for (NSDictionary *error in errors) {
     NSString *type = [error objectForKey:kHGSPluginLoaderPluginFailureKey];
     if (![type isEqualToString:kHGSPluginLoaderPluginFailedUnknownPluginType]) {
+      //TODO(dmaclach): Change this over to an alert.
       HGSLogDebug(@"Unable to load %@ (%@)",
                   [error objectForKey:kHGSPluginLoaderPluginPathKey], type);
     }
@@ -944,15 +945,55 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 - (void)application:(NSApplication *)app openFiles:(NSArray *)fileList {
   NSArray *plugIns
      = [fileList pathsMatchingExtensions:[NSArray arrayWithObject:@"hgs"]];
+  NSMutableArray *otherFiles = [[fileList mutableCopy] autorelease];
+  [otherFiles removeObjectsInArray:plugIns];
+  BOOL wasGood = YES;
+  NSError *error = nil;
   if ([plugIns count]) {
-    // TODO(alcor): install the plugin
-    [app replyToOpenOrPrint:NSApplicationDelegateReplyFailure];
-  } else {
-    HGSResultArray *results = [HGSResultArray arrayWithFilePaths:fileList];
+    // TODO(dmaclach): give user option to install globally or locally.
+    // TODO(dmaclach): handle case where user launches plugin while qsb is
+    // running. We will want to install it asap.
+    // TODO(dmaclach): Add case for plugin that already is here.
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSString *pluginsDir
+      = [[hgsDelegate_ userApplicationSupportFolderForApp]
+         stringByAppendingPathComponent:@"PlugIns"];
+    if (![fm fileExistsAtPath:pluginsDir]) {
+      wasGood = [fm createDirectoryAtPath:pluginsDir
+             withIntermediateDirectories:YES
+                              attributes:nil
+                                   error:&error];
+    }
+    if (wasGood) {    
+      for (NSString *plugIn in plugIns) {
+        NSString *name = [plugIn lastPathComponent];
+        NSString *newPath = [pluginsDir stringByAppendingPathComponent:name];
+        wasGood = [fm copyItemAtPath:plugIn toPath:newPath error:&error];
+        if (!wasGood) {
+          break;
+        }
+      }
+      BOOL isRunning = [NSApp currentEvent] != nil;
+      if (wasGood && isRunning) {
+        // TODO(dmaclach): Fix up so that we can load the plugins dynamically.
+        HGSLog(@"Need to restart QSB for Plugins to take effect");
+      }
+    }
+  }
+  if ([otherFiles count]) {
+    HGSResultArray *results = [HGSResultArray arrayWithFilePaths:otherFiles];
     [searchWindowController_ selectResults:results];
     [searchWindowController_ showSearchWindowBecause:kQSBFilesFromFinderChangeVisiblityToggle];
-    [app replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
+    
   }
+  NSApplicationDelegateReply reply = NSApplicationDelegateReplySuccess; 
+  if (!wasGood) {
+    NSAlert *alert = [NSAlert alertWithError:error];
+    // TODO(dmaclach): Better error alerts. The default ones are pathetic.
+    [alert runModal];
+    reply = NSApplicationDelegateReplyFailure;
+  }
+  [app replyToOpenOrPrint:reply];
 }
 
 - (void)getSelectionFromService:(NSPasteboard *)pasteboard
