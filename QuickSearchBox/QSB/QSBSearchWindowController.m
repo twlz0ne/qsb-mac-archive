@@ -226,7 +226,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   // Defaults to ResultsWindow.xib
   NSString *nibName = [[NSUserDefaults standardUserDefaults]
                         stringForKey:kQSBMainInterfaceNibName];
-  if (!nibName) nibName = @"ResultsWindow";
+  if (!nibName) nibName = @"QSBSearchWindow";
   if ((self = [self initWithWindowNibName:nibName])) {
     [self loadWindow];
   }

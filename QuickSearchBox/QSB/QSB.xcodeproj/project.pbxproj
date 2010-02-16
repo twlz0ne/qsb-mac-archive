@@ -465,7 +465,6 @@
 		62ED06910EC265AF001A838E /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		62ED5EE50E8AADB200C9C2C3 /* QSBSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62ED5EE40E8AADB200C9C2C3 /* QSBSearchViewController.m */; };
 		62EFB4C71018F35500F984C7 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
-		62F150040DD4EE3D00BCAE1A /* ResultsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 62F150020DD4EE3C00BCAE1A /* ResultsWindow.xib */; };
 		62F594B70FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */; };
 		62F594B80FEB06A60076CDDA /* GoogleDocsSaveAsActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */; };
 		62F595B10FEB278A0076CDDA /* GoogleDocsConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */; };
@@ -542,7 +541,6 @@
 		7F9CDD050DD8C37F007C4BF4 /* SearchPulldownActive.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9CDD030DD8C37F007C4BF4 /* SearchPulldownActive.png */; };
 		7F9CDD810DD8D69B007C4BF4 /* QSBMenuButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F9CDD800DD8D69B007C4BF4 /* QSBMenuButtonCell.m */; };
 		7FA450BC0EF88741006FD4E9 /* QSBDraggableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA450BA0EF88741006FD4E9 /* QSBDraggableImageView.m */; };
-		7FD2E82E0F33D75F00189D93 /* ResultsWindow-Large.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7FD2E82C0F33D75F00189D93 /* ResultsWindow-Large.xib */; };
 		7FE2542C0F5CE3E4004FE5A6 /* blue-nav.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F45C0F17C7BF00896770 /* blue-nav.icns */; };
 		7FE602A60D91975000336364 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796A438C0976F3B5000659B6 /* CoreServices.framework */; };
 		7FE961B20F5E66E100CBBA8D /* action-audiochat-icon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7FE2537B0F5CDA23004FE5A6 /* action-audiochat-icon.pdf */; };
@@ -992,6 +990,7 @@
 		8BA61B920F0ADEAD008182B5 /* QuickLook.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B6ECB620E154F08006A815D /* QuickLook.png */; };
 		8BA61DBB0F0AEF78008182B5 /* AddToPartyShuffle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BA61DBA0F0AEF78008182B5 /* AddToPartyShuffle.icns */; };
 		8BA61DBD0F0AEF7E008182B5 /* PlayInPartyShuffle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BA61DBC0F0AEF7E008182B5 /* PlayInPartyShuffle.icns */; };
+		8BA91E1C112B131F004A431F /* QSBSearchWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8BA91E1A112B131F004A431F /* QSBSearchWindow.xib */; };
 		8BAAA8640F813E2A00DF4F12 /* HGSExtensionPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BAAA85B0F813E2A00DF4F12 /* HGSExtensionPoint.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BAAA8650F813E2A00DF4F12 /* HGSPluginLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85C0F813E2A00DF4F12 /* HGSPluginLoader.m */; };
 		8BAAA8660F813E2A00DF4F12 /* HGSCoreExtensionPoints.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85D0F813E2A00DF4F12 /* HGSCoreExtensionPoints.m */; };
@@ -2301,7 +2300,6 @@
 		62EA8C1A0F2E7E5E00C92E0B /* GoogleAccounts-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleAccounts-Info.plist"; sourceTree = "<group>"; };
 		62ED5EE30E8AADA800C9C2C3 /* QSBSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBSearchViewController.h; sourceTree = "<group>"; };
 		62ED5EE40E8AADB200C9C2C3 /* QSBSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBSearchViewController.m; sourceTree = "<group>"; };
-		62F150030DD4EE3D00BCAE1A /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/ResultsWindow.xib; sourceTree = "<group>"; };
 		62F594B40FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDocsSaveAsAccessoryController.h; sourceTree = "<group>"; };
 		62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSaveAsAccessoryController.m; sourceTree = "<group>"; };
 		62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSaveAsActions.m; sourceTree = "<group>"; };
@@ -2421,7 +2419,6 @@
 		7F9FF9140DD27A530040408E /* HGSSuggestSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSuggestSource.m; sourceTree = "<group>"; };
 		7FA450BA0EF88741006FD4E9 /* QSBDraggableImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBDraggableImageView.m; sourceTree = "<group>"; };
 		7FA450BB0EF88741006FD4E9 /* QSBDraggableImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBDraggableImageView.h; sourceTree = "<group>"; };
-		7FD2E82D0F33D75F00189D93 /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = "en_US.lproj/ResultsWindow-Large.xib"; sourceTree = "<group>"; };
 		7FD8F1A70E252CDE00E7E6A5 /* URLDetectionSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLDetectionSource.m; sourceTree = "<group>"; };
 		7FE253790F5CDA23004FE5A6 /* action-videochat-icon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "action-videochat-icon.pdf"; sourceTree = "<group>"; };
 		7FE2537A0F5CDA23004FE5A6 /* action-chat-icon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "action-chat-icon.pdf"; sourceTree = "<group>"; };
@@ -3291,6 +3288,7 @@
 		8BA624BF0F12C79E008182B5 /* PackageVersion.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = PackageVersion.xcconfig; sourceTree = "<group>"; };
 		8BA624C00F12C79E008182B5 /* QSBDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = QSBDebug.xcconfig; sourceTree = "<group>"; };
 		8BA624C10F12C79E008182B5 /* QSBRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = QSBRelease.xcconfig; sourceTree = "<group>"; };
+		8BA91E1B112B131F004A431F /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/QSBSearchWindow.xib; sourceTree = "<group>"; };
 		8BAAA85A0F813E2A00DF4F12 /* HGSPluginLoaderTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPluginLoaderTest.m; sourceTree = "<group>"; };
 		8BAAA85B0F813E2A00DF4F12 /* HGSExtensionPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSExtensionPoint.h; sourceTree = "<group>"; };
 		8BAAA85C0F813E2A00DF4F12 /* HGSPluginLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPluginLoader.m; sourceTree = "<group>"; };
@@ -4865,11 +4863,10 @@
 				621B1E390E4CD7B800EEF553 /* PreferencesWindow.xib */,
 				8B4893FF0F16EA5300786C1E /* QSBIcon.icns */,
 				8B4894540F16EB1E00786C1E /* QSBPlugin.icns */,
+				8BA91E1A112B131F004A431F /* QSBSearchWindow.xib */,
 				8B4894600F16EB9900786C1E /* QSBStatusMenuIconGray.png */,
 				8B48945F0F16EB9900786C1E /* QSBStatusMenuIconGrayInverted.png */,
 				8B6ECB620E154F08006A815D /* QuickLook.png */,
-				62F150020DD4EE3C00BCAE1A /* ResultsWindow.xib */,
-				7FD2E82C0F33D75F00189D93 /* ResultsWindow-Large.xib */,
 				7F947AE00E1447600042B638 /* RightArrow.png */,
 				7F9CDD020DD8C37F007C4BF4 /* SearchPulldown.png */,
 				7F9CDD030DD8C37F007C4BF4 /* SearchPulldownActive.png */,
@@ -7621,7 +7618,6 @@
 				7F7357E60DC93426003DB5C6 /* shopping-icon.png in Resources */,
 				7F7357E70DC93426003DB5C6 /* webhistory-icon.png in Resources */,
 				7F7357E80DC93426003DB5C6 /* wikipedia-icon.png in Resources */,
-				62F150040DD4EE3D00BCAE1A /* ResultsWindow.xib in Resources */,
 				7F9CDD040DD8C37F007C4BF4 /* SearchPulldown.png in Resources */,
 				7F9CDD050DD8C37F007C4BF4 /* SearchPulldownActive.png in Resources */,
 				7F220BC50DDB44F800737C26 /* imdb-icon.png in Resources */,
@@ -7696,7 +7692,6 @@
 				7F1A72750F26264700B44BEF /* gmail.icns in Resources */,
 				7F7F90930F32570F00B39433 /* TopSearchIconResultView.xib in Resources */,
 				7F7F90940F32570F00B39433 /* TopSearchForResultView.xib in Resources */,
-				7FD2E82E0F33D75F00189D93 /* ResultsWindow-Large.xib in Resources */,
 				7F1804F90F38F61500E687CA /* Search14Small.png in Resources */,
 				7F1804FA0F38F61500E687CA /* Search14.png in Resources */,
 				5ACEF2CB0F40EBFC007EA38B /* PluginVerifyWindow.xib in Resources */,
@@ -7724,6 +7719,7 @@
 				8BAB322A10BC55D2002E1AC9 /* MoveApplication.strings in Resources */,
 				62D5150A10DAD73B007ECA33 /* dsa_pub.pem in Resources */,
 				8B67278C10F503B500F62D01 /* QSBDebugWindow.xib in Resources */,
+				8BA91E1C112B131F004A431F /* QSBSearchWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9917,14 +9913,6 @@
 			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
-		62F150020DD4EE3C00BCAE1A /* ResultsWindow.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				62F150030DD4EE3D00BCAE1A /* en_US */,
-			);
-			name = ResultsWindow.xib;
-			sourceTree = "<group>";
-		};
 		7F7F908F0F32570F00B39433 /* TopSearchIconResultView.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -9939,14 +9927,6 @@
 				7F7F90920F32570F00B39433 /* en_US */,
 			);
 			name = TopSearchForResultView.xib;
-			sourceTree = "<group>";
-		};
-		7FD2E82C0F33D75F00189D93 /* ResultsWindow-Large.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7FD2E82D0F33D75F00189D93 /* en_US */,
-			);
-			name = "ResultsWindow-Large.xib";
 			sourceTree = "<group>";
 		};
 		8B0E665E0FD82C6300461C4A /* GTMHotKeyTextField.strings */ = {
@@ -10894,6 +10874,14 @@
 				8B98A2C50FA96EBB009DC652 /* en_US */,
 			);
 			name = WelcomeWindow.xib;
+			sourceTree = "<group>";
+		};
+		8BA91E1A112B131F004A431F /* QSBSearchWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8BA91E1B112B131F004A431F /* en_US */,
+			);
+			name = QSBSearchWindow.xib;
 			sourceTree = "<group>";
 		};
 		8BAB322810BC55D2002E1AC9 /* MoveApplication.strings */ = {
