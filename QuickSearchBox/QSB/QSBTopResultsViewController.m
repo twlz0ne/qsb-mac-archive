@@ -40,6 +40,7 @@
 #import "QSBSearchWindowController.h"
 #import "QSBSearchController.h"
 #import "QSBCategory.h"
+#import "QSBTopResultsRowViewControllers.h"
 
 @interface QSBTopResultsViewController ()
 @property (readwrite, copy) NSString *categorySummaryString;
@@ -63,15 +64,17 @@
   QSBSearchViewController *viewController = [self searchViewController];
   QSBSearchWindowController *windowController 
     = [viewController searchWindowController];
-  NSWindow *resultsWindow = [windowController resultsWindow];
-  NSView *contentView = [resultsWindow contentView];
+  NSView *contentView = [windowController resultsView];
   viewFrame.size.width = NSWidth([contentView frame]);
   [resultsView setFrame:viewFrame];
+  
+  rowViewControllers_ = [[NSMutableDictionary dictionary] retain];
   
   [super awakeFromNib];
 }
 
 - (void)dealloc {
+  [rowViewControllers_ release];
   [categorySummaryString_ release];
   [super dealloc];
 }
@@ -120,10 +123,6 @@
   }
 }
 
-- (Class)rowViewControllerClassForResult:(QSBTableResult *)result {
-  return [result topResultsRowViewControllerClass];
-}
-
 - (QSBTableResult *)tableResultForRow:(NSInteger)row { 
   return [[[self searchViewController] searchController] topResultForIndex:row];
 }
@@ -155,6 +154,46 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
             row:(NSInteger)row {
   QSBTableResult *result = [self tableResultForRow:row];
   return [result isPivotable] ? [NSImage imageNamed:@"ChildArrow"] : nil;
+}
+
+- (NSView*)tableView:(NSTableView*)tableView
+       viewForColumn:(NSTableColumn*)column
+                 row:(NSInteger)row {
+  // Creating our views lazily.
+  QSBResultRowViewController *oldController
+    = [rowViewControllers_ objectForKey:[NSNumber numberWithInteger:row]];
+  QSBResultRowViewController *newController = nil;
+  
+  // Decide what kind of view we want to use based on the result.
+  QSBTableResult *result = [self tableResultForRow:row];
+  Class aRowViewControllerClass 
+    = [result topResultsRowViewControllerClass];
+  if (aRowViewControllerClass) {
+    if (!oldController 
+        || [oldController class] != aRowViewControllerClass) {
+      // We cannot reuse the old controller.
+      QSBSearchViewController *queryController = [self searchViewController];
+      newController
+        = [[[aRowViewControllerClass alloc] initWithController:queryController]
+           autorelease];          
+      [rowViewControllers_ setObject:newController
+                              forKey:[NSNumber numberWithInteger:row]];
+      [newController loadView];
+    } else {
+      newController = oldController;
+    }
+    if ([newController representedObject] != result) {
+      [newController setRepresentedObject:result];
+    }
+  } 
+  
+  if (!newController) {
+    HGSLogDebug(@"Unable to determine result row view for result %@ (row %d).",
+                result, row);
+  }
+  
+  NSView *newView = [newController view];
+  return newView;
 }
 
 #pragma mark Notifications

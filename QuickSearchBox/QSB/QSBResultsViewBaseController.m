@@ -39,7 +39,6 @@
 #import "QSBTableResult.h"
 #import "QSBResultsViewTableView.h"
 #import "QSBSearchWindowController.h"
-#import "QSBTopResultsRowViewControllers.h"
 #import "GTMGeometryUtils.h"
 #import "QSBSearchController.h"
 
@@ -59,7 +58,7 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 @implementation QSBResultsViewBaseController
 
 - (void)awakeFromNib {
-  rowViewControllers_ = [[NSMutableDictionary dictionary] retain];
+  
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc addObserver:self 
          selector:@selector(searchControllerDidUpdateResults:) 
@@ -73,7 +72,6 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 }
 
 - (void)dealloc {
-  [rowViewControllers_ release];
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [super dealloc];
 }
@@ -280,54 +278,6 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
 
 - (QSBTableResult *)tableResultForRow:(NSInteger)row {
   [self doesNotRecognizeSelector:_cmd];
-  return nil;
-}
-
-#pragma mark QSBViewTableViewDelegateProtocol methods
-
-- (NSView*)tableView:(NSTableView*)tableView
-       viewForColumn:(NSTableColumn*)column
-                 row:(NSInteger)row {
-  // Creating our views lazily.
-  QSBResultRowViewController *oldController
-    = [rowViewControllers_ objectForKey:[NSNumber numberWithInteger:row]];
-  QSBResultRowViewController *newController = nil;
-  
-  // Decide what kind of view we want to use based on the result.
-  QSBTableResult *result = [self tableResultForRow:row];
-  Class aRowViewControllerClass 
-    = [self rowViewControllerClassForResult:result];
-  if (aRowViewControllerClass) {
-    if (!oldController 
-        || [oldController class] != aRowViewControllerClass) {
-      // We cannot reuse the old controller.
-      QSBSearchViewController *queryController = [self searchViewController];
-      newController
-        = [[[aRowViewControllerClass alloc] initWithController:queryController]
-           autorelease];          
-      [rowViewControllers_ setObject:newController
-                              forKey:[NSNumber numberWithInteger:row]];
-      [newController loadView];
-    } else {
-      newController = oldController;
-    }
-    if ([newController representedObject] != result) {
-      [newController setRepresentedObject:result];
-    }
-  } 
-  
-  if (!newController) {
-    HGSLogDebug(@"Unable to determine result row view for result %@ (row %d).",
-                result, row);
-  }
-  
-  NSView *newView = [newController view];
-  return newView;
-}
-
-- (Class)rowViewControllerClassForResult:(QSBTableResult *)result {
-  HGSLogDebug(@"Your child class needs to handle this method ([%@ %s]",
-              [self class], _cmd);
   return nil;
 }
 

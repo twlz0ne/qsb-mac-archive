@@ -306,25 +306,11 @@
 				<string key="NSFrameSize">{0, 0}</string>
 				<string key="NSClassName">QSBTextFieldEditor</string>
 			</object>
-			<object class="NSWindowTemplate" id="195429014">
-				<int key="NSWindowStyleMask">129</int>
-				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{196, 125}, {480, 385}}</string>
-				<int key="NSWTFlags">1677722624</int>
-				<string key="NSWindowTitle">Results</string>
-				<string key="NSWindowClass">QSBCustomPanel</string>
-				<nil key="NSViewClass"/>
-				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
-				<object class="NSView" key="NSWindowView" id="544255073">
-					<nil key="NSNextResponder"/>
-					<int key="NSvFlags">274</int>
-					<string key="NSFrameSize">{480, 385}</string>
-				</object>
-				<string key="NSScreenRect">{{0, 0}, {2560, 1578}}</string>
-				<string key="NSMaxSize">{3.40282e+38, 3.40282e+38}</string>
-			</object>
 			<object class="NSCustomObject" id="397439943">
 				<string key="NSClassName">GTMUILocalizer</string>
+			</object>
+			<object class="NSCustomObject" id="995384323">
+				<string key="NSClassName">QSBResultsWindowController</string>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -385,14 +371,6 @@
 						<reference key="destination" ref="60305898"/>
 					</object>
 					<int key="connectionID">2076</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">resultsWindow_</string>
-						<reference key="source" ref="11512819"/>
-						<reference key="destination" ref="195429014"/>
-					</object>
-					<int key="connectionID">2169</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -498,6 +476,22 @@
 					</object>
 					<int key="connectionID">2672</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">resultsWindowController_</string>
+						<reference key="source" ref="11512819"/>
+						<reference key="destination" ref="995384323"/>
+					</object>
+					<int key="connectionID">2674</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">searchWindowController_</string>
+						<reference key="source" ref="995384323"/>
+						<reference key="destination" ref="11512819"/>
+					</object>
+					<int key="connectionID">2675</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -595,23 +589,6 @@
 						<int key="objectID">1951</int>
 						<reference key="object" ref="371109170"/>
 						<reference key="parent" ref="742172827"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">2099</int>
-						<reference key="object" ref="195429014"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="544255073"/>
-						</object>
-						<reference key="parent" ref="413361475"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">2100</int>
-						<reference key="object" ref="544255073"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<reference key="parent" ref="195429014"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">2291</int>
@@ -719,6 +696,11 @@
 						<reference key="object" ref="397439943"/>
 						<reference key="parent" ref="413361475"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2673</int>
+						<reference key="object" ref="995384323"/>
+						<reference key="parent" ref="413361475"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -746,11 +728,6 @@
 					<string>2.CustomClassName</string>
 					<string>2.IBPluginDependency</string>
 					<string>2.ImportedFromIB2</string>
-					<string>2099.IBEditorWindowLastContentRect</string>
-					<string>2099.IBViewEditorWindowController.showingLayoutRectangles</string>
-					<string>2099.IBWindowTemplateEditedContentRect</string>
-					<string>2099.NSWindowTemplate.visibleAtLaunch</string>
-					<string>2099.windowTemplate.maxSize</string>
 					<string>21.IBEditorWindowLastContentRect</string>
 					<string>21.IBViewEditorWindowController.showingLayoutRectangles</string>
 					<string>21.IBWindowTemplateEditedContentRect</string>
@@ -761,8 +738,6 @@
 					<string>21.windowTemplate.hasMinSize</string>
 					<string>21.windowTemplate.maxSize</string>
 					<string>21.windowTemplate.minSize</string>
-					<string>2100.CustomClassName</string>
-					<string>2100.IBPluginDependency</string>
 					<string>2112.CustomClassName</string>
 					<string>2112.IBPluginDependency</string>
 					<string>2112.ImportedFromIB2</string>
@@ -780,6 +755,7 @@
 					<string>2564.IBPluginDependency</string>
 					<string>2565.IBPluginDependency</string>
 					<string>2653.IBPluginDependency</string>
+					<string>2673.IBPluginDependency</string>
 					<string>270.IBPluginDependency</string>
 					<string>270.IBViewIntegration.shadowBlurRadius</string>
 					<string>270.IBViewIntegration.shadowColor</string>
@@ -822,23 +798,16 @@
 					<string>QSBBackgroundView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{280, -110}, {480, 385}}</string>
+					<string>{{402, 1099}, {426, 96}}</string>
+					<reference ref="9"/>
+					<string>{{402, 1099}, {426, 96}}</string>
+					<reference ref="9"/>
 					<integer value="0" id="8"/>
-					<string>{{280, -110}, {480, 385}}</string>
-					<reference ref="8"/>
-					<string>{3.40282e+38, 3.40282e+38}</string>
-					<string>{{347, 1099}, {426, 96}}</string>
-					<reference ref="9"/>
-					<string>{{347, 1099}, {426, 96}}</string>
-					<reference ref="9"/>
-					<reference ref="8"/>
 					<string>{{12, 668}, {552, 480}}</string>
 					<reference ref="8"/>
 					<reference ref="8"/>
 					<string>{552, 480}</string>
 					<string>{0, 0}</string>
-					<string>QSBGrayView</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>QSBLargeIconView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
@@ -859,6 +828,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>QSBDraggableImageView</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -905,7 +875,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">2672</int>
+			<int key="maxID">2675</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1072,6 +1042,13 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">QSBResultTableView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
 					</object>
@@ -1211,22 +1188,6 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">QSBGrayView</string>
-					<string key="superclassName">NSView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">QSBGrayView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">QSBGrayView</string>
-					<string key="superclassName">NSView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBUserSource</string>
-						<string key="minorKey"/>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
 					<string key="className">QSBLargeIconView</string>
 					<string key="superclassName">QSBDraggableImageView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -1343,6 +1304,18 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">QSBResultsWindowController</string>
+					<string key="superclassName">NSWindowController</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">searchWindowController_</string>
+						<string key="NS.object.0">QSBSearchWindowController</string>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">QSBResultsWindowController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">QSBSearchWindowController</string>
 					<string key="superclassName">NSWindowController</string>
 					<object class="NSMutableDictionary" key="actions">
@@ -1378,7 +1351,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>logoView_</string>
 							<string>resultsOffsetterView_</string>
-							<string>resultsWindow_</string>
+							<string>resultsWindowController_</string>
 							<string>searchMenu_</string>
 							<string>searchTextFieldEditor_</string>
 							<string>searchTextField_</string>
@@ -1390,7 +1363,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSImageView</string>
 							<string>NSView</string>
-							<string>QSBCustomPanel</string>
+							<string>QSBResultsWindowController</string>
 							<string>QSBMenuButton</string>
 							<string>QSBTextFieldEditor</string>
 							<string>NSTextField</string>

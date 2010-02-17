@@ -31,11 +31,15 @@
 //
 
 #import "QSBResultsViewBaseController.h"
+#import "QSBViewTableViewDelegateProtocol.h"
 
 // A controller that manages the view-based 'More' results view.
-@interface QSBTopResultsViewController : QSBResultsViewBaseController {
+@interface QSBTopResultsViewController : QSBResultsViewBaseController  <QSBViewTableViewDelegateProtocol> {
  @private
   NSString *categorySummaryString_;
+  
+  // Storage for our lazily created row results view controllers.
+  NSMutableDictionary *rowViewControllers_;
 }
 
 @property (readonly, copy) NSString *categorySummaryString;

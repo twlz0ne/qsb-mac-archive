@@ -40,8 +40,11 @@
 @class QSBSearchViewController;
 @class QSBWelcomeController;
 @class QSBViewAnimation;
+@class QSBResultsWindowController;
 
 extern const NSTimeInterval kQSBAppearDelay;
+extern const NSTimeInterval kQSBShowDuration;
+extern const NSTimeInterval kQSBHideDuration;
 
 @interface QSBSearchWindowController : NSWindowController {
  @private
@@ -50,10 +53,10 @@ extern const NSTimeInterval kQSBAppearDelay;
   IBOutlet NSImageView *logoView_;
   IBOutlet QSBMenuButton *searchMenu_;
   IBOutlet QSBMenuButton *windowMenuButton_;
-  IBOutlet QSBCustomPanel *resultsWindow_;
   IBOutlet NSWindow *shieldWindow_;
   IBOutlet NSView *resultsOffsetterView_;
   IBOutlet NSImageView *thumbnailView_;
+  IBOutlet QSBResultsWindowController *resultsWindowController_;
   
   QSBSearchViewController *activeSearchViewController_;  // Currently active query.
 
@@ -71,7 +74,6 @@ extern const NSTimeInterval kQSBAppearDelay;
   QSBWelcomeController *welcomeController_;
   
   // Animations
-  QSBViewAnimation *resultWindowVisibilityAnimation_;
   QSBViewAnimation *searchWindowVisibilityAnimation_;
   QSBViewAnimation *pivotingAnimation_;
 }
@@ -105,12 +107,11 @@ extern const NSTimeInterval kQSBAppearDelay;
 // Pivot on the current selection, if possible
 - (void)pivotOnSelection;
 
+- (NSView *)resultsView;
+
 // Utility function to handle everything that's needed when we change our results
 // Resizes our window, and reloads our tableview.
 - (void)updateResultsView;
-
-// Return our main results window.
-- (NSWindow *)resultsWindow;
 
 // Attempt to set the height of the results window while insuring that
 // the results window fits comfortably on the screen along with the

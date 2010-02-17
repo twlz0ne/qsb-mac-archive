@@ -31,8 +31,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "QSBViewTableViewDelegateProtocol.h"
-
 
 @class QSBSearchViewController;
 @class QSBResultsViewTableView;
@@ -41,14 +39,11 @@
 // Abstract base class for the result views which manages the presentation
 // of results in the Top Results and the More Results views.
 //
-@interface QSBResultsViewBaseController : NSViewController <QSBViewTableViewDelegateProtocol> {
+@interface QSBResultsViewBaseController : NSViewController {
  @private
   IBOutlet QSBSearchViewController *searchViewController_;
   IBOutlet NSView *resultsView_;
   IBOutlet QSBResultsViewTableView *resultsTableView_;
-
-  // Storage for our lazily created row results view controllers.
-  NSMutableDictionary *rowViewControllers_;
   
   BOOL isShowing_;  // YES when our results section is showing.
   BOOL resultsNeedUpdating_;
@@ -100,9 +95,6 @@
 - (void)scrollToEndOfDocument:(id)sender;
 - (void)scrollPageUp:(id)sender;
 - (void)scrollPageDown:(id)sender;
-
-// Derived classes must provide a view controller class for a given result
-- (Class)rowViewControllerClassForResult:(QSBTableResult *)result;
 
 // Respond to a click in the path control.
 - (void)pathControlClick:(id)sender;

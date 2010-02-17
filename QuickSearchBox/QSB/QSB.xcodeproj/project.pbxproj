@@ -438,7 +438,6 @@
 		62D0E96B0EF059B40028522C /* HGSAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D0E96A0EF059B40028522C /* HGSAccount.m */; };
 		62D0E96F0EF05D0E0028522C /* HGSAccountsExtensionPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D0E96D0EF05D0E0028522C /* HGSAccountsExtensionPoint.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62D0E9700EF05D0E0028522C /* HGSAccountsExtensionPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D0E96E0EF05D0E0028522C /* HGSAccountsExtensionPoint.m */; };
-		62D14DFB0F15651B0053B99F /* QSBBooleanToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D14DFA0F15651B0053B99F /* QSBBooleanToColorTransformer.m */; };
 		62D2A92A0E256FCA00D42E81 /* DoubleDownChevrons.png in Resources */ = {isa = PBXBuildFile; fileRef = 62D2A9290E256FCA00D42E81 /* DoubleDownChevrons.png */; };
 		62D5150A10DAD73B007ECA33 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 62D5150910DAD73B007ECA33 /* dsa_pub.pem */; };
 		62D56E240EF317A900D3EB5F /* HGSAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 62D0E9640EF058950028522C /* HGSAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -991,6 +990,8 @@
 		8BA61DBB0F0AEF78008182B5 /* AddToPartyShuffle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BA61DBA0F0AEF78008182B5 /* AddToPartyShuffle.icns */; };
 		8BA61DBD0F0AEF7E008182B5 /* PlayInPartyShuffle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BA61DBC0F0AEF7E008182B5 /* PlayInPartyShuffle.icns */; };
 		8BA91E1C112B131F004A431F /* QSBSearchWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8BA91E1A112B131F004A431F /* QSBSearchWindow.xib */; };
+		8BA9203F112B215D004A431F /* QSBResultsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8BA9203D112B215D004A431F /* QSBResultsWindow.xib */; };
+		8BA921A5112B2B0D004A431F /* QSBResultsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BA9202E112B210D004A431F /* QSBResultsWindowController.m */; };
 		8BAAA8640F813E2A00DF4F12 /* HGSExtensionPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BAAA85B0F813E2A00DF4F12 /* HGSExtensionPoint.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BAAA8650F813E2A00DF4F12 /* HGSPluginLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85C0F813E2A00DF4F12 /* HGSPluginLoader.m */; };
 		8BAAA8660F813E2A00DF4F12 /* HGSCoreExtensionPoints.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA85D0F813E2A00DF4F12 /* HGSCoreExtensionPoints.m */; };
@@ -2278,7 +2279,6 @@
 		62D0E96A0EF059B40028522C /* HGSAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccount.m; sourceTree = "<group>"; };
 		62D0E96D0EF05D0E0028522C /* HGSAccountsExtensionPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAccountsExtensionPoint.h; sourceTree = "<group>"; };
 		62D0E96E0EF05D0E0028522C /* HGSAccountsExtensionPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSAccountsExtensionPoint.m; sourceTree = "<group>"; };
-		62D14DFA0F15651B0053B99F /* QSBBooleanToColorTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBBooleanToColorTransformer.m; sourceTree = "<group>"; };
 		62D2A9290E256FCA00D42E81 /* DoubleDownChevrons.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DoubleDownChevrons.png; sourceTree = "<group>"; };
 		62D5150810DAD701007ECA33 /* QSBUpdateAppcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = QSBUpdateAppcast.xml; sourceTree = "<group>"; };
 		62D5150910DAD73B007ECA33 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
@@ -3289,6 +3289,9 @@
 		8BA624C00F12C79E008182B5 /* QSBDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = QSBDebug.xcconfig; sourceTree = "<group>"; };
 		8BA624C10F12C79E008182B5 /* QSBRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = QSBRelease.xcconfig; sourceTree = "<group>"; };
 		8BA91E1B112B131F004A431F /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/QSBSearchWindow.xib; sourceTree = "<group>"; };
+		8BA9202D112B210D004A431F /* QSBResultsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBResultsWindowController.h; sourceTree = "<group>"; };
+		8BA9202E112B210D004A431F /* QSBResultsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBResultsWindowController.m; sourceTree = "<group>"; };
+		8BA9203E112B215D004A431F /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = Resources/en_US.lproj/QSBResultsWindow.xib; sourceTree = "<group>"; };
 		8BAAA85A0F813E2A00DF4F12 /* HGSPluginLoaderTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPluginLoaderTest.m; sourceTree = "<group>"; };
 		8BAAA85B0F813E2A00DF4F12 /* HGSExtensionPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSExtensionPoint.h; sourceTree = "<group>"; };
 		8BAAA85C0F813E2A00DF4F12 /* HGSPluginLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPluginLoader.m; sourceTree = "<group>"; };
@@ -3424,8 +3427,8 @@
 		8BF52F640EE2250600D981A0 /* QSBCustomPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCustomPanel.m; sourceTree = "<group>"; };
 		8BF60FE611079035000AB941 /* HGSUserMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSUserMessage.h; sourceTree = "<group>"; };
 		8BF60FE711079035000AB941 /* HGSUserMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSUserMessage.m; sourceTree = "<group>"; };
-		8BF61F86110A5D2E000AB941 /* Transference Beacon-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Transference Beacon-Info.plist"; sourceTree = "<group>"; };
-		8BF61FF6110A5DD1000AB941 /* Transference Demo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Transference Demo-Info.plist"; sourceTree = "<group>"; };
+		8BF61F86110A5D2E000AB941 /* Transference Beacon-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Transference Beacon-Info.plist"; path = "../../QSB/Transference Beacon-Info.plist"; sourceTree = "<group>"; };
+		8BF61FF6110A5DD1000AB941 /* Transference Demo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Transference Demo-Info.plist"; path = "../../QSB/Transference Demo-Info.plist"; sourceTree = "<group>"; };
 		8BF62037110A60C2000AB941 /* TransferenceBeacon.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TransferenceBeacon.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BF620CF110A60F5000AB941 /* BeaconServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BeaconServer.h; sourceTree = "<group>"; };
 		8BF620D0110A60F5000AB941 /* BeaconServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BeaconServer.m; sourceTree = "<group>"; };
@@ -4067,8 +4070,6 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				D45B92550A3F6E68003A5A05 /* Libraries */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				8BF61F86110A5D2E000AB941 /* Transference Beacon-Info.plist */,
-				8BF61FF6110A5DD1000AB941 /* Transference Demo-Info.plist */,
 			);
 			name = GoogleDesktop;
 			sourceTree = "<group>";
@@ -4734,7 +4735,6 @@
 				8B5EC6510CEE61BE00AD3BBD /* QSBApplicationDelegate.m */,
 				8B5EC6480CEE61BE00AD3BBD /* QSBBackgroundView.h */,
 				8B5EC6490CEE61BE00AD3BBD /* QSBBackgroundView.m */,
-				62D14DFA0F15651B0053B99F /* QSBBooleanToColorTransformer.m */,
 				8B338AF411189477007E3342 /* QSBCategories.h */,
 				8BF62EA9110E593B000AB941 /* QSBCategory.h */,
 				8BF62EAA110E593B000AB941 /* QSBCategory.m */,
@@ -4788,6 +4788,8 @@
 				6223CC870E76EC4E00F61030 /* QSBResultsViewTableView.m */,
 				8B5EC6700CEE61BF00AD3BBD /* QSBResultTableView.h */,
 				8B5EC6710CEE61BF00AD3BBD /* QSBResultTableView.m */,
+				8BA9202D112B210D004A431F /* QSBResultsWindowController.h */,
+				8BA9202E112B210D004A431F /* QSBResultsWindowController.m */,
 				7F3F758A0E152A57001AF34E /* QSBScrollView.h */,
 				7F3F758B0E152A57001AF34E /* QSBScrollView.m */,
 				8B5EC6660CEE61BF00AD3BBD /* QSBSearchController.h */,
@@ -4863,6 +4865,7 @@
 				621B1E390E4CD7B800EEF553 /* PreferencesWindow.xib */,
 				8B4893FF0F16EA5300786C1E /* QSBIcon.icns */,
 				8B4894540F16EB1E00786C1E /* QSBPlugin.icns */,
+				8BA9203D112B215D004A431F /* QSBResultsWindow.xib */,
 				8BA91E1A112B131F004A431F /* QSBSearchWindow.xib */,
 				8B4894600F16EB9900786C1E /* QSBStatusMenuIconGray.png */,
 				8B48945F0F16EB9900786C1E /* QSBStatusMenuIconGrayInverted.png */,
@@ -5987,6 +5990,8 @@
 		8BF620CE110A60F5000AB941 /* Transference */ = {
 			isa = PBXGroup;
 			children = (
+				8BF61F86110A5D2E000AB941 /* Transference Beacon-Info.plist */,
+				8BF61FF6110A5DD1000AB941 /* Transference Demo-Info.plist */,
 				8BF620CF110A60F5000AB941 /* BeaconServer.h */,
 				8BF620D0110A60F5000AB941 /* BeaconServer.m */,
 				8BF6243A110A6109000AB941 /* Transference.icns */,
@@ -7720,6 +7725,7 @@
 				62D5150A10DAD73B007ECA33 /* dsa_pub.pem in Resources */,
 				8B67278C10F503B500F62D01 /* QSBDebugWindow.xib in Resources */,
 				8BA91E1C112B131F004A431F /* QSBSearchWindow.xib in Resources */,
+				8BA9203F112B215D004A431F /* QSBResultsWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9051,7 +9057,6 @@
 				623BC8E00EFABC560004FAB7 /* NSAttributedString+Attributes.m in Sources */,
 				62521AB70EFAC30000A6E647 /* QSBViewTableViewCell.m in Sources */,
 				62521AB80EFAC30000A6E647 /* QSBViewTableViewColumn.m in Sources */,
-				62D14DFB0F15651B0053B99F /* QSBBooleanToColorTransformer.m in Sources */,
 				8B488A480F15DE6A00786C1E /* QSBMenuButton.m in Sources */,
 				62AD18A60F16B034000D380C /* QSBPathControl.m in Sources */,
 				624137530F2A657B009229E6 /* QSBSetUpAccountWindowController.m in Sources */,
@@ -9068,6 +9073,7 @@
 				8B67278A10F502C500F62D01 /* QSBDebugWindowController.m in Sources */,
 				8BF62F0C110E5EC6000AB941 /* Categories.plistsrc in Sources */,
 				8B6AF52311248A5600D5D636 /* QSBMoreResultsResultCell.m in Sources */,
+				8BA921A5112B2B0D004A431F /* QSBResultsWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10882,6 +10888,15 @@
 				8BA91E1B112B131F004A431F /* en_US */,
 			);
 			name = QSBSearchWindow.xib;
+			sourceTree = "<group>";
+		};
+		8BA9203D112B215D004A431F /* QSBResultsWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8BA9203E112B215D004A431F /* en_US */,
+			);
+			name = QSBResultsWindow.xib;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		8BAB322810BC55D2002E1AC9 /* MoveApplication.strings */ = {

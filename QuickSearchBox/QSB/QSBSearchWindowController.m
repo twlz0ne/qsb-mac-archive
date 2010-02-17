@@ -56,9 +56,10 @@
 #import "QSBWelcomeController.h"
 #import "QSBViewAnimation.h"
 #import "QSBSimpleInvocation.h"
+#import "QSBResultsWindowController.h"
 
-static const NSTimeInterval kQSBShowDuration = 0.1;
-static const NSTimeInterval kQSBHideDuration = 0.3;
+const NSTimeInterval kQSBShowDuration = 0.1;
+const NSTimeInterval kQSBHideDuration = 0.3;
 static const NSTimeInterval kQSBShortHideDuration = 0.15;
 static const NSTimeInterval kQSBResizeDuration = 0.1;
 static const NSTimeInterval kQSBPushPopDuration = 0.2;
@@ -67,7 +68,6 @@ static const NSTimeInterval kQSBLongerAppearDelay = 0.667;
 const NSTimeInterval kQSBUpdateSizeDelay = 0.333;
 static const NSTimeInterval kQSBReshowResultsDelay = 4.0;
 static const CGFloat kTextFieldPadding = 2.0;
-static const CGFloat kResultsAnimationDistance = 12.0;
 
 // Should we fade the background. User default. Bool value.
 static NSString * const kQSBSearchWindowDimBackground
@@ -95,8 +95,6 @@ static NSString * const kQSBAnimationNameKey = @"QSBAnimationName";
 static NSString *const kQSBHideSearchAndResultsWindowAnimationName
   = @"QSBHideSearchAndResultsWindowAnimationName";
 
-static NSString *const kQSBResultWindowVisibilityAnimationName 
-  = @"QSBResultWindowVisibilityAnimationName"; 
 static NSString *const kQSBSearchWindowVisibilityAnimationName 
   = @"QSBSearchWindowVisibilityAnimationName"; 
 static NSString *const kQSBPivotingAnimationName 
@@ -123,15 +121,6 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 
 // Bottleneck function for registering/deregistering for window changes.
 - (void)setObservingMoveAndResizeNotifications:(BOOL)doRegister;
-
-// Utility function to update the shadows around our custom table view
-- (void)updateShadows;
-
-// Hides the result window.
-- (void)hideResultsWindow;
-
-// Shows the result window.
-- (void)showResultsWindow;
 
 // Reposition our window on screen as appropriate
 - (void)centerWindowOnScreen;
@@ -233,7 +222,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   return self;
 }
 
-- (void)awakeFromNib {  
+- (void)awakeFromNib { 
   // If we have a remembered position for the search window then restore it.
   // Note: See note in |windowPositionChanged:|.
   NSWindow *searchWindow = [self window];
@@ -332,10 +321,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   
   [searchWindow setMovableByWindowBackground:YES];
   [searchWindow invalidateShadow];
-  [searchWindow setAlphaValue:0.0];
-  [resultsWindow_ setCanBecomeKeyWindow:NO];
-  [resultsWindow_ setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces]; 
-  
+  [searchWindow setAlphaValue:0.0];  
   
   // Load up the base results views nib and install the subordinate results views.
   QSBSearchViewController *baseResultsController
@@ -376,11 +362,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [searchTextField_ setStringValue:startupString];
   [searchTextField_ setEnabled:NO];
   
-  resultWindowVisibilityAnimation_ 
-    = [[QSBViewAnimation alloc] initWithViewAnimations:nil 
-                                                  name:kQSBResultWindowVisibilityAnimationName
-                                              userInfo:nil];
-  [resultWindowVisibilityAnimation_ setDelegate:self];
   
   searchWindowVisibilityAnimation_
     = [[QSBViewAnimation alloc] initWithViewAnimations:nil 
@@ -416,7 +397,6 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [activeSearchViewController_ release];
   [corpora_ release];
   [welcomeController_ release];
-  [resultWindowVisibilityAnimation_ release];
   [searchWindowVisibilityAnimation_ release];
   [pivotingAnimation_ release];
   [super dealloc];
@@ -586,11 +566,11 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
 
 - (IBAction)resetSearchOrHideQuery:(id)sender {
   // Hide the results window if it's showing.
-  if ([resultsWindow_ isVisible]) {
+  if ([[resultsWindowController_ window] isVisible]) {
     while ([self popViewControllerAnimate:NO]) { }
     [activeSearchViewController_ setTokenizedQueryString:nil];
     [searchTextField_ setStringValue:@""];
-    [self hideResultsWindow];
+    [resultsWindowController_ hideWindowAnimated];
   } else {
     NSUInteger queryStringLength 
       = [[activeSearchViewController_ tokenizedQueryString] originalLength];
@@ -669,7 +649,7 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   [searchTextField_ setStringValue:string];
   if ([string length]) {
     [activeSearchViewController_ setQueryString:string];
-    [self showResultsWindow];
+    [resultsWindowController_ showWindowAnimated];
   }
 }
 
@@ -925,7 +905,7 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (void)updateResultsViewNow {
-  BOOL isVisible = [resultsWindow_ isVisible];
+  BOOL isVisible = [[resultsWindowController_ window] isVisible];
   
   if (!isVisible || showResults_) {
     if (isVisible) {
@@ -944,15 +924,15 @@ doCommandBySelector:(SEL)commandSelector {
   
   if (showResults_ != isVisible) {
     if (showResults_) {
-      [self showResultsWindow];
+      [resultsWindowController_ showWindowAnimated];
     } else {
-      [self hideResultsWindow];
+      [resultsWindowController_ hideWindowAnimated];
     }
   }
 }
 
 - (void)updateResultsView {
-  if ([resultsWindow_ isVisible]) {
+  if ([[resultsWindowController_ window] isVisible]) {
     [NSObject cancelPreviousPerformRequestsWithTarget:self
                                              selector:@selector(updateResultsViewNow) 
                                                object:nil];
@@ -1115,13 +1095,13 @@ doCommandBySelector:(SEL)commandSelector {
     
     NSDictionary *anim2 
       = [NSDictionary dictionaryWithObjectsAndKeys:
-         resultsWindow_, NSViewAnimationTargetKey, 
+         [resultsWindowController_ window], NSViewAnimationTargetKey, 
          NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey, 
          nil];
     NSArray *animations = [NSArray arrayWithObjects:anim1, anim2, nil];
     
     // Stop any other visibility animations we may have currently running
-    [resultWindowVisibilityAnimation_ stopAnimation];
+    [resultsWindowController_ stopWindowAnimation];
     [searchWindowVisibilityAnimation_ stopAnimation];
 
     QSBViewAnimation *animation 
@@ -1132,12 +1112,12 @@ doCommandBySelector:(SEL)commandSelector {
     [animation setAnimationBlockingMode:NSAnimationBlocking];
     [animation startAnimation];
     [animation release];
-    [resultsWindow_ setIgnoresMouseEvents:YES];
+    [[resultsWindowController_ window] setIgnoresMouseEvents:YES];
     [searchWindow setIgnoresMouseEvents:YES];
-    [resultsWindow_ orderOut:nil];
+    [[resultsWindowController_ window] orderOut:nil];
     [searchWindow orderOut:nil];
   }  else {
-    [self hideResultsWindow];
+    [resultsWindowController_ hideWindowAnimated];
     [searchWindow setIgnoresMouseEvents:YES];
     [self setWelcomeHidden:YES];
     [searchWindowVisibilityAnimation_ stopAnimation];
@@ -1168,10 +1148,6 @@ doCommandBySelector:(SEL)commandSelector {
   [window orderOut:self];
 }
 
-- (NSWindow *)resultsWindow {
-  return resultsWindow_;
-}
-
 - (void)setResultsWindowHeight:(CGFloat)newHeight
                      animating:(BOOL)animating {
   // Don't let one of these trigger during our animations, they can cause
@@ -1184,7 +1160,7 @@ doCommandBySelector:(SEL)commandSelector {
   
   NSWindow *queryWindow = [self window];
   
-  BOOL resultsVisible = [resultsWindow_ isVisible];
+  BOOL resultsVisible = [[resultsWindowController_ window] isVisible];
   NSRect baseFrame = [resultsOffsetterView_ frame];
   baseFrame.origin = [queryWindow convertBaseToScreen:baseFrame.origin];
   // Always start with the baseFrame and enlarge it to fit the height
@@ -1210,7 +1186,9 @@ doCommandBySelector:(SEL)commandSelector {
       [queryWindow setFrame:queryFrame display:YES animate:animating];
     }
     
-    [resultsWindow_ setFrame:actualFrame display:YES animate:animating];
+    [[resultsWindowController_ window] setFrame:actualFrame 
+                                        display:YES 
+                                        animate:animating];
   }
 
   // Turn back on size/move notifications.
@@ -1503,80 +1481,6 @@ doCommandBySelector:(SEL)commandSelector {
   }
 }
 
-- (void)updateShadows {
-  // We invalidate the shadow here so that it looks right after we have adjusted
-  // our tables. Note that we force a display BEFORE we invalidate, as we need
-  // to be sure that our window is properly displayed before we recalculate
-  // it's shadow, otherwise we will get the old shadow. The actual drawing of
-  // the shadow will take place in the normal event chain.
-  [resultsWindow_ display];
-  [resultsWindow_ invalidateShadow];
-}
-
-// See comment at declaration regarding why we move offscreen as well as hide
-- (void)hideResultsWindow {
-  if (![resultsWindow_ ignoresMouseEvents]) {
-    [resultsWindow_ setIgnoresMouseEvents:YES];
-    NSRect newFrame = NSOffsetRect([resultsWindow_ frame], 0.0, 0.0);
-    [resultWindowVisibilityAnimation_ stopAnimation];
-    NSDictionary *animation 
-      = [NSDictionary dictionaryWithObjectsAndKeys:
-         resultsWindow_, NSViewAnimationTargetKey,
-         [NSValue valueWithRect:newFrame], NSViewAnimationEndFrameKey,
-         NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey,
-         nil];
-    NSArray *animations = [NSArray arrayWithObject:animation];
-    [resultWindowVisibilityAnimation_ setViewAnimations:animations];
-    QSBSimpleInvocation *invocation
-      = [QSBSimpleInvocation selector:@selector(hideResultsWindowAnimationCompleted:) 
-                               target:self 
-                               object:resultsWindow_];
-    [resultWindowVisibilityAnimation_ setUserInfo:invocation];
-    [resultWindowVisibilityAnimation_ setAnimationBlockingMode:NSAnimationNonblocking];
-    [resultWindowVisibilityAnimation_ setDuration:kQSBHideDuration];
-    [resultWindowVisibilityAnimation_ setDelegate:self];
-    [resultWindowVisibilityAnimation_ startAnimation];
-  }
-}
-
-- (void)hideResultsWindowAnimationCompleted:(NSWindow *)window {
-  [[resultsWindow_ parentWindow] removeChildWindow:resultsWindow_];
-  [resultsWindow_ orderOut:self];
-}
-
-- (void)showResultsWindow {
-  NSRect frame = [resultsWindow_ frame];
-  [resultsWindow_ setAlphaValue:0.0];  
-  
-  [resultsWindow_ setFrame:NSOffsetRect(frame, 0.0, kResultsAnimationDistance) 
-                   display:YES
-                   animate:YES];
-  NSWindow *searchWindow = [self window];
-  // Fix for stupid Apple ordering bug. By removing and re-adding all the
-  // the children we keep the window list in the right order.
-  // TODO(dmaclach):log a radar on this. Try removing the two
-  // for loops, and doing a search with the help window showing.
-  NSArray *children = [searchWindow childWindows];
-  for (NSWindow *child in children) {
-    [searchWindow removeChildWindow:child];
-  }
-  [searchWindow addChildWindow:resultsWindow_ ordered:NSWindowBelow];
-  for (NSWindow *child in children) {
-    [searchWindow addChildWindow:child ordered:NSWindowBelow];
-  }
-  [resultsWindow_ setLevel:kCGStatusWindowLevel + 1];
-  [resultsWindow_ setIgnoresMouseEvents:NO];
-  [resultsWindow_ makeKeyAndOrderFront:self];
-  [NSObject cancelPreviousPerformRequestsWithTarget:resultsWindow_ 
-                                           selector:@selector(orderOut:) 
-                                             object:nil];
-  
-  [NSAnimationContext beginGrouping];
-  [[NSAnimationContext currentContext] setDuration:kQSBShowDuration];
-  [[resultsWindow_ animator] setAlphaValue:1.0];
-  [self setResultsWindowHeight:NSHeight(frame) animating:YES];
-  [NSAnimationContext endGrouping];
-}
 
 - (void)centerWindowOnScreen {
   NSWindow *window = [self window];
@@ -1796,7 +1700,7 @@ doCommandBySelector:(SEL)commandSelector {
 }
 
 - (NSView *)resultsView {
-  return [[self resultsWindow] contentView]; 
+  return [[resultsWindowController_ window] contentView]; 
 }
 
 - (NSRect)rightOffscreenViewRect {

@@ -1,7 +1,7 @@
 //
-//  QSBBooleanToColorTransformer.m
+//  QSBResultsWindowController.h
 //
-//  Copyright (c) 2009 Google Inc. All rights reserved.
+//  Copyright (c) 2010 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -31,33 +31,19 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "HGSLog.h"
 
-// A value transformer that will convert a boolean into one of two
-// colors.
-//
-@interface QSBBooleanToColorTransformer : NSValueTransformer
+@class QSBViewAnimation;
+@class QSBSearchWindowController;
 
+@interface QSBResultsWindowController : NSWindowController {
+ @private
+  QSBViewAnimation *windowVisibilityAnimation_;
+  IBOutlet QSBSearchWindowController *searchWindowController_;
+}
+
+- (void)hideWindowAnimated;
+- (void)showWindowAnimated;
+- (void)stopWindowAnimation;
 @end
 
 
-@implementation QSBBooleanToColorTransformer
-
-+ (Class)transformedValueClass {
-  return [NSColor class];
-}
-
-- (id)transformedValue:(id)value {
-  NSColor *resultColor = [NSColor blackColor];
-  
-  if (value && [value isKindOfClass:[NSNumber class]]) {
-    BOOL boolValue = [value boolValue];
-    if (!boolValue) {
-      resultColor = [NSColor redColor];
-    }
-  }
-  
-  return resultColor;
-}
-
-@end

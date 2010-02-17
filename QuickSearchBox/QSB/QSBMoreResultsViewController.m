@@ -94,8 +94,7 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   QSBSearchViewController *viewController = [self searchViewController];
   QSBSearchWindowController *windowController 
     = [viewController searchWindowController];
-  NSWindow *resultsWindow = [windowController resultsWindow];
-  NSView *contentView = [resultsWindow contentView];
+  NSView *contentView = [windowController resultsView];
   viewFrame.origin.y -= viewOffset;
   viewFrame.size.width = NSWidth([contentView frame]);
   [resultsView setFrame:viewFrame];
