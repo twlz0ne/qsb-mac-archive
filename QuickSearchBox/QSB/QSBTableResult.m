@@ -49,7 +49,8 @@
 typedef enum {
   kQSBResultDescriptionTitle = 0,
   kQSBResultDescriptionSnippet,
-  kQSBResultDescriptionSourceURL
+  kQSBResultDescriptionSourceURL,
+  kQSBResultDescriptionShowAll,
 } QSBResultDescriptionItemType;
 
 static NSString *const kClipboardCopyActionIdentifier
@@ -118,6 +119,12 @@ static NSDictionary *gBaseStringAttributes_ = nil;
                                   forKey:NSParagraphStyleAttributeName];
     [gBaseStringAttributes_ retain];
   }
+}
+
++ (NSColor *)secondaryTitleColor {
+  return [NSColor colorWithCalibratedRed:165.0/255.0 
+                                   green:180.0/255.0 
+                                    blue:204.0/255.0 alpha:1.0];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -212,6 +219,10 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   } else if (itemType == kQSBResultDescriptionTitle) {
     [string addAttribute:NSForegroundColorAttributeName
                    value:[NSColor blackColor]];
+  } else if (itemType == kQSBResultDescriptionShowAll) {
+    NSColor *secondaryColor = [[self class] secondaryTitleColor];
+    [string addAttribute:NSForegroundColorAttributeName
+                   value:secondaryColor];
   } else {
     HGSLogDebug(@"Unknown itemType: %d", itemType);
   }
@@ -649,6 +660,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSString *title 
     = [NSString stringWithFormat:format, categoryCount_, [self categoryName]];
   return [self mutableAttributedStringWithString:title];
+}
+
+- (NSAttributedString *)titleString {
+  NSMutableAttributedString *resultString = [self genericTitleLine];
+  [self addAttributes:resultString elementType:kQSBResultDescriptionShowAll];
+  return resultString;
 }
 
 - (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {

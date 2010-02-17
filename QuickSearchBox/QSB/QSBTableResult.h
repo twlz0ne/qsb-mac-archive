@@ -48,6 +48,11 @@
 @interface QSBTableResult : NSObject <NSCopying>
 
 /*!
+ The secondary title color used for many text elements in QSB.
+*/
++ (NSColor *)secondaryTitleColor;
+
+/*!
   Determine if the result can be pivoted on.
 */
 - (BOOL)isPivotable;

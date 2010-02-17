@@ -64,14 +64,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSString *category = [result categoryName];
   if (category) {
     textFrame = NSMakeRect(cellFrame.origin.x, cellFrame.origin.y + 2, 85, 17);
-    NSColor *greyColor = [NSColor colorWithCalibratedWhite:0.7 alpha:1.0];
+    NSColor *secondaryTitleColor = [QSBTableResult secondaryTitleColor];
     NSMutableParagraphStyle *paraStyle 
       = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
     [paraStyle setAlignment:NSRightTextAlignment];
     NSDictionary *attributes 
       = [NSDictionary dictionaryWithObjectsAndKeys:
          [NSFont systemFontOfSize:13], NSFontAttributeName,
-         greyColor, NSForegroundColorAttributeName,
+         secondaryTitleColor, NSForegroundColorAttributeName,
          paraStyle, NSParagraphStyleAttributeName,
          nil];
     [category drawWithRect:textFrame
