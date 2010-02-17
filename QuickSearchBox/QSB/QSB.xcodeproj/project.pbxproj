@@ -1079,6 +1079,7 @@
 		8BCCD3CC0EC8FA3A00688D64 /* getIP.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD3C80EC8FA3A00688D64 /* getIP.icns */; };
 		8BCCD3CD0EC8FA3A00688D64 /* main.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 8BCCD3C90EC8FA3A00688D64 /* main.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
 		8BCFD1820D34004F003A33F4 /* QSBTableResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BCFD1810D34004F003A33F4 /* QSBTableResult.m */; };
+		8BD114BE112C5A6D00B246F2 /* QSBBooleanToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BD114BD112C5A6D00B246F2 /* QSBBooleanToColorTransformer.m */; };
 		8BD83CAF0F1EC46400098475 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD83CAE0F1EC46400098475 /* Quartz.framework */; };
 		8BD83CB00F1EC46400098475 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD83CAE0F1EC46400098475 /* Quartz.framework */; };
 		8BD97D2D0E636DB900F5C83B /* GTMNSImage+Scaling.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3EB1890E5DD03A00A7A75E /* GTMNSImage+Scaling.m */; };
@@ -3392,6 +3393,7 @@
 		8BCCD3C90EC8FA3A00688D64 /* main.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = main.applescript; sourceTree = "<group>"; };
 		8BCFD1800D34004F003A33F4 /* QSBTableResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBTableResult.h; sourceTree = "<group>"; };
 		8BCFD1810D34004F003A33F4 /* QSBTableResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBTableResult.m; sourceTree = "<group>"; };
+		8BD114BD112C5A6D00B246F2 /* QSBBooleanToColorTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBBooleanToColorTransformer.m; sourceTree = "<group>"; };
 		8BD46A7C0E43DD3C00BF3562 /* GTMNSAppleScript+Handler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSAppleScript+Handler.m"; sourceTree = "<group>"; };
 		8BD46A7D0E43DD3C00BF3562 /* GTMNSAppleScript+Handler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSAppleScript+Handler.h"; sourceTree = "<group>"; };
 		8BD46A7E0E43DD3C00BF3562 /* GTMNSAppleEventDescriptor+Handler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSAppleEventDescriptor+Handler.m"; sourceTree = "<group>"; };
@@ -4735,6 +4737,7 @@
 				8B5EC6510CEE61BE00AD3BBD /* QSBApplicationDelegate.m */,
 				8B5EC6480CEE61BE00AD3BBD /* QSBBackgroundView.h */,
 				8B5EC6490CEE61BE00AD3BBD /* QSBBackgroundView.m */,
+				8BD114BD112C5A6D00B246F2 /* QSBBooleanToColorTransformer.m */,
 				8B338AF411189477007E3342 /* QSBCategories.h */,
 				8BF62EA9110E593B000AB941 /* QSBCategory.h */,
 				8BF62EAA110E593B000AB941 /* QSBCategory.m */,
@@ -9074,6 +9077,7 @@
 				8BF62F0C110E5EC6000AB941 /* Categories.plistsrc in Sources */,
 				8B6AF52311248A5600D5D636 /* QSBMoreResultsResultCell.m in Sources */,
 				8BA921A5112B2B0D004A431F /* QSBResultsWindowController.m in Sources */,
+				8BD114BE112C5A6D00B246F2 /* QSBBooleanToColorTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
