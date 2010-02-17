@@ -65,9 +65,10 @@ typedef enum {
 }
 
 /*! 
-  A pivot object in the context is any result currently set to filter search
-  this could  a directory (filtering to its contents) or a website (searching
-  data there) or many other types of searchable items.
+  Pivot objects are result(s) that are used to filter queries. For example, 
+  a singular pivot object could be a directory (filtering to its contents) or a 
+  website (searching data there). An example of multiple pivot objects could be
+  a collection of files to apply an action to.
 */
 @property (readonly, retain) HGSResultArray *pivotObjects;
 

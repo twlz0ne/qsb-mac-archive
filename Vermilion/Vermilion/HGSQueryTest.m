@@ -35,6 +35,7 @@
 #import "HGSTokenizer.h"
 #import "HGSQuery.h"
 #import "HGSTokenizer.h"
+#import "HGSResult.h"
 
 @interface HGSQueryTest : GTMTestCase
 @end
@@ -84,6 +85,33 @@
   
   STAssertNil([query1 parent], nil);
   STAssertNil([query2 parent], nil);
+}
+
+- (void)testPivotObjects {
+  HGSQuery *query  = [[[HGSQuery alloc] initWithString:@"abc"
+                                          pivotObjects:nil
+                                            queryFlags:0] autorelease];
+  STAssertNotNil(query, nil);
+  STAssertNil([query pivotObjects], nil);
+  STAssertNil([query pivotObject], nil);
+  
+  NSArray *array = [NSArray arrayWithObject:@"a"];
+  HGSResultArray *pivotObjects = [HGSResultArray arrayWithResults:array];
+  query  = [[[HGSQuery alloc] initWithString:@"abc"
+                                pivotObjects:pivotObjects
+                                  queryFlags:0] autorelease];
+  STAssertNotNil(query, nil);
+  STAssertEqualObjects([query pivotObjects], pivotObjects, nil);
+  STAssertEqualObjects([query pivotObject], @"a", nil);
+  
+  array = [NSArray arrayWithObjects:@"a", @"b", nil];
+  pivotObjects = [HGSResultArray arrayWithResults:array];
+  query  = [[[HGSQuery alloc] initWithString:@"abc"
+                                pivotObjects:pivotObjects
+                                  queryFlags:0] autorelease];
+  STAssertNotNil(query, nil);
+  STAssertEqualObjects([query pivotObjects], pivotObjects, nil);
+  STAssertNil([query pivotObject], nil);
 }
 
 @end
