@@ -48,7 +48,7 @@
 */
 @interface GoogleDocsSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
-  GDataServiceGoogleDocs *docService_;
+  GDataServiceGoogleDocs *googleDocsService_;
   GDataServiceTicket *docServiceTicket_;
   BOOL currentlyFetchingDocs_;
   GDataServiceGoogleSpreadsheet *spreadsheetService_;

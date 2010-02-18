@@ -13,8 +13,17 @@
 /* Popup title specifying the format to which a document is to be saved. */
 "Save as document type:" = "Save as document type:";
 
-/* Action name for saving a Google Document. */
+/* Action name for downloading and saving a Google Document. */
 "Save as…" = "Save as…";
+
+/* Action name for uploading and converting a file to Google Docs. */
+"Upload as Google Doc" = "Upload as Google Doc";
+
+/* Action name for uploading and image file and performing OCR (optical character recognition) on the image and saving as a Google Doc. */
+"Upload and OCR as Google Doc" = "Upload and OCR as Google Doc";
+
+/* Action name for uploading a file in its raw state to Google Docs. */
+"Upload without Conversion to Google Docs" = "Upload without Conversion to Google Docs";
 
 /* Descriptive titles and extensions of the types of files by which a Google
  Doc document can be exported.  These titles are shown in a popup. */
@@ -47,3 +56,9 @@
 
 /* A keyword used when searching to detect a Google Doc that is a PDF. */
 "pdf" = "pdf";
+
+/* A message explaining that the file given by %@ could not be uploaded because the MIME type of the file could not be determined. */
+"Could not upload '%@' because the MIME type of the file could not be determined." = "Could not upload '%@' because the MIME type of the file could not be determined.";
+
+/* A message explaining that a file could not be uploaded because the type of the file could not be determined. */
+"Could not upload '%@' because the type of the file could not be determined." = "Could not upload '%@' because the type of the file could not be determined.";

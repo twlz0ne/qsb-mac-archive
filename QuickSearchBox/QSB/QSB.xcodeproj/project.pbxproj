@@ -379,6 +379,7 @@
 		622911E60F2E805B005D34CE /* GoogleAccounts.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 62EA8BCD0F2E7DE200C92E0B /* GoogleAccounts.hgs */; };
 		622912120F2E81E7005D34CE /* GoogleAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 622912110F2E81E7005D34CE /* GoogleAccount.m */; };
 		622912F40F2EAF80005D34CE /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
+		6231EBCA1125FC060066B921 /* GoogleDocsUploadActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 62AFEFFA1124CE4A00CC31B9 /* GoogleDocsUploadActions.m */; };
 		62365B3E0F3A1919008A760E /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		623A002E0E9BC534002A8401 /* TopStandardResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 623A002C0E9BC534002A8401 /* TopStandardResultView.xib */; };
 		623A00330E9BC5A6002A8401 /* TopSeparatorResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 623A002F0E9BC5A6002A8401 /* TopSeparatorResultView.xib */; };
@@ -408,6 +409,7 @@
 		6263CAF60EB79F3600FF03A1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E429DF760AC1907A00E747D8 /* Security.framework */; };
 		6263CB0E0EB79FB300FF03A1 /* PicasawebSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 6263CB0A0EB79FB300FF03A1 /* PicasawebSource.m */; };
 		626585230F43BD4C008A94B2 /* QSBUserMessenger.m in Sources */ = {isa = PBXBuildFile; fileRef = 626585220F43BD4C008A94B2 /* QSBUserMessenger.m */; };
+		6274BD83112C69D2008D56D7 /* HGSGDataUploadActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6274BD82112C69D2008D56D7 /* HGSGDataUploadActionTest.m */; };
 		627B43C00FA0E3D9006BE269 /* HGSGoogleAccountTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 627B43BF0FA0E3D9006BE269 /* HGSGoogleAccountTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		627B84A20E2423DC001FB81E /* DoubleUpChevrons.png in Resources */ = {isa = PBXBuildFile; fileRef = 627B84A10E2423DC001FB81E /* DoubleUpChevrons.png */; };
 		627FAEC20DF9D73500E3E765 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
@@ -418,6 +420,8 @@
 		6283338B1063F3DA00B1F3B8 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6283338A1063F3DA00B1F3B8 /* Info.plist */; };
 		628B8C240FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist in Resources */ = {isa = PBXBuildFile; fileRef = 628B8C230FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist */; };
 		62906DAD100D046400A09A0E /* PicasaWebUploadImageAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 62906DAC100D046400A09A0E /* PicasaWebUploadImageAction.m */; };
+		62917AAD112B5B9300653562 /* HGSGDataUploadAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 62917AAB112B5B9300653562 /* HGSGDataUploadAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		62917AAE112B5B9300653562 /* HGSGDataUploadAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 62917AAC112B5B9300653562 /* HGSGDataUploadAction.m */; };
 		6294463E0EDE1921009295EA /* GTMNSArray+Merge.m in Sources */ = {isa = PBXBuildFile; fileRef = 6294463A0EDE190B009295EA /* GTMNSArray+Merge.m */; };
 		62A16A8F0ED484DF0074F41B /* HGSPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 62A16A8D0ED484DF0074F41B /* HGSPlugin.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62A16A900ED484DF0074F41B /* HGSPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A16A8E0ED484DF0074F41B /* HGSPlugin.m */; };
@@ -2249,6 +2253,7 @@
 		6263CB0A0EB79FB300FF03A1 /* PicasawebSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicasawebSource.m; sourceTree = "<group>"; };
 		626585210F43BD4C008A94B2 /* QSBUserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBUserMessenger.h; sourceTree = "<group>"; };
 		626585220F43BD4C008A94B2 /* QSBUserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBUserMessenger.m; sourceTree = "<group>"; };
+		6274BD82112C69D2008D56D7 /* HGSGDataUploadActionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSGDataUploadActionTest.m; sourceTree = "<group>"; };
 		627B43BF0FA0E3D9006BE269 /* HGSGoogleAccountTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSGoogleAccountTypes.h; sourceTree = "<group>"; };
 		627B84A10E2423DC001FB81E /* DoubleUpChevrons.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DoubleUpChevrons.png; sourceTree = "<group>"; };
 		627FAEB50DF9D71D00E3E765 /* RecentDocumentsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecentDocumentsSource.m; sourceTree = "<group>"; };
@@ -2259,6 +2264,8 @@
 		6283338A1063F3DA00B1F3B8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		628B8C230FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = GoogleDocsSaveAsFileTypes.plist; sourceTree = "<group>"; };
 		62906DAC100D046400A09A0E /* PicasaWebUploadImageAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicasaWebUploadImageAction.m; sourceTree = "<group>"; };
+		62917AAB112B5B9300653562 /* HGSGDataUploadAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSGDataUploadAction.h; sourceTree = "<group>"; };
+		62917AAC112B5B9300653562 /* HGSGDataUploadAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSGDataUploadAction.m; sourceTree = "<group>"; };
 		629446390EDE190B009295EA /* GTMNSArray+Merge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSArray+Merge.h"; sourceTree = "<group>"; };
 		6294463A0EDE190B009295EA /* GTMNSArray+Merge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSArray+Merge.m"; sourceTree = "<group>"; };
 		629A95630E5F244D005AE855 /* InstantMessage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InstantMessage.framework; path = System/Library/Frameworks/InstantMessage.framework; sourceTree = SDKROOT; };
@@ -2273,6 +2280,7 @@
 		62AD18A40F16B034000D380C /* QSBPathControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPathControl.h; sourceTree = "<group>"; };
 		62AD18A50F16B034000D380C /* QSBPathControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPathControl.m; sourceTree = "<group>"; };
 		62AD99140F33AB190063579F /* google_products.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = google_products.png; sourceTree = "<group>"; };
+		62AFEFFA1124CE4A00CC31B9 /* GoogleDocsUploadActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsUploadActions.m; sourceTree = "<group>"; };
 		62B4406B10631A4E00984D34 /* FakeHGSPluginLoaderTest.sdefsrc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = FakeHGSPluginLoaderTest.sdefsrc; sourceTree = "<group>"; };
 		62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PicasaPlaceholder.icns; sourceTree = "<group>"; };
 		62D0909F107FAFA300D2F334 /* QSBHGSObjectSpecifiers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBHGSObjectSpecifiers.h; sourceTree = "<group>"; };
@@ -4161,8 +4169,9 @@
 				62F594B40FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.h */,
 				62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */,
 				62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */,
-				33D2C65C0DD1080700C1FBDC /* GoogleDocs-Info.plist */,
 				628B8C230FF0166900A468C6 /* GoogleDocsSaveAsFileTypes.plist */,
+				62AFEFFA1124CE4A00CC31B9 /* GoogleDocsUploadActions.m */,
+				33D2C65C0DD1080700C1FBDC /* GoogleDocs-Info.plist */,
 				33D2C6550DD1080700C1FBDC /* gdocdocument.icns */,
 				33D2C6560DD1080700C1FBDC /* gdocpresentation.icns */,
 				6262F7EF10D70F5D00BCF513 /* gdocpdfdocument.icns */,
@@ -4571,11 +4580,11 @@
 			isa = PBXGroup;
 			children = (
 				8B6872D01018232400ADEA67 /* Resources */,
+				62B4406B10631A4E00984D34 /* FakeHGSPluginLoaderTest.sdefsrc */,
 				8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */,
 				8B6AE87F112231F400D5D636 /* HGSSearchTermScorerTestData.plist */,
 				5AC3E8230F7C2F6200F171EB /* VermilionTest.py */,
 				8B5C86840FD1F0E400A6AA25 /* RoundRectAndDropShadow.tiff */,
-				62B4406B10631A4E00984D34 /* FakeHGSPluginLoaderTest.sdefsrc */,
 			);
 			path = TestData;
 			sourceTree = "<group>";
@@ -5478,6 +5487,9 @@
 				8BAAA85B0F813E2A00DF4F12 /* HGSExtensionPoint.h */,
 				8BAAA85E0F813E2A00DF4F12 /* HGSExtensionPoint.m */,
 				8BAAA8600F813E2A00DF4F12 /* HGSExtensionPointTest.m */,
+				62917AAB112B5B9300653562 /* HGSGDataUploadAction.h */,
+				62917AAC112B5B9300653562 /* HGSGDataUploadAction.m */,
+				6274BD82112C69D2008D56D7 /* HGSGDataUploadActionTest.m */,
 				627B43BF0FA0E3D9006BE269 /* HGSGoogleAccountTypes.h */,
 				5AED35E50EB7D978004C7187 /* HGSIconProvider.h */,
 				5AED35E60EB7D978004C7187 /* HGSIconProvider.m */,
@@ -6208,6 +6220,7 @@
 				8BF2607B10FB9DB9000490C8 /* HGSType.h in Headers */,
 				8BF60FE811079035000AB941 /* HGSUserMessage.h in Headers */,
 				8B6AE77711222D2300D5D636 /* HGSTypeFilter.h in Headers */,
+				62917AAD112B5B9300653562 /* HGSGDataUploadAction.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8764,6 +8777,7 @@
 				62F595B10FEB278A0076CDDA /* GoogleDocsConstants.m in Sources */,
 				620EC2E10FF5BFD7008666B3 /* GTMMethodCheck.m in Sources */,
 				62DA51450FFAA86C002B008E /* GoogleDocsSource.m in Sources */,
+				6231EBCA1125FC060066B921 /* GoogleDocsUploadActions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9174,6 +9188,7 @@
 				8B4463F910F278FC00561E62 /* HGSKeychainItem.m in Sources */,
 				8BF60FE911079035000AB941 /* HGSUserMessage.m in Sources */,
 				8B6AE77611222D2300D5D636 /* HGSTypeFilter.m in Sources */,
+				62917AAE112B5B9300653562 /* HGSGDataUploadAction.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9367,6 +9382,7 @@
 				8B53E17D10D95790007E6AF2 /* HGSSearchSourceRankerTest.m in Sources */,
 				8B4463FD10F2790700561E62 /* HGSKeychainItemTest.m in Sources */,
 				8B6AE77A11222D2B00D5D636 /* HGSTypeFilterTest.m in Sources */,
+				6274BD83112C69D2008D56D7 /* HGSGDataUploadActionTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -58,8 +58,6 @@
 			</array>
 			<key>HGSExtensionDesiredAccountTypes</key>
 			<string>com.google.qsb.google.account</string>
-			<key>HGSExtensionIsEnabledByDefault</key>
-			<true/>
 			<key>HGSActionMustRunOnMainThread</key>
 			<false/>
 		</dict>

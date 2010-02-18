@@ -19,26 +19,5 @@
 /* The proper name of the Picasa Web service. */
 "Picasa Web" = "Picasa Web";
 
-/* A message explaining to the user that an image is currently being uploaded. %1$@ is either 'image' or 'movie', %2$@ is the name of the image or movie that was uploaded. */
-"Uploading %1$@ '%2$@' to your Drop Box at Picasa Web." = "Uploading %1$@ '%2$@' to your Drop Box at Picasa Web.";
-
-/* A message explaining to the user that an image is currently being uploaded and that it is the first of several being uploaded. %1$@ is either 'image' or 'movie', %2$@ is the name of the image or movie that was uploaded, and the %3$d is an integer giving the count of total images to be uploaded. */
-"Uploading %1$@ '%2$@' (the first of %3$d) to your Drop Box at Picasa Web." = "Uploading %1$@ '%2$@' (the first of %3$d) to your Drop Box at Picasa Web.";
-
-/* A message explaining to the user that an image was successfully uploaded. %1$@ is either 'image' or 'movie', %2$@ is the name of the image or movie that was uploaded. */
-"%1$@ '%2$@' uploaded to your Drop Box at Picasa Web." = "%1$@ '%2$@' uploaded to your Drop Box at Picasa Web.";
-
-/* Used to specify that an image has been uploaded.  Note that the capitalization may need to be adjusted based on placement with the "%1$@ '%2$@' uploaded to your Drop Box at Picasa Web." string. */
-"image" = "image";
-
-/* Used to specify that a video has been uploaded.  Note that the capitalization may need to be adjusted based on placement with the "%1$@ '%2$@' uploaded to your Drop Box at Picasa Web." string. */
-"video" = "video";
-
-/* A message explaining that the user could not upload Picasa Web images due to a bad password for account %@. */
-"Could not upload images. Please check the password for account '%@'." = "Could not upload images. Please check the password for account '%@'.";
-
-/* A message explaining to the user that we could not upload an image. %1$@ is the type of item being uploaded (image or video), %2$@ is the path to the item being uploaded, %3$@ is the error description, and %4$d is the error code. */
-"Could not upload %1@ '%2$@'. \"%3$@\" (%4$d)" = "Could not upload %1@ '%2$@'. \"%3$@\" (%4$d)";
-
-/* A message explaining that an image could not be uploaded to Picasa Web albums because it was taking too long.  %1$@ is the type of item being uploaded (image or video), %2$@ is the file name of the image or video as shown in the search results. */
-"Upload of %1$@ '%2$@' timed out and could not be completed. Please check your connection to the Internet." = "Upload of %1$@ '%2$@' timed out and could not be completed. Please check your connection to the Internet.";
+/* A message explaining that the file given by %@ could not be uploaded because the MIME type of the file could not be determined. */
+"Could not upload '%@' because the MIME type of the file could not be determined." = "Could not upload '%@' because the MIME type of the file could not be determined.";

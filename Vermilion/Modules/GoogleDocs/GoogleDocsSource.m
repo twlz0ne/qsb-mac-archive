@@ -162,7 +162,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   if ([category isEqualToString:kDocCategoryDocument]
       || [category isEqualToString:kDocCategoryPresentation]
       || [category isEqualToString:kDocCategoryPDFDocument]) {
-    service = docService_;
+    service = googleDocsService_;
   } else if ([category isEqualToString:kDocCategorySpreadsheet]) {
     service = spreadsheetService_;
   } else {
@@ -232,8 +232,8 @@ GTM_METHOD_CHECK(NSEnumerator,
   // Clear the services so that we make new ones with the correct credentials.
   [docServiceTicket_ release];
   docServiceTicket_ = nil;
-  [docService_ release];
-  docService_ = nil;
+  [googleDocsService_ release];
+  googleDocsService_ = nil;
   [spreadsheetServiceTicket_ release];
   spreadsheetServiceTicket_ = nil;
   [spreadsheetService_ release];
@@ -283,8 +283,8 @@ GTM_METHOD_CHECK(NSEnumerator,
   }
   [docServiceTicket_ release];
   docServiceTicket_ = nil;
-  [docService_ release];
-  docService_ = nil;
+  [googleDocsService_ release];
+  googleDocsService_ = nil;
   // Stop spreadsheet fetches.
   if (currentlyFetchingSpreadsheets_) {
     [spreadsheetServiceTicket_ cancelTicket];
@@ -309,17 +309,17 @@ GTM_METHOD_CHECK(NSEnumerator,
   NSString *userName = nil;
   NSString *password = nil;
   if (!currentlyFetchingDocs_) {
-    if (!docService_) {
+    if (!googleDocsService_) {
       keychainItem = [HGSKeychainItem keychainItemForService:[account_ identifier]
                                                     username:nil];
       userName = [keychainItem username];
       password = [keychainItem password];
       if (userName && password) {
-        docService_ = [[GDataServiceGoogleDocs alloc] init];
-        [docService_ setUserAgent:@"google-qsb-1.0"];
-        [docService_ setUserCredentialsWithUsername: userName
+        googleDocsService_ = [[GDataServiceGoogleDocs alloc] init];
+        [googleDocsService_ setUserAgent:@"google-qsb-1.0"];
+        [googleDocsService_ setUserCredentialsWithUsername: userName
                                            password: password];
-        [docService_ setIsServiceRetryEnabled:YES];
+        [googleDocsService_ setIsServiceRetryEnabled:YES];
       } else {
         // Can't do much without a login; invalidate so we stop trying (until
         // we get a notification that the credentials have changed) and bail.
@@ -333,12 +333,12 @@ GTM_METHOD_CHECK(NSEnumerator,
     // If the doc feed is attempting an http request then upgrade it to https.
     NSURL *docURL = [GDataServiceGoogleDocs docsFeedURLUsingHTTPS:YES];
     docServiceTicket_
-      = [[docService_ fetchFeedWithURL:docURL
-                              delegate:self
-                     didFinishSelector:@selector(docFeedTicket:
-                                                 finishedWithFeed:
-                                                 error:)]
-         retain];
+      = [[googleDocsService_ fetchFeedWithURL:docURL
+                                     delegate:self
+                            didFinishSelector:@selector(docFeedTicket:
+                                                        finishedWithFeed:
+                                                        error:)]
+       retain];
   }
   if (!currentlyFetchingSpreadsheets_) {
     if (!spreadsheetService_) {
@@ -462,7 +462,7 @@ GTM_METHOD_CHECK(NSEnumerator,
        nil];
   [cellArray addObject:googleDocsCell];
   
-  NSString *userName = [docService_ username];
+  NSString *userName = [googleDocsService_ username];
   NSDictionary *userCell = [NSDictionary dictionaryWithObjectsAndKeys:
                             userName, kQSBPathCellDisplayTitleKey,
                             nil];
