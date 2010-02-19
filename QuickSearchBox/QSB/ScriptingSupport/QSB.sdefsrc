@@ -142,7 +142,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <cocoa class="HGSPlugin"/>
       <property name="enabled" code="Enab" type="boolean" access="rw"
                 description="Is this plugin enabled?">
-         <cocoa key="isEnabled"/>
+         <cocoa key="enabled"/>
       </property>
       <property name="name" code="pnam" type="text" access="r"
                 description="Name of the plugin.">
