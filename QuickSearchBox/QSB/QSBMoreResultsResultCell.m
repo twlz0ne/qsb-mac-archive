@@ -79,6 +79,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                 attributes:attributes];
   }
   
+  // Fix up our image drawing to look pretty.
+  NSGraphicsContext *context = [NSGraphicsContext currentContext];
+  NSImageInterpolation interpolation = [context imageInterpolation];
+  [context setImageInterpolation:NSImageInterpolationHigh];
+  
   // Draw the display icon.
   NSImage *image = [result displayIcon];
   if (image) {
@@ -86,13 +91,21 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                                  cellFrame.origin.y + 3, 16, 16);
     NSSize imageSize = [image size];
     NSRect sourceRect = NSMakeRect(0, 0, imageSize.width, imageSize.height);
-    BOOL imageIsFlipped = [image isFlipped];
-    [image setFlipped:YES];
+    [NSGraphicsContext saveGraphicsState];
+    if ([controlView isFlipped]) {
+      // Flip our context to draw the image right side up. This is part
+      // of the graphics state so it is restored below.
+      NSAffineTransform *transform = [NSAffineTransform transform];
+      [transform translateXBy:destRect.origin.x yBy:NSMaxY(destRect)];
+      [transform scaleXBy:1.0 yBy:-1.0];
+      [transform concat];
+    }
+    destRect.origin = NSZeroPoint;
     [image drawInRect:destRect 
              fromRect:sourceRect 
             operation:NSCompositeSourceOver 
              fraction:1];
-    [image setFlipped:imageIsFlipped];
+    [NSGraphicsContext restoreGraphicsState];
   }
   
   // Draw the pivotable arrow if applicable.
@@ -107,6 +120,10 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
             operation:NSCompositeSourceOver 
              fraction:1];
   }
+  
+  // Image interpolation is not part of the graphics state, so we
+  // reset it ourselves.
+  [context setImageInterpolation:interpolation];
 }
 
 - (void)drawShowAllResult:(QSBShowAllTableResult *)result 
