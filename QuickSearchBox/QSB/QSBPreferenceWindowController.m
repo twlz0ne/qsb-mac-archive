@@ -221,6 +221,11 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   [tabView_ selectTabViewItemAtIndex:0];
   [sourcesTable_ setIntercellSpacing:NSMakeSize(3.0, 6.0)];
   [accountsTable_ setIntercellSpacing:NSMakeSize(3.0, 6.0)];
+  
+  [toolbar_ setDelegate:self];
+  NSString *firstIdentifier
+    = [[[toolbar_ items] objectAtIndex:0] itemIdentifier];
+  [toolbar_ setSelectedItemIdentifier:firstIdentifier];
 }
 
 
@@ -519,6 +524,11 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 - (void)setSourceSortDescriptor:(NSArray *)value {
   [sourceSortDescriptor_ autorelease];
   sourceSortDescriptor_ = [value retain];
+}
+
+- (NSArray *)toolbarSelectableItemIdentifiers: (NSToolbar *)toolbar; {
+  NSArray *identifiers = [[toolbar items] valueForKey:@"itemIdentifier"];
+  return identifiers;
 }
 
 #pragma mark Account Management
