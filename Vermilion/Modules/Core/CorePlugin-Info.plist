@@ -227,7 +227,7 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Open Again</string>
 			<key>HGSActionDirectObjectTypes</key>
-			<string>file</string>
+			<string>file.application</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
