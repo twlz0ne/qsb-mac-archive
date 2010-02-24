@@ -465,10 +465,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                   inDatabase:db_
                                    errorCode:&sqliteErr];
     if (statement && !sqliteErr) {
-      while ([statement stepRow] == SQLITE_ROW) {
-        if ([operation isCancelled]) {
-          break;
-        }
+      while ((![operation isCancelled]) 
+             && ([statement stepRow] == SQLITE_ROW)) {
         NSString *playlistId = [statement resultStringAtPosition:0];
         NSString *playlist = [statement resultStringAtPosition:1];
         [results addObject:[self playListResult:playlist
@@ -500,10 +498,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                    errorCode:&sqliteErr];
     NSMutableArray *results = [NSMutableArray array];
     if (statement && !sqliteErr) {
-      while ([statement stepRow] == SQLITE_ROW) {
-        if ([operation isCancelled]) {
-          break;
-        }
+      while ((![operation isCancelled]) 
+             && ([statement stepRow] == SQLITE_ROW)) {
         NSString *track = [statement resultStringAtPosition:1];
         if (![query tokenizedLength]
             || [track rangeOfString:[query tokenizedString]
@@ -549,10 +545,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                    errorCode:&sqliteErr];
     NSMutableArray *results = [NSMutableArray array];
     if (statement && !sqliteErr) {
-      while ([statement stepRow] == SQLITE_ROW) {
-        if ([operation isCancelled]) {
-          break;
-        }
+      while ((![operation isCancelled]) 
+             && ([statement stepRow] == SQLITE_ROW)) {
         NSString *track = [statement resultStringAtPosition:1];
         if (![query tokenizedLength]
             || [track rangeOfString:[query tokenizedString]
@@ -618,11 +612,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                    errorCode:&sqliteErr];
     NSMutableArray *results = [NSMutableArray array];
     if (statement && !sqliteErr) {
-      while ([statement stepRow] == SQLITE_ROW
-             && [results count] < kMaxSearchResults) {
-        if ([operation isCancelled]) {
-          break;
-        }
+      while ((![operation isCancelled]) 
+             && ([statement stepRow] == SQLITE_ROW)
+             && ([results count] < kMaxSearchResults)) {
         NSString *album = [statement resultStringAtPosition:0];
         if (![query tokenizedLength]
             || [album rangeOfString:[query tokenizedString]
@@ -692,11 +684,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                     inDatabase:db_
                                      errorCode:&sqliteErr];
       if (statement && !sqliteErr) {
-        while ([statement stepRow] == SQLITE_ROW
-               && [results count] < kMaxSearchResults) {
-          if ([operation isCancelled]) {
-            break;
-          }
+        while ((![operation isCancelled])
+               && ([statement stepRow] == SQLITE_ROW)
+               && ([results count] < kMaxSearchResults)) {
           NSString *track = [statement resultStringAtPosition:1];
           NSString *artist = [statement resultStringAtPosition:2];
           NSString *album = [statement resultStringAtPosition:3];
@@ -769,10 +759,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                             inDatabase:db_
                                              errorCode:&sqliteErr];
       if (statement && !sqliteErr) {
-        while ([statement stepRow] == SQLITE_ROW) {
-          if ([operation isCancelled]) {
-            break;
-          }
+        while ((![operation isCancelled]) 
+               && ([statement stepRow] == SQLITE_ROW)) {
           NSString *playlistId = [statement resultStringAtPosition:0];
           NSString *playlist = [statement resultStringAtPosition:1];
           [results addObject:[self playListResult:playlist
