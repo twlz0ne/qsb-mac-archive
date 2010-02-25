@@ -48,8 +48,6 @@
 #import "QSBSearchWindowController.h"
 #import "QSBSearchViewController.h"
 #import "QSBSearchController.h"
-#import "HGSQuery.h"
-#import "HGSTokenizer.h"
 
 static NSString *const kPrefsPath =
   @"Preferences/com.google.qsb.module.transferencebeacon.plist";
