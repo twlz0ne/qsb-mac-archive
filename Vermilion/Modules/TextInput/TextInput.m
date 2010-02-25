@@ -166,9 +166,9 @@ static NSString *const kDateTimeMarker = @"[DTS]";
   NSArray *resultsArray = nil;
   if (hgsObject2) {
     // Intentionally reversed so that stamped comes first.
-    [NSArray arrayWithObjects:hgsObject2, hgsObject, nil];
+    resultsArray = [NSArray arrayWithObjects:hgsObject2, hgsObject, nil];
   } else {
-    [NSArray arrayWithObject:hgsObject];
+    resultsArray = [NSArray arrayWithObject:hgsObject];
   }
   [operation setRankedResults:resultsArray];
 }
