@@ -133,6 +133,7 @@
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		621BA0B711363DEB00C6887D /* QSBSearchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = QSBSearchController.h; path = ../../QSB/QSBSearchController.h; sourceTree = SOURCE_ROOT; };
 		8D1107320486CEB800E47090 /* Transference Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Transference Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -243,6 +244,7 @@
 			isa = PBXGroup;
 			children = (
 				104031420FD5F372000FFBEB /* QSBApplicationDelegate.h */,
+				621BA0B711363DEB00C6887D /* QSBSearchController.h */,
 				104031430FD5F372000FFBEB /* QSBSearchWindowController.h */,
 				104031440FD5F372000FFBEB /* QSBSearchViewController.h */,
 			);
