@@ -47,6 +47,9 @@
 #import "QSBApplicationDelegate.h"
 #import "QSBSearchWindowController.h"
 #import "QSBSearchViewController.h"
+#import "QSBSearchController.h"
+#import "HGSQuery.h"
+#import "HGSTokenizer.h"
 
 static NSString *const kPrefsPath =
   @"Preferences/com.google.qsb.module.transferencebeacon.plist";
@@ -404,7 +407,11 @@ static NSString *const kResultActionKey = @"ResultAction";
     QSBSearchWindowController *window = [delegate searchWindowController];
     QSBSearchViewController *view = [window activeSearchViewController];
     QSBSearchController *searchController = [view searchController];
-    [searchController setQueryString:queryString];
+    HGSQuery *fakeQuery = [[[HGSQuery alloc] initWithString:queryString
+                                               pivotObjects:nil
+                                                 queryFlags:0] autorelease];
+    HGSTokenizedString *tokenString = [fakeQuery tokenizedQueryString];
+    [searchController setTokenizedQueryString:tokenString];
     NSMutableDictionary *userInfo =
       [NSMutableDictionary dictionaryWithObjectsAndKeys:
          resultArray, kQSBNotificationDirectObjectsKey,
