@@ -34,12 +34,27 @@
 // Simple wrapper for NSLog so you can have debug messages or release messages
 //
 
-#define HGSLog(...) NSLog(__VA_ARGS__)
+// HGSLog always logs
+// HGSLogDebug logs in debug only
+// HGSCheckDebug Logs in debug only if condition is false
+
+#define HGSLog(...) NSLog(__VA_ARGS__);
 
 #ifdef DEBUG
-#define HGSLogDebug(...) NSLog(__VA_ARGS__)
+#define HGSLogDebug(...) HGSLog(__VA_ARGS__)
+#define HGSCheckDebug(condition, format, ...)                         \
+  do {                                                                \
+    if (!(condition)) {                                               \
+      NSString *_hgsCheckDebug                                        \
+        = [NSString stringWithFormat:@"%s - %@", #condition, format]; \
+      _hgsCheckDebug                                                  \
+        = [NSString stringWithFormat:_hgsCheckDebug, ##__VA_ARGS__];  \
+      HGSLogDebug(@"%@", _hgsCheckDebug);                             \
+    }                                                                 \
+  } while(0)                                   
 #else
 #define HGSLogDebug(...) do { } while (0)
+#define HGSCheckDebug(condition, format, ...) do { } while (0)
 #endif
 
 //
