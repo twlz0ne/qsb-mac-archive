@@ -90,7 +90,7 @@ NSString *HGSTypeForUTType(CFStringRef utType) {
 } 
 BOOL HGSTypeConformsToType(NSString *type1, NSString *type2) {
   // Must have the exact prefix
-  HGSAssert([type1 length], nil);
+  HGSCheckDebug([type1 length], nil);
   BOOL result = [type2 isEqual:kHGSTypeAllTypes];
   if (!result) {
     NSUInteger type2Len = [type2 length];
@@ -107,7 +107,7 @@ BOOL HGSTypeConformsToType(NSString *type1, NSString *type2) {
 }
 
 static BOOL HGSTypeConformsToTypeSet(NSString *type1, NSSet *types) {
-  HGSAssert([type1 length], nil);
+  HGSCheckDebug([type1 length], nil);
   BOOL conforms = NO;
   for (NSString *type in types) {
     if (HGSTypeConformsToType(type1, type)) {
@@ -120,7 +120,7 @@ static BOOL HGSTypeConformsToTypeSet(NSString *type1, NSSet *types) {
 
 static BOOL HGSTypeDoesNotConformToTypeSet(NSString *type1, NSSet *types) {
   BOOL doesNotConform = YES;
-  HGSAssert([type1 length], nil);
+  HGSCheckDebug([type1 length], nil);
   if ([types count] != 0) {
     for (NSString *type in types) {
       if (HGSTypeConformsToType(type1, type)) {
@@ -174,7 +174,7 @@ static HGSTypeFilter *sHGSTypeFilterAllTypes = nil;
 
 - (id)initWithConformTypes:(NSSet *)conformTypes
        doesNotConformTypes:(NSSet *)doesNotConformTypes {
-  HGSAssert(conformTypes, nil);
+  HGSCheckDebug(conformTypes, nil);
   if ((self = [super init])) {
     conformTypes_ = [conformTypes copy];
     doesNotConformTypes_ = [doesNotConformTypes copy];
@@ -182,16 +182,20 @@ static HGSTypeFilter *sHGSTypeFilterAllTypes = nil;
 #if DEBUG
     // Debug runtime check to make sure our types are sane.
     if ([doesNotConformTypes_ count]) {
-      HGSAssert(![conformTypes_ intersectsSet:doesNotConformTypes_], nil);
+      HGSCheckDebug(![conformTypes_ intersectsSet:doesNotConformTypes_], nil);
       if (![conformTypes isEqual:[[self class] allTypesSet]]) {
         for (NSString *type in doesNotConformTypes) {
-          HGSAssert(HGSTypeConformsToTypeSet(type, conformTypes), 
-                    @"Type: %@ does not conform to conformTypes %@", 
-                    type, conformTypes);
+          HGSCheckDebug(HGSTypeConformsToTypeSet(type, conformTypes), 
+                        @"Type: %@ does not conform to conformTypes %@", 
+                        type, conformTypes);
         }
       }
     }
-#endif  // DEBUG    
+#endif  // DEBUG
+    if (!conformTypes_) {
+      [self release];
+      self = nil;
+    }
   }
   return self;
 }
@@ -207,7 +211,7 @@ static HGSTypeFilter *sHGSTypeFilterAllTypes = nil;
 }
 
 - (BOOL)isValidType:(NSString *)type {
-  HGSAssert(type, nil);
+  HGSCheckDebug(type, nil);
   
   return HGSTypeConformsToTypeSet(type, conformTypes_) 
     && HGSTypeDoesNotConformToTypeSet(type, doesNotConformTypes_);
