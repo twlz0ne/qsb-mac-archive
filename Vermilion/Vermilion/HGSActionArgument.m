@@ -34,7 +34,9 @@
 #import "HGSTypeFilter.h"
 #import "HGSBundle.h"
 #import "HGSExtension.h"
+#import "HGSLog.h"
 
+NSString* const kHGSActionArgumentBundleKey = @"HGSActionArgumentBundle";
 NSString* const kHGSActionArgumentSupportedTypesKey 
   = @"HGSActionArgumentSupportedTypes";
 NSString* const kHGSActionArgumentUnsupportedTypesKey
@@ -56,14 +58,33 @@ NSString* const kHGSActionArgumentDescriptionKey
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super init])) {
-    NSBundle *bundle = HGSGetPluginBundle();
-    optional_ 
-      = [[configuration valueForKey:kHGSActionArgumentOptionalKey] boolValue];
+    NSBundle *bundle = [configuration valueForKey:kHGSActionArgumentBundleKey];
+    HGSCheckDebug(name_, @"Action argument needs a bundle! %@", self);
 
     name_ = [[configuration valueForKey:kHGSActionArgumentNameKey] retain];
+    HGSCheckDebug(name_, @"Action argument needs a name! %@", self);
+    
+    id value = [configuration objectForKey:kHGSActionArgumentSupportedTypesKey];
+    NSSet *supportedTypes = [NSSet setFromId:value];
+    
+    value = [configuration objectForKey:kHGSActionArgumentUnsupportedTypesKey];
+    NSSet *unsupportedTypes = [NSSet setFromId:value];
+    
+    typeFilter_ = [[HGSTypeFilter alloc] initWithConformTypes:supportedTypes 
+                                          doesNotConformTypes:unsupportedTypes];
+    
+    HGSCheckDebug(typeFilter_, 
+                  @"Action Argument %@ must have supported type", self);
+
     localizedName_ = [[bundle localizedStringForKey:name_ 
                                               value:@"" 
                                               table:nil] retain];
+    HGSCheckDebug(![name_ isEqualToString:localizedName_], 
+                  @"Action argument %@ needs localized name", self);
+    
+    optional_ 
+      = [[configuration valueForKey:kHGSActionArgumentOptionalKey] boolValue];
+
     localizedDescription_ 
       = [configuration valueForKey:kHGSActionArgumentDescriptionKey];
 
@@ -73,29 +94,27 @@ NSString* const kHGSActionArgumentDescriptionKey
                                                      value:@"" 
                                                      table:nil] retain];
     
-    id value = [configuration objectForKey:kHGSActionArgumentOtherTermsKey];
+    value = [configuration objectForKey:kHGSActionArgumentOtherTermsKey];
     NSSet *otherTerms = [NSSet setFromId:value];
-    NSMutableSet *localizedOtherTerms 
-      = [[NSMutableSet alloc] initWithCapacity:[otherTerms count]];
-    for (NSString *term in otherTerms) {
-      // We don't use HGSLocalizedString because the macro is designed to be
-      // used with a string constant so that it can be used with 'genstrings'.
-      NSString *localizedTerm = [bundle localizedStringForKey:term 
-                                                        value:@"" 
-                                                        table:nil];
-      [localizedOtherTerms addObject:localizedTerm];
+    if (otherTerms) {
+      NSMutableSet *localizedOtherTerms 
+        = [[NSMutableSet alloc] initWithCapacity:[otherTerms count]];
+      for (NSString *term in otherTerms) {
+        // We don't use HGSLocalizedString because the macro is designed to be
+        // used with a string constant so that it can be used with 'genstrings'.
+        NSString *localizedTerm = [bundle localizedStringForKey:term 
+                                                          value:@"" 
+                                                          table:nil];
+        HGSCheckDebug(![localizedTerm isEqualToString:term], 
+                      @"Missing localized term for %@ for %@", term, self);
+        [localizedOtherTerms addObject:localizedTerm];
+      }
+      localizedOtherTerms_ = [localizedOtherTerms retain];
     }
     
-    value = [configuration objectForKey:kHGSActionArgumentSupportedTypesKey];
-    NSSet *supportedTypes = [NSSet setFromId:value];
-    
-    value = [configuration objectForKey:kHGSActionArgumentUnsupportedTypesKey];
-    NSSet *unsupportedTypes = [NSSet setFromId:value];
-    
-    if (supportedTypes || unsupportedTypes) {
-      typeFilter_ 
-        = [[HGSTypeFilter alloc] initWithConformTypes:supportedTypes 
-                                  doesNotConformTypes:unsupportedTypes];
+    if (!name_ || !typeFilter_ || !bundle) {
+      [self release];
+      self = nil;
     }
   }
   return self;
@@ -108,6 +127,11 @@ NSString* const kHGSActionArgumentDescriptionKey
   [localizedDescription_ release];
   [localizedOtherTerms_ release];
   [super dealloc];
+}
+
+- (NSString *)description {
+  return [NSString stringWithFormat:@"<%@:%p name='%@'>", 
+          [self class], self, [self name]];
 }
 
 @end

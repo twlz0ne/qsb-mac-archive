@@ -30,10 +30,90 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-@interface HGSActionArgumentTest
+#import "GTMSenTestCase.h"
+#import "HGSActionArgument.h"
+#import "HGSType.h"
+#import "HGSBundle.h"
+
+static NSString *const kActionArgumentTestName = @"^FooActionArgument";
+
+@interface HGSActionArgumentTest : GTMTestCase
 @end
 
-@implementation HGSActionArgumentTest 
+@implementation HGSActionArgumentTest
+
+- (void)testActionArgumentCreation {
+  NSDictionary *config = [NSDictionary dictionary];
+  STAssertNil([[[HGSActionArgument alloc] 
+                initWithConfiguration:config] autorelease], nil);
+  
+  config = [NSDictionary dictionaryWithObjectsAndKeys:
+            kActionArgumentTestName, kHGSActionArgumentNameKey, nil];
+  STAssertNil([[[HGSActionArgument alloc] 
+                initWithConfiguration:config] autorelease], nil);
+  
+  config = [NSDictionary dictionaryWithObjectsAndKeys:
+            kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
+            nil];
+  STAssertNil([[[HGSActionArgument alloc] 
+                initWithConfiguration:config] autorelease], nil);
+  
+  config = [NSDictionary dictionaryWithObjectsAndKeys:
+            kActionArgumentTestName, kHGSActionArgumentNameKey, 
+            kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
+            nil];
+  
+  STAssertNil([[[HGSActionArgument alloc] 
+                initWithConfiguration:config] autorelease], nil);
+
+  config = [NSDictionary dictionaryWithObjectsAndKeys:
+            kActionArgumentTestName, kHGSActionArgumentNameKey, 
+            kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
+            HGSGetPluginBundle(), kHGSActionArgumentBundleKey,
+            nil];
+  
+  HGSActionArgument *arg = [[[HGSActionArgument alloc] 
+                             initWithConfiguration:config] autorelease];
+  STAssertNotNil(arg, nil);
+  STAssertEqualObjects([arg name], kActionArgumentTestName, nil);  
+}
+
+- (void)testActionArgumentLocalization {
+  NSBundle *bundle = HGSGetPluginBundle();
+  
+  NSDictionary *config = [NSDictionary dictionaryWithObjectsAndKeys:
+                          kActionArgumentTestName, kHGSActionArgumentNameKey, 
+                          kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
+                          bundle, kHGSActionArgumentBundleKey,
+                          nil];
+  
+  HGSActionArgument *arg = [[[HGSActionArgument alloc] 
+                             initWithConfiguration:config] autorelease];
+  STAssertNotNil(arg, nil);
+  STAssertEqualObjects([arg name], kActionArgumentTestName, nil);
+  STAssertEqualObjects([arg localizedName], @"FooActionArgument", nil);
+  
+  NSArray *otherTerms = [NSArray arrayWithObjects: 
+                         @"^FooActionArgumentTerm1",
+                         @"^FooActionArgumentTerm2",
+                         nil];                         
+  config = [NSDictionary dictionaryWithObjectsAndKeys:
+            kActionArgumentTestName, kHGSActionArgumentNameKey, 
+            kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
+            bundle, kHGSActionArgumentBundleKey,
+            otherTerms, kHGSActionArgumentOtherTermsKey,
+            nil];
+  
+  arg = [[[HGSActionArgument alloc] 
+          initWithConfiguration:config] autorelease];
+  STAssertNotNil(arg, nil);
+  NSSet *localizedOtherTerms = [NSSet setWithObjects: 
+                                @"FooActionArgumentTerm1",
+                                @"FooActionArgumentTerm2",
+                                nil];
+  STAssertEqualObjects([arg localizedOtherTerms], localizedOtherTerms, nil);
+}
+
 @end
 
 

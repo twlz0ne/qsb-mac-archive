@@ -91,9 +91,23 @@
 @end
 
 /*!
+ Bundle for localizing the action argument.
+ 
+ Type is NSBundle. Required.
+*/
+extern NSString* const kHGSActionArgumentBundleKey;
+
+/*!
+ Configuration key for the name of the argument.
+ 
+ Type is NSString. Required.
+*/
+extern NSString* const kHGSActionArgumentNameKey;
+
+/*!
  Configuration key for the supported object types for the action argument.
  
- Type is NSString, NSArray or NSSet. '*' matches all types.
+ Type is NSString, NSArray or NSSet. '*' matches all types. Required.
  */
 extern NSString* const kHGSActionArgumentSupportedTypesKey;
 
@@ -101,13 +115,13 @@ extern NSString* const kHGSActionArgumentSupportedTypesKey;
  Configuration key for the unsupported object types for the action argument.
  Default is nil, which means that no filtering is performed.
  
- Type is NSString, NSArray or NSSet. '*' is not allowed.
+ Type is NSString, NSArray or NSSet. '*' is not allowed. Optional.
 */
 extern NSString* const kHGSActionArgumentUnsupportedTypesKey;
 
 /*!
  Configuration key for whether the argument is optional.
- Default is NO.
+ Default is NO. Optional.
  
  Type is Boolean.
  */
@@ -116,23 +130,16 @@ extern NSString* const kHGSActionArgumentOptionalKey;
 /*!
  Configuration key for other terms that match for this action argument. 
  
- Type is NSString, or NSArray of NSString.
+ Type is NSString, or NSArray of NSString. Optional.
  */
 extern NSString* const kHGSActionArgumentOtherTermsKey;
 
 /*!
- Configuration key for the name of the argument.
- 
- Type is String.
- */
-extern NSString* const kHGSActionArgumentNameKey;
-
-/*!
  Configuration key for the description of the argument. This will be used
  as a key to look up a localized version.
- Default is nil.
+ Default is nil. Optional.
  
- Type is String.
- */
+ Type is NSString.
+*/
 extern NSString* const kHGSActionArgumentDescriptionKey;
 
