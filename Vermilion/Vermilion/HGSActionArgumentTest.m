@@ -33,9 +33,10 @@
 #import "GTMSenTestCase.h"
 #import "HGSActionArgument.h"
 #import "HGSType.h"
+#import "HGSTypeFilter.h"
 #import "HGSBundle.h"
 
-static NSString *const kActionArgumentTestName = @"^FooActionArgument";
+static NSString *const kActionArgumentTestIdentifier = @"FooActionArgument";
 
 @interface HGSActionArgumentTest : GTMTestCase
 @end
@@ -43,77 +44,72 @@ static NSString *const kActionArgumentTestName = @"^FooActionArgument";
 @implementation HGSActionArgumentTest
 
 - (void)testActionArgumentCreation {
+  NSBundle *bundle = HGSGetPluginBundle();
   NSDictionary *config = [NSDictionary dictionary];
   STAssertNil([[[HGSActionArgument alloc] 
                 initWithConfiguration:config] autorelease], nil);
   
   config = [NSDictionary dictionaryWithObjectsAndKeys:
-            kActionArgumentTestName, kHGSActionArgumentNameKey, nil];
+            kActionArgumentTestIdentifier, kHGSActionArgumentIdentifierKey, nil];
   STAssertNil([[[HGSActionArgument alloc] 
                 initWithConfiguration:config] autorelease], nil);
   
   config = [NSDictionary dictionaryWithObjectsAndKeys:
             kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
             nil];
-  STAssertNil([[[HGSActionArgument alloc] 
-                initWithConfiguration:config] autorelease], nil);
-  
-  config = [NSDictionary dictionaryWithObjectsAndKeys:
-            kActionArgumentTestName, kHGSActionArgumentNameKey, 
-            kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
-            nil];
-  
   STAssertNil([[[HGSActionArgument alloc] 
                 initWithConfiguration:config] autorelease], nil);
 
   config = [NSDictionary dictionaryWithObjectsAndKeys:
-            kActionArgumentTestName, kHGSActionArgumentNameKey, 
+            kActionArgumentTestIdentifier, kHGSActionArgumentIdentifierKey, 
             kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
-            HGSGetPluginBundle(), kHGSActionArgumentBundleKey,
             nil];
+  STAssertNil([[[HGSActionArgument alloc] 
+                initWithConfiguration:config] autorelease], nil);
   
-  HGSActionArgument *arg = [[[HGSActionArgument alloc] 
-                             initWithConfiguration:config] autorelease];
-  STAssertNotNil(arg, nil);
-  STAssertEqualObjects([arg name], kActionArgumentTestName, nil);  
-}
-
-- (void)testActionArgumentLocalization {
-  NSBundle *bundle = HGSGetPluginBundle();
-  
-  NSDictionary *config = [NSDictionary dictionaryWithObjectsAndKeys:
-                          kActionArgumentTestName, kHGSActionArgumentNameKey, 
-                          kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
-                          bundle, kHGSActionArgumentBundleKey,
-                          nil];
-  
-  HGSActionArgument *arg = [[[HGSActionArgument alloc] 
-                             initWithConfiguration:config] autorelease];
-  STAssertNotNil(arg, nil);
-  STAssertEqualObjects([arg name], kActionArgumentTestName, nil);
-  STAssertEqualObjects([arg localizedName], @"FooActionArgument", nil);
-  
-  NSArray *otherTerms = [NSArray arrayWithObjects: 
-                         @"^FooActionArgumentTerm1",
-                         @"^FooActionArgumentTerm2",
-                         nil];                         
   config = [NSDictionary dictionaryWithObjectsAndKeys:
-            kActionArgumentTestName, kHGSActionArgumentNameKey, 
+            kActionArgumentTestIdentifier, kHGSActionArgumentIdentifierKey, 
             kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
             bundle, kHGSActionArgumentBundleKey,
-            otherTerms, kHGSActionArgumentOtherTermsKey,
             nil];
   
-  arg = [[[HGSActionArgument alloc] 
-          initWithConfiguration:config] autorelease];
+  HGSActionArgument *arg = [[[HGSActionArgument alloc] 
+                             initWithConfiguration:config] autorelease];
   STAssertNotNil(arg, nil);
-  NSSet *localizedOtherTerms = [NSSet setWithObjects: 
-                                @"FooActionArgumentTerm1",
-                                @"FooActionArgumentTerm2",
-                                nil];
-  STAssertEqualObjects([arg localizedOtherTerms], localizedOtherTerms, nil);
+  
+  // Verify requireds
+  STAssertEqualObjects([arg identifier], kActionArgumentTestIdentifier, nil);
+  STAssertTrue([[arg typeFilter] isValidType:kHGSTypeTextFile], nil);
+  STAssertFalse([[arg typeFilter] isValidType:kHGSTypeWebBookmark], nil);
+  
+  // Verify optionals
+  STAssertFalse([arg isOptional], nil);
+  STAssertNil([arg displayName], nil);
+  STAssertNil([arg displayDescription], nil);
+  STAssertNil([arg displayOtherTerms], nil);
+}
+
+- (void)testLoadFromPlist {
+  NSBundle *bundle = HGSGetPluginBundle();
+  NSArray *tests = [bundle objectForInfoDictionaryKey:@"HGSActionArgumentTests"];
+  STAssertNotNil(tests, nil);
+  NSMutableDictionary *test1 = [[[tests objectAtIndex:0] mutableCopy] autorelease];
+  [test1 setObject:bundle forKey:@"HGSActionArgumentBundle"];
+  
+  HGSActionArgument *arg = [[[HGSActionArgument alloc] 
+                             initWithConfiguration:test1] autorelease];
+  // Verify requireds
+  STAssertEqualObjects([arg identifier], @"testActionArgument", nil);
+  STAssertTrue([[arg typeFilter] isValidType:kHGSTypeFileApplication], nil);
+  STAssertFalse([[arg typeFilter] isValidType:kHGSTypeTextFile], nil);
+  
+  // Verify optionals
+  STAssertTrue([arg isOptional], nil);
+  STAssertEqualObjects([arg displayName], @"File", nil);
+  STAssertEqualObjects([arg displayDescription], 
+                       @"The file you want to manipulate.", nil);
+  NSSet *otherTerms = [NSSet setWithObjects:@"Document", @"Doohickey", nil];
+  STAssertEqualObjects([arg displayOtherTerms], otherTerms, nil);
 }
 
 @end
-
-

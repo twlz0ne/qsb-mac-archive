@@ -32,43 +32,47 @@
 
 #import "HGSActionArgument.h"
 #import "HGSTypeFilter.h"
-#import "HGSBundle.h"
 #import "HGSExtension.h"
 #import "HGSLog.h"
 
 NSString* const kHGSActionArgumentBundleKey = @"HGSActionArgumentBundle";
+NSString* const kHGSActionArgumentIdentifierKey = @"HGSActionArgumentIdentifier";
 NSString* const kHGSActionArgumentSupportedTypesKey 
   = @"HGSActionArgumentSupportedTypes";
 NSString* const kHGSActionArgumentUnsupportedTypesKey
   = @"HGSActionArgumentUnsupportedTypes";
 NSString* const kHGSActionArgumentOptionalKey = @"HGSActionArgumentOptional";
-NSString* const kHGSActionArgumentOtherTermsKey = @"HGSActionArgumentOtherTerms";
-NSString* const kHGSActionArgumentNameKey = @"HGSActionArgumentName";
-NSString* const kHGSActionArgumentDescriptionKey 
-  = @"HGSActionArgumentDescription";
+NSString* const kHGSActionArgumentUserVisibleOtherTermsKey 
+  = @"HGSActionArgumentUserVisibleOtherTerms";
+NSString* const kHGSActionArgumentUserVisibleNameKey 
+  = @"HGSActionArgumentUserVisibleName";
+NSString* const kHGSActionArgumentUserVisibleDescriptionKey 
+  = @"HGSActionArgumentUserVisibleDescription";
 
 @implementation HGSActionArgument
 
 @synthesize optional = optional_;
-@synthesize name = name_;
-@synthesize localizedName = localizedName_;
+@synthesize identifier = identifier_;
+@synthesize displayName = displayName_;
 @synthesize typeFilter = typeFilter_;
-@synthesize localizedDescription = localizedDescription_;
-@synthesize localizedOtherTerms = localizedOtherTerms_;
+@synthesize displayDescription = displayDescription_;
+@synthesize displayOtherTerms = displayOtherTerms_;
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super init])) {
-    NSBundle *bundle = [configuration valueForKey:kHGSActionArgumentBundleKey];
-    HGSCheckDebug(name_, @"Action argument needs a bundle! %@", self);
-
-    name_ = [[configuration valueForKey:kHGSActionArgumentNameKey] retain];
-    HGSCheckDebug(name_, @"Action argument needs a name! %@", self);
+    
+    NSBundle *bundle = [configuration objectForKey:kHGSActionArgumentBundleKey];
+    HGSCheckDebug(bundle, @"Action argument needs a bundle! %@", self);
+    
+    identifier_ 
+      = [[configuration objectForKey:kHGSActionArgumentIdentifierKey] retain];
+    HGSCheckDebug(identifier_, @"Action argument needs an identifier! %@", self);
     
     id value = [configuration objectForKey:kHGSActionArgumentSupportedTypesKey];
-    NSSet *supportedTypes = [NSSet setFromId:value];
+    NSSet *supportedTypes = [NSSet qsb_setFromId:value];
     
     value = [configuration objectForKey:kHGSActionArgumentUnsupportedTypesKey];
-    NSSet *unsupportedTypes = [NSSet setFromId:value];
+    NSSet *unsupportedTypes = [NSSet qsb_setFromId:value];
     
     typeFilter_ = [[HGSTypeFilter alloc] initWithConformTypes:supportedTypes 
                                           doesNotConformTypes:unsupportedTypes];
@@ -76,43 +80,40 @@ NSString* const kHGSActionArgumentDescriptionKey
     HGSCheckDebug(typeFilter_, 
                   @"Action Argument %@ must have supported type", self);
 
-    localizedName_ = [[bundle localizedStringForKey:name_ 
-                                              value:@"" 
-                                              table:nil] retain];
-    HGSCheckDebug(![name_ isEqualToString:localizedName_], 
-                  @"Action argument %@ needs localized name", self);
-    
     optional_ 
-      = [[configuration valueForKey:kHGSActionArgumentOptionalKey] boolValue];
+      = [[configuration objectForKey:kHGSActionArgumentOptionalKey] boolValue];
 
-    localizedDescription_ 
-      = [configuration valueForKey:kHGSActionArgumentDescriptionKey];
-
-    // We don't use HGSLocalizedString because the macro is designed to be
-    // used with a string constant so that it can be used with 'genstrings'.
-    localizedDescription_ = [[bundle localizedStringForKey:localizedDescription_ 
-                                                     value:@"" 
-                                                     table:nil] retain];
-    
-    value = [configuration objectForKey:kHGSActionArgumentOtherTermsKey];
-    NSSet *otherTerms = [NSSet setFromId:value];
-    if (otherTerms) {
-      NSMutableSet *localizedOtherTerms 
-        = [[NSMutableSet alloc] initWithCapacity:[otherTerms count]];
-      for (NSString *term in otherTerms) {
-        // We don't use HGSLocalizedString because the macro is designed to be
-        // used with a string constant so that it can be used with 'genstrings'.
-        NSString *localizedTerm = [bundle localizedStringForKey:term 
-                                                          value:@"" 
-                                                          table:nil];
-        HGSCheckDebug(![localizedTerm isEqualToString:term], 
-                      @"Missing localized term for %@ for %@", term, self);
-        [localizedOtherTerms addObject:localizedTerm];
+    displayName_ 
+      = [configuration objectForKey:kHGSActionArgumentUserVisibleNameKey];
+    displayName_ 
+      = [[bundle qsb_localizedInfoPListStringForKey:displayName_] retain];
+    HGSCheckDebug(!optional_ || displayName_, 
+                  @"Optional Action Argument %@ must have a display name", self);
+    HGSCheckDebug(!displayName_ || [displayName_ characterAtIndex:0] != '^',
+                  @"Display name not localized %@", self);
+    displayDescription_ 
+      = [configuration objectForKey:kHGSActionArgumentUserVisibleDescriptionKey];
+    displayDescription_ 
+      = [[bundle qsb_localizedInfoPListStringForKey:displayDescription_] retain];
+    HGSCheckDebug((!displayDescription_ 
+                   || [displayDescription_ characterAtIndex:0] != '^'),
+                  @"Display name not localized %@", self);
+   
+    value = [configuration objectForKey:kHGSActionArgumentUserVisibleOtherTermsKey];
+    NSSet *terms = [NSSet qsb_setFromId:value];
+    if ([terms count]) {
+      NSMutableSet *localizedTerms 
+        = [[NSMutableSet alloc] initWithCapacity:[terms count]];
+      for (NSString *term in terms) {
+        term = [bundle qsb_localizedInfoPListStringForKey:term];
+        HGSCheckDebug(!term || [term characterAtIndex:0] != '^',
+                    @"Other term %@ not localized for %@", term, self);
+        [localizedTerms addObject:term];
       }
-      localizedOtherTerms_ = [localizedOtherTerms retain];
+      displayOtherTerms_ = localizedTerms;
     }
-    
-    if (!name_ || !typeFilter_ || !bundle) {
+
+    if (!bundle || !identifier_ || !typeFilter_ || (optional_ && !displayName_)) {
       [self release];
       self = nil;
     }
@@ -121,19 +122,17 @@ NSString* const kHGSActionArgumentDescriptionKey
 }
 
 - (void)dealloc {
-  [name_ release];
-  [localizedName_ release];
+  [identifier_ release];
+  [displayName_ release];
   [typeFilter_ release];
-  [localizedDescription_ release];
-  [localizedOtherTerms_ release];
+  [displayDescription_ release];
+  [displayOtherTerms_ release];
   [super dealloc];
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"<%@:%p name='%@'>", 
-          [self class], self, [self name]];
+  return [NSString stringWithFormat:@"<%@:%p identifier='@' name='%@'>", 
+          [self class], self, [self identifier], [self displayName]];
 }
 
 @end
-
-

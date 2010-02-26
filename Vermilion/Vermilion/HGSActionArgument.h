@@ -48,26 +48,26 @@
 @interface HGSActionArgument : NSObject {
  @private
   BOOL optional_;
-  NSString *name_;
-  NSString *localizedName_;
+  NSString *identifier_;
+  NSString *displayName_;
   HGSTypeFilter *typeFilter_;
-  NSString *localizedDescription_;
-  NSSet *localizedOtherTerms_;
+  NSString *displayDescription_;
+  NSSet *displayOtherTerms_;
 }
 
 /*! Is this argument an optional one. */
 @property (readonly, nonatomic, assign, getter=isOptional) BOOL optional;
 
 /*! 
- Name of the argument. Each argument for an action must have a unique
- name. This is not to be displayed to the user.
+ Identifier for the argument. Each argument for an action must have a unique
+ identifier. This is not to be displayed to the user.
 */
-@property (readonly, nonatomic, retain) NSString *name;
+@property (readonly, nonatomic, retain) NSString *identifier;
 
 /*! 
  Localized name of the argument for user display.
 */
-@property (readonly, nonatomic, retain) NSString *localizedName;
+@property (readonly, nonatomic, retain) NSString *displayName;
 
 /*!
  Describes the valid types for the argument.
@@ -78,31 +78,32 @@
  A description for the argument that can be displayed.
 */
 
-@property (readonly, nonatomic, retain) NSString *localizedDescription;
+@property (readonly, nonatomic, retain) NSString *displayDescription;
 
 /*!
  Localized synonyms for the argument. Again these must be unique across
  all arguments for a given action.
 */
-@property (readonly, nonatomic, retain) NSSet *localizedOtherTerms;
+@property (readonly, nonatomic, retain) NSSet *displayOtherTerms;
 
 - (id)initWithConfiguration:(NSDictionary *)configuration;
 
 @end
 
 /*!
- Bundle for localizing the action argument.
+ Bundle for getting localized strings.
  
  Type is NSBundle. Required.
 */
 extern NSString* const kHGSActionArgumentBundleKey;
 
+
 /*!
- Configuration key for the name of the argument.
+ Identifier for the action argument.
  
  Type is NSString. Required.
 */
-extern NSString* const kHGSActionArgumentNameKey;
+extern NSString* const kHGSActionArgumentIdentifierKey;
 
 /*!
  Configuration key for the supported object types for the action argument.
@@ -128,18 +129,26 @@ extern NSString* const kHGSActionArgumentUnsupportedTypesKey;
 extern NSString* const kHGSActionArgumentOptionalKey;
 
 /*!
- Configuration key for other terms that match for this action argument. 
+ Configuration key for the name of the argument. This is localized.
+ 
+ Type is NSString. Optional unless kHGSActionArgumentOptionalKey is YES, then
+ it is required.
+*/
+extern NSString* const kHGSActionArgumentUserVisibleNameKey;
+
+/*!
+ Configuration key for other terms that match for this action argument. These
+ are localized.
  
  Type is NSString, or NSArray of NSString. Optional.
  */
-extern NSString* const kHGSActionArgumentOtherTermsKey;
+extern NSString* const kHGSActionArgumentUserVisibleOtherTermsKey;
 
 /*!
- Configuration key for the description of the argument. This will be used
- as a key to look up a localized version.
+ Configuration key for the description of the argument. This is localized.
  Default is nil. Optional.
  
  Type is NSString.
 */
-extern NSString* const kHGSActionArgumentDescriptionKey;
+extern NSString* const kHGSActionArgumentUserVisibleDescriptionKey;
 

@@ -53,7 +53,8 @@ static NSString *const kHGSSimpleNamedSearchSourceTestID
     = [HGSSimpleNamedSearchSource sourceWithName:@"testSource"
                                       identifier:nil
                                           bundle:HGSGetPluginBundle()];
-  STAssertNil(source, nil);
+  // Gets identifier from bundle identifier.
+  STAssertNotNil(source, nil);
   source 
     = [HGSSimpleNamedSearchSource sourceWithName:@"testSource"
                                       identifier:kHGSSimpleNamedSearchSourceTestID

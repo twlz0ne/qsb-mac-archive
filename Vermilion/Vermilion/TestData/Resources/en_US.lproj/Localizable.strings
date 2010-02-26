@@ -1,7 +1,3 @@
 ﻿/* A string for testing Python & AppleScript module localization */
 "Localized Value" = "Localized Value in English";
 
-/* ActionArgument Test Strings */
-"^FooActionArgument" = "FooActionArgument";
-"^FooActionArgumentTerm1" = "FooActionArgumentTerm1";
-"^FooActionArgumentTerm2" = "FooActionArgumentTerm2";
