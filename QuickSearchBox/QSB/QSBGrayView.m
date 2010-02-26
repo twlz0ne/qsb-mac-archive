@@ -31,23 +31,44 @@
 //
 
 #import "QSBGrayView.h"
-#import "GTMMethodCheck.h"
-#import "GTMNSBezierPath+RoundRect.h"
 
 @implementation QSBGrayView
-
-GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
 
 - (BOOL)isOpaque {
   return NO;
 }
 
+- (void)lockFocus {
+  // We clip to a view with rounded rects in the bottom, and square corners
+  // up top.
+  NSGraphicsContext *context = [NSGraphicsContext currentContext];
+  [context saveGraphicsState];
+  NSRect rect = [self bounds];
+  NSBezierPath *path = [NSBezierPath bezierPath];
+  NSPoint topLeft = NSMakePoint(NSMinX(rect), NSMaxY(rect));
+  NSPoint topRight = NSMakePoint(NSMaxX(rect), NSMaxY(rect));
+  NSPoint bottomRight = NSMakePoint(NSMaxX(rect), NSMinY(rect));
+  
+  [path moveToPoint:topLeft];
+  [path appendBezierPathWithArcFromPoint:rect.origin
+                                 toPoint:bottomRight
+                                  radius:4.0];
+  [path appendBezierPathWithArcFromPoint:bottomRight
+                                 toPoint:topRight
+                                  radius:4.0];
+  [path lineToPoint:topRight];
+  [path lineToPoint:topLeft];
+  
+  [path closePath];
+  
+  [path addClip];
+  [super lockFocus];
+  [context restoreGraphicsState];
+}
+
 - (void)drawRect:(NSRect)rect {
   [NSBezierPath clipRect:rect];
-  rect = [self bounds];
-  NSBezierPath *path = [NSBezierPath gtm_bezierPathWithRoundRect:rect 
-                                                    cornerRadius:4.0];
   [[NSColor whiteColor] setFill];
-  [path fill];
+  NSRectFill(rect);
 }    
 @end

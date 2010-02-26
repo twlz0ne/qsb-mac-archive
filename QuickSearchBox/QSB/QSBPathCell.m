@@ -33,11 +33,11 @@
 #import "QSBPathCell.h"
 #import <Vermilion/Vermilion.h>
 #import <QSBPluginUI/QSBPluginUI.h>
+#import <GTM/GTMLinearRGBShading.h>
+#import <GTM/GTMNSBezierPath+Shading.h>
+#import <GTM/GTMMethodCheck.h>
 
 #import "QSBPathComponentCell.h"
-#import "GTMLinearRGBShading.h"
-#import "GTMNSBezierPath+RoundRect.h"
-#import "GTMNSBezierPath+Shading.h"
 
 // TODO(mrossetti): Remove workaround once we get a fix from Apple.
 // This includes the declaration of _hoveredCell and _setHoveredCell
@@ -60,6 +60,8 @@
 
 @implementation QSBPathCell
 
+GTM_METHOD_CHECK(NSBezierPath, gtm_fillAxiallyFrom:to:extendingStart:extendingEnd:shading:);
+
 // Stipulate that HGSPathComponentCell is to be used for the
 // pathComponentCells.  We may want to consider allowing the
 // delegate to specify the class to be used while providing
@@ -80,9 +82,6 @@
   NSRect clipRect = cellFrame;
   clipRect.size.height += 10.0;
   clipRect.origin.y -= 10.0; // flipped context
-  [NSGraphicsContext saveGraphicsState];
-  NSBezierPath *clip = [NSBezierPath bezierPathWithRoundedRect:clipRect xRadius:4.0 yRadius:4.0];
-  [clip addClip];
   NSBezierPath *path = [NSBezierPath bezierPathWithRect:cellFrame];
   [path gtm_fillAxiallyFrom:NSMakePoint(0, NSMinY(cellFrame))
                          to:NSMakePoint(0, NSMaxY(cellFrame))
@@ -96,8 +95,6 @@
   NSRectFill(borderRect);
   
   [self drawInteriorWithFrame:cellFrame inView:controlView];
-  
-  [NSGraphicsContext restoreGraphicsState];
 }
 
 

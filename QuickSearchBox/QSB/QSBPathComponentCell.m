@@ -32,12 +32,14 @@
 
 #import "QSBPathComponentCell.h"
 
-#import "GTMLinearRGBShading.h"
-#import "GTMNSBezierPath+RoundRect.h"
-#import "GTMNSBezierPath+Shading.h"
-
+#import <GTM/GTMLinearRGBShading.h>
+#import <GTM/GTMNSBezierPath+Shading.h>
+#import <GTM/GTMMethodCheck.h>
 
 @implementation QSBPathComponentCell
+
+GTM_METHOD_CHECK(NSBezierPath, gtm_fillAxiallyFrom:to:extendingStart:extendingEnd:shading:);
+
 - (BOOL)needsHighlighting {
   return needsHighlighting_;
 }
