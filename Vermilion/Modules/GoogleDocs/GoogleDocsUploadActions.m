@@ -44,20 +44,11 @@
 //
 @interface GoogleDocsUploadAction : HGSGDataUploadAction 
 
-// Bottleneck function that performs the uploading of each document in a loop.
-// This function is called by child classes. |shouldConvert| causes the
-// document being uploaded to be converted from its local format into the
-// Google Docs format.  |shouldConvert| is ignored when |shouldOCR| is YES
-// as all OCR actions result in conversion to Google Docs format.
-- (BOOL)uploadResultsWithInfo:(NSDictionary*)info
-                    shouldOCR:(BOOL)shouldOCR
-                 souldConvert:(BOOL)souldConvert;
-
 // Bottleneck function which dispatches the uploading of a single result and
-// which is only called by -[uploadResultsWithInfo:shouldOCR:souldConvert:].
+// which is only called by -[performWithInfo:]. The conversion requirements (i.e.
+// performing an OCR or leaving as a raw file) is determined by each child
+// class via the uploadURL method.
 - (void)uploadResult:(HGSResult *)docResult
-           shouldOCR:(BOOL)shouldOCR
-        souldConvert:(BOOL)souldConvert
                 item:(NSUInteger)item
                   of:(NSUInteger)count;
 
@@ -82,9 +73,7 @@
 
 @implementation GoogleDocsUploadAction
 
-- (BOOL)uploadResultsWithInfo:(NSDictionary*)info
-                    shouldOCR:(BOOL)shouldOCR
-                 souldConvert:(BOOL)souldConvert {
+- (BOOL)performWithInfo:(NSDictionary*)info {
   BOOL success = NO;
   GDataServiceGoogle *uploadService = [self uploadService];
   if (uploadService) {
@@ -94,8 +83,6 @@
     NSUInteger item = 0;
     for (HGSResult *result in results) {
       [self uploadResult:result
-               shouldOCR:shouldOCR
-            souldConvert:souldConvert
                     item:item
                       of:resultCount];
       ++item;
@@ -106,15 +93,13 @@
 }
 
 - (void)uploadResult:(HGSResult *)result
-           shouldOCR:(BOOL)shouldOCR
-        souldConvert:(BOOL)souldConvert
                 item:(NSUInteger)item
                   of:(NSUInteger)count {
   // See if we can ascertain the type of the file being uploaded from
   // its extension.
   NSString *resultPath = [result filePath];
   NSString *resultTitle
-    = [[NSFileManager defaultManager] displayNameAtPath:resultPath];
+  = [[NSFileManager defaultManager] displayNameAtPath:resultPath];
   NSString *mimeType = [GoogleDocsUploadAction mimeTypeForResult:result];
   if (mimeType) {
     Class entryClass
@@ -172,8 +157,8 @@
 
 - (NSString *)serviceName {
   NSString *name
-      = HGSLocalizedString(@"Google Docs", 
-                           @"The title of a service provided by Google.");
+    = HGSLocalizedString(@"Google Docs", 
+                         @"The title of a service provided by Google.");
   return name;
 }
 
@@ -185,10 +170,6 @@
 
 
 @implementation GoogleDocsUploadAsGoogleDocAction
-
-- (BOOL)performWithInfo:(NSDictionary*)info {
-  return [self uploadResultsWithInfo:info shouldOCR:NO souldConvert:YES];
-}
 
 - (NSURL *)uploadURL {
   return [GDataServiceGoogleDocs docsUploadURL];
@@ -209,10 +190,6 @@
   return [acceptableMIMETypes containsObject:mimeType];
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
-  return [self uploadResultsWithInfo:info shouldOCR:YES souldConvert:YES];
-}
-
 - (NSURL *)uploadURL {
   NSURL *uploadURL = [GDataServiceGoogleDocs docsUploadURL];
   GDataQueryDocs *query = [GDataQueryDocs queryWithFeedURL:uploadURL];
@@ -226,10 +203,6 @@
 
 
 @implementation GoogleDocsUploadWithoutConversionToGoogleDocsAction
-
-- (BOOL)performWithInfo:(NSDictionary*)info {
-  return [self uploadResultsWithInfo:info shouldOCR:NO souldConvert:NO];
-}
 
 - (NSURL *)uploadURL {
   NSURL *uploadURL = [GDataServiceGoogleDocs docsUploadURL];
