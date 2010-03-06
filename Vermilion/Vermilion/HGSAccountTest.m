@@ -32,6 +32,7 @@
 
 
 #import "GTMSenTestCase.h"
+#import "GoogleAccountsConstants.h" // Note dependency.
 #import "HGSAccount.h"
 #import "HGSAccountType.h"
 #import "HGSGoogleAccountTypes.h"
@@ -417,7 +418,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
 
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME G", kHGSAccountUserNameKey,
-                   @"GoogleAppsAccount", kHGSAccountTypeKey,
+                   kGoogleAppsAccountClassName, kHGSAccountTypeKey,
                    bundleMock, kHGSExtensionBundleKey,
                    oldVersionNumber, kHGSAccountsPrefVersionKey,
                    nil];

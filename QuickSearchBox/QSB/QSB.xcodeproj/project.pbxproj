@@ -143,6 +143,7 @@
 				5A0BB2E30FAB8B3100AA4858 /* PBXTargetDependency */,
 				F4EF8F830ECB3F85008DD6DA /* PBXTargetDependency */,
 				5A5832C0100BFD5E00EC32CF /* PBXTargetDependency */,
+				621047DD113C992B00AF95F8 /* PBXTargetDependency */,
 			);
 			name = "QSB Application";
 			productName = "Add Plugins To QSB";
@@ -369,6 +370,18 @@
 		620CB56F0FAA85160029801C /* QSBSetUpSimpleAccountViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 62F974C80F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		620CB5700FAA85160029801C /* QSBSetUpSimpleAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F974C90F8EF676001C55B6 /* QSBSetUpSimpleAccountViewController.m */; };
 		620EC2E10FF5BFD7008666B3 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
+		621044FC113C85AA00AF95F8 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
+		62104500113C85AA00AF95F8 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
+		62104504113C85AA00AF95F8 /* GData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B77E0DC0F28FC3B00FA2A3C /* GData.framework */; };
+		62104505113C85AA00AF95F8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
+		62104506113C85AA00AF95F8 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
+		62104507113C85AA00AF95F8 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E429DF760AC1907A00E747D8 /* Security.framework */; };
+		62104508113C85AA00AF95F8 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
+		621045AB113C865200AF95F8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 621044E5113C856600AF95F8 /* InfoPlist.strings */; };
+		621045AC113C865A00AF95F8 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 621044E7113C856600AF95F8 /* Localizable.strings */; };
+		621045AD113C865F00AF95F8 /* GoogleCalendarsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 621044E3113C856500AF95F8 /* GoogleCalendarsSource.m */; };
+		621045AE113C866900AF95F8 /* gcalendar.icns in Resources */ = {isa = PBXBuildFile; fileRef = 621044E1113C856500AF95F8 /* gcalendar.icns */; };
+		62104744113C945400AF95F8 /* GoogleCalendars.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6210450E113C85AA00AF95F8 /* GoogleCalendars.hgs */; };
 		6211C51D0F312E7E003A5122 /* HGSSimpleAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */; };
 		6219B5340E8C1DB3008643F4 /* BaseResultsViews.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */; };
 		621B1E3B0E4CD7B800EEF553 /* PreferencesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 621B1E390E4CD7B800EEF553 /* PreferencesWindow.xib */; };
@@ -403,6 +416,7 @@
 		62541753102C904A00808254 /* HGSSearchTermScorer.h in Headers */ = {isa = PBXBuildFile; fileRef = 62541751102C904A00808254 /* HGSSearchTermScorer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62541754102C904A00808254 /* HGSSearchTermScorer.m in Sources */ = {isa = PBXBuildFile; fileRef = 62541752102C904A00808254 /* HGSSearchTermScorer.m */; };
 		625A2C980E5614F3008CA9BF /* QSBPreferenceWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 625A2C970E5614F3008CA9BF /* QSBPreferenceWindowController.m */; };
+		625E350A113EEE3E00359047 /* gcalendarevent.icns in Resources */ = {isa = PBXBuildFile; fileRef = 625E3509113EEE3E00359047 /* gcalendarevent.icns */; };
 		6262F7F010D70F5D00BCF513 /* gdocpdfdocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6262F7EF10D70F5D00BCF513 /* gdocpdfdocument.icns */; };
 		6263CAF40EB79F3600FF03A1 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		6263CAF50EB79F3600FF03A1 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -433,6 +447,9 @@
 		62AD18A60F16B034000D380C /* QSBPathControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 62AD18A50F16B034000D380C /* QSBPathControl.m */; };
 		62AD99150F33AB190063579F /* google_products.png in Resources */ = {isa = PBXBuildFile; fileRef = 62AD99140F33AB190063579F /* google_products.png */; };
 		62B4406C10631A4E00984D34 /* FakeHGSPluginLoaderTest.sdefsrc in Sources */ = {isa = PBXBuildFile; fileRef = 62B4406B10631A4E00984D34 /* FakeHGSPluginLoaderTest.sdefsrc */; };
+		62B444D111417BF90028A679 /* HGSPathCellElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 62B444CF11417BF90028A679 /* HGSPathCellElement.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		62B444D211417BF90028A679 /* HGSPathCellElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 62B444D011417BF90028A679 /* HGSPathCellElement.m */; };
+		62B445C4114197C80028A679 /* HGSPathCellElementTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 62B445C3114197C80028A679 /* HGSPathCellElementTest.m */; };
 		62B7CDE70E63746E00299B23 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		62B7CE0E0E63747300299B23 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		62B7CE9F0E6375AA00299B23 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
@@ -1371,6 +1388,13 @@
 			remoteGlobalIDString = 620CB3080FAA827E0029801C;
 			remoteInfo = QSBPluginUI;
 		};
+		621047DC113C992B00AF95F8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 621044EF113C85AA00AF95F8;
+			remoteInfo = "Google Calendars";
+		};
 		622911BC0F2E8034005D34CE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -2095,6 +2119,7 @@
 				5AF0EC900F6076000041E0B9 /* Dictionary.hgs in CopyFiles */,
 				5AF0EF330F61D32E0041E0B9 /* Trash.hgs in CopyFiles */,
 				5AF0F5B90F6720B10041E0B9 /* Mount.hgs in CopyFiles */,
+				62104744113C945400AF95F8 /* GoogleCalendars.hgs in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2201,6 +2226,12 @@
 		620055670F78595F00C806A1 /* GoogleAccountSetUpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleAccountSetUpViewController.h; sourceTree = "<group>"; };
 		620055680F78595F00C806A1 /* GoogleAccountSetUpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountSetUpViewController.m; sourceTree = "<group>"; };
 		620CB3090FAA827E0029801C /* QSBPluginUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = QSBPluginUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		621044E1113C856500AF95F8 /* gcalendar.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = gcalendar.icns; sourceTree = "<group>"; };
+		621044E2113C856500AF95F8 /* GoogleCalendars-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleCalendars-Info.plist"; sourceTree = "<group>"; };
+		621044E3113C856500AF95F8 /* GoogleCalendarsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleCalendarsSource.m; sourceTree = "<group>"; };
+		621044E6113C856600AF95F8 /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = en_US.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		621044E8113C856600AF95F8 /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = en_US.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6210450E113C85AA00AF95F8 /* GoogleCalendars.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleCalendars.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		6211C4BA0F311ADE003A5122 /* HGSSimpleAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSimpleAccount.h; sourceTree = "<group>"; };
 		6211C4BB0F311ADE003A5122 /* HGSSimpleAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleAccount.m; sourceTree = "<group>"; };
 		6219B5330E8C1DB3008643F4 /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/BaseResultsViews.xib; sourceTree = "<group>"; };
@@ -2247,6 +2278,7 @@
 		62541752102C904A00808254 /* HGSSearchTermScorer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSearchTermScorer.m; sourceTree = "<group>"; };
 		625A2C960E5614F3008CA9BF /* QSBPreferenceWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPreferenceWindowController.h; sourceTree = "<group>"; };
 		625A2C970E5614F3008CA9BF /* QSBPreferenceWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPreferenceWindowController.m; sourceTree = "<group>"; };
+		625E3509113EEE3E00359047 /* gcalendarevent.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = gcalendarevent.icns; sourceTree = "<group>"; };
 		6262F7EF10D70F5D00BCF513 /* gdocpdfdocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = gdocpdfdocument.icns; sourceTree = "<group>"; };
 		6263CAFB0EB79F3600FF03A1 /* PicasaWeb.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PicasaWeb.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		6263CB070EB79FB300FF03A1 /* Picasaweb-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Picasaweb-Info.plist"; sourceTree = "<group>"; };
@@ -2282,6 +2314,10 @@
 		62AD99140F33AB190063579F /* google_products.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = google_products.png; sourceTree = "<group>"; };
 		62AFEFFA1124CE4A00CC31B9 /* GoogleDocsUploadActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsUploadActions.m; sourceTree = "<group>"; };
 		62B4406B10631A4E00984D34 /* FakeHGSPluginLoaderTest.sdefsrc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = FakeHGSPluginLoaderTest.sdefsrc; sourceTree = "<group>"; };
+		62B4444211416BBE0028A679 /* GoogleAccountsConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleAccountsConstants.h; sourceTree = "<group>"; };
+		62B444CF11417BF90028A679 /* HGSPathCellElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSPathCellElement.h; sourceTree = "<group>"; };
+		62B444D011417BF90028A679 /* HGSPathCellElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPathCellElement.m; sourceTree = "<group>"; };
+		62B445C3114197C80028A679 /* HGSPathCellElementTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPathCellElementTest.m; sourceTree = "<group>"; };
 		62C25E260F8BF17500DA57E7 /* PicasaPlaceholder.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PicasaPlaceholder.icns; sourceTree = "<group>"; };
 		62D0909F107FAFA300D2F334 /* QSBHGSObjectSpecifiers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBHGSObjectSpecifiers.h; sourceTree = "<group>"; };
 		62D0E9640EF058950028522C /* HGSAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSAccount.h; sourceTree = "<group>"; };
@@ -3601,6 +3637,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		62104503113C85AA00AF95F8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				62104504113C85AA00AF95F8 /* GData.framework in Frameworks */,
+				62104505113C85AA00AF95F8 /* Cocoa.framework in Frameworks */,
+				62104506113C85AA00AF95F8 /* Vermilion.framework in Frameworks */,
+				62104507113C85AA00AF95F8 /* Security.framework in Frameworks */,
+				62104508113C85AA00AF95F8 /* GTM.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		623ADD3C0EC0CC17001651D1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -4064,6 +4112,7 @@
 				8B0FFC8110C6033800C1A6FD /* Shortcuts Test.octest */,
 				8BF62037110A60C2000AB941 /* TransferenceBeacon.hgs */,
 				8BF62716110A6519000AB941 /* Transference Demo.app */,
+				6210450E113C85AA00AF95F8 /* GoogleCalendars.hgs */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -4163,9 +4212,9 @@
 			children = (
 				8B6EB4231019FE26006CFF7A /* Resources */,
 				62F595AF0FEB278A0076CDDA /* GoogleDocsConstants.h */,
+				62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */,
 				62DA51430FFAA86C002B008E /* GoogleDocsSource.h */,
 				62DA51440FFAA86C002B008E /* GoogleDocsSource.m */,
-				62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */,
 				62F594B40FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.h */,
 				62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */,
 				62F594B60FEB06A60076CDDA /* GoogleDocsSaveAsActions.m */,
@@ -4324,6 +4373,27 @@
 			path = QSBPluginUI;
 			sourceTree = "<group>";
 		};
+		621044E0113C856500AF95F8 /* GoogleCalendars */ = {
+			isa = PBXGroup;
+			children = (
+				621044E4113C856600AF95F8 /* Resources */,
+				621044E3113C856500AF95F8 /* GoogleCalendarsSource.m */,
+				621044E2113C856500AF95F8 /* GoogleCalendars-Info.plist */,
+				621044E1113C856500AF95F8 /* gcalendar.icns */,
+				625E3509113EEE3E00359047 /* gcalendarevent.icns */,
+			);
+			path = GoogleCalendars;
+			sourceTree = "<group>";
+		};
+		621044E4113C856600AF95F8 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				621044E5113C856600AF95F8 /* InfoPlist.strings */,
+				621044E7113C856600AF95F8 /* Localizable.strings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		623ADD740EC0CC31001651D1 /* EmailActions */ = {
 			isa = PBXGroup;
 			children = (
@@ -4391,6 +4461,7 @@
 				8B6EB3D21019FDBD006CFF7A /* Resources */,
 				622912100F2E81E7005D34CE /* GoogleAccount.h */,
 				622912110F2E81E7005D34CE /* GoogleAccount.m */,
+				62B4444211416BBE0028A679 /* GoogleAccountsConstants.h */,
 				620055650F78595F00C806A1 /* GoogleAccountEditController.h */,
 				620055660F78595F00C806A1 /* GoogleAccountEditController.m */,
 				620055670F78595F00C806A1 /* GoogleAccountSetUpViewController.h */,
@@ -5388,6 +5459,7 @@
 				7F2206FD0DDA029700737C26 /* Google.com */,
 				62EA8C190F2E7E5E00C92E0B /* GoogleAccounts */,
 				33D2CAC70DD24BBF00C1FBDC /* GoogleBookmarks */,
+				621044E0113C856500AF95F8 /* GoogleCalendars */,
 				7F34589A0DDE16C00050702F /* GoogleCorpora */,
 				33D2C6630DD1080C00C1FBDC /* GoogleDocs */,
 				5AF2C5A50E5E1C5700F4D546 /* ITunes */,
@@ -5507,6 +5579,9 @@
 				5AED32B80EAFDF1F004C7187 /* HGSOperation.h */,
 				5AED32B90EAFDF1F004C7187 /* HGSOperation.m */,
 				5AED32BC0EAFDF2C004C7187 /* HGSOperationTest.m */,
+				62B444CF11417BF90028A679 /* HGSPathCellElement.h */,
+				62B444D011417BF90028A679 /* HGSPathCellElement.m */,
+				62B445C3114197C80028A679 /* HGSPathCellElementTest.m */,
 				62A16A8D0ED484DF0074F41B /* HGSPlugin.h */,
 				62A16A8E0ED484DF0074F41B /* HGSPlugin.m */,
 				8B95CA970F6B09FE003BDBDD /* HGSPluginTest.m */,
@@ -6221,6 +6296,7 @@
 				8BF60FE811079035000AB941 /* HGSUserMessage.h in Headers */,
 				8B6AE77711222D2300D5D636 /* HGSTypeFilter.h in Headers */,
 				62917AAD112B5B9300653562 /* HGSGDataUploadAction.h in Headers */,
+				62B444D111417BF90028A679 /* HGSPathCellElement.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6477,6 +6553,24 @@
 			productName = QSBPluginUI;
 			productReference = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		621044EF113C85AA00AF95F8 /* Google Calendars */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6210450A113C85AA00AF95F8 /* Build configuration list for PBXNativeTarget "Google Calendars" */;
+			buildPhases = (
+				621044F2113C85AA00AF95F8 /* Resources */,
+				621044FB113C85AA00AF95F8 /* Sources */,
+				62104503113C85AA00AF95F8 /* Frameworks */,
+				62104509113C85AA00AF95F8 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Google Calendars";
+			productName = GoogleDocs;
+			productReference = 6210450E113C85AA00AF95F8 /* GoogleCalendars.hgs */;
+			productType = "com.apple.product-type.bundle";
 		};
 		623ADD320EC0CC17001651D1 /* Email URL Action */ = {
 			isa = PBXNativeTarget;
@@ -7290,6 +7384,7 @@
 				7F9415CE0EEF52970049AE06 /* Directory Scanner */,
 				623ADD320EC0CC17001651D1 /* Email URL Action */,
 				33D2CADF0DD24C2500C1FBDC /* Google Bookmarks */,
+				621044EF113C85AA00AF95F8 /* Google Calendars */,
 				8B3EF76E0EF2C8000036FFBD /* Google Corpora */,
 				33D2C5F20DD1068000C1FBDC /* Google Docs */,
 				62EA8BBD0F2E7DE200C92E0B /* GoogleAccounts */,
@@ -7522,6 +7617,17 @@
 				8BA61DBB0F0AEF78008182B5 /* AddToPartyShuffle.icns in Resources */,
 				8BA61DBD0F0AEF7E008182B5 /* PlayInPartyShuffle.icns in Resources */,
 				8B6EB44B1019FE38006CFF7A /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		621044F2113C85AA00AF95F8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				621045AB113C865200AF95F8 /* InfoPlist.strings in Resources */,
+				621045AC113C865A00AF95F8 /* Localizable.strings in Resources */,
+				621045AE113C866900AF95F8 /* gcalendar.icns in Resources */,
+				625E350A113EEE3E00359047 /* gcalendarevent.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8050,6 +8156,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/BuildScripts/PostBuild.sh\"";
+		};
+		62104509113C85AA00AF95F8 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
+			);
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
+				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/PostBuild.sh\"";
 		};
 		62EA8BC90F2E7DE200C92E0B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8909,6 +9031,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		621044FB113C85AA00AF95F8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				621044FC113C85AA00AF95F8 /* HGSBundle.m in Sources */,
+				62104500113C85AA00AF95F8 /* GTMMethodCheck.m in Sources */,
+				621045AD113C865F00AF95F8 /* GoogleCalendarsSource.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		623ADD3A0EC0CC17001651D1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -9189,6 +9321,7 @@
 				8BF60FE911079035000AB941 /* HGSUserMessage.m in Sources */,
 				8B6AE77611222D2300D5D636 /* HGSTypeFilter.m in Sources */,
 				62917AAE112B5B9300653562 /* HGSGDataUploadAction.m in Sources */,
+				62B444D211417BF90028A679 /* HGSPathCellElement.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9383,6 +9516,7 @@
 				8B4463FD10F2790700561E62 /* HGSKeychainItemTest.m in Sources */,
 				8B6AE77A11222D2B00D5D636 /* HGSTypeFilterTest.m in Sources */,
 				6274BD83112C69D2008D56D7 /* HGSGDataUploadActionTest.m in Sources */,
+				62B445C4114197C80028A679 /* HGSPathCellElementTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9481,6 +9615,11 @@
 			isa = PBXTargetDependency;
 			target = 620CB3080FAA827E0029801C /* QSBPluginUI */;
 			targetProxy = 620CB3620FAA838F0029801C /* PBXContainerItemProxy */;
+		};
+		621047DD113C992B00AF95F8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 621044EF113C85AA00AF95F8 /* Google Calendars */;
+			targetProxy = 621047DC113C992B00AF95F8 /* PBXContainerItemProxy */;
 		};
 		622911BD0F2E8034005D34CE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -9881,6 +10020,22 @@
 				5ACEF2CA0F40EBFC007EA38B /* en_US */,
 			);
 			name = PluginVerifyWindow.xib;
+			sourceTree = "<group>";
+		};
+		621044E5113C856600AF95F8 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				621044E6113C856600AF95F8 /* en_US */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		621044E7113C856600AF95F8 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				621044E8113C856600AF95F8 /* en_US */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		6219B5320E8C1DB3008643F4 /* BaseResultsViews.xib */ = {
@@ -11190,6 +11345,42 @@
 				INFOPLIST_FILE = "$(SRCROOT)/QSBPluginUI/QSBPluginUI-Info.plist";
 				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
 				PRODUCT_NAME = QSBPluginUI;
+			};
+			name = Release;
+		};
+		6210450B113C85AA00AF95F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleCalendars/GoogleCalendars-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
+				PRODUCT_NAME = GoogleCalendars;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = Debug;
+		};
+		6210450C113C85AA00AF95F8 /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleCalendars/GoogleCalendars-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
+				PRODUCT_NAME = GoogleCalendars;
+				WRAPPER_EXTENSION = hgs;
+			};
+			name = "Debug-gcov";
+		};
+		6210450D113C85AA00AF95F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleCalendars/GoogleCalendars-Info.plist";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
+				INFOPLIST_PREPROCESS = YES;
+				PRODUCT_NAME = GoogleCalendars;
+				WRAPPER_EXTENSION = hgs;
 			};
 			name = Release;
 		};
@@ -12924,6 +13115,16 @@
 				620CB30B0FAA827E0029801C /* Debug */,
 				620CB30C0FAA827E0029801C /* Debug-gcov */,
 				620CB30D0FAA827E0029801C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6210450A113C85AA00AF95F8 /* Build configuration list for PBXNativeTarget "Google Calendars" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6210450B113C85AA00AF95F8 /* Debug */,
+				6210450C113C85AA00AF95F8 /* Debug-gcov */,
+				6210450D113C85AA00AF95F8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

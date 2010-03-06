@@ -1,7 +1,7 @@
 //
-//  QSBHGSResultAttributeKeys.h
+//  GoogleAccountsConstants.h
 //
-//  Copyright (c) 2009 Google Inc. All rights reserved.
+//  Copyright (c) 2010 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,34 +30,13 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-// QSB specific values that can be gotten from HGSResults using valueForKey:
+/*!
+ @header
+ @discussion GoogleAccountsConstants
+*/
 
-// Path cell-related keys
-
-// The path presentation shown in the search results window can be
-// built from one of the following (in order of preference):
-//   1. an array of cell descriptions
-//   2. a file path URL (from our |identifier|).
-//   3. a slash-delimeted string of cell titles
-// Only the first option guarantees that a cell is clickable, the
-// second option may but is not likely to support clicking, and the
-// third definitely not.  We will return a decent cell array for regular URLs 
-// and file URLs and a mediocre one for public.message results but you can 
-// compose and provide your own in your source's provideValueForKey: method.
-
-//   selector as string
-#define kQSBObjectAttributePathCellClickHandlerKey \
-  @"QSBObjectAttributePathCellClickHandler"
-//   NSArray of NSDictionaries
-#define kQSBObjectAttributePathCellsKey \
-  @"QSBObjectAttributePathCells"
-//   NSString
-#define kQSBPathCellDisplayTitleKey @"QSBPathCellDisplayTitle"
-//   NSImage
-#define kQSBPathCellImageKey @"QSBPathCellImage"
-//   NSURL
-#define kQSBPathCellURLKey @"QSBPathCellURL"
-
-// QSB Table result for a given HGSScoredResult
-#define kQSBObjectTableResultAttributeKey @"QSBObjectTableResultAttributeKey"
-
+/*!
+ A string which can be used to identify the class of an HGSAccount as
+ being that of a 'hosted' Google account.
+ */
+#define kGoogleAppsAccountClassName @"GoogleAppsAccount"

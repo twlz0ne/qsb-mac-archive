@@ -40,16 +40,6 @@
 
 static NSString *const kPhotosAlbumKey = @"kPhotosAlbumKey";
 
-// Keys used in describing an account connection error.
-static NSString *const kHGSPicasawebFetchTypeKey
-  = @"HGSPicasawebFetchTypeKey";
-
-// Strings identifying the fetch operation type.
-static NSString *const kHGSPicasawebFetchOperationAlbum
-  = @"HGSPicasawebFetchOperationAlbum";
-static NSString *const kHGSPicasawebFetchOperationPhoto
-  = @"HGSPicasawebFetchOperationPhoto";
-
 static const NSTimeInterval kRefreshSeconds = 3600.0;  // 60 minutes.
 static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
@@ -102,7 +92,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
     // Keep track of active tickets so we can cancel them if necessary.
-    activeTickets_ = [[NSMutableSet set] retain];
+    activeTickets_ = [[NSMutableSet alloc] init];
     
     account_ = [[configuration objectForKey:kHGSExtensionAccount] retain];
 
@@ -143,9 +133,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (void)cancelAllTickets {
-  for (GDataServiceTicket *ticket in activeTickets_) {
-    [ticket cancelTicket];
-  }
+  [activeTickets_ makeObjectsPerformSelector:@selector(cancelTicket)];
   [activeTickets_ removeAllObjects];
 }
 
@@ -297,42 +285,32 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     [attributes setObject:[[album updatedDate] date]
                    forKey:kHGSObjectAttributeLastUsedDateKey];
     
-    // Compose the contents of the path control.  First cell will be
-    // 'Picasaweb', second cell will be the username, and the last cell
-    // will be the album name.
+    // Compose the contents of the path control:
+    // 'Picasaweb'/username/album name.
     NSURL *baseURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/",
                                            [albumURL scheme],
                                            [albumURL host]]];
-    NSMutableArray *cellArray = [NSMutableArray array];
     NSString *picasaWeb = HGSLocalizedString(@"Picasaweb", 
                                              @"A label denoting the picasaweb "
                                              @"service.");
-    NSDictionary *picasawebCell 
-      = [NSDictionary dictionaryWithObjectsAndKeys:
-         picasaWeb, kQSBPathCellDisplayTitleKey,
-         baseURL, kQSBPathCellURLKey,
-         nil];
-    [cellArray addObject:picasawebCell];
-
     NSString *userNameEncoded = [self encodedUserName];
     NSURL *userURL = [[[NSURL alloc] initWithScheme:[albumURL scheme]
                                                host:[albumURL host]
                                                path:userNameEncoded]
                       autorelease];
-    NSDictionary *userCell 
-      = [NSDictionary dictionaryWithObjectsAndKeys:
-         [picasawebService_ username], kQSBPathCellDisplayTitleKey,
-         userURL, kQSBPathCellURLKey,
+    NSArray *pathCellElements
+      = [NSArray arrayWithObjects:
+         [HGSPathCellElement elementWithTitle:picasaWeb url:baseURL],
+         [HGSPathCellElement elementWithTitle:[picasawebService_ username]
+                                          url:userURL],
+         [HGSPathCellElement elementWithTitle:albumTitle url:albumURL],
          nil];
-    [cellArray addObject:userCell];
+    NSArray *cellArray
+      = [HGSPathCellElement pathCellArrayWithElements:pathCellElements];
+    if (cellArray) {
+      [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
+    }
     
-    NSDictionary *albumCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                                   albumTitle, kQSBPathCellDisplayTitleKey,
-                                   albumURL, kQSBPathCellURLKey,
-                                   nil];
-    [cellArray addObject:albumCell];
-    [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
-
     // Remember the first photo's URL to ease on-demand fetching later.
     [PicasawebSource setBestFitThumbnailFromMediaGroup:[album mediaGroup]
                                           inAttributes:attributes];
@@ -376,13 +354,14 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 }
 
 - (void)albumInfoFetcher:(GDataServiceTicket *)ticket
-       finishedWithAlbum:(GDataFeedPhotoUser *)albumList
+       finishedWithAlbum:(GDataFeedPhotoUser *)albumFeed
                    error:(NSError *)error {
+  HGSCheckDebug([activeTickets_ containsObject:ticket], nil);
   [activeTickets_ removeObject:ticket];
   if (!error) {
     [self clearResultIndex];
     
-    for (GDataEntryPhotoAlbum* album in [albumList entries]) {
+    for (GDataEntryPhotoAlbum* album in [albumFeed entries]) {
       [self indexAlbum:album];
     }
   } else {
@@ -416,52 +395,38 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     [attributes setObject:[[photo updatedDate] date]
                    forKey:kHGSObjectAttributeLastUsedDateKey];
     
-    // Compose the contents of the path control.  First cell will be
-    // 'Picasaweb', second cell will be the username, the third will be the
-    // album name, and the last cell will be the photo title.
+    // Compose the contents of the path control:
+    // 'Picasaweb'/username/album name/photo title.
     NSURL *baseURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/",
                                            [photoURL scheme],
                                            [photoURL host]]];
-    NSMutableArray *cellArray = [NSMutableArray array];
     NSString *picasaWeb = HGSLocalizedString(@"Picasaweb", 
                                              @"A label denoting the picasaweb "
                                              @"service.");
-    NSDictionary *picasawebCell 
-      = [NSDictionary dictionaryWithObjectsAndKeys:
-         picasaWeb, kQSBPathCellDisplayTitleKey,
-         baseURL, kQSBPathCellURLKey,
-         nil];
-    [cellArray addObject:picasawebCell];
     NSString *userNameEncoded = [self encodedUserName];
     NSURL *userURL = [[[NSURL alloc] initWithScheme:[photoURL scheme]
                                                host:[photoURL host]
                                                path:userNameEncoded]
                       autorelease];
-    NSDictionary *userCell 
-      = [NSDictionary dictionaryWithObjectsAndKeys:
-         [picasawebService_ username], kQSBPathCellDisplayTitleKey,
-         userURL, kQSBPathCellURLKey,
-         nil];
-    [cellArray addObject:userCell];
-    
     NSString* albumTitle = [[album title] stringValue];
     NSURL* albumURL = [[album HTMLLink] URL];
-    NSDictionary *albumCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                               albumTitle, kQSBPathCellDisplayTitleKey,
-                               albumURL, kQSBPathCellURLKey,
-                               nil];
-    [cellArray addObject:albumCell];
-    
     NSString* photoTitle = [[photo title] stringValue];
+    NSArray *pathCellElements
+      = [NSArray arrayWithObjects:
+         [HGSPathCellElement elementWithTitle:picasaWeb url:baseURL],
+         [HGSPathCellElement elementWithTitle:[picasawebService_ username]
+                                          url:userURL],
+         [HGSPathCellElement elementWithTitle:albumTitle url:albumURL],
+         [HGSPathCellElement elementWithTitle:photoTitle url:photoURL],
+         nil];
+    NSArray *cellArray
+      = [HGSPathCellElement pathCellArrayWithElements:pathCellElements];
+    if (cellArray) {
+      [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
+    }
     if ([photoDescription length] == 0) {
       photoDescription = photoTitle;
     }
-    NSDictionary *photoCell = [NSDictionary dictionaryWithObjectsAndKeys:
-                               photoTitle, kQSBPathCellDisplayTitleKey,
-                               photoURL, kQSBPathCellURLKey,
-                               nil];
-    [cellArray addObject:photoCell];
-    [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
     
     // Remember the photo's first image URL.
     [PicasawebSource setBestFitThumbnailFromMediaGroup:[photo mediaGroup]
@@ -512,6 +477,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (void)photoInfoFetcher:(GDataServiceTicket *)ticket
        finishedWithPhoto:(GDataFeedPhotoAlbum *)photoFeed
                    error:(NSError *)error {
+  HGSCheckDebug([activeTickets_ containsObject:ticket], nil);
   [activeTickets_ removeObject:ticket];
   if (!error) {
     NSArray *photoList = [photoFeed entries];

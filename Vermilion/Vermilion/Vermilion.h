@@ -62,3 +62,4 @@
 #import <Vermilion/HGSTokenizer.h>
 #import <Vermilion/HGSUserMessage.h>
 #import <Vermilion/HGSGDataUploadAction.h>
+#import <Vermilion/HGSPathCellElement.h>
