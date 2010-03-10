@@ -205,7 +205,7 @@ static NSString *const kServiceName
   // The SimpleAccountWithFakeKeychain class provides a fake keychain item
   // so should result in an account.
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
-  [[[bundleMock stub] andReturn:@"bundle.identifier"] 
+  [[[bundleMock expect] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   NSNumber *versionNumber
     = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
@@ -215,8 +215,8 @@ static NSString *const kServiceName
                                  versionNumber, kHGSAccountsPrefVersionKey,
                                  nil];
   NSString *value = @"HGSSimpleAccount D ((null))";
-  [[[bundleMock stub] andReturn:value] 
-   localizedStringForKey:value value:@"NOT_FOUND" table:@"InfoPlist"];  
+  [[[bundleMock expect] andReturn:value] 
+   qsb_localizedInfoPListStringForKey:value];  
   
   HGSAccount *account
     = [[[SimpleAccountWithFakeKeychain alloc] initWithConfiguration:configuration]

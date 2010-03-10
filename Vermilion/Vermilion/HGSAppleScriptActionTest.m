@@ -78,7 +78,7 @@
   NSDictionary *userInfo = [ns userInfo];
   actionReceived_ = YES;
   actionWasGood_ 
-    = [[userInfo objectForKey:kHGSActionCompletedSuccessfully] boolValue];
+    = [[userInfo objectForKey:kHGSActionCompletedSuccessfullyKey] boolValue];
 }
 
 - (BOOL)waitOnActionOperationResult:(HGSActionOperation *)operation 
@@ -137,9 +137,12 @@
   STAssertNotNil(hgsResults, nil);
   STAssertTrue([action appliesToResults:hgsResults], nil);
   STAssertFalse([action showInGlobalSearchResults], nil);
+  NSDictionary *args
+    = [NSDictionary dictionaryWithObject:hgsResults 
+                                  forKey:kHGSActionDirectObjectsKey];
   HGSActionOperation *operation 
     = [[[HGSActionOperation alloc] initWithAction:action 
-                                    directObjects:hgsResults] autorelease];
+                                        arguments:args] autorelease];
   STAssertTrue([self waitOnActionOperationResult:operation action:action], 
                @"timed out waiting for action notification");
   STAssertTrue(actionWasGood_, nil);
@@ -155,9 +158,11 @@
   STAssertNotNil(action, nil);
   STAssertTrue([action appliesToResults:hgsResults], nil);
   STAssertFalse([action showInGlobalSearchResults], nil);
+  
   operation 
     = [[[HGSActionOperation alloc] initWithAction:action 
-                                    directObjects:hgsResults] autorelease];
+                                        arguments:args] autorelease];
+  
   STAssertTrue([self waitOnActionOperationResult:operation action:action],
                @"timed out waiting for action notification");
   STAssertTrue(actionWasGood_, nil);

@@ -48,6 +48,8 @@
   HGSPython *sharedPython = [HGSPython sharedPython];
   STAssertNotNil(sharedPython, nil);
   HGSQuery *query = [[[HGSQuery alloc] initWithString:@"Hello world"
+                                       actionArgument:nil
+                                      actionOperation:nil
                                          pivotObjects:nil
                                            queryFlags:0] autorelease];
   STAssertNotNil(query, nil);

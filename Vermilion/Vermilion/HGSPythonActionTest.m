@@ -72,6 +72,7 @@
                               source:nil
                           attributes:nil
                                score:0
+                               flags:0
                          matchedTerm:nil
                       matchedIndexes:nil];
   STAssertNotNil(result, nil);
@@ -97,7 +98,7 @@
   // second call passes two. The third call passes 3.
   STAssertEquals(notificationCount_, 6, nil);
   [nc removeObserver:self name:kHGSUserMessageNotification object:nil];
-  STAssertNotNil([action directObjectTypes], nil);
+  STAssertNotNil([action directObjectTypeFilter], nil);
 }
 
 - (void)displayUserMessage:(NSNotification *)notification {
@@ -117,4 +118,7 @@
   
   ++notificationCount_;
 }
+
+// TODO(dmaclach): Add test that returns results from python action.
+
 @end

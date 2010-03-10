@@ -228,8 +228,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   [[[bundleMock stub] andReturn:@"USERNAME C ((null))"] 
-   localizedStringForKey:@"USERNAME C ((null))" 
-                   value:@"NOT_FOUND" table:@"InfoPlist"];
+   qsb_localizedInfoPListStringForKey:@"USERNAME C ((null))"];
   configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"USERNAME C", kHGSAccountUserNameKey,
                    @"DUMMY TYPE C", kHGSAccountTypeKey,
@@ -246,8 +245,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   [[[bundleMock stub] andReturn:@"USERNAME D ((null))"] 
-   localizedStringForKey:@"USERNAME D ((null))" 
-                   value:@"NOT_FOUND" table:@"InfoPlist"];
+   qsb_localizedInfoPListStringForKey:@"USERNAME D ((null))"];
   NSNumber *versionNumber
     = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -297,8 +295,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
        kTestAccountClass, kHGSExtensionOfferedAccountClass,
        nil];
   [[[bundleMock stub] andReturn:kTestAccountTypeName] 
-   localizedStringForKey:kTestAccountTypeName 
-                   value:@"NOT_FOUND" table:@"InfoPlist"];
+   qsb_localizedInfoPListStringForKey:kTestAccountTypeName];
   HGSProtoExtension *accountTypeProto
     = [[[HGSProtoExtension alloc] initWithConfiguration:configuration
                                                  plugin:pluginMock]
@@ -311,8 +308,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   NSString *key = [NSString stringWithFormat:@"USERNAME E (%@)", 
                    kTestAccountTypeName];
   [[[bundleMock stub] andReturn:key] 
-   localizedStringForKey:key
-                   value:@"NOT_FOUND" table:@"InfoPlist"];
+   qsb_localizedInfoPListStringForKey:key];
   // Let's add an account.
   NSNumber *versionNumber
     = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
@@ -346,8 +342,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   [[[bundleMock stub] andReturn:@"USERNAME F ((null))"] 
-   localizedStringForKey:@"USERNAME F ((null))" 
-                   value:@"NOT_FOUND" table:@"InfoPlist"];
+   qsb_localizedInfoPListStringForKey:@"USERNAME F ((null))"];
   NSNumber *versionNumber
     = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -368,8 +363,7 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
   [[[bundleMock stub] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   [[[bundleMock stub] andReturn:@"USERNAME G ((null))"] 
-   localizedStringForKey:@"USERNAME G ((null))"
-                   value:@"NOT_FOUND" table:@"InfoPlist"];
+   qsb_localizedInfoPListStringForKey:@"USERNAME G ((null))"];
   NSNumber *versionNumber
     = [NSNumber numberWithInteger:kHGSAccountsPrefCurrentVersion];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:

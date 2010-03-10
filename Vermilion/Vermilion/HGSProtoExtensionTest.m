@@ -76,7 +76,7 @@ static NSString *const kAccountType = @"AccountType";
 
   // Bad configurations.
   id pluginMock = [OCMockObject mockForClass:[HGSPlugin class]];
-  [[[pluginMock stub] andReturn:@"PLUGIN A"] displayName];
+  [[[pluginMock expect] andReturn:@"PLUGIN A"] displayName];
   [[[pluginMock stub] andReturn:[NSBundle mainBundle]] bundle];
   NSDictionary *configurationA
     = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -128,8 +128,8 @@ static NSString *const kAccountType = @"AccountType";
        @"EXTENSION POINT D", kHGSExtensionPointKey,
        nil];
   id pluginMockD = [OCMockObject mockForClass:[HGSPlugin class]];
-  [[[pluginMockD stub] andReturn:@"PLUGIN D"] displayName];
-  [[[pluginMockD stub] andReturn:nil] bundle];
+  [[[pluginMockD expect] andReturn:@"PLUGIN D"] displayName];
+  [[[pluginMockD expect] andReturn:nil] bundle];
   protoExtension
     = [[[HGSProtoExtension alloc] initWithConfiguration:configurationD
                                                  plugin:pluginMockD]
@@ -139,7 +139,7 @@ static NSString *const kAccountType = @"AccountType";
 
 - (void)testGoodInits {
   id pluginMockE = [OCMockObject mockForClass:[HGSPlugin class]];
-  [[[pluginMockE stub] andReturn:@"PLUGIN E"] displayName];
+  [[[pluginMockE expect] andReturn:@"PLUGIN E"] displayName];
   [[[pluginMockE stub] andReturn:[NSBundle mainBundle]] bundle];
   NSDictionary *configurationE
     = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -181,13 +181,13 @@ static NSString *const kAccountType = @"AccountType";
        kAccountType, kHGSExtensionDesiredAccountTypes,
        nil];
   id pluginMockJ = [OCMockObject mockForClass:[HGSPlugin class]];
-  [[[pluginMockJ stub] andReturn:@"PLUGIN J"] displayName];
-  [[[pluginMockJ stub] andReturn:[NSBundle mainBundle]] bundle];
+  [[[pluginMockJ expect] andReturn:@"PLUGIN J"] displayName];
+  [[[pluginMockJ expect] andReturn:[NSBundle mainBundle]] bundle];
   NSAttributedString *extensionDescription
     = [[[NSAttributedString alloc] initWithString:@"EXTENSION DESCRIPTION J"]
        autorelease];
-  [[[pluginMockJ stub] andReturn:extensionDescription] extensionDescription];
-  [[[pluginMockJ stub] andReturn:@"EXTENSION VERSION J"] extensionVersion];
+  [[[pluginMockJ expect] andReturn:extensionDescription] extensionDescription];
+  [[[pluginMockJ expect] andReturn:@"EXTENSION VERSION J"] extensionVersion];
   HGSProtoExtension *protoExtensionJ
     = [[[HGSProtoExtension alloc] initWithConfiguration:configurationJ
                                                  plugin:pluginMockJ]
@@ -207,10 +207,10 @@ static NSString *const kAccountType = @"AccountType";
 
 - (void)testInstallAccountTypes {
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
-  [[[bundleMock stub] andReturn:@"bundle.identifier"] 
+  [[[bundleMock expect] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
   BOOL yes = YES;
-  [[[bundleMock stub] andReturnValue:OCMOCK_VALUE(yes)] isLoaded];
+  [[[bundleMock expect] andReturnValue:OCMOCK_VALUE(yes)] isLoaded];
   NSDictionary *configurationK
     = [NSDictionary dictionaryWithObjectsAndKeys:
        @"DISPLAY NAME K", kHGSExtensionUserVisibleNameKey,
@@ -222,12 +222,11 @@ static NSString *const kAccountType = @"AccountType";
        bundleMock, kHGSExtensionBundleKey,
        nil];
   id pluginMockK = [OCMockObject mockForClass:[HGSPlugin class]];
-  [[[pluginMockK stub] andReturn:@"PLUGIN K"] displayName];
-  [[[pluginMockK stub] andReturn:bundleMock] bundle];
-  [[[pluginMockK stub] andReturn:@"EXTENSION VERSION K"] extensionVersion];
-  [[[bundleMock stub] andReturn:@"DISPLAY NAME K"] 
-   localizedStringForKey:@"DISPLAY NAME K" 
-                   value:@"NOT_FOUND" table:@"InfoPlist"];  
+  [[[pluginMockK expect] andReturn:@"PLUGIN K"] displayName];
+  [[[pluginMockK expect] andReturn:bundleMock] bundle];
+  [[[pluginMockK expect] andReturn:@"EXTENSION VERSION K"] extensionVersion];
+  [[[bundleMock expect] andReturn:@"DISPLAY NAME K"] 
+   qsb_localizedInfoPListStringForKey:@"DISPLAY NAME K"];  
 
   HGSProtoExtension *protoExtensionK
     = [[[HGSProtoExtension alloc] initWithConfiguration:configurationK
@@ -247,8 +246,8 @@ static NSString *const kAccountType = @"AccountType";
        @"ACCOUNT TYPE G", kHGSExtensionDesiredAccountTypes,
        nil];
   id pluginMockG = [OCMockObject mockForClass:[HGSPlugin class]];
-  [[[pluginMockG stub] andReturn:@"PLUGIN G"] displayName];
-  [[[pluginMockG stub] andReturn:[NSBundle mainBundle]] bundle];
+  [[[pluginMockG expect] andReturn:@"PLUGIN G"] displayName];
+  [[[pluginMockG expect] andReturn:[NSBundle mainBundle]] bundle];
   HGSProtoExtension *protoExtensionG
     = [[[HGSProtoExtension alloc] initWithConfiguration:configurationG
                                                  plugin:pluginMockG]
@@ -264,8 +263,8 @@ static NSString *const kAccountType = @"AccountType";
        [NSNumber numberWithBool:YES], kHGSExtensionEnabledKey,
        nil];
   id pluginMockH = [OCMockObject mockForClass:[HGSPlugin class]];
-  [[[pluginMockH stub] andReturn:@"PLUGIN H"] displayName];
-  [[[pluginMockH stub] andReturn:[NSBundle mainBundle]] bundle];
+  [[[pluginMockH expect] andReturn:@"PLUGIN H"] displayName];
+  [[[pluginMockH expect] andReturn:[NSBundle mainBundle]] bundle];
   HGSProtoExtension *protoExtensionH
     = [[[HGSProtoExtension alloc] initWithConfiguration:configurationH
                                                  plugin:pluginMockH]

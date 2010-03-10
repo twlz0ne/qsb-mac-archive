@@ -92,31 +92,31 @@ static NSString *const kAccountType = @"FactorableAccount";
 
 - (void)testFactoring {
   // Debugging Note: If you plan to inspect the protoExtension (via an
-  // NSLog, for instance) then you'll need a _real_ bundle.  Subtituting
+  // NSLog, for instance) then you'll need a _real_ bundle.  Substituting
   // the following for the OCMockObject will suffice:
   //  NSBundle *bundleMock = [NSBundle bundleForClass:[self class]];
 
   // We need a bundle.
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
-  [[[bundleMock stub] andReturn:@"bundle.identifier"] 
+  [[[bundleMock expect] andReturn:@"bundle.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
-  [[[bundleMock stub] andReturn:@"bundle.executable"]
+  [[[bundleMock expect] andReturn:kAccountTypeName] 
+   qsb_localizedInfoPListStringForKey:kAccountTypeName];  
+  [[[bundleMock expect] andReturn:kAccountTypeName] 
+   qsb_localizedInfoPListStringForKey:kAccountTypeName];  
+  [[[bundleMock expect] andReturn:@"bundle.executable"]
    objectForInfoDictionaryKey:@"CFBundleExecutable"];
-  [[[bundleMock stub] andReturn:kAccountTypeName] 
-   localizedStringForKey:kAccountTypeName 
-                   value:@"NOT_FOUND" table:@"InfoPlist"];  
   NSString *value 
     = [NSString stringWithFormat:@"testUserName (%@)", kAccountTypeName];
-  [[[bundleMock stub] andReturn:value] 
-   localizedStringForKey:value value:@"NOT_FOUND" table:@"InfoPlist"];  
+  [[[bundleMock expect] andReturn:value] 
+   qsb_localizedInfoPListStringForKey:value];  
   BOOL yes = YES;
-  [[[bundleMock stub] andReturnValue:OCMOCK_VALUE(yes)] isLoaded];
+  [[[bundleMock expect] andReturnValue:OCMOCK_VALUE(yes)] isLoaded];
 
   // We need a plugin
   id pluginMock = [OCMockObject mockForClass:[HGSPlugin class]];
-  [[[pluginMock stub] andReturn:@"PLUGIN"] displayName];
   [[[pluginMock stub] andReturn:bundleMock] bundle];
-  [[[pluginMock stub] andReturnValue:OCMOCK_VALUE(yes)] isEnabled];
+  [[[pluginMock expect] andReturnValue:OCMOCK_VALUE(yes)] isEnabled];
   
   // We need an account type extension point.
   HGSExtensionPoint *accountTypesPoint = [HGSExtensionPoint accountTypesPoint];
@@ -161,8 +161,8 @@ static NSString *const kAccountType = @"FactorableAccount";
   STAssertEquals([accounts count], (NSUInteger)1, nil);
   HGSAccount *account = [accounts objectAtIndex:0];
   [account setAuthenticated:YES];
-  [[[bundleMock stub] andReturn:@"DISPLAY NAME"] 
-   localizedStringForKey:@"DISPLAY NAME" value:@"NOT_FOUND" table:@"InfoPlist"];  
+  [[[bundleMock expect] andReturn:@"DISPLAY NAME"] 
+   qsb_localizedInfoPListStringForKey:@"DISPLAY NAME"];  
 
   // Create the factorable extension.
   NSDictionary *factorConfiguration
@@ -180,8 +180,8 @@ static NSString *const kAccountType = @"FactorableAccount";
                                                  plugin:pluginMock]
        autorelease];
   value = @"DISPLAY NAME (testUserName (Factorable Account Type))";
-  [[[bundleMock stub] andReturn:value] 
-   localizedStringForKey:value value:@"NOT_FOUND" table:@"InfoPlist"];  
+  [[[bundleMock expect] andReturn:value] 
+   qsb_localizedInfoPListStringForKey:value];  
 
   NSArray *factored = [protoExtensionI factor];
   STAssertEquals([factored count], (NSUInteger)1, nil);
