@@ -116,18 +116,8 @@
         NSString *displayName 
           = [configuration_ objectForKey:kHGSExtensionUserVisibleNameKey];
         if (displayName) {
-          // First check our InfoPlist.strings file
-          NSString *localizedName 
-            = [pluginBundle localizedStringForKey:displayName 
-                                            value:@"NOT_FOUND" 
-                                            table:@"InfoPlist"];
-          if ([localizedName isEqualToString:@"NOT_FOUND"]) {
-            // Then our Localizable.strings file
-            localizedName = [pluginBundle localizedStringForKey:displayName 
-                                                          value:nil 
-                                                          table:nil];
-          }
-          displayName = localizedName;
+          displayName 
+            = [pluginBundle qsb_localizedInfoPListStringForKey:displayName];
         }
         if (!displayName) {
           displayName = [plugin displayName];

@@ -39,21 +39,8 @@
 #import "HGSCoreExtensionPoints.h"
 #import "HGSTokenizer.h"
 #import "HGSTypeFilter.h"
-
-// The result is already retained for you
-static NSSet *CopyStringSetFromId(id value) {
-  if (!value) return nil;
-  
-  NSSet *result = nil;
-  if ([value isKindOfClass:[NSString class]]) {
-    result = [[NSSet alloc] initWithObjects:value, nil];
-  } else if ([value isKindOfClass:[NSArray class]]) {
-    result = [[NSSet alloc] initWithArray:value];
-  } else if ([value isKindOfClass:[NSSet class]]) {
-    result = [value copy];
-  }
-  return result;
-}
+#import "HGSType.h"
+#import "HGSActionArgument.h"
 
 NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources 
   = @"HGSSearchSourceUTIsToExcludeFromDiskSources";
@@ -87,24 +74,24 @@ NSString *const kHGSSearchSourceUnsupportedTypes
   if ((self = [super initWithConfiguration:configuration])) {
 
     id value = [configuration objectForKey:@"HGSSearchSourcePivotableTypes"];
-    pivotableTypes_ = CopyStringSetFromId(value);
+    pivotableTypes_ = [[NSSet qsb_setFromId:value] retain];
 
     value
       = [configuration objectForKey:kHGSSearchSourceUTIsToExcludeFromDiskSources];
-    utisToExcludeFromDiskSources_ = CopyStringSetFromId(value);
+    utisToExcludeFromDiskSources_ = [[NSSet qsb_setFromId:value] retain];
     
     value = [configuration objectForKey:@"HGSSearchSourceCannotArchive"];
     cannotArchive_ = [value boolValue];
     
     value = [configuration objectForKey:@"HGSSearchSourceSupportedTypes"];
-    NSSet *supportedTypes = [CopyStringSetFromId(value) autorelease];
+    NSSet *supportedTypes = [NSSet qsb_setFromId:value];
     if (!supportedTypes) {
       HGSLogDebug(@"Source: %@ does not have a HGSSearchSourceSupportedTypes key", 
                   self);
       supportedTypes = [HGSTypeFilter allTypesSet];
     }
     value = [configuration objectForKey:@"HGSSearchSourceUnsupportedTypes"];
-    NSSet *unsupportedTypes = [CopyStringSetFromId(value) autorelease];
+    NSSet *unsupportedTypes = [NSSet qsb_setFromId:value];
     resultTypeFilter_ 
       = [[HGSTypeFilter alloc] initWithConformTypes:supportedTypes
                                 doesNotConformTypes:unsupportedTypes];
@@ -120,26 +107,49 @@ NSString *const kHGSSearchSourceUnsupportedTypes
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
-  // Must have a pivot or something we parse as a word
   BOOL isValid = NO;
-  HGSResultArray *pivotObjects = [query pivotObjects];
-  if (pivotObjects) {
+  
+  // If we have a current action argument we are trying to fulfill,
+  // does the type desired by the action intersect with the types we can
+  // return?
+  HGSActionArgument *currentArg = [query actionArgument];
+  HGSTypeFilter *typeFilter = [currentArg typeFilter];
+  if (typeFilter) {
+    isValid = [typeFilter intersectsWithFilter:[self resultTypeFilter]];
+  } else {
+    isValid = YES;
+  }
+  if (isValid) {
+    HGSResultArray *pivotObjects = [query pivotObjects];
     NSSet *pivotTypes = [self pivotableTypes];
-    if (pivotTypes) {
-      isValid = YES;
+    if (pivotObjects && pivotTypes) {
       NSSet *allPivots = [NSSet setWithObject:@"*"];
       if (![pivotTypes isEqual:allPivots]) {
         for (NSString *pivotType in pivotTypes) {
           for (HGSResult *pivotObject in pivotObjects) {
-            if (![pivotObject conformsToType:pivotType]) {
-              return NO;
+            if ([pivotObject conformsToType:kHGSTypeAction]) {
+              isValid = YES;
+            } else {
+              isValid = [pivotObject conformsToType:pivotType];
             }
+            if (!isValid) {
+              break;
+            }
+          }
+          if (!isValid) {
+            break;
           }
         }
       }
+    } else {
+      for (HGSResult *pivotObject in pivotObjects) {
+        if (![pivotObject conformsToType:kHGSTypeAction]) {
+          isValid = NO;
+          break;
+        } 
+      } 
+      isValid &= [[[query tokenizedQueryString] tokenizedString] length] > 0;
     }
-  } else {
-    isValid = [[[query tokenizedQueryString] tokenizedString] length] > 0;
   }
   return isValid;
 }

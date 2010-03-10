@@ -119,8 +119,8 @@ static NSString* const kHGSMemorySourceVersion = @"1";
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   NSArray *rankedResults = nil;
   @synchronized(resultsArray_) {
-  rankedResults = [self rankedResultsFromPreparedArray:resultsArray_ 
-                                          forOperation:operation];
+    rankedResults = [self rankedResultsFromPreparedArray:resultsArray_ 
+                                            forOperation:operation];
   }
   [operation setRankedResults:rankedResults];
 }
@@ -170,7 +170,9 @@ static NSString* const kHGSMemorySourceVersion = @"1";
       if (!result) continue;
       HGSScoredResult *scoredResult 
         = [HGSScoredResult resultWithResult:result
-                                      score:HGSCalibratedScore(kHGSCalibratedModerateScore) 
+                                      score:HGSCalibratedScore(kHGSCalibratedModerateScore)
+                                 flagsToSet:0
+                               flagsToClear:0
                                 matchedTerm:tokenizedQuery 
                              matchedIndexes:nil];
       scoredResult = [self postFilterScoredResult:scoredResult 
