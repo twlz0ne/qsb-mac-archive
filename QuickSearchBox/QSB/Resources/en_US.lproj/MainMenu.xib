@@ -8,9 +8,6 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="403"/>
-			<integer value="57"/>
-			<integer value="2145"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1848,7 +1845,7 @@
 							<string>NSView</string>
 							<string>QSBCustomPanel</string>
 							<string>QSBMenuButton</string>
-							<string>QSBTextFieldEditor</string>
+							<string>QSBTextField</string>
 							<string>NSTextField</string>
 							<string>NSWindow</string>
 							<string>NSImageView</string>
@@ -1861,15 +1858,15 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">QSBTextFieldEditor</string>
+					<string key="className">QSBTextField</string>
 					<string key="superclassName">NSTextView</string>
 					<object class="NSMutableDictionary" key="outlets">
 						<string key="NS.key.0">windowController_</string>
 						<string key="NS.object.0">QSBSearchWindowController</string>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">QSBTextField.h</string>
+						<string key="majorKey">IBUserSource</string>
+						<string key="minorKey"/>
 					</object>
 				</object>
 			</object>
