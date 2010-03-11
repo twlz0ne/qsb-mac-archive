@@ -71,22 +71,18 @@ static NSString *const kQSBResultViewControllerClassName
 @implementation QSBResultRowViewController
 
 @synthesize customResultViewInstalled = customResultViewInstalled_;
-@synthesize searchViewController = searchViewController_;
 
-- (id)initWithNib:(NSNib *)nib
-       controller:(QSBSearchViewController *)searchViewController {
+- (id)initWithNib:(NSNib *)nib {
   // Instead of passing a name and bundle into NSViewController, we actually
   // cache the nib ourselves.
   if ((self = [super initWithNibName:nil
                               bundle:nil])) {
-    searchViewController_ = [searchViewController retain];
     nib_ = [nib retain];
   }
   return self;
 }
 
 - (void)dealloc {
-  [searchViewController_ release];
   [topLevelObjects_ release];
   [nib_ release];
   [super dealloc];
