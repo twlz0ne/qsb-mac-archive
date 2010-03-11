@@ -40,21 +40,6 @@
 
 static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 
-// When an action is selected directly from the UI as a "sub object" of a pivot
-// we want it to apply to the pivot object. By wrapping it in an
-// ActionPivotObjectProxy it will act exactly like the action it wraps
-// EXCEPT when invoked it will pass the pivot object from the predicate_
-// into the action as it's direct object.
-// See -[ActionPivotObjectProxy performWithInfo] for details.
-@interface ActionPivotObjectProxy : NSProxy {
- @private
-  HGSAction *action_;
-  HGSQuery *query_;
-}
-- (id)initWithAction:(HGSAction *)action
-               query:(HGSQuery *)query;
-@end
-
 @interface ActionSource : HGSMemorySearchSource {
  @private
   BOOL rebuildCache_;
@@ -108,6 +93,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        action, kHGSObjectAttributeDefaultActionKey,
+       array, kHGSObjectAttributeActionDirectObjectsKey,
        nil];
   NSImage *icon = [action displayIconForResults:array];
   if (icon) {
@@ -137,7 +123,9 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     HGSResult *actionObject = [self objectFromAction:action
                                          resultArray:nil];
     // Index our result
-    [self indexResult:actionObject];
+    [self indexResult:actionObject 
+                 name:[actionObject displayName] 
+           otherTerms:[[action otherTerms] allObjects]];
   }
 }
 
@@ -193,16 +181,8 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     // action.
     HGSAction *action
       = [scoredResult valueForKey:kHGSObjectAttributeDefaultActionKey];
-    if ([action appliesToResults:queryPivotObjects]) {
-      // Now that it is all set up, let's wrap it up in our proxy action.
-      // We do this so that we can sub in the query's pivot object
-      // when our action is called.
-      ActionPivotObjectProxy *proxy 
-        = [[[ActionPivotObjectProxy alloc] initWithAction:action
-                                                    query:query]
-           autorelease];
-      
-      HGSResult *actionResult = [self objectFromAction:(HGSAction *)proxy
+    if ([action appliesToResults:queryPivotObjects]) {   
+      HGSResult *actionResult = [self objectFromAction:action
                                            resultArray:queryPivotObjects];
       CGFloat score = [scoredResult score];
       HGSTokenizedString *matchedTerm = [scoredResult matchedTerm];
@@ -212,7 +192,9 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
         // This gives some ordering to actions, putting more specific actions
         // first.
         HGSCalibratedScoreType scoreType;
-        if ([[action directObjectTypes] isEqual:[HGSTypeFilter allTypesSet]]) {
+        HGSTypeFilter *directObjectTypeFilter = [action directObjectTypeFilter];
+        HGSTypeFilter *allTypeFilter = [HGSTypeFilter filterAllowingAllTypes];
+        if ([directObjectTypeFilter isEqual:allTypeFilter]) {
           scoreType = kHGSCalibratedWeakScore;
         } else {
           scoreType = kHGSCalibratedModerateScore;
@@ -243,41 +225,3 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 
 @end
 
-@implementation ActionPivotObjectProxy
-- (id)initWithAction:(HGSAction *)action
-               query:(HGSQuery *)query {
-  action_ = [action retain];
-  query_ = [query retain];
-  return self;
-}
- 
-- (void)dealloc {
-  [action_ release];
-  [query_ release];
-  [super dealloc];
-}
-
-- (void)forwardInvocation:(NSInvocation *)invocation {
-  [invocation invokeWithTarget:action_];
-}
-
-- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
-  return [action_ methodSignatureForSelector:sel];
-}
-
-- (BOOL)performWithInfo:(NSDictionary*)info {
-  // We promote the actions to let the action source know they were of interest.
-  HGSResultArray *actions = [info objectForKey:kHGSActionDirectObjectsKey];
-  [actions promote];
-  
-  // We sub in the pivot object as the primary object, ignoring whatever
-  // info we got from above.
-  HGSResultArray *directObjects = [query_ pivotObjects];
-  NSDictionary *newInfo 
-    = [NSDictionary dictionaryWithObject:directObjects
-                                  forKey:kHGSActionDirectObjectsKey];
-  return [action_ performWithInfo:newInfo];
-}
-
-
-@end
