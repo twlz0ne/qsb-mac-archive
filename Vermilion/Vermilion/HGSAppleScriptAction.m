@@ -193,10 +193,12 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_appleEventDescriptor);
   [manager removeEventHandlerForEventClass:'appS' andEventID:'locS'];
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   // If we have a handler we call it
   // if not and it supports open, we call that
   // otherwise we just run the script.
+  
+  // TODO(dmaclach): Give applescripts a way to return results.
   BOOL wasGood = NO;
   @synchronized(self) {
     [self installLocalizedStringHandler];
