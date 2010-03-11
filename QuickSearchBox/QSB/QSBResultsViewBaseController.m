@@ -35,7 +35,6 @@
 #import <QSBPluginUI/QSBPluginUI.h>
 
 #import "QSBApplicationDelegate.h"
-#import "QSBSearchViewController.h"
 #import "QSBTableResult.h"
 #import "QSBResultsViewTableView.h"
 #import "QSBSearchWindowController.h"
@@ -47,9 +46,6 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 
 @interface QSBResultsViewBaseController ()
 
-// Return our main search window controller.
-- (QSBSearchWindowController *)searchWindowController;
-
 // Update the metrics of our results presentation and propose a new table height.
 - (void)updateTableHeight;
 @end
@@ -57,31 +53,29 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 
 @implementation QSBResultsViewBaseController
 
-- (void)awakeFromNib {
-  
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self 
-         selector:@selector(searchControllerDidUpdateResults:) 
-             name:kQSBSearchControllerDidUpdateResultsNotification 
-           object:[searchViewController_ searchController]];
+@synthesize searchController = searchController_;
 
-  resultsNeedUpdating_ = YES;
-  [resultsTableView_ setDoubleAction:@selector(openResultsTableItem:)];
-  QSBSearchWindowController *controller = [self searchWindowController];
-  [resultsTableView_ setTarget:controller];
+- (id)initWithSearchController:(QSBSearchController *)controller
+                       nibName:(NSString *)nibName {
+  if ((self = [super initWithNibName:nibName bundle:nil])) {
+    searchController_ = [controller retain];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self 
+           selector:@selector(searchControllerDidUpdateResults:) 
+               name:kQSBSearchControllerDidUpdateResultsNotification 
+             object:searchController_];
+  }
+  return self;
+}
+
+- (void)awakeFromNib {
+  [resultsTableView_ setDoubleAction:@selector(insertNewline:)];
+  [resultsTableView_ setTarget:nil];
 }
 
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [super dealloc];
-}
-
-- (QSBSearchViewController *)searchViewController {
-  return searchViewController_;
-}
-
-- (NSView *)resultsView {
-  return resultsView_;
 }
 
 - (QSBResultsViewTableView *)resultsTableView {
@@ -96,55 +90,8 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
   return 1024.0;
 }
 
-- (BOOL)isTransitionDirectionUp {
-  return YES;
-}
-
-- (void)setResultsNeedUpdating:(BOOL)value {
-  resultsNeedUpdating_ = value;
-  [self updateTableHeight];
-}
-
-- (BOOL)resultsNeedUpdating {
-  return resultsNeedUpdating_;
-}
-
-- (void)setShowing:(BOOL)value {
-  if (value) {
-    // See if we're about to be shown and we need updating.
-    if ([self resultsNeedUpdating] && ![self isShowing]) {
-      [self updateTableHeight];
-    }
-    [self scrollToBeginningOfDocument:self];
-
-    // Set origin to 0,0 and return previously calculated lastWindowHeight_.
-    [resultsView_ setHidden:NO];
-    [[resultsView_ animator] setFrameOrigin:NSMakePoint(0.0, 0.0)];
-  } else {
-    // Set origin to be off-screen in proper direction and it doesn't matter
-    // what you return.
-    NSPoint viewOrigin = [resultsView_ frame].origin;
-    CGFloat resultsWindowHeight = NSHeight([[resultsView_ window] frame]);
-    CGFloat transition = ([self isTransitionDirectionUp] ? 1.0 : -1.0);
-    CGFloat viewYOffset = (resultsWindowHeight + 100.0) * transition;
-    viewOrigin.y = viewYOffset;
-    [[resultsView_ animator] setFrameOrigin:viewOrigin];
-    [[resultsView_ animator] setHidden:YES];
-  }
-  isShowing_ = value;
-}
-
-- (BOOL)isShowing {
-  return isShowing_;
-}
-
 - (QSBTableResult *)selectedTableResult {
   return [self tableResultForRow:[resultsTableView_ selectedRow]];
-}
-
-- (void)reset {
-  // Reset our selection to be the first row.
-  [self scrollToBeginningOfDocument:self];
 }
 
 - (void)updateTableHeight {
@@ -172,92 +119,6 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
   return lastTableHeight_;
 }
 
-- (BOOL)performSelectionMovementSelector:(SEL)selector {
-  BOOL acceptable = (selector == @selector(moveUp:)
-                     || selector == @selector(moveDown:)
-                     || selector == @selector(scrollToBeginningOfDocument:)
-                     || selector == @selector(scrollToEndOfDocument:)
-                     || selector == @selector(moveToBeginningOfDocument:)
-                     || selector == @selector(moveToEndOfDocument:)
-                     || selector == @selector(scrollPageUp:)
-                     || selector == @selector(scrollPageDown:));
-  if (acceptable) {
-    [self performSelector:selector
-               withObject:self];
-  }
-  return acceptable;
-}
-
-- (void)moveUp:(id)sender {
-  NSInteger newRow = [resultsTableView_ selectedRow] - 1;
-  if (newRow >= 0) {
-    [resultsTableView_ moveUp:nil];
-    newRow = [resultsTableView_ selectedRow];
-    [resultsTableView_ scrollRowToVisible:newRow];
-  }
-}
-
-- (void)moveDown:(id)sender {
-  NSInteger newRow = [resultsTableView_ selectedRow] + 1;
-  if (newRow < [resultsTableView_ numberOfRows]) {
-    [resultsTableView_ moveDown:nil];
-    newRow = [resultsTableView_ selectedRow];
-    [resultsTableView_ scrollRowToVisible:newRow];
-  }
-}
-
-- (void)scrollToBeginningOfDocument:(id)sender {
-  NSInteger selectedRow = [resultsTableView_ selectFirstSelectableRow];
-  [resultsTableView_ scrollRowToVisible:selectedRow];
-}
-
-- (void)scrollToEndOfDocument:(id)sender {
-  NSInteger selectedRow = [resultsTableView_ selectLastSelectableRow];
-  [resultsTableView_ scrollRowToVisible:selectedRow];
-}
-
-- (void)moveToBeginningOfDocument:(id)sender {
-  [self scrollToBeginningOfDocument:sender];
-}
-
-- (void)moveToEndOfDocument:(id)sender {
-  [self scrollToEndOfDocument:sender];
-}
-
-- (void)scrollPageUp:(id)sender {
-  // Scroll so that the first visible row is now shown at the bottom, but
-  // select the top visible row, and adjust so it is shown top-aligned.
-  NSRange visibleRows = [resultsTableView_ visibleRows];
-  if (visibleRows.length) {
-    NSInteger newBottomRow = visibleRows.location;
-    [resultsTableView_ scrollRowToVisible:0];
-    [resultsTableView_ scrollRowToVisible:newBottomRow];
-    visibleRows = [resultsTableView_ visibleRows];
-    [resultsTableView_ selectFirstSelectableRowByIncrementing:YES
-                                                   startingAt:visibleRows.location];
-    [resultsTableView_ scrollRowToVisible:[resultsTableView_ numberOfRows] - 1];
-    [resultsTableView_ scrollRowToVisible:[resultsTableView_ selectedRow]];
-  }
-}
-
-- (void)scrollPageDown:(id)sender {
-  // Scroll so that the last visible row is now show at the top.
-  NSRange visibleRows = [resultsTableView_ visibleRows];
-  if (visibleRows.length) {
-    NSInteger newRow = visibleRows.location + visibleRows.length - 1;
-    if ([resultsTableView_ selectFirstSelectableRowByIncrementing:YES
-                                             startingAt:newRow]) {
-      NSUInteger rowCount = [resultsTableView_ numberOfRows];
-      [resultsTableView_ scrollRowToVisible:rowCount - 1];
-      [resultsTableView_ scrollRowToVisible:newRow];
-    }
-  }
-}
-
-- (QSBSearchWindowController *)searchWindowController {
-  return [searchViewController_ searchWindowController];
-}
-
 - (void)searchControllerDidUpdateResults:(NSNotification *)notification {
   NSTableView *resultsTableView = [self resultsTableView];
   [resultsTableView reloadData];
@@ -265,7 +126,6 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
     [resultsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0]
                   byExtendingSelection:NO];
   }
-  [searchViewController_ updateResultsView];
 }
 
 - (BOOL)tableView:(NSTableView *)tv
@@ -274,6 +134,14 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   NSUInteger row = [rowIndexes firstIndex];
   QSBTableResult *tableResult = [self tableResultForRow:row];
   return [tableResult copyToPasteboard:pb];
+}
+
+- (void)tableView:(NSTableView *)aTableView 
+  willDisplayCell:(id)aCell 
+   forTableColumn:(NSTableColumn *)aTableColumn 
+              row:(NSInteger)rowIndex {
+  QSBTableResult *result = [self tableResultForRow:rowIndex];
+  [aCell setRepresentedObject:result];
 }
 
 - (QSBTableResult *)tableResultForRow:(NSInteger)row {
@@ -305,6 +173,30 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
       }
     }
   }
+}
+
+- (void)qsb_pickCurrentTableResult:(id)sender {
+  QSBTableResult *result = [self selectedTableResult];
+  [result performAction:self];
+}
+
+#pragma mark Actions
+
+- (IBAction)copy:(id)sender {
+  QSBTableResult *qsbTableResult = [self selectedTableResult];
+  NSPasteboard *pb = [NSPasteboard generalPasteboard];
+  [qsbTableResult copyToPasteboard:pb];
+}
+
+#pragma mark UI Validation
+
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
+  BOOL validated = YES;
+  if ([anItem action] == @selector(copy:)) {
+    QSBTableResult *qsbTableResult = [self selectedTableResult];
+    validated = [qsbTableResult isKindOfClass:[QSBSourceTableResult class]];
+  } 
+  return validated;
 }
 
 @end

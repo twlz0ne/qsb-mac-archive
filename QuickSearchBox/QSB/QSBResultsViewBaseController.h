@@ -32,44 +32,31 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class QSBSearchViewController;
 @class QSBResultsViewTableView;
 @class QSBTableResult;
+@class QSBSearchController;
 
 // Abstract base class for the result views which manages the presentation
 // of results in the Top Results and the More Results views.
 //
 @interface QSBResultsViewBaseController : NSViewController {
  @private
-  IBOutlet QSBSearchViewController *searchViewController_;
-  IBOutlet NSView *resultsView_;
   IBOutlet QSBResultsViewTableView *resultsTableView_;
-  
-  BOOL isShowing_;  // YES when our results section is showing.
-  BOOL resultsNeedUpdating_;
   CGFloat lastTableHeight_;  // Remember last calculated table height.
+  QSBSearchController *searchController_;
 }
 
-// Returns the query controller.
-- (QSBSearchViewController *)searchViewController;
+@property (readonly, retain) QSBSearchController *searchController;
+
+- (id)initWithSearchController:(QSBSearchController *)controller
+                       nibName:(NSString *)nibName;
 
 // Return the various views associated with this controller.
-- (NSView *)resultsView;
 - (QSBResultsViewTableView *)resultsTableView;
 
 // Get some UI metrics
 - (CGFloat)minimumTableHeight;
 - (CGFloat)maximumTableHeight;
-- (BOOL)isTransitionDirectionUp;
-
-// Set/get that the results for this view need to be updated.
-- (void)setResultsNeedUpdating:(BOOL)value;
-- (BOOL)resultsNeedUpdating;
-
-// Show or hide the results view.  Return the previously calculated
-// window height if our results view is showing.
-- (void)setShowing:(BOOL)value;
-- (BOOL)isShowing;
 
 // Return the last selected table item.
 - (QSBTableResult *)selectedTableResult;
@@ -77,24 +64,8 @@
 // For a given row in the table, return the associated QSBTableResult
 - (QSBTableResult *)tableResultForRow:(NSInteger)row;
 
-// Reset due to a query restart.  The default implementation selects the
-// first row of the results table.
-- (void)reset;
-
 // Return the most recently calculated table height to properly show ourself.
 - (CGFloat)tableHeight;
-
-// Determines if the provided selector is a selection movement selector,
-// performs it if so, and returns whether it was performed.
-- (BOOL)performSelectionMovementSelector:(SEL)selector;
-
-// Select previous, next, first or last rows in the results table.
-- (void)moveUp:(id)sender;
-- (void)moveDown:(id)sender;
-- (void)scrollToBeginningOfDocument:(id)sender;
-- (void)scrollToEndOfDocument:(id)sender;
-- (void)scrollPageUp:(id)sender;
-- (void)scrollPageDown:(id)sender;
 
 // Respond to a click in the path control.
 - (void)pathControlClick:(id)sender;
