@@ -80,17 +80,7 @@ NSString *const kHGSExtensionAccount = @"HGSExtensionAccount";
     NSString *name 
       = [configuration objectForKey:kHGSExtensionUserVisibleNameKey];
     if (name) {
-      // First check our InfoPlist.strings file
-      NSString *localizedName = [bundle_ localizedStringForKey:name 
-                                                         value:@"NOT_FOUND" 
-                                                         table:@"InfoPlist"];
-      if ([localizedName isEqualToString:@"NOT_FOUND"]) {
-        // Then our Localizable.strings file
-        localizedName = [bundle_ localizedStringForKey:name 
-                                                 value:nil 
-                                                 table:nil];
-      }
-      name = localizedName; 
+      name = [bundle_ qsb_localizedInfoPListStringForKey:name];
     }
     NSString *iconPath
       = [configuration objectForKey:kHGSExtensionIconImagePathKey];
@@ -319,12 +309,51 @@ NSString *const kHGSExtensionAccount = @"HGSExtensionAccount";
   }
   return image;
 }
-      
+
 - (NSString*)description {
   return [NSString stringWithFormat:@"%@<%p> identifier: %@, name: %@, "
           @"userVisible: %d", 
           [self class], self, [self identifier], [self displayName],
           [self userVisible]];
+}
+
+@end
+
+@implementation NSSet (HGSExtension)
+
++ (NSSet *)qsb_setFromId:(id)value {  
+  NSSet *result = nil;
+  if (!value) {
+    result = nil;
+  } else if ([value isKindOfClass:[NSString class]]) {
+    result = [NSSet setWithObject:value];
+  } else if ([value isKindOfClass:[NSArray class]]) {
+    result = [NSSet setWithArray:value];
+  } else if ([value isKindOfClass:[NSSet class]]) {
+    result = value;
+  } else {
+    HGSLog(@"Bad Value Type %@ for qsb_setFromId", value);
+  }
+  return result;
+}
+
+@end
+
+@implementation NSBundle (HGSExtension)
+- (NSString *)qsb_localizedInfoPListStringForKey:(NSString *)key {
+  NSString *localizedName = nil;
+  if (key) {
+    localizedName = [self localizedStringForKey:key 
+                                          value:@"QSB_NOT_FOUND_VALUE" 
+                                          table:@"InfoPlist"];
+    if ([localizedName isEqualToString:@"QSB_NOT_FOUND_VALUE"]) {
+      // Then our Localizable.strings file
+      localizedName = [self localizedStringForKey:key 
+                                            value:key 
+                                            table:nil];
+    }
+  }
+  return localizedName;
 }
 
 @end

@@ -33,9 +33,18 @@
 
 #import "GTMSenTestCase.h"
 #import "HGSExtension.h"
+
 #import <OCMock/OCMock.h>
 
+#import "HGSBundle.h"
+
 @interface HGSExtensionTest : GTMTestCase 
+@end
+
+@interface NSSet_HGSExtensionTest : GTMTestCase 
+@end
+
+@interface NSBundle_HGSExtensionTest : GTMTestCase 
 @end
 
 @implementation HGSExtensionTest
@@ -121,7 +130,7 @@
   STAssertNotNil(imagePath, nil);
   [[[bundleMock stub] andReturn:imagePath] pathForImageResource:@"testPath"];
   [[[bundleMock stub] andReturn:@"testName"] 
-   localizedStringForKey:@"testName" value:@"NOT_FOUND" table:@"InfoPlist"];
+   qsb_localizedInfoPListStringForKey:@"testName"];
   HGSExtension *extension 
     = [[[HGSExtension alloc] initWithConfiguration:config] autorelease];
   STAssertNotNil(extension, nil);
@@ -140,13 +149,64 @@
      @"testPath", kHGSExtensionIconImagePathKey,
      nil];
   [[[bundleMock stub] andReturn:@"testName"] 
-   localizedStringForKey:@"testName" value:@"NOT_FOUND" table:@"InfoPlist"];
+   qsb_localizedInfoPListStringForKey:@"testName"];
   [[[bundleMock stub] andReturn:@"imagePath"] pathForImageResource:@"testPath"];
   extension 
     = [[[HGSExtension alloc] initWithConfiguration:config] autorelease];
   STAssertNotNil(extension, nil);
   icon = [extension icon];
   STAssertNotNil(icon, nil);
+}
+
+@end
+
+@implementation NSSet_HGSExtensionTest
+
+- (void)test_qsb_setFromId {
+  id value = nil;
+  NSSet *set = [NSSet qsb_setFromId:value];
+  STAssertNil(set, nil);
+  
+  value = @"Foo";
+  set = [NSSet qsb_setFromId:value];
+  STAssertTrue([set containsObject:value], nil);
+
+  value = [NSArray arrayWithObjects:@"Foo", @"Bar", nil];
+  set = [NSSet qsb_setFromId:value];
+  SEL sortSel = @selector(caseInsensitiveCompare:);
+  STAssertEqualObjects([[set allObjects] sortedArrayUsingSelector:sortSel], 
+                       [value sortedArrayUsingSelector:sortSel], nil);
+  
+  value = [NSSet setWithObjects:@"Foo", @"Bar", nil];
+  set = [NSSet qsb_setFromId:value];
+  STAssertEqualObjects(set, value, nil);
+  
+  value = [NSNumber numberWithInt:0];
+  set = [NSSet qsb_setFromId:value];
+  STAssertNil(set, nil);
+}
+
+@end
+
+@implementation NSBundle_HGSExtensionTest
+
+- (void)test_qsb_localizedInfoPListStringForKey {
+  NSBundle *bundle = HGSGetPluginBundle();
+  STAssertNotNil(bundle, nil);
+  
+  NSString *string 
+    = [bundle qsb_localizedInfoPListStringForKey:@"^Localize Me Localizable.strings"];
+  STAssertEqualObjects(string, @"Localize Me Localizable.strings", nil);
+  
+  string 
+    = [bundle qsb_localizedInfoPListStringForKey:@"^Localize Me InfoPlist.strings"];
+  STAssertEqualObjects(string, @"Localize Me InfoPlist.strings", nil);
+  
+  string = [bundle qsb_localizedInfoPListStringForKey:@"^No localized string"];
+  STAssertEqualObjects(string, @"^No localized string", nil);
+  
+  string = [bundle qsb_localizedInfoPListStringForKey:nil];
+  STAssertNil(string, nil);
 }
 
 @end

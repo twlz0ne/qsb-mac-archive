@@ -165,6 +165,36 @@
   Finally attempts to get an image treating nameOrPathOrExtension as a fileType.
 */
 - (NSImage *)imageNamed:(NSString *)nameOrPathOrExtension;
+
+@end
+
+/*!
+ Extensions to NSSet to make it easier to read values in from configuration
+ dictionaries.
+*/
+@interface NSSet (HGSExtension)
+
+/*!
+ Given a string, array, or a set, will convert it into a set.
+ Useful for reading configuration dictionaries.
+*/
++ (NSSet *)qsb_setFromId:(id)value;
+
+@end
+
+/*!
+ Extensions to NSBundle to make it easier to read values in from configuration
+ dictionaries.
+*/
+@interface NSBundle (HGSExtension)
+
+/*!
+ Given a key, will look for it first in InfoPList.strings, and then
+ in Localizable.strings attempting to localize it.
+ Will return string, if no localized version is found.
+*/
+- (NSString *)qsb_localizedInfoPListStringForKey:(NSString *)key;
+
 @end
 
 #pragma mark Extension keys
@@ -173,19 +203,23 @@
   String which is the class of the extension. Required.
 */
 extern NSString *const kHGSExtensionClassKey;
+
 /*!
   String giving the points to which to attach the extension. Required.
 */
 extern NSString *const kHGSExtensionPointKey;
+
 /*!
   String which is the reverse DNS identifier of the extension. Required.
 */
 extern NSString *const kHGSExtensionIdentifierKey;
+
 /*!
   String which is the user-visible name of the extension. Optional.
   Will use plugin display name if not supplied.
 */
 extern NSString *const kHGSExtensionUserVisibleNameKey;
+
 /*!
   Extension's icon image. This can be requested through defaultObjectForKey but
   cannot be set in the initial configuration, because we want to discourage
@@ -193,49 +227,58 @@ extern NSString *const kHGSExtensionUserVisibleNameKey;
   expect a 128x128 image.
 */
 extern NSString *const kHGSExtensionIconImageKey;
+
 /*!
   String which is the path to an icon image. The path can either just be a
   name, in which case it will be looked for in the extension bundle, or a full
   path.
 */
 extern NSString *const kHGSExtensionIconImagePathKey;
+
 /*!
   NSNumber (BOOL) indicating if extension is enabled. Optional. Defaults
   to YES.
 */
 extern NSString *const kHGSExtensionEnabledKey;
+
 /*!
   NSBundle bundle associated with the extension
 */
 extern NSString *const kHGSExtensionBundleKey;
+
 /*!
   Types of accounts in which the extension is interested.  This may be a
   single NSString specifying the account type, or an array of NSStrings.
   The account type is typically expressed in reverse-DNS format.
 */
 extern NSString *const kHGSExtensionDesiredAccountTypes;
+
 /*!
   Type of accounts in which the extension is offering.  Appropriate only
   for extensions of type HGSAccountType.
 */
 extern NSString *const kHGSExtensionOfferedAccountType;
+
 /*!
   Class name of the account class deriving from HGSAccount which the
   extension is offering.  Appropriate only for extensions of type
   HGSAccountType.
 */
 extern NSString *const kHGSExtensionOfferedAccountClass;
+
 /*!
   YES if the extension presented to the user in the preferences panel.  If this
   is not present then YES is assumed.
 */
 extern NSString *const kHGSExtensionIsUserVisible;
+
 /*!
   YES if the extension is to be enabled by default.  If this key is _not_
   present, YES is assumed, except for account-dependent sources, in which case
   NO is assumed.
 */
 extern NSString *const kHGSExtensionIsEnabledByDefault;
+
 /*!
   Account assigned to the extension. (id<HGSAccount>)
 */

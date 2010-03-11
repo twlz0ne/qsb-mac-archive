@@ -40,5 +40,9 @@
 			<string>^The file you want to manipulate.</string>
 		</dict>
 	</array>
+	<key>LocalizedKeyInfoPlistStringsTest</key>
+	<string>^Localize Me InfoPlist.strings</string>
+	<key>LocalizedKeyLocalizableTest</key>
+	<string>^Localize Me Localizable.strings</string>
 </dict>
 </plist>
