@@ -161,7 +161,7 @@ static NSString *const kAccountType = @"AccountType";
        @"IDENTIFIER F", kHGSExtensionIdentifierKey,
        @"CLASS NAME F", kHGSExtensionClassKey,
        @"EXTENSION POINT F", kHGSExtensionPointKey,
-       [NSNumber numberWithBool:YES], kHGSExtensionIsEnabledByDefault,
+       [NSNumber numberWithBool:YES], kHGSExtensionIsEnabledByDefaultKey,
        nil];
   protoExtension
     = [[[HGSProtoExtension alloc] initWithConfiguration:configurationF
@@ -178,7 +178,7 @@ static NSString *const kAccountType = @"AccountType";
        @"CLASS NAME J", kHGSExtensionClassKey,
        @"EXTENSION POINT J", kHGSExtensionPointKey,
        [NSNumber numberWithBool:YES], kHGSExtensionEnabledKey,
-       kAccountType, kHGSExtensionDesiredAccountTypes,
+       kAccountType, kHGSExtensionDesiredAccountTypesKey,
        nil];
   id pluginMockJ = [OCMockObject mockForClass:[HGSPlugin class]];
   [[[pluginMockJ expect] andReturn:@"PLUGIN J"] displayName];
@@ -218,7 +218,7 @@ static NSString *const kAccountType = @"AccountType";
        @"CLASS NAME K", kHGSExtensionClassKey,
        [NSNumber numberWithBool:YES], kHGSExtensionEnabledKey,
        kHGSAccountsExtensionPoint, kHGSExtensionPointKey,
-       kAccountType, kHGSExtensionDesiredAccountTypes,
+       kAccountType, kHGSExtensionDesiredAccountTypesKey,
        bundleMock, kHGSExtensionBundleKey,
        nil];
   id pluginMockK = [OCMockObject mockForClass:[HGSPlugin class]];
@@ -243,7 +243,7 @@ static NSString *const kAccountType = @"AccountType";
        @"CLASS NAME G", kHGSExtensionClassKey,
        @"EXTENSION POINT G", kHGSExtensionPointKey,
        [NSNumber numberWithBool:YES], kHGSExtensionEnabledKey,
-       @"ACCOUNT TYPE G", kHGSExtensionDesiredAccountTypes,
+       @"ACCOUNT TYPE G", kHGSExtensionDesiredAccountTypesKey,
        nil];
   id pluginMockG = [OCMockObject mockForClass:[HGSPlugin class]];
   [[[pluginMockG expect] andReturn:@"PLUGIN G"] displayName];

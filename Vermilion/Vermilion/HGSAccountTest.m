@@ -291,8 +291,8 @@ static NSString *const kTestAccountTypeName = @"Test Account Type";
        kTestAccountTypeID, kHGSExtensionIdentifierKey,
        kTestAccountTypeName, kHGSExtensionUserVisibleNameKey,
        kHGSAccountTypesExtensionPoint, kHGSExtensionPointKey,
-       kTestAccountType, kHGSExtensionOfferedAccountType,
-       kTestAccountClass, kHGSExtensionOfferedAccountClass,
+       kTestAccountType, kHGSExtensionOfferedAccountTypeKey,
+       kTestAccountClass, kHGSExtensionOfferedAccountClassKey,
        nil];
   [[[bundleMock stub] andReturn:kTestAccountTypeName] 
    qsb_localizedInfoPListStringForKey:kTestAccountTypeName];

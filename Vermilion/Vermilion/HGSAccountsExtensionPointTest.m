@@ -295,8 +295,8 @@ static NSString *const kAccountTypeAName = @"Account Type A";
        kAccountTypeAID, kHGSExtensionIdentifierKey,
        kAccountTypeAName, kHGSExtensionUserVisibleNameKey,
        kHGSAccountTypesExtensionPoint, kHGSExtensionPointKey,
-       kAccountTypeA, kHGSExtensionOfferedAccountType,
-       kAccountAClass, kHGSExtensionOfferedAccountClass,
+       kAccountTypeA, kHGSExtensionOfferedAccountTypeKey,
+       kAccountAClass, kHGSExtensionOfferedAccountClassKey,
        nil];
   HGSProtoExtension *accountTypeProto
     = [[[HGSProtoExtension alloc] initWithConfiguration:configuration

@@ -83,7 +83,7 @@
                                  bundleMock, kHGSExtensionBundleKey,
                                  @"fakeIdentifier", kHGSExtensionIdentifierKey,
                                  @"fakeAction", kHGSExtensionUserVisibleNameKey,
-                                 mockAccount, kHGSExtensionAccount,
+                                 mockAccount, kHGSExtensionAccountKey,
                                  nil];
   BadUploadAction *missingUploadURLAction
     = [[[BadUploadAction alloc] initWithConfiguration:configuration] autorelease];

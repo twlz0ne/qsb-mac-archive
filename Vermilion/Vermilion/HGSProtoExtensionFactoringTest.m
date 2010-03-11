@@ -130,8 +130,8 @@ static NSString *const kAccountType = @"FactorableAccount";
        kAccountTypeID, kHGSExtensionIdentifierKey,
        kAccountTypeName, kHGSExtensionUserVisibleNameKey,
        kHGSAccountTypesExtensionPoint, kHGSExtensionPointKey,
-       kAccountType, kHGSExtensionOfferedAccountType,
-       kAccountClass, kHGSExtensionOfferedAccountClass,
+       kAccountType, kHGSExtensionOfferedAccountTypeKey,
+       kAccountClass, kHGSExtensionOfferedAccountClassKey,
        nil];
   HGSProtoExtension *accountTypeProto
     = [[[HGSProtoExtension alloc] initWithConfiguration:configuration
@@ -172,8 +172,8 @@ static NSString *const kAccountType = @"FactorableAccount";
        @"CLASS NAME", kHGSExtensionClassKey,
        kHGSAccountsExtensionPoint, kHGSExtensionPointKey,
        [NSNumber numberWithBool:YES], kHGSExtensionEnabledKey,
-       kAccountType, kHGSExtensionDesiredAccountTypes,
-       [NSNumber numberWithBool:YES], kHGSExtensionIsUserVisible,
+       kAccountType, kHGSExtensionDesiredAccountTypesKey,
+       [NSNumber numberWithBool:YES], kHGSExtensionIsUserVisibleKey,
        nil];
   HGSProtoExtension *protoExtensionI
     = [[[HGSProtoExtension alloc] initWithConfiguration:factorConfiguration
