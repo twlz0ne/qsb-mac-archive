@@ -682,7 +682,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   SEL action = [menuItem action];
   SEL showSearchWindowSel = @selector(showSearchWindow:);
   SEL hideSearchWindowSel = @selector(hideSearchWindow:);
-  BOOL searchWindowActive = [[self window] isVisible];
+  BOOL searchWindowActive = ![[self window] ignoresMouseEvents];
   if (action == showSearchWindowSel && searchWindowActive) {
     [menuItem setAction:hideSearchWindowSel];
     [menuItem setTitle:NSLocalizedString(@"Hide Quick Search Box", nil)];
