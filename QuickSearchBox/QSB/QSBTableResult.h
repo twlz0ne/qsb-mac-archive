@@ -38,9 +38,8 @@
  */
 
 @class HGSScoredResult;
-@class QSBSearchViewController;
-@class HGSTokenizedString;
 @class QSBCategory;
+@class QSBSearchController;
 
 /*!
   Abstract base class for showing results in our tables
@@ -119,7 +118,7 @@
 /*!
   Attempt to perform the default action on the item.
 */
-- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller;
+- (void)performAction:(id)sender;
 
 /*!
   Copies the contents of the result to the pasteboard.
@@ -162,10 +161,13 @@
 /*!
   A fold (eg Show more results or Show Top Results).
 */
-@interface QSBFoldTableResult : QSBTableResult
+@interface QSBFoldTableResult : QSBTableResult {
+ @private
+  QSBSearchController *controller_;
+}
 
-+ (id)tableResult;
-
++ (id)tableResultWithSearchController:(QSBSearchController *)controller;
+- (id)initWithSearchController:(QSBSearchController *)controller;
 @end
 
 /*!

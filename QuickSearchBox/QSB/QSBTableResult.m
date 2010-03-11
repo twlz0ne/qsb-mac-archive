@@ -33,24 +33,23 @@
 #import "QSBTableResult.h"
 #import <Vermilion/Vermilion.h>
 #import <QSBPluginUI/QSBPluginUI.h>
-#import "GTMMethodCheck.h"
-#import "GTMNSString+URLArguments.h"
+#import <GTM/GTMNSString+HTML.h>
+#import <GTM/GTMNSObject+KeyValueObserving.h>
+#import <GTM/GTMMethodCheck.h>
+#import <GTM/GTMGoogleSearch.h>
+
 #import "NSAttributedString+Attributes.h"
-#import "GTMNSString+HTML.h"
-#import "QSBSearchViewController.h"
-#import "QSBMoreResultsViewController.h"
 #import "NSString+ReadableURL.h"
 #import "QSBTopResultsRowViewControllers.h"
-#import "GTMNSObject+KeyValueObserving.h"
-#import "GTMMethodCheck.h"
-#import "GTMGoogleSearch.h"
 #import "ClipboardSearchSource.h"
+#import "QSBSearchController.h"
 
 typedef enum {
   kQSBResultDescriptionTitle = 0,
   kQSBResultDescriptionSnippet,
   kQSBResultDescriptionSourceURL,
   kQSBResultDescriptionShowAll,
+  kQSBResultDescriptionFold,
 } QSBResultDescriptionItemType;
 
 static NSString *const kClipboardCopyActionIdentifier
@@ -190,8 +189,8 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   return nil;
 }
 
-- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
-  return NO;
+- (void)performAction:(id)sender {
+  // Do nothing
 }
 
 - (NSString *)displayName {
@@ -207,24 +206,33 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   // Note: nothing should be done here that changes the string metrics,
   // since computations may already have been done based on string sizes.
   [string addAttributes:gBaseStringAttributes_];
-  if (itemType == kQSBResultDescriptionSnippet) {
+  switch (itemType) {
+    case kQSBResultDescriptionSnippet:
     [string addAttribute:NSForegroundColorAttributeName
                    value:[NSColor grayColor]];
-  } else if (itemType == kQSBResultDescriptionSourceURL) {
-    [string addAttribute:NSForegroundColorAttributeName
-                   value:[NSColor colorWithCalibratedRed:(float)0x00/0xFF
-                                                   green:(float)0x4c/0xFF
-                                                    blue:(float)0x00/0xFF
-                                                   alpha:0.5]];
-  } else if (itemType == kQSBResultDescriptionTitle) {
-    [string addAttribute:NSForegroundColorAttributeName
-                   value:[NSColor blackColor]];
-  } else if (itemType == kQSBResultDescriptionShowAll) {
-    NSColor *secondaryColor = [[self class] secondaryTitleColor];
-    [string addAttribute:NSForegroundColorAttributeName
-                   value:secondaryColor];
-  } else {
-    HGSLogDebug(@"Unknown itemType: %d", itemType);
+      break;
+    case kQSBResultDescriptionSourceURL:
+      [string addAttribute:NSForegroundColorAttributeName
+                     value:[NSColor colorWithCalibratedRed:(float)0x00/0xFF
+                                                     green:(float)0x4c/0xFF
+                                                      blue:(float)0x00/0xFF
+                                                     alpha:0.5]];
+      break;
+    case kQSBResultDescriptionTitle:
+      [string addAttribute:NSForegroundColorAttributeName
+                     value:[NSColor blackColor]];
+      break;
+    case kQSBResultDescriptionShowAll:
+      [string addAttribute:NSForegroundColorAttributeName
+                     value:[[self class] secondaryTitleColor]];
+      break;
+    case kQSBResultDescriptionFold:
+      [string addAttribute:NSFontAttributeName 
+                     value:[NSFont systemFontOfSize:12]];
+      break;
+    default:
+      HGSLogDebug(@"Unknown itemType: %d", itemType);
+      break;
   }
 }
 
@@ -376,8 +384,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   // We want to pivot on non-suggestions, non-qsb stuff, and non-actions.
   HGSScoredResult *result = [self representedResult];
   BOOL pivotable = YES;
-  if ([result conformsToType:kHGSTypeGoogleSuggest]) pivotable = YES;
-  if ([result conformsToType:kHGSTypeAction]) pivotable = NO;
+  if ([result conformsToType:kHGSTypeGoogleSuggest]) pivotable = NO;
+  if ([result conformsToType:kHGSTypeAction]) {
+    HGSAction *action = [result valueForKey:kHGSObjectAttributeDefaultActionKey];
+    pivotable = [[action arguments] count] > 0;
+  }
+    
   return pivotable;
 }
 
@@ -417,17 +429,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return rowViewClass;
 }
 
-- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
-  HGSScoredResult *scoredResult = [self representedResult];
-  HGSAction *action
-    = [scoredResult valueForKey:kHGSObjectAttributeDefaultActionKey];
-  if (action) {
-    HGSResultArray *results = [HGSResultArray arrayWithResult:scoredResult];
-    [controller performAction:action withResults:results];
-  } else {
-    HGSLog(@"Unable to get default action for %@", scoredResult);
-  }
-  return YES;
+- (void)performAction:(id)sender {
+  [NSApp sendAction:@selector(qsb_pickCurrentSourceTableResult:) to:nil from:self];
 }
 
 - (NSArray *)displayPath {
@@ -611,17 +614,39 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 @implementation QSBFoldTableResult
 
-+ (id)tableResult {
-  return [[[[self class] alloc] init] autorelease];
++ (id)tableResultWithSearchController:(QSBSearchController *)controller {  
+  return [[[[self class] alloc] initWithSearchController:controller] autorelease];
+}
+
+- (id)initWithSearchController:(QSBSearchController *)controller {
+  if ((self = [super init])) {
+    controller_ = [controller retain];
+  }
+  return self;
+}
+
+- (void)dealloc {
+  [controller_ release];
+  [super dealloc];
 }
 
 - (Class)topResultsRowViewControllerClass {
   return [QSBTopFoldRowViewController class];
 }
 
-- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
-  [controller toggleTopMoreViews];
-  return YES;
+- (void)performAction:(id)sender {
+  [NSApp sendAction:@selector(qsb_showMoreResults:) to:nil from:self];
+}
+
+- (NSMutableAttributedString *)genericTitleLine {
+  NSString *title = [controller_ categorySummaryString];
+  return [self mutableAttributedStringWithString:title];
+}
+
+- (NSAttributedString *)titleString {
+  NSMutableAttributedString *resultString = [self genericTitleLine];
+  [self addAttributes:resultString elementType:kQSBResultDescriptionFold];
+  return resultString;
 }
 
 @end
@@ -668,11 +693,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return resultString;
 }
 
-- (BOOL)performDefaultActionWithSearchViewController:(QSBSearchViewController*)controller {
-  QSBMoreResultsViewController *viewController
-    = [controller moreResultsController];
-  [viewController addShowAllCategory:category_];
-  return YES;
+- (void)performAction:(id)sender {
+  [NSApp sendAction:@selector(qsb_showAllForSelectedCategory:) to:nil from:self];
 }
 
 - (NSString *)description {
