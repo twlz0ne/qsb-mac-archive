@@ -554,6 +554,146 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
 }
 
+- (NSArray *)resultsFromObjects:(PyObject *)pythonResults 
+                 tokenizedQuery:(HGSTokenizedString *)tokenizedQuery 
+                         source:(HGSSearchSource *)source {
+  NSMutableArray *results = nil;
+  if (pythonResults) {
+    if (PyList_Check(pythonResults)) {
+      Py_ssize_t resultCount = PyList_Size(pythonResults);
+      results = [NSMutableArray arrayWithCapacity:resultCount];
+      for (Py_ssize_t i = 0; i < resultCount; ++i) {
+        PyObject *dict = PyList_GET_ITEM(pythonResults, i);
+        char *identifier = NULL, *displayName = NULL, *snippet = NULL;
+        char *mainItem = NULL, *otherItems = NULL;
+        char *image = NULL, *defaultAction = NULL;
+        NSString *type = kHGSTypePython;
+        if (PyDict_Check(dict)) {
+          NSMutableDictionary *privateValues 
+            = [NSMutableDictionary dictionary];
+          PyObject *pyKey, *pyValue;
+          Py_ssize_t pos = 0;
+          while (PyDict_Next(dict, &pos, &pyKey, &pyValue)) {
+            if (PyString_Check(pyKey)) {
+              NSString *key = [NSString
+                               stringWithUTF8String:PyString_AsString(pyKey)];
+              if ([key isEqual:kHGSObjectAttributeURIKey]) {
+                if (PyString_Check(pyValue)) {
+                  identifier = PyString_AsString(pyValue);
+                }
+              } else if ([key isEqual:kHGSObjectAttributeNameKey]) {
+                if (PyString_Check(pyValue)) {
+                  displayName = PyString_AsString(pyValue);
+                }
+              } else if ([key isEqual:kHGSObjectAttributeSnippetKey]) {
+                if (PyString_Check(pyValue)) {
+                  snippet = PyString_AsString(pyValue);
+                }
+              } else if ([key isEqual:kHGSObjectAttributeIconPreviewFileKey]) {
+                if (PyString_Check(pyValue)) {
+                  image = PyString_AsString(pyValue);
+                }
+              } else if ([key isEqual:kHGSObjectAttributeDefaultActionKey]) {
+                if (PyString_Check(pyValue)) {
+                  defaultAction = PyString_AsString(pyValue);
+                }
+              } else if ([key isEqual:kHGSObjectAttributeTypeKey]) {
+                if (PyString_Check(pyValue)) {
+                  type = [NSString stringWithUTF8String:
+                          PyString_AsString(pyValue)];
+                }
+              } else if ([key isEqual:kHGSPythonResultMainItemStringKey]) {
+                if (PyString_Check(pyValue)) {
+                  mainItem = PyString_AsString(pyValue);
+                }
+              } else if ([key isEqual:kHGSPythonResultOtherItemsStringKey]) {
+                if (PyString_Check(pyValue)) {
+                  otherItems = PyString_AsString(pyValue);
+                }
+              } else if (pyValue) {
+                HGSPythonObject *pyObj 
+                  = [HGSPythonObject pythonObjectWithObject:pyValue];
+                [privateValues setObject:pyObj forKey:key];
+              }
+            }
+          }
+          if (identifier) {
+            NSString *displayNameString = nil;
+            if (displayName) {
+              displayNameString = [NSString stringWithUTF8String:displayName];
+            }
+            // Score the main term and then the other terms, giving the
+            // other terms a 50% weight.
+            CGFloat score = 0.0;
+            HGSTokenizedString *matchedString = nil;
+            NSIndexSet *matchedIndexes = nil;
+            if (mainItem && tokenizedQuery) {
+              NSString *itemString = [NSString stringWithUTF8String:mainItem];
+              HGSTokenizedString *mainItemTokenized 
+                = [HGSTokenizer tokenizeString:itemString];
+
+              itemString = [NSString stringWithUTF8String:otherItems];
+              NSArray *otherItemsArray
+                = [itemString componentsSeparatedByString:@" "];
+             
+              NSArray *otherItemsTokenized
+                = [HGSTokenizer tokenizeStrings:otherItemsArray];
+              score = HGSScoreTermForMainAndOtherItems(tokenizedQuery, 
+                                                       mainItemTokenized,
+                                                       otherItemsTokenized,
+                                                       &matchedString,
+                                                       &matchedIndexes);
+            }
+            
+            if (score > 0.0 || !tokenizedQuery) {
+              NSMutableDictionary *attributes 
+                = [NSMutableDictionary dictionary];
+              NSString *urlString = [NSString stringWithUTF8String:identifier];
+              if (snippet && strlen(snippet) > 0) {
+                [attributes setObject:[NSString stringWithUTF8String:snippet]
+                               forKey:kHGSObjectAttributeSnippetKey];
+              }
+              if (defaultAction && strlen(defaultAction) > 0) {
+                HGSAction *action 
+                  = [[HGSExtensionPoint actionsPoint] extensionWithIdentifier:
+                     [NSString stringWithUTF8String:defaultAction]];
+                if (action) {
+                  [attributes setObject:action 
+                                 forKey:kHGSObjectAttributeDefaultActionKey];
+                }
+              }
+              if (image && strlen(image) > 0) {
+                NSString *imageString = [NSString stringWithUTF8String:image];
+                NSImage *img = [source imageNamed:imageString];
+                if (img) {
+                  [attributes setObject:img
+                                 forKey:kHGSObjectAttributeImmediateIconKey];
+                }
+              }
+              [attributes setObject:privateValues 
+                           forKey:kHGSPythonPrivateValuesKey];
+              HGSScoredResult *scoredResult 
+                = [HGSScoredResult resultWithURI:urlString
+                                            name:displayNameString
+                                            type:type
+                                          source:source
+                                      attributes:attributes
+                                           score:score
+                                           flags:0
+                                     matchedTerm:matchedString 
+                                  matchedIndexes:matchedIndexes];
+              if (scoredResult) {
+                [results addObject:scoredResult];
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return results;
+}
+
 + (NSString *)stringAttribute:(NSString *)attr fromObject:(PyObject *)obj {
   NSString *result = nil;
   if (obj) {
@@ -732,139 +872,13 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
   
   PyObject *pythonResults = NULL;
   if (PyArg_ParseTuple(args, "O", &pythonResults)) {
-    NSMutableArray *results = [NSMutableArray array];
-    // Generate a "real" result from each of the Python results
+    HGSTokenizedString *queryString = [self->query_ tokenizedQueryString];
+    HGSSearchSource *source = [self->operation_ source];
+    NSArray *results 
+      = [[HGSPython sharedPython] resultsFromObjects:pythonResults
+                                      tokenizedQuery:queryString
+                                              source:source];
     if (pythonResults) {
-      if (PyList_Check(pythonResults)) {
-        Py_ssize_t resultCount = PyList_Size(pythonResults);
-        for (Py_ssize_t i = 0; i < resultCount; ++i) {
-          PyObject *dict = PyList_GET_ITEM(pythonResults, i);
-          char *identifier = NULL, *displayName = NULL, *snippet = NULL;
-          char *mainItem = NULL, *otherItems = NULL;
-          char *image = NULL, *defaultAction = NULL;
-          NSString *type = kHGSTypePython;
-          if (PyDict_Check(dict)) {
-            NSMutableDictionary *privateValues 
-              = [NSMutableDictionary dictionary];
-            PyObject *pyKey, *pyValue;
-            Py_ssize_t pos = 0;
-            while (PyDict_Next(dict, &pos, &pyKey, &pyValue)) {
-              if (PyString_Check(pyKey)) {
-                NSString *key = [NSString
-                                 stringWithUTF8String:PyString_AsString(pyKey)];
-                if ([key isEqual:kHGSObjectAttributeURIKey]) {
-                  if (PyString_Check(pyValue)) {
-                    identifier = PyString_AsString(pyValue);
-                  }
-                } else if ([key isEqual:kHGSObjectAttributeNameKey]) {
-                  if (PyString_Check(pyValue)) {
-                    displayName = PyString_AsString(pyValue);
-                  }
-                } else if ([key isEqual:kHGSObjectAttributeSnippetKey]) {
-                  if (PyString_Check(pyValue)) {
-                    snippet = PyString_AsString(pyValue);
-                  }
-                } else if ([key isEqual:kHGSObjectAttributeIconPreviewFileKey]) {
-                  if (PyString_Check(pyValue)) {
-                    image = PyString_AsString(pyValue);
-                  }
-                } else if ([key isEqual:kHGSObjectAttributeDefaultActionKey]) {
-                  if (PyString_Check(pyValue)) {
-                    defaultAction = PyString_AsString(pyValue);
-                  }
-                } else if ([key isEqual:kHGSObjectAttributeTypeKey]) {
-                  if (PyString_Check(pyValue)) {
-                    type = [NSString stringWithUTF8String:
-                            PyString_AsString(pyValue)];
-                  }
-                } else if ([key isEqual:kHGSPythonResultMainItemStringKey]) {
-                  if (PyString_Check(pyValue)) {
-                    mainItem = PyString_AsString(pyValue);
-                  }
-                } else if ([key isEqual:kHGSPythonResultOtherItemsStringKey]) {
-                  if (PyString_Check(pyValue)) {
-                    otherItems = PyString_AsString(pyValue);
-                  }
-                } else if (pyValue) {
-                  HGSPythonObject *pyObj 
-                    = [HGSPythonObject pythonObjectWithObject:pyValue];
-                  [privateValues setObject:pyObj forKey:key];
-                }
-              }
-            }
-            if (identifier) {
-              NSString *displayNameString = nil;
-              if (displayName) {
-                displayNameString = [NSString stringWithUTF8String:displayName];
-              }
-              // Score the main term and then the other terms, giving the
-              // other terms a 50% weight.
-              CGFloat score = 0.0;
-              HGSTokenizedString *matchedString = nil;
-              NSIndexSet *matchedIndexes = nil;
-              if (mainItem) {
-                NSString *itemString = [NSString stringWithUTF8String:mainItem];
-                HGSTokenizedString *mainItemTokenized 
-                  = [HGSTokenizer tokenizeString:itemString];
-
-                itemString = [NSString stringWithUTF8String:otherItems];
-                NSArray *otherItemsArray
-                  = [itemString componentsSeparatedByString:@" "];
-               
-                NSArray *otherItemsTokenized
-                  = [HGSTokenizer tokenizeStrings:otherItemsArray];
-                HGSTokenizedString *queryString 
-                  = [self->query_ tokenizedQueryString];
-                score = HGSScoreTermForMainAndOtherItems(queryString, 
-                                                         mainItemTokenized,
-                                                         otherItemsTokenized,
-                                                         &matchedString,
-                                                         &matchedIndexes);
-              }
-              
-              if (score > 0.0) {
-                NSMutableDictionary *attributes 
-                  = [NSMutableDictionary dictionary];
-                NSString *urlString = [NSString stringWithUTF8String:identifier];
-                if (snippet && strlen(snippet) > 0) {
-                  [attributes setObject:[NSString stringWithUTF8String:snippet]
-                                 forKey:kHGSObjectAttributeSnippetKey];
-                }
-                if (defaultAction && strlen(defaultAction) > 0) {
-                  HGSAction *action 
-                    = [[HGSExtensionPoint actionsPoint] extensionWithIdentifier:
-                       [NSString stringWithUTF8String:defaultAction]];
-                  if (action) {
-                    [attributes setObject:action 
-                                   forKey:kHGSObjectAttributeDefaultActionKey];
-                  }
-                }
-                if (image && strlen(image) > 0) {
-                  NSString *imageURLString = [NSString stringWithUTF8String:image];
-                  if (imageURLString) {
-                    [attributes setObject:imageURLString
-                                   forKey:kHGSObjectAttributeIconPreviewFileKey];
-                  }
-                }
-                [attributes setObject:privateValues 
-                             forKey:kHGSPythonPrivateValuesKey];
-                HGSScoredResult *scoredResult 
-                  = [HGSScoredResult resultWithURI:urlString
-                                              name:displayNameString
-                                              type:type
-                                            source:[self->operation_ source]
-                                        attributes:attributes
-                                             score:score 
-                                       matchedTerm:matchedString 
-                                    matchedIndexes:matchedIndexes];
-                if (scoredResult) {
-                  [results addObject:scoredResult];
-                }
-              }
-            }
-          }
-        }
-      }
       Py_DECREF(pythonResults);
     }
     [self->operation_ setRankedResults:results];

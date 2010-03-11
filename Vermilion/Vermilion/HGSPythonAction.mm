@@ -33,6 +33,7 @@
 #import "HGSPythonAction.h"
 #import "HGSLog.h"
 #import "HGSBundle.h"
+#import "HGSResult.h"
 
 static const char *const kHGSPythonAppliesToResults = "AppliesToResults";
 static const char *const kHGSPythonPerform = "Perform";
@@ -135,37 +136,108 @@ static const char *const kHGSPythonPerform = "Perform";
   [super dealloc];
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   BOOL result = NO;
   
   HGSResultArray *directs 
     = [info objectForKey:kHGSActionDirectObjectsKey];
-  HGSResultArray *indirects 
-    = [info valueForKey:kHGSActionIndirectObjectsKey];
-  
+
   if (instance_ && directs) {
     PythonStackLock gilLock;
     HGSPython *sharedPython = [HGSPython sharedPython];
     PyObject *pyDirects = [sharedPython tupleForResults:directs];
-    PyObject *pyIndirects = [sharedPython tupleForResults:indirects];
+    
     if (pyDirects) {
+      
+      PyObject *pyIndirects = NULL;
+      NSMutableDictionary *indirects 
+        = [NSMutableDictionary dictionaryWithDictionary:info];
+      [indirects removeObjectForKey:kHGSActionDirectObjectsKey];
+      if ([indirects count]) {
+        pyIndirects = PyDict_New();
+        if (pyIndirects) {
+          for (NSString *key in indirects) {
+            HGSResultArray *indirectValues = [indirects objectForKey:key];
+            PyObject *pyIndirectValues 
+              = [sharedPython tupleForResults:indirectValues];
+            PyDict_SetItemString(pyIndirects, 
+                                 [key UTF8String], pyIndirectValues);
+            Py_DECREF(pyIndirectValues);
+          }
+        }
+      }
       PyObject *pythonResult = PyObject_CallMethodObjArgs(instance_,
                                                           perform_,
                                                           pyDirects,
                                                           pyIndirects,
                                                           NULL);
+      if (pyIndirects) {
+        Py_DECREF(pyIndirects);
+      }
+      
       if (pythonResult) {
         result = (pythonResult == Py_True);
         Py_DECREF(pythonResult);
       }
       Py_DECREF(pyDirects);
     }
-    if (pyIndirects) {
-      Py_DECREF(pyIndirects);
+  }
+  return result;
+}
+
+- (HGSResultArray *)performReturningResultsWithInfo:(NSDictionary *)info {
+  HGSResultArray* results = nil;
+  
+  HGSResultArray *directs 
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+
+  if (instance_ && directs) {
+    PythonStackLock gilLock;
+    HGSPython *sharedPython = [HGSPython sharedPython];
+    PyObject *pyDirects = [sharedPython tupleForResults:directs];
+    
+    if (pyDirects) {
+      
+      PyObject *pyIndirects = NULL;
+      NSMutableDictionary *indirects 
+        = [NSMutableDictionary dictionaryWithDictionary:info];
+      [indirects removeObjectForKey:kHGSActionDirectObjectsKey];
+      if ([indirects count]) {
+        pyIndirects = PyDict_New();
+        if (pyIndirects) {
+          for (NSString *key in indirects) {
+            HGSResultArray *indirectValues = [indirects objectForKey:key];
+            PyObject *pyIndirectValues 
+              = [sharedPython tupleForResults:indirectValues];
+            PyDict_SetItemString(pyIndirects, 
+                                 [key UTF8String], pyIndirectValues);
+            Py_DECREF(pyIndirectValues);
+          }
+        }
+      }
+      PyObject *pythonResult = PyObject_CallMethodObjArgs(instance_,
+                                                          perform_,
+                                                          pyDirects,
+                                                          pyIndirects,
+                                                          NULL);
+      if (pyIndirects) {
+        Py_DECREF(pyIndirects);
+      }
+      
+      if (pythonResult) {
+        if (PyDict_Check(pythonResult)) {
+          NSArray *array = [sharedPython resultsFromObjects:pythonResult
+                                             tokenizedQuery:nil 
+                                                     source:nil];
+          results = [HGSResultArray arrayWithResults:array];
+        }
+        Py_DECREF(pythonResult);
+      }
+      Py_DECREF(pyDirects);
     }
   }
   
-  return result;
+  return results;
 }
 
 - (BOOL)appliesToResults:(HGSResultArray *)results {

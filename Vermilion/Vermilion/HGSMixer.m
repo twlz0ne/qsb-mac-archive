@@ -42,34 +42,44 @@ inline NSInteger HGSMixerScoredResultSort(HGSScoredResult *resultA,
   NSInteger result = NSOrderedSame;
   HGSRankFlags rankFlagsA = [resultA rankFlags];
   HGSRankFlags rankFlagsB = [resultB rankFlags];
-  BOOL belowFoldA = rankFlagsA & eHGSBelowFoldRankFlag ? YES : NO;
-  BOOL belowFoldB = rankFlagsB & eHGSBelowFoldRankFlag ? YES : NO;
-  if (!belowFoldA && belowFoldB) {
+  BOOL shortcutA = rankFlagsA & eHGSShortcutRankFlag ? YES : NO;
+  BOOL shortcutB = rankFlagsB & eHGSShortcutRankFlag ? YES : NO;
+  if (shortcutA && !shortcutB) {
     result = NSOrderedAscending;
-  } else if (belowFoldA && !belowFoldB) {
+  } else if (!shortcutA && shortcutB) {
     result = NSOrderedDescending;
   } else {
-    CGFloat scoreA = [resultA score];
-    CGFloat scoreB = [resultB score];
-    if (scoreA > scoreB) {
+    BOOL belowFoldA = rankFlagsA & eHGSBelowFoldRankFlag ? YES : NO;
+    BOOL belowFoldB = rankFlagsB & eHGSBelowFoldRankFlag ? YES : NO;
+    if (!belowFoldA && belowFoldB) {
       result = NSOrderedAscending;
-    } else if (scoreA < scoreB) {
+    } else if (belowFoldA && !belowFoldB) {
       result = NSOrderedDescending;
     } else {
-      NSDate *lastUsedA = [resultA valueForKey:kHGSObjectAttributeLastUsedDateKey];
-      NSDate *lastUsedB = [resultB valueForKey:kHGSObjectAttributeLastUsedDateKey];
-      result = [lastUsedB compare:lastUsedA];
-      if (result == NSOrderedSame) {
-        NSString *normalizedA = [[resultA matchedTerm] tokenizedString];
-        NSString *normalizedB = [[resultB matchedTerm] tokenizedString];
-        result = [normalizedA compare:normalizedB];
+      CGFloat scoreA = [resultA score];
+      CGFloat scoreB = [resultB score];
+      if (scoreA > scoreB) {
+        result = NSOrderedAscending;
+      } else if (scoreA < scoreB) {
+        result = NSOrderedDescending;
+      } else {
+        NSDate *lastUsedA 
+          = [resultA valueForKey:kHGSObjectAttributeLastUsedDateKey];
+        NSDate *lastUsedB 
+          = [resultB valueForKey:kHGSObjectAttributeLastUsedDateKey];
+        result = [lastUsedB compare:lastUsedA];
         if (result == NSOrderedSame) {
-          NSUInteger urlLengthA = [[resultA uri] length];
-          NSUInteger urlLengthB = [[resultB uri] length];
-          if (urlLengthA > urlLengthB) {
-            result = NSOrderedDescending;
-          } else if (urlLengthA < urlLengthB) {
-            result = NSOrderedAscending;
+          NSString *normalizedA = [[resultA matchedTerm] tokenizedString];
+          NSString *normalizedB = [[resultB matchedTerm] tokenizedString];
+          result = [normalizedA compare:normalizedB];
+          if (result == NSOrderedSame) {
+            NSUInteger urlLengthA = [[resultA uri] length];
+            NSUInteger urlLengthB = [[resultB uri] length];
+            if (urlLengthA > urlLengthB) {
+              result = NSOrderedDescending;
+            } else if (urlLengthA < urlLengthB) {
+              result = NSOrderedAscending;
+            }
           }
         }
       }

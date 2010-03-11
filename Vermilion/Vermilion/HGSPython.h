@@ -56,6 +56,8 @@ public:
 @class HGSResult;
 @class HGSResultArray;
 @class HGSExtension;
+@class HGSSearchSource;
+@class HGSTokenizedString;
 
 @interface HGSPythonObject : NSObject {
  @private
@@ -80,6 +82,9 @@ public:
 - (PyObject *)loadModule:(NSString *)moduleName;
 - (void)appendPythonPath:(NSString *)path;
 - (PyObject *)objectForExtension:(HGSExtension *)extension;
+- (NSArray *)resultsFromObjects:(PyObject *)pythonResults 
+                 tokenizedQuery:(HGSTokenizedString *)tokenizedQuery 
+                         source:(HGSSearchSource *)source;
 @end
 
 extern const NSString *kHGSPythonPrivateValuesKey;
