@@ -39,22 +39,25 @@
 #import "GTMNSBezierPath+RoundRect.h"
 #import "GTMNSBezierPath+Shading.h"
 #import "HGSResult.h"
+#import "HGSLog.h"
 
 @interface QSBResultTableView ()
 - (CGFloat)selectionLeftInset;
 - (CGFloat)selectionRightInset;
 - (CGFloat)selectionCornerRadius;
-- (void)moveSelectionByARow:(BOOL)incrementing;
+// Determine the rows in the table view which are visible within
+// the enclosing scroll view's clip region.  If nothing is visible
+// or there are no rows return a range with a length of 0.
+- (NSRange)visibleRows;
+
+// Determine a row's visibility.
+- (BOOL)rowIsVisible:(NSInteger)row;
 @end
 
 @implementation QSBResultTableView
 
 GTM_METHOD_CHECK(NSBezierPath, gtm_fillAxiallyFrom:to:extendingStart:extendingEnd:shading:);
 GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
-
-- (BOOL)acceptsFirstResponder {
-  return NO;
-}
 
 - (void)highlightSelectionInClipRect:(NSRect)rect {
   NSInteger selectedRow = [self selectedRow];
@@ -134,51 +137,6 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
   return NO;  
 }
 
-#if 0
-// TODO(alcor): reenable this or remove depending on final UI
-- (void)drawBackgroundInClipRect:(NSRect)clipRect {
-  NSRect bounds = [self bounds];
-  bounds.origin.x += kQSBUIElementValues[kQSBUIBoundingBoxLeftOffset][uiSet_];
-  bounds.size.width -= kQSBUIElementValues[kQSBUIBoundingBoxLeftOffset][uiSet_];
-  bounds = NSInsetRect(bounds, 0.5, 0.5);
-  NSBezierPath *bezier = [NSBezierPath bezierPathWithRoundedRect:bounds
-                                                         xRadius:3.5
-                                                         yRadius:3.5];
-  [[NSColor whiteColor] set];
-  [bezier fill];
-  [[NSColor colorWithCalibratedWhite:0.0 alpha:0.15] set];
-  [bezier stroke];
-}
-#endif
-
-- (void)moveUp:(id)sender {
-  [self moveSelectionByARow:NO];
-}
-
-- (void)moveDown:(id)sender {
-  [self moveSelectionByARow:YES];
-}
-
-- (NSInteger)selectFirstSelectableRow {
-  [self selectFirstSelectableRowByIncrementing:YES
-                                    startingAt:0];
-  return [self selectedRow];
-}
-
-- (NSInteger)selectLastSelectableRow {
-  NSInteger lastRow = [self numberOfRows] - 1;
-  [self selectFirstSelectableRowByIncrementing:NO
-                                    startingAt:lastRow];
-  return [self selectedRow];
-}
-
-- (void)scrollWheel:(NSEvent *)event {
-  if ([event deltaY] < 0) {
-    [[self delegate] moveDown:self];
-  } else if ([event deltaY] > 0) {
-    [[self delegate] moveUp:self];
-  }    
-}
 
 - (BOOL)selectFirstSelectableRowByIncrementing:(BOOL)incrementing 
                                     startingAt:(NSInteger)firstRow {
@@ -211,6 +169,7 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
         byExtendingSelection:NO];
       haveSelection = YES;
     }
+    [self scrollRowToVisible:[self selectedRow]];
   }
   return haveSelection;
 }
@@ -250,22 +209,6 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
   return 0.0;
 }
 
-- (void)moveSelectionByARow:(BOOL)incrementing {
-  NSInteger rowToSelect = [self selectedRow];
-  NSInteger bottom = [self numberOfRows] - 1;
-  if (incrementing) {
-    if (rowToSelect < bottom) {
-      rowToSelect +=1;
-    }
-  } else {
-    if (rowToSelect > 0) {
-      rowToSelect -=  1;
-    }
-  }
-  [self selectFirstSelectableRowByIncrementing:incrementing 
-                                    startingAt:rowToSelect];
-}
-
 - (NSRect)adjustScroll:(NSRect)newVisible {
   NSRect adjustRect = [super adjustScroll:newVisible];
   NSRange visibleRows = [self visibleRows];
@@ -281,5 +224,114 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
   }
   return adjustRect;
 }
-                                                                                                                 
+
+- (void)reloadData {
+  [super reloadData];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc postNotificationName:kQSBResultTableViewDidReloadData object:self];
+}
+
+#pragma mark NSResponder Overrides
+
+- (void)moveUp:(id)sender {
+  if ([[self delegate] respondsToSelector:_cmd]) {
+    [[self delegate] performSelector:_cmd withObject:sender];
+  } else {
+    [self selectFirstSelectableRowByIncrementing:NO
+                                      startingAt:[self selectedRow] - 1];
+  }
+}
+
+- (void)moveDown:(id)sender {
+  if ([[self delegate] respondsToSelector:_cmd]) {
+    [[self delegate] performSelector:_cmd withObject:sender];
+  } else {
+    [self selectFirstSelectableRowByIncrementing:YES
+                                      startingAt:[self selectedRow] + 1];
+  }
+}
+
+- (void)moveToBeginningOfDocument:(id)sender {
+  [self selectFirstSelectableRowByIncrementing:YES
+                                    startingAt:0];
+}
+
+- (void)moveToEndOfDocument:(id)sender {
+  NSInteger lastRow = [self numberOfRows] - 1;
+  [self selectFirstSelectableRowByIncrementing:NO
+                                    startingAt:lastRow];
+}
+
+- (void)moveDownAndModifySelection:(id)sender {
+  [self moveDown:sender];
+}
+
+- (void)moveUpAndModifySelection:(id)sender {
+  [self moveUp:sender];
+}
+
+- (void)scrollWheel:(NSEvent *)event {
+  if ([event deltaY] < 0) {
+    [self moveDown:self];
+  } else if ([event deltaY] > 0) {
+    [self moveUp:self];
+  }    
+}
+
+- (void)noop:(id)sender {
+  // Currently holding down ctrl key and shift while doing up/down arrow
+  // sends out a noop: command.
+  NSEvent *theEvent = [[self window] currentEvent];
+  if ([theEvent modifierFlags] & (NSControlKeyMask | NSShiftKeyMask)) {
+    NSString *chars = [theEvent characters];
+    if ([chars length] == 1) {
+      unichar theChar = [chars characterAtIndex:0];
+      if (theChar == NSUpArrowFunctionKey) {
+        [self moveUp:sender];
+      } else if (theChar == NSDownArrowFunctionKey) {
+        [self moveDown:sender];
+      }
+    }
+  }
+}
+
+- (void)scrollPageUp:(id)sender {
+  // Scroll so that the first visible row is now shown at the bottom, but
+  // select the top visible row, and adjust so it is shown top-aligned.
+  NSRange visibleRows = [self visibleRows];
+  if (visibleRows.length) {
+    NSInteger newBottomRow = visibleRows.location;
+    [self scrollRowToVisible:0];
+    [self scrollRowToVisible:newBottomRow];
+    visibleRows = [self visibleRows];
+    [self selectFirstSelectableRowByIncrementing:YES
+                                      startingAt:visibleRows.location];
+    [self scrollRowToVisible:[self numberOfRows] - 1];
+    [self scrollRowToVisible:[self selectedRow]];
+  }
+}
+
+- (void)scrollPageDown:(id)sender {
+  // Scroll so that the last visible row is now show at the top.
+  NSRange visibleRows = [self visibleRows];
+  if (visibleRows.length) {
+    NSInteger newRow = visibleRows.location + visibleRows.length - 1;
+    if ([self selectFirstSelectableRowByIncrementing:YES
+                                          startingAt:newRow]) {
+      NSUInteger rowCount = [self numberOfRows];
+      [self scrollRowToVisible:rowCount - 1];
+      [self scrollRowToVisible:newRow];
+    }
+  }
+}
+
+- (void)insertNewline:(id)sender {
+  // This sends an action up to QSBResultsViewBaseController which takes care
+  // of dispatching it appropriately.
+  BOOL handled = [NSApp sendAction:@selector(qsb_pickCurrentTableResult:) 
+                                to:nil 
+                              from:self];
+  HGSAssert(handled, nil);
+}
+
 @end

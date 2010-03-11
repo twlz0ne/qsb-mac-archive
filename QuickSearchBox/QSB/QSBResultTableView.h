@@ -38,10 +38,6 @@
   NSRange visibleRowRange_;
 }
 
-// Select first or last selectable rows in the table.
-- (NSInteger)selectFirstSelectableRow;
-- (NSInteger)selectLastSelectableRow;
-
 // Tries to select a row in a table. Checks the current selection
 // and if it isn't good, increments or decrements (depending on |incrementing|)
 // until we find one, or we're at the top or bottom of the table and have
@@ -50,14 +46,6 @@
 // Note: We do not wrap around the table.
 - (BOOL)selectFirstSelectableRowByIncrementing:(BOOL)incrementing
                                     startingAt:(NSInteger)firstRow;
-
-// Determine the rows in the table view which are visible within
-// the enclosing scroll view's clip region.  If nothing is visible
-// or there are no rows return a range with a length of 0.
-- (NSRange)visibleRows;
-
-// Determine a row's visibility.
-- (BOOL)rowIsVisible:(NSInteger)row;
 @end
 
 @interface NSObject (QSBResultTableViewDelegateMethods)
@@ -65,3 +53,8 @@
   changedVisibleRowsFrom:(NSRange)oldVisible 
                   to:(NSRange)newVisible;
 @end
+
+// Notification that the table reloaded its data
+// Object is the table.
+#define kQSBResultTableViewDidReloadData @"QSBResultTableViewDidReloadData"
+
