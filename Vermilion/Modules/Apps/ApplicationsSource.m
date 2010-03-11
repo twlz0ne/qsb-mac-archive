@@ -334,7 +334,7 @@ static NSString *const kApplicationSourcePredicateString
   BOOL isValid = [super isValidSourceForQuery:query];
   if (isValid) {
     HGSResult *pivotObject = [query pivotObject];
-    if (pivotObject) {
+    if ([pivotObject conformsToType:kHGSTypeFileApplication]) {
       NSString *appName = [[pivotObject filePath] lastPathComponent];
       isValid = [appName isEqualToString:@"System%20Preferences.app"];
     }
@@ -345,7 +345,7 @@ static NSString *const kApplicationSourcePredicateString
 - (HGSResult *)preFilterResult:(HGSResult *)result
                matchesForQuery:(HGSQuery*)query
                   pivotObjects:(HGSResultArray *)pivotObjects {
-  if (pivotObjects) {
+  if ([pivotObjects conformsToType:kHGSTypeFileApplication]) {
     // Remove things that aren't preference panes
     NSString *absolutePath = [result filePath];
     if (![self pathIsPrefPane:absolutePath]) {
