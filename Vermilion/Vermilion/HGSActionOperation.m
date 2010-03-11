@@ -31,79 +31,134 @@
 //
 
 #import "HGSActionOperation.h"
+#import <GTM/GTMMethodCheck.h>
+
 #import "HGSAction.h"
 #import "HGSLog.h"
 #import "HGSOperation.h"
+#import "HGSActionArgument.h"
+#import "NSNotificationCenter+MainThread.h"
 
-NSString *const kHGSActionWillPerformNotification 
-  = @"HSGActionWillPerformNotification";
-NSString *const kHGSActionDidPerformNotification 
-  = @"HSGActionDidPerformNotification";
-NSString* const kHGSActionCompletedSuccessfully 
-  = @"HGSActionCompletedSuccessfully";
+@interface HGSActionOperation ()
+@property (readwrite, retain)  NSMutableDictionary *arguments;
+@end
 
 @implementation HGSActionOperation
-- (id)initWithAction:(HGSAction *)action 
-       directObjects:(HGSResultArray *)directObjects {
-  return [self initWithAction:action
-                directObjects:directObjects
-              indirectObjects:nil];
-}
+GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:object:userInfo:);
 
-- (id)initWithAction:(HGSAction *)action 
-       directObjects:(HGSResultArray *)directObjects
-     indirectObjects:(HGSResultArray *)indirectObjects {
+@synthesize action = action_;
+@synthesize arguments = arguments_;
+
+- (id)initWithAction:(HGSAction *)action arguments:(NSDictionary *)args {
   if ((self = [super init])) {
     action_ = [action retain];
-    args_
-      = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-           directObjects, kHGSActionDirectObjectsKey,
-           indirectObjects, kHGSActionIndirectObjectsKey,
-           nil];
-    if (!action_ || !directObjects || !args_) {
-      [self release];
-      return nil;
+    if (args) {
+      arguments_ = [args mutableCopy];
+    } else {
+      arguments_ = [[NSMutableDictionary alloc] init];
     }
   }
   return self;
 }
-  
+
+- (id)init {
+  return [self initWithAction:nil arguments:nil];
+}
+
 - (void)dealloc {
   [action_ release];
-  [args_ release];
+  [arguments_ release];
   [super dealloc];
 }
 
-- (void)performedAction:(NSNumber *)success {
-  [args_ setObject:success forKey:kHGSActionCompletedSuccessfully];
+- (id)copyWithZone:(NSZone *)zone {
+  return [[HGSActionOperation alloc] initWithAction:[self action]
+                                          arguments:[self arguments]];
+}
+
+- (id)mutableCopyWithZone:(NSZone *)zone {
+  return [[HGSMutableActionOperation alloc] initWithAction:[self action]
+                                                 arguments:[self arguments]];
+}
+
+- (HGSResultArray *)argumentForKey:(NSString *)key {
+  HGSResultArray *argument = nil;
+  @synchronized(arguments_) {
+    argument = [arguments_ objectForKey:key];
+  }
+  return argument;
+}
+
+- (BOOL)isValid {
+  HGSAction *action = [self action];
+  BOOL isValid = action != nil;
+  if (isValid) {
+    NSArray *argumentsToFill = [action arguments];
+    for (HGSActionArgument *arg in argumentsToFill) {
+      if (![arg isOptional]) {
+        NSString *identifier = [arg identifier];
+        if (![self argumentForKey:identifier]) {
+          isValid = NO;
+          break;
+        }
+      }
+    }
+  }
+  return isValid;
+}
+
+- (void)performedAction:(NSDictionary *)results {
+  NSMutableDictionary *userInfo = nil;
+  @synchronized (arguments_) {
+    userInfo = [NSMutableDictionary dictionaryWithDictionary:arguments_];
+  }
+  [userInfo addEntriesFromDictionary:results];
   NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
   [center postNotificationName:kHGSActionDidPerformNotification
                         object:action_
-                      userInfo:args_];  
+                      userInfo:userInfo];  
 }
    
 - (void)performActionOperation:(id)ignored {
-  BOOL result = NO;
-  @try {
-    // Adding exception handler as we are potentially calling out
-    // to third party code here that could be nasty to us.
-    result = [action_ performWithInfo:args_];
-  } 
-  @catch (NSException *e) {
-    result = NO;
-    HGSLog(@"Exception thrown performing action: %@ (%@)", action_, e);
+  BOOL result = [self isValid];
+  HGSResultArray *results = nil;
+  if (result) {
+    NSDictionary *arguments = nil;
+    @synchronized (arguments_) {
+      arguments = [NSDictionary dictionaryWithDictionary:arguments_];
+    }
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center hgs_postOnMainThreadNotificationName:kHGSActionWillPerformNotification
+                                          object:action_
+                                        userInfo:arguments];
+    @try {
+      // Adding exception handler as we are potentially calling out
+      // to third party code here that could be nasty to us.
+      if ([action_ returnedResultsTypeFilter]) {
+        results = [action_ performReturningResultsWithInfo:arguments];
+        result = results != nil;
+      } else {
+        result = [action_ performWithInfo:arguments];
+      }
+    } 
+    @catch (NSException *e) {
+      result = NO;
+      HGSLog(@"Exception thrown performing action: %@ (%@)", action_, e);
+    }
   }
   NSNumber *success = [NSNumber numberWithBool:result ? YES : NO];
+  NSMutableDictionary *actionResults 
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       success, kHGSActionCompletedSuccessfullyKey, nil];
+  if (results) {
+    [actionResults setObject:results forKey:kHGSActionResultsKey];
+  }
   [self performSelectorOnMainThread:@selector(performedAction:)
-                         withObject:success   
+                         withObject:actionResults   
                       waitUntilDone:NO];  
 }
 
 - (void)performAction {
-  NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-  [center postNotificationName:kHGSActionWillPerformNotification
-                        object:action_
-                      userInfo:args_];
   SEL selector = @selector(performActionOperation:);
   if ([action_ mustRunOnMainThread]) {
     [self performSelector:selector withObject:nil afterDelay:0];
@@ -113,6 +168,30 @@ NSString* const kHGSActionCompletedSuccessfully
                                               selector:selector
                                                 object:nil] autorelease];
     [[HGSOperationQueue sharedOperationQueue] addOperation:op];
+  }
+}
+
+@end
+
+@implementation HGSMutableActionOperation
+@synthesize action = action_;
+
+- (void)reset {
+  [self setAction:nil];
+  NSMutableDictionary *args = [self arguments];
+  @synchronized(args) {
+    [args removeAllObjects];
+  }
+}
+
+- (void)setArgument:(HGSResultArray *)argument forKey:(NSString *)key {
+  NSMutableDictionary *args = [self arguments];
+  @synchronized(args) {
+    if (!argument) {
+      [args removeObjectForKey:key];
+    } else {
+      [args setObject:argument forKey:key];
+    }
   }
 }
 

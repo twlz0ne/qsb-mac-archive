@@ -41,52 +41,77 @@
 @class HGSResultArray;
 
 /*!
- HGSActionOperation represents a single task performed by an action.
+ HGSActionOperation represents an action and the arguments to pass to that
+ action so that it can be performed.
 */
-@interface HGSActionOperation : NSObject {
+@interface HGSActionOperation : NSObject<NSCopying, NSMutableCopying> {
  @private
   HGSAction * action_;
-  NSMutableDictionary *args_;
+  NSMutableDictionary *arguments_;
 }
 
-- (id)initWithAction:(HGSAction *)action 
-       directObjects:(HGSResultArray *)directObjects;
-- (id)initWithAction:(HGSAction *)action 
-       directObjects:(HGSResultArray *)directObjects
-     indirectObjects:(HGSResultArray *)indirectObjects;
+/*!
+ The action that the operation will perform.
+*/
+@property (readonly, retain) HGSAction *action;
+
+/*!
+ Create an action with the given action and arguments.
+ Designated initializer.
+ @param action The action to perform.
+ @param args The arguments to pass to the action.
+ @result An HGSActionOperation.
+*/
+- (id)initWithAction:(HGSAction *)action arguments:(NSDictionary *)args;
+
+/*!
+ Perform the action with the current arguments.
+*/
 - (void)performAction;
+
+/*!
+ Verifies that an action operation has all the required components for it to
+ be able to perform.
+ @result Returns YES if the operation has an action, and has values for all
+         of its required arguments.
+*/
+- (BOOL)isValid;
+
+/*!
+ Returns an argument for a given key if that argument has been set.
+ @param key The key for the argument you want the value for.
+            The key for a given argument is the value set for 
+            kHGSActionArgumentIdentifierKey.
+ @result The argument. Returns nil if there is no argument set for the key.
+*/
+- (HGSResultArray*)argumentForKey:(NSString *)key;
+
 @end
 
 /*!
- Notification sent to notification center to announce that
- an action will be performed.
- <ul>
-  <li>Object is action</li>
-  <li>UserInfo is dictionary with following keys
-   <ul>
-    <li>kHGSActionDirectObjectsKey (reqd)</li>
-    <li>kHGSActionIndirectObjectsKey (opt)</li>
-   </ul>
- </ul>
+ An action operation that can be modified.
 */
-extern NSString *const kHGSActionWillPerformNotification;
+@interface HGSMutableActionOperation : HGSActionOperation
 
 /*!
- Notification sent to notification center to announce that
- an action was attempted (not necessarily that it did succeed)
- <ul>
- <li>Object is action</li>
- <li>UserInfo is dictionary with following keys
-  <ul>
-    <li>kHGSActionDirectObjectsKey (reqd)</li>
-    <li>kHGSActionIndirectObjectsKey (opt)</li>
-    <li>kHGSActionCompletedSuccessfully (reqd)</li>
-  </ul>
- </ul>
+ The action that the operation will perform.
 */
-extern NSString *const kHGSActionDidPerformNotification;
+@property (readwrite, retain) HGSAction *action;
 
 /*!
- Key for kHGSAction*Notifications. BOOL as NSNumber.
+ Set an argument for a given key to arg. If that argument has already been set 
+ it will be replaced by arg. If arg is nil, the argument will be removed.
+ @param arg The value to set the argument identified by key to.
+ @param key The key for the argument you want the value for.
+            The key for a given argument is the value set for 
+            kHGSActionArgumentIdentifierKey.
 */
-extern NSString* const kHGSActionCompletedSuccessfully;  
+- (void)setArgument:(HGSResultArray*)arg forKey:(NSString *)key;
+
+/*!
+ Reset an action operation back to a default state. Remove all arguments, and
+ set the action to nil.
+*/
+- (void)reset;
+
+@end

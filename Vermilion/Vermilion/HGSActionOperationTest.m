@@ -32,10 +32,170 @@
 
 
 #import "GTMSenTestCase.h"
-#import "HGSActionOperation.h"
+#import <OCMock/OCMock.h>
 
-@interface HGSActionOperationTest : GTMTestCase 
+#import "HGSActionOperation.h"
+#import "HGSActionArgument.h"
+#import "HGSAction.h"
+#import "HGSResult.h"
+#import "HGSType.h"
+
+@interface HGSActionOperationTest : GTMTestCase
 @end
 
 @implementation HGSActionOperationTest
+- (void)testActionOperationCreation {
+  HGSMutableActionOperation *op = [[HGSMutableActionOperation alloc] init];
+  STAssertNotNil(op, nil);
+  STAssertNil([op action], nil);
+  
+  HGSAction *testAction = [[[HGSAction alloc] init] autorelease];
+  NSDictionary *args = [NSDictionary dictionary];
+  HGSActionOperation *op2 
+    = [[[HGSActionOperation alloc] initWithAction:testAction 
+                                        arguments:args] autorelease];
+  STAssertEquals([op2 action], testAction, nil);
+  STAssertNil([op2 argumentForKey:@"Foo"], nil);
+}
+
+- (void)testActionOperationArguments {
+  HGSMutableActionOperation *op = [[HGSMutableActionOperation alloc] init];
+  STAssertNotNil(op, nil);
+  HGSUnscoredResult *result = [HGSUnscoredResult resultWithURI:@"foo:foo" 
+                                                          name:@"foo"
+                                                          type:kHGSTypeFile 
+                                                        source:nil 
+                                                    attributes:nil];
+  HGSResultArray *array = [HGSResultArray arrayWithResult:result];
+  STAssertNotNil(array, nil);
+  
+  HGSResultArray *results = [op argumentForKey:@"testKey"];
+  STAssertNil(results, nil);
+
+  [op setArgument:array forKey:@"testKey"];
+  results = [op argumentForKey:@"testKey"];
+  STAssertEqualObjects(results, array, nil);
+  
+  // Try doing some copies.
+  
+  HGSActionOperation *op2 = [[op copy] autorelease];
+  STAssertNotNil(op2, nil);
+  results = [op2 argumentForKey:@"testKey"];
+  STAssertEqualObjects(results, array, nil);
+  
+  [op setArgument:nil forKey:@"testKey"];
+  results = [op argumentForKey:@"testKey"];
+  STAssertNil(results, nil);
+  
+  results = [op2 argumentForKey:@"testKey"];
+  STAssertEqualObjects(results, array, nil);
+  
+  op = [[op2 mutableCopy] autorelease];
+  results = [op argumentForKey:@"testKey"];
+  STAssertEqualObjects(results, array, nil);
+  
+  [op setArgument:nil forKey:@"testKey"];
+  results = [op argumentForKey:@"testKey"];
+  STAssertNil(results, nil);  
+}
+
+- (void)testActionOperationReset {
+  HGSMutableActionOperation *op = [[HGSMutableActionOperation alloc] init];
+  STAssertNotNil(op, nil);
+  HGSUnscoredResult *result = [HGSUnscoredResult resultWithURI:@"foo:foo" 
+                                                          name:@"foo"
+                                                          type:kHGSTypeFile 
+                                                        source:nil 
+                                                    attributes:nil];
+  HGSResultArray *array = [HGSResultArray arrayWithResult:result];
+  STAssertNotNil(array, nil);
+    
+  [op setArgument:array forKey:@"testKey"];
+  HGSResultArray *results = [op argumentForKey:@"testKey"];
+  STAssertEqualObjects(results, array, nil);
+  
+  [op reset];
+  results = [op argumentForKey:@"testKey"];
+  STAssertNil(results, nil);
+}
+
+- (void)testActionOperationIsValid {
+  id action = [OCMockObject mockForClass:[HGSAction class]];
+  id arg1 = [OCMockObject mockForClass:[HGSActionArgument class]];
+  id arg2 = [OCMockObject mockForClass:[HGSActionArgument class]];
+  NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
+                        @"Foo", @"Arg1",
+                        @"Bar", @"Arg2",
+                        nil];
+  NSArray *actionArgs = [NSArray arrayWithObjects:arg1, arg2, nil];
+  HGSMutableActionOperation *op 
+    = [[[HGSMutableActionOperation alloc] initWithAction:action 
+                                               arguments:args] autorelease];
+  STAssertNotNil(op, nil);
+  BOOL no = NO;
+  BOOL yes = YES;
+  id nilId = nil;
+  
+  [[[action expect] andReturn:actionArgs] arguments];
+  [[[arg1 expect] andReturnValue:OCMOCK_VALUE(no)] isOptional];
+  [[[arg1 expect] andReturn:@"Arg1"] identifier];
+  [[[arg2 expect] andReturnValue:OCMOCK_VALUE(no)] isOptional];
+  [[[arg2 expect] andReturn:@"Arg2"] identifier];
+  STAssertTrue([op isValid], nil);
+  [arg1 verify];
+  [arg2 verify];
+  [action verify];
+  
+  // Test nil action
+  HGSAction *oldAction = [op action];
+  [op setAction:nil];
+  STAssertFalse([op isValid], nil);
+  [op setAction:oldAction];
+  
+  [[[action expect] andReturn:actionArgs] arguments];
+  [[[arg1 expect] andReturnValue:OCMOCK_VALUE(yes)] isOptional];
+  [[[arg2 expect] andReturnValue:OCMOCK_VALUE(no)] isOptional];
+  [[[arg2 expect] andReturn:@"Arg2"] identifier];
+  STAssertTrue([op isValid], nil);
+  [arg1 verify];
+  [arg2 verify];
+  [action verify];
+  
+  [[[action expect] andReturn:actionArgs] arguments];
+  [[[arg1 expect] andReturnValue:OCMOCK_VALUE(no)] isOptional];
+  [[[arg1 expect] andReturn:@"Arg1"] identifier];
+  [[[arg2 expect] andReturnValue:OCMOCK_VALUE(yes)] isOptional];
+  STAssertTrue([op isValid], nil);
+  [arg1 verify];
+  [action verify];
+  
+  [[[action expect] andReturn:actionArgs] arguments];
+  [[[arg1 expect] andReturnValue:OCMOCK_VALUE(yes)] isOptional];
+  [[[arg2 expect] andReturnValue:OCMOCK_VALUE(yes)] isOptional];
+  STAssertTrue([op isValid], nil);
+  [arg1 verify];
+  [arg2 verify];
+  [action verify];
+  
+  [[[action expect] andReturn:actionArgs] arguments];
+  [[[arg1 expect] andReturnValue:OCMOCK_VALUE(no)] isOptional];
+  [[[arg1 expect] andReturnValue:OCMOCK_VALUE(nilId)] identifier];
+  STAssertFalse([op isValid], nil);
+
+  [[[action expect] andReturn:actionArgs] arguments];
+  [[[arg1 expect] andReturnValue:OCMOCK_VALUE(no)] isOptional];
+  [[[arg1 expect] andReturn:@"Arg1"] identifier];
+  [[[arg2 expect] andReturnValue:OCMOCK_VALUE(no)] isOptional];
+  [[[arg2 expect] andReturn:OCMOCK_VALUE(nilId)] identifier];
+  STAssertFalse([op isValid], nil);
+  [arg1 verify];
+  [arg2 verify];
+  [action verify];
+  
+  [op reset];
+  STAssertFalse([op isValid], nil);
+}
+
+// TODO(dmaclach): Add tests for performAction
+
 @end
