@@ -1,7 +1,7 @@
 //
-//  QSBCustomPanel.m
+//  QSBCustomPanelTest.m
 //
-//  Copyright (c) 2006-2008 Google Inc. All rights reserved.
+//  Copyright (c) 2010 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,51 +30,34 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#import "GTMSenTestCase.h"
 #import "QSBCustomPanel.h"
 
-@implementation QSBCustomPanel
+@interface QSBCustomPanelTest : GTMTestCase
+@end
 
-// Standard window init method. Sets up some special stuff for custom windows.
-- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)aStyle 
-                  backing:(NSBackingStoreType)bufferingType defer:(BOOL)flag {
 
-  // Pass NSBorderlessWindowMask for the styleMask so we don't get a title bar
-  aStyle = NSBorderlessWindowMask | NSNonactivatingPanelMask;
-  self = [super initWithContentRect:contentRect 
-                                      styleMask:aStyle
-                                        backing:bufferingType 
-                                          defer:flag];
-  
-  if (self) {
-    // Set window to be clear and non-opaque so we can see through it.
-    [self setBackgroundColor:[NSColor clearColor]];
-    [self setOpaque:NO];
-    
-    // Pull the window up to Status Level
-    [self setLevel:NSStatusWindowLevel];
-    
-    [self setCanBecomeKeyWindow:YES];
-  }  
-  return self;
-}
+@implementation QSBCustomPanelTest
 
-// NSBorderlessWindowMask can't become key by default, so we return
-// YES here to allow ours to become key.
-- (BOOL)canBecomeKeyWindow {
-  return canBecomeKeyWindow_;
-}
-
-- (void)setCanBecomeKeyWindow:(BOOL)becomeKey {
-  canBecomeKeyWindow_ = becomeKey;
-}
-
-- (void)resignAsKeyWindow {
-  // Disable screen updates so that we can force the window to resign key
-  // by orderering it out, and then bringing it back to the front.
-  NSDisableScreenUpdates();
-	[self orderOut:self];
-	[self orderFront:self];
-	NSEnableScreenUpdates();
+- (void)testCustomPanel {
+  QSBCustomPanel *panel 
+    = [[QSBCustomPanel alloc] initWithContentRect:NSMakeRect(100,100,100,100) 
+                                        styleMask:0 
+                                          backing:NSBackingStoreRetained 
+                                            defer:NO];
+  STAssertNotNil(panel, nil);
+  STAssertTrue([panel canBecomeKeyWindow], nil);
+  STAssertFalse([panel isKeyWindow], nil);
+  [panel makeKeyAndOrderFront:self];
+  STAssertTrue([panel isKeyWindow], nil);
+  [panel resignAsKeyWindow];
+  STAssertFalse([panel isKeyWindow], nil);
+  [panel setCanBecomeKeyWindow:NO];
+  STAssertFalse([panel canBecomeKeyWindow], nil);
+  [panel makeKeyWindow];
+  STAssertFalse([panel isKeyWindow], nil);
+  [panel setReleasedWhenClosed:YES];
+  [panel close];
 }
 
 @end

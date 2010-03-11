@@ -30,20 +30,33 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion QSBCustomPanel
+*/
+
 #import <Cocoa/Cocoa.h>
 
-// Creates a transparent window that accepts keys
-//
-// By default it is at level NSStatusWindowLevel.
-// To customize it, add your own custom background view.
-// This class can be easily used from within Interface Builder. Get IB to read
-// this header file, and then set your window class to be of custom class
-// "QSBCustomPanel"
+/*!
+ Creates a transparent window that accepts keys
+ 
+ By default it is at level NSStatusWindowLevel.
+ 
+ To customize it, add your own custom background view.
+ 
+ This class can be easily used from within Interface Builder. Get IB to read
+ this header file, and then set your window class to be of custom class
+ "QSBCustomPanel".
+*/
 @interface QSBCustomPanel : NSPanel {
  @private
   BOOL canBecomeKeyWindow_;
 }
 
-// Allows you to set whether a window can become key. Defaults to YES
+/*! Allows you to set whether a window can become key. Defaults to YES. */
 - (void)setCanBecomeKeyWindow:(BOOL)becomeKey;
+
+/*! Forces the window to resign key. */
+- (void)resignAsKeyWindow;
+
 @end
