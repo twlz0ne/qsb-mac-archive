@@ -31,41 +31,74 @@
 //
 
 #import "QSBTextField.h"
+#import <objc/message.h>
+#import <Vermilion/HGSLog.h>
 #import "GTMMethodCheck.h"
-#import "GTMNSEnumerator+Filter.h"
 #import "NSString+CaseInsensitive.h"
+#import "NSAttributedString+Attributes.h"
 
-@implementation QSBTextFieldEditor
+static const CGFloat kQSBTextFieldCursorInset = 2;
+static const CGFloat kQSBTextFieldLineHeight = 30;
+static const CGFloat kQSBTextFieldTextBaselineOffset = 20;
 
-GTM_METHOD_CHECK(NSEnumerator,
-                 gtm_enumeratorByMakingEachObjectPerformSelector:withObject:);
+@interface QSBTextField ()
+- (BOOL)isAtEnd;
+- (BOOL)isAtEndOfPivots;
+- (void)deleteCompletion;
+- (void)handleMoveBack:(id)sender command:(SEL)command;
+- (void)handleMoveForward:(id)sender command:(SEL)command;
+@end
+
+@interface NSTextView (QSBNSTextViewPrivates)
+// Undocument API. We override it because it is called (instead of 
+// drawInsertionPointInRect:color:turnedOn:) for the first blink of the cursor,
+// and we don't want that first blink looking funny.
+- (void)_drawInsertionPointInRect:(NSRect)arg1 color:(NSColor *)arg2;
+@end
+
+@interface NSAttributedString (QSBTextField)
+// Return the range of pivot attachments in a attributed string.
+- (NSRange)qsb_rangeOfPivotAttachments;
+@end
+
+@interface QSBTypesetter : NSATSTypesetter 
+@end
+
+@implementation QSBTypesetter
+
+- (void)willSetLineFragmentRect:(NSRect *)lineRect 
+                  forGlyphRange:(NSRange)glyphRange 
+                       usedRect:(NSRect *)usedRect 
+                 baselineOffset:(CGFloat *)baselineOffset {
+  lineRect->size.height = kQSBTextFieldLineHeight;
+  usedRect->size.height = kQSBTextFieldLineHeight;
+  *baselineOffset = kQSBTextFieldTextBaselineOffset;
+}
+
+@end
+
+
+@implementation QSBTextField
+
 GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
+GTM_METHOD_CHECK(NSAttributedString, attrStringWithString:attributes:);
 
 - (void)awakeFromNib {
   [self setEditable:YES];
   [self setFieldEditor:YES];
   [self setSelectable:YES];
+  
+  NSTextContainer *container = [self textContainer];
+  [container setWidthTracksTextView:NO];
+  [container setHeightTracksTextView:NO];
+  [container setContainerSize:NSMakeSize(1.0e7, 1.0e7)];
+  
+  NSLayoutManager *layoutMgr = [self layoutManager];
+  QSBTypesetter *setter = [[[QSBTypesetter alloc] init] autorelease];
+  [layoutMgr setTypesetter:setter];
 }
 
-- (void)deleteCompletion {
-  if (lastCompletionRange_.length > 0) {
-    NSTextStorage *storage = [self textStorage];
-    NSRange intersection = NSIntersectionRange(lastCompletionRange_, 
-                                               NSMakeRange(0, [storage length]));
-    
-    if (intersection.length > 0) {
-      [storage beginEditing];
-      [storage deleteCharactersInRange:intersection];
-      [storage endEditing];
-    }
-    lastCompletionRange_ = NSMakeRange(0,0);
-  }
-}
-
-- (void)resetCompletion {
-  [self deleteCompletion];
-  lastCompletionRange_ = NSMakeRange(0,0);
-}
+#pragma mark NSResponder overrides
 
 - (void)keyDown:(NSEvent *)theEvent {
   [self deleteCompletion];
@@ -83,6 +116,124 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   }
 }
 
+- (void)moveRight:(id)sender {
+  [self handleMoveForward:sender command:_cmd];
+}
+
+- (void)moveWordRight:(id)sender {
+  [self handleMoveForward:sender command:_cmd];
+}
+
+- (void)moveRightAndModifySelection:(id)sender {
+  [self handleMoveForward:sender command:_cmd];
+}
+
+- (void)moveWordRightAndModifySelection:(id)sender {
+  [self handleMoveForward:sender command:_cmd];
+}
+
+- (void)moveWordForward:(id)sender {
+  [self handleMoveForward:sender command:_cmd];
+}
+
+- (void)moveForwardAndModifySelection:(id)sender {
+  [self handleMoveForward:sender command:_cmd];
+}
+
+- (void)moveWordForwardAndModifySelection:(id)sender {
+  [self handleMoveForward:sender command:_cmd];
+}
+
+- (void)moveToEndOfLine:(id)sender {
+  [self handleMoveForward:sender command:_cmd];
+}
+
+- (void)moveToEndOfLineAndModifySelection:(id)sender {
+  [self handleMoveForward:sender command:_cmd];
+}
+
+- (void)moveLeft:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)moveWordLeft:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)moveLeftAndModifySelection:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)moveWordLeftAndModifySelection:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)moveWordBackward:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)moveBackwardAndModifySelection:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)moveWordBackwardAndModifySelection:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)moveToBeginningOfLine:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)moveToBeginningOfLineAndModifySelection:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)deleteBackward:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)deleteBackwardByDecomposingPreviousCharacter:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)deleteWordBackward:(id)sender {
+  [self handleMoveBack:sender command:_cmd];
+}
+
+- (void)deleteToBeginningOfLine:(id)sender {
+  BOOL handled = [NSApp sendAction:@selector(qsb_clearSearchString:) 
+                                to:nil from:self];
+  HGSAssert(handled, nil);
+}
+
+- (void)deleteToBeginningOfParagraph:(id)sender {
+  BOOL handled = [NSApp sendAction:@selector(qsb_clearSearchString:) 
+                                to:nil from:self];
+  HGSAssert(handled, nil);
+}
+
+- (void)insertTab:(id)sender {
+  if (![[NSApp currentEvent] isARepeat]) {
+    BOOL handled = [NSApp sendAction:@selector(qsb_pivotOnSelection:) 
+                                  to:nil from:self];
+    HGSAssert(handled, nil);
+  }
+}
+
+- (void)insertTabIgnoringFieldEditor:(id)sender {
+  return [self insertTab:sender];
+}
+
+- (void)insertBacktab:(id)sender {
+  if (![[NSApp currentEvent] isARepeat]) {
+    BOOL handled = [NSApp sendAction:@selector(qsb_unpivotOnSelection:) 
+                                  to:nil from:self];
+    HGSAssert(handled, nil);
+  }
+}
+
+#pragma mark NSUserInterfaceValidations Protocol
+
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
   BOOL validated = NO;
   if ([anItem action] == @selector(copy:)) {
@@ -92,6 +243,19 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     validated = [super validateUserInterfaceItem:anItem];
   }
   return validated;
+}
+
+#pragma mark NSTextView Overrides
+
+- (NSDictionary *)typingAttributes {
+  NSDictionary *typingAttributes = [super typingAttributes];
+  NSMutableDictionary *newAttributes 
+    = [NSMutableDictionary dictionaryWithDictionary:typingAttributes];
+  [newAttributes setObject:[NSNumber numberWithInt:0] 
+                    forKey:NSBaselineOffsetAttributeName];
+  [newAttributes setObject:[NSFont systemFontOfSize:[NSFont systemFontSize]]
+                    forKey:NSFontAttributeName];
+  return newAttributes;
 }
 
 - (void)didChangeText {
@@ -131,10 +295,11 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
     [storage beginEditing];
     
     NSString *typedString = [[self string] substringWithRange:charRange];
-    NSRange substringRange = [completion rangeOfString:typedString
-                                               options:(NSWidthInsensitiveSearch 
-                                                        | NSCaseInsensitiveSearch
-                                                        | NSDiacriticInsensitiveSearch)];
+    NSRange substringRange 
+      = [completion rangeOfString:typedString
+                          options:(NSWidthInsensitiveSearch 
+                                   | NSCaseInsensitiveSearch
+                                   | NSDiacriticInsensitiveSearch)];
     
     // If this string isn't found at the beginning or with a space prefix,
     // find the range of the last word and proceed with that.
@@ -142,10 +307,11 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
             [completion characterAtIndex:substringRange.location - 1] != ' ')) {
       NSString *lastWord =
       [[typedString componentsSeparatedByString:@" "] lastObject];
-      substringRange = [completion rangeOfString:lastWord
-                                         options:(NSWidthInsensitiveSearch 
-                                                  | NSCaseInsensitiveSearch
-                                                  | NSDiacriticInsensitiveSearch)];
+      substringRange 
+        = [completion rangeOfString:lastWord
+                            options:(NSWidthInsensitiveSearch 
+                                     | NSCaseInsensitiveSearch
+                                     | NSDiacriticInsensitiveSearch)];
     }
     
     NSString *wordCompletion = @"";
@@ -214,10 +380,125 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   }
 }
 
-- (BOOL)isAtBeginning {
-  NSRange range = [self selectedRange];
-  return (range.length == 0 && range.location == 0);
+- (void)_drawInsertionPointInRect:(NSRect)rect color:(NSColor *)color {
+  NSScrollView *view = [self enclosingScrollView];
+  NSRect visibleRect = [view documentVisibleRect];
+  rect.origin.y = NSMinY(visibleRect) + kQSBTextFieldCursorInset;
+  rect.size.height = NSHeight(visibleRect) - (kQSBTextFieldCursorInset * 2);  
+  [super _drawInsertionPointInRect:rect color:color];
 }
+
+- (void)drawInsertionPointInRect:(NSRect)rect 
+                           color:(NSColor *)color 
+                        turnedOn:(BOOL)flag {
+  NSScrollView *view = [self enclosingScrollView];
+  NSRect visibleRect = [view documentVisibleRect];
+  rect.origin.y = NSMinY(visibleRect) + kQSBTextFieldCursorInset;
+  rect.size.height = NSHeight(visibleRect) - (kQSBTextFieldCursorInset * 2);  
+  [super drawInsertionPointInRect:rect color:color turnedOn:flag];
+}
+
+- (void)setString:(NSString *)string {
+  if (!string) {
+    string = @"";
+  }
+  
+  NSAttributedString *attrString 
+    = [NSAttributedString attrStringWithString:string
+                                    attributes:[self typingAttributes]];
+  NSTextStorage *storage = [self textStorage];
+  NSRange rangeOfPivotAttachments 
+    = [[self textStorage] qsb_rangeOfPivotAttachments];
+  [storage beginEditing];
+  NSRange replaceRange = NSMakeRange(0, [storage length]);
+  replaceRange.length -= NSMaxRange(rangeOfPivotAttachments);
+  replaceRange.location = NSMaxRange(rangeOfPivotAttachments);
+  [storage replaceCharactersInRange:replaceRange withAttributedString:attrString];
+  [storage endEditing];
+}
+
+- (void)setSelectedRanges:(NSArray *)rangeValues
+                 affinity:(NSSelectionAffinity)affinity
+           stillSelecting:(BOOL)stillSelectingFlag {
+  NSRange rangeOfPivotAttachments 
+    = [[self textStorage] qsb_rangeOfPivotAttachments];
+  NSString *fullString = [self string];
+  NSMutableArray *newRangeValues
+    = [NSMutableArray arrayWithCapacity:[rangeValues count]];
+  for (NSValue *rangeValue in rangeValues) {
+    NSRange range = [rangeValue rangeValue];
+    
+    // Keep the selection out of our pivot attachments
+    if (rangeOfPivotAttachments.length) {
+      if (range.location < rangeOfPivotAttachments.length) {
+        if (range.length > rangeOfPivotAttachments.length) {
+          range.length -= rangeOfPivotAttachments.length;
+        } else {
+          range.length = 0;
+        }
+        range.location = rangeOfPivotAttachments.length;
+      }
+    }
+    
+    // Keep the selection out of our completion range.
+    if (lastCompletionRange_.length != 0) {
+      if (lastCompletionRange_.location < NSMaxRange(range)) {
+        if (range.location >= lastCompletionRange_.location) {
+          range.location = lastCompletionRange_.location;
+        }
+        range.length = lastCompletionRange_.location - range.location;
+      }
+    }
+    
+    // Adjust the selection ranges to prevent mid-glyph selections.
+    // Insure that the selection range does not start or end in the middle of
+    // a composed character sequence.  If the selection is of zero length then
+    // adjust the selection start forwards, otherwise adjust the selection start
+    // backwards and the selection end forwards.
+    if (NSMaxRange(range) < [fullString length]) {
+      // Adjust the selection start.
+      NSRange adjustedRange
+        = [fullString rangeOfComposedCharacterSequenceAtIndex:range.location];
+      if (range.length) {
+        // Adjust the selection end forward.
+        NSUInteger selectionEnd = NSMaxRange(range) - 1;
+        NSRange newEndRange
+          = [fullString rangeOfComposedCharacterSequenceAtIndex:selectionEnd];
+        NSUInteger adjustedSelectionEnd = NSMaxRange(newEndRange);
+        adjustedRange.length = adjustedSelectionEnd - adjustedRange.location;
+      } else {
+        // When we have an empty selection and the adjusted length
+        // is more than one character and start location has changed then
+        // adjust selection start forward.
+        if (adjustedRange.location != range.location
+            && adjustedRange.length > 1) {
+          adjustedRange.location += adjustedRange.length;
+        }
+        adjustedRange.length = 0;
+      }
+      range = adjustedRange;
+    }
+    
+    [newRangeValues addObject:[NSValue valueWithRange:range]];
+  }
+  [super setSelectedRanges:newRangeValues
+                  affinity:affinity
+            stillSelecting:stillSelectingFlag];
+}
+
+#pragma mark NSDragging Overrides
+
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender {
+  [self deleteCompletion];
+  return [super draggingEntered:sender];
+}
+
+- (void)draggingExited:(id <NSDraggingInfo>)sender {
+  [self complete:self];
+  [super draggingExited:sender];
+}
+
+#pragma mark Private Methods
 
 - (BOOL)isAtEnd {
   BOOL isatEnd = NO;
@@ -232,92 +513,99 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:)
   return isatEnd;
 }
 
-- (NSRange)removeCompletionIfNecessaryFromSelection:(NSRange)selection {
-  if (lastCompletionRange_.length > 0 && 
-      NSMaxRange(selection) > lastCompletionRange_.location) {
-    selection.length -= lastCompletionRange_.location - selection.location;
-    [self deleteCompletion];
-  }
-  return selection;
+- (BOOL)isAtEndOfPivots {
+  NSRange range = [self selectedRange];
+  return (range.length == 0 
+          && (range.location 
+              == NSMaxRange([[self textStorage] qsb_rangeOfPivotAttachments])));
 }
 
-- (void)setSelectedRanges:(NSArray *)rangeValues
-                 affinity:(NSSelectionAffinity)affinity
-           stillSelecting:(BOOL)stillSelectingFlag {
-  NSArray *outRangeValues = rangeValues;
-  if (lastCompletionRange_.length != 0) {
-    NSMutableArray *newRangeValues
-      = [NSMutableArray arrayWithCapacity:[rangeValues count]];
-    for (NSValue *rangeValue in rangeValues) {
-      NSRange range = [rangeValue rangeValue];
-      if (lastCompletionRange_.location < NSMaxRange(range)) {
-        if (range.location >= lastCompletionRange_.location) {
-          range.location = lastCompletionRange_.location;
-        }
-        range.length = lastCompletionRange_.location - range.location;
-      }
-      [newRangeValues addObject:[NSValue valueWithRange:range]];
+- (void)deleteCompletion {
+  if (lastCompletionRange_.length > 0) {
+    NSTextStorage *storage = [self textStorage];
+    NSRange intersection = NSIntersectionRange(lastCompletionRange_, 
+                                               NSMakeRange(0, [storage length]));
+    
+    if (intersection.length > 0) {
+      [storage beginEditing];
+      [storage deleteCharactersInRange:intersection];
+      [storage endEditing];
     }
-    outRangeValues = newRangeValues;
+    lastCompletionRange_ = NSMakeRange(0,0);
   }
-  // Adjust the selection ranges to prevent mid-glyph selections.
-  NSString *fullString = [self string];
-  NSEnumerator *adjustedRangeValuesEnum
-    = [[outRangeValues objectEnumerator]
-       gtm_enumeratorByMakingEachObjectPerformSelector:
-        @selector(qsb_adjustRangeForComposedCharacterSequence:)
-       withObject:fullString];
-  outRangeValues = [adjustedRangeValuesEnum allObjects];
-  [super setSelectedRanges:outRangeValues
-                  affinity:affinity
-            stillSelecting:stillSelectingFlag];
 }
 
-- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender {
-  [self deleteCompletion];
-  return [super draggingEntered:sender];
+- (void)handleMoveBack:(id)sender command:(SEL)command {
+  if ([self isAtEndOfPivots] && ![[NSApp currentEvent] isARepeat]) {
+    BOOL handled = [NSApp sendAction:@selector(qsb_unpivotOnSelection:) 
+                                  to:nil from:self];
+    HGSAssert(handled, nil);
+  } else {
+    struct objc_super superData = { self, class_getSuperclass([self class]) };
+    objc_msgSendSuper(&superData, command, sender);
+  }
 }
 
-- (void)draggingExited:(id <NSDraggingInfo>)sender {
-  [self complete:self];
-  [super draggingExited:sender];
+- (void)handleMoveForward:(id)sender command:(SEL)command {
+  if ([self isAtEnd] && ![[NSApp currentEvent] isARepeat]) {
+    BOOL handled = [NSApp sendAction:@selector(qsb_pivotOnSelection:) 
+                                  to:nil from:self];
+    HGSAssert(handled, nil);
+  } else {
+    struct objc_super superData = { self, class_getSuperclass([self class]) };
+    objc_msgSendSuper(&superData, command, sender);
+  }
+}
+
+#pragma mark Public Methods
+
+- (void)setAttributedStringValue:(NSAttributedString *)pivotString {
+  // Shift the baseline
+  NSUInteger pivotLength = [pivotString length];
+  NSMutableAttributedString *mutablePivotString 
+    = [[pivotString mutableCopy] autorelease];
+  NSRange rangeOfPivotAttachments = [pivotString qsb_rangeOfPivotAttachments];
+  NSNumber *baseLine = [NSNumber numberWithFloat:(kQSBTextFieldTextBaselineOffset 
+                                                  - kQSBTextFieldLineHeight)];
+  [mutablePivotString addAttribute:NSBaselineOffsetAttributeName 
+                             value:baseLine
+                             range:rangeOfPivotAttachments];
+  
+  // set it
+  NSTextStorage *storage = [self textStorage];
+  [storage beginEditing];
+  [storage replaceCharactersInRange:NSMakeRange(0, [storage length]) 
+               withAttributedString:mutablePivotString];
+  [storage endEditing];
+  [self scrollRangeToVisible:NSMakeRange(pivotLength, 1)];
+}
+
+- (NSString *)stringWithoutPivots {
+  NSString *string = [self string];
+  NSRange range = [[self textStorage] qsb_rangeOfPivotAttachments];
+  string = [string substringFromIndex:NSMaxRange(range)];
+  return string;
 }
 
 @end
 
-@implementation NSValue (qsb_adjustRangeForComposedCharacterSequence)
+@implementation NSAttributedString (QSBTextField)
 
-- (NSValue *)qsb_adjustRangeForComposedCharacterSequence:(NSString *)string {
-  // Insure that the selection range does not start or end in the middle of
-  // a composed character sequence.  If the selection is of zero length then
-  // adjust the selection start forwards, otherwise adjust the selection start
-  // backwards and the selection end forwards.
-  NSValue *adjustedRangeValue = self;
-  NSRange proposedRange = [self rangeValue];
-  if (NSMaxRange(proposedRange) < [string length]) {
-    // Adjust the selection start.
-    NSRange adjustedRange
-      = [string rangeOfComposedCharacterSequenceAtIndex:proposedRange.location];
-    if (proposedRange.length) {
-      // Adjust the selection end forward.
-      NSUInteger selectionEnd = NSMaxRange(proposedRange) - 1;
-      NSRange newEndRange
-        = [string rangeOfComposedCharacterSequenceAtIndex:selectionEnd];
-      NSUInteger adjustedSelectionEnd = NSMaxRange(newEndRange);
-      adjustedRange.length = adjustedSelectionEnd - adjustedRange.location;
-    } else {
-      // When we have an empty selection and the adjusted length
-      // is more than one character and start location has changed then
-      // adjust selection start forward.
-      if (adjustedRange.location != proposedRange.location
-          && adjustedRange.length > 1) {
-        adjustedRange.location += adjustedRange.length;
-      }
-      adjustedRange.length = 0;
-    }
-    adjustedRangeValue = [NSValue valueWithRange:adjustedRange];
+- (NSRange)qsb_rangeOfPivotAttachments {
+  NSString *string = [self string]; 
+  NSString *attachmentString = [NSString stringWithFormat:@"%C", 
+                                NSAttachmentCharacter];
+  NSRange range = [string rangeOfString:attachmentString 
+                                options:NSBackwardsSearch];
+  if (range.location != NSNotFound) {
+    range.length += range.location;
+    range.location = 0;
+  } else {
+    range.location = 0;
+    range.length = 0;
   }
-  return adjustedRangeValue;
-}
+  return range;
+}  
 
 @end
+

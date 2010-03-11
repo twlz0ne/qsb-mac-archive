@@ -30,21 +30,35 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+/*!
+ @header
+ @discussion QSBTextField
+*/
+
 #import <Cocoa/Cocoa.h>
 
-@class QSBSearchWindowController;
-
-// Handles the text field in the QSB. Is responsible for rerouting all
-// key commands that come to the QSB.
-@interface QSBTextFieldEditor : NSTextView {
+/*!
+  Handles the text field in the QSB. Is responsible for rerouting all
+  key commands that come to the QSB.
+ 
+  QSBTextField may send the following commands down the responder chain:
+  qsb_pivotOnSelection:
+  qsb_unpivotOnSelection:
+  qsb_clearSearchString:
+*/
+@interface QSBTextField : NSTextView {
  @private
   NSRange lastCompletionRange_;
-  IBOutlet QSBSearchWindowController *windowController_;
 }
-- (NSRange)removeCompletionIfNecessaryFromSelection:(NSRange)selection;
-- (BOOL)isAtBeginning;
-- (BOOL)isAtEnd;
 
-- (void)resetCompletion;
+/*!
+ Replace the contents of the text field with the value of "attributed string".
+*/
+- (void)setAttributedStringValue:(NSAttributedString *)attributedString;
+
+/*! 
+ Returns the string in the field editor with all pivot attachments removed. 
+*/
+- (NSString *)stringWithoutPivots;
 
 @end
