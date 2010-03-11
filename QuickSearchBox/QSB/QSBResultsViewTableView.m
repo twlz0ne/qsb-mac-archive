@@ -162,11 +162,17 @@
               row:(NSInteger)row
 {
   if ([[cell class] isSubclassOfClass:[QSBViewTableViewCell class]]) {
-    if ([[tableView_ dataSource] respondsToSelector:@selector(tableView:viewForColumn:row:)]) { 
+    id dataSource = [tableView_ dataSource];
+    if ([dataSource respondsToSelector:@selector(tableView:viewForColumn:row:)]) { 
       QSBViewTableViewCell *viewCell = (QSBViewTableViewCell *)cell;
-      [viewCell setContentView:[[tableView_ dataSource]
-                     tableView:tableView 
-                 viewForColumn:tableColumn row:row]];
+      NSView *view = [dataSource tableView:tableView 
+                             viewForColumn:tableColumn 
+                                       row:row];
+      [viewCell setContentView:view];
+      id object = [dataSource tableView:tableView 
+              objectValueForTableColumn:tableColumn 
+                                    row:row];
+      [viewCell setRepresentedObject:object];
     }
   } else {
     if ([self doesDelegateRespondToSelector:_cmd]) {
@@ -366,9 +372,7 @@ shouldSelectTableColumn:(NSTableColumn *)tableColumn
 objectValueForTableColumn:(NSTableColumn *)tableColumn 
             row:(NSInteger)row {
   id obj = nil;
-  NSCell *cell = [tableColumn dataCellForRow:row];
-  if (![[cell class] isSubclassOfClass:[QSBViewTableViewCell class]] 
-      && [self doesDataSourceRespondToSelector:_cmd]) {
+  if ([self doesDataSourceRespondToSelector:_cmd]) {
     obj = [[self dataSource] tableView:tableView 
              objectValueForTableColumn:tableColumn 
                                    row:row];
@@ -378,9 +382,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)obj 
    forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-  NSCell *cell = [tableColumn dataCellForRow:row];
-  if (![[cell class] isSubclassOfClass:[QSBViewTableViewCell class]] 
-      && [self doesDataSourceRespondToSelector:_cmd]) {
+  if ([self doesDataSourceRespondToSelector:_cmd]) {
     [[self dataSource] tableView:tableView setObjectValue:obj 
                   forTableColumn:tableColumn row:row];
   }
