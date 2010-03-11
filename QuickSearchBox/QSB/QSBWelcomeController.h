@@ -30,23 +30,30 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Cocoa/Cocoa.h>
+/*!
+ @header
+ @discussion QSBWelcomeController
+*/
 
-// A window controller that manages its window as a child window of another
-// window.  The child window is kept positioned relative to the parent
-// window as the parent is moved by centering the child horizontally
-// and tucking the child just below the parent such that the parent overlaps
-// the child a bit.
-@interface QSBWelcomeController : NSWindowController {
- @private
-  __weak NSWindow *parentWindow_;
-}
+#import "QSBCustomPanel.h"
 
-// Designated initializer.  |parentWindow| is required.
-- (id)initWithWindowNibName:(NSString *)windowNibName
-               parentWindow:(NSWindow *)parentWindow;
+/*!
+ The welcome controller manages the welcome window, which is the window that
+ appears at first launch to explain how to use QSB.
+*/
+@interface QSBWelcomeController : NSWindowController
 
-// Hide the window associated with this controller using animation.
+/*! Designated initializer. */
+- (id)init;
+
+/*! Hide/Show the window associated with this controller using animation. */
 - (void)setHidden:(BOOL)hidden;
 
+@end
+
+/*!
+  The actual welcome window class that keeps itself aligned with a parent
+  window if it has one.
+*/
+@interface QSBWelcomeWindow : QSBCustomPanel
 @end

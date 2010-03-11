@@ -1,7 +1,7 @@
 //
-//  QSBWelcomeController.m
+//  QSBWelcomeControllerTest.m
 //
-//  Copyright (c) 2009 Google Inc. All rights reserved.
+//  Copyright (c) 2010 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,54 +30,43 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#import "GTMSenTestCase.h"
 #import "QSBWelcomeController.h"
-#import "QSBSearchWindowController.h"
 
-@implementation QSBWelcomeController
+@interface QSBWelcomeControllerTest : GTMTestCase
+@end
 
-- (id)init {
-  return [super initWithWindowNibName:@"WelcomeWindow"];
-}
 
-- (void)windowDidLoad {
-  [super windowDidLoad];
-  QSBCustomPanel *window = (QSBCustomPanel *)[self window];
-  [window setCanBecomeKeyWindow:NO];
-  [window setAlphaValue:0.0];
-  [window orderFront:nil];
-}
+@implementation QSBWelcomeControllerTest
 
-- (void)windowWillClose:(NSNotification *)notification {
-  [self autorelease];
-}
+- (void)testWelcomeController {
+  QSBWelcomeController *controller = [[QSBWelcomeController alloc] init];
+  STAssertNotNil(controller, nil);
 
-- (void)setHidden:(BOOL)hidden {
-  NSWindow *window = [self window];
-  CGFloat alphaValue = hidden ? 0.0 : 1.0;
-  NSTimeInterval duration = hidden ? kQSBHideDuration : kQSBShowDuration;
-  [NSAnimationContext beginGrouping];
-  [[NSAnimationContext currentContext] setDuration:duration];
-  [[window animator] setAlphaValue:alphaValue];
-  [NSAnimationContext endGrouping];
+  NSWindow *window = [controller window];
+  STAssertNotNil(window, nil);
+
+  // Just execute this code in two states. It's animated, so testing it
+  // is a real pain.
+  [controller setHidden:YES];
+  [controller setHidden:NO];
+  
+  // Test window moving when we assign it a parent.
+  [window setFrameOrigin:NSMakePoint(500, 500)];
+  
+  NSWindow *parentWindow 
+    = [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 400, 400, 100)
+                                  styleMask:0 
+                                    backing:0 
+                                      defer:NO];
+  [parentWindow setReleasedWhenClosed:YES];
+  [parentWindow addChildWindow:window ordered:NSWindowBelow];
+  NSPoint origin = [window frame].origin;
+  STAssertEquals(origin.x, (CGFloat)125, nil);
+  STAssertEquals(origin.y, (CGFloat)217, nil);
+  [window close];
+  [parentWindow close];
 }
 
 @end
 
-@implementation QSBWelcomeWindow
-
-- (void)setParentWindow:(NSWindow *)parentWindow {
-  [super setParentWindow:parentWindow];
-  if (parentWindow) {
-    NSRect welcomeFrame = [self frame];
-    CGFloat welcomeWidth = NSWidth(welcomeFrame);
-    CGFloat welcomeHeight = NSHeight(welcomeFrame);
-    NSRect parentFrame = [parentWindow frame];
-    CGFloat parentWidth = NSWidth(parentFrame);
-    CGFloat hOffset = (parentWidth - welcomeWidth) / 2.0;
-    CGFloat hPosition = parentFrame.origin.x + hOffset;
-    CGFloat vPosition = parentFrame.origin.y + 45.0 - welcomeHeight;
-    [self setFrameOrigin:NSMakePoint(hPosition, vPosition)];
-  }
-}
-
-@end

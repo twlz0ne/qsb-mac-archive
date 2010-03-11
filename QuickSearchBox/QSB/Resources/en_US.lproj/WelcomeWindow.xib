@@ -37,9 +37,9 @@
 				<int key="NSWindowStyleMask">1</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{196, 272}, {350, 228}}</string>
-				<int key="NSWTFlags">-1543502848</int>
+				<int key="NSWTFlags">603980800</int>
 				<string key="NSWindowTitle"/>
-				<string key="NSWindowClass">QSBCustomPanel</string>
+				<string key="NSWindowClass">QSBWelcomeWindow</string>
 				<nil key="NSViewClass"/>
 				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<object class="NSView" key="NSWindowView" id="330235815">
@@ -747,6 +747,13 @@ aGUgbmV3IFF1aWNrIFNlYXJjaCBCb3guIFR5cGUgaW4gdGhpcyBib3ggdG86Cg</string>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">QSBResultTableView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
 					</object>
@@ -806,10 +813,15 @@ aGUgbmV3IFF1aWNrIFNlYXJjaCBCb3guIFR5cGUgaW4gdGhpcyBib3ggdG86Cg</string>
 				<object class="IBPartialClassDescription">
 					<string key="className">QSBWelcomeController</string>
 					<string key="superclassName">NSWindowController</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="882892050">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">QSBWelcomeController.h</string>
 					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">QSBWelcomeWindow</string>
+					<string key="superclassName">QSBCustomPanel</string>
+					<reference key="sourceIdentifier" ref="882892050"/>
 				</object>
 			</object>
 		</object>
