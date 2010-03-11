@@ -305,9 +305,9 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 
 - (IBAction)hideResultsWindow:(id)sender {
   NSWindow *window = [self window];
-  CGFloat alphaValue = [window alphaValue];
+  if ([window ignoresMouseEvents]) return;
+  
   [window setIgnoresMouseEvents:YES];
-  if (alphaValue <= 0.0) return;
 
   [NSAnimationContext beginGrouping];
   [[NSAnimationContext currentContext] gtm_setDuration:kQSBHideDuration
@@ -318,11 +318,11 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 
 - (IBAction)showResultsWindow:(id)sender {
   NSWindow *window = [self window];
+  if (![window ignoresMouseEvents]) return;
   [window setIgnoresMouseEvents:NO];
-  CGFloat alphaValue = [window alphaValue];
-  if (alphaValue >= 1.0) return;
-  NSRect frame = [window frame];
   
+  NSRect frame = [window frame];
+  CGFloat alphaValue = [window alphaValue];
   if (alphaValue <= 0.0) {
     [window setFrame:NSOffsetRect(frame, 0.0, kQSBResultsAnimationDistance) 
              display:YES

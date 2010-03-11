@@ -57,11 +57,13 @@ extern const NSTimeInterval kQSBHideDuration;
   IBOutlet QSBActionPresenter *actionPresenter_;
   
   BOOL needToUpdatePositionOnActivation_;  // Do we need to reposition
-  // (STRONG) Resets our query to "" after kQSBResetQueryTimeoutPrefKey seconds
-  NSTimer *queryResetTimer_;
+  // Resets our query to "" after kQSBResetQueryTimeoutPrefKey seconds
+  __weak NSTimer *queryResetTimer_;
+  // Shows our results window after a delay
+  __weak NSTimer *displayResultsTimer_;
+  // controls whether we put the pasteboard data in the qsb
+  __weak NSTimer *findPasteBoardChangedTimer_;
   NSInteger findPasteBoardChangeCount_;  // used to detect if the pasteboard has changed
-  // (STRONG) controls whether we put the pasteboard data in the qsb
-  NSTimer *findPasteBoardChangedTimer_;
   BOOL insertFindPasteBoardString_;  // should we use the find pasteboard string
   // The welcome window controller.
   __weak QSBWelcomeController *welcomeController_;

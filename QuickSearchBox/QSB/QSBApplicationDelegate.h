@@ -89,9 +89,6 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
 // Show the about box
 - (IBAction)orderFrontStandardAboutPanel:(id)sender;
 
-// Deactivate, and activate previous app
-- (IBAction)qsb_deactivate:(id)sender;
-
 // method that is called when the modifier keys are hit and we are inactive
 - (void)modifiersChangedWhileInactive:(NSEvent*)event;
 

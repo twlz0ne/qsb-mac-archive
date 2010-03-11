@@ -254,6 +254,8 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
                 selector:@selector(backgroundColorChanged:)];
   [queryResetTimer_ invalidate];
   queryResetTimer_ = nil;
+  [displayResultsTimer_ invalidate];
+  displayResultsTimer_ = nil;
   [findPasteBoardChangedTimer_ invalidate];
   findPasteBoardChangedTimer_ = nil;
   [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -306,16 +308,18 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   [searchWindow addChildWindow:[resultsWindowController_ window] 
                        ordered:NSWindowBelow];
   
-  NSWindow *welcomeWindow = [welcomeController_ window];
+  if (welcomeController_) {
+    NSWindow *welcomeWindow = [welcomeController_ window];
+    
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self 
+           selector:@selector(welcomeWindowWillClose:)
+               name:NSWindowWillCloseNotification
+             object:welcomeWindow];
   
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self 
-         selector:@selector(welcomeWindowWillClose:)
-             name:NSWindowWillCloseNotification
-           object:welcomeWindow];
-  
-  [searchWindow addChildWindow:welcomeWindow  
-                       ordered:NSWindowBelow];
+    [searchWindow addChildWindow:welcomeWindow  
+                         ordered:NSWindowBelow];
+  }
 }
 
 - (BOOL)firstLaunch {
@@ -610,9 +614,12 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
     [welcomeController_ setHidden:NO];
     
     if ([[searchTextField_ string] length]) {
-      [self performSelector:@selector(displayResults:)
-                 withObject:nil 
-                 afterDelay:kQSBReshowResultsDelay];
+      displayResultsTimer_ 
+        = [NSTimer scheduledTimerWithTimeInterval:kQSBReshowResultsDelay 
+                                           target:self 
+                                         selector:@selector(displayResults:) 
+                                         userInfo:nil 
+                                          repeats:NO];
     }
   } else {
     // Bring whatever modal up front.
@@ -646,11 +653,8 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
     [[[self shieldWindow] animator] setAlphaValue:0.0];
     [NSAnimationContext endGrouping];
   }
-  
-  // Cancel the order to display the results window.
-  [NSObject cancelPreviousPerformRequestsWithTarget:self 
-                                           selector:@selector(displayResults:) 
-                                             object:nil];
+  [displayResultsTimer_ invalidate];
+  displayResultsTimer_ = nil;
   [NSAnimationContext beginGrouping];
   [[NSAnimationContext currentContext] setDuration:kQSBHideDuration];
   [[searchWindow animator] setAlphaValue:0.0];
@@ -660,8 +664,9 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 }
 
 - (IBAction)displayResults:(id)sender {
+  displayResultsTimer_ = nil;
   NSWindow *searchWindow = [self window];
-  if ([searchWindow alphaValue] > 0) {
+  if (![searchWindow ignoresMouseEvents]) {
     // Force the results view to show
     if ([resultsWindowController_ selectedTableResult]) {
       [welcomeController_ close];

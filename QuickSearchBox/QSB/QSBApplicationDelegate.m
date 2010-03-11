@@ -60,10 +60,6 @@
 #import "QSBDebugWindowController.h"
 #import "QSBActionPresenter.h"
 
-CFArrayRef _LSCopyApplicationArrayInFrontToBackOrder(uint32_t sessionID);
-CFTypeRef _LSCopyCurrentApplicationASN(uint32_t sessionID);
-void _LSASNExtractHighAndLowParts(void const* asn, UInt32* psnHigh, UInt32* psnLow);
-
 // Local pref set once we've been launched. Used to control whether or not we
 // show the help window at startup.
 NSString *const kQSBBeenLaunchedPrefKey = @"QSBBeenLaunchedPrefKey";
@@ -616,22 +612,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [NSApp orderFrontStandardAboutPanelWithOptions:nil];
 }
 
-- (IBAction)qsb_deactivate:(id)sender {
-  CFArrayRef asnArray = _LSCopyApplicationArrayInFrontToBackOrder(-1);
-  CFTypeRef myASN = _LSCopyCurrentApplicationASN(-1);
-  CFIndex idx = 0;
-  CFIndex count = CFArrayGetCount(asnArray);
-  if (count > 0) {
-    CFTypeRef app = CFArrayGetValueAtIndex(asnArray, idx);
-    if (CFEqual(app, myASN) && count > 1) {
-      app = CFArrayGetValueAtIndex(asnArray, idx + 1);
-    }
-    ProcessSerialNumber psn;
-    _LSASNExtractHighAndLowParts(app, &psn.highLongOfPSN, &psn.lowLongOfPSN);
-    SetFrontProcess(&psn);
-  }
-}
-
 - (IBAction)showPreferences:(id)sender {
   if (!prefsWindowController_) {
     prefsWindowController_ = [[QSBPreferenceWindowController alloc] init];
@@ -984,7 +964,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   HGSActionOperation *operation = [presenter actionOperation];
   HGSAction * action = [operation action];
   if ([action causesUIContextChange]) {
-    [NSApp sendAction:@selector(qsb_deactivate:) to:nil from:self];
+    [NSApp sendAction:@selector(hideSearchWindow:) to:nil from:self];
   }
 }
 
