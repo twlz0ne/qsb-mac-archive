@@ -34,47 +34,39 @@
 #import "HGSResult.h"
 #import "HGSLog.h"
 #import "HGSTypeFilter.h"
+#import "HGSActionArgument.h"
+#import "HGSActionOperation.h"
 
 NSString *const kHGSActionDirectObjectsKey = @"HGSActionDirectObjects";
-NSString *const kHGSActionIndirectObjectsKey = @"HGSActionIndirectObjects";
 NSString *const kHGSActionDirectObjectTypesKey = @"HGSActionDirectObjectTypes";
 NSString *const kHGSActionExcludedDirectObjectTypesKey
   = @"HGSActionExcludedDirectObjectTypesKey";
-NSString *const kHGSActionIndirectObjectTypesKey 
-  = @"HGSActionIndirectObjectTypes";
-NSString *const kHGSActionIndirectObjectOptionalKey 
-  = @"HGSActionIndirectObjectOptional";
 NSString *const kHGSActionDoesActionCauseUIContextChangeKey
   = @"HGSActionDoesActionCauseUIContextChange";
 NSString *const kHGSActionMustRunOnMainThreadKey
   = @"HGSActionMustRunOnMainThread";
-NSString* const kHGSActionOtherTermsKey
-  = @"HGSActionOtherTerms";
-
-// The result is already retained for you
-static NSSet *CopyStringSetFromId(id value) {  
-  NSSet *result = nil;
-  if (!value) {
-    result = nil;
-  } else if ([value isKindOfClass:[NSString class]]) {
-    result = [[NSSet alloc] initWithObjects:value, nil];
-  } else if ([value isKindOfClass:[NSArray class]]) {
-    result = [[NSSet alloc] initWithArray:value];
-  } else if ([value isKindOfClass:[NSSet class]]) {
-    result = [value copy];
-  }
-  return result;
-}
+NSString* const kHGSActionOtherTermsKey= @"HGSActionOtherTerms";
+NSString* const kHGSActionArgumentsKey = @"HGSActionArguments";
+NSString *const kHGSActionWillPerformNotification 
+  = @"HSGActionWillPerformNotification";
+NSString *const kHGSActionDidPerformNotification 
+  = @"HSGActionDidPerformNotification";
+NSString *const kHGSActionCompletedSuccessfullyKey
+  = @"HGSActionCompletedSuccessfully";
+NSString *const kHGSActionResultsKey = @"HGSActionResults";
+NSString* const kHGSActionReturnedResultsTypesKey 
+  = @"HGSActionReturnedResultsTypes";
+NSString* const kHGSActionExcludedReturnedResultsTypesKey
+  = @"HGSActionExcludedReturnedResultsTypes";
 
 @implementation HGSAction
 
-@synthesize directObjectTypes = directObjectTypes_;
-@synthesize excludedDirectObjectTypes = excludedDirectObjectTypes_;
-@synthesize indirectObjectTypes = indirectObjectTypes_;
-@synthesize indirectObjectOptional = indirectObjectOptional_;
+@synthesize directObjectTypeFilter = directObjectTypeFilter_;
+@synthesize returnedResultsTypeFilter = returnedResultsTypeFilter_;
 @synthesize causesUIContextChange = causesUIContextChange_;
 @synthesize mustRunOnMainThread = mustRunOnMainThread_;
 @synthesize otherTerms = otherTerms_;
+@synthesize arguments = arguments_;
 
 + (void)initialize {
   if (self == [HGSAction class]) {
@@ -95,20 +87,40 @@ static NSSet *CopyStringSetFromId(id value) {
   if ((self = [super initWithConfiguration:configuration])) {
     
     id value = [configuration objectForKey:kHGSActionDirectObjectTypesKey];
-    directObjectTypes_ = CopyStringSetFromId(value);
+    NSSet *directObjectTypes = [NSSet qsb_setFromId:value];
     
     value = [configuration objectForKey:kHGSActionExcludedDirectObjectTypesKey];
-    excludedDirectObjectTypes_ = CopyStringSetFromId(value);
+    NSSet *excludedDirectObjectTypes = [NSSet qsb_setFromId:value];
+    if (directObjectTypes) {
+      directObjectTypeFilter_ 
+        = [[HGSTypeFilter alloc] initWithConformTypes:directObjectTypes 
+                                  doesNotConformTypes:excludedDirectObjectTypes];
+    }
+ 
+    value = [configuration objectForKey:kHGSActionReturnedResultsTypesKey];
+    NSSet *returnedResultsTypes = [NSSet qsb_setFromId:value];
     
-    value = [configuration objectForKey:kHGSActionIndirectObjectTypesKey];
-    indirectObjectTypes_ = CopyStringSetFromId(value);
-    
-    value = [configuration objectForKey:kHGSActionIndirectObjectOptionalKey];
-    // Default is NO, so just call boolValue on nil
-    indirectObjectOptional_ = [value boolValue];
-  
+    value = [configuration objectForKey:kHGSActionExcludedReturnedResultsTypesKey];
+    NSSet *excludedReturnedResultsTypes = [NSSet qsb_setFromId:value];
+    if (returnedResultsTypes) {
+      returnedResultsTypeFilter_ 
+        = [[HGSTypeFilter alloc] initWithConformTypes:returnedResultsTypes 
+                                  doesNotConformTypes:excludedReturnedResultsTypes];
+    }
+
     value = [configuration objectForKey:kHGSActionOtherTermsKey];
-    otherTerms_ = CopyStringSetFromId(value);
+    NSSet *otherTerms = [NSSet qsb_setFromId:value];
+    NSUInteger count = [otherTerms count];
+    if (count) {
+      NSMutableSet *mutableTerms 
+        = [[NSMutableSet alloc] initWithCapacity:count];
+      NSBundle *bundle = [self bundle];
+      for (NSString *term in otherTerms) {
+        NSString *localized = [bundle qsb_localizedInfoPListStringForKey:term]; 
+        [mutableTerms addObject:localized];
+      }
+      otherTerms_ = mutableTerms;
+    }
     
     value 
       = [configuration objectForKey:kHGSActionDoesActionCauseUIContextChangeKey];
@@ -125,30 +137,88 @@ static NSSet *CopyStringSetFromId(id value) {
     } else {
       mustRunOnMainThread_ = NO;
     }
+    
+    BOOL goodArgs = YES;
+    value = [configuration objectForKey:kHGSActionArgumentsKey];
+    if (value) {
+      // Arguments can come to us as a single dictionary, or an array of
+      // dictionaries. If it's a single dictionary, make an array out of it.
+      if ([value isKindOfClass:[NSDictionary class]]) {
+        value = [NSArray arrayWithObject:value];
+      }
+      NSMutableArray *arguments 
+        = [NSMutableArray arrayWithCapacity:[value count]];
+      for (NSDictionary *config in value) {
+        // Add our bundle to the argument dictionary so it can find its own
+        // localized values.
+        NSMutableDictionary *bundledConfig 
+          = [NSMutableDictionary dictionaryWithDictionary:config];
+        [bundledConfig setObject:[self bundle] 
+                          forKey:kHGSActionArgumentBundleKey];
+        // We allow arguments to specify their own subclasses of action
+        // argument.
+        NSString *className 
+          = [bundledConfig objectForKey:kHGSActionArgumentClassKey];
+        Class argClass = Nil;
+        if (className) {
+          argClass = NSClassFromString(className);
+        } else {
+          argClass = [HGSActionArgument class];
+        }
+        if (!argClass) {
+          HGSLogDebug(@"Unable to find class %@ for %@", argClass, 
+                      bundledConfig);
+          goodArgs = NO;
+          break;
+        }
+        if ([argClass conformsToProtocol:@protocol(HGSActionArgument)]) {
+          HGSActionArgument *actionArgument 
+            = [[[argClass alloc] 
+                initWithConfiguration:bundledConfig] autorelease];
+          if (actionArgument) {
+            [arguments addObject:actionArgument];
+          } else {
+            HGSLogDebug(@"Unable to instantiate action argument for %@", 
+                        bundledConfig);
+            goodArgs = NO;
+            break;
+          }
+        } else  {
+          HGSLogDebug(@"Action argument from %@ does not conform to "
+                      @"HGSActionArgument protocol", bundledConfig);
+          goodArgs = NO;
+          break;
+        }
+      }
+      if (goodArgs) {
+        arguments_ = [arguments retain];
+      }
+    }
+    if (!goodArgs) {
+      [self release];
+      self = nil;
+    }
   }
   return self;
 }
 
 - (void)dealloc {
-  [directObjectTypes_ release];
-  [excludedDirectObjectTypes_ release];
-  [indirectObjectTypes_ release];
+  [directObjectTypeFilter_ release];
+  [returnedResultsTypeFilter_ release];
+  [otherTerms_ release];
+  [arguments_ release];
   
   [super dealloc];
 }
 
 - (BOOL)appliesToResults:(HGSResultArray *)results {
   BOOL doesApply = NO;
-  NSSet *directObjectTypes = [self directObjectTypes];
-  if (directObjectTypes) {
+  if (![self showInGlobalSearchResults]) {
+    HGSTypeFilter *directObjectTypeFilter = [self directObjectTypeFilter];
     // Not a global-only action.
-    NSSet *excludedDirectObjectTypes = [self excludedDirectObjectTypes];
     // All results must apply to the action for the action to show.
-    HGSTypeFilter *filter 
-      = [HGSTypeFilter filterWithConformTypes:directObjectTypes
-                          doesNotConformTypes:excludedDirectObjectTypes];
     for (HGSResult *result in results) {
-      doesApply = [filter isValidType:[result type]] 
+      doesApply = [directObjectTypeFilter isValidType:[result type]] 
         && [self appliesToResult:result];
       if (!doesApply) break;
     }
@@ -175,14 +245,35 @@ static NSSet *CopyStringSetFromId(id value) {
 }
 
 - (BOOL)showInGlobalSearchResults {
-  return [self directObjectTypes] == nil;
+  return [self directObjectTypeFilter] == nil;
 }
 
-// Subclasses should override to perform the action. Actions can have either one
-// or two objects. If only one is present, it should act as "noun verb" such as
-// "file open". If there are two it should behave as "noun verb noun" such as
-// "file 'email to' hasselhoff" with the 2nd being the indirect object.
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (HGSActionArgument *)nextArgumentToFillIn:(HGSActionOperation *)operation {
+  HGSActionArgument *reqdArgument = nil;
+  HGSActionArgument *optArgument = nil;
+  NSArray *arguments = [self arguments];
+  // Return the first required argument, or failing that, the first optional
+  // argument.
+  for (HGSActionArgument *arg in arguments) {
+    if ([arg isOptional]) {
+      if (!optArgument) {
+        id value = [operation argumentForKey:[arg identifier]];
+        if (!value) {
+          optArgument = arg;
+        }
+      }
+    } else {
+      id value = [operation argumentForKey:[arg identifier]];
+      if (!value) {
+        reqdArgument = arg;
+        break;
+      }
+    }
+  }
+  return reqdArgument ? reqdArgument : optArgument;
+}
+
+- (BOOL)performWithInfo:(NSDictionary *)info {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   if ([defaults boolForKey:kHGSValidateActionBehaviorsPrefKey]) {
     HGSLog(@"ERROR: Action %@ forgot to override performWithInfo:.",
@@ -190,6 +281,17 @@ static NSSet *CopyStringSetFromId(id value) {
   }
   [self doesNotRecognizeSelector:_cmd];
   return NO;  // COV_NF_LINE
+}
+
+- (HGSResultArray *)performReturningResultsWithInfo:(NSDictionary *)info {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  if ([defaults boolForKey:kHGSValidateActionBehaviorsPrefKey]) {
+    HGSLog(@"ERROR: Action %@ forgot to override "
+           @"performReturningResultsWithInfo:.",
+           [self class]);
+  }
+  [self doesNotRecognizeSelector:_cmd];
+  return nil;  // COV_NF_LINE
 }
 
 - (NSString*)description {

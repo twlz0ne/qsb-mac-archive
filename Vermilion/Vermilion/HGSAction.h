@@ -38,65 +38,52 @@
 #import <Foundation/Foundation.h>
 #import "HGSExtension.h"
 
+@class HGSTypeFilter;
 @class HGSResult;
 @class HGSResultArray;
+@class HGSActionArgument;
+@class HGSActionOperation;
 
 /*!
   @class HGSAction
   @discussion
-  The base class for actions. Actions can exist in two different versions.  The
-  first version is "noun verb" such as "file open". The second requires two
-  objects, "noun verb noun" such as "file 'email to' hasselhoff" with the 2nd
-  being the indirect object. An action can be asked if a given result is valid
-  as an indirect object. Actions can also return a result so that they can be
-  chained together.
+  The base class for actions. An action describes something that can be done.
+  Actions can have zero or more arguments. The primary argument for an action
+  (if is has one), is known as its direct object. The other arguments for an
+  action can be made required or optional.
+  Actions can also return a result so that they can be chained together.
 */
 @interface HGSAction : HGSExtension {
  @private
-  NSSet *directObjectTypes_;
-  NSSet *excludedDirectObjectTypes_;
-  NSSet *indirectObjectTypes_;
+  HGSTypeFilter *directObjectTypeFilter_;
   NSSet *otherTerms_;
-  BOOL indirectObjectOptional_;
   BOOL causesUIContextChange_;
   BOOL mustRunOnMainThread_;
+  HGSTypeFilter *returnedResultsTypeFilter_;
+  NSArray *arguments_;
 }
 
 /*!
   The types of direct objects that are valid for this action.
-  If directObjectTypes is nil, then the action is shown in the first
+  If directObjectTypeFilter is nil, then the action is shown in the first
   layer of search results.
   @result The value of "HGSActionDirectObjectTypes" from config dict.
 */
-@property (readonly, retain) NSSet *directObjectTypes;
+@property (readonly, retain) HGSTypeFilter *directObjectTypeFilter;
 
 /*!
-  The types of direct objects that are specifically excluded for this action.
-  Results are first filtered for acceptable types using directObjectTypes
-  and then eliminated based on types found in excludedDirectObjectTypes,
-  if any.
-  @result The value of "HGSActionExcludedDirectObjectTypes" from config dict.
-*/
-@property (readonly, retain) NSSet *excludedDirectObjectTypes;
-
-/*!
-  The types of direct objects that are valid for this action
-  @result The value of "HGSActionIndirectObjectTypes" from config dict.
-*/
-@property (readonly, retain) NSSet *indirectObjectTypes;
-
-/*!
-  Is the indirect object optional for this action.
-  @result Defaults to NO or the value of "HGSActionIndirectObjectOptional" from 
-          config dict.
-*/ 
-@property (readonly) BOOL indirectObjectOptional;
+ The types of results that this action returns.
+ If returnedResultsTypeFilter is nil, then the action does not return
+ any results.
+ @result The value of "HGSActionDirectObjectTypes" from config dict.
+ */
+@property (readonly, retain) HGSTypeFilter *returnedResultsTypeFilter;
 
 /*!
   Should this action appear in global search results list (ie-no pivot).
   @result Defautls to YES if directObjectTypes is nil.
 */
-@property (readonly) BOOL showInGlobalSearchResults;
+@property (readonly, assign) BOOL showInGlobalSearchResults;
 
 /*!
   Does the action cause a UI Context change? In the case of QSB, should we hide
@@ -104,20 +91,26 @@
   @result YES or the value of "HGSActionDoesActionCauseUIContextChange" from
           config dict.
 */
-@property (readonly) BOOL causesUIContextChange;
+@property (readonly, assign) BOOL causesUIContextChange;
 
 /*!
  Do you have to run this action on the main thread? Most actions should be able
  to be run in any thread.
  @result NO or the value of "HGSActionMustRunOnMainThread" from config dict.
 */
-@property (readonly) BOOL mustRunOnMainThread;
+@property (readonly, assign) BOOL mustRunOnMainThread;
 
 /*!
  Other terms that match this action when searching for it other than its name.
  @result nil or the value of "HGSActionOtherTerms" from config dict.
 */
-@property (readonly) NSSet *otherTerms;
+@property (readonly, retain) NSSet *otherTerms;
+
+/*!
+ Other arguments that this action can accept (aside from the directObject)
+ @result nil or the value of "HGSActionArguments" from config dict.
+*/
+@property (readonly, retain) NSArray *arguments;
 
 /*!
   Does the action apply to an individual result. The calling code will check
@@ -159,21 +152,39 @@
 - (id)displayIconForResults:(HGSResultArray*)results;
 
 /*!
-  Conformers override to perform the action. Actions can have either one or two
-  objects. If only one is present, it should act as "noun verb" such as "file
-  open". If there are two it should behave as "noun verb noun" such as "file
-  'email to' hasselhoff" with the 2nd being the indirect object.
-  
-  <b>Do not call this method directly. Wrap your action up in an
-  HGSActionOperation and use that instead.</b>
-  
-  @param info keys: 
-  1 kHGSActionDirectObjectsKey (HGSResultArray *) - the direct objects (reqd)  
-  2 kHGSActionIndirectObjectsKey (HGSResultArray *) - the indirect objects (opt)
-  
-  @result YES if action performed.
+ Subclassers override to perform the action if the action does not return
+ results.
+ 
+ <b>Do not call this method directly. Wrap your action up in an
+ HGSActionOperation and use that instead.</b>
+ 
+ @param info contains a key/value pair for each argument being passed to the
+ action. kHGSActionDirectObjectsKey represent the direct objects.
+ Arguments will be HGSResultArrays (even if it's a single object).
+ @result YES if action performed.
 */
-- (BOOL)performWithInfo:(NSDictionary*)info;
+- (BOOL)performWithInfo:(NSDictionary *)info;
+
+/*!
+ Subclassers override to perform the action if it returns results.
+ 
+ <b>Do not call this method directly. Wrap your action up in an
+ HGSActionOperation and use that instead.</b>
+ 
+ @param info contains a key/value pair for each argument being passed to the
+ action. kHGSActionDirectObjectsKey represent the direct objects.
+ Arguments will be HGSResultArrays (even if it's a single object).
+ @result array of results. nil, or empty array implies the action failed.
+*/
+- (HGSResultArray *)performReturningResultsWithInfo:(NSDictionary *)info;
+
+/*!
+  Return the next action argument to fill in based on the state of the
+  operation that we are creating.
+  @param operation the current operation that we are creating
+  @result the argument to fill in. nil if there are no more arguments.
+*/
+- (HGSActionArgument *)nextArgumentToFillIn:(HGSActionOperation *)operation;
 
 @end
 
@@ -186,20 +197,20 @@
 #define kHGSValidateActionBehaviorsPrefKey @"HGSValidateActionBehaviors"
 
 /*!
-  The key for the direct objects for to performWithInfo:. 
+  The key for the direct objects for performWithInfo:results:. 
  
   Type is HGSResultsArray.
-  @see //google_vermilion_ref/occ/instm/HGSAction/performWithInfo: performWithInfo:
+  @see //google_vermilion_ref/occ/instm/HGSAction/performWithInfo:results: performWithInfo:results:
 */
 extern NSString* const kHGSActionDirectObjectsKey;
 
 /*!
- The key for the indirect objects for to performWithInfo:.
+ The key for the arguments for performWithInfo:results: results. 
  
- Type is HGSResultsArray.
- @see //google_vermilion_ref/occ/instm/HGSAction/performWithInfo: performWithInfo:
+ Type is NSDictionary.
+ @see //google_vermilion_ref/occ/instm/HGSAction/performWithInfo:results: performWithInfo:results:
 */
-extern NSString* const kHGSActionIndirectObjectsKey;
+extern NSString* const kHGSActionArgumentsKey;
 
 /*!
  Configuration key for direct object types that the action supports.
@@ -217,33 +228,43 @@ extern NSString* const kHGSActionDirectObjectTypesKey;
  Default is nil, which means that no filtering is performed.
  
  Type is NSString, NSArray or NSSet. '*' is not allowed.
- */
+*/
 extern NSString* const kHGSActionExcludedDirectObjectTypesKey;
-
-/*!
- Configuration key for indirect object types that the action supports.
- Default is nil, which means no indirect objects.
- 
- Type is NSString, NSArray or NSSet. '*' matches all types.
-*/
-extern NSString* const kHGSActionIndirectObjectTypesKey;
-
-/*!
- Configuration key for whether indirect object types are optional.
- Default is NO.
- 
- Type is Boolean.
-*/
-extern NSString* const kHGSActionIndirectObjectOptionalKey;
 
 /*!
  Configuration key for whether the action should cause a UI context change
  away from QSB. If there's a context change QSB will disappear.
  Default is YES.
  
- Type is Boolean.
+ Type is BOOL.
 */
 extern NSString* const kHGSActionDoesActionCauseUIContextChangeKey;
+
+/*!
+ Configuration key for result types that the action returns.
+ Default is nil, which means that the action does not return results.
+ 
+ Type is NSString, NSArray or NSSet. '*' matches all types.
+*/
+extern NSString* const kHGSActionReturnedResultsTypesKey;
+
+/*!
+ Configuration key for result types types that the action specifically
+ does not return and which filters the types allowed by
+ kHGSActionReturnedResultsTypesKey.
+ Default is nil, which means that no filtering is performed.
+ 
+ Type is NSString, NSArray or NSSet. '*' is not allowed.
+*/
+extern NSString* const kHGSActionExcludedReturnedResultsTypesKey;
+
+/*!
+ Configuration key for whether the action needs to run on the main thread.
+ Default is NO.
+ 
+ Type is BOOL.
+ */
+extern NSString* const kHGSActionMustRunOnMainThreadKey;
 
 /*!
  Configuration key for other terms that match for this action. 
@@ -251,3 +272,47 @@ extern NSString* const kHGSActionDoesActionCauseUIContextChangeKey;
  Type is NSString, or NSArray of NSString.
 */
 extern NSString* const kHGSActionOtherTermsKey;
+
+/*!
+ Configuration key for other arguments for this action. 
+ 
+ Type is NSArray or NSDictionary
+*/
+extern NSString* const kHGSActionArgumentsKey;
+
+/*!
+ Notification sent to notification center to announce that
+ an action will be performed.
+
+ Object is the action (HGSAction *)
+
+ The userInfo argument contains an entry for each argument keyed by name.
+ Usually has HGSActionDirectObjects representing the direct objects for the
+ action.
+*/
+extern NSString *const kHGSActionWillPerformNotification;
+
+/*!
+ Notification sent to notification center to announce that
+ an action was attempted (not necessarily that it did succeed)
+ 
+ Object is the action (HGSAction *)
+ 
+ The userInfo argument contains an entry for each argument keyed by name.
+ Usually has HGSActionDirectObjects representing the direct objects for the
+ action.
+ The userInfo also contains a value for HGSActionCompletedSuccessfully 
+ designating if the action was successful.
+*/
+extern NSString *const kHGSActionDidPerformNotification;
+
+/*!
+ Key for kHGSActionDidPerformNotification. BOOL as NSNumber.
+*/
+extern NSString* const kHGSActionCompletedSuccessfullyKey;  
+
+/*!
+ Key for kHGSActionDidPerformNotification. Represents the result (if any)
+ of an action. Type is HGSResultArray.
+*/
+extern NSString* const kHGSActionResultsKey;  

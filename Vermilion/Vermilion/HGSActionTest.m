@@ -35,9 +35,13 @@
 #else
 #import <UIKit/UIKit.h>
 #endif
+#import <OCMock/OCMock.h>
+
 #import "GTMSenTestCase.h"
 
 #import "HGSAction.h"
+#import "HGSActionArgument.h"
+#import "HGSActionOperation.h"
 #import "HGSResult.h"
 #import "HGSType.h"
 
@@ -72,7 +76,7 @@
 
 @implementation MyAction : HGSAction
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects
      = [info objectForKey:kHGSActionDirectObjectsKey];
   return (directObjects != nil) ? YES : NO;
@@ -97,6 +101,32 @@
   [localIcon_ release];
   [super dealloc];
 }
+@end
+
+@interface BadActionArgument : NSObject
+@end
+
+@implementation BadActionArgument
+@end
+
+@interface CantInitActionArgument : HGSActionArgument
+@end
+
+@implementation CantInitActionArgument
+
+- (id)initWithConfiguration:(NSDictionary *)dictionary {
+  self = [super initWithConfiguration:dictionary];
+  [self release];
+  self = nil;
+  return self;
+}
+
+@end
+
+@interface GoodActionArgument : HGSActionArgument
+@end
+
+@implementation GoodActionArgument
 @end
 
 #pragma mark -
@@ -137,10 +167,14 @@
        @"designatedInit", kHGSExtensionUserVisibleNameKey,
        @"test2", kHGSExtensionIdentifierKey,
        bundle_, kHGSExtensionBundleKey,
+       [NSNumber numberWithBool:YES], kHGSActionDoesActionCauseUIContextChangeKey,
+       [NSNumber numberWithBool:YES], kHGSActionMustRunOnMainThreadKey,
        nil];
   HGSAction* myAction = [[MyAction alloc] initWithConfiguration:myConfig];
   STAssertNotNil(myAction, @"couldn't create action");
   STAssertNotNil([myAction description], @"no description");
+  STAssertTrue([myAction causesUIContextChange], nil);
+  STAssertTrue([myAction mustRunOnMainThread], nil);
   [myAction release];
   
   // test passing empty configuration
@@ -231,7 +265,6 @@
   
   NSMutableDictionary* info = [NSMutableDictionary dictionary];
   [info setObject:obj forKey:kHGSActionDirectObjectsKey];
-  [info setObject:obj2 forKey:kHGSActionIndirectObjectsKey];
   
   BOOL result = [myAction performWithInfo:info];
   STAssertTrue(result, @"action failed");
@@ -301,6 +334,182 @@
   results = [HGSResultArray arrayWithResults:
              [NSArray arrayWithObjects:acceptableText, acceptableFile, nil]];
   STAssertTrue([pickyAction appliesToResults:results], nil);
+}
+
+- (void)testActionArguments {
+  NSMutableDictionary *argOneConfig 
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       @"testActionArguments", kHGSActionArgumentIdentifierKey,
+       @"*", kHGSActionArgumentSupportedTypesKey,
+       nil];
+  NSMutableDictionary *actionConfiguration
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       @"ActionArguments", kHGSExtensionUserVisibleNameKey,
+       @"action.arguments", kHGSExtensionIdentifierKey,
+       bundle_, kHGSExtensionBundleKey,
+       argOneConfig, kHGSActionArgumentsKey,
+       nil];
+  HGSAction* action
+    = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+       autorelease];
+  STAssertNotNil(action, nil);
+  
+  NSMutableDictionary *argTwoConfig
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       @"testActionArguments2", kHGSActionArgumentIdentifierKey,
+       @"*", kHGSActionArgumentSupportedTypesKey,
+       nil];
+  NSArray *args = [NSArray arrayWithObjects:argOneConfig, argTwoConfig, nil];
+  [actionConfiguration setObject:args forKey:kHGSActionArgumentsKey];
+  action = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+            autorelease];
+  STAssertNotNil(action, nil);
+  
+  // Test various action argument classes
+  [argOneConfig setObject:@"BogusTestActionArgument" 
+                   forKey:kHGSActionArgumentClassKey];
+  action = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+            autorelease];
+  STAssertNil(action, nil);
+
+  [argOneConfig setObject:NSStringFromClass([BadActionArgument class])
+                   forKey:kHGSActionArgumentClassKey];
+  action = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+            autorelease];
+  STAssertNil(action, nil);
+
+  [argOneConfig setObject:NSStringFromClass([CantInitActionArgument class])
+                   forKey:kHGSActionArgumentClassKey];
+  action = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+            autorelease];
+  STAssertNil(action, nil);
+  
+  [argOneConfig setObject:NSStringFromClass([GoodActionArgument class]) 
+                   forKey:kHGSActionArgumentClassKey];
+  action = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+            autorelease];
+  STAssertNotNil(action, nil);
+}
+
+- (void)testPerformWithInfo {
+  NSDictionary *actionConfiguration
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       @"testPerformWithInfo", kHGSExtensionUserVisibleNameKey,
+       @"testPerformWithInfo", kHGSExtensionIdentifierKey,
+       bundle_, kHGSExtensionBundleKey,
+       nil];
+  HGSAction* action
+    = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+       autorelease];
+  STAssertThrows([action performWithInfo:nil], nil);
+}
+
+- (void)testNextArgToFillIn {
+  NSMutableDictionary *actionConfiguration
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       @"ActionArguments", kHGSExtensionUserVisibleNameKey,
+       @"action.arguments", kHGSExtensionIdentifierKey,
+       bundle_, kHGSExtensionBundleKey,
+       nil];
+  HGSAction* action
+    = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+       autorelease];
+  STAssertNotNil(action, nil);
+  
+  // Test action with no args
+  HGSActionOperation *actionOperation 
+    = [[[HGSActionOperation alloc] initWithAction:action
+                                        arguments:nil] autorelease];
+  STAssertNotNil(actionOperation, nil);
+  HGSActionArgument *arg = [action nextArgumentToFillIn:actionOperation];
+  STAssertNil(arg, nil);
+  
+  // test action with one reqd arg, no values
+  NSMutableDictionary *argOneConfig 
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       @"testActionArguments", kHGSActionArgumentIdentifierKey,
+       @"*", kHGSActionArgumentSupportedTypesKey,
+       @"testActionArguments", kHGSActionArgumentUserVisibleNameKey,
+       nil];
+  [actionConfiguration setObject:argOneConfig forKey:kHGSActionArgumentsKey];
+  action
+    = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+       autorelease];
+  STAssertNotNil(action, nil);
+  actionOperation 
+    = [[[HGSActionOperation alloc] initWithAction:action
+                                        arguments:nil] autorelease];
+  STAssertNotNil(actionOperation, nil);
+  arg = [action nextArgumentToFillIn:actionOperation];
+  STAssertEqualObjects([arg identifier], @"testActionArguments", nil);
+  
+  // Test action one reqd arg, with value
+  id results = [OCMockObject mockForClass:[HGSResultArray class]];
+  NSDictionary *argValues 
+    = [NSDictionary dictionaryWithObject:results
+                                  forKey:@"testActionArguments"];
+  actionOperation 
+    = [[[HGSActionOperation alloc] initWithAction:action
+                                        arguments:argValues] autorelease];
+  STAssertNotNil(actionOperation, nil);
+  arg = [action nextArgumentToFillIn:actionOperation];
+  STAssertNil(arg, nil);
+  
+  // Test action one optional, one reqd, no values
+  NSMutableDictionary *argTwoConfig
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       @"testActionArguments2", kHGSActionArgumentIdentifierKey,
+       @"*", kHGSActionArgumentSupportedTypesKey,
+       [NSNumber numberWithBool:YES], kHGSActionArgumentOptionalKey,
+       @"testActionArguments2", kHGSActionArgumentUserVisibleNameKey,
+       nil];
+  NSArray *args = [NSArray arrayWithObjects:argTwoConfig, argOneConfig, nil];
+  [actionConfiguration setObject:args forKey:kHGSActionArgumentsKey];
+  action
+    = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+       autorelease];
+  STAssertNotNil(action, nil);
+  actionOperation 
+    = [[[HGSActionOperation alloc] initWithAction:action
+                                        arguments:nil] autorelease];
+  STAssertNotNil(actionOperation, nil);
+  arg = [action nextArgumentToFillIn:actionOperation];
+  STAssertEqualObjects([arg identifier], @"testActionArguments", nil);
+  
+  // Test action one optional, one reqd, reqd filled in
+  actionOperation 
+    = [[[HGSActionOperation alloc] initWithAction:action
+                                        arguments:argValues] autorelease];
+  STAssertNotNil(actionOperation, nil);
+  arg = [action nextArgumentToFillIn:actionOperation];
+  STAssertEqualObjects([arg identifier], @"testActionArguments2", nil);
+  
+  // Test two optional, no values
+  [argOneConfig setObject:[NSNumber numberWithBool:YES] 
+                   forKey:kHGSActionArgumentOptionalKey];
+  action
+    = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+       autorelease];
+  STAssertNotNil(action, nil);
+  actionOperation 
+    = [[[HGSActionOperation alloc] initWithAction:action
+                                      arguments:nil] autorelease];
+  STAssertNotNil(actionOperation, nil);
+  arg = [action nextArgumentToFillIn:actionOperation];
+  STAssertEqualObjects([arg identifier], @"testActionArguments2", nil);
+}
+
+- (void)testDefaultIconName {
+  NSMutableDictionary *actionConfiguration
+    = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+       @"DefaultIcon", kHGSExtensionUserVisibleNameKey,
+       @"DefaultIcon", kHGSExtensionIdentifierKey,
+       bundle_, kHGSExtensionBundleKey,
+       nil];
+  HGSAction* action
+    = [[[HGSAction alloc] initWithConfiguration:actionConfiguration]
+       autorelease];
+  STAssertEqualObjects([action defaultIconName], @"red-gear", nil);
 }
 
 @end
