@@ -31,20 +31,15 @@
 //
 
 #import "QSBMoreResultsViewController.h"
-#import <QSBPluginUI/QSBPluginUI.h>
+
+#import <Vermilion/Vermilion.h>
 #import <GTM/GTMNSObject+KeyValueObserving.h>
-#import "QSBApplicationDelegate.h"
+#import <GTM/GTMMethodCheck.h>
+
 #import "QSBSearchController.h"
-#import "QSBSearchViewController.h"
 #import "QSBPreferences.h"
 #import "QSBTableResult.h"
 #import "QSBResultsViewTableView.h"
-#import "QSBSearchWindowController.h"
-#import "QSBTopResultsViewController.h"
-#import "HGSLog.h"
-#import "GTMGarbageCollection.h"
-#import "GTMMethodCheck.h"
-#import "GTMNSNumber+64Bit.h"
 #import "NSAttributedString+Attributes.h"
 #import "QSBMoreResultsResultCell.h"
 
@@ -60,6 +55,7 @@ static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 - (void)cacheTableResult:(QSBTableResult *)result forRow:(NSInteger)row;
 - (void)uncacheTableResultForRow:(NSInteger)row;
 - (void)uncacheAllTableResults;
+- (void)addShowAllCategory:(QSBCategory *)category;
 @end
 
 @implementation QSBMoreResultsViewController
@@ -67,55 +63,36 @@ static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
 
-- (id)initWithNibName:(NSString *)nibNameOrNil 
-               bundle:(NSBundle *)nibBundleOrNil {
-  if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
+- (id)initWithSearchController:(QSBSearchController *)controller {
+  if ((self = [super initWithSearchController:controller 
+                                      nibName:@"QSBMoreResultsView"])) {
     showAllCategoriesSet_ = [[NSMutableSet alloc] init];
     cachedRows_ = [[NSMutableDictionary alloc] init];
+    blockTime_ = -1;
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    [prefs gtm_addObserver:self
+                forKeyPath:kQSBMoreCategoryResultCountKey
+                  selector:@selector(moreCategoryResultCountChanged:)
+                  userInfo:nil
+                   options:NSKeyValueObservingOptionNew];
+    [prefs gtm_addObserver:self
+                forKeyPath:kQSBMaxMoreResultCountBeforeAbridgingKey
+                  selector:@selector(maxMoreResultCountBeforeAbridgingChanged:)
+                  userInfo:nil
+                   options:NSKeyValueObservingOptionNew];
+    
+    moreCategoryResultCount_ 
+      = [prefs integerForKey:kQSBMoreCategoryResultCountKey];
+    maxMoreResultCountBeforeAbridging_ 
+      = [prefs integerForKey:kQSBMaxMoreResultCountBeforeAbridgingKey];
   }
   return self;
 }
-  
+
 - (void)awakeFromNib {  
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
-  [resultsTableView setDataSource:self];
-  [resultsTableView setDelegate:self];
-  [resultsTableView reloadData];
   [resultsTableView setIntercellSpacing:NSMakeSize(0.0, 3.0)];
 
-  // Hide and install the 'More' view.
-  NSView *resultsView = [self resultsView];
-  [resultsView setHidden:YES];
-  [self setShowing:NO];
-  NSRect viewFrame = [resultsView frame];
-
-  // Nudge the view just out of visibility (by 100).
-  CGFloat viewOffset = NSHeight(viewFrame) + 100.0;
-  QSBSearchViewController *viewController = [self searchViewController];
-  QSBSearchWindowController *windowController 
-    = [viewController searchWindowController];
-  NSView *contentView = [windowController resultsView];
-  viewFrame.origin.y -= viewOffset;
-  viewFrame.size.width = NSWidth([contentView frame]);
-  [resultsView setFrame:viewFrame];
-  [contentView addSubview:resultsView];
-  blockTime_ = -1;
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_addObserver:self
-              forKeyPath:kQSBMoreCategoryResultCountKey
-                selector:@selector(moreCategoryResultCountChanged:)
-                userInfo:nil
-                 options:NSKeyValueObservingOptionNew];
-  [prefs gtm_addObserver:self
-              forKeyPath:kQSBMaxMoreResultCountBeforeAbridgingKey
-                selector:@selector(maxMoreResultCountBeforeAbridgingChanged:)
-                userInfo:nil
-                 options:NSKeyValueObservingOptionNew];
-  
-  moreCategoryResultCount_ 
-    = [prefs integerForKey:kQSBMoreCategoryResultCountKey];
-  maxMoreResultCountBeforeAbridging_ 
-    = [prefs integerForKey:kQSBMaxMoreResultCountBeforeAbridgingKey];
   [super awakeFromNib];
 }
 
@@ -133,10 +110,6 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   // TODO(mrossetti): We probably want to calculate the following based
   // on the screen geometry.
   return 550.0;
-}
-
-- (BOOL)isTransitionDirectionUp {
-  return NO;
 }
 
 - (NSUInteger)resultCountForCategory:(QSBCategory *)category {
@@ -215,10 +188,8 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
                                                           count:count];
       }
       if (!object) {
-        QSBSearchViewController *searchViewController 
-          = [self searchViewController];
         QSBSearchController *searchController 
-          = [searchViewController searchController];
+          = [self searchController];
         NSUInteger startRow = [separatorRows_ indexLessThanIndex:endRow];
         if (startRow == NSNotFound) {
           startRow = 0;
@@ -240,9 +211,14 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   return object;
 }
 
-- (void)setShowing:(BOOL)value {
-  [showAllCategoriesSet_ removeAllObjects];
-  [super setShowing:value];
+- (IBAction)qsb_showAllForSelectedCategory:(id)sender {
+  NSTableView *tableView = [self resultsTableView];
+  NSInteger row = [tableView selectedRow];
+  NSRange range = NSMakeRange(0, row);
+  NSUInteger categoryIndex = [separatorRows_ countOfIndexesInRange:range];
+  
+  QSBCategory *category = [sortedCategories_ objectAtIndex:categoryIndex];
+  [self addShowAllCategory:category];
 }
 
 - (void)addShowAllCategory:(QSBCategory *)category {
@@ -293,15 +269,17 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
 }
 
 - (void)cacheTableResult:(QSBTableResult *)result forRow:(NSInteger)row {
-  NSNumber *key = [NSNumber numberWithInteger:row];
-  [self removeCachedTableResultObserver:key];
-  if ([result isKindOfClass:[QSBSourceTableResult class]]) {
-    [result gtm_addObserver:self forKeyPath:@"displayIcon" 
-                   selector:@selector(displayIconUpdated:) 
-                   userInfo:key 
-                    options:0];
+  if (result) {
+    NSNumber *key = [NSNumber numberWithInteger:row];
+    [self removeCachedTableResultObserver:key];
+    if ([result isKindOfClass:[QSBSourceTableResult class]]) {
+      [result gtm_addObserver:self forKeyPath:@"displayIcon" 
+                     selector:@selector(displayIconUpdated:) 
+                     userInfo:key 
+                      options:0];
+    }
+    [cachedRows_ setObject:result forKey:key];
   }
-  [cachedRows_ setObject:result forKey:key];
 }
 
 
@@ -321,7 +299,8 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
 #pragma mark NSResponder Overrides
 
 - (void)moveUp:(id)sender {
-  NSInteger row = [[self resultsTableView] selectedRow];
+  QSBResultsViewTableView *tableView = [self resultsTableView];
+  NSInteger row = [tableView selectedRow];
   
   NSTimeInterval timeToBlock = 0.0;
   
@@ -343,9 +322,10 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   
   if (row == 0) {
     // If we're on the first row then transition to the 'Top' results view.
-    [[self searchViewController] showTopResults:sender];
+    [NSApp sendAction:@selector(qsb_showTopResults:) to:nil from:self];
   } else {
-    [super moveUp:sender];
+    [tableView selectFirstSelectableRowByIncrementing:NO
+                                           startingAt:row - 1];
   }
    blockTime_ = -1;
 }
@@ -353,7 +333,8 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
 // Repeats can't move us past the first row until a delay passes. this prevents
 // overshooting the top results
 - (void)moveDown:(id)sender {
-  NSInteger row = [[self resultsTableView] selectedRow];
+  QSBResultsViewTableView *tableView = [self resultsTableView];
+  NSInteger row = [tableView selectedRow];
   
   NSTimeInterval timeToBlock = 0.0;
   
@@ -380,7 +361,8 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
     }
   }
   blockTime_ = -1;
-  [super moveDown:sender];
+  [tableView selectFirstSelectableRowByIncrementing:YES
+                                         startingAt:row + 1];
 }
 
 #pragma mark NSTableViewDelegate Methods
@@ -396,14 +378,6 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
   // this method as a datasource. We actually set our cell's data in
   // tableView:willDisplayCell:forTableColumn:row
   return @"";
-}
-
-- (void)tableView:(NSTableView *)aTableView 
-  willDisplayCell:(id)aCell 
-   forTableColumn:(NSTableColumn *)aTableColumn 
-              row:(NSInteger)rowIndex {
-  QSBTableResult *result = [self tableResultForRow:rowIndex];
-  [aCell setRepresentedObject:result];
 }
 
 - (void)qsbTableView:(NSTableView*)view

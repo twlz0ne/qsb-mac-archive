@@ -52,9 +52,10 @@
   NSMutableDictionary *cachedRows_;  // A cache of the currently visible rows
 }
 
-// Adds a category to the 'show all' list and then updates the contents
-// appropriately.
-- (void)addShowAllCategory:(QSBCategory *)category;
+- (id)initWithSearchController:(QSBSearchController *)controller;
+
+// Reveals all of the items in the currently selected category
+- (IBAction)qsb_showAllForSelectedCategory:(id)sender;
 
 @end
 
