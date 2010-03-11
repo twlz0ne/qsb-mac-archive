@@ -30,9 +30,16 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <GData/GData.h>
 #import "HGSGDataUploadAction.h"
+
+#import <GData/GData.h>
+
+#import "HGSBundle.h"
 #import "HGSKeychainItem.h"
+#import "HGSLog.h"
+#import "HGSResult.h"
+#import "HGSSimpleAccount.h"
+#import "HGSType.h"
 
 static NSString *const kHGSGDataUploadActionAttemptNumberKey
   = @"kHGSGDataUploadActionAttemptNumberKey";
