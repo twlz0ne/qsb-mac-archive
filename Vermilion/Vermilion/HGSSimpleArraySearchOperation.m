@@ -37,6 +37,8 @@
 #import "HGSMixer.h"
 #import "HGSResult.h"
 #import "HGSTypeFilter.h"
+#import "HGSActionArgument.h"
+#import "HGSQuery.h"
 
 @implementation HGSSimpleArraySearchOperation
 GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:object:userInfo:);
@@ -54,14 +56,29 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
   HGSAssert(![self isFinished], @"setting results after the query is done?");
   // No point in telling the observers there weren't results.  The source
   // should be calling finishQuery shortly to let it know it's done.
-  if ([results count] == 0) return;
+  NSUInteger resultsCount = [results count];
+  if (resultsCount == 0) return;
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  // We do a copy here in case sources pass us a mutable object
-  // and then go and mutate it underneath us.
+  HGSQuery *query = [self query];
+  HGSActionArgument *actionArg = [query actionArgument];
+  if (actionArg) {
+    NSMutableArray *actionScoredResults 
+      = [NSMutableArray arrayWithCapacity:resultsCount];
+    [actionArg willScoreForQuery:query];
+    for (HGSScoredResult *result in results) {
+      result = [actionArg scoreResult:result forQuery:query];
+      if (result) {
+        [actionScoredResults addObject:result];
+      }
+    }
+    [actionArg didScoreForQuery:query];
+    results = actionScoredResults;
+  } 
+  NSArray *sortedResults 
+    = [results sortedArrayUsingFunction:HGSMixerScoredResultSort context:nil];
   @synchronized (self) {
     [results_ autorelease];
-    results_ = [[results sortedArrayUsingFunction:HGSMixerScoredResultSort 
-                                          context:nil] retain];
+    results_ = [sortedResults retain];
   }
   [nc hgs_postOnMainThreadNotificationName:kHGSSearchOperationDidUpdateResultsNotification
                                     object:self
