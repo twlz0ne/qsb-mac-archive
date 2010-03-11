@@ -49,6 +49,22 @@
 @interface FileSystemOpenAgainAction : HGSAction
 @end
 
+@interface FileSystemOpenActionApplicationArgument : HGSActionArgument {
+ @private
+  NSArray *appURLs_;
+  NSURL *defaultURL_;
+}
+@end
+
+@interface FileSystemRenameAction : HGSAction
+@end
+
+@interface FileSystemMoveToAction : HGSAction
+@end
+
+@interface FileSystemSetCommentAction : HGSAction
+@end
+
 @interface FileSystemQuickLookAction : HGSAction {
  @private
   NSArray *urls_;
@@ -72,7 +88,96 @@
 
 @implementation FileSystemOpenWithAction
 
-// TODO(alcor): for now this behaves as Open, support indirects.
+- (BOOL)performWithInfo:(NSDictionary *)info {
+  HGSResultArray *directObjects 
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  HGSResultArray *apps 
+    = [info objectForKey:@"com.google.filesystem.action.openwith.application"];
+  NSArray *appURLs = [apps urls];
+  NSArray *directURLs = [directObjects urls];
+  BOOL wasGood = YES;
+  for (NSString *appURL in appURLs) {
+    LSLaunchURLSpec spec = {
+      (CFURLRef)appURL,
+      (CFArrayRef)directURLs,
+      NULL,
+      0,
+      NULL
+    };
+    wasGood &= LSOpenFromURLSpec(&spec, NULL) == noErr;
+  }
+  return wasGood;
+}
+
+@end
+
+@implementation FileSystemOpenActionApplicationArgument
+
+- (void)willScoreForQuery:(HGSQuery *)query {
+  HGSActionOperation *actionOperation = [query actionOperation];
+  HGSResultArray *directTypes 
+    = [actionOperation argumentForKey:kHGSActionDirectObjectsKey];
+  if ([directTypes count]) {
+    HGSResult *theDirectType = [directTypes objectAtIndex:0];
+    CFURLRef directTypeURL = NULL;
+    if ([theDirectType isFileResult]) {
+      NSString *filePath = [theDirectType filePath];
+      directTypeURL = (CFURLRef)[NSURL fileURLWithPath:filePath];
+    } else {
+      directTypeURL = (CFURLRef)[theDirectType url];
+    }
+    appURLs_ = (NSArray *)LSCopyApplicationURLsForURL(directTypeURL, 
+                                                      kLSRolesAll);
+    OSStatus err = LSGetApplicationForURL(directTypeURL, 
+                                          kLSRolesAll, 
+                                          NULL, 
+                                          (CFURLRef *)&defaultURL_);
+    HGSCheckDebug(err == noErr, nil);
+  } else {
+    HGSLogDebug(@"No direct types for %@ for %@", 
+                actionOperation, [self class]);
+  }
+}
+  
+- (void)didScoreForQuery:(HGSQuery *)query {
+  [appURLs_ release];
+  appURLs_ = nil;
+  [defaultURL_ release];
+  defaultURL_ = nil;
+}
+
+- (HGSScoredResult *)scoreResult:(HGSScoredResult *)result 
+                        forQuery:(HGSQuery *)query {
+  HGSScoredResult *outResult = nil;
+  if ([result conformsToType:kHGSTypeFileApplication]) {
+    NSString *appPath = [result filePath];
+    NSURL *appURL = [NSURL fileURLWithPath:appPath];
+    Boolean accepts = [appURLs_ containsObject:appURL];
+    if (!accepts) {
+      outResult = [HGSScoredResult resultWithResult:result
+                                              score:[result score]
+                                         flagsToSet:eHGSBelowFoldRankFlag
+                                       flagsToClear:0
+                                        matchedTerm:[result matchedTerm]
+                                     matchedIndexes:[result matchedIndexes]];
+    } else {
+      CGFloat score = [result score];
+      if ([appURL isEqual:defaultURL_]) {
+        score = HGSCalibratedScore(kHGSCalibratedPerfectScore);
+      }
+      
+      outResult = [HGSScoredResult resultWithResult:result
+                                              score:score
+                                         flagsToSet:0
+                                       flagsToClear:0
+                                        matchedTerm:[result matchedTerm]
+                                     matchedIndexes:[result matchedIndexes]];
+    }
+  } else if ([result conformsToType:kHGSTypeDirectory]) {
+    outResult = result;
+  }
+  return outResult;
+}
 
 @end
 
@@ -91,7 +196,7 @@
   return defaultObject;
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects
      = [info objectForKey:kHGSActionDirectObjectsKey];
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
@@ -220,7 +325,7 @@
   return defaultObject;
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
   
@@ -288,7 +393,7 @@
   return fileSystemActionScript;
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects
      = [info objectForKey:kHGSActionDirectObjectsKey];
   NSArray *args = [directObjects filePaths];
@@ -335,6 +440,118 @@
 
 @end
 
+@implementation FileSystemRenameAction
+
+- (BOOL)performWithInfo:(NSDictionary *)info {
+  BOOL wasGood = NO;
+  HGSResultArray *directObjects 
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  HGSResultArray *names
+    = [info objectForKey:@"com.google.filesystem.action.rename.name"];
+  if ([directObjects count] && [names count]) {
+    HGSResult *nameResult = [names objectAtIndex:0];
+    NSDictionary *value 
+      = [nameResult valueForKey:kHGSObjectAttributePasteboardValueKey];
+    if (value) {
+      NSString *name = [value objectForKey:NSStringPboardType];
+      NSUInteger location = [name rangeOfString:@"."].location;
+      NSFileManager *fm = [NSFileManager defaultManager];
+      wasGood = YES;
+      for (HGSResult *result in directObjects) {
+        NSString *filePath = [result filePath];
+        NSString *extension = [filePath pathExtension];
+        NSString *directory = [filePath stringByDeletingLastPathComponent];
+        NSString *newPath = [directory stringByAppendingPathComponent:name];
+        // If the user hasn't supplied us with an extension, use the one that
+        // is already there.
+        if (location == 0 || location == NSNotFound) {
+          newPath = [newPath stringByAppendingPathExtension:extension];
+        }
+        NSError *error = nil;
+        if (![fm moveItemAtPath:filePath toPath:newPath error:&error]) {
+          wasGood = NO;
+          [NSApp presentError:error];
+          break;
+        }
+      }
+    }
+  }
+  return wasGood;
+}
+
+@end
+
+@implementation FileSystemSetCommentAction
+
+- (BOOL)performWithInfo:(NSDictionary *)info {
+  BOOL wasGood = NO;
+  HGSResultArray *directObjects 
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  HGSResultArray *comments
+    = [info objectForKey:@"com.google.filesystem.action.setcomments.comment"];
+  if ([directObjects count] && [comments count]) {
+    HGSResult *commentResult = [comments objectAtIndex:0];
+    NSDictionary *value 
+      = [commentResult valueForKey:kHGSObjectAttributePasteboardValueKey];
+    if (value) {
+      NSString *comment = [value objectForKey:NSStringPboardType];
+      wasGood = YES;
+      for (HGSResult *result in directObjects) {
+        NSString *filePath = [result filePath];
+        NSString *source 
+          = [NSString stringWithFormat:
+             @"tell app \"Finder\"\r"
+             @"set comment of file (posix file(\"%@\")) to \"%@\"\r"
+             @"end", filePath, comment];
+        NSAppleScript *script = [[NSAppleScript alloc] initWithSource:source];
+        NSDictionary *error = nil;
+        NSAppleEventDescriptor *desc = [script executeAndReturnError:&error];
+        [script release];
+        if (!desc || error) {
+          wasGood = NO;
+          HGSLog(@"Error Setting Comment: %@", error);
+          break;
+        }
+      }
+    }
+  }
+  return wasGood;
+}
+
+@end
+
+@implementation FileSystemMoveToAction
+
+- (BOOL)performWithInfo:(NSDictionary *)info {
+  BOOL wasGood = NO;
+  HGSResultArray *directObjects 
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  HGSResultArray *directories
+    = [info objectForKey:@"com.google.filesystem.action.moveto.location"];
+  if ([directObjects count] && [directories count]) {
+    HGSResult *dirResult = [directories objectAtIndex:0];
+    NSString *dir = [dirResult filePath];
+    if (dir) {
+      NSFileManager *fm = [NSFileManager defaultManager];
+      wasGood = YES;
+      for (HGSResult *result in directObjects) {
+        NSString *filePath = [result filePath];
+        NSString *newFile = [filePath lastPathComponent];
+        newFile = [dir stringByAppendingPathComponent:newFile];
+        NSError *error = nil;
+        if (![fm moveItemAtPath:filePath toPath:newFile error:&error]) {
+          wasGood = NO;
+          [NSApp presentError:error];
+          break;
+        }
+      }
+    }
+  }
+  return wasGood;
+}
+
+@end
+
 @implementation FileSystemQuickLookAction
 
 - (void)dealloc {
@@ -361,7 +578,7 @@
   return url;
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
   [urls_ autorelease];
@@ -440,7 +657,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
   return defaultObject;
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects
      = [info objectForKey:kHGSActionDirectObjectsKey];
   

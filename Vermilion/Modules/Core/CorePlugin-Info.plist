@@ -182,6 +182,10 @@
 			<string>^Show in Finder</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file</string>
+			<key>HGSActionOtherTerms</key>
+			<array>
+				<string>^Reveal in Finder</string>
+			</array>
 			<key>HGSActionMustRunOnMainThread</key>
 			<true/>
 		</dict>
@@ -238,10 +242,95 @@
 			<string>^Open With…</string>
 			<key>HGSActionDirectObjectTypes</key>
 			<string>*</string>
-			<key>HGSActionIndirectObjectTypes</key>
-			<string>file.application</string>
+			<key>HGSActionArguments</key>
+			<dict>
+				<key>HGSActionArgumentIdentifier</key>
+				<string>com.google.filesystem.action.openwith.application</string>
+				<key>HGSActionArgumentSupportedTypes</key>
+				<string>file.application</string>
+				<key>HGSActionArgumentClass</key>
+				<string>FileSystemOpenActionApplicationArgument</string>
+			</dict>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.filesystem.action.openwith</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>FileSystemRenameAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Rename…</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file</string>
+			<key>HGSActionArguments</key>
+			<dict>
+				<key>HGSActionArgumentIdentifier</key>
+				<string>com.google.filesystem.action.rename.name</string>
+				<key>HGSActionArgumentSupportedTypes</key>
+				<string>text.userinput</string>
+			</dict>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.filesystem.action.rename</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>FileSystemMoveToAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Move To…</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file</string>
+			<key>HGSActionArguments</key>
+			<dict>
+				<key>HGSActionArgumentIdentifier</key>
+				<string>com.google.filesystem.action.moveto.location</string>
+				<key>HGSActionArgumentSupportedTypes</key>
+				<string>file.directory</string>
+			</dict>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.filesystem.action.moveto</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>TextAppendToFileAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Append To File…</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>text.userinput</string>
+			<key>HGSActionArguments</key>
+			<dict>
+				<key>HGSActionArgumentIdentifier</key>
+				<string>com.google.text.action.appendtofile.file</string>
+				<key>HGSActionArgumentSupportedTypes</key>
+				<string>file.text</string>
+			</dict>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.text.action.appendtofile</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>FileSystemSetCommentAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Set Comment…</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file</string>
+			<key>HGSActionExcludedDirectObjectTypes</key>
+			<string>file.directory</string>
+			<key>HGSActionArguments</key>
+			<dict>
+				<key>HGSActionArgumentIdentifier</key>
+				<string>com.google.filesystem.action.setcomments.comment</string>
+				<key>HGSActionArgumentSupportedTypes</key>
+				<string>text.userinput</string>
+			</dict>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.filesystem.action.setcomment</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

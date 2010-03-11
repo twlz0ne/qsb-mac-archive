@@ -42,3 +42,18 @@
 
 /* A label denoting the name of the Open Again action which allows you to open a file multiple times. Do not include ^ in localization. */
 "^Open Again" = "Open Again";
+
+/* A label denoting the name of the Rename action which allows you to rename a file. Do not include ^ in localization. */
+"^Rename…" = "Rename…";
+
+/* A label denoting the name of the Move To action which allows you to move a file. Do not include ^ in localization. */
+"^Move To…" = "Move To…";
+
+/* A label denoting the name of the Append To file action which allows you to append text to a file. Do not include ^ in localization. */
+"^Append To File…" = "Append To File…";
+
+/* A label denoting the name of the Set Comment file action which allows you to Set Comments for a file. Do not include ^ in localization. */
+"^Set Comment…" = "Set Comment…";
+
+/* A label denoting the name of the Reveal In Finder action which is a synonym for Show in Finder. Do not include ^ in localization. */
+"^Reveal In Finder…" = "Reveal In Finder…";
