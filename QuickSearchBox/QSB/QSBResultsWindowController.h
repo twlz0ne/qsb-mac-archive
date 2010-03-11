@@ -32,18 +32,43 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class QSBViewAnimation;
 @class QSBSearchWindowController;
+@class QSBActionPresenter;
+@class QSBFlippedView;
+@class QSBAnimatedScroll;
+@class QSBResultsViewBaseController;
+@class QSBTableResult;
+@class QSBResultsViewControllerTrio;
 
 @interface QSBResultsWindowController : NSWindowController {
  @private
-  QSBViewAnimation *windowVisibilityAnimation_;
   IBOutlet QSBSearchWindowController *searchWindowController_;
+  IBOutlet QSBFlippedView *resultsView_;
+  IBOutlet NSPathControl *statusBar_;
+  IBOutlet QSBActionPresenter *actionPresenter_;
+  QSBAnimatedScroll *pivotAnimation_;
+  NSMutableArray *resultsViewControllerTrios_;
+  QSBResultsViewControllerTrio *pivotTrio_;
 }
 
-- (void)hideWindowAnimated;
-- (void)showWindowAnimated;
-- (void)stopWindowAnimation;
+@property (readonly, assign) QSBActionPresenter *actionPresenter;
+
+- (NSTableView *)activeTableView;
+- (QSBTableResult *)selectedTableResult;
+
+- (IBAction)hideResultsWindow:(id)sender;
+- (IBAction)showResultsWindow:(id)sender;
+- (IBAction)qsb_showTopResults:(id)sender;
+- (IBAction)qsb_showMoreResults:(id)sender;
 @end
 
+// Notification that the selected result did change.
+// Object is the QSBResultsWindowController
+// Userinfo keys:
+//   QSBSelectedTableResultKey - the QSBTableResult if one is selected.
+//
+// If nothing is selected, there will be no QSBSelectedTableResultKey.
+#define kQSBSelectedTableResultDidChangeNotification \
+  @"QSBSelectedTableResultDidChangeNotification"
+#define kQSBSelectedTableResultKey @"QSBSelectedTableResultKey"
 
