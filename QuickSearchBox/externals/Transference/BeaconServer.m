@@ -46,8 +46,9 @@
 #import "GTMSystemVersion.h"
 #import "QSBApplicationDelegate.h"
 #import "QSBSearchWindowController.h"
-#import "QSBSearchViewController.h"
 #import "QSBSearchController.h"
+#import "QSBResultsWindowController.h"
+#import "Shortcuts.h"
 
 static NSString *const kPrefsPath =
   @"Preferences/com.google.qsb.module.transferencebeacon.plist";
@@ -375,9 +376,12 @@ static NSString *const kResultActionKey = @"ResultAction";
 
   HGSResult *result = [dict objectForKey:kResultHGSResultKey];
   HGSResultArray *resultArray = [HGSResultArray arrayWithResult:result];
+  NSDictionary *arguments 
+    = [NSDictionary dictionaryWithObject:resultArray 
+                                  forKey:kHGSActionDirectObjectsKey];
   HGSActionOperation *operation =
     [[HGSActionOperation alloc] initWithAction:action
-                                 directObjects:resultArray];
+                                     arguments:arguments];
 
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc addObserver:self
@@ -399,24 +403,14 @@ static NSString *const kResultActionKey = @"ResultAction";
   BOOL skipShortcutNotification = [[result source] cannotArchive];
   NSString *queryString = [dict objectForKey:kActionQueryStringKey];
   if (actionWillBePerformed_ && queryString && !skipShortcutNotification) {
-    // Fake out the QSB so it applies the execution of the action to the
-    // shortcuts database.
-    QSBApplicationDelegate *delegate = [NSApp delegate];
-    QSBSearchWindowController *window = [delegate searchWindowController];
-    QSBSearchViewController *view = [window activeSearchViewController];
-    QSBSearchController *searchController = [view searchController];
-    HGSQuery *fakeQuery = [[[HGSQuery alloc] initWithString:queryString
-                                               pivotObjects:nil
-                                                 queryFlags:0] autorelease];
-    HGSTokenizedString *tokenString = [fakeQuery tokenizedQueryString];
-    [searchController setTokenizedQueryString:tokenString];
-    NSMutableDictionary *userInfo =
-      [NSMutableDictionary dictionaryWithObjectsAndKeys:
-         resultArray, kQSBNotificationDirectObjectsKey,
-         searchController, kQSBNotificationSearchControllerKey,
-         nil];
-    [nc postNotificationName:kQSBQueryControllerWillPerformActionNotification
-                      object:action
+    // Apply the execution of the action to the shortcuts database using
+    // a backdoor.
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                              result, kShortcutsResultKey,
+                              queryString, kShortcutsShortcutKey,
+                              nil];
+    [nc postNotificationName:kShortcutsUpdateShortcutNotification
+                      object:self
                     userInfo:userInfo];
   }
   return [NSNumber numberWithBool:actionWillBePerformed_];
