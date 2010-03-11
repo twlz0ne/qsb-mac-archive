@@ -32,103 +32,60 @@
 
 #import "QSBTopResultsViewController.h"
 #import <Vermilion/Vermilion.h>
-#import "QSBApplicationDelegate.h"
-#import "QSBTableResult.h"
-#import "QSBSearchViewController.h"
-#import "QSBResultRowViewController.h"
-#import "QSBResultsViewTableView.h"
-#import "QSBSearchWindowController.h"
-#import "QSBSearchController.h"
-#import "QSBCategory.h"
-#import "QSBTopResultsRowViewControllers.h"
+#import <objc/message.h>
 
-@interface QSBTopResultsViewController ()
-@property (readwrite, copy) NSString *categorySummaryString;
-@end
+#import "QSBSearchController.h"
+#import "QSBResultsViewTableView.h"
+#import "QSBTableResult.h"
+#import "QSBTopResultsRowViewControllers.h"
 
 @implementation QSBTopResultsViewController
 
-@synthesize categorySummaryString = categorySummaryString_;
+- (id)initWithSearchController:(QSBSearchController *)controller {
+  return [super initWithSearchController:controller 
+                                 nibName:@"QSBTopResultsView"];
+}
 
 - (void)awakeFromNib {  
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
-  [resultsTableView setDataSource:self];
-  [resultsTableView setDelegate:self];
-  [resultsTableView reloadData];
-
   [resultsTableView setIntercellSpacing:NSMakeSize(0.0, 0.0)];
-  
-  // Adjust the 'Top' results view to properly fit.
-  NSView *resultsView = [self resultsView];
-  NSRect viewFrame = [resultsView frame];
-  QSBSearchViewController *viewController = [self searchViewController];
-  QSBSearchWindowController *windowController 
-    = [viewController searchWindowController];
-  NSView *contentView = [windowController resultsView];
-  viewFrame.size.width = NSWidth([contentView frame]);
-  [resultsView setFrame:viewFrame];
-  
   rowViewControllers_ = [[NSMutableDictionary dictionary] retain];
-  
   [super awakeFromNib];
 }
 
 - (void)dealloc {
   [rowViewControllers_ release];
-  [categorySummaryString_ release];
   [super dealloc];
 }
 
-- (void)setSwapSelection {
-  [self scrollToEndOfDocument:self];
+#pragma mark QSBResultsViewBaseController Overrides
+
+- (QSBTableResult *)tableResultForRow:(NSInteger)row { 
+  return [[self searchController] topResultForIndex:row];
 }
 
-- (void)updateCategorySummaryString:(NSDictionary *)resultCountByCategory {
-  NSMutableString *categorySummary = [NSMutableString string];
-  NSString *comma = nil;
-  for (QSBCategory *category in resultCountByCategory) {
-    NSNumber *nsValue = [resultCountByCategory objectForKey:category];
-    NSUInteger catCount = [nsValue unsignedIntValue];
-    if (catCount) {
-      NSString *catString = nil;
-      if (catCount == 1) {
-        catString = [category localizedSingularName];
-      } else {
-        catString = [category localizedName];
-      }
-      if (!comma) {
-        comma = NSLocalizedString(@", ", nil);
-      } else {
-        [categorySummary appendString:comma];
-      }
-      [categorySummary appendFormat:@"%u %@", catCount, catString];
-    }
-  }
-  [self setCategorySummaryString:categorySummary];
-}
-
-#pragma mark NSTableView Delegate Methods
+#pragma mark Actions
 
 - (void)moveDown:(id)sender {
-  NSInteger newRow = [[self resultsTableView] selectedRow] + 1;
+  QSBResultsViewTableView *tableView = [self resultsTableView];
+  NSInteger newRow = [tableView selectedRow] + 1;
   if (newRow >= [self numberOfRowsInTableView:nil]) {
     QSBTableResult *result = [self selectedTableResult];
     if ([result isKindOfClass:[QSBFoldTableResult class]]) {
-      // If we're on the last row and it's a fold then transition
-      // to the 'Top' results view.
-      [[self searchViewController] showMoreResults:sender];
+      BOOL handled = [NSApp sendAction:@selector(qsb_showMoreResults:) 
+                                  to:nil 
+                                from:self];
+      HGSCheckDebug(handled, @"qsb_showMoreResults not handled");
     }
   } else {
-    [super moveDown:sender];
+    [tableView selectFirstSelectableRowByIncrementing:YES startingAt:newRow];
   }
 }
-
-- (QSBTableResult *)tableResultForRow:(NSInteger)row { 
-  return [[[self searchViewController] searchController] topResultForIndex:row];
-}
+  
+#pragma mark NSTableView Delegate Methods
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
-  return [[[self searchViewController] searchController] topResultCount];
+  return [[self searchController] topResultCount];
 }
 
 - (CGFloat)tableView:(NSTableView *)tableView
@@ -152,8 +109,17 @@
 - (id)tableView:(NSTableView *)tableView
 objectValueForTableColumn:(NSTableColumn *)tableColumn
             row:(NSInteger)row {
+  id value = nil;
+  NSString *identifier = [tableColumn identifier];
   QSBTableResult *result = [self tableResultForRow:row];
-  return [result isPivotable] ? [NSImage imageNamed:@"ChildArrow"] : nil;
+  if ([identifier isEqual:@"PivotArrows"]) {
+    value = [result isPivotable] ? [NSImage imageNamed:@"ChildArrow"] : nil;
+  } else if ([identifier isEqual:@"Results"]) {
+    value = result;
+  } else {
+    HGSAssert(@"Unknown table identifier %@ for %@", identifier, tableView);
+  }
+  return value;
 }
 
 - (NSView*)tableView:(NSTableView*)tableView
@@ -171,11 +137,8 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
   if (aRowViewControllerClass) {
     if (!oldController 
         || [oldController class] != aRowViewControllerClass) {
-      // We cannot reuse the old controller.
-      QSBSearchViewController *queryController = [self searchViewController];
       newController
-        = [[[aRowViewControllerClass alloc] initWithController:queryController]
-           autorelease];          
+        = [[[aRowViewControllerClass alloc] init] autorelease];          
       [rowViewControllers_ setObject:newController
                               forKey:[NSNumber numberWithInteger:row]];
       [newController loadView];
@@ -194,15 +157,6 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
   
   NSView *newView = [newController view];
   return newView;
-}
-
-#pragma mark Notifications
-- (void)searchControllerDidUpdateResults:(NSNotification *)notification {
-  NSDictionary *userInfo = [notification userInfo];
-  NSDictionary *resultCountByCategory 
-    = [userInfo objectForKey:kQSBSearchControllerResultCountByCategoryKey];
-  [self updateCategorySummaryString:resultCountByCategory];
-  [super searchControllerDidUpdateResults:notification];
 }
 
 @end

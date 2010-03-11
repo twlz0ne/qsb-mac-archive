@@ -40,17 +40,13 @@
     nib = [[NSNib alloc] initWithNibNamed:name \
                                    bundle:nil];\
   } \
-  return [super initWithNib:nib \
-                 controller:controller];
+  return [super initWithNib:nib];
 
 @implementation QSBTopDetailedRowViewController
 
 - (void)awakeFromNib {
   // Remember our standard view height and text view y offset.
   defaultViewHeight_ = NSHeight([[self view] frame]);
-  NSView *detailView = [self detailView];
-  defaultTextYOffset_ = [detailView frame].origin.y;
-  defaultTextHeight_ = NSHeight([detailView frame]);
 }
 
 - (void)setRepresentedObject:(id)object {
@@ -62,88 +58,49 @@
       NSView *mainView = [self view];
       CGFloat mainWidth = NSWidth([mainView frame]);
       NSSize newViewSize = NSMakeSize(mainWidth, defaultViewHeight_);
-      NSView *detailView = [self detailView];
-      CGFloat originX = [detailView frame].origin.x;
-      NSPoint textOrigin = NSMakePoint(originX, defaultTextYOffset_);
-      CGFloat textWidth = NSWidth([detailView frame]);
-      NSSize textSize = NSMakeSize(textWidth, defaultTextHeight_);
-      
-      // Adjust our view height and text position as necessary to accommodate
-      // the title/snippet/description.
-      QSBTableResult *result = object;
-      NSAttributedString *resultDescription 
-      = [self titleSourceURLStringForResult:result];
-      CGFloat stringHeight = [resultDescription size].height;
-      
-      // If the height is less than the standard then we need to center the text
-      // vertically in the containing view.  If the height is more than the
-      // standard then we need to increase the height of the containing view.
-      if (stringHeight < (defaultTextHeight_ - 0.5)) {
-        CGFloat newOriginY = defaultTextYOffset_
-        + ((defaultTextHeight_ - stringHeight) / 2.0);
-        textOrigin = NSMakePoint(originX, newOriginY);
-        textSize = NSMakeSize(textWidth, stringHeight);
-      } else if (stringHeight > (defaultTextHeight_ + 0.5)) {
-        CGFloat newViewHeight = stringHeight
-        + (defaultViewHeight_ - defaultTextHeight_);
-        newViewSize = NSMakeSize(mainWidth, newViewHeight);
-        textSize = NSMakeSize(textWidth, stringHeight);
-      }
       [mainView setFrameSize:newViewSize];
-      [detailView setFrameOrigin:textOrigin];
-      [detailView setFrameSize:textSize];
-      
     } else {
       HGSLogDebug(@"The represented object must be a QSBTableResult.");
     }
   }
 }
 
-- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result {
-  HGSLogDebug(@"titleSourceURLStringForResult should be overridden by subclasses");
-  return nil;
-}
-
 @end
 
 @implementation QSBTopStandardRowViewController
 
-- (id)initWithController:(QSBSearchViewController *)controller {
+- (id)init {
   QSBVIEWCONTROLLER_INIT(@"TopStandardResultView")
-}
-
-- (NSAttributedString *)titleSourceURLStringForResult:(QSBTableResult *)result {
-  return [result titleSnippetSourceURLString];
 }
 
 @end
 
 @implementation QSBTopSeparatorRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller {
+- (id)init {
   QSBVIEWCONTROLLER_INIT(@"TopSeparatorResultView")
 }
 @end
 
 @implementation QSBTopSearchForRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller {
+- (id)init {
   QSBVIEWCONTROLLER_INIT(@"TopSearchForResultView")
 }
 @end
 
 @implementation QSBTopSearchIconViewController
-- (id)initWithController:(QSBSearchViewController *)controller {
+- (id)init {
   QSBVIEWCONTROLLER_INIT(@"TopSearchIconResultView")
 }
 @end
 
 @implementation QSBTopFoldRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller {
+- (id)init {
   QSBVIEWCONTROLLER_INIT(@"TopFoldResultView")
 }
 @end
 
 @implementation QSBTopMessageRowViewController
-- (id)initWithController:(QSBSearchViewController *)controller {
+- (id)init {
   QSBVIEWCONTROLLER_INIT(@"TopMessageResultView")
 }
 @end
