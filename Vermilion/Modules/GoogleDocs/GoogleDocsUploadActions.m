@@ -73,18 +73,19 @@
 
 @implementation GoogleDocsUploadAction
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   BOOL success = NO;
   GDataServiceGoogle *uploadService = [self uploadService];
   if (uploadService) {
     [self setUserWasNoticed:NO];
-    HGSResultArray *results = [info objectForKey:kHGSActionDirectObjectsKey];
-    NSUInteger resultCount = [results count];
+    HGSResultArray *directObjects
+      = [info objectForKey:kHGSActionDirectObjectsKey];
+    NSUInteger directObjectsCount = [directObjects count];
     NSUInteger item = 0;
-    for (HGSResult *result in results) {
-      [self uploadResult:result
+    for (HGSResult *directObject in directObjects) {
+      [self uploadResult:directObject
                     item:item
-                      of:resultCount];
+                      of:directObjectsCount];
       ++item;
     }
     success = YES;
@@ -99,7 +100,7 @@
   // its extension.
   NSString *resultPath = [result filePath];
   NSString *resultTitle
-  = [[NSFileManager defaultManager] displayNameAtPath:resultPath];
+    = [[NSFileManager defaultManager] displayNameAtPath:resultPath];
   NSString *mimeType = [GoogleDocsUploadAction mimeTypeForResult:result];
   if (mimeType) {
     Class entryClass

@@ -76,7 +76,7 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
 
 @implementation GoogleDocsSaveAsAction
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   id<HGSDelegate> delegate = [[HGSPluginLoader sharedPluginLoader] delegate];
   HGSResultArray *directObjects = [info objectForKey:kHGSActionDirectObjectsKey];
   for (HGSResult *directObject in directObjects) {
