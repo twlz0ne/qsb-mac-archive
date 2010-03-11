@@ -127,7 +127,8 @@
                                   type:kHGSTypeWebpage
                                 source:self
                             attributes:attributes
-                                 score:score 
+                                 score:score
+                                 flags:0
                            matchedTerm:tokenizedQueryString 
                         matchedIndexes:nil];
     [operation setRankedResults:[NSArray arrayWithObject:scoredResult]];

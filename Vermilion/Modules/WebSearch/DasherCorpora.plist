@@ -3,41 +3,41 @@
 <plist version="1.0">
 <array>
 	<dict>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>%@ Mail</string>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>gmail</string>
 		<key>Id</key>
 		<string>gmail</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>https://mail.google.com/a/%@/?view=tl&amp;q={searchterms}&amp;search=query&amp;fs=1</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://mail.google.com/a/%@/</string>
 		<key>AcceptsSource</key>
 		<true/>
 	</dict>
 	<dict>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>%@ Calendar</string>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>calendar</string>
 		<key>Id</key>
 		<string>calendar</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.google.com/calendar/hosted/%@/</string>
 		<key>AcceptsSource</key>
 		<true/>
 	</dict>
 	<dict>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>%@ Docs</string>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>docs</string>
 		<key>Id</key>
 		<string>docs</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://docs.google.com/a/%@/#search/{searchterms}</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://docs.google.com/a/%@/</string>
 	</dict>
 	<dict>
@@ -48,17 +48,17 @@
 		</dict>
 		<key>AcceptsHL</key>
 		<true/>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>%@ Talk</string>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>talk</string>
 		<key>Id</key>
 		<string>talk</string>
 		<key>AcceptsSource</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://hostedtalkgadget.google.com/a/%@/talkgadget/popout</string>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>http://hostedtalkgadget.google.com/a/%@/talkgadget/m</string>
 	</dict>
 </array>

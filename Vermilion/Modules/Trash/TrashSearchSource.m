@@ -131,7 +131,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                   = [HGSScoredResult resultWithFilePath:fullPath
                                                  source:self
                                              attributes:nil
-                                                  score:score 
+                                                  score:score
+                                                  flags:eHGSBelowFoldRankFlag
                                             matchedTerm:tokenizedQueryString 
                                          matchedIndexes:matchedIndexes];
                 [results addObject:scoredResult];
@@ -157,8 +158,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                   type:kTrashResultType 
                                 source:self 
                             attributes:attributes 
-                                 score:score 
-                           matchedTerm:tokenizedQueryString 
+                                 score:score
+                                 flags:0
+                         matchedTerm:tokenizedQueryString 
                         matchedIndexes:matchedIndexes];
     [results addObject:scoredResult];
   }

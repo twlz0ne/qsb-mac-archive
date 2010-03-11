@@ -193,6 +193,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   HGSScoredResult *scoredResult 
     = [HGSScoredResult resultWithResult:result
                                   score:score
+                             flagsToSet:0
+                           flagsToClear:0
                             matchedTerm:queryString
                          matchedIndexes:matchedIndexes];
   return scoredResult;

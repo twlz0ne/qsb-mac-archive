@@ -854,7 +854,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                       type:kHGSTypeFileMusic
                                                     source:self
                                                 attributes:attributes
-                                                     score:score 
+                                                     score:score
+                                                     flags:0
                                                matchedTerm:queryString 
                                             matchedIndexes:matchedIndexes];
   return result;
@@ -899,6 +900,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                     source:self
                                                 attributes:attributes
                                                      score:score 
+                                                     flags:0
                                                matchedTerm:queryString 
                                             matchedIndexes:matchedIndexes];
   return result;
@@ -927,7 +929,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                     source:self
                                                 attributes:attributes
                                                      score:score 
-                                               matchedTerm:queryString 
+                                                     flags:0
+                                              matchedTerm:queryString 
                                             matchedIndexes:matchedIndexes];
   return result;
 }
@@ -954,7 +957,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                     source:self
                                                 attributes:attributes
                                                      score:score 
-                                               matchedTerm:queryString 
+                                                     flags:0
+                                              matchedTerm:queryString 
                                             matchedIndexes:matchedIndexes]; 
   return result;
 }
@@ -1008,7 +1012,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                     source:self
                                                 attributes:attributes      
                                                      score:score 
-                                               matchedTerm:queryString 
+                                                     flags:0
+                                              matchedTerm:queryString 
                                             matchedIndexes:matchedIndexes]; 
   return result;
 }
@@ -1036,7 +1041,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                     source:self
                                                 attributes:attributes
                                                      score:score 
-                                               matchedTerm:queryString 
+                                                     flags:0
+                                              matchedTerm:queryString 
                                             matchedIndexes:matchedIndexes]; 
   return result;
 }

@@ -68,10 +68,10 @@
   for (size_t i = 0; 
        i < sizeof(stubValuesAndKeys) / sizeof(stubValuesAndKeys[0]);
        ++i) {
-    [[[bundleMock stub] andReturn:stubValuesAndKeys[i].value] 
+    [[[bundleMock expect] andReturn:stubValuesAndKeys[i].value] 
      objectForInfoDictionaryKey:stubValuesAndKeys[i].key];
     if (!stubValuesAndKeys[i].value) {
-      [[[bundleMock stub] andReturn:nil] 
+      [[[bundleMock expect] andReturn:nil] 
        pathForResource:@"QSBInfo" ofType:@"plist"];
     }
   }
@@ -100,10 +100,10 @@
   for (size_t i = 0; 
        i < sizeof(stubValuesAndKeys) / sizeof(stubValuesAndKeys[0]);
        ++i) {
-    [[[bundleMock stub] andReturn:stubValuesAndKeys[i].value] 
+    [[[bundleMock expect] andReturn:stubValuesAndKeys[i].value] 
      objectForInfoDictionaryKey:stubValuesAndKeys[i].key];
     if (!stubValuesAndKeys[i].value) {
-      [[[bundleMock stub] andReturn:nil] 
+      [[[bundleMock expect] andReturn:nil] 
        pathForResource:@"QSBInfo" ofType:@"plist"];
     }
   }
@@ -123,12 +123,9 @@
                                      source:searchSourceMock
                                  attributes:nil];
   STAssertNotNil(result, nil);
-  [[[searchSourceMock stub] 
+  [[[searchSourceMock expect] 
     andReturn:nil] 
-   provideValueForKey:@"HGSObjectAttributeWordRangesKey" result:result];
-  [[[searchSourceMock stub] 
-    andReturn:nil] 
-   provideValueForKey:@"kHGSObjectAttributeRankFlags" result:result];
+   provideValueForKey:kHGSObjectAttributeRankFlagsKey result:result];
   [memSource indexResult:result
                     name:@"testName"
               otherTerms:[NSArray arrayWithObjects:@"foo", @"bar", @"bam", nil]];
@@ -138,8 +135,9 @@
     = [[[HGSCallbackSearchOperation alloc] initWithQuery:searchQueryMock
                                                   source:memSource] autorelease];
   HGSTokenizedString *tokenString = [HGSTokenizer tokenizeString:@"foo"]; 
-  [[[searchQueryMock stub] andReturn:tokenString] tokenizedQueryString];
-  [[[searchQueryMock stub] andReturn:nil] pivotObjects];
+  [[[searchQueryMock expect] andReturn:tokenString] tokenizedQueryString];
+  [[[searchQueryMock expect] andReturn:nil] pivotObjects];
+  [[[searchQueryMock expect] andReturn:nil] actionArgument];
   [memSource performSearchOperation:op];
 }
 @end

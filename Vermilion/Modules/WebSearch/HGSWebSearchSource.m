@@ -133,7 +133,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
       BOOL searchInline = NO;
 #if TARGET_OS_IPHONE
       searchInline =
-        [[pivotObject valueForKey:@"kHGSObjectAttributeSearchInline"]
+        [[pivotObject valueForKey:@"HGSObjectAttributeSearchInline"]
           boolValue];
 #endif
       if (!searchInline) {
@@ -155,6 +155,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
                                     source:self
                                 attributes:attributes
                                      score:HGSCalibratedScore(kHGSCalibratedPerfectScore)
+                                     flags:eHGSSpecialUIRankFlag
                                matchedTerm:tokenizedQuery
                             matchedIndexes:nil];
         [operation setRankedResults:[NSArray arrayWithObject:placeholderItem]];
@@ -180,7 +181,8 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
                                 source:nil
                             attributes:attributes
                                  score:HGSCalibratedScore(kHGSCalibratedModerateScore)
-                           matchedTerm:tokenizedQueryString
+                                 flags:0
+                          matchedTerm:tokenizedQueryString
                         matchedIndexes:nil];
     [operation setRankedResults:[NSArray arrayWithObject:result]];
   }

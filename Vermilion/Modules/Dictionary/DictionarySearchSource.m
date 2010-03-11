@@ -162,6 +162,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                   source:self
                               attributes:attributes
                                    score:score 
+                                   flags:eHGSSpecialUIRankFlag
                              matchedTerm:tokenizedQueryString 
                           matchedIndexes:nil];
       [results addObject:scoredResult];

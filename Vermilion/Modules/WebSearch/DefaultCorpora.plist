@@ -3,277 +3,277 @@
 <plist version="1.0">
 <array>
 	<dict>
-		<key>kHGSObjectAttributeCategory</key>
+		<key>HGSObjectAttributeCategory</key>
 		<string>Google</string>
-		<key>kHGSObjectAttributeHideFromResults</key>
+		<key>HGSObjectAttributeHideFromResults</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>web-google</string>
-		<key>kHGSCorporaSourceAttributeHideFromDesktop</key>
+		<key>HGSCorporaSourceAttributeHideFromDesktop</key>
 		<true/>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>iPhone and Web</string>
-		<key>kHGSObjectAttributeCorpusName</key>
+		<key>HGSObjectAttributeCorpusName</key>
 		<string>iPhone and Web</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>googleapp:</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string></string>
 	</dict>
 	<dict>
-		<key>kHGSObjectAttributeCategory</key>
+		<key>HGSObjectAttributeCategory</key>
 		<string>Google</string>
-		<key>kHGSObjectAttributeGoogleAPIIncludeLocation</key>
+		<key>HGSObjectAttributeGoogleAPIIncludeLocation</key>
 		<true/>
-		<key>kHGSObjectAttributeGoogleAPIURL</key>
+		<key>HGSObjectAttributeGoogleAPIURL</key>
 		<string>http://ajax.googleapis.com/ajax/services/search/local</string>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>alt-local</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Local</string>
-		<key>kHGSObjectAttributeHideFromDropdown</key>
+		<key>HGSObjectAttributeHideFromDropdown</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://local.google.com/</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
-		<key>kHGSObjectAttributeWebSearchDisplayString</key>
+		<key>HGSObjectAttributeWebSearchDisplayString</key>
 		<string>Search nearby</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://local.google.com/maps?q={searchterms}</string>
-		<key>kHGSObjectAttributeRequiresLocation</key>
+		<key>HGSObjectAttributeRequiresLocation</key>
 		<true/>
 	</dict>
 	<dict>
-		<key>kHGSObjectAttributeCategory</key>
+		<key>HGSObjectAttributeCategory</key>
 		<string>Google</string>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>maps</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Google Maps</string>
-		<key>kHGSObjectAttributeHideFromDropdown</key>
+		<key>HGSObjectAttributeHideFromDropdown</key>
 		<true/>
-		<key>kHGSObjectAttributeGoogleAPIURL</key>
+		<key>HGSObjectAttributeGoogleAPIURL</key>
 		<string>http://ajax.googleapis.com/ajax/services/search/local</string>
-		<key>kHGSObjectAttributeGoogleAPIIncludeLocation</key>
+		<key>HGSObjectAttributeGoogleAPIIncludeLocation</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://maps.google.com/</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://maps.google.com/maps?q={searchterms}</string>
-		<key>kHGSObjectAttributeWebSearchDisplayString</key>
+		<key>HGSObjectAttributeWebSearchDisplayString</key>
 		<string>Search nearby</string>
-		<key>kHGSObjectAttributeRequiresLocation</key>
+		<key>HGSObjectAttributeRequiresLocation</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>maps:</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 	<dict>
-		<key>kHGSObjectAttributeCategory</key>
+		<key>HGSObjectAttributeCategory</key>
 		<string>Google</string>
-		<key>kHGSObjectAttributeGoogleAPIAlwaysHideResults</key>
+		<key>HGSObjectAttributeGoogleAPIAlwaysHideResults</key>
 		<true/>
-		<key>kHGSObjectAttributeGoogleAPIURL</key>
+		<key>HGSObjectAttributeGoogleAPIURL</key>
 		<string></string>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>image_search</string>
-		<key>kHGSObjectAttributeInlineBrowserLimit</key>
+		<key>HGSObjectAttributeInlineBrowserLimit</key>
 		<string>http://images.google.com/images</string>
-		<key>kHGSObjectAttributeSearchInline</key>
+		<key>HGSObjectAttributeSearchInline</key>
 		<true/>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>^Google Image Search</string>
-		<key>kHGSObjectAttributeCorpusName</key>
+		<key>HGSObjectAttributeCorpusName</key>
 		<string>Images</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://images.google.com/imghp</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://images.google.com/images?q={searchterms}</string>
-		<key>kHGSObjectAttributeHasLocalizedGoogleDomain</key>
+		<key>HGSObjectAttributeHasLocalizedGoogleDomain</key>
 		<true/>
-		<key>kHGSObjectAttributeAcceptsSafeSearch</key>
+		<key>HGSObjectAttributeAcceptsSafeSearch</key>
 		<true/>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>gmail</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>^Gmail</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://mail.google.com/mail/?view=tl&amp;q={searchterms}&amp;search=query&amp;fs=1</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://mail.google.com</string>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>http://www.google.com/m#gmail</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>calendar</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Google Calendar</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.google.com/calendar</string>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>http://www.google.com/m#calendar</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 	<dict>
-		<key>kHGSObjectAttributeCategory</key>
+		<key>HGSObjectAttributeCategory</key>
 		<string>Google</string>
-		<key>kHGSObjectAttributeGoogleAPIHideResults</key>
+		<key>HGSObjectAttributeGoogleAPIHideResults</key>
 		<true/>
-		<key>kHGSObjectAttributeGoogleAPIURL</key>
+		<key>HGSObjectAttributeGoogleAPIURL</key>
 		<string>http://ajax.googleapis.com/ajax/services/search/news</string>
-		<key>kHGSObjectAttributeInlineBrowserLimit</key>
+		<key>HGSObjectAttributeInlineBrowserLimit</key>
 		<string>http://news.google.com/news</string>
-		<key>kHGSObjectAttributeGoogleAPIAlwaysHideResults</key>
+		<key>HGSObjectAttributeGoogleAPIAlwaysHideResults</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>news</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>^Google News</string>
-		<key>kHGSObjectAttributeCorpusName</key>
+		<key>HGSObjectAttributeCorpusName</key>
 		<string>News</string>
-		<key>kHGSObjectAttributeSearchInline</key>
+		<key>HGSObjectAttributeSearchInline</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.google.com/news</string>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>http://www.google.com/m/news</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://news.google.com/news?q={searchterms}</string>
-		<key>kHGSObjectAttributeHasLocalizedGoogleDomain</key>
+		<key>HGSObjectAttributeHasLocalizedGoogleDomain</key>
 		<true/>
 	</dict>
 	<dict>
-		<key>kHGSObjectAttributeCategory</key>
+		<key>HGSObjectAttributeCategory</key>
 		<string>Google</string>
-		<key>kHGSObjectAttributeGoogleAPIAlwaysHideResults</key>
+		<key>HGSObjectAttributeGoogleAPIAlwaysHideResults</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>groups-icon</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Google Groups</string>
-		<key>kHGSCorporaSourceAttributeHideCorpus</key>
+		<key>HGSCorporaSourceAttributeHideCorpus</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://groups.google.com/</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://groups.google.com/groups/search?q={searchterms}</string>
 	</dict>
 	<dict>
-		<key>kHGSObjectAttributeCategory</key>
+		<key>HGSObjectAttributeCategory</key>
 		<string>Google</string>
-		<key>kHGSObjectAttributeInlineBrowserLimit</key>
+		<key>HGSObjectAttributeInlineBrowserLimit</key>
 		<string>http://www.google.com/products</string>
-		<key>kHGSObjectAttributeGoogleAPIAlwaysHideResults</key>
+		<key>HGSObjectAttributeGoogleAPIAlwaysHideResults</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>alt-shopping</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>^Google Product Search</string>
-		<key>kHGSObjectAttributeCorpusName</key>
+		<key>HGSObjectAttributeCorpusName</key>
 		<string>Shopping</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.google.com/products</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
-		<key>kHGSObjectAttributeSearchInline</key>
+		<key>HGSObjectAttributeSearchInline</key>
 		<true/>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://www.google.com/products?q={searchterms}</string>
 	</dict>
 	<dict>
-		<key>kHGSObjectAttributeCategory</key>
+		<key>HGSObjectAttributeCategory</key>
 		<string>Google</string>
-		<key>kHGSObjectAttributeGoogleAPIURL</key>
+		<key>HGSObjectAttributeGoogleAPIURL</key>
 		<string>http://ajax.googleapis.com/ajax/services/search/web</string>
-		<key>kHGSCorporaSourceAttributeHideCorpus</key>
+		<key>HGSCorporaSourceAttributeHideCorpus</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>googlecom</string>
-		<key>kHGSObjectAttributeSearchInline</key>
+		<key>HGSObjectAttributeSearchInline</key>
 		<true/>
-		<key>kHGSObjectAttributeInlineBrowserLimit</key>
+		<key>HGSObjectAttributeInlineBrowserLimit</key>
 		<string>http://www.google.com/search</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Google.com</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.google.com/</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
-		<key>kHGSObjectAttributeWebSearchDisplayString</key>
+		<key>HGSObjectAttributeWebSearchDisplayString</key>
 		<string>Search Google</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://www.google.com/search?q={searchterms}</string>
 	</dict>
 	<dict>
-		<key>kHGSObjectAttributeCategory</key>
+		<key>HGSObjectAttributeCategory</key>
 		<string>Google</string>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>wikipedia</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>^Wikipedia</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://en.wikipedia.org</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://en.wikipedia.org/wiki/Special:Search?search={searchterms}</string>
-		<key>kHGSObjectAttributeWebSuggestTemplate</key>
+		<key>HGSObjectAttributeWebSuggestTemplate</key>
 		<string>http://en.wikipedia.org/w/api.php?action=opensearch&amp;search={searchterms}&amp;namespace=0</string>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeHideCorpus</key>
+		<key>HGSCorporaSourceAttributeHideCorpus</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>amazon-icon</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Amazon</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.amazon.com</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://www.amazon.com/s/ref=nb_ss_gw?field-keywords={searchterms}</string>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeHideCorpus</key>
+		<key>HGSCorporaSourceAttributeHideCorpus</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>imdb-icon</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>IMDB</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.imdb.com</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://www.imdb.com/find?s=all&amp;q={searchterms}</string>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>reader</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Google Reader</string>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>http://www.google.com/m#reader</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.google.com/reader</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 	<dict>
@@ -284,117 +284,117 @@
 		</dict>
 		<key>AcceptsHL</key>
 		<true/>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Google Talk</string>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>talk</string>
 		<key>Id</key>
 		<string>talk</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://talkgadget.google.com/talkgadget/popout</string>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>http://talkgadget.google.com/talkgadget/m</string>
 		<key>AcceptsSource</key>
 		<true/>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>photos</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Picasa Web Albums</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://picasaweb.google.com/</string>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>http://picasaweb.google.com/m/</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>docs</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>^Google Docs</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://docs.google.com/#search/{searchterms}</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://docs.google.com/</string>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>http://docs.google.com/m</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>igoogle</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>iGoogle</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.google.com/ig</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>notebook</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Google Notebook</string>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>http://www.google.com/notebook/m</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.google.com/notebook/</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>goog411</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>GOOG-411</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>tel:800-4664-411</string>
-		<key>kHGSObjectAttributeHideFromResults</key>
+		<key>HGSObjectAttributeHideFromResults</key>
 		<true/>
-		<key>kHGSCorporaSourceAttributeHideFromDesktop</key>
+		<key>HGSCorporaSourceAttributeHideFromDesktop</key>
 		<true/>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>youtube</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>^YouTube</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.youtube.com/</string>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>youtube:</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://www.youtube.com/results?search_query={searchterms}</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>blogger</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Blogger</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://blogger.com</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 	<dict>
-		<key>kHGSCorporaSourceAttributeIconNameKey</key>
+		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>finance</string>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>Google Finance</string>
-		<key>kHGSCorporaSourceAttributeURIString</key>
+		<key>HGSCorporaSourceAttributeURIString</key>
 		<string>http://www.google.com/finance</string>
-		<key>kHGSCorporaSourceAttributeMobileURIString</key>
+		<key>HGSCorporaSourceAttributeMobileURIString</key>
 		<string>finance:</string>
-		<key>kHGSObjectAttributeWebSearchTemplate</key>
+		<key>HGSObjectAttributeWebSearchTemplate</key>
 		<string>http://www.google.com/finance?q={searchterms}</string>
-		<key>kHGSObjectAttributeType</key>
+		<key>HGSObjectAttributeType</key>
 		<string>webpage.application</string>
 	</dict>
 </array>

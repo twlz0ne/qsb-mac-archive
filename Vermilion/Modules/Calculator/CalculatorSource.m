@@ -155,6 +155,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                   source:self
                               attributes:attributes
                                    score:HGSCalibratedScore(kHGSCalibratedPerfectScore) 
+                                   flags:eHGSSpecialUIRankFlag
                              matchedTerm:queryString
                           matchedIndexes:nil];
       NSArray *resultsArray = [NSArray arrayWithObject:rankedHGSObject];

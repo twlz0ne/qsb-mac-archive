@@ -70,6 +70,7 @@ extern NSString* const kHGSObjectAttributeAliasDataKey;  // NSData
 extern NSString* const kHGSObjectAttributeIsSyntheticKey;  // NSNumber (BOOL)
 extern NSString* const kHGSObjectAttributeIsContainerKey;  // NSNumber (BOOL)
 extern NSString* const kHGSObjectAttributeDefaultActionKey;  // id<HGSAction>
+extern NSString* const kHGSObjectAttributeActionDirectObjectsKey;  // HGSResultArray
 extern NSString* const kHGSObjectAttributeContactEmailKey; // NSString - Primary email address
 extern NSString* const kHGSObjectAttributeEmailAddressesKey; // NSArray of NSString - Related email addresses
 extern NSString* const kHGSObjectAttributeContactsKey;  // NSArray of NSString - Names of related people
@@ -96,11 +97,9 @@ enum {
   eHGSLaunchableRankFlag = 1 << 2,
   eHGSSpecialUIRankFlag = 1 << 3,
   eHGSUnderHomeRankFlag = 1 << 4,
-  eHGSUnderDownloadsRankFlag = 1 << 5,
-  eHGSUnderDesktopRankFlag = 1 << 6,
-  eHGSSpamRankFlag = 1 << 7,
   eHGSHomeChildRankFlag = 1 << 8,
   eHGSBelowFoldRankFlag = 1 << 9,
+  eHGSShortcutRankFlag = 1 << 10,
 };
 typedef NSUInteger HGSRankFlags;
 
@@ -292,11 +291,6 @@ extern NSString* const kHGSObjectStatusStaleValue;
          matchedTerm:(HGSTokenizedString *)term
       matchedIndexes:(NSIndexSet *)ranges;
 
-+ (id)resultWithResult:(HGSResult *)result
-                 score:(CGFloat)score
-           matchedTerm:(HGSTokenizedString *)term
-        matchedIndexes:(NSIndexSet *)indexes;
-
 + (id)resultWithResult:(HGSResult *)result 
                  score:(CGFloat)score
             flagsToSet:(HGSRankFlags)setFlags
@@ -310,6 +304,7 @@ extern NSString* const kHGSObjectStatusStaleValue;
              source:(HGSSearchSource *)source
          attributes:(NSDictionary *)attributes
               score:(CGFloat)score
+              flags:(HGSRankFlags)flags
         matchedTerm:(HGSTokenizedString *)term
      matchedIndexes:(NSIndexSet *)indexes;
 
@@ -317,6 +312,7 @@ extern NSString* const kHGSObjectStatusStaleValue;
                   source:(HGSSearchSource *)source 
               attributes:(NSDictionary *)attributes
                    score:(CGFloat)score
+                   flags:(HGSRankFlags)flags
              matchedTerm:(HGSTokenizedString *)term
           matchedIndexes:(NSIndexSet *)indexes;
 
@@ -326,6 +322,7 @@ extern NSString* const kHGSObjectStatusStaleValue;
            source:(HGSSearchSource *)source
        attributes:(NSDictionary *)attributes
             score:(CGFloat)score
+            flags:(HGSRankFlags)flags
       matchedTerm:(HGSTokenizedString *)term
    matchedIndexes:(NSIndexSet *)indexes;
 

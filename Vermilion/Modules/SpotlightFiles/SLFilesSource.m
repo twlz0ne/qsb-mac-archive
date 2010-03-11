@@ -396,7 +396,8 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
                                              type:resultType
                                            source:[self source]
                                        attributes:hgsAttributes
-                                            score:score 
+                                            score:score
+                                            flags:0
                                       matchedTerm:matchedTerm 
                                    matchedIndexes:matchedIndexes];
     [hgsResults_ setObject:scoredResult forKey:key];

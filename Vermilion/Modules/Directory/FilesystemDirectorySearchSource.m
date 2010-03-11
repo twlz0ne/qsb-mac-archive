@@ -166,6 +166,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                        source:self 
                                    attributes:attributes
                                         score:score
+                                        flags:0
                                   matchedTerm:tokenizedSubpath
                                matchedIndexes:matchedIndexes];
       [results addObject:result];
@@ -194,7 +195,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                          source:self
                                      attributes:nil
                                           score:score
-                                    matchedTerm:tokenizedQueryString
+                                          flags:0
+                                   matchedTerm:tokenizedQueryString
                                  matchedIndexes:nil];
         [operation setRankedResults:[NSArray arrayWithObject:result]]; 
       } else {
@@ -227,6 +229,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                source:self
                                            attributes:nil
                                                 score:score
+                                                flags:0
                                           matchedTerm:tokenizedQueryString
                                        matchedIndexes:nil];
               [contents addObject:result];

@@ -52,43 +52,44 @@ NSString *const kHGSResultDidPromoteNotification
   = @"HGSResultDidPromoteNotification";
 
 // storage and initialization for value names
-NSString* const kHGSObjectAttributeNameKey = @"kHGSObjectAttributeName";
-NSString* const kHGSObjectAttributeURIKey = @"kHGSObjectAttributeURI";
-NSString* const kHGSObjectAttributeUniqueIdentifiersKey = @"kHGSObjectAttributeUniqueIdentifiers";  // NSString
-NSString* const kHGSObjectAttributeTypeKey = @"kHGSObjectAttributeType";
-NSString* const kHGSObjectAttributeStatusKey = @"kHGSObjectAttributeStatus";
-NSString* const kHGSObjectAttributeLastUsedDateKey = @"kHGSObjectAttributeLastUsedDate";
-NSString* const kHGSObjectAttributeSnippetKey = @"kHGSObjectAttributeSnippet";
-NSString* const kHGSObjectAttributeSourceURLKey = @"kHGSObjectAttributeSourceURL";
-NSString* const kHGSObjectAttributeIconKey = @"kHGSObjectAttributeIcon";
-NSString* const kHGSObjectAttributeImmediateIconKey = @"kHGSObjectAttributeImmediateIconKey";
-NSString* const kHGSObjectAttributeIconPreviewFileKey = @"kHGSObjectAttributeIconPreviewFileKey";
-NSString* const kHGSObjectAttributeFlagIconNameKey = @"kHGSObjectAttributeFlagIconName";
-NSString* const kHGSObjectAttributeAliasDataKey = @"kHGSObjectAttributeAliasData";
-NSString* const kHGSObjectAttributeIsSyntheticKey = @"kHGSObjectAttributeIsSynthetic";
-NSString* const kHGSObjectAttributeIsContainerKey = @"kHGSObjectAttributeIsContainer";
-NSString* const kHGSObjectAttributeRankFlagsKey = @"kHGSObjectAttributeRankFlags";
+NSString* const kHGSObjectAttributeNameKey = @"HGSObjectAttributeName";
+NSString* const kHGSObjectAttributeURIKey = @"HGSObjectAttributeURI";
+NSString* const kHGSObjectAttributeUniqueIdentifiersKey = @"HGSObjectAttributeUniqueIdentifiers";  // NSString
+NSString* const kHGSObjectAttributeTypeKey = @"HGSObjectAttributeType";
+NSString* const kHGSObjectAttributeStatusKey = @"HGSObjectAttributeStatus";
+NSString* const kHGSObjectAttributeLastUsedDateKey = @"HGSObjectAttributeLastUsedDate";
+NSString* const kHGSObjectAttributeSnippetKey = @"HGSObjectAttributeSnippet";
+NSString* const kHGSObjectAttributeSourceURLKey = @"HGSObjectAttributeSourceURL";
+NSString* const kHGSObjectAttributeIconKey = @"HGSObjectAttributeIcon";
+NSString* const kHGSObjectAttributeImmediateIconKey = @"HGSObjectAttributeImmediateIcon";
+NSString* const kHGSObjectAttributeIconPreviewFileKey = @"HGSObjectAttributeIconPreviewFile";
+NSString* const kHGSObjectAttributeFlagIconNameKey = @"HGSObjectAttributeFlagIconName";
+NSString* const kHGSObjectAttributeAliasDataKey = @"HGSObjectAttributeAliasData";
+NSString* const kHGSObjectAttributeIsSyntheticKey = @"HGSObjectAttributeIsSynthetic";
+NSString* const kHGSObjectAttributeIsContainerKey = @"HGSObjectAttributeIsContainer";
+NSString* const kHGSObjectAttributeRankFlagsKey = @"HGSObjectAttributeRankFlags";
 NSString* const kHGSObjectAttributeMatchedTermKey = @"HGSObjectAttributeMatchedTerm";
-NSString* const kHGSObjectAttributeDefaultActionKey = @"kHGSObjectAttributeDefaultActionKey";
-NSString* const kHGSObjectAttributeBundleIDKey = @"kHGSObjectAttributeBundleID";
-NSString* const kHGSObjectAttributeWebSearchDisplayStringKey = @"kHGSObjectAttributeWebSearchDisplayString";
-NSString* const kHGSObjectAttributeWebSearchTemplateKey = @"kHGSObjectAttributeWebSearchTemplate";
-NSString* const kHGSObjectAttributeAllowSiteSearchKey = @"kHGSObjectAttributeAllowSiteSearch";
-NSString* const kHGSObjectAttributeWebSuggestTemplateKey = @"kHGSObjectAttributeWebSuggestTemplate";
-NSString* const kHGSObjectAttributeStringValueKey = @"kHGSObjectAttributeStringValue";
-NSString* const kHGSObjectAttributePasteboardValueKey = @"kHGSObjectAttributePasteboardValue";
-NSString* const kHGSObjectAttributeUTTypeKey = @"kHGSObjectAttributeUTType";
+NSString* const kHGSObjectAttributeDefaultActionKey = @"HGSObjectAttributeDefaultAction";
+NSString* const kHGSObjectAttributeActionDirectObjectsKey = @"HGSObjectAttributeActionDirectObjects";
+NSString* const kHGSObjectAttributeBundleIDKey = @"HGSObjectAttributeBundleID";
+NSString* const kHGSObjectAttributeWebSearchDisplayStringKey = @"HGSObjectAttributeWebSearchDisplayString";
+NSString* const kHGSObjectAttributeWebSearchTemplateKey = @"HGSObjectAttributeWebSearchTemplate";
+NSString* const kHGSObjectAttributeAllowSiteSearchKey = @"HGSObjectAttributeAllowSiteSearch";
+NSString* const kHGSObjectAttributeWebSuggestTemplateKey = @"HGSObjectAttributeWebSuggestTemplate";
+NSString* const kHGSObjectAttributeStringValueKey = @"HGSObjectAttributeStringValue";
+NSString* const kHGSObjectAttributePasteboardValueKey = @"HGSObjectAttributePasteboardValue";
+NSString* const kHGSObjectAttributeUTTypeKey = @"HGSObjectAttributeUTType";
 
 // Contact related keys
-NSString* const kHGSObjectAttributeContactEmailKey = @"kHGSObjectAttributeContactEmail";  
-NSString* const kHGSObjectAttributeEmailAddressesKey = @"kHGSObjectAttributeEmailAddressesKey";
-NSString* const kHGSObjectAttributeContactsKey = @"kHGSObjectAttributeContactsKey";
-NSString* const kHGSObjectAttributeAlternateActionURIKey = @"kHGSObjectAttributeAlternateActionURI";
-NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey = @"kHGSObjectAttributeAddressBookRecordIdentifier";
+NSString* const kHGSObjectAttributeContactEmailKey = @"HGSObjectAttributeContactEmail";  
+NSString* const kHGSObjectAttributeEmailAddressesKey = @"HGSObjectAttributeEmailAddresses";
+NSString* const kHGSObjectAttributeContactsKey = @"HGSObjectAttributeContacts";
+NSString* const kHGSObjectAttributeAlternateActionURIKey = @"HGSObjectAttributeAlternateActionURI";
+NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey = @"HGSObjectAttributeAddressBookRecordIdentifier";
 
 static NSString* const kHGSResultFileSchemePrefix = @"file://localhost";
 
-NSString* const kHGSObjectStatusStaleValue = @"kHGSObjectStatusStaleValue";
+NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
 
 
 @interface HGSResult ()
@@ -563,18 +564,6 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 @synthesize matchedTerm = matchedTerm_;
 @synthesize matchedIndexes = matchedIndexes_;
 
-+ (id)resultWithResult:(HGSResult *)result
-                 score:(CGFloat)score
-           matchedTerm:(HGSTokenizedString *)term
-        matchedIndexes:(NSIndexSet *)indexes {
-  return [[[[self class] alloc] initWithResult:result 
-                                         score:score 
-                                    flagsToSet:0 
-                                  flagsToClear:0 
-                                   matchedTerm:term 
-                                matchedIndexes:indexes] autorelease];
-}
-
 + (id)resultWithResult:(HGSResult *)result 
                  score:(CGFloat)score
             flagsToSet:(HGSRankFlags)setFlags
@@ -596,6 +585,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
              source:(HGSSearchSource *)source
          attributes:(NSDictionary *)attributes
               score:(CGFloat)score
+              flags:(HGSRankFlags)flags
         matchedTerm:(HGSTokenizedString *)term
      matchedIndexes:(NSIndexSet *)indexes {
   return [[[[self class] alloc] initWithURI:uri 
@@ -604,6 +594,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
                                      source:source 
                                  attributes:attributes 
                                        score:score 
+                                      flags:flags
                                 matchedTerm:term 
                              matchedIndexes:indexes] autorelease];
 }
@@ -612,13 +603,16 @@ GTM_METHOD_CHECK(NSString, readableURLString);
                   source:(HGSSearchSource *)source 
               attributes:(NSDictionary *)attributes
                    score:(CGFloat)score
-             matchedTerm:(HGSTokenizedString *)term
+                   flags:(HGSRankFlags)flags
+            matchedTerm:(HGSTokenizedString *)term
           matchedIndexes:(NSIndexSet *)indexes {
   HGSUnscoredResult *result = [HGSUnscoredResult resultWithFilePath:path 
                                                              source:source 
                                                          attributes:attributes];
   return [self resultWithResult:result 
                           score:score 
+                     flagsToSet:flags
+                   flagsToClear:~flags
                     matchedTerm:term
                  matchedIndexes:indexes];
 }
@@ -654,7 +648,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
            source:(HGSSearchSource *)source
        attributes:(NSDictionary *)attributes
              score:(CGFloat)score
-      matchedTerm:(HGSTokenizedString *)term
+            flags:(HGSRankFlags)flags
+     matchedTerm:(HGSTokenizedString *)term
    matchedIndexes:(NSIndexSet *)indexes {
   HGSUnscoredResult *result = [HGSUnscoredResult resultWithURI:uri 
                                                           name:name 
@@ -663,8 +658,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
                                                     attributes:attributes];
   return [self initWithResult:result 
                          score:score
-                   flagsToSet:0 
-                 flagsToClear:0 
+                   flagsToSet:flags 
+                 flagsToClear:~flags 
                   matchedTerm:term 
                matchedIndexes:indexes];
 }
@@ -674,14 +669,16 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   // We can't calculate this in initially because some sources could create
   // HGSScoredResults that they keep around, and they wouldn't be updated
   // dynamically.
-  HGSSearchSource *source = [self source];
-  HGSSearchSourceRanker *ranker = [HGSSearchSourceRanker sharedSearchSourceRanker];
-  UInt64 promotionCount = [ranker promotionCount];
-  UInt64 promotionForSource = [ranker promotionCountForSource:source];
-  CGFloat promotionMultiplier 
-    = ((CGFloat)promotionForSource / (CGFloat)promotionCount);
-  CGFloat score = score_ + 1.0 * promotionMultiplier;
-  if (score > 1.0) score = 1.0;
+  CGFloat score = score_;
+  if (!([self rankFlags] & eHGSShortcutRankFlag)) {
+    HGSSearchSource *source = [self source];
+    HGSSearchSourceRanker *ranker = [HGSSearchSourceRanker sharedSearchSourceRanker];
+    UInt64 promotionCount = [ranker promotionCount];
+    UInt64 promotionForSource = [ranker promotionCountForSource:source];
+    CGFloat promotionMultiplier 
+      = ((CGFloat)promotionForSource / (CGFloat)promotionCount);
+    score = score + 1.0 * promotionMultiplier;
+  }
   return score;
 }
 
@@ -726,6 +723,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
                                                        source:[self source]
                                                    attributes:newAttributes
                                                         score:[self score]
+                                                        flags:[self rankFlags]
                                                   matchedTerm:[self matchedTerm]
                                                matchedIndexes:[self matchedIndexes]];
   return newResult;

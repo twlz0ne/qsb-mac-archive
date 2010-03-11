@@ -638,7 +638,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                                source:self
                                                            attributes:attributes
                                                                 score:score
-                                                          matchedTerm:matchedTerm
+                                                                flags:0
+                                                      matchedTerm:matchedTerm
                                                        matchedIndexes:matchedIndexes];
       if (navsuggestion) {
         [suggestionResults addObject:navsuggestion];
@@ -702,6 +703,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                   source:self
                               attributes:attributes
                                    score:[result score]
+                                   flags:[result rankFlags]
                              matchedTerm:[result matchedTerm]
                           matchedIndexes:[result matchedIndexes]];
       [results replaceObjectAtIndex:i withObject:urlResult];

@@ -37,13 +37,17 @@
 #import <Vermilion/Vermilion.h>
 
 static NSString *const kHGSCorporaSourceAttributeIconNameKey 
-  = @"kHGSCorporaSourceAttributeIconNameKey";  // NSString
+  = @"HGSCorporaSourceAttributeIconName";  // NSString
 static NSString *const kHGSCorporaSourceAttributeHideCorpusKey
-  = @"kHGSCorporaSourceAttributeHideCorpus";  // BOOL
+  = @"HGSCorporaSourceAttributeHideCorpus";  // BOOL
 static NSString *const kHGSCorporaSourceAttributeHideFromDesktopKey
-  = @"kHGSCorporaSourceAttributeHideFromDesktop";  // BOOL
+  = @"HGSCorporaSourceAttributeHideFromDesktop";  // BOOL
 static NSString *const kHGSCorporaSourceAttributeURIStringKey
-  = @"kHGSCorporaSourceAttributeURIString";  //NSString
+  = @"HGSCorporaSourceAttributeURIString";  //NSString
+static NSString *const kHGSObjectAttributeHideFromDropdownKey
+  = @"HGSObjectAttributeHideFromDropdown";  // BOOL
+static NSString *const kHGSObjectAttributeHideFromResultsKey
+  = @"HGSObjectAttributeHideFromResults";   // BOOL
 
 @interface GoogleCorporaSource ()
 - (BOOL)loadCorpora;
@@ -231,10 +235,10 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   
   for (HGSResult *corpus in allCorpora) {
     if ([corpus valueForKey:kHGSObjectAttributeWebSearchTemplateKey]
-    && ![[corpus valueForKey:@"kHGSObjectAttributeHideFromDropdown"] boolValue]) {
+    && ![[corpus valueForKey:kHGSObjectAttributeHideFromDropdownKey] boolValue]) {
       [searchableCorpora addObject:corpus];
     }
-    if (![[corpus valueForKey:@"kHGSObjectAttributeHideFromResults"] boolValue]) {
+    if (![[corpus valueForKey:kHGSObjectAttributeHideFromResultsKey] boolValue]) {
       [visibleCorpora addObject:corpus];
     } 
   }

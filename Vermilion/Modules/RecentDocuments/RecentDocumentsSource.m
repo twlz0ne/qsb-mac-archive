@@ -169,7 +169,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                 = [HGSScoredResult resultWithFilePath:recentPath
                                                source:self
                                            attributes:attributes
-                                                score:score 
+                                                score:score
+                                                flags:0
                                           matchedTerm:tokenizedName 
                                        matchedIndexes:matchedIndexes];
               [finalResults addObject:scoredResult];

@@ -233,6 +233,7 @@ static NSString *const kWeatherResultURL
                                     source:self
                                 attributes:attributes
                                      score:HGSCalibratedScore(kHGSCalibratedPerfectScore) 
+                                     flags:eHGSSpecialUIRankFlag
                                matchedTerm:tokenizedQueryString 
                             matchedIndexes:nil];
         NSArray *resultsArray = [NSArray arrayWithObject:scoredResult];

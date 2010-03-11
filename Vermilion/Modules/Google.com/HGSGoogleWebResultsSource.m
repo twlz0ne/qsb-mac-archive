@@ -146,7 +146,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
 
 #if TARGET_OS_IPHONE
   static NSTimeInterval const kThirtyMinutes = 60.0 * 30.0;
-  if ([pivotObject valueForKey:@"kHGSObjectAttributeGoogleAPIIncludeLocation"]) {
+  if ([pivotObject valueForKey:@"HGSObjectAttributeGoogleAPIIncludeLocation"]) {
     location = [[GMOLocationManager sharedLocationManager] currentLocationAsNameYoungerThan:kThirtyMinutes];
     if (!location) {
       [self finishQuery];
@@ -157,7 +157,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
 
   NSString *baseURLString = kJSONQueryURL;
 
-  NSString *altURLString = [pivotObject valueForKey:@"kHGSObjectAttributeGoogleAPIURL"];
+  NSString *altURLString = [pivotObject valueForKey:@"HGSObjectAttributeGoogleAPIURL"];
   if (altURLString) {
     baseURLString = altURLString;
   }
@@ -288,7 +288,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
                                                       source:[self source]
                                                   attributes:attributes
                                                        score:score
-                                                 matchedTerm:tokenizedQueryString
+                                                       flags:0
+                                                matchedTerm:tokenizedQueryString
                                               matchedIndexes:nil];
     score *= 0.9;
     
@@ -331,7 +332,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
     HGSResult *pivotObject = [query pivotObject];
     NSURL *url = [pivotObject url];
     NSNumber *hideResults 
-      = [pivotObject valueForKey:@"kHGSObjectAttributeGoogleAPIAlwaysHideResults"];
+      = [pivotObject valueForKey:@"HGSObjectAttributeGoogleAPIAlwaysHideResults"];
     if ([hideResults boolValue]) {
       isValid = NO;
     } else if ([[url scheme] isEqualToString:@"http"]) {

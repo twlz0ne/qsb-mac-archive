@@ -6,7 +6,7 @@
 		<key>HGSSearchSourceRankerSourceID</key>
 		<string>com.google.qsb.shortcuts.source</string>
 		<key>promotions</key>
-		<integer>50</integer>
+		<integer>0</integer>
 		<key>runtime</key>
 		<integer>1</integer>
 	</dict>

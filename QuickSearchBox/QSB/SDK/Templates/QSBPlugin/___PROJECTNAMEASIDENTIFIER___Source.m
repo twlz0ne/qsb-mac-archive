@@ -33,6 +33,7 @@
                                 source:self
                             attributes:nil
                                  score:score
+                                 flags:0
                            matchedTerm:term
                         matchedIndexes:nil];
     [operation setRankedResults:[NSArray arrayWithObject:result]];

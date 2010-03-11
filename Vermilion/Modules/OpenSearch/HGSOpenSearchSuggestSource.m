@@ -105,7 +105,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                                                       source:self
                                                   attributes:attributes
                                                        score:score
-                                                 matchedTerm:tokenizedSuggestion
+                                                       flags:0
+                                              matchedTerm:tokenizedSuggestion
                                               matchedIndexes:matchedIndexes];
     [suggestions addObject:result];
   }

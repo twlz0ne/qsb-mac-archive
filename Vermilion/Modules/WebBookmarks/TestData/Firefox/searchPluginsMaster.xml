@@ -3,9 +3,9 @@
 <plist version="1.0">
 <array>
 	<dict>
-		<key>kHGSObjectAttributeName</key>
+		<key>HGSObjectAttributeName</key>
 		<string>IMDB</string>
-		<key>kHGSObjectAttributeURI</key>
+		<key>HGSObjectAttributeURI</key>
 		<string>http://www.imdb.com/find?q=%s&amp;sourceid=mozilla-search</string>
 	</dict>
 </array>

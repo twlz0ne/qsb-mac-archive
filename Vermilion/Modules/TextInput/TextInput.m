@@ -59,31 +59,36 @@ static NSString *const kDateTimeMarker = @"[DTS]";
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   BOOL isValid = [super isValidSourceForQuery:query];
   if (isValid) {
-  // TODO(thomasvl): support indirect w/o loading space
-  
-  // For top level, must start w/ our prefix.
-    NSString *rawQuery = [[query tokenizedQueryString] originalString];
-    NSUInteger len = [rawQuery length];
-    NSUInteger prefixLen = [kInputPrefix length];
-    if (len > prefixLen) {
-      isValid = [rawQuery compare:kInputPrefix
-                          options:NSCaseInsensitiveSearch
-                            range:NSMakeRange(0, prefixLen)] == NSOrderedSame;
-    } else {
-      isValid = NO;
+    if (![query actionArgument]) {
+      // For top level, must start w/ our prefix.
+      NSString *rawQuery = [[query tokenizedQueryString] originalString];
+      NSUInteger len = [rawQuery length];
+      NSUInteger prefixLen = [kInputPrefix length];
+      if (len > prefixLen) {
+        isValid = [rawQuery compare:kInputPrefix
+                            options:NSCaseInsensitiveSearch
+                              range:NSMakeRange(0, prefixLen)] == NSOrderedSame;
+      } else {
+        isValid = NO;
+      }
     }
   }
   return isValid;
 }
 
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
-  HGSTokenizedString *tokenizedQueryString 
-    = [[operation query] tokenizedQueryString];
+  HGSQuery *query = [operation query];
+  HGSTokenizedString *tokenizedQueryString = [query tokenizedQueryString];
   NSString *rawQuery = [tokenizedQueryString originalString];
 
-  // TODO(thomasvl): support indirect w/o loading space
-  HGSAssert([rawQuery hasPrefix:kInputPrefix], nil);
-  NSString *userText = [rawQuery substringFromIndex:[kInputPrefix length]];
+  NSString *userText = nil;
+  if (![query actionArgument]) {
+    // TODO(thomasvl): support indirect w/o loading space
+    HGSAssert([rawQuery hasPrefix:kInputPrefix], nil);
+    userText = [rawQuery substringFromIndex:[kInputPrefix length]];
+  } else {
+    userText = rawQuery;
+  }
   
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
   NSString *fileType = NSFileTypeForHFSTypeCode(kClippingTextType);
@@ -107,6 +112,7 @@ static NSString *const kDateTimeMarker = @"[DTS]";
                               source:self
                           attributes:attributes
                                score:HGSCalibratedScore(kHGSCalibratedPerfectScore)
+                               flags:eHGSSpecialUIRankFlag
                          matchedTerm:tokenizedQueryString
                       matchedIndexes:nil];
   
@@ -159,6 +165,7 @@ static NSString *const kDateTimeMarker = @"[DTS]";
                                          source:self
                                      attributes:attributes
                                           score:HGSCalibratedScore(kHGSCalibratedPerfectScore)
+                                          flags:eHGSSpecialUIRankFlag
                                     matchedTerm:tokenizedQueryString
                                  matchedIndexes:nil];
   }
