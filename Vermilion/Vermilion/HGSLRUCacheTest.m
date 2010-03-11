@@ -112,8 +112,8 @@ static BOOL HGSLRUCacheTestEvict(const void *key,
   STAssertEqualObjects(values, @"happy", nil);
   id key = [OCMockObject mockForClass:[NSObject class]];
   id value = [OCMockObject mockForClass:[NSObject class]];
-  [[[key stub] andReturn:key] retain];
-  [[[value stub] andReturn:value] retain];
+  [[[key expect] andReturn:key] retain];
+  [[[value expect] andReturn:value] retain];
   STAssertTrue([cache setValue:value forKey:key size:1023], nil);
   [cache getKeys:(const void**)&keys values:(const void**)&values];
   
@@ -123,13 +123,13 @@ static BOOL HGSLRUCacheTestEvict(const void *key,
   STAssertEquals(values, value, nil);
   
   id value2 = [OCMockObject mockForClass:[NSObject class]];
-  [[key stub] release];
-  [[value stub] release];
-  [[[key stub] andReturn:key] retain];
-  [[[value2 stub] andReturn:value2] retain];
+  [[key expect] release];
+  [[value expect] release];
+  [[[key expect] andReturn:key] retain];
+  [[[value2 expect] andReturn:value2] retain];
   STAssertTrue([cache setValue:value forKey:key size:1023], nil);
-  [[key stub] release];
-  [[value2 stub] release];
+  [[key expect] release];
+  [[value2 expect] release];
   [cache release];
 }
 
@@ -155,14 +155,14 @@ static BOOL HGSLRUCacheTestEvict(const void *key,
   id value2 = [OCMockObject mockForClass:[NSObject class]];
   id key3 = [OCMockObject mockForClass:[NSObject class]];
   id value3 = [OCMockObject mockForClass:[NSObject class]];
-  [[[key1 stub] andReturn:key1] retain];
-  [[[value1 stub] andReturn:value1] retain];
+  [[[key1 expect] andReturn:key1] retain];
+  [[[value1 expect] andReturn:value1] retain];
   STAssertTrue([cache setValue:value1 forKey:key1 size:10], nil);
-  [[[key2 stub] andReturn:key2] retain];
-  [[[value2 stub] andReturn:value2 ] retain];
+  [[[key2 expect] andReturn:key2] retain];
+  [[[value2 expect] andReturn:value2 ] retain];
   STAssertTrue([cache setValue:value2 forKey:key2 size:20], nil);
-  [[[key3 stub] andReturn:key3] retain];
-  [[[value3 stub] andReturn:value3] retain];
+  [[[key3 expect] andReturn:key3] retain];
+  [[[value3 expect] andReturn:value3] retain];
   STAssertTrue([cache setValue:value3 forKey:key3 size:30], nil); 
   id value = (id)[cache valueForKey:@"Foo"];
   STAssertNil(value,nil);
@@ -173,24 +173,24 @@ static BOOL HGSLRUCacheTestEvict(const void *key,
   value = (id)[cache valueForKey:key1];
   STAssertEquals(value, value1, nil);
  
-  [[key3 stub] release];
-  [[value3 stub] release];
+  [[key3 expect] release];
+  [[value3 expect] release];
   [cache removeValueForKey:key3];
   
-  [[[key3 stub] andReturn:key3] retain];
-  [[[value3 stub] andReturn:value3] retain];
-  [[key2 stub] release];
-  [[value2 stub] release];
+  [[[key3 expect] andReturn:key3] retain];
+  [[[value3 expect] andReturn:value3] retain];
+  [[key2 expect] release];
+  [[value2 expect] release];
   STAssertTrue([cache setValue:value3 forKey:key3 size:1000], nil); 
   value = (id)[cache valueForKey:key2];
   STAssertNil(value, nil);
   evict = NO;
   STAssertFalse([cache setValue:value2 forKey:key2 size:1000], nil);
   evict = YES;
-  [[key1 stub] release];
-  [[value1 stub] release];
-  [[key3 stub] release];
-  [[value3 stub] release];  
+  [[key1 expect] release];
+  [[value1 expect] release];
+  [[key3 expect] release];
+  [[value3 expect] release];  
   STAssertFalse([cache setValue:value2 forKey:key2 size:10000], nil);
   [cache release];
 }

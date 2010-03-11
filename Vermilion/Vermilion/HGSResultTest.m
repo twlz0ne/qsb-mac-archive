@@ -85,7 +85,7 @@
   STAssertEqualObjects([NSURL URLWithString:path], 
                        [infoObject url], 
                        @"didn't find uri");
-  [[[searchSourceMock stub] 
+  [[[searchSourceMock expect] 
     andReturn:kHGSObjectAttributeSnippetKey] 
    provideValueForKey:kHGSObjectAttributeSnippetKey result:infoObject];
   STAssertEqualStrings(kHGSObjectAttributeSnippetKey, 

@@ -63,13 +63,13 @@
 
 - (void)testMIMETypeDetection {
   id resultMockA = [OCMockObject mockForClass:[HGSResult class]];
-  [[[resultMockA stub] andReturn:@"fakepath.jpg"] filePath];
+  [[[resultMockA expect] andReturn:@"fakepath.jpg"] filePath];
   NSString *typeA = [HGSGDataUploadAction mimeTypeForResult:resultMockA];
   STAssertEqualStrings(@"image/jpeg", typeA, nil);
 
   id resultMockB = [OCMockObject mockForClass:[HGSResult class]];
-  [[[resultMockB stub] andReturn:@"fakepath.woohoo"] filePath];
-  [[[resultMockB stub] andReturn:kHGSTypeFilePDF] type];
+  [[[resultMockB expect] andReturn:@"fakepath.woohoo"] filePath];
+  [[[resultMockB expect] andReturn:kHGSTypeFilePDF] type];
   NSString *typeB = [HGSGDataUploadAction mimeTypeForResult:resultMockB];
   STAssertEqualStrings(@"application/pdf", typeB, nil);
 }
@@ -77,7 +77,7 @@
 - (void)testMissingImplementations {
   OCMockObject *bundleMock = [OCMockObject mockForClass:[NSBundle class]];
   [[[bundleMock stub] andReturn:@"fakeAction"] 
-   localizedStringForKey:@"fakeAction" value:@"NOT_FOUND" table:@"InfoPlist"];
+   qsb_localizedInfoPListStringForKey:@"fakeAction"];
   OCMockObject *mockAccount = [OCMockObject mockForClass:[HGSSimpleAccount class]];
   NSDictionary *configuration = [NSDictionary dictionaryWithObjectsAndKeys:
                                  bundleMock, kHGSExtensionBundleKey,

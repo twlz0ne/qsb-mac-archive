@@ -46,35 +46,26 @@
   
   // Test with no extensions
   id bundleMock = [OCMockObject mockForClass:[NSBundle class]];
-  [[[bundleMock stub] 
-    andReturn:@"plugin.identifier"] 
+  [[[bundleMock expect] andReturn:@"plugin.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
-  [[[bundleMock stub] 
-    andReturn:@"pluginName"] 
+  [[[bundleMock expect] andReturn:@"pluginName"] 
    objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-  [[[bundleMock stub] 
-    andReturn:nil] 
+  [[[bundleMock expect] andReturn:nil] 
    objectForInfoDictionaryKey:@"HGSExtensions"];
-  [[[bundleMock stub] 
-    andReturn:nil] 
-   pathForResource:@"QSBInfo" ofType:@"plist"];
-  [[[bundleMock stub] 
-    andReturn:@"bundlePath"] 
-   bundlePath];  
+  [[[bundleMock expect] andReturn:nil] pathForResource:@"QSBInfo" 
+                                                ofType:@"plist"];
+  [[[bundleMock expect] andReturn:@"bundlePath"] bundlePath];  
   plugin = [[[HGSPlugin alloc] initWithBundle:bundleMock] autorelease];
   STAssertNil(plugin, nil);
   [bundleMock verify];
   
   // Test with extensions
   bundleMock = [OCMockObject mockForClass:[NSBundle class]];
-  [[[bundleMock stub] 
-    andReturn:@"plugin.identifier"] 
+  [[[bundleMock expect] andReturn:@"plugin.identifier"] 
    objectForInfoDictionaryKey:@"CFBundleIdentifier"];
-  [[[bundleMock stub] 
-    andReturn:@"pluginName"] 
+  [[[bundleMock expect] andReturn:@"pluginName"] 
    objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-  [[[bundleMock stub] 
-    andReturn:@"bundle.identifier"] 
+  [[[bundleMock expect] andReturn:@"bundle.identifier"] 
    bundleIdentifier];  
   NSDictionary *extensionDict 
     = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -83,15 +74,8 @@
        @"HGSPluginExtensionID", kHGSExtensionIdentifierKey,
        nil];
   NSArray *array = [NSArray arrayWithObject:extensionDict];
-  [[[bundleMock stub] 
-    andReturn:array] 
+  [[[bundleMock expect] andReturn:array] 
    objectForInfoDictionaryKey:@"HGSExtensions"];
-  [[[bundleMock stub] 
-    andReturn:nil] 
-   pathForResource:@"QSBInfo" ofType:@"plist"];
-  [[[bundleMock stub] 
-    andReturn:@"bundlePath"] 
-   bundlePath];  
   plugin = [[[HGSPlugin alloc] initWithBundle:bundleMock] autorelease];
   STAssertNotNil(plugin, nil);
   NSString *bundleIdentifier = [plugin bundleIdentifier];

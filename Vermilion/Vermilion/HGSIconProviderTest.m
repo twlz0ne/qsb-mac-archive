@@ -64,8 +64,7 @@
   HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
   [[[searchSourceMock stub] andReturn:nil]
    provideValueForKey:kHGSObjectAttributeIconPreviewFileKey result:result];
-  [[[searchSourceMock stub] 
-    andReturn:nil]
+  [[[searchSourceMock expect] andReturn:nil]
    provideValueForKey:kHGSObjectAttributeImmediateIconKey result:result];
   [[[searchSourceMock stub] andReturn:@"Display Name"] displayName];
   [[[searchSourceMock stub] andReturn:nil] 
