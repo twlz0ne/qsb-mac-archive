@@ -41,6 +41,8 @@
 @class HGSResult;
 @class HGSResultArray;
 @class HGSTokenizedString;
+@class HGSActionArgument;
+@class HGSActionOperation;
 
 typedef enum {
   eHGSQueryShowAlternatesFlag = 1 << 0,
@@ -60,6 +62,8 @@ typedef enum {
  @private
   HGSTokenizedString *tokenizedQueryString_;
   HGSResultArray *pivotObjects_;
+  HGSActionArgument *actionArgument_;
+  HGSActionOperation *actionOperation_;
   HGSQuery *parent_;
   HGSQueryFlags flags_;
 }
@@ -83,27 +87,33 @@ typedef enum {
 */
 @property (readonly, retain) HGSTokenizedString *tokenizedQueryString;
 
-/*!
-  A "parent" is a query that has asked for this one to be created.  Usually to
-  pick up an indirect object for an action.  This allows a SearchSource to walk
-  to the parent and fetch it's direct object to return results specific to that
-  object.
-*/
-@property (readwrite, retain) HGSQuery *parent;
-
 /*! 
   Various flags that modify some queries.
 */
 @property (readonly, assign) HGSQueryFlags flags;
 
+/*!
+  The action argument that we are attempting to fulfill with this query.
+*/
+@property (readonly, retain) HGSActionArgument *actionArgument;
+
+/*!
+  The action operation that we are attempting to create with this query.
+*/
+@property (readonly, retain) HGSActionOperation *actionOperation;
+
 /*! 
  Designated Initializer.
 */
-- (id)initWithTokenizedString:(HGSTokenizedString *)query 
+- (id)initWithTokenizedString:(HGSTokenizedString *)query
+               actionArgument:(HGSActionArgument *)actionArgument
+              actionOperation:(HGSActionOperation *)actionOperation
                  pivotObjects:(HGSResultArray *)pivots
                    queryFlags:(HGSQueryFlags)flags;
 
 - (id)initWithString:(NSString *)query 
+      actionArgument:(HGSActionArgument *)actionArgument
+     actionOperation:(HGSActionOperation *)actionOperation
         pivotObjects:(HGSResultArray *)pivots
           queryFlags:(HGSQueryFlags)flags;
 @end

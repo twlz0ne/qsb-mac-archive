@@ -37,16 +37,21 @@
 
 @synthesize tokenizedQueryString = tokenizedQueryString_;
 @synthesize pivotObjects = pivotObjects_;
-@synthesize parent = parent_;
+@synthesize actionArgument = actionArgument_;
 @synthesize flags = flags_;
+@synthesize actionOperation = actionOperation_;
 
 - (id)initWithTokenizedString:(HGSTokenizedString *)query 
+               actionArgument:(HGSActionArgument *)actionArgument
+              actionOperation:(HGSActionOperation *)actionOperation
                  pivotObjects:(HGSResultArray *)pivotObjects
                    queryFlags:(HGSQueryFlags)flags {
   if ((self = [super init])) {
     pivotObjects_ = [pivotObjects retain];
     flags_ = flags;
-
+    actionArgument_ = [actionArgument retain];
+    actionOperation_ = [actionOperation retain];
+    
     // If we got nil for a query, but had a pivot, turn it into an empty query.
     if (!query && pivotObjects) {
       query = [HGSTokenizer tokenizeString:@""];
@@ -60,19 +65,24 @@
   return self;
 }
 
-- (id)initWithString:(NSString *)query 
-        pivotObjects:(HGSResultArray *)pivotObjects
+- (id)initWithString:(NSString *)query
+      actionArgument:(HGSActionArgument *)actionArgument
+     actionOperation:(HGSActionOperation *)actionOperation
+       pivotObjects:(HGSResultArray *)pivotObjects
           queryFlags:(HGSQueryFlags)flags {
   HGSTokenizedString *tokenizedQuery = [HGSTokenizer tokenizeString:query];
   return [self initWithTokenizedString:tokenizedQuery 
+                        actionArgument:actionArgument
+                       actionOperation:actionOperation
                           pivotObjects:pivotObjects 
                             queryFlags:flags];
 }
 
 - (void)dealloc {
+  [actionArgument_ release];
+  [actionOperation_ release];
   [tokenizedQueryString_ release];
   [pivotObjects_ release];
-  [parent_ release];
   [super dealloc];
 }
 

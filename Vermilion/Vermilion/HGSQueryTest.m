@@ -44,52 +44,34 @@
 
 - (void)testInit {
   STAssertNil([[[HGSQuery alloc] initWithTokenizedString:nil
-                                            pivotObjects:nil
+                                          actionArgument:nil
+                                         actionOperation:nil
+                                           pivotObjects:nil
                                               queryFlags:0] autorelease],
               nil);
   STAssertNotNil([[[HGSQuery alloc] initWithString:@""
+                                    actionArgument:nil
+                                   actionOperation:nil
                                       pivotObjects:nil
                                         queryFlags:0] autorelease],
                  nil);
-  STAssertNotNil([[[HGSQuery alloc] initWithString:@"a"
-                                      pivotObjects:nil
-                                        queryFlags:0] autorelease],
-                 nil);
-}
-
-
-- (void)testParent {
-  HGSQuery *query1;
-  HGSQuery *query2;
+  HGSQuery *query = [[[HGSQuery alloc] initWithString:@"a"
+                                       actionArgument:nil
+                                      actionOperation:nil
+                                         pivotObjects:nil
+                                           queryFlags:0] autorelease];
+  STAssertNotNil(query, nil);
   
-  query1 = [[[HGSQuery alloc] initWithString:@"abc"
-                                pivotObjects:nil
-                                  queryFlags:0] autorelease];
-  STAssertNotNil(query1, nil);
-  
-  query2 = [[[HGSQuery alloc] initWithString:@"xyz"
-                                pivotObjects:nil
-                                  queryFlags:0] autorelease];
-  STAssertNotNil(query2, nil);
-  
-  STAssertNil([query1 parent], nil);
-  STAssertNil([query2 parent], nil);
-  
-  [query2 setParent:query1];
-  
-  STAssertNil([query1 parent], nil);
-  STAssertNotNil([query2 parent], nil);
-  STAssertEquals([query2 parent], query1, nil);
-  
-  [query2 setParent:nil];
-  
-  STAssertNil([query1 parent], nil);
-  STAssertNil([query2 parent], nil);
+  // For completeness ;-)
+  NSString *desc = [query description];
+  STAssertNotNil(desc, nil);
 }
 
 - (void)testPivotObjects {
   HGSQuery *query  = [[[HGSQuery alloc] initWithString:@"abc"
-                                          pivotObjects:nil
+                                        actionArgument:nil
+                                       actionOperation:nil
+                                         pivotObjects:nil
                                             queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertNil([query pivotObjects], nil);
@@ -97,8 +79,10 @@
   
   NSArray *array = [NSArray arrayWithObject:@"a"];
   HGSResultArray *pivotObjects = [HGSResultArray arrayWithResults:array];
-  query  = [[[HGSQuery alloc] initWithString:@"abc"
-                                pivotObjects:pivotObjects
+  query  = [[[HGSQuery alloc] initWithString:nil
+                              actionArgument:nil
+                             actionOperation:nil
+                              pivotObjects:pivotObjects
                                   queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query pivotObjects], pivotObjects, nil);
@@ -107,7 +91,9 @@
   array = [NSArray arrayWithObjects:@"a", @"b", nil];
   pivotObjects = [HGSResultArray arrayWithResults:array];
   query  = [[[HGSQuery alloc] initWithString:@"abc"
-                                pivotObjects:pivotObjects
+                              actionArgument:nil
+                             actionOperation:nil
+                              pivotObjects:pivotObjects
                                   queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
   STAssertEqualObjects([query pivotObjects], pivotObjects, nil);

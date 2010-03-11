@@ -145,7 +145,9 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
       }
     }
   }
-  
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  BOOL alwaysRunOnMainThread 
+    = [defaults boolForKey:@"runQSBSearchesOnMainThread"];
   UInt64 startUpTime = 0;
   // We will run up to 50 ms of queries on the main thread. This cuts
   // down on the overhead of thread creation, and gives us really fast
@@ -160,7 +162,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
     if (runOnMainThread) {
       startUpTime += averageTimeForSource;
     }
-    [operation run:runOnMainThread];
+    [operation run:alwaysRunOnMainThread || runOnMainThread];
   }
 #if DEBUG
   for (HGSSearchOperation *op in pendingQueryOperations_) {
@@ -333,8 +335,16 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
             NSUInteger resultIndex = 0;
             for (HGSScoredResult *scoredResult in rankedResults) {
               if ([scoredResult isDuplicate:newRankedResult]) {
-                newRankedResult 
-                  = [scoredResult resultByAddingAttributesFromResult:newRankedResult];
+                NSInteger order = HGSMixerScoredResultSort(newRankedResult, 
+                                                           scoredResult, 
+                                                           NULL);
+                if (order == NSOrderedAscending) {
+                  newRankedResult 
+                    = [newRankedResult resultByAddingAttributesFromResult:scoredResult];
+                } else {
+                  newRankedResult 
+                    = [scoredResult resultByAddingAttributesFromResult:newRankedResult];
+                }
                 [rankedResults replaceObjectAtIndex:resultIndex 
                                          withObject:newRankedResult];
                 newRankedResult = nil;
