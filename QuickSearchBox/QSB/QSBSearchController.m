@@ -32,26 +32,20 @@
 //
 
 #import "QSBSearchController.h"
+
+#import <Vermilion/Vermilion.h>
 #import <QSBPluginUI/QSBPluginUI.h>
-#import "QSBApplication.h"
-#import "QSBApplicationDelegate.h"
-#import "QSBMoreResultsViewController.h"
+#import <GTM/GTMMethodCheck.h>
+#import <GTM/GTMNSObject+KeyValueObserving.h>
+
 #import "QSBPreferences.h"
 #import "QSBTableResult.h"
-#import "QSBResultsViewBaseController.h"
-#import "GTMMethodCheck.h"
-#import "GoogleCorporaSource.h"
 #import "NSString+CaseInsensitive.h"
 #import "NSString+ReadableURL.h"
-#import "HGSOpenSearchSuggestSource.h"
-#import "GTMNSObject+KeyValueObserving.h"
+#import "QSBActionPresenter.h"
 
 NSString *const kQSBSearchControllerDidUpdateResultsNotification
   = @"QSBSearchControllerDidUpdateResultsNotification";
-NSString *const kQSBSearchControllerWillChangeQueryStringNotification
-  = @"QSBSearchControllerWillChangeQueryStringNotification";
-NSString *const kQSBSearchControllerDidChangeQueryStringNotification
-  = @"QSBSearchControllerDidChangeQueryStringNotification";
 NSString *const kQSBSearchControllerResultCountByCategoryKey
   = @"QSBSearchControllerResultCountByCategoryKey";
 NSString *const kQSBSearchControllerResultCountKey
@@ -72,18 +66,23 @@ const NSTimeInterval kQSBDisplayTimerStages[] = { 0.1, 0.3, 0.7 };
 - (void)performQuery;
 - (NSDictionary *)resultCountByCategory;
 
+- (void)updateCategorySummaryString:(NSDictionary *)resultCountByCategory;
 
 @property(nonatomic, assign, getter=isQueryInProcess) BOOL queryInProcess;
-@property(nonatomic, assign, getter=isGatheringFinished) BOOL gatheringFinished;
+@property(nonatomic, assign, getter=isQueryFinished) BOOL queryFinished;
+@property(nonatomic, readwrite, copy) NSString *categorySummaryString;
+@property(nonatomic, readwrite, retain) HGSTokenizedString *tokenizedQueryString;
+@property(nonatomic, readwrite, retain) HGSResultArray *pivotObjects;
 @end
 
 @implementation QSBSearchController
 
 @synthesize pushModifierFlags = pushModifierFlags_;
 @synthesize pivotObjects = pivotObjects_;
-@synthesize parentSearchController = parentSearchController_;
 @synthesize queryInProcess = queryInProcess_;
-@synthesize gatheringFinished = gatheringFinished_;
+@synthesize categorySummaryString = categorySummaryString_;
+@synthesize tokenizedQueryString = tokenizedQueryString_;
+@synthesize queryFinished = queryFinished_;
 
 GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
@@ -96,7 +95,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [pool release];
 }
 
-- (id)init {
+- (id)initWithActionPresenter:(QSBActionPresenter *)actionPresenter {
   if ((self = [super init])) {
     topResults_ = [[NSMutableArray alloc] init];
     
@@ -112,6 +111,14 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
       [moreResults setObject:cache forKey:category];
     }
     moreResults_ = [moreResults retain];
+    actionPresenter_ = [actionPresenter retain];
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    [prefs gtm_addObserver:self
+                forKeyPath:kQSBResultCountKey
+                  selector:@selector(resultCountValueChanged:)
+                  userInfo:nil
+                   options:NSKeyValueObservingOptionNew];
+    totalResultDisplayCount_ = [prefs integerForKey:kQSBResultCountKey];
   }
   return self;
 }
@@ -128,21 +135,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self stopQuery];
   [tokenizedQueryString_ release];
   [pivotObjects_ release];
-  [parentSearchController_ release];
   [topResults_ release];
   [moreResults_ release];
   [lockedResults_ release];
+  [actionPresenter_ release];
+  [categorySummaryString_ release];
   [super dealloc];
-}
-
-- (void)awakeFromNib {
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_addObserver:self
-              forKeyPath:kQSBResultCountKey
-                selector:@selector(resultCountValueChanged:)
-                userInfo:nil
-                 options:NSKeyValueObservingOptionNew];
-  totalResultDisplayCount_ = [prefs integerForKey:kQSBResultCountKey];
 }
 
 - (void)resetMoreResults {
@@ -258,7 +256,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                    && ![userDefaults boolForKey:@"disableMoreResults"]);
   if (showMore) {
     [topQSBTableResults addObject:[QSBSeparatorTableResult tableResult]];
-    [topQSBTableResults addObject:[QSBFoldTableResult tableResult]];
+    QSBFoldTableResult *result 
+      = [QSBFoldTableResult tableResultWithSearchController:self];
+    [topQSBTableResults addObject:result];
   }
   [topResults_ setArray:topQSBTableResults];
 
@@ -270,12 +270,12 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     NSPointerArray *cache = [moreResults_ objectForKey:category];
     [cache setCount:value];
   }
+  [self updateCategorySummaryString:resultCountByCategory];
   resultsNeedUpdating_ = NO;
   
   NSDictionary *infoDict 
     = [NSDictionary dictionaryWithObjectsAndKeys:
-       [self resultCountByCategory], 
-       kQSBSearchControllerResultCountByCategoryKey,
+       resultCountByCategory, kQSBSearchControllerResultCountByCategoryKey,
        [NSNumber numberWithUnsignedInteger:resultCount],
        kQSBSearchControllerResultCountKey, 
        nil];
@@ -320,7 +320,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
         result = tableResult;
       }
       [resultsForCategory replacePointerAtIndex:idx withPointer:tableResult];
-      ++idx;
     }
   }
   return result;
@@ -340,29 +339,25 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return resultCountByCategory;
 }
 
-- (void)setTokenizedQueryString:(HGSTokenizedString *)queryString {
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc postNotificationName:kQSBSearchControllerWillChangeQueryStringNotification
-                    object:self];
+- (void)setTokenizedQueryString:(HGSTokenizedString *)tokenizedQueryString
+                   pivotObjects:(HGSResultArray *)pivotObjects {
   [self stopQuery];
-  [tokenizedQueryString_ autorelease];
-  tokenizedQueryString_ = [queryString retain];
-  if ([tokenizedQueryString_ tokenizedLength] || parentSearchController_) {
+  HGSTokenizedString *oldString = [self tokenizedQueryString];
+  HGSResultArray *oldPivots = [self pivotObjects];
+  BOOL hadQuery = [oldString tokenizedLength] || [oldPivots count];
+  [self setTokenizedQueryString:tokenizedQueryString];
+  [self setPivotObjects:pivotObjects];
+  if ([tokenizedQueryString tokenizedLength] || [pivotObjects count]) {
     [self performQuery];
-  } else {
+  } else if (hadQuery) {
     [topResults_ removeAllObjects];
     [self resetMoreResults];
     [lockedResults_ release];
     lockedResults_ = nil;
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:kQSBSearchControllerDidUpdateResultsNotification
                       object:self];
   }
-  [nc postNotificationName:kQSBSearchControllerDidChangeQueryStringNotification
-                    object:self];
-}
-
-- (HGSTokenizedString *)tokenizedQueryString {
-  return tokenizedQueryString_;
 }
 
 - (NSUInteger)maximumResultsToCollect {
@@ -383,6 +378,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
     HGSQuery *query 
       = [[[HGSQuery alloc] initWithTokenizedString:tokenizedQueryString_
+                                   actionArgument:[actionPresenter_ currentActionArgument]
+                                   actionOperation:[actionPresenter_ actionOperation]
                                       pivotObjects:pivotObjects_
                                         queryFlags:flags]
                        autorelease];
@@ -412,7 +409,8 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                                          target:self
                                        selector:@selector(displayTimerElapsed:)
                                        userInfo:@"displayTimer"
-                                        repeats:NO];    
+                                        repeats:NO];
+    [self setQueryFinished:NO];
     [queryController_ startQuery];
   }
 }
@@ -423,14 +421,44 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     displayTimer_ = nil;
     [self cancelAndReleaseQueryController];
     [self setQueryInProcess:NO];
+    [self setQueryFinished:YES];
   }
+}
+
+- (void)updateCategorySummaryString:(NSDictionary *)resultCountByCategory {
+  NSMutableString *categorySummary = [NSMutableString string];
+  NSString *comma = nil;
+  for (QSBCategory *category in resultCountByCategory) {
+    NSNumber *nsValue = [resultCountByCategory objectForKey:category];
+    NSUInteger catCount = [nsValue unsignedIntValue];
+    if (catCount) {
+      NSString *catString = nil;
+      if (catCount == 1) {
+        catString = [category localizedSingularName];
+      } else {
+        catString = [category localizedName];
+      }
+      if (!comma) {
+        comma = NSLocalizedString(@", ", nil);
+      } else {
+        [categorySummary appendString:comma];
+      }
+      [categorySummary appendFormat:@"%u %@", catCount, catString];
+    }
+  }
+  [self setCategorySummaryString:categorySummary];
+}
+
+- (NSString *)description {
+  return [NSString stringWithFormat:@"<%@: %p> query:%@ pivots:%@", 
+          [self class], self, [tokenizedQueryString_ originalString], 
+          [self pivotObjects]];
 }
 
 #pragma mark Notifications
 
 - (void)queryControllerWillStart:(NSNotification *)notification { 
   [self setQueryInProcess:YES];
-  [self setGatheringFinished:NO];
   resultsNeedUpdating_ = YES;
 }
 
@@ -440,9 +468,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 // reaching a time threshold.
 - (void)queryControllerDidFinish:(NSNotification *)notification { 
   currentResultDisplayCount_ = [self maximumResultsToCollect];
-  [self setGatheringFinished:YES];
   [self setQueryInProcess:NO];
   [self updateResults];
+  [self setQueryFinished:YES];
   [displayTimer_ invalidate];
   displayTimer_ = nil;
 }

@@ -31,19 +31,18 @@
 //
 //
 
-#import <Cocoa/Cocoa.h>
-#import <Vermilion/Vermilion.h>
+#import <Foundation/Foundation.h>
 
-@class QSBMoreResultsViewController;
 @class QSBTableResult;
 @class QSBCategory;
 @class QSBSourceTableResult;
+@class QSBActionPresenter;
+@class HGSTokenizedString;
+@class HGSResultArray;
+@class HGSQueryController;
+
 // Interface between QSB and the web suggestor and the desktop query
 // takes a query string and is responsible for turning it into results.
-// As far as QSBSearchController is concerned, a "query" is split up into two
-// distinct phases. We have the gathering phase, in which we collect all of
-// the valid results from the various sources, and the mixing phase in which
-// we sort all of the results from the sources. 
 @interface QSBSearchController : NSObject {
  @private
   NSMutableArray *topResults_;
@@ -52,13 +51,14 @@
   HGSResultArray *pivotObjects_;
   NSUInteger currentResultDisplayCount_;
   HGSQueryController *queryController_;
-  QSBSearchController *parentSearchController_;
+  QSBActionPresenter *actionPresenter_;
+  NSString *categorySummaryString_;
 
   // used to update the UI at various times through the life of the query
   NSTimer *displayTimer_;
   NSUInteger displayTimerStage_;
   BOOL queryInProcess_;  // Yes while a query is under way.
-  BOOL gatheringFinished_;  // Yes if the results gathering has completed.
+  BOOL queryFinished_;
   NSUInteger pushModifierFlags_; // NSEvent Modifiers at pivot time
   NSUInteger totalResultDisplayCount_;
   BOOL resultsNeedUpdating_;
@@ -67,12 +67,16 @@
 
 // Sets/Gets NSEvent Modifiers at pivot time
 @property(nonatomic, assign) NSUInteger pushModifierFlags;
-// Sets/Gets a context (pivot objects) for the current query.
-@property(nonatomic, retain) HGSResultArray *pivotObjects;
-// Sets/Gets the parent query from which we were spawned.
-@property(nonatomic, retain) QSBSearchController *parentSearchController;
+// Gets a context (pivot objects) for the current query.
+@property(nonatomic, readonly, retain) HGSResultArray *pivotObjects;
 // Bound to the progress indicator in BaseResultsViews.xib
 @property(nonatomic, readonly, assign, getter=isQueryInProcess) BOOL queryInProcess;
+@property(nonatomic, readonly, assign, getter=isQueryFinished) BOOL queryFinished;
+@property(nonatomic, readonly, copy) NSString *categorySummaryString;
+@property(nonatomic, readonly, retain) HGSTokenizedString *tokenizedQueryString;
+
+// Designated Initializer
+- (id)initWithActionPresenter:(QSBActionPresenter *)actionPresenter;
 
 // Returns the top results
 - (QSBTableResult *)topResultForIndex:(NSInteger)idx;
@@ -82,10 +86,8 @@
                                           atIndex:(NSInteger)idx;
 
 // Changes and restarts the query.
-- (void)setTokenizedQueryString:(HGSTokenizedString *)setTokenizedQueryString;
-
-// Returns the current query
-- (HGSTokenizedString *)tokenizedQueryString;
+- (void)setTokenizedQueryString:(HGSTokenizedString *)tokenizedQueryString
+                   pivotObjects:(HGSResultArray *)pivotObjects;
 
 // Returns the maximum number of results to present.
 - (NSUInteger)maximumResultsToCollect;
@@ -102,8 +104,3 @@
 extern NSString *const kQSBSearchControllerDidUpdateResultsNotification;
 extern NSString *const kQSBSearchControllerResultCountByCategoryKey;  // NSDictionary *
 extern NSString *const kQSBSearchControllerResultCountKey; // NSNumber *
-
-extern NSString *const kQSBSearchControllerWillChangeQueryStringNotification;
-extern NSString *const kQSBSearchControllerDidChangeQueryStringNotification;
-
-
