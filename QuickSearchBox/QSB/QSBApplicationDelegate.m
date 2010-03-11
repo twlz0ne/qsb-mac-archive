@@ -53,11 +53,16 @@
 #import "GTMHotKeyTextField.h"
 #import "GTMNSWorkspace+Running.h"
 #import "QSBHGSDelegate.h"
-#import "QSBSearchViewController.h"
+#import "QSBResultsWindowController.h"
 #import "GTMNSObject+KeyValueObserving.h"
 #import "QLUIPrivate.h"
 #import "PFMoveApplication.h"
 #import "QSBDebugWindowController.h"
+#import "QSBActionPresenter.h"
+
+CFArrayRef _LSCopyApplicationArrayInFrontToBackOrder(uint32_t sessionID);
+CFTypeRef _LSCopyCurrentApplicationASN(uint32_t sessionID);
+void _LSASNExtractHighAndLowParts(void const* asn, UInt32* psnHigh, UInt32* psnLow);
 
 // Local pref set once we've been launched. Used to control whether or not we
 // show the help window at startup.
@@ -86,7 +91,6 @@ static NSString *const kQSBAccountsPrefKey = @"QSBAccountsPrefKey";
 // The old key for an NSArray of account information.
 static NSString *const kQSBAccountsPrefAccountsKey
   = @"QSBAccountsPrefAccountsKey";
-
 
 static NSString *const kQSBHomepageKey = @"QSBHomepageURL";
 static NSString *const kQSBFeedbackKey = @"QSBFeedbackURL";
@@ -170,6 +174,7 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
 GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 @synthesize applicationASDictionary = applicationASDictionary_;
+@synthesize searchWindowController = searchWindowController_;
 
 + (NSSet *)keyPathsForValuesAffectingSourceExtensions {
   NSSet *affectingKeys = [NSSet setWithObject:kQSBPluginsScriptingKVOKey];
@@ -184,11 +189,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     NSNotificationCenter *wsNotificationCenter
       = [[NSWorkspace sharedWorkspace] notificationCenter];
     [wsNotificationCenter addObserver:self
-                             selector:@selector(didLaunchApp:)
+                             selector:@selector(didLaunchApplication:)
                                  name:NSWorkspaceDidLaunchApplicationNotification
                                object:nil];
     [wsNotificationCenter addObserver:self
-                             selector:@selector(didTerminateApp:)
+                             selector:@selector(didTerminateApplication:)
                                  name:NSWorkspaceDidTerminateApplicationNotification
                                object:nil];
 
@@ -202,6 +207,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                name:kHGSPluginLoaderDidInstallPluginsNotification
              object:[HGSPluginLoader sharedPluginLoader]];
     [QSBPreferences registerDefaults];
+
     BOOL iconInDock
       = [[NSUserDefaults standardUserDefaults] boolForKey:kQSBIconInDockKey];
     if (iconInDock) {
@@ -298,10 +304,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                        action:@selector(showDebugWindow:)  
                 keyEquivalent:@""];
 #endif
-}
-
-- (void)showDebugWindow:(id)sender {
-  [[QSBDebugWindowController sharedWindowController] showWindow:sender];
 }
 
 - (void)hotKeyValueChanged:(GTMKeyValueChangeNotification *)note {
@@ -438,34 +440,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   hotModifiersState_ = 0;
 }
 
-- (IBAction)orderFrontStandardAboutPanel:(id)sender {
-  [NSApp activateIgnoringOtherApps:YES];
-  [NSApp orderFrontStandardAboutPanelWithOptions:nil];
-}
-
-- (IBAction)showPreferences:(id)sender {
-  if (!prefsWindowController_) {
-    prefsWindowController_ = [[QSBPreferenceWindowController alloc] init];
-  }
-  [prefsWindowController_ showPreferences:sender];
-  [NSApp activateIgnoringOtherApps:YES];
-}
-
-// Open a browser window with the QSB homepage
-- (IBAction)showProductHomepage:(id)sender {
-  NSBundle *bundle = [NSBundle mainBundle];
-  NSString *homepageStr = [bundle objectForInfoDictionaryKey:kQSBHomepageKey];
-  NSURL *homepageURL = [NSURL URLWithString:homepageStr];
-  [[NSWorkspace sharedWorkspace] openURL:homepageURL];
-}
-
-- (IBAction)sendFeedbackToGoogle:(id)sender {
-  NSBundle *bundle = [NSBundle mainBundle];
-  NSString *feedbackStr = [bundle objectForInfoDictionaryKey:kQSBFeedbackKey];
-  NSURL *feedbackURL = [NSURL URLWithString:feedbackStr];
-  [[NSWorkspace sharedWorkspace] openURL:feedbackURL];
-}
-
 - (NSMenu*)statusItemMenu {
   return statusItemMenu_;
 }
@@ -541,10 +515,6 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
   [statusMenuItem setKeyEquivalent:statusMenuItemKey];
   [statusMenuItem setKeyEquivalentModifierMask:statusMenuItemModifiers];
-}
-
-- (QSBSearchWindowController *)searchWindowController {
-  return searchWindowController_;
 }
 
 - (void)hitHotKey:(id)sender {
@@ -629,83 +599,62 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   return doubleClickThreshold;
 }
 
-// If we launch up another QSB we will let it handle all the activations until
-// it dies. This is to make working with QSB easier for us as we can have a
-// version running all the time, even when we are debugging the newer version.
-// See "hitHotKey:" to see where otherQSBPSN_ is actually used.
-- (void)didLaunchApp:(NSNotification *)notification {
-  if (otherQSBPSN_.highLongOfPSN == 0 && otherQSBPSN_.lowLongOfPSN == 0) {
-    NSDictionary *userInfo = [notification userInfo];
-    ProcessSerialNumber psn;
-    psn.highLongOfPSN
-      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
-    psn.lowLongOfPSN
-      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberLow"] unsignedIntValue];
-    NSDictionary *info
-      = GTMCFAutorelease(ProcessInformationCopyDictionary(&psn,
-                                                          kProcessDictionaryIncludeAllInformationMask));
-    // bundleID is "optional"
-    NSString *bundleID = [info objectForKey:(NSString*)kCFBundleIdentifierKey];
-    if (!bundleID) return;
-    ProcessSerialNumber myPSN;
-    MacGetCurrentProcess(&myPSN);
-    NSString *myBundleID = [[NSBundle mainBundle] bundleIdentifier];
-    Boolean sameProcess;
-    if (SameProcess(&myPSN, &psn, &sameProcess) == noErr
-        && !sameProcess
-        && [bundleID isEqualToString:myBundleID]) {
-      otherQSBPSN_ = psn;
-
-      // Fade out our dock tile
-      NSDockTile *tile = [NSApp dockTile];
-      NSRect tileRect = GTMNSRectOfSize([tile size]);
-      NSImage *appImage = [NSImage imageNamed:@"NSApplicationIcon"];
-      NSImage *newImage
-        = [[[NSImage alloc] initWithSize:tileRect.size] autorelease];
-      [newImage lockFocus];
-      [appImage drawInRect:tileRect
-                  fromRect:GTMNSRectOfSize([appImage size])
-                 operation:NSCompositeCopy
-                  fraction:0.3];
-      [newImage unlockFocus];
-      NSImageView *imageView
-        = [[[NSImageView alloc] initWithFrame:tileRect] autorelease];
-      [imageView setImageFrameStyle:NSImageFrameNone];
-      [imageView setImageScaling:NSImageScaleProportionallyDown];
-      [imageView setImage:newImage];
-      [tile setContentView:imageView];
-      [tile display];
-    }
-  }
-}
-
-- (void)didTerminateApp:(NSNotification *)notification {
-  if (otherQSBPSN_.highLongOfPSN != 0 || otherQSBPSN_.lowLongOfPSN != 0) {
-    NSDictionary *userInfo = [notification userInfo];
-    ProcessSerialNumber psn;
-    psn.highLongOfPSN
-      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
-    psn.lowLongOfPSN
-      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberLow"] unsignedIntValue];
-
-    Boolean sameProcess;
-    if (SameProcess(&otherQSBPSN_, &psn, &sameProcess) == noErr
-        && sameProcess) {
-      otherQSBPSN_.highLongOfPSN = 0;
-      otherQSBPSN_.lowLongOfPSN = 0;
-      NSDockTile *tile = [NSApp dockTile];
-      [tile setContentView:nil];
-      [tile display];
-    }
-  }
-}
-
 -(BOOL)suppressStartupDialogs {
   NSDictionary *envVars = [[NSProcessInfo processInfo] environment];
   NSString *value = [envVars objectForKey:@"QSBSuppressStartupDialogs"];
   return [value boolValue] || [GTMUnitTestingUtilities areWeBeingUnitTested];
 }
-  
+
+#pragma mark Actions
+
+- (IBAction)showDebugWindow:(id)sender {
+  [[QSBDebugWindowController sharedWindowController] showWindow:sender];
+}
+
+- (IBAction)orderFrontStandardAboutPanel:(id)sender {
+  [NSApp activateIgnoringOtherApps:YES];
+  [NSApp orderFrontStandardAboutPanelWithOptions:nil];
+}
+
+- (IBAction)qsb_deactivate:(id)sender {
+  CFArrayRef asnArray = _LSCopyApplicationArrayInFrontToBackOrder(-1);
+  CFTypeRef myASN = _LSCopyCurrentApplicationASN(-1);
+  CFIndex idx = 0;
+  CFIndex count = CFArrayGetCount(asnArray);
+  if (count > 0) {
+    CFTypeRef app = CFArrayGetValueAtIndex(asnArray, idx);
+    if (CFEqual(app, myASN) && count > 1) {
+      app = CFArrayGetValueAtIndex(asnArray, idx + 1);
+    }
+    ProcessSerialNumber psn;
+    _LSASNExtractHighAndLowParts(app, &psn.highLongOfPSN, &psn.lowLongOfPSN);
+    SetFrontProcess(&psn);
+  }
+}
+
+- (IBAction)showPreferences:(id)sender {
+  if (!prefsWindowController_) {
+    prefsWindowController_ = [[QSBPreferenceWindowController alloc] init];
+  }
+  [prefsWindowController_ showPreferences:sender];
+  [NSApp activateIgnoringOtherApps:YES];
+}
+
+// Open a browser window with the QSB homepage
+- (IBAction)showProductHomepage:(id)sender {
+  NSBundle *bundle = [NSBundle mainBundle];
+  NSString *homepageStr = [bundle objectForInfoDictionaryKey:kQSBHomepageKey];
+  NSURL *homepageURL = [NSURL URLWithString:homepageStr];
+  [[NSWorkspace sharedWorkspace] openURL:homepageURL];
+}
+
+- (IBAction)sendFeedbackToGoogle:(id)sender {
+  NSBundle *bundle = [NSBundle mainBundle];
+  NSString *feedbackStr = [bundle objectForInfoDictionaryKey:kQSBFeedbackKey];
+  NSURL *feedbackURL = [NSURL URLWithString:feedbackStr];
+  [[NSWorkspace sharedWorkspace] openURL:feedbackURL];
+}
+
 #pragma mark Plugins & Extensions Management
 
 - (NSArray *)plugins {
@@ -830,18 +779,35 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 #pragma mark Application Delegate Methods
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
-  if (![self suppressStartupDialogs]) {
-    PFMoveToApplicationsFolderIfNecessary();
+  // If the user launches us hidden we don't want to activate.
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+  NSDictionary *processDict 
+    = [ws gtm_processInfoDictionary];
+  NSNumber *nsDoNotActivateOnStartup 
+    = [processDict valueForKey:kGTMWorkspaceRunningIsHidden];
+  activateOnStartup_ = ![nsDoNotActivateOnStartup boolValue];
+  if (activateOnStartup_) {
+    activateOnStartup_ = ![ws gtm_wasLaunchedAsLoginItem];
   }
-
+  if (activateOnStartup_) {
+    // During startup we may inadvertently be made inactive, most likely due
+    // to keychain access requests, so let's just force ourself to be
+    // active.
+    [NSApp activateIgnoringOtherApps:YES];
+    if (![self suppressStartupDialogs]) {
+      PFMoveToApplicationsFolderIfNecessary();
+    }
+  }
   [self updateHotKeyRegistration];
-
   [self updateMenuWithAppName:[NSApp mainMenu]];
   [self updateMenuWithAppName:dockMenu_];
   [self updateMenuWithAppName:statusItemMenu_];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
+  if (activateOnStartup_) {
+    [searchWindowController_ showSearchWindow:self];
+  }
   // Inventory and process all plugins and extensions.
   [self inventoryPlugins];
 
@@ -851,7 +817,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc addObserver:self
          selector:@selector(actionWillPerformNotification:)
-             name:kQSBQueryControllerWillPerformActionNotification
+             name:kQSBActionPresenterWillPerformActionNotification
            object:nil];
   [nc addObserver:self
          selector:@selector(actionDidPerformNotification:)
@@ -983,7 +949,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   if ([otherFiles count]) {
     HGSResultArray *results = [HGSResultArray arrayWithFilePaths:otherFiles];
     [searchWindowController_ selectResults:results];
-    [searchWindowController_ showSearchWindowBecause:kQSBFilesFromFinderChangeVisiblityToggle];
+    [searchWindowController_ showSearchWindow:self];
     
   }
   NSApplicationDelegateReply reply = NSApplicationDelegateReplySuccess; 
@@ -1008,22 +974,23 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     userText = [userText stringByTrimmingCharactersInSet:ws];
     [searchWindowController_ searchForString:userText];
   }
-  [searchWindowController_ showSearchWindowBecause:kQSBServicesMenuChangeVisiblityToggle];
+  [searchWindowController_ showSearchWindow:self];
 }
 
 #pragma mark Notifications
 
 - (void)actionWillPerformNotification:(NSNotification *)notification {
-  HGSAction * action = [notification object];
+  QSBActionPresenter *presenter = [notification object];
+  HGSActionOperation *operation = [presenter actionOperation];
+  HGSAction * action = [operation action];
   if ([action causesUIContextChange]) {
-    [searchWindowController_ hideSearchWindowBecause:
-      kQSBExecutedChangeVisiblityToggle];
+    [NSApp sendAction:@selector(qsb_deactivate:) to:nil from:self];
   }
 }
 
 - (void)actionDidPerformNotification:(NSNotification *)notification {
   NSDictionary *userInfo = [notification userInfo];
-  NSNumber *success = [userInfo objectForKey:kHGSActionCompletedSuccessfully];
+  NSNumber *success = [userInfo objectForKey:kHGSActionCompletedSuccessfullyKey];
   if (success && ![success boolValue]) {
     // TODO(dmaclach): Once we are able to add localized strings again
     // maybe put a growl notification up about the action failing.
@@ -1073,7 +1040,79 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   [self didChangeValueForKey:@"accounts"];
 }
 
-#pragma mark Apple Script Support
+// If we launch up another QSB we will let it handle all the activations until
+// it dies. This is to make working with QSB easier for us as we can have a
+// version running all the time, even when we are debugging the newer version.
+// See "hitHotKey:" to see where otherQSBPSN_ is actually used.
+- (void)didLaunchApplication:(NSNotification *)notification {
+  if (otherQSBPSN_.highLongOfPSN == 0 && otherQSBPSN_.lowLongOfPSN == 0) {
+    NSDictionary *userInfo = [notification userInfo];
+    ProcessSerialNumber psn;
+    psn.highLongOfPSN
+      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
+    psn.lowLongOfPSN
+      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberLow"] unsignedIntValue];
+    NSDictionary *info
+      = GTMCFAutorelease(ProcessInformationCopyDictionary(&psn,
+                                                          kProcessDictionaryIncludeAllInformationMask));
+    // bundleID is "optional"
+    NSString *bundleID = [info objectForKey:(NSString*)kCFBundleIdentifierKey];
+    if (!bundleID) return;
+    ProcessSerialNumber myPSN;
+    MacGetCurrentProcess(&myPSN);
+    NSString *myBundleID = [[NSBundle mainBundle] bundleIdentifier];
+    Boolean sameProcess;
+    OSErr err = SameProcess(&myPSN, &psn, &sameProcess);
+    if (!err
+        && !sameProcess
+        && [bundleID isEqualToString:myBundleID]) {
+      otherQSBPSN_ = psn;
+
+      // Fade out our dock tile
+      NSDockTile *tile = [NSApp dockTile];
+      NSRect tileRect = GTMNSRectOfSize([tile size]);
+      NSImage *appImage = [NSImage imageNamed:@"NSApplicationIcon"];
+      NSImage *newImage
+        = [[[NSImage alloc] initWithSize:tileRect.size] autorelease];
+      [newImage lockFocus];
+      [appImage drawInRect:tileRect
+                  fromRect:GTMNSRectOfSize([appImage size])
+                 operation:NSCompositeCopy
+                  fraction:0.3];
+      [newImage unlockFocus];
+      NSImageView *imageView
+        = [[[NSImageView alloc] initWithFrame:tileRect] autorelease];
+      [imageView setImageFrameStyle:NSImageFrameNone];
+      [imageView setImageScaling:NSImageScaleProportionallyDown];
+      [imageView setImage:newImage];
+      [tile setContentView:imageView];
+      [tile display];
+    }  
+  }
+}
+
+- (void)didTerminateApplication:(NSNotification *)notification {
+  if (otherQSBPSN_.highLongOfPSN != 0 || otherQSBPSN_.lowLongOfPSN != 0) {
+    NSDictionary *userInfo = [notification userInfo];
+    ProcessSerialNumber psn;
+    psn.highLongOfPSN
+      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberHigh"] unsignedIntValue];
+    psn.lowLongOfPSN
+      = [[userInfo objectForKey:@"NSApplicationProcessSerialNumberLow"] unsignedIntValue];
+
+    Boolean sameProcess;
+    if (SameProcess(&otherQSBPSN_, &psn, &sameProcess) == noErr
+        && sameProcess) {
+      otherQSBPSN_.highLongOfPSN = 0;
+      otherQSBPSN_.lowLongOfPSN = 0;
+      NSDockTile *tile = [NSApp dockTile];
+      [tile setContentView:nil];
+      [tile display];
+    }
+  }
+}
+
+#pragma mark AppleScript Support
 
 - (void)composeApplicationAEDictionary {
   // Inventory all .sdef files, including the app's and all plugins.

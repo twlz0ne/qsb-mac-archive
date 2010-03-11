@@ -72,7 +72,10 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
   QSBHGSDelegate *hgsDelegate_;
   QSBUserMessenger *userMessenger_;
   NSAppleEventDescriptor *applicationASDictionary_;
+  BOOL activateOnStartup_;
 }
+
+@property (readonly, retain, nonatomic) QSBSearchWindowController *searchWindowController;
 
 // Manage our application preferences.
 - (IBAction)showPreferences:(id)sender;
@@ -86,8 +89,8 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
 // Show the about box
 - (IBAction)orderFrontStandardAboutPanel:(id)sender;
 
-// provides access to the search window
-- (QSBSearchWindowController *)searchWindowController;
+// Deactivate, and activate previous app
+- (IBAction)qsb_deactivate:(id)sender;
 
 // method that is called when the modifier keys are hit and we are inactive
 - (void)modifiersChangedWhileInactive:(NSEvent*)event;
