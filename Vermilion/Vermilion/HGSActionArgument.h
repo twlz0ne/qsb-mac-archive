@@ -38,14 +38,83 @@
 #import <Foundation/Foundation.h>
 
 @class HGSTypeFilter;
+@class HGSScoredResult;
+@class HGSQuery;
+
+/*!
+ All of the routines that an action argument is required to implement.
+ Done as a protocol, so that if users choose to supply their own class
+ for arguments to actions, that they are not required to subclass
+ HGSActionArgument (although in most cases they will).
+*/
+@protocol HGSActionArgument
+
+/*! Is this argument an optional one. */
+@property (readonly, nonatomic, assign, getter=isOptional) BOOL optional;
+
+/*! 
+ Identifier for the argument. Each argument for an action must have a unique
+ identifier. This is not to be displayed to the user.
+ */
+@property (readonly, nonatomic, retain) NSString *identifier;
+
+/*! 
+ Localized name of the argument for user display.
+ */
+@property (readonly, nonatomic, retain) NSString *displayName;
+
+/*!
+ Describes the valid types for the argument.
+ */
+@property (readonly, nonatomic, retain) HGSTypeFilter *typeFilter;
+
+/*!
+ A description for the argument that can be displayed.
+ */
+
+@property (readonly, nonatomic, retain) NSString *displayDescription;
+
+/*!
+ Localized synonyms for the argument. Again these must be unique across
+ all arguments for a given action.
+ */
+@property (readonly, nonatomic, retain) NSSet *displayOtherTerms;
+
+- (id)initWithConfiguration:(NSDictionary *)configuration;
+
+/*!
+ This argument will be requested to score multiple objects against
+ query. This is a no-op by default, but allows action arguments to
+ set up for scoring.
+*/
+- (void)willScoreForQuery:(HGSQuery *)query;
+
+/*!
+ This argument has been requested to score multiple objects against
+ query. This is a no-op by default, but allows action arguments to
+ clean up after scoring.
+ */
+- (void)didScoreForQuery:(HGSQuery *)query;
+
+/*!
+ Given a scored result, rescore it based on the arguments knowledge of the
+ action being performed, the other arguments passed to the action etc.
+ Base implementation just returns result.
+ @param result The result as already scored by the query system.
+ @param query The query to score against.
+ @result The newly scored result. 
+ */
+- (HGSScoredResult *)scoreResult:(HGSScoredResult *)result 
+                        forQuery:(HGSQuery *)query;
+
+@end
 
 /*!
  @class HGSActionArgument
  @discussion
  Describes an argument that an action may have.
 */
-
-@interface HGSActionArgument : NSObject {
+@interface HGSActionArgument : NSObject <HGSActionArgument> {
  @private
   BOOL optional_;
   NSString *identifier_;
@@ -54,39 +123,6 @@
   NSString *displayDescription_;
   NSSet *displayOtherTerms_;
 }
-
-/*! Is this argument an optional one. */
-@property (readonly, nonatomic, assign, getter=isOptional) BOOL optional;
-
-/*! 
- Identifier for the argument. Each argument for an action must have a unique
- identifier. This is not to be displayed to the user.
-*/
-@property (readonly, nonatomic, retain) NSString *identifier;
-
-/*! 
- Localized name of the argument for user display.
-*/
-@property (readonly, nonatomic, retain) NSString *displayName;
-
-/*!
- Describes the valid types for the argument.
-*/
-@property (readonly, nonatomic, retain) HGSTypeFilter *typeFilter;
-
-/*!
- A description for the argument that can be displayed.
-*/
-
-@property (readonly, nonatomic, retain) NSString *displayDescription;
-
-/*!
- Localized synonyms for the argument. Again these must be unique across
- all arguments for a given action.
-*/
-@property (readonly, nonatomic, retain) NSSet *displayOtherTerms;
-
-- (id)initWithConfiguration:(NSDictionary *)configuration;
 
 @end
 
@@ -152,3 +188,9 @@ extern NSString* const kHGSActionArgumentUserVisibleOtherTermsKey;
 */
 extern NSString* const kHGSActionArgumentUserVisibleDescriptionKey;
 
+/*!
+ Identifier for name of the class to be instantiated for this argument.
+ 
+ Type is NSString. Optional.
+*/
+extern NSString* const kHGSActionArgumentClassKey;

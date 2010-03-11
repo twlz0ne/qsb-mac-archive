@@ -31,10 +31,15 @@
 //
 
 #import "GTMSenTestCase.h"
+
+#import <OCMock/OCMock.h>
+
 #import "HGSActionArgument.h"
 #import "HGSType.h"
 #import "HGSTypeFilter.h"
 #import "HGSBundle.h"
+#import "HGSResult.h"
+#import "HGSQuery.h"
 
 static NSString *const kActionArgumentTestIdentifier = @"FooActionArgument";
 
@@ -72,7 +77,6 @@ static NSString *const kActionArgumentTestIdentifier = @"FooActionArgument";
             kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
             bundle, kHGSActionArgumentBundleKey,
             nil];
-  
   HGSActionArgument *arg = [[[HGSActionArgument alloc] 
                              initWithConfiguration:config] autorelease];
   STAssertNotNil(arg, nil);
@@ -87,6 +91,28 @@ static NSString *const kActionArgumentTestIdentifier = @"FooActionArgument";
   STAssertNil([arg displayName], nil);
   STAssertNil([arg displayDescription], nil);
   STAssertNil([arg displayOtherTerms], nil);
+  
+  // Must have a display name for an optional
+  config = [NSDictionary dictionaryWithObjectsAndKeys:
+            kActionArgumentTestIdentifier, kHGSActionArgumentIdentifierKey, 
+            kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
+            bundle, kHGSActionArgumentBundleKey,
+            [NSNumber numberWithBool:YES], kHGSActionArgumentOptionalKey,
+            nil];
+  arg = [[[HGSActionArgument alloc] 
+          initWithConfiguration:config] autorelease];
+  STAssertNil(arg, nil);
+ 
+  config = [NSDictionary dictionaryWithObjectsAndKeys:
+            kActionArgumentTestIdentifier, kHGSActionArgumentIdentifierKey, 
+            kHGSTypeFile, kHGSActionArgumentSupportedTypesKey,
+            bundle, kHGSActionArgumentBundleKey,
+            [NSNumber numberWithBool:YES], kHGSActionArgumentOptionalKey,
+            @"foo", kHGSActionArgumentUserVisibleNameKey,
+            nil];
+  arg = [[[HGSActionArgument alloc] 
+          initWithConfiguration:config] autorelease];
+  STAssertNotNil(arg, nil);
 }
 
 - (void)testLoadFromPlist {
@@ -110,6 +136,12 @@ static NSString *const kActionArgumentTestIdentifier = @"FooActionArgument";
                        @"The file you want to manipulate.", nil);
   NSSet *otherTerms = [NSSet setWithObjects:@"Document", @"Doohickey", nil];
   STAssertEqualObjects([arg displayOtherTerms], otherTerms, nil);
+
+  id result = [OCMockObject mockForClass:[HGSScoredResult class]];
+  id query = [OCMockObject mockForClass:[HGSQuery class]];
+  HGSScoredResult *newResult = [arg scoreResult:result 
+                                       forQuery:query];
+  STAssertEquals(result, newResult, nil);
 }
 
 @end

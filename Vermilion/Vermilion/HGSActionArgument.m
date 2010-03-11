@@ -48,6 +48,7 @@ NSString* const kHGSActionArgumentUserVisibleNameKey
   = @"HGSActionArgumentUserVisibleName";
 NSString* const kHGSActionArgumentUserVisibleDescriptionKey 
   = @"HGSActionArgumentUserVisibleDescription";
+NSString* const kHGSActionArgumentClassKey = @"HGSActionArgumentClass";
 
 @implementation HGSActionArgument
 
@@ -131,8 +132,19 @@ NSString* const kHGSActionArgumentUserVisibleDescriptionKey
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"<%@:%p identifier='@' name='%@'>", 
+  return [NSString stringWithFormat:@"<%@:%p identifier='%@' name='%@'>", 
           [self class], self, [self identifier], [self displayName]];
+}
+
+- (HGSScoredResult *)scoreResult:(HGSScoredResult *)result 
+                        forQuery:(HGSQuery *)query {
+  return result;
+}
+
+- (void)willScoreForQuery:(HGSQuery *)query {
+}
+
+- (void)didScoreForQuery:(HGSQuery *)query {
 }
 
 @end
