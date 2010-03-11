@@ -111,6 +111,9 @@ CGFloat HGSScoreTermForItem(HGSTokenizedString *term,
     } else {
       // We missed a character
       // Scan forward to the next word
+      if (abbrChar == termSeparator) {
+        abbrIndex += 1;
+      }
       for (; stringIndex < strLength; 
            ++stringIndex) {
         UniChar nextStrChar = strChars[stringIndex];

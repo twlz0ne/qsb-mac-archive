@@ -80,6 +80,9 @@ static CGFloat HGSScoreTermForString(NSString *stringA, NSString *stringB) {
   scoreB 
     = HGSScoreTermForString(@"ic", @"Icons");
   STAssertEquals(scoreA, scoreB, nil);
+  
+  scoreA = HGSScoreTermForString(@"dis u", @"Disk Utility");
+  STAssertGreaterThan(scoreA, (CGFloat)0, nil);
 }
 
 - (void)testRelativeTermScoring {
