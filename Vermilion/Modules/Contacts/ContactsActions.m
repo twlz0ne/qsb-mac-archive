@@ -57,7 +57,7 @@
   return emailAddress != nil;
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects 
     = [info objectForKey:kHGSActionDirectObjectsKey];
   NSMutableString *emailAddresses = nil;
@@ -107,7 +107,7 @@
 
 @implementation ContactTextChatAction
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects 
     = [info objectForKey:kHGSActionDirectObjectsKey];
   BOOL isGood = NO;
@@ -181,7 +181,7 @@
   return doesApply;
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   BOOL isGood = YES;
   HGSResultArray *directObjects 
     = [info objectForKey:kHGSActionDirectObjectsKey];

@@ -52,16 +52,16 @@
 
 @implementation PicasaWebUploadImageAction
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   BOOL success = NO;
   GDataServiceGoogle *uploadService = [self uploadService];
   if (uploadService) {
     [self setUserWasNoticed:NO];
-    HGSResultArray *results = [info objectForKey:kHGSActionDirectObjectsKey];
-    NSUInteger resultCount = [results count];
+    HGSResultArray *directObjects = [info objectForKey:kHGSActionDirectObjectsKey];
+    NSUInteger directObjectsCount = [directObjects count];
     NSUInteger item = 0;
-    for (HGSResult *result in results) {
-      [self uploadImage:result item:item of:resultCount];
+    for (HGSResult *directObject in directObjects) {
+      [self uploadImage:directObject item:item of:directObjectsCount];
       ++item;
     }
     success = YES;

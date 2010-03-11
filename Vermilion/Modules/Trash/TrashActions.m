@@ -33,7 +33,6 @@
 #import <Vermilion/Vermilion.h>
 
 @interface MoveToTrashAction : HGSAction
-- (BOOL)performWithInfo:(NSDictionary*)info;
 @end
 
 @implementation MoveToTrashAction

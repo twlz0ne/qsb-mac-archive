@@ -31,10 +31,8 @@
 --  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --
 
-on doScript(theScripts)
-	repeat with theScript in theScripts
-		tell application "Terminal" to do script theScript
-	end repeat
+on doScript(theScript)
+	tell application "Terminal" to do script theScript
 end doScript
 
 on openDirectory(thePaths)

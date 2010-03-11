@@ -38,7 +38,7 @@
 
 @implementation TextLargeTypeAction
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
   BOOL success = NO;
@@ -63,4 +63,56 @@
   }
   return success;
 }
+
 @end
+
+@interface TextAppendToFileAction : HGSAction
+@end
+
+@implementation TextAppendToFileAction
+
+- (BOOL)performWithInfo:(NSDictionary *)info {
+  BOOL wasGood = YES;
+  HGSResultArray *directObjects 
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  HGSResultArray *files
+    = [info objectForKey:@"com.google.text.action.appendtofile.file"];
+  NSError *error = nil;
+  for (HGSResult *text in directObjects) {
+    NSDictionary *value 
+      = [text valueForKey:kHGSObjectAttributePasteboardValueKey];
+    NSString *textValue = [value objectForKey:NSStringPboardType];
+    if (textValue) {
+      for (HGSResult *file in files) {
+        NSString *filePath = [file filePath];
+        NSStringEncoding encoding;
+        NSMutableString *contents 
+          = [NSMutableString stringWithContentsOfFile:filePath 
+                                         usedEncoding:&encoding 
+                                                error:&error];
+        if (contents) {
+          if (![contents hasSuffix:@"\r"]) {
+            [contents appendString:@"\r"];
+          }
+          [contents appendString:textValue];
+          if (![contents writeToFile:filePath atomically:YES 
+                            encoding:encoding 
+                               error:&error]) {
+            break;
+          }
+        } else {
+          break;
+        }
+      }
+    }
+    if (error) break;
+  }
+  if (error) {
+    [NSApp presentError:error];
+    wasGood = NO;
+  }
+  return wasGood;
+}
+
+@end
+

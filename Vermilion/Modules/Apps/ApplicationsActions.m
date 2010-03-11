@@ -38,7 +38,6 @@
 #import <Carbon/Carbon.h>
 
 @interface ApplicationsAction : HGSAction
-- (BOOL)performWithInfo:(NSDictionary*)info;
 @end
 
 @interface ApplicationsQuitAction : ApplicationsAction

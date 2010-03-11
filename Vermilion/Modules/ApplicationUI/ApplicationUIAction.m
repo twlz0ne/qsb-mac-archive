@@ -94,7 +94,7 @@ static NSString *const kApplicationUIAXActionKey = @"ApplicationUIAXAction";
   [super dealloc];
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   BOOL wasGood = YES;
   HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];

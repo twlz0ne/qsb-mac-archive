@@ -33,21 +33,23 @@
 #import <Vermilion/Vermilion.h>
 #import "GTMNSAppleScript+Handler.h"
 
-@interface TerminalShowDirectoryAction : HGSAction {
- @private
-  NSAppleScript *script_;  // STRONG
-}
+static NSAppleScript *sTerminalAppleScript;
+
+@interface TerminalAction : HGSAction
+
 - (NSAppleScript *)appleScript;
+
+@end
+
+@interface TerminalShowDirectoryAction : TerminalAction
+@end
+
+@interface TerminalExecuteInShellAction : TerminalAction
 @end
 
 static NSString *const kTerminalBundleID = @"com.apple.Terminal";
 
-@implementation TerminalShowDirectoryAction
-
-- (void)dealloc {
-  [script_ release];
-  [super dealloc];
-}
+@implementation TerminalAction
 
 - (id)defaultObjectForKey:(NSString *)key {
   id defaultObject = nil;
@@ -66,19 +68,23 @@ static NSString *const kTerminalBundleID = @"com.apple.Terminal";
 
 - (NSAppleScript *)appleScript {
   @synchronized(self) {
-    if (!script_) {
+    if (!sTerminalAppleScript) {
       NSString *path = [[self bundle] pathForResource:@"Terminal"
                                                ofType:@"scpt"
                                           inDirectory:@"Scripts"];
       NSURL *url = [NSURL fileURLWithPath:path];
-      script_ = [[NSAppleScript alloc] initWithContentsOfURL:url
-                                                       error:nil];
+      sTerminalAppleScript = [[NSAppleScript alloc] initWithContentsOfURL:url
+                                                                    error:nil];
     }
   }
-  return script_;
+  return sTerminalAppleScript;
 }
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+@end
+
+@implementation TerminalShowDirectoryAction
+
+- (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
   NSArray *paths = [directObjects filePaths];
@@ -88,9 +94,38 @@ static NSString *const kTerminalBundleID = @"com.apple.Terminal";
                                         parameters:parameters
                                              error:&errorDictionary];
   
-  if (errorDictionary) return NO;
-  
+  if (errorDictionary) {
+    HGSLog(@"error: %@", errorDictionary);
+    return NO;
+  }  
   return YES;
 }
 
 @end
+
+@implementation TerminalExecuteInShellAction
+
+- (BOOL)performWithInfo:(NSDictionary *)info {
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  for (HGSResult *result in directObjects) {
+    NSDictionary *value 
+      = [result valueForKey:kHGSObjectAttributePasteboardValueKey];
+    if (value) {
+      NSString *script = [value objectForKey:NSStringPboardType];
+      NSArray *parameters = [NSArray arrayWithObject:script];
+      NSDictionary *errorDictionary = nil;
+      [[self appleScript] gtm_executePositionalHandler:@"doScript"
+                                            parameters:parameters
+                                                 error:&errorDictionary];
+      if (errorDictionary) {
+        HGSLog(@"error: %@", errorDictionary);
+        return NO;
+      }
+    }
+  }
+  return YES;
+}
+
+@end
+

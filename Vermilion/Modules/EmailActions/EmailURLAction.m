@@ -75,7 +75,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 #pragma mark HGSAction Protocol Methods
 
-- (BOOL)performWithInfo:(NSDictionary*)info {
+- (BOOL)performWithInfo:(NSDictionary *)info {
   // TODO(mrossetti): Rework this to accommodate different email products.
   BOOL wasGood = NO;
   HGSResultArray *directObjects

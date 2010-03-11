@@ -32,6 +32,18 @@
 			<key>HGSExtensionUserVisibleName</key>
 			<string>^Show in Terminal</string>
 		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>TerminalExecuteInShellAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.terminal.action.executeinshell</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>text.userinput</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Run as Shell Script</string>
+		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>
 	<string>${VERMILLION_PLUGIN_API_VERSION}</string>

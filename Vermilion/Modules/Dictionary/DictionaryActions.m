@@ -36,7 +36,6 @@ extern NSString *kDictionaryTermKey;
 static NSString *const kDictUrlFormat = @"dict://%@";
 
 @interface ShowInDictionaryAction : HGSAction
-- (BOOL)performWithInfo:(NSDictionary*)info;
 @end
 
 @implementation ShowInDictionaryAction
