@@ -104,7 +104,9 @@
   NSString *text = [self directParameter];
   
   // set up our internals
-  HGSQuery *query = [[[HGSQuery alloc] initWithString:text 
+  HGSQuery *query = [[[HGSQuery alloc] initWithString:text
+                                       actionArgument:nil
+                                      actionOperation:nil
                                          pivotObjects:nil
                                            queryFlags:0] autorelease];
   
