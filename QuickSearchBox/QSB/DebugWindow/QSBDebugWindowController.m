@@ -38,7 +38,7 @@
 
 static NSString *const kQSBDWTopResultsKey = @"Top Results";
 static NSString *const kQSBDWMoreResultsKey =@"More Results";
-static NSUInteger kQSBDWResultRowCount = 8;
+static NSUInteger kQSBDWResultRowCount = 10;
 
 static NSInteger QSBDWSortOperations(HGSSearchOperation *op1, 
                                      HGSSearchOperation *op2, 
@@ -266,20 +266,31 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
     case 4:
       cellData = [[result url] absoluteString];
       break;
-
+      
     case 5:
       cellData = [NSString stringWithFormat:@"Below Fold: %@", 
                   [result rankFlags] & eHGSBelowFoldRankFlag ? @"Yes" : @"No"];
       break;
-
+    
     case 6:
+      cellData = [NSString stringWithFormat:@"Shortcut: %@", 
+                  [result rankFlags] & eHGSShortcutRankFlag ? @"Yes" : @"No"];
+      break;
+      
+    case 7:
       cellData = [NSString stringWithFormat:@"Last Used: %@", 
                   [result valueForKey:kHGSObjectAttributeLastUsedDateKey]];
       break;
       
-    case 7:
+    case 8:
       cellData = [NSString stringWithFormat:@"Matched Term: %@", 
                   [[result matchedTerm] tokenizedString]];
+      break;
+    
+    case 9:
+      cellData = [NSString stringWithFormat:@"Source: %@",
+                  [[result source] identifier]];
+      break;
   }
   [cell setStringValue:cellData];
   [cell setLeaf:YES];

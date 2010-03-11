@@ -33,9 +33,11 @@
 #import "QSBSmallScroller.h"
 
 @implementation QSBSmallScroller
-
-- (void)awakeFromNib {
-  [self setArrowsPosition:NSScrollerArrowsNone]; 
+- (id)initWithFrame:(NSRect)frameRect {
+  if ((self = [super initWithFrame:frameRect])) {
+    [self setArrowsPosition:NSScrollerArrowsNone];
+  }
+  return self;
 }
 
 // Set the width to 0 so our scrollers don't limit the size of the content area
@@ -44,17 +46,16 @@
 }
 
 - (void)drawKnob {
-  
   NSRect knobRect = NSInsetRect([self rectForPart:NSScrollerKnob], 2, 0);
   
   CGFloat propFraction = 1.0 - pow([self knobProportion], 10);
+
   // Restrict color by proportion
   // Almost complete scroll bars are nearly translucent
-  
   CGFloat heightFraction = MAX(1.0 - (NSHeight(knobRect) / 128), 0.333);
+
   // Restrict color by height
   // Tall scrollbars are dimmer
-  
   CGFloat alphaFraction = propFraction * heightFraction;
   
   NSColor *knobColor = [NSColor colorWithDeviceWhite:0.0 alpha:alphaFraction];
@@ -91,4 +92,5 @@
   [self drawKnob];
   CGContextEndTransparencyLayer(cgContext);
 }
+
 @end
