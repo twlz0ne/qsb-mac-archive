@@ -219,16 +219,15 @@
         directObjects = [HGSResultArray arrayWithResult:scoredResult];
       }
       [operation setArgument:directObjects forKey:kHGSActionDirectObjectsKey];
-      
-      NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-      [nc postNotificationName:kQSBActionPresenterWillPerformActionNotification
-                        object:self
-                      userInfo:nil];
     } else {
       HGSLog(@"Unable to get default action for %@", scoredResult);
     }
   }
   if ([operation isValid]) {
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc postNotificationName:kQSBActionPresenterWillPerformActionNotification
+                      object:self
+                    userInfo:nil];
     [operation performAction];
   }
 }
