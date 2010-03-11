@@ -34,17 +34,20 @@
 #import "QSBSearchWindowController.h"
 #import "QSBTableResult.h"
 #import "QSBSearchController.h"
+#import "QSBResultsWindowController.h"
+#import "QSBActionModel.h"
+#import "QSBActionPresenter.h"
 
-// A mocked up table result for using in tests. Didn't use OCMock because
-// I didn't want to bring QSBTableResult into my binary.
+#pragma mark Mocked Up QSB Classes
+
+// A collection of mocked up objects. We aren't using OCMock because we don't
+// want to bring QSB classes into our binary.
 @interface ShortcutTestQSBTableResult : NSObject {
  @private
   HGSScoredResult *representedResult_;
 }
 
 @property (readonly, retain) HGSResult *representedResult;
-
-- (id)initWithRankedResult:(HGSScoredResult *)result;
 
 @end
 
@@ -66,43 +69,80 @@
 
 @end
 
-// A mocked up QSBSearchController for using in tests. Didn't use OCMock because
-// I didn't want to bring QSBSearchController into my binary.
-@interface ShortcutTestQSBSearchController : NSObject {
+@interface ShortcutTestSearchController : NSObject {
  @private
-  HGSTokenizedString *tokenizedQueryString_;
+  HGSTokenizedString *query_;
 }
-
-@property (readonly, copy) HGSTokenizedString *tokenizedQueryString;
-@property (readonly, assign) ShortcutTestQSBSearchController* parentSearchController;
-
-- (id)initWithQueryString:(HGSTokenizedString *)queryString;
-
 @end
 
-@implementation ShortcutTestQSBSearchController
-
-@synthesize tokenizedQueryString = tokenizedQueryString_;
-
-- (id)initWithQueryString:(HGSTokenizedString *)queryString {
+@implementation ShortcutTestSearchController
+- (id)initWithTokenizedQueryString:(HGSTokenizedString *)query {
   if ((self = [super init])) {
-    tokenizedQueryString_ = [queryString copy];
+    query_ = [query retain];
   }
   return self;
 }
 
 - (void)dealloc {
-  [tokenizedQueryString_ release];
+  [query_ release];
   [super dealloc];
 }
 
-- (ShortcutTestQSBSearchController *)parentSearchController {
-  return nil;
+- (id)tokenizedQueryString {
+  return query_;
 }
-@end 
 
+@end
 
-@interface ShortcutsSourceTest : HGSSearchSourceAbstractTestCase
+@interface ShortcutTestQSBActionPresenter : NSObject {
+ @private
+  ShortcutTestQSBTableResult *result_;
+  ShortcutTestSearchController *controller_;
+}
+@end
+
+@implementation ShortcutTestQSBActionPresenter
+- (id)initWithTableResult:(ShortcutTestQSBTableResult *)result
+         searchController:(ShortcutTestSearchController *)controller {
+  if ((self = [super init])) {
+    result_ = [result retain];
+    controller_ = [controller retain];
+  }
+  return self;
+}
+
+- (void)dealloc {
+  [result_ release];
+  [controller_ release];
+  [super dealloc];
+}
+
+- (BOOL)canPivot {
+  return YES;
+}
+
+- (BOOL)canUnpivot {
+  return NO;
+}
+
+- (id)activeSearchController {
+  return controller_;
+}
+
+- (id)selectedTableResult {
+  return result_;
+}
+
+@end
+
+#pragma mark -
+#pragma mark Actual Test Code
+
+@interface ShortcutsSourceTest : HGSSearchSourceAbstractTestCase {
+ @private
+  BOOL foundResult_;
+}
+
 @end
 
 @implementation ShortcutsSourceTest
@@ -117,6 +157,8 @@
 - (void)testEmptySource {
   HGSSearchSource *source = [self source];
   HGSQuery *query = [[HGSQuery alloc] initWithString:@"i" 
+                                      actionArgument:nil
+                                     actionOperation:nil
                                         pivotObjects:nil 
                                           queryFlags:0];
   HGSSearchOperation *op = [source searchOperationForQuery:query];
@@ -136,7 +178,7 @@
 }
 
 - (void)testSinglePivot {
-  HGSTokenizedString *queryString = [HGSTokenizer tokenizeString:@"i"];
+  // Create up a result
   NSBundle *bundle = [NSBundle bundleForClass:[self class]];
   NSString *resultPath = [bundle pathForResource:@"SampleContact" 
                                           ofType:@"abcdp"];
@@ -146,49 +188,64 @@
   HGSScoredResult *scoredResult = [HGSScoredResult resultWithFilePath:resultPath 
                                                                source:source
                                                            attributes:nil
-                                                                score:0 
+                                                                score:0
+                                                                flags:0
                                                           matchedTerm:nil 
                                                        matchedIndexes:nil];
-                                         
   STAssertNotNil(scoredResult, nil);
-  ShortcutTestQSBSearchController *searchController 
-    = [[[ShortcutTestQSBSearchController alloc] initWithQueryString:queryString] 
-       autorelease];
-  STAssertNotNil(searchController, nil);
-  ShortcutTestQSBTableResult *tableResult 
-    = [[[ShortcutTestQSBTableResult alloc] initWithRankedResult:scoredResult] autorelease];
+  
+  // Fake a pivot on it
+  id tableResult = [[[ShortcutTestQSBTableResult alloc] 
+                     initWithRankedResult:scoredResult] autorelease];
   STAssertNotNil(tableResult, nil);
-  NSDictionary *userInfo 
-    = [NSDictionary dictionaryWithObject:searchController 
-                                forKey:kQSBNotificationSearchControllerKey];
   NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-
-  [center postNotificationName:kQSBWillPivotNotification
-                        object:tableResult 
-                      userInfo:userInfo];
+  HGSTokenizedString *queryString 
+    = [HGSTokenizer tokenizeString:@"shortcut.test.query.string.blah"];
+  id searchController 
+    = [[[ShortcutTestSearchController alloc] 
+        initWithTokenizedQueryString:queryString] autorelease];
+  id actionPresenter 
+    = [[[ShortcutTestQSBActionPresenter alloc] initWithTableResult:tableResult
+                                                  searchController:searchController]
+       autorelease];
+  [center postNotificationName:kQSBActionPresenterWillPivotNotification
+                        object:actionPresenter
+                      userInfo:nil];
+  
+  // Perform a search on that pivot now
   HGSQuery *query = [[[HGSQuery alloc] initWithTokenizedString:queryString
+                                                actionArgument:nil
+                                               actionOperation:nil
                                                   pivotObjects:nil 
                                                     queryFlags:0] autorelease];
   HGSSearchOperation *op = [[self source] searchOperationForQuery:query];
   [center addObserver:self
-             selector:@selector(singleResult:) 
+             selector:@selector(testSinglePivotDidUpdateResultsNotification:) 
                  name:kHGSSearchOperationDidUpdateResultsNotification 
                object:op];
+  foundResult_ = NO;
+  
+  // run ourself, and spin the runloop
   [op run:YES];
 
   NSRunLoop *rl = [NSRunLoop currentRunLoop];
   [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
 
-  [center removeObserver:self];
+  [center removeObserver:self 
+                    name:kHGSSearchOperationDidUpdateResultsNotification 
+                  object:op];
+  STAssertTrue(foundResult_, nil);
 }
 
-- (void)singleResult:(NSNotification *)notification {
+- (void)testSinglePivotDidUpdateResultsNotification:(NSNotification *)notification {
   HGSSearchOperation *op = [notification object];
   HGSTypeFilter *filter = [HGSTypeFilter filterAllowingAllTypes];
-  STAssertEquals([op resultCountForFilter:filter], 1U, nil);
+  NSUInteger count = [op resultCountForFilter:filter];
+  STAssertTrue(count > 0, nil);
   HGSScoredResult *scoredResult = [op sortedRankedResultAtIndex:0
                                                      typeFilter:filter];
   STAssertEqualObjects([scoredResult displayName], @"SampleContact.abcdp", nil);
+  foundResult_ = YES;
 }
 
 // TODO(dmaclach): Add more ShortcutsTests when time is available.

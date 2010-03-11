@@ -49,12 +49,12 @@
 
 #if TARGET_OS_IPHONE
 #import "GMOSourceConfigProvider.h"
-#else
-#import "QSBSearchWindowController.h"
-#import "QSBSearchViewController.h"
-#import "QSBSearchController.h"
+#else  // TARGET_OS_IPHONE
 #import "QSBTableResult.h"
-#endif
+#import "QSBActionPresenter.h"
+#import "Shortcuts.h"
+#endif  // TARGET_OS_IPHONE
+
 #import "GTMMethodCheck.h"
 #import "GTMObjectSingleton.h"
 #import "GTMExceptionalInlines.h"
@@ -87,8 +87,8 @@ static const unsigned int kMaxEntriesPerShortcut = 3;
 
 // Tell the database that "object" was selected for shortcut, and let it do its
 // magic internally to update itself.
-- (BOOL)updateShortcutFromController:(QSBSearchController *)searchController 
-                    withRankedResult:(HGSScoredResult *)result;
+- (BOOL)updateShortcutForTokenizedString:(HGSTokenizedString *)shortcut 
+                        withRankedResult:(HGSScoredResult *)result;
 
 - (NSArray *)rankedObjectsForShortcut:(HGSTokenizedString *)shortcut;
 
@@ -124,12 +124,16 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
       = [[appSupportPath stringByAppendingPathComponent:@"shortcuts.db"] retain];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self 
-           selector:@selector(qsbWillPivot:) 
-               name:kQSBWillPivotNotification 
+           selector:@selector(qsbActionPresenterWillPivot:) 
+               name:kQSBActionPresenterWillPivotNotification 
              object:nil];
     [nc addObserver:self
-           selector:@selector(qsbWillPerformAction:)
-               name:kQSBQueryControllerWillPerformActionNotification
+           selector:@selector(qsbActionPresenterWillPerformAction:)
+               name:kQSBActionPresenterWillPerformActionNotification
+             object:nil];
+    [nc addObserver:self
+           selector:@selector(updateShortcut:)
+               name:kShortcutsUpdateShortcutNotification
              object:nil];
 #endif
     shortcuts_ = [[self readShortcuts:shortcutsFilePath_] retain];
@@ -205,20 +209,14 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   return archive;
 }
 
-- (BOOL)updateShortcutFromController:(QSBSearchController *)searchController  
-                    withRankedResult:(HGSScoredResult *)result {
+- (BOOL)updateShortcutForTokenizedString:(HGSTokenizedString *)shortcut  
+                        withRankedResult:(HGSScoredResult *)result {
   // Check to see if the args we got are reasonable
-  if (!searchController || !result) {
+  if (!shortcut || !result) {
     HGSLogDebug(@"Bad Args");
     return NO;
   }
   
-  // right now we only store shortcuts at the top level
-  if ([searchController parentSearchController]) {
-    return NO;
-  }
-  
-  HGSTokenizedString *shortcut = [searchController tokenizedQueryString];
   if (![shortcut tokenizedLength]) {
     return NO;
   }
@@ -305,14 +303,19 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
       CGFloat score = HGSScoreTermForItem(shortcut, key, &matchedIndexes);
       if (score > 0.0) {
         NSArray *resultArray = [shortcuts_ objectForKey:key];
+        CGFloat base = 1.0;
         for (NSDictionary *resultDict in resultArray) {
           HGSResult *result = [self unarchiveResult:resultDict];
           HGSScoredResult *scoredResult = nil;
           if (result) {
+            score = score * base;
             scoredResult = [HGSScoredResult resultWithResult:result 
                                                        score:score 
+                                                  flagsToSet:eHGSShortcutRankFlag
+                                                flagsToClear:0
                                                  matchedTerm:shortcut 
                                               matchedIndexes:matchedIndexes];
+            base -= .01;
           }
           if (scoredResult) {
             // We are not interested in stale results, but we also do not
@@ -350,31 +353,50 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
 #else 
 
 // Store off the shortcut on a pivot.
-- (void)qsbWillPivot:(NSNotification *)notification {
-  NSDictionary *userDict = [notification userInfo];
-  QSBSearchController *searchController 
-    = [userDict objectForKey:kQSBNotificationSearchControllerKey];
-  id result = [notification object];
-  if ([result respondsToSelector:@selector(representedResult)]) {
-    HGSScoredResult *hgsResult = [result representedResult];
-    HGSAssert([hgsResult isKindOfClass:[HGSScoredResult class]], nil);
-    [self updateShortcutFromController:searchController 
-                      withRankedResult:hgsResult];
-  }  
+- (void)qsbActionPresenterWillPivot:(NSNotification *)notification {
+  QSBActionPresenter *presenter = [notification object];
+  if (![presenter canUnpivot]) {
+    QSBSearchController *controller = [presenter activeSearchController];
+    QSBSourceTableResult *tableResult 
+      = (QSBSourceTableResult*)[presenter selectedTableResult];
+    if ([tableResult respondsToSelector:@selector(representedResult)]) {
+      HGSScoredResult *result = [tableResult representedResult];
+      HGSAssert([result isKindOfClass:[HGSScoredResult class]], nil);
+      [self updateShortcutForTokenizedString:[controller tokenizedQueryString]
+                                              withRankedResult:result];
+    }
+  }
 }
 
 // Store off the shortcut when an action is performed on it.
-- (void)qsbWillPerformAction:(NSNotification *)notification {
-  NSDictionary *userDict = [notification userInfo];
-  QSBSearchController *searchController 
-    = [userDict objectForKey:kQSBNotificationSearchControllerKey];
+- (void)qsbActionPresenterWillPerformAction:(NSNotification *)notification {
+  QSBActionPresenter *presenter = [notification object];
+  QSBSearchController *searchController = [presenter activeSearchController];
+  HGSActionOperation *operation = [presenter actionOperation];
+  
   HGSResultArray *directObjects 
-    = [userDict objectForKey:kQSBNotificationDirectObjectsKey];
+    = [operation argumentForKey:kHGSActionDirectObjectsKey];
   if ([directObjects count] == 1) {
     HGSScoredResult *directObject = [directObjects objectAtIndex:0];
-    [self updateShortcutFromController:searchController 
-                      withRankedResult:directObject];
+    HGSTokenizedString *shortcut = [searchController tokenizedQueryString];
+    if ([shortcut originalLength] > 0) {
+      [self updateShortcutForTokenizedString:[searchController tokenizedQueryString]
+                            withRankedResult:directObject];
+    }
   }
+}
+
+- (void)updateShortcut:(NSNotification *)notification {
+  NSDictionary *userInfo = [notification userInfo];
+  HGSTokenizedString *string = [userInfo objectForKey:kShortcutsShortcutKey];
+  HGSScoredResult *result = [userInfo objectForKey:kShortcutsResultKey];
+  if (!string) {
+    HGSLog(@"No Tokenized String at updateShortcut:");
+  }
+  if (!result) {
+    HGSLog(@"No Result at updateShortcut:");
+  }
+  [self updateShortcutForTokenizedString:string withRankedResult:result];
 }
 
 // When the plugin is being uninstalled, write out shortcuts, and invalidate 

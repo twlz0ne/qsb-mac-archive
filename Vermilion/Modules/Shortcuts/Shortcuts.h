@@ -1,7 +1,7 @@
 //
 //  Shortcuts.h
 //
-//  Copyright (c) 2007-2008 Google Inc. All rights reserved.
+//  Copyright (c) 2010 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,35 +30,6 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-
-// Shortcuts stores things in our user defaults.
-// The top level is a dictionary keyed by "shortcut" where a shortcut is the
-// series of characters entered by the user for them to get a object (i.e. 
-// 'ipho' could correspond to iPhoto. The value associated with the key is
-// an array of object identifiers. These identifiers match an entry in
-// a sqlite cache that holds the data needed to rebuild the object.
-// When a user associates a object (ex 'ipho') with a object (ex 'iphoto') 
-// and there is nothing else keyed to 'ipho' in the DB, the array for 'ipho'
-// will have a single entry 'iphoto'. If the user then associates 'iphone' with
-// 'ipho' the array for 'ipho' will have two objects (iphoto and iphone). If
-// the user again associates ipho with iPhone then the array will change to
-// (iPhone, iPhoto). If the user then associates ipho with iphonizer the array
-// will change to (iphone, iponizer). Object for shortcut will always return the
-// first element in the array for a given key.
-
-#import <Vermilion/Vermilion.h>
-
-@class HGSSQLiteBackedCache;
-
-@interface ShortcutsSource : HGSCallbackSearchSource {
- @private
-  HGSSQLiteBackedCache *cache_;
-}
-
-// Tell the database that "object" was selected for shortcut, and let it do its
-// magic internally to update itself.
-- (BOOL)updateShortcut:(NSString*)shortcut 
-            withObject:(HGSObject *)object;
-@end
-
-extern NSString *const kShortcutsSourceExtensionIdentifier;
+#define kShortcutsUpdateShortcutNotification @"ShortcutsUpdateShortcutNotification"
+#define kShortcutsShortcutKey @"ShortcutsShortcut"
+#define kShortcutsResultKey @"ShortcutsResult"
