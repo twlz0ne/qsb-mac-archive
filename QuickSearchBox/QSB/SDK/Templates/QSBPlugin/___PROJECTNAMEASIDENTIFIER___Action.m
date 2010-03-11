@@ -13,10 +13,8 @@
 
 @implementation  ___PROJECTNAMEASIDENTIFIER___Action
 
-// Perform an action given a dictionary of info. For now, we are just passing
-// in an array of direct objects, but there may be more keys added to future
-// SDKs
-- (BOOL)performWithInfo:(NSDictionary*)info {
+// Perform an action given a dictionary of info.
+- (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
   BOOL success = NO;

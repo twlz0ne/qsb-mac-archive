@@ -196,17 +196,22 @@ class ___PROJECTNAMEASIDENTIFIER___Action(object):
     """
     return True
 
-  def Perform(self, results, indirect_objects=None):
+  def Perform(self, direct_objects, other_arguments=None):
     """Perform the action on each of the results.
     
     Args:
-      results: An array of result objects for with which to perform the action.
-      indirect_objects: The indirect objects associated with the action.
+      direct_objects: An array of result objects to perform the action with.
+      other_arguments: A dictionary of other arguments keyed by argument id.
+
+    Returns:
+      If this action returns results, an array of results on success. Otherwise
+      return True on success, and False on failure.
     """
-    for result in results:
-      url = Foundation.NSURL.URLWithString_(result[CUSTOM_RESULT_VALUE])
+    for direct_object in direct_objects:
+      url = Foundation.NSURL.URLWithString_(direct_object[CUSTOM_RESULT_VALUE])
       workspace = AppKit.NSWorkspace.sharedWorkspace()
       workspace.openURL_(url)
+    return True
 
 
 def main():
