@@ -254,6 +254,8 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
                            + kQSBPivotCellRightPadding
                            + kQSBPivotCellXInset,
                            kQSBPivotCellHeight);
+  // Make width integral so that we don't get blurring occuring.
+  size.width = floor(size.width + 0.5);
   return size;
 }
 
