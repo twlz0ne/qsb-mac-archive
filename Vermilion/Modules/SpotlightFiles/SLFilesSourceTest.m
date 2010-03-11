@@ -163,6 +163,8 @@
 - (NSArray *)performSearchFor:(NSString *)value 
                    pivotingOn:(HGSResultArray *)pivots {
   HGSQuery *query = [[[HGSQuery alloc] initWithString:value 
+                                       actionArgument:nil
+                                      actionOperation:nil
                                          pivotObjects:pivots 
                                            queryFlags:0] autorelease];
   STAssertNotNil(query, nil);
@@ -180,6 +182,8 @@
 - (HGSResult *)spotlightResultForQuery:(NSString *)queryString
                                   path:(NSString *)path {
   HGSQuery *query = [[[HGSQuery alloc] initWithString:queryString 
+                                       actionArgument:nil
+                                      actionOperation:nil
                                          pivotObjects:nil 
                                            queryFlags:0] autorelease];
   HGSSearchOperation *op = [[self source] searchOperationForQuery:query];
@@ -270,9 +274,9 @@
      @"testPath", kHGSExtensionIconImagePathKey,
      (NSString*)kUTTypeData, kHGSSearchSourceUTIsToExcludeFromDiskSources,
      nil];
-  [[[bundleMock stub] andReturn:@"testUtiFilter"] 
-   localizedStringForKey:@"testUtiFilter" value:@"NOT_FOUND" table:@"InfoPlist"];
-  [[[bundleMock stub] andReturn:@"imagePath"] pathForImageResource:@"testPath"];
+  [[[bundleMock expect] andReturn:@"testUtiFilter"] 
+   qsb_localizedInfoPListStringForKey:@"testUtiFilter"];
+  [[[bundleMock expect] andReturn:@"imagePath"] pathForImageResource:@"testPath"];
   HGSSearchSource *source 
     = [[[HGSSearchSource alloc] initWithConfiguration:config] autorelease];
   HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
@@ -286,11 +290,15 @@
 - (void)testValidSourceForQuery {
   HGSSearchSource *source = [self source];
   HGSQuery *query = [[[HGSQuery alloc] initWithString:@"ha" 
+                                       actionArgument:nil
+                                      actionOperation:nil
                                          pivotObjects:nil 
                                            queryFlags:0] autorelease]; 
   STAssertFalse([source isValidSourceForQuery:query], 
                 @"Queries < 3 characters should be ignored");
   query = [[[HGSQuery alloc] initWithString:@"hap" 
+                             actionArgument:nil
+                            actionOperation:nil
                                pivotObjects:nil 
                                  queryFlags:0] autorelease]; 
   STAssertTrue([source isValidSourceForQuery:query], 
@@ -306,6 +314,8 @@
     = [HGSUnscoredResult resultWithDictionary:badTypeDict source:source];
   query 
     = [[[HGSQuery alloc] initWithString:@"happy" 
+                         actionArgument:nil
+                        actionOperation:nil
                            pivotObjects:[NSArray arrayWithObject:badTypeResult] 
                              queryFlags:0] autorelease]; 
   STAssertFalse([source isValidSourceForQuery:query],
@@ -321,6 +331,8 @@
                                                                        source:source];
   query 
     = [[[HGSQuery alloc] initWithString:@"happy" 
+                         actionArgument:nil
+                        actionOperation:nil
                            pivotObjects:[NSArray arrayWithObject:goodTypeResult] 
                              queryFlags:0] autorelease]; 
   STAssertTrue([source isValidSourceForQuery:query],
@@ -337,7 +349,8 @@
   HGSScoredResult *mailResult = [HGSScoredResult resultWithFilePath:mailFilePath 
                                                              source:source
                                                          attributes:nil
-                                                              score:0 
+                                                              score:0
+                                                              flags:0
                                                         matchedTerm:nil 
                                                      matchedIndexes:nil];
   STAssertNotNil(mailResult, nil);
@@ -372,6 +385,8 @@
   HGSScoredResult *scoredResult 
     = [HGSScoredResult resultWithResult:contactResult 
                                   score:0 
+                             flagsToSet:0
+                           flagsToClear:0
                             matchedTerm:nil 
                          matchedIndexes:nil];
   STAssertNotNil(scoredResult, nil);

@@ -60,6 +60,8 @@ static NSString *const kClipboardTestString = @"Lazarus Long Text";
   [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.5]];
   HGSSearchSource *source = [self source];
   HGSQuery *query = [[HGSQuery alloc] initWithString:@"Lazarus" 
+                                      actionArgument:nil
+                                     actionOperation:nil
                                         pivotObjects:nil 
                                           queryFlags:0];
   HGSSearchOperation *op = [source searchOperationForQuery:query];
