@@ -103,7 +103,7 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
 - (BOOL)canDragRowsWithIndexes:(NSIndexSet *)rowIndexes 
                        atPoint:(NSPoint)mouseDownPoint {
   NSUInteger row = [rowIndexes firstIndex];
-  NSInteger resultsIndex = [self columnWithIdentifier:@"GDResults"];
+  NSInteger resultsIndex = [self columnWithIdentifier:@"Results"];
   NSRect cellFrame = [self frameOfCellAtColumn:resultsIndex row:row];
   BOOL canDrag = NSPointInRect(mouseDownPoint, cellFrame);
   if (canDrag) {

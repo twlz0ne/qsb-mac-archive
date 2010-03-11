@@ -8,6 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="145"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -34,7 +35,7 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSScrollView" id="717884256">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">274</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -57,13 +58,14 @@
 								<object class="NSMutableArray" key="NSTableColumns">
 									<bool key="EncodedWithXMLCoder">YES</bool>
 									<object class="NSTableColumn" id="254946887">
+										<string key="NSIdentifier">Results</string>
 										<double key="NSWidth">2.590000e+02</double>
 										<double key="NSMinWidth">4.000000e+01</double>
 										<double key="NSMaxWidth">1.000000e+03</double>
 										<object class="NSTableHeaderCell" key="NSHeaderCell">
 											<int key="NSCellFlags">75628032</int>
 											<int key="NSCellFlags2">134217728</int>
-											<string key="NSContents">Column 2</string>
+											<string key="NSContents"/>
 											<object class="NSFont" key="NSSupport">
 												<string key="NSName">LucidaGrande</string>
 												<double key="NSSize">1.100000e+01</double>
@@ -166,6 +168,7 @@
 					</object>
 				</object>
 				<string key="NSFrameSize">{262, 70}</string>
+				<reference key="NSSuperview"/>
 				<reference key="NSNextKeyView" ref="1072380100"/>
 				<int key="NSsFlags">528</int>
 				<reference key="NSVScroller" ref="604040381"/>
@@ -348,21 +351,6 @@
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBPartialClassDescription">
-					<string key="className">HGSResultArray</string>
-					<string key="superclassName">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../Vermilion/Vermilion/HGSResult.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">HGSResultArray</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">QSBHGSResult+NSPasteboard.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
 					<string key="className">NSApplication</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="101768679">
 						<string key="majorKey">IBProjectSource</string>
@@ -435,16 +423,35 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">NSTextField</string>
-					<reference key="sourceIdentifier" ref="101768679"/>
-				</object>
-				<object class="IBPartialClassDescription">
 					<string key="className">NSView</string>
 					<reference key="sourceIdentifier" ref="101768679"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSWindow</string>
 					<reference key="sourceIdentifier" ref="101768679"/>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">QSBActionPresenter</string>
+					<string key="superclassName">NSResponder</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSMutableArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>qsb_pickCurrentSourceTableResult:</string>
+							<string>qsb_pivotOnSelection:</string>
+							<string>qsb_unpivotOnSelection:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">QSBActionPresenter.h</string>
+					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">QSBFlippedView</string>
@@ -490,7 +497,7 @@
 					<string key="className">QSBMoreResultsViewController</string>
 					<string key="superclassName">QSBResultsViewBaseController</string>
 					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">showAllForSelectedCategory:</string>
+						<string key="NS.key.0">qsb_showAllForSelectedCategory:</string>
 						<string key="NS.object.0">id</string>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -562,15 +569,13 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>performSelectionAction:</string>
-							<string>pivotOnSelection:</string>
-							<string>showMoreResults:</string>
-							<string>showTopResults:</string>
-							<string>unpivotOnSelection:</string>
+							<string>hideResultsWindow:</string>
+							<string>qsb_showMoreResults:</string>
+							<string>qsb_showTopResults:</string>
+							<string>showResultsWindow:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -581,13 +586,17 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>actionPresenter_</string>
 							<string>resultsView_</string>
 							<string>searchWindowController_</string>
+							<string>statusBar_</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>QSBActionPresenter</string>
 							<string>QSBFlippedView</string>
 							<string>QSBSearchWindowController</string>
+							<string>NSPathControl</string>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -606,9 +615,9 @@
 							<string>grabSelection:</string>
 							<string>hideSearchWindow:</string>
 							<string>hitHotKey:</string>
-							<string>resetSearchOrHideQuery:</string>
+							<string>qsb_clearSearchString:</string>
+							<string>resetSearchString:</string>
 							<string>selectCorpus:</string>
-							<string>selectResults:</string>
 							<string>showSearchWindow:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
@@ -619,7 +628,7 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
-							<string>HGSResultArray</string>
+							<string>id</string>
 							<string>id</string>
 						</object>
 					</object>
@@ -627,11 +636,10 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>actionPresenter_</string>
 							<string>logoView_</string>
 							<string>resultsOffsetterView_</string>
 							<string>resultsWindowController_</string>
-							<string>searchMenu_</string>
-							<string>searchTextFieldEditor_</string>
 							<string>searchTextField_</string>
 							<string>shieldWindow_</string>
 							<string>thumbnailView_</string>
@@ -639,12 +647,11 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>QSBActionPresenter</string>
 							<string>NSImageView</string>
 							<string>NSView</string>
 							<string>QSBResultsWindowController</string>
-							<string>QSBMenuButton</string>
 							<string>QSBTextField</string>
-							<string>NSTextField</string>
 							<string>NSWindow</string>
 							<string>NSImageView</string>
 							<string>QSBMenuButton</string>
@@ -692,6 +699,14 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">QSBTextField</string>
+					<string key="superclassName">NSTextView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">QSBTextField.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
