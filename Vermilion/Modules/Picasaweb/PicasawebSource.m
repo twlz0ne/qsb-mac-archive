@@ -94,7 +94,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     // Keep track of active tickets so we can cancel them if necessary.
     activeTickets_ = [[NSMutableSet alloc] init];
     
-    account_ = [[configuration objectForKey:kHGSExtensionAccount] retain];
+    account_ = [[configuration objectForKey:kHGSExtensionAccountKey] retain];
 
     if (account_) {
       // Get album and photo metadata now, and schedule a timer to check

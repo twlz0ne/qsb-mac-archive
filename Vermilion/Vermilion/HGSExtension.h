@@ -251,35 +251,35 @@ extern NSString *const kHGSExtensionBundleKey;
   single NSString specifying the account type, or an array of NSStrings.
   The account type is typically expressed in reverse-DNS format.
 */
-extern NSString *const kHGSExtensionDesiredAccountTypes;
+extern NSString *const kHGSExtensionDesiredAccountTypesKey;
 
 /*!
   Type of accounts in which the extension is offering.  Appropriate only
   for extensions of type HGSAccountType.
 */
-extern NSString *const kHGSExtensionOfferedAccountType;
+extern NSString *const kHGSExtensionOfferedAccountTypeKey;
 
 /*!
   Class name of the account class deriving from HGSAccount which the
   extension is offering.  Appropriate only for extensions of type
   HGSAccountType.
 */
-extern NSString *const kHGSExtensionOfferedAccountClass;
+extern NSString *const kHGSExtensionOfferedAccountClassKey;
 
 /*!
   YES if the extension presented to the user in the preferences panel.  If this
   is not present then YES is assumed.
 */
-extern NSString *const kHGSExtensionIsUserVisible;
+extern NSString *const kHGSExtensionIsUserVisibleKey;
 
 /*!
   YES if the extension is to be enabled by default.  If this key is _not_
   present, YES is assumed, except for account-dependent sources, in which case
   NO is assumed.
 */
-extern NSString *const kHGSExtensionIsEnabledByDefault;
+extern NSString *const kHGSExtensionIsEnabledByDefaultKey;
 
 /*!
   Account assigned to the extension. (id<HGSAccount>)
 */
-extern NSString *const kHGSExtensionAccount;
+extern NSString *const kHGSExtensionAccountKey;

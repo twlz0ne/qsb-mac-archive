@@ -60,7 +60,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    account_ = [[configuration objectForKey:kHGSExtensionAccount] retain];
+    account_ = [[configuration objectForKey:kHGSExtensionAccountKey] retain];
     if (account_) {
       // Fetch, and schedule a timer to update every hour.
       [self startAsynchronousBookmarkFetch];

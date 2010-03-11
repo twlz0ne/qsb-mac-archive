@@ -42,12 +42,16 @@
 #import "HGSType.h"
 #import "HGSActionArgument.h"
 
-NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources 
+NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSourcesKey
   = @"HGSSearchSourceUTIsToExcludeFromDiskSources";
-NSString *const kHGSSearchSourceSupportedTypes
+NSString *const kHGSSearchSourceSupportedTypesKey
   = @"HGSSearchSourceSupportedTypes";
-NSString *const kHGSSearchSourceUnsupportedTypes
+NSString *const kHGSSearchSourceUnsupportedTypesKey
   = @"HGSSearchSourceUnsupportedTypes";
+NSString *const kHGSSearchSourcePivotableTypesKey
+  = @"HGSSearchSourcePivotableTypes";
+NSString *const kHGSSearchSourceCannotArchiveKey
+= @"HGSSearchSourceCannotArchive";
 
 @implementation HGSSearchSource
 @synthesize pivotableTypes = pivotableTypes_;
@@ -73,24 +77,24 @@ NSString *const kHGSSearchSourceUnsupportedTypes
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
 
-    id value = [configuration objectForKey:@"HGSSearchSourcePivotableTypes"];
+    id value = [configuration objectForKey:kHGSSearchSourcePivotableTypesKey];
     pivotableTypes_ = [[NSSet qsb_setFromId:value] retain];
 
     value
-      = [configuration objectForKey:kHGSSearchSourceUTIsToExcludeFromDiskSources];
+      = [configuration objectForKey:kHGSSearchSourceUTIsToExcludeFromDiskSourcesKey];
     utisToExcludeFromDiskSources_ = [[NSSet qsb_setFromId:value] retain];
     
-    value = [configuration objectForKey:@"HGSSearchSourceCannotArchive"];
+    value = [configuration objectForKey:kHGSSearchSourceCannotArchiveKey];
     cannotArchive_ = [value boolValue];
     
-    value = [configuration objectForKey:@"HGSSearchSourceSupportedTypes"];
+    value = [configuration objectForKey:kHGSSearchSourceSupportedTypesKey];
     NSSet *supportedTypes = [NSSet qsb_setFromId:value];
     if (!supportedTypes) {
       HGSLogDebug(@"Source: %@ does not have a HGSSearchSourceSupportedTypes key", 
                   self);
       supportedTypes = [HGSTypeFilter allTypesSet];
     }
-    value = [configuration objectForKey:@"HGSSearchSourceUnsupportedTypes"];
+    value = [configuration objectForKey:kHGSSearchSourceUnsupportedTypesKey];
     NSSet *unsupportedTypes = [NSSet qsb_setFromId:value];
     resultTypeFilter_ 
       = [[HGSTypeFilter alloc] initWithConformTypes:supportedTypes

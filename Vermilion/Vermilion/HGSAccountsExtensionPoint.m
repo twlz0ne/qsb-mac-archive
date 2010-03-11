@@ -58,7 +58,7 @@ GTM_METHOD_CHECK(NSEnumerator,
       HGSProtoExtension *protoAccountType = [accountType protoExtension];
       if (protoAccountType) {
         NSString *accountClassName
-          = [protoAccountType objectForKey:kHGSExtensionOfferedAccountClass];
+          = [protoAccountType objectForKey:kHGSExtensionOfferedAccountClassKey];
         Class accountClass = NSClassFromString(accountClassName);
         HGSAccount *account = [[[accountClass alloc]
                                 initWithConfiguration:accountDict]

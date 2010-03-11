@@ -102,7 +102,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   if ((self = [super initWithConfiguration:configuration])) {
     // Keep track of active tickets so we can cancel them if necessary.
     activeTickets_ = [[NSMutableSet alloc] init];
-    account_ = [[configuration objectForKey:kHGSExtensionAccount] retain];
+    account_ = [[configuration objectForKey:kHGSExtensionAccountKey] retain];
     if (account_) {
       // Get calendarEntry and event metadata now, and schedule a timer to
       // check every so often to see if it needs to be updated.

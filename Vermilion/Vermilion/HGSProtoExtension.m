@@ -105,7 +105,7 @@
           enabled_ = [enabled boolValue]; 
         } else {
           enabled 
-            = [configuration objectForKey:kHGSExtensionIsEnabledByDefault];
+            = [configuration objectForKey:kHGSExtensionIsEnabledByDefaultKey];
           if (enabled) {
             enabled_ = [enabled boolValue];
           }
@@ -162,7 +162,7 @@
   // We are factorable if we are looking for accounts.  
   // TODO(mrossetti): Additional types of factors may be added in the future.
   NSString *desiredAccountType
-    = [configuration_ objectForKey:kHGSExtensionDesiredAccountTypes];
+    = [configuration_ objectForKey:kHGSExtensionDesiredAccountTypesKey];
   BOOL factorsByAccount = (desiredAccountType != nil);
   return factorsByAccount;
 }
@@ -195,12 +195,12 @@
   NSArray *desiredAccountTypes = [self desiredAccountTypes];
   if ([desiredAccountTypes containsObject:accountType]) {
     factoredExtension = [[self copyWithFactor:account
-                                       forKey:kHGSExtensionAccount]
+                                       forKey:kHGSExtensionAccountKey]
                          autorelease];
     // For account-based extensions we disable unless this has been
     // specifically overridden in the plist.
     NSNumber *isEnabledByDefaultValue 
-      = [configuration_ objectForKey:kHGSExtensionIsEnabledByDefault];
+      = [configuration_ objectForKey:kHGSExtensionIsEnabledByDefaultKey];
     BOOL doEnable = [isEnabledByDefaultValue boolValue];
     if (!doEnable || ![account isAuthenticated]) {
       // Set isEnabled_ directly--we don't want the setter side-effects.
@@ -230,7 +230,7 @@
 - (BOOL)canSetEnabled {
   BOOL canSet = [plugin_ isEnabled];
   if (canSet) {
-    HGSAccount *account = [configuration_ objectForKey:kHGSExtensionAccount];
+    HGSAccount *account = [configuration_ objectForKey:kHGSExtensionAccountKey];
     if (account) {
       canSet = [account isAuthenticated];
     }
@@ -363,7 +363,7 @@
   BOOL doesExtend = [[self extensionPointKey] isEqualToString:extensionPoint];
   if (doesExtend) {
     NSNumber *isUserVisibleValue 
-      = [configuration_ objectForKey:kHGSExtensionIsUserVisible];
+      = [configuration_ objectForKey:kHGSExtensionIsUserVisibleKey];
     if (isUserVisibleValue) {
       doesExtend = [isUserVisibleValue boolValue];
     }
@@ -447,7 +447,7 @@
   
 - (NSArray *)desiredAccountTypes {
   NSArray *desiredAccountTypes
-    = [configuration_ objectForKey:kHGSExtensionDesiredAccountTypes];
+    = [configuration_ objectForKey:kHGSExtensionDesiredAccountTypesKey];
   if ([desiredAccountTypes isKindOfClass:[NSString class]]) {
     desiredAccountTypes = [NSArray arrayWithObject:desiredAccountTypes];
   }

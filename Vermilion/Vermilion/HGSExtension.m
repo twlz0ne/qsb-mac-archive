@@ -46,16 +46,16 @@ NSString *const kHGSExtensionIconImageKey = @"HGSExtensionIconImage";
 NSString *const kHGSExtensionIconImagePathKey = @"HGSExtensionIconImagePath";
 NSString *const kHGSExtensionEnabledKey = @"HGSExtensionEnabled";
 NSString *const kHGSExtensionBundleKey = @"HGSExtensionBundle";
-NSString *const kHGSExtensionDesiredAccountTypes
+NSString *const kHGSExtensionDesiredAccountTypesKey
   = @"HGSExtensionDesiredAccountTypes";
-NSString *const kHGSExtensionOfferedAccountType
+NSString *const kHGSExtensionOfferedAccountTypeKey
   = @"HGSExtensionOfferedAccountType";
-NSString *const kHGSExtensionOfferedAccountClass
+NSString *const kHGSExtensionOfferedAccountClassKey
   = @"HGSExtensionOfferedAccountClass";
-NSString *const kHGSExtensionIsUserVisible = @"HGSExtensionIsUserVisible";
-NSString *const kHGSExtensionIsEnabledByDefault 
+NSString *const kHGSExtensionIsUserVisibleKey = @"HGSExtensionIsUserVisible";
+NSString *const kHGSExtensionIsEnabledByDefaultKey
   = @"HGSExtensionIsEnabledByDefault";
-NSString *const kHGSExtensionAccount = @"HGSExtensionAccount";
+NSString *const kHGSExtensionAccountKey = @"HGSExtensionAccount";
 
 @implementation HGSExtension
 
@@ -138,7 +138,7 @@ NSString *const kHGSExtensionAccount = @"HGSExtensionAccount";
       iconPath_ = [iconPath copy];
     }
     NSNumber *userVisibleValue 
-      = [configuration objectForKey:kHGSExtensionIsUserVisible];
+      = [configuration objectForKey:kHGSExtensionIsUserVisibleKey];
     BOOL userVisible = (userVisibleValue) ? [userVisibleValue boolValue] : YES;
     [self setUserVisible:userVisible];
   }

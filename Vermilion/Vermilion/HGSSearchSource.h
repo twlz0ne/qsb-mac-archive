@@ -71,9 +71,8 @@
 
 /*!
  Returns whether the results for the source should be added to the QSB shortcuts
- list.
- @result YES if the results from the given source should not be added to the
-         shortcuts list.
+ list. Default to the value of "HGSSearchSourceCannotArchive", or NO if that key
+ is not defined.
  */
 @property (readonly) BOOL cannotArchive;
 
@@ -180,7 +179,6 @@
 
 @end
 
-
 /*!
   kHGSValidateSearchSourceBehaviorsPrefKey is a boolean preference that the
   engine can use to enable extra logging about Source behaviors to help
@@ -195,7 +193,29 @@
   that we will exclude from disk sources (specifically spotlight). See comment
   about utisToExcludeFromDiskSources above.
 */
-extern NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSources;
+extern NSString *const kHGSSearchSourceUTIsToExcludeFromDiskSourcesKey;
+
+/*!
+ Configuration dictionary key that along with 
+ kHGSSearchSourceUnsupportedTypesKey controls resultTypeFilter.
+*/
+extern NSString *const kHGSSearchSourceSupportedTypesKey;
+
+/*!
+ Configuration dictionary key that along with 
+ kHGSSearchSourceSupportedTypesKey controls resultTypeFilter.
+*/
+extern NSString *const kHGSSearchSourceUnsupportedTypesKey;
+
+/*!
+ Configuration dictionary key that controls pivotableTypes.
+*/
+extern NSString *const kHGSSearchSourcePivotableTypesKey;
+
+/*!
+ Configuration dictionary key that controls cannotArchive.
+*/
+extern NSString *const kHGSSearchSourceCannotArchiveKey;
 
 /*!
  A simple way to register a source for things that we generate in non-standard

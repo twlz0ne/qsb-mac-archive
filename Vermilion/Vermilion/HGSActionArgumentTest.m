@@ -139,8 +139,10 @@ static NSString *const kActionArgumentTestIdentifier = @"FooActionArgument";
 
   id result = [OCMockObject mockForClass:[HGSScoredResult class]];
   id query = [OCMockObject mockForClass:[HGSQuery class]];
+  [arg willScoreForQuery:query];
   HGSScoredResult *newResult = [arg scoreResult:result 
                                        forQuery:query];
+  [arg didScoreForQuery:query];
   STAssertEquals(result, newResult, nil);
 }
 

@@ -98,7 +98,7 @@ GTM_METHOD_CHECK(NSEnumerator,
                  presImage, kDocCategoryPresentation,
                  pdfImage, kDocCategoryPDFDocument,
                  nil];
-    account_ = [[configuration objectForKey:kHGSExtensionAccount] retain];
+    account_ = [[configuration objectForKey:kHGSExtensionAccountKey] retain];
     userName_ = [[account_ userName] copy];
     if (account_) {
       // Get a doc listing now, and schedule a timer to update it every hour.

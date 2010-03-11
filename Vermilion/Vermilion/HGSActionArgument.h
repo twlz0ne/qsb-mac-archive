@@ -40,6 +40,7 @@
 @class HGSTypeFilter;
 @class HGSScoredResult;
 @class HGSQuery;
+@class HGSActionArgumentSource;
 
 /*!
  All of the routines that an action argument is required to implement.
@@ -107,6 +108,16 @@
 - (HGSScoredResult *)scoreResult:(HGSScoredResult *)result 
                         forQuery:(HGSQuery *)query;
 
+@optional
+
+/*!
+ Return a custom set of results for this argument based on query.
+ If implemented, the action argument will be asked to return values.
+ @param query The query to return results for.
+ @result The results.
+*/
+- (NSArray *)resultsForQuery:(HGSQuery *)query;
+
 @end
 
 /*!
@@ -124,6 +135,11 @@
   NSSet *displayOtherTerms_;
 }
 
+/*!
+ Return the action argument source, which is the source responsible for
+ returning custom results for actions.
+*/
++ (HGSActionArgumentSource *)defaultActionArgumentSource;
 @end
 
 /*!
