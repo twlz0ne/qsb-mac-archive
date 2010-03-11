@@ -100,6 +100,15 @@ GTM_METHOD_CHECK(NSAttributedString, attrStringWithString:attributes:);
 
 #pragma mark NSResponder overrides
 
+#if 0
+// Useful chunk of debugging code when you are trying to figure out what
+// command is being sent by a key combination.
+- (void)doCommandBySelector:(SEL)aSelector {
+  HGSLog(@"%@", NSStringFromSelector(aSelector));
+  [super doCommandBySelector:aSelector];
+}
+#endif  // 0
+
 - (void)keyDown:(NSEvent *)theEvent {
   [self deleteCompletion];
   [super keyDown:theEvent];
