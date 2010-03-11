@@ -63,10 +63,6 @@
 #define kQSBMaxMoreResultCountBeforeAbridgingKey @"kQSBMaxMoreResultCountBeforeAbridging"
 #define kQSBMaxMoreResultCountBeforeAbridgingDefault    20
 
-// BOOL - QSB snippet display
-#define kQSBSnippetsKey                       @"QSBSnippets"
-#define kQSBSnippetsDefault                   YES
-
 // Dictionary - Hot key information, see GMHotKeyUtils for keys
 #define kQSBHotKeyKey                         @"QSBHotKey"
 // Default hotkey is ControlSpace
