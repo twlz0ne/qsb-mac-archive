@@ -1,6 +1,5 @@
 //
-//  NSArray+HGSCommonPrefixDetection.m
-//  GoogleMobile
+//  NSArray+CommonPrefixDetection.m
 //
 //  Created by J. Nicholas Jitkoff on 6/5/08.
 //  Copyright (c) 2008 Google Inc. All rights reserved.
@@ -32,10 +31,10 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "NSArray+HGSCommonPrefixDetection.h"
+#import "NSArray+CommonPrefixDetection.h"
 
-@implementation NSArray (HGSCommonPrefixDetection)
-// TODO(alcor): move this into shared if anyone else could ever use it
+@implementation NSArray (CorePluginCommonPrefixDetection)
+
 - (NSString *)commonPrefixForStringsWithOptions:(NSStringCompareOptions)options {
 
   BOOL backwards = (options & NSBackwardsSearch) > 0;
@@ -59,18 +58,21 @@
             break;
           }
         } else {
-          if ([bestString characterAtIndex:i] != [thisString characterAtIndex:i]) {
+          if ([bestString characterAtIndex:i] 
+              != [thisString characterAtIndex:i]) {
             bestString = [bestString substringToIndex:i];
             break;
           }
         }
       }
+      
       // Truncate the prefix to the minimum length.
-      if ([bestString length] > 0 &&
+      bestLength = [bestString length];
+      if (bestLength > 0 &&
           minLength > 0 &&
-          minLength < [bestString length]) {
+          minLength < bestLength) {
         if (backwards) {
-          bestString = [bestString substringFromIndex:([bestString length] - minLength)];
+          bestString = [bestString substringFromIndex:(bestLength - minLength)];
         } else {
           bestString = [bestString substringToIndex:minLength];
         }
@@ -80,17 +82,19 @@
   
   // TODO(altse): Move the breaker characters definition to a common header.
   // TODO(alcor): Include hypen as a breaker, but take care of In-N-Out cases
-  NSCharacterSet *breakerSet = [NSCharacterSet characterSetWithCharactersInString:@":|*><"];
-  
-  NSUInteger breakerOffset = [bestString rangeOfCharacterFromSet:breakerSet
-                                                         options:backwards ? 0 : NSBackwardsSearch].location;
+  NSCharacterSet *breakerSet 
+    = [NSCharacterSet characterSetWithCharactersInString:@":|*><"];
+  NSStringCompareOptions opts = backwards ? 0 : NSBackwardsSearch;
+  NSUInteger breakerOffset 
+    = [bestString rangeOfCharacterFromSet:breakerSet options:opts].location;
   
   // Also check for a hyphen with spaces around. We special case this to avoid
   // breaking on things like In-N-Out
   if (breakerOffset == NSNotFound) {
-    breakerOffset = [bestString rangeOfString:@" - "
-                                      options:backwards ? 0 : NSBackwardsSearch].location;
-    if (breakerOffset != NSNotFound) breakerOffset++; // Move right one character to skip the space
+    breakerOffset 
+      = [bestString rangeOfString:@" - " options:opts].location;
+    // Move right one character to skip the space
+    if (breakerOffset != NSNotFound) breakerOffset++; 
   }
   
   // Don't accept a common prefix unless ends in a breaker
@@ -99,12 +103,16 @@
   if (backwards) {
     //Include an extra character if space is the next character
     if ((breakerOffset > 0) &&
-        ([bestString characterAtIndex:breakerOffset - 1] == ' ')) breakerOffset--;
+        ([bestString characterAtIndex:breakerOffset - 1] == ' ')) {
+      breakerOffset--;
+    }
     return [bestString substringFromIndex:breakerOffset];
   } else {
     //Include an extra character if space is the next character
     if (([bestString length] > breakerOffset + 1) &&
-        ([bestString characterAtIndex:breakerOffset + 1] == ' ')) breakerOffset++;
+        ([bestString characterAtIndex:breakerOffset + 1] == ' ')) {
+      breakerOffset++;
+    }
     return [bestString substringToIndex:breakerOffset + 1];
   }
   return nil;

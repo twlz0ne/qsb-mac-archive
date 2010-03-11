@@ -1,5 +1,5 @@
 //
-//  NSArray+HGSCommonPrefixDetection.h
+//  NSArray+CommonPrefixDetection.h
 //  GoogleMobile
 //
 //  Created by J. Nicholas Jitkoff on 6/5/08.
@@ -34,6 +34,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSArray (HGSCommonPrefixDetection)
+@interface NSArray (CorePluginCommonPrefixDetection)
 - (NSString *)commonPrefixForStringsWithOptions:(NSStringCompareOptions)options;
 @end

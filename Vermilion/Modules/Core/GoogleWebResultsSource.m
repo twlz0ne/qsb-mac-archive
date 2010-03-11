@@ -1,5 +1,5 @@
 //
-//  HGSGoogleWebResultsSource.m
+//  GoogleWebResultsSource.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -31,13 +31,14 @@
 //
 
 #import "Vermilion/Vermilion.h"
-#import "JSON/JSON.h"
+#import <JSON/JSON.h>
 #import <GData/GDataHTTPFetcher.h>
-#import "GTMMethodCheck.h"
-#import "GTMNSDictionary+URLArguments.h"
-#import "GTMNSString+HTML.h"
-#import "GTMNSString+URLArguments.h"
-#import "NSArray+HGSCommonPrefixDetection.h"
+#import <GTM/GTMMethodCheck.h>
+#import <GTM/GTMNSDictionary+URLArguments.h>
+#import <GTM/GTMNSString+HTML.h>
+#import <GTM/GTMNSString+URLArguments.h>
+
+#import "NSArray+CommonPrefixDetection.h"
 #import "NSString+ReadableURL.h"
 
 #if TARGET_OS_IPHONE
@@ -52,7 +53,7 @@
 }
 @end
 
-@interface HGSGoogleWebResultsSource : HGSSearchSource
+@interface GoogleWebResultsSource : HGSSearchSource
 @end
 
 NSString *const kJSONQueryURL = @"http://ajax.googleapis.com/ajax/services/search/web";
@@ -324,7 +325,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
 
 @end
 
-@implementation HGSGoogleWebResultsSource
+@implementation GoogleWebResultsSource
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   BOOL isValid = [super isValidSourceForQuery:query];

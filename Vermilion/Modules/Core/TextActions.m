@@ -76,7 +76,7 @@
   HGSResultArray *directObjects 
     = [info objectForKey:kHGSActionDirectObjectsKey];
   HGSResultArray *files
-    = [info objectForKey:@"com.google.text.action.appendtofile.file"];
+    = [info objectForKey:@"com.google.core.text.action.appendtofile.file"];
   NSError *error = nil;
   for (HGSResult *text in directObjects) {
     NSDictionary *value 

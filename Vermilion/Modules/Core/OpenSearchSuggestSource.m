@@ -1,5 +1,5 @@
 //
-//  HGSOpenSearchSuggestSource.m
+//  OpenSearchSuggestSource.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -30,10 +30,10 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSOpenSearchSuggestSource.h"
+#import "HGSSuggestSource.h"
 
-#import "GTMMethodCheck.h"
-#import "GTMNSString+URLArguments.h"
+#import <GTM/GTMMethodCheck.h>
+#import <GTM/GTMNSString+URLArguments.h>
 
 #if TARGET_OS_IPHONE
 #import "GMOCompletionSourceNotifications.h"
@@ -46,7 +46,10 @@
 
 static const int kGMODefaultMaxResults = 1;
 
-@implementation HGSOpenSearchSuggestSource
+@interface OpenSearchSuggestSource : HGSSuggestSource
+@end
+
+@implementation OpenSearchSuggestSource
 GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {

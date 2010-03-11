@@ -92,7 +92,7 @@
   HGSResultArray *directObjects 
     = [info objectForKey:kHGSActionDirectObjectsKey];
   HGSResultArray *apps 
-    = [info objectForKey:@"com.google.filesystem.action.openwith.application"];
+    = [info objectForKey:@"com.google.core.filesystem.action.openwith.application"];
   NSArray *appURLs = [apps urls];
   NSArray *directURLs = [directObjects urls];
   BOOL wasGood = YES;
@@ -447,7 +447,7 @@
   HGSResultArray *directObjects 
     = [info objectForKey:kHGSActionDirectObjectsKey];
   HGSResultArray *names
-    = [info objectForKey:@"com.google.filesystem.action.rename.name"];
+    = [info objectForKey:@"com.google.core.filesystem.action.rename.name"];
   if ([directObjects count] && [names count]) {
     HGSResult *nameResult = [names objectAtIndex:0];
     NSDictionary *value 
@@ -488,7 +488,7 @@
   HGSResultArray *directObjects 
     = [info objectForKey:kHGSActionDirectObjectsKey];
   HGSResultArray *comments
-    = [info objectForKey:@"com.google.filesystem.action.setcomments.comment"];
+    = [info objectForKey:@"com.google.core.filesystem.action.setcomments.comment"];
   if ([directObjects count] && [comments count]) {
     HGSResult *commentResult = [comments objectAtIndex:0];
     NSDictionary *value 
@@ -527,7 +527,7 @@
   HGSResultArray *directObjects 
     = [info objectForKey:kHGSActionDirectObjectsKey];
   HGSResultArray *directories
-    = [info objectForKey:@"com.google.filesystem.action.moveto.location"];
+    = [info objectForKey:@"com.google.core.filesystem.action.moveto.location"];
   if ([directObjects count] && [directories count]) {
     HGSResult *dirResult = [directories objectAtIndex:0];
     NSString *dir = [dirResult filePath];

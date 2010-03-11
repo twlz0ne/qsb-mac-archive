@@ -272,7 +272,7 @@
      @"SLFilesSourceTest.testUtiFilter.identifier", kHGSExtensionIdentifierKey,
      @"testUtiFilter", kHGSExtensionUserVisibleNameKey,
      @"testPath", kHGSExtensionIconImagePathKey,
-     (NSString*)kUTTypeData, kHGSSearchSourceUTIsToExcludeFromDiskSources,
+     (NSString*)kUTTypeData, kHGSSearchSourceUTIsToExcludeFromDiskSourcesKey,
      nil];
   [[[bundleMock expect] andReturn:@"testUtiFilter"] 
    qsb_localizedInfoPListStringForKey:@"testUtiFilter"];

@@ -1,6 +1,5 @@
 //
-//  NSArray+HGSCommonPrefixDetectionTest.m
-//  GoogleMobile
+//  NSArray+CommonPrefixDetectionTest.m
 //
 //  Created by Alastair Tse on 2008/06/10.
 //  Copyright (c) 2008 Google Inc. All rights reserved.
@@ -32,71 +31,69 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "NSArray+HGSCommonPrefixDetectionTest.h"
-#import "NSArray+HGSCommonPrefixDetection.h"
+#import "GTMSenTestCase.h"
+#import "NSArray+CommonPrefixDetection.h"
+
+@interface NSArray_HGSCommonPrefixDetectionTest : SenTestCase
+@end
 
 @implementation NSArray_HGSCommonPrefixDetectionTest
 
 - (void)testCommonPrefixForStringsWithOptionsForwards {
-  NSArray *strings = [NSArray arrayWithObjects:@"abc", @"abcd", @"abd", @"ab", nil];
-  STAssertNil([strings commonPrefixForStringsWithOptions:NSLiteralSearch],
+  NSArray *strings 
+    = [NSArray arrayWithObjects:@"abc", @"abcd", @"abd", @"ab", nil];
+  STAssertNil([strings commonPrefixForStringsWithOptions:0],
               @"Got common prefix even though there are no breakers");
 
   strings = [NSArray arrayWithObjects:@"ab-c", @"ab-cd", @"ab-d", @"ab", nil];
-  STAssertNil([strings commonPrefixForStringsWithOptions:NSLiteralSearch],
+  STAssertNil([strings commonPrefixForStringsWithOptions:0],
               @"Found common prefix even though it does not have a breaker");
 
   strings = [NSArray arrayWithObjects:@"ab-c", @"ab-cd", @"ab-d", nil];
-  STAssertEqualObjects([strings commonPrefixForStringsWithOptions:NSLiteralSearch],
-                       @"ab-",
-                       nil);
+  STAssertNil([strings commonPrefixForStringsWithOptions:0],
+              @"Found prefix even though - does not have spaces around it");
 
   strings = [NSArray arrayWithObjects:@"", nil];
-  STAssertNil([strings commonPrefixForStringsWithOptions:NSLiteralSearch],
-              nil);
+  STAssertNil([strings commonPrefixForStringsWithOptions:0], nil);
 
   strings = [NSArray arrayWithObjects:@"", @"", nil];
-  STAssertNil([strings commonPrefixForStringsWithOptions:NSLiteralSearch],
-              nil);
+  STAssertNil([strings commonPrefixForStringsWithOptions:0], nil);
 
   strings = [NSArray arrayWithObjects:@"", @"", @"abc", nil];
-  STAssertNil([strings commonPrefixForStringsWithOptions:NSLiteralSearch],
-              nil);
+  STAssertNil([strings commonPrefixForStringsWithOptions:0], nil);
 
-  strings = [NSArray arrayWithObjects:@"Amazon - John Mayer", @"Amazon - Google", nil];
-  STAssertEqualObjects([strings commonPrefixForStringsWithOptions:NSLiteralSearch],
-                       @"Amazon - ",
-                       nil);
-
+  strings = [NSArray arrayWithObjects:
+             @"Amazon - John Mayer", @"Amazon - Google", nil];
+  STAssertEqualObjects([strings commonPrefixForStringsWithOptions:0],
+                       @"Amazon - ",nil);
+  
   strings = [NSArray arrayWithObjects:@"---", @"--", nil];
-  STAssertEqualObjects([strings commonPrefixForStringsWithOptions:NSLiteralSearch],
-                       @"--",
-                       nil);
+  STAssertNil([strings commonPrefixForStringsWithOptions:0],
+              @"Shouldn't have found prefix");
 }
 
 - (void)testCommonPrefixForStringsWithOptionsBackwards {
-  NSArray *strings = [NSArray arrayWithObjects:@"xyz", @"wxyz", @"vwxyz", @"yz", nil];
-  STAssertNil([strings commonPrefixForStringsWithOptions:NSLiteralSearch],
+  NSArray *strings = [NSArray arrayWithObjects:
+                      @"xyz", @"wxyz", @"vwxyz", @"yz", nil];
+  STAssertNil([strings commonPrefixForStringsWithOptions:NSBackwardsSearch],
               @"Got common prefix even though there are not breakers");
 
   strings = [NSArray arrayWithObjects:@"c-ab", @"cd-ab", @"d-ab", @"ab", nil];
   STAssertNil([strings commonPrefixForStringsWithOptions:NSBackwardsSearch],
               @"Found common prefix even though it does not have a breaker");
 
-  strings = [NSArray arrayWithObjects:@"x-yz", @"w-yz", @"k-yz", nil];
+  strings = [NSArray arrayWithObjects:@"x - yz", @"w - yz", @"k - yz", nil];
   STAssertEqualObjects([strings commonPrefixForStringsWithOptions:NSBackwardsSearch],
-                       @"-yz",
-                       nil);
+                       @" - yz", nil);
 
-  strings = [NSArray arrayWithObjects:@"amazon-a", @"amazon-a", @"amazon-a", nil];
+  strings = [NSArray arrayWithObjects:
+             @"amazon - a", @"amazon - a", @"amazon - a", nil];
   STAssertEqualObjects([strings commonPrefixForStringsWithOptions:NSBackwardsSearch],
-                       @"-a",
-                       nil);
+                       @" - a", nil);
 
   strings = [NSArray arrayWithObjects:@"-a", @"-a", @"-a", nil];
-  STAssertEqualObjects([strings commonPrefixForStringsWithOptions:NSBackwardsSearch],
-                       @"-a",
-                       nil);
+  STAssertNil([strings commonPrefixForStringsWithOptions:NSBackwardsSearch],
+              nil);
 
   strings = [NSArray arrayWithObjects:@"", nil];
   STAssertNil([strings commonPrefixForStringsWithOptions:NSBackwardsSearch],
@@ -111,14 +108,14 @@
   STAssertNil([strings commonPrefixForStringsWithOptions:NSBackwardsSearch],
               nil);
 
-  strings = [NSArray arrayWithObjects:@"blah blah | liquidx", @"ho | liquidx", nil];
+  strings = [NSArray arrayWithObjects:
+             @"blah blah | liquidx", @"ho | liquidx", nil];
   STAssertEqualObjects([strings commonPrefixForStringsWithOptions:NSBackwardsSearch],
                        @" | liquidx",
                        nil);
 
   strings = [NSArray arrayWithObjects:@"---", @"--", nil];
-  STAssertEqualObjects([strings commonPrefixForStringsWithOptions:NSBackwardsSearch],
-                       @"--",
-                       nil);
+  STAssertNil([strings commonPrefixForStringsWithOptions:0],
+              @"Shouldn't have found prefix");
 }
 @end

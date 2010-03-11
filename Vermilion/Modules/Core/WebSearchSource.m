@@ -1,5 +1,5 @@
 //
-//  HGSWebSearchSource.m
+//  WebSearchSource.m
 //
 //  Copyright (c) 2008 Google Inc. All rights reserved.
 //
@@ -40,7 +40,7 @@
 // TODO(dmaclach): should this be off webpage?
 #define kHGSTypeSearchCorpus @"searchcorpus"
 
-@interface HGSWebSearchSource : HGSCallbackSearchSource
+@interface WebSearchSource : HGSCallbackSearchSource
 + (NSString *)urlStringForQuery:(NSString *)queryString 
                    onSiteResult:(HGSResult *)result;
 @end
@@ -55,7 +55,7 @@ static NSString *const kWebSourceIconName = @"blue-searchhistory";
 
 static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchURLFormat";
 
-@implementation HGSWebSearchSource
+@implementation WebSearchSource
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   BOOL isValid = [super isValidSourceForQuery:query];

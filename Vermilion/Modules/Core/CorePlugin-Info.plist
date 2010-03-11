@@ -55,7 +55,7 @@
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
-			<string>HGSWebSearchSource</string>
+			<string>WebSearchSource</string>
 			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 			<key>HGSExtensionPoint</key>
@@ -71,7 +71,7 @@
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
-			<string>HGSGoogleWebResultsSource</string>
+			<string>GoogleWebResultsSource</string>
 			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 			<key>HGSExtensionIdentifier</key>
@@ -101,7 +101,7 @@
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
-			<string>HGSOpenSearchSuggestSource</string>
+			<string>OpenSearchSuggestSource</string>
 			<key>HGSExtensionIsUserVisible</key>
 			<false/>
 			<key>HGSExtensionPoint</key>
@@ -141,7 +141,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>*</string>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.filesystem.action.open</string>
+			<string>com.google.core.filesystem.action.open</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -153,7 +153,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>*</string>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.text.action.largetype</string>
+			<string>com.google.core.text.action.largetype</string>
 			<key>HGSActionMustRunOnMainThread</key>
 			<true/>
 		</dict>
@@ -167,7 +167,7 @@
 			<key>HGSActionDirectObjectTypes</key>
 			<string>file.directory</string>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.filesystem.action.eject</string>
+			<string>com.google.core.filesystem.action.eject</string>
 			<key>HGSActionMustRunOnMainThread</key>
 			<true/>
 		</dict>
@@ -175,7 +175,7 @@
 			<key>HGSExtensionClass</key>
 			<string>FileSystemShowInFinderAction</string>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.qsb.filesystem.action.showinfinder</string>
+			<string>com.google.core.filesystem.action.showinfinder</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
@@ -193,7 +193,7 @@
 			<key>HGSExtensionClass</key>
 			<string>FileSystemQuickLookAction</string>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.qsb.filesystem.action.quicklook</string>
+			<string>com.google.core.filesystem.action.quicklook</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
@@ -211,7 +211,7 @@
 			<key>HGSExtensionClass</key>
 			<string>FileSystemGetInfoAction</string>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.qsb.filesystem.action.getinfo</string>
+			<string>com.google.core.filesystem.action.getinfo</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
@@ -225,7 +225,7 @@
 			<key>HGSExtensionClass</key>
 			<string>FileSystemOpenAgainAction</string>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.qsb.filesystem.action.openagain</string>
+			<string>com.google.core.filesystem.action.openagain</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
@@ -245,14 +245,14 @@
 			<key>HGSActionArguments</key>
 			<dict>
 				<key>HGSActionArgumentIdentifier</key>
-				<string>com.google.filesystem.action.openwith.application</string>
+				<string>com.google.core.filesystem.action.openwith.application</string>
 				<key>HGSActionArgumentSupportedTypes</key>
 				<string>file.application</string>
 				<key>HGSActionArgumentClass</key>
 				<string>FileSystemOpenActionApplicationArgument</string>
 			</dict>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.filesystem.action.openwith</string>
+			<string>com.google.core.filesystem.action.openwith</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -266,12 +266,12 @@
 			<key>HGSActionArguments</key>
 			<dict>
 				<key>HGSActionArgumentIdentifier</key>
-				<string>com.google.filesystem.action.rename.name</string>
+				<string>com.google.core.filesystem.action.rename.name</string>
 				<key>HGSActionArgumentSupportedTypes</key>
 				<string>text.userinput</string>
 			</dict>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.filesystem.action.rename</string>
+			<string>com.google.core.filesystem.action.rename</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -285,12 +285,12 @@
 			<key>HGSActionArguments</key>
 			<dict>
 				<key>HGSActionArgumentIdentifier</key>
-				<string>com.google.filesystem.action.moveto.location</string>
+				<string>com.google.core.filesystem.action.moveto.location</string>
 				<key>HGSActionArgumentSupportedTypes</key>
 				<string>file.directory</string>
 			</dict>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.filesystem.action.moveto</string>
+			<string>com.google.core.filesystem.action.moveto</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -304,12 +304,12 @@
 			<key>HGSActionArguments</key>
 			<dict>
 				<key>HGSActionArgumentIdentifier</key>
-				<string>com.google.text.action.appendtofile.file</string>
+				<string>com.google.core.text.action.appendtofile.file</string>
 				<key>HGSActionArgumentSupportedTypes</key>
 				<string>file.text</string>
 			</dict>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.text.action.appendtofile</string>
+			<string>com.google.core.text.action.appendtofile</string>
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
@@ -325,12 +325,24 @@
 			<key>HGSActionArguments</key>
 			<dict>
 				<key>HGSActionArgumentIdentifier</key>
-				<string>com.google.filesystem.action.setcomments.comment</string>
+				<string>com.google.core.filesystem.action.setcomments.comment</string>
 				<key>HGSActionArgumentSupportedTypes</key>
 				<string>text.userinput</string>
 			</dict>
 			<key>HGSExtensionIdentifier</key>
-			<string>com.google.filesystem.action.setcomment</string>
+			<string>com.google.core.filesystem.action.setcomment</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>GoogleShortenURLAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Shorten URL</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>webpage</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.core.url.action.shortenurl</string>
 		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>

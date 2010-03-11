@@ -57,3 +57,6 @@
 
 /* A label denoting the name of the Reveal In Finder action which is a synonym for Show in Finder. Do not include ^ in localization. */
 "^Reveal In Finder…" = "Reveal In Finder…";
+
+/* A label denoting the name of the Shorten URL action which allows you to Shorten URLs. Do not include ^ in localization. */
+"^Shorten URL" = "Shorten URL";

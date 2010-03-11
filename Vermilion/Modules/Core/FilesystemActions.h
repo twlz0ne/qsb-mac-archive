@@ -30,4 +30,4 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#define kFileSystemOpenActionIdentifier @"com.google.filesystem.action.open"
+#define kFileSystemOpenActionIdentifier @"com.google.core.filesystem.action.open"
