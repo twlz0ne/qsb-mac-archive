@@ -37,24 +37,25 @@
 #import <Vermilion/Vermilion.h>
 #import <Sparkle/Sparkle.h>
 
+#import <GTM/GTMCarbonEvent.h>
+#import <GTM/GTMGarbageCollection.h>
+#import <GTM/GTMGeometryUtils.h>
+#import <GTM/GTMMethodCheck.h>
+#import <GTM/GTMSystemVersion.h>
+#import <GTM/GTMUnitTestingUtilities.h>
+#import <GTM/GTMHotKeyTextField.h>
+#import <GTM/GTMNSWorkspace+Running.h>
+#import <GTM/GTMNSObject+KeyValueObserving.h>
+
 #import "QSBHGSObjectSpecifiers.h"
 #import "QSBKeyMap.h"
 #import "QSBPreferences.h"
 #import "QSBPreferenceWindowController.h"
 #import "QSBHGSResult+NSPasteboard.h"
-#import "GTMCarbonEvent.h"
 #import "QSBUserMessenger.h"
-#import "GTMGarbageCollection.h"
-#import "GTMGeometryUtils.h"
-#import "GTMMethodCheck.h"
-#import "GTMSystemVersion.h"
-#import "GTMUnitTestingUtilities.h"
 #import "QSBSearchWindowController.h"
-#import "GTMHotKeyTextField.h"
-#import "GTMNSWorkspace+Running.h"
 #import "QSBHGSDelegate.h"
 #import "QSBResultsWindowController.h"
-#import "GTMNSObject+KeyValueObserving.h"
 #import "QLUIPrivate.h"
 #import "PFMoveApplication.h"
 #import "QSBDebugWindowController.h"
