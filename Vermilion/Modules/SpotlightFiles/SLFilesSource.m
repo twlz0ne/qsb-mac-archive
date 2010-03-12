@@ -165,8 +165,17 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
       }
     }
     NSUInteger count = MDQueryGetResultCount(mdTopQuery_);
-    HGSTypeFilter *filter = [HGSTypeFilter filterWithDoesNotConformTypes:[NSSet setWithObject:kHGSTypeSuggest]];
-    [resultCountByFilter setObject:[NSNumber numberWithUnsignedInteger:count]
+    NSNumber *nsCount = [NSNumber numberWithUnsignedInteger:count];
+    
+    // Two common sets we get asked for is the complete set and the set
+    // without suggestions. We will return the same value for both.
+    NSSet *suggestSet = [NSSet setWithObject:kHGSTypeSuggest];
+    HGSTypeFilter *filter 
+      = [HGSTypeFilter filterWithDoesNotConformTypes:suggestSet];
+    [resultCountByFilter setObject:nsCount
+                            forKey:filter];
+    filter = [HGSTypeFilter filterAllowingAllTypes];
+    [resultCountByFilter setObject:nsCount
                             forKey:filter];
     resultCountByFilter_ = [resultCountByFilter retain];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
