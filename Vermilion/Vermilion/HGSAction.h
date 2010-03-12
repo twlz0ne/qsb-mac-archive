@@ -149,7 +149,7 @@
   the contents of |result|, but the base class ignores it.
   @result Defaults to generic action icon.
 */
-- (id)displayIconForResults:(HGSResultArray*)results;
+- (NSImage *)displayIconForResults:(HGSResultArray*)results;
 
 /*!
  Subclassers override to perform the action if the action does not return

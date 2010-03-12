@@ -239,7 +239,7 @@ NSString* const kHGSActionExcludedReturnedResultsTypesKey
   return @"red-gear";
 }
 
-- (id)displayIconForResults:(HGSResultArray *)result {
+- (NSImage *)displayIconForResults:(HGSResultArray *)result {
   // default to our init icon
   return [self icon];
 }

@@ -208,36 +208,41 @@
   return wasGood;
 }
 
-- (id)displayIconForResults:(HGSResultArray*)results {
+- (NSImage *)displayIconForResults:(HGSResultArray*)results {
   NSImage *icon = nil;
-  if ([results count] > 1) {
-    icon = [super displayIconForResults:results];
-  } else {
-    HGSResult *result = [results objectAtIndex:0];
-    NSURL *url = [result url];
-  
-    BOOL isDirectory = NO;
-    if ([url isFileURL]) {
-      [[NSFileManager defaultManager] fileExistsAtPath:[url path]
-                                           isDirectory:&isDirectory];
-    }
-    
-    if (isDirectory) {
-      NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-      NSString *finderPath
-        = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
-      icon = [ws iconForFile:finderPath];
+  NSUInteger resultsCount = [results count];
+  if (resultsCount) {
+    if ([results count] > 1) {
+      icon = [super displayIconForResults:results];
     } else {
-      CFURLRef appURL = NULL;
-      if (url
-          && noErr == LSGetApplicationForURL((CFURLRef)url,
-                                             kLSRolesViewer | kLSRolesEditor,
-                                             NULL, &appURL)) {
-        GTMCFAutorelease(appURL);
-        icon
-          = [[NSWorkspace sharedWorkspace] iconForFile:[(NSURL *)appURL path]];
+      HGSResult *result = [results objectAtIndex:0];
+      NSURL *url = [result url];
+    
+      BOOL isDirectory = NO;
+      if ([url isFileURL]) {
+        [[NSFileManager defaultManager] fileExistsAtPath:[url path]
+                                             isDirectory:&isDirectory];
+      }
+      
+      if (isDirectory) {
+        NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+        NSString *finderPath
+          = [ws absolutePathForAppBundleWithIdentifier:@"com.apple.finder"];
+        icon = [ws iconForFile:finderPath];
+      } else {
+        CFURLRef appURL = NULL;
+        if (url
+            && noErr == LSGetApplicationForURL((CFURLRef)url,
+                                               kLSRolesViewer | kLSRolesEditor,
+                                               NULL, &appURL)) {
+          GTMCFAutorelease(appURL);
+          icon
+            = [[NSWorkspace sharedWorkspace] iconForFile:[(NSURL *)appURL path]];
+        }
       }
     }
+  } else {
+    icon = [super displayIconForResults:results];
   }
   return icon;
 }
@@ -352,17 +357,22 @@
   return success;
 }
 
-- (id)displayIconForResults:(HGSResultArray*)results {
+- (NSImage *)displayIconForResults:(HGSResultArray*)results {
   NSImage *icon = nil;
-  if ([results count] > 1) {
-    icon = [super displayIconForResults:results];
+  NSUInteger resultsCount = [results count];
+  if (resultsCount) {
+    if (resultsCount > 1) {
+      icon = [super displayIconForResults:results];
+    } else {
+      HGSResult *result = [results objectAtIndex:0];
+      NSString *path = [result filePath];
+      NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+      icon = [ws iconForFile:path];
+    }
+    icon = [self openAgainIconFromImage:icon];
   } else {
-    HGSResult *result = [results objectAtIndex:0];
-    NSString *path = [result filePath];
-    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-    icon = [ws iconForFile:path];
+    icon = [super displayIconForResults:results];
   }
-  icon = [self openAgainIconFromImage:icon];
   return icon;
 }
 
