@@ -33,6 +33,7 @@
 
 #import "QSBSearchWindowController.h"
 
+#import <objc/runtime.h>
 #import <GTM/GTMTypeCasting.h>
 #import <GTM/GTMMethodCheck.h>
 #import <GTM/GTMNSImage+Scaling.h>
@@ -885,10 +886,21 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 - (BOOL)textView:(NSTextView *)textView
     doCommandBySelector:(SEL)commandSelector {
   BOOL handled = NO;
-  NSTableView *tableView = [resultsWindowController_ activeTableView];
-  if ([tableView respondsToSelector:commandSelector]) {
-    [tableView doCommandBySelector:commandSelector];
-    handled = YES;
+  
+  // If our results aren't visible, make them so.
+  if (sel_isEqual(commandSelector, @selector(moveDown:))) {
+    if ([[resultsWindowController_ window] ignoresMouseEvents]) {
+      [resultsWindowController_ showResultsWindow:self];
+      handled = YES;
+    }
+  }
+  
+  if (!handled) {
+    NSTableView *tableView = [resultsWindowController_ activeTableView];
+    if ([tableView respondsToSelector:commandSelector]) {
+      [tableView doCommandBySelector:commandSelector];
+      handled = YES;
+    }
   }
   return handled;
 }
