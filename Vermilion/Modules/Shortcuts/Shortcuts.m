@@ -55,9 +55,10 @@
 #import "Shortcuts.h"
 #endif  // TARGET_OS_IPHONE
 
-#import "GTMMethodCheck.h"
-#import "GTMObjectSingleton.h"
-#import "GTMExceptionalInlines.h"
+#import <GTM/GTMMethodCheck.h>
+#import <GTM/GTMObjectSingleton.h>
+#import <GTM/GTMExceptionalInlines.h>
+#import <GTM/GTMTypeCasting.h>
 
 static NSString *const kHGSShortcutsDictionaryKey 
   = @"kHGSShortcutsDictionaryKey";
@@ -388,15 +389,20 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
 
 - (void)updateShortcut:(NSNotification *)notification {
   NSDictionary *userInfo = [notification userInfo];
-  HGSTokenizedString *string = [userInfo objectForKey:kShortcutsShortcutKey];
-  HGSScoredResult *result = [userInfo objectForKey:kShortcutsResultKey];
+  NSString *string 
+    = GTM_STATIC_CAST(NSString, [userInfo objectForKey:kShortcutsShortcutKey]);
+  HGSScoredResult *result 
+    = GTM_STATIC_CAST(HGSScoredResult, 
+                      [userInfo objectForKey:kShortcutsResultKey]);
   if (!string) {
-    HGSLog(@"No Tokenized String at updateShortcut:");
+    HGSLog(@"Bad String at updateShortcut:");
   }
   if (!result) {
-    HGSLog(@"No Result at updateShortcut:");
+    HGSLog(@"Bad Result at updateShortcut:");
   }
-  [self updateShortcutForTokenizedString:string withRankedResult:result];
+  HGSTokenizedString *tokenizedString = [HGSTokenizer tokenizeString:string];
+  [self updateShortcutForTokenizedString:tokenizedString
+                        withRankedResult:result];
 }
 
 // When the plugin is being uninstalled, write out shortcuts, and invalidate 

@@ -31,5 +31,5 @@
 //
 
 #define kShortcutsUpdateShortcutNotification @"ShortcutsUpdateShortcutNotification"
-#define kShortcutsShortcutKey @"ShortcutsShortcut"
-#define kShortcutsResultKey @"ShortcutsResult"
+#define kShortcutsShortcutKey @"ShortcutsShortcut"  // NSString
+#define kShortcutsResultKey @"ShortcutsResult"  // HGSScored Result
