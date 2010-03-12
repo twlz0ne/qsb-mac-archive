@@ -207,7 +207,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
   if (!googleResultArray) return;
 
   HGSResult *pivotObject = [[self query] pivotObject];
-  id image = [pivotObject valueForKey:kHGSObjectAttributeIconKey];
 
   NSArray *unescapedNames = [googleResultArray valueForKeyPath:@"titleNoFormatting.gtm_stringByUnescapingFromHTML"];
   if (!unescapedNames) return;
@@ -230,6 +229,20 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
     NSString *urlString = [[resultDict objectForKey:@"url"] gtm_stringByUnescapingFromHTML];
     if (!urlString) continue;
     urlString = [urlString gtm_stringByUnescapingFromURLArgument];
+    NSImage *image = nil;
+    NSString *imageURL = nil;
+    
+    // Get a small preview icon from google.
+    NSString *tableImageURL = [resultDict objectForKey:@"tbUrl"];
+    tableImageURL = [tableImageURL gtm_stringByUnescapingFromHTML];
+    NSArray *fileTypes = [NSImage imageFileTypes];
+    NSString *extension = [tableImageURL pathExtension];
+    if ([fileTypes containsObject:extension]) {
+      imageURL = tableImageURL;
+    } else {
+      image = [pivotObject valueForKey:kHGSObjectAttributeIconKey];
+    }
+
     NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
     if ([resultClass isEqualToString:@"GlocalSearch"]) {
       NSString *address = [resultDict objectForKey:@"streetAddress"];
@@ -262,7 +275,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
         image = [NSImage imageNamed:@"web-nav"];
       }
     }
-    [attributes setObject:image forKey:kHGSObjectAttributeIconKey];
+    if (imageURL) {
+      [attributes setObject:imageURL forKey:kHGSObjectAttributeIconPreviewFileKey];
+    } else if (image) {
+      [attributes setObject:image forKey:kHGSObjectAttributeIconKey];
+    }
+    
 #if TARGET_OS_IPHONE
     // The phone doesn't support attributed strings :(
     if (content) {
@@ -332,8 +350,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
   if (isValid) {
     HGSResult *pivotObject = [query pivotObject];
     NSURL *url = [pivotObject url];
+#if TARGET_OS_IPHONE
     NSNumber *hideResults 
       = [pivotObject valueForKey:@"HGSObjectAttributeGoogleAPIAlwaysHideResults"];
+#else 
+    NSNumber *hideResults = nil;
+#endif
     if ([hideResults boolValue]) {
       isValid = NO;
     } else if ([[url scheme] isEqualToString:@"http"]) {
