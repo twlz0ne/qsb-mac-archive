@@ -941,6 +941,10 @@
 		8B847C34114996CD002C460B /* NSArray+CommonPrefixDetectionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B847C33114996CD002C460B /* NSArray+CommonPrefixDetectionTest.m */; };
 		8B847E2D1149977F002C460B /* NSArray+CommonPrefixDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B847B7A11499645002C460B /* NSArray+CommonPrefixDetection.m */; };
 		8B847FE311499F7F002C460B /* URLActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B847FE211499F7F002C460B /* URLActions.m */; };
+		8B8481E81149B0B7002C460B /* HGSSuggestSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8481E61149B0B7002C460B /* HGSSuggestSource.m */; };
+		8B8481E91149B0B7002C460B /* HGSSuggestSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B8481E71149B0B7002C460B /* HGSSuggestSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B8481EB1149B0C1002C460B /* HGSSuggestSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8481EA1149B0C1002C460B /* HGSSuggestSourceTest.m */; };
+		8B8482551149B520002C460B /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
 		8B8516C9100278CC00880329 /* QSBResultIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8516C6100278CC00880329 /* QSBResultIconView.m */; };
 		8B85296E1006931E00880329 /* WebBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B85296D1006931E00880329 /* WebBookmarksSource.m */; };
 		8B852A381006AC7900880329 /* FirefoxBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B852A371006AC7900880329 /* FirefoxBookmarksSource.m */; };
@@ -1101,7 +1105,6 @@
 		8BC685570F5ED38C003B5C6A /* SetUpAccount.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8BC685550F5ED38C003B5C6A /* SetUpAccount.xib */; };
 		8BC771C3111351AA008B08BD /* MDItemPrivate.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BC771BF111351AA008B08BD /* MDItemPrivate.c */; };
 		8BC771C4111351AA008B08BD /* MDQueryPrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC771C2111351AA008B08BD /* MDQueryPrivate.m */; };
-		8BCCCC7E0EC508C800688D64 /* HGSSuggestSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F9FF9140DD27A530040408E /* HGSSuggestSource.m */; };
 		8BCCD2B10EC8E67300688D64 /* closeDiskTray.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A20EC8E67300688D64 /* closeDiskTray.icns */; };
 		8BCCD2B30EC8E67300688D64 /* ejectDiskTray.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A40EC8E67300688D64 /* ejectDiskTray.icns */; };
 		8BCCD2B40EC8E67300688D64 /* emptyTrash.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A50EC8E67300688D64 /* emptyTrash.icns */; };
@@ -1689,6 +1692,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
+		};
+		8B84820E1149B517002C460B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B61289E0F4641BF00E29B40;
+			remoteInfo = JSON;
 		};
 		8B852B9A1007AD1B00880329 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2470,8 +2480,6 @@
 		7F9CDD030DD8C37F007C4BF4 /* SearchPulldownActive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SearchPulldownActive.png; sourceTree = "<group>"; };
 		7F9CDD7F0DD8D69B007C4BF4 /* QSBMenuButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBMenuButtonCell.h; sourceTree = "<group>"; };
 		7F9CDD800DD8D69B007C4BF4 /* QSBMenuButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMenuButtonCell.m; sourceTree = "<group>"; };
-		7F9FF9130DD27A530040408E /* HGSSuggestSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSuggestSource.h; sourceTree = "<group>"; };
-		7F9FF9140DD27A530040408E /* HGSSuggestSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSuggestSource.m; sourceTree = "<group>"; };
 		7FA450BA0EF88741006FD4E9 /* QSBDraggableImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBDraggableImageView.m; sourceTree = "<group>"; };
 		7FA450BB0EF88741006FD4E9 /* QSBDraggableImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBDraggableImageView.h; sourceTree = "<group>"; };
 		7FE253790F5CDA23004FE5A6 /* action-videochat-icon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "action-videochat-icon.pdf"; sourceTree = "<group>"; };
@@ -3266,6 +3274,9 @@
 		8B847B9711499653002C460B /* CorePlugin Test.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CorePlugin Test.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B847C33114996CD002C460B /* NSArray+CommonPrefixDetectionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+CommonPrefixDetectionTest.m"; sourceTree = "<group>"; };
 		8B847FE211499F7F002C460B /* URLActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLActions.m; sourceTree = "<group>"; };
+		8B8481E61149B0B7002C460B /* HGSSuggestSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSuggestSource.m; sourceTree = "<group>"; };
+		8B8481E71149B0B7002C460B /* HGSSuggestSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSuggestSource.h; sourceTree = "<group>"; };
+		8B8481EA1149B0C1002C460B /* HGSSuggestSourceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSuggestSourceTest.m; sourceTree = "<group>"; };
 		8B8516C5100278CC00880329 /* QSBResultIconView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBResultIconView.h; sourceTree = "<group>"; };
 		8B8516C6100278CC00880329 /* QSBResultIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBResultIconView.m; sourceTree = "<group>"; };
 		8B85296D1006931E00880329 /* WebBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebBookmarksSource.m; sourceTree = "<group>"; };
@@ -4065,6 +4076,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B8482551149B520002C460B /* JSON.framework in Frameworks */,
 				8B1490A80F715781002E05FA /* OCMock.framework in Frameworks */,
 				8B77DCDD0F27A31000FA2A3C /* GTM.framework in Frameworks */,
 				E4D28B330DF9AA0C00FC6C31 /* AppKit.framework in Frameworks */,
@@ -4635,15 +4647,6 @@
 				7F9417360EEF533B0049AE06 /* SharedFileListSource.m */,
 			);
 			path = SharedFileList;
-			sourceTree = "<group>";
-		};
-		7F9FF9120DD27A530040408E /* Suggest */ = {
-			isa = PBXGroup;
-			children = (
-				7F9FF9130DD27A530040408E /* HGSSuggestSource.h */,
-				7F9FF9140DD27A530040408E /* HGSSuggestSource.m */,
-			);
-			path = Suggest;
 			sourceTree = "<group>";
 		};
 		7FF01A070EB08A1B001A2C7B /* Terminal */ = {
@@ -5514,7 +5517,6 @@
 				5AEC5C550FBA2824005608EA /* SharedScript */,
 				8B3EF7660EF2C7CB0036FFBD /* Shortcuts */,
 				8B6F2D1D0DA2B83F0052CA40 /* SpotlightFiles */,
-				7F9FF9120DD27A530040408E /* Suggest */,
 				7FF01A070EB08A1B001A2C7B /* Terminal */,
 				5AF0EED80F61D1520041E0B9 /* Trash */,
 				F4E3B6F60EB66A7100CB713D /* Weather */,
@@ -5676,6 +5678,9 @@
 				7F3F75D80E152E6D001AF34E /* HGSSQLiteBackedCache.h */,
 				7F3F75D90E152E6D001AF34E /* HGSSQLiteBackedCache.m */,
 				7F3F75DB0E152E6D001AF34E /* HGSSQLiteBackedCacheTest.m */,
+				8B8481E61149B0B7002C460B /* HGSSuggestSource.m */,
+				8B8481E71149B0B7002C460B /* HGSSuggestSource.h */,
+				8B8481EA1149B0C1002C460B /* HGSSuggestSourceTest.m */,
 				F4D153580E9F9E2900C0EAA9 /* HGSTokenizer.h */,
 				F4D153590E9F9E2900C0EAA9 /* HGSTokenizer.mm */,
 				F4D1535A0E9F9E2900C0EAA9 /* HGSTokenizerTest.m */,
@@ -6331,6 +6336,7 @@
 				62917AAD112B5B9300653562 /* HGSGDataUploadAction.h in Headers */,
 				62B444D111417BF90028A679 /* HGSPathCellElement.h in Headers */,
 				8B062F051135A2D30003CC70 /* HGSActionArgument.h in Headers */,
+				8B8481E91149B0B7002C460B /* HGSSuggestSource.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7271,6 +7277,7 @@
 			dependencies = (
 				E4F5513B0DF730A0008A846E /* PBXTargetDependency */,
 				8B1490650F71576B002E05FA /* PBXTargetDependency */,
+				8B84820F1149B517002C460B /* PBXTargetDependency */,
 			);
 			name = "Vermilion Test";
 			productName = VermilionTest;
@@ -9403,6 +9410,7 @@
 				62917AAE112B5B9300653562 /* HGSGDataUploadAction.m in Sources */,
 				62B444D211417BF90028A679 /* HGSPathCellElement.m in Sources */,
 				8B062F061135A2D30003CC70 /* HGSActionArgument.m in Sources */,
+				8B8481E81149B0B7002C460B /* HGSSuggestSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9611,6 +9619,7 @@
 				6274BD83112C69D2008D56D7 /* HGSGDataUploadActionTest.m in Sources */,
 				62B445C4114197C80028A679 /* HGSPathCellElementTest.m in Sources */,
 				8B53352C11382B0E00B89BAA /* HGSActionArgumentTest.m in Sources */,
+				8B8481EB1149B0C1002C460B /* HGSSuggestSourceTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9638,7 +9647,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F40FECA80EC4DE5C00B32381 /* GTMMethodCheck.m in Sources */,
-				8BCCCC7E0EC508C800688D64 /* HGSSuggestSource.m in Sources */,
 				8B8B131C0EEBADE400E543D0 /* HGSBundle.m in Sources */,
 				8B8478B61149870B002C460B /* FilesystemDirectorySearchSource.m in Sources */,
 				8B8478B71149870B002C460B /* FilesystemActions.m in Sources */,
@@ -9865,6 +9873,11 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 8B6F2F420DA2C37C0052CA40 /* PBXContainerItemProxy */;
+		};
+		8B84820F1149B517002C460B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B61289E0F4641BF00E29B40 /* JSON */;
+			targetProxy = 8B84820E1149B517002C460B /* PBXContainerItemProxy */;
 		};
 		8B852B991007AD1B00880329 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
