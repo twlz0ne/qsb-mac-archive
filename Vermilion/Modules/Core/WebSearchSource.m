@@ -129,7 +129,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
     NSString *queryString = [tokenizedQuery originalString];
     NSString *url = [[self class] urlStringForQuery:queryString 
                                        onSiteResult:pivotObject];
-    if ([queryString length] && url) {
+    if (url) {
       BOOL searchInline = NO;
 #if TARGET_OS_IPHONE
       searchInline =
