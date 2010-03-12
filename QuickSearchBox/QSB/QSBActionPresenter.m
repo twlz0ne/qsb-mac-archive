@@ -95,7 +95,27 @@
   return action;
 }
 
-- (void)searchFor:(NSString *)text pivotObjects:(HGSResultArray *)pivotObjects {
+- (void)searchFor:(NSString *)text {
+  HGSTokenizedString *tokenizedQueryString = [HGSTokenizer tokenizeString:text];
+  QSBSearchController *activeController = [self activeSearchController];
+  [activeController setTokenizedQueryString:tokenizedQueryString
+                               pivotObjects:[activeController pivotObjects]];
+}
+
+- (void)pivotOnObjects:(HGSResultArray *)pivotObjects {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  QSBSearchController *oldSearchController = [self activeSearchController];
+  QSBSearchController *newController 
+    = [[[QSBSearchController alloc] initWithActionPresenter:self] autorelease];
+  NSDictionary *userInfo 
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       oldSearchController, kQSBOldSearchControllerKey,
+       newController, kQSBNewSearchControllerKey,
+       nil];
+  [nc postNotificationName:kQSBActionPresenterWillPivotNotification
+                    object:self userInfo:userInfo];
+  [actionModel_ pushSearchController:newController];
+   
   NSUInteger pivotCount = [pivotObjects count];
   QSBSearchController *activeController = [self activeSearchController];
   
@@ -105,22 +125,18 @@
       HGSMutableActionOperation *operation = [actionModel_ actionOperation];
       [operation setAction:action];
       HGSResultArray *directObjects 
-        = [[pivotObjects lastObject] valueForKey:kHGSObjectAttributeActionDirectObjectsKey];
+        = [[pivotObjects lastObject] 
+           valueForKey:kHGSObjectAttributeActionDirectObjectsKey];
       [operation setArgument:directObjects forKey:kHGSActionDirectObjectsKey];
       currentActionArgument_ = [action nextArgumentToFillIn:operation];
     }
   }
   
-  HGSTokenizedString *tokenizedQueryString = [HGSTokenizer tokenizeString:text];
-  [activeController setTokenizedQueryString:tokenizedQueryString
-                               pivotObjects:pivotObjects];
-}
-
-- (void)searchFor:(NSString *)text {
-  HGSTokenizedString *tokenizedQueryString = [HGSTokenizer tokenizeString:text];
-  QSBSearchController *activeController = [self activeSearchController];
-  [activeController setTokenizedQueryString:tokenizedQueryString
-                               pivotObjects:[activeController pivotObjects]];
+  [activeController setTokenizedQueryString:nil
+                               pivotObjects:pivotObjects]; 
+  [nc postNotificationName:kQSBActionPresenterDidPivotNotification
+                    object:self 
+                  userInfo:userInfo];  
 }
 
 - (void)reset {
@@ -234,28 +250,13 @@
 
 - (IBAction)qsb_pivotOnSelection:(id)sender {
   if (![self canPivot]) return;
-  
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  QSBSearchController *oldSearchController = [self activeSearchController];
-  QSBSearchController *newController 
-    = [[[QSBSearchController alloc] initWithActionPresenter:self] autorelease];
-  NSDictionary *userInfo 
-    = [NSDictionary dictionaryWithObjectsAndKeys:
-       oldSearchController, kQSBOldSearchControllerKey,
-       newController, kQSBNewSearchControllerKey,
-       nil];
-  [nc postNotificationName:kQSBActionPresenterWillPivotNotification
-                    object:self userInfo:userInfo];
+ 
   QSBTableResult *tableResult = [self selectedTableResult];
   QSBSourceTableResult *sourceTableResult = GTM_STATIC_CAST(QSBSourceTableResult, 
                                                             tableResult);
   HGSResult *pivotObject = [sourceTableResult representedResult];
   HGSResultArray *pivotObjects = [HGSResultArray arrayWithResult:pivotObject];
-  [actionModel_ pushSearchController:newController];
-  [self searchFor:nil pivotObjects:pivotObjects];
-  [nc postNotificationName:kQSBActionPresenterDidPivotNotification
-                    object:self 
-                  userInfo:userInfo];
+  [self pivotOnObjects:pivotObjects];
 }
 
 - (IBAction)qsb_unpivotOnSelection:(id)sender {

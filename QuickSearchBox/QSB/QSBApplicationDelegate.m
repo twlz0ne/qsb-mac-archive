@@ -928,7 +928,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
   }
   if ([otherFiles count]) {
     HGSResultArray *results = [HGSResultArray arrayWithFilePaths:otherFiles];
-    [searchWindowController_ selectResults:results];
+    [searchWindowController_ selectResults:results saveText:NO];
     [searchWindowController_ showSearchWindow:self];
     
   }
@@ -947,7 +947,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
                           error:(NSString **)error {
   HGSResultArray *results = [HGSResultArray resultsWithPasteboard:pasteboard];
   if (results) {
-    [searchWindowController_ selectResults:results];
+    [searchWindowController_ selectResults:results saveText:NO];
   } else {
     NSString *userText = [pasteboard stringForType:NSStringPboardType];
     NSCharacterSet *ws = [NSCharacterSet whitespaceAndNewlineCharacterSet];

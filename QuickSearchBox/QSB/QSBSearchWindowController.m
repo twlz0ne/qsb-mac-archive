@@ -385,16 +385,23 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   [searchTextField_ didChangeText];
 }
 
-- (void)selectResults:(HGSResultArray *)results {
+- (void)selectResults:(HGSResultArray *)results saveText:(BOOL)saveText {
+  // If there's not a current pivot then add one.  Then change the pivot object
+  // for the pivot (either the existing one or the newly created one) to the
+  // chosen corpus.  Don't alter the search text.
+  NSString *text = saveText ? [searchTextField_ stringWithoutPivots] : nil;
   // Selecting destroys the stack
   [self resetActionModel];
   
   // Create a pivot with the current text, and set the base query to the
   // indicated corpus.
-  QSBSearchController *controller = [actionPresenter_ activeSearchController];
-  [controller setTokenizedQueryString:nil pivotObjects:results];
-  NSAttributedString *pivotString = [actionPresenter_ pivotAttributedString];
-  [searchTextField_ setAttributedStringValue:pivotString];
+  [actionPresenter_ pivotOnObjects:results];
+  if (text) {
+    [actionPresenter_ searchFor:text];
+  }
+  NSAttributedString *attrString = [actionPresenter_ pivotAttributedString];
+  [searchTextField_ setAttributedStringValue:attrString];
+  [searchTextField_ didChangeText];
 }
 
 - (void)hitHotKey:(id)sender {
@@ -520,7 +527,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
       if (paths) {
         HGSResultArray *results
           = [HGSResultArray arrayWithFilePaths:paths];
-        [self selectResults:results];
+        [self selectResults:results saveText:NO];
       }
     }
   }
@@ -528,7 +535,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 
 - (IBAction)dropSelection:(id)sender {
   //TODO(dmaclach): implement
-  [self selectResults:nil];
+  [self selectResults:nil saveText:NO];
   NSBeep();
 }
 
@@ -549,23 +556,11 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 }
 
 - (IBAction)selectCorpus:(id)sender {
-  // If there's not a current pivot then add one.  Then change the pivot object
-  // for the pivot (either the existing one or the newly created one) to the
-  // chosen corpus.  Don't alter the search text.
-  NSString *text = [searchTextField_ stringWithoutPivots];
   
   NSInteger tag = [sender tag] - kBaseCorporaTagValue;
   HGSScoredResult *corpus = [[self corpora] objectAtIndex:tag];
   HGSResultArray *results = [HGSResultArray arrayWithResult:corpus];
-  // Selecting destroys the stack
-  [self resetActionModel];
-  
-  // Create a pivot with the current text, and set the base query to the
-  // indicated corpus.
-  [actionPresenter_ searchFor:text pivotObjects:results];
-  NSAttributedString *attrString = [actionPresenter_ pivotAttributedString];
-  [searchTextField_ setAttributedStringValue:attrString];
-  [searchTextField_ didChangeText];
+  [self selectResults:results saveText:YES];
 }
 
 - (IBAction)showSearchWindow:(id)sender {

@@ -75,9 +75,6 @@
 /*! Return YES if we can pivot on the current table selection. */
 - (BOOL)canUnpivot;
 
-/*! Start a search with text and pivotObjects. */
-- (void)searchFor:(NSString *)text pivotObjects:(HGSResultArray *)pivotObjects;
-
 /*! 
  Start a search with text getting pivotObjects from the current table selection.
 */
@@ -88,6 +85,11 @@
  user.
 */
 - (NSAttributedString *)pivotAttributedString;
+
+/*!
+ Force a pivot on the given objects.
+*/
+- (void)pivotOnObjects:(HGSResultArray *)pivotObjects;
 
 /*!
  Request that the model attempt to perform its action based on the current

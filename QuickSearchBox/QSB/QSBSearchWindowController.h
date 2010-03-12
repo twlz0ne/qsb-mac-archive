@@ -101,8 +101,9 @@ extern const NSTimeInterval kQSBHideDuration;
 // Search for a string in the UI
 - (void)searchForString:(NSString *)string;
 
-// Select an object in the UI
-- (void)selectResults:(HGSResultArray *)results;
+// Select an object in the UI.
+// SaveText - do we maintain the users current typing?
+- (void)selectResults:(HGSResultArray *)results saveText:(BOOL)saveText;
 
 // The hot key was hit.
 - (void)hitHotKey:(id)sender;
