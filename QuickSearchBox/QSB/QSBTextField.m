@@ -576,6 +576,9 @@ GTM_METHOD_CHECK(NSAttributedString, attrStringWithString:attributes:);
   NSRange rangeOfPivotAttachments = [pivotString qsb_rangeOfPivotAttachments];
   NSNumber *baseLine = [NSNumber numberWithFloat:(kQSBTextFieldTextBaselineOffset 
                                                   - kQSBTextFieldLineHeight)];
+  
+  // Set our attributes appropriately so that our text and pivots look correct.
+  [mutablePivotString addAttributes:[self typingAttributes]];
   [mutablePivotString addAttribute:NSBaselineOffsetAttributeName 
                              value:baseLine
                              range:rangeOfPivotAttachments];
