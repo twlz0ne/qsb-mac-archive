@@ -52,17 +52,12 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    rebuildCache_ = YES;
-    NSNotificationCenter *dc = [NSNotificationCenter defaultCenter];
-    HGSExtensionPoint *actionsPoint = [HGSExtensionPoint actionsPoint];
-    [dc addObserver:self
-           selector:@selector(extensionPointActionsChanged:)
-               name:kHGSExtensionPointDidAddExtensionNotification
-             object:actionsPoint];
-    [dc addObserver:self
-           selector:@selector(extensionPointActionsChanged:)
-               name:kHGSExtensionPointDidRemoveExtensionNotification
-             object:actionsPoint];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    HGSPluginLoader *pluginLoader = [HGSPluginLoader sharedPluginLoader];
+    [nc addObserver:self 
+           selector:@selector(pluginLoaderDidInstallPlugins:)
+               name:kHGSPluginLoaderDidInstallPluginsNotification 
+             object:pluginLoader];
   }
   return self;
 }
@@ -73,6 +68,24 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 }
 
 #pragma mark -
+
+- (void)pluginLoaderDidInstallPlugins:(NSNotification *)notification {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  HGSExtensionPoint *actionsPoint = [HGSExtensionPoint actionsPoint];
+
+  [nc addObserver:self
+         selector:@selector(extensionPointActionsChanged:)
+             name:kHGSExtensionPointDidAddExtensionNotification
+           object:actionsPoint];
+  [nc addObserver:self
+         selector:@selector(extensionPointActionsChanged:)
+             name:kHGSExtensionPointDidRemoveExtensionNotification
+           object:actionsPoint];
+  [nc removeObserver:self 
+                name:kHGSPluginLoaderDidInstallPluginsNotification 
+              object:[notification object]];
+  [self collectActions];
+}
 
 - (void)extensionPointActionsChanged:(NSNotification*)notification {
   // Since the notifications can come in baches as we load things (and if/when
