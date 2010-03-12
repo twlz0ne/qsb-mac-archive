@@ -78,7 +78,7 @@
 		<key>HGSObjectAttributeGoogleAPIAlwaysHideResults</key>
 		<true/>
 		<key>HGSObjectAttributeGoogleAPIURL</key>
-		<string></string>
+		<string>http://ajax.googleapis.com/ajax/services/search/images</string>
 		<key>HGSCorporaSourceAttributeIconName</key>
 		<string>image_search</string>
 		<key>HGSObjectAttributeInlineBrowserLimit</key>
