@@ -87,7 +87,11 @@ static NSString* IconURLStringForResult(HGSResult *result) {
       urlPath
         = [NSString stringWithFormat:thumbnailURL, urlPath];
     } else {
-      urlPath = [urlPath stringByAppendingPathComponent:@"favicon.ico"];
+      NSArray *fileTypes = [NSImage imageFileTypes];
+      NSString *extension = [urlPath pathExtension];
+      if (![fileTypes containsObject:extension]) {
+        urlPath = [urlPath stringByAppendingPathComponent:@"favicon.ico"];
+      }
     }
   } else if ([urlPath rangeOfString:@"://"].location == NSNotFound) {
     urlPath 
@@ -363,72 +367,79 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
   HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
   NSImage *favicon = [[[NSImage alloc] initWithData:retrievedData] autorelease];
   NSURL *url = [[fetcher request] URL];
-  NSImage *baseImage = FileSystemImageForURL(url);
-  NSSize iconSize = [sharedIconProvider preferredIconSize];
-  NSSize baseImageSize = NSMakeSize(32, 32);
-  NSSize faviconSize = NSMakeSize(16, 16);
-  [baseImage setSize:baseImageSize];
-  [favicon setSize:faviconSize];
-  NSImage *icon = [[[NSImage alloc] initWithSize:iconSize] autorelease];
-  NSBitmapImageRep *imageRep 
-    = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL 
-                                               pixelsWide:baseImageSize.width
-                                               pixelsHigh:baseImageSize.height 
-                                            bitsPerSample:8 
-                                          samplesPerPixel:4 
-                                                 hasAlpha:YES 
-                                                 isPlanar:NO 
-                                           colorSpaceName:NSCalibratedRGBColorSpace 
-                                             bitmapFormat:0 
-                                              bytesPerRow:0
-                                             bitsPerPixel:0] autorelease];
-  NSGraphicsContext *gc 
-    = [NSGraphicsContext graphicsContextWithBitmapImageRep:imageRep];
-  [NSGraphicsContext saveGraphicsState];
-  [NSGraphicsContext setCurrentContext:gc];
-  [baseImage drawInRect:GTMNSRectOfSize(baseImageSize)
-               fromRect:GTMNSRectOfSize(baseImageSize)
-              operation:NSCompositeCopy fraction:1.0];
-  [favicon drawInRect:NSMakeRect(baseImageSize.width / 2, 
-                                 0, 
-                                 baseImageSize.height / 2, 
-                                 baseImageSize.width / 2) 
-             fromRect:GTMNSRectOfSize(faviconSize) 
-            operation:NSCompositeSourceOver 
-             fraction:1.0];
-  [NSGraphicsContext restoreGraphicsState];
-  [icon addRepresentation:imageRep];
-  
-  baseImageSize = iconSize;
-  faviconSize = NSMakeSize(32, 32);
-  [baseImage setSize:baseImageSize];
-  [favicon setScalesWhenResized:YES];
-  [favicon setSize:faviconSize];
-  imageRep 
-    = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL 
-                                               pixelsWide:baseImageSize.width
-                                               pixelsHigh:baseImageSize.height
-                                            bitsPerSample:8 
-                                          samplesPerPixel:4 
-                                                 hasAlpha:YES 
-                                                 isPlanar:NO 
-                                           colorSpaceName:NSCalibratedRGBColorSpace 
-                                             bitmapFormat:0 
-                                              bytesPerRow:0 
-                                             bitsPerPixel:0] autorelease];
-  gc = [NSGraphicsContext graphicsContextWithBitmapImageRep:imageRep];
-  [NSGraphicsContext saveGraphicsState];
-  [NSGraphicsContext setCurrentContext:gc];
-  [baseImage drawInRect:GTMNSRectOfSize(baseImageSize)
-               fromRect:GTMNSRectOfSize(baseImageSize)
-              operation:NSCompositeCopy 
+  NSImage *icon = nil;
+  if ([[url absoluteString] hasSuffix:@"favicon.ico"]) {
+    NSImage *baseImage = FileSystemImageForURL(url);
+    NSSize iconSize = [sharedIconProvider preferredIconSize];
+    NSSize baseImageSize = NSMakeSize(32, 32);
+    NSSize faviconSize = NSMakeSize(16, 16);
+    [baseImage setSize:baseImageSize];
+    [favicon setSize:faviconSize];
+    icon = [[[NSImage alloc] initWithSize:iconSize] autorelease];
+    NSBitmapImageRep *imageRep 
+      = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL 
+                                                 pixelsWide:baseImageSize.width
+                                                 pixelsHigh:baseImageSize.height 
+                                              bitsPerSample:8 
+                                            samplesPerPixel:4 
+                                                   hasAlpha:YES 
+                                                   isPlanar:NO 
+                                             colorSpaceName:NSCalibratedRGBColorSpace 
+                                               bitmapFormat:0 
+                                                bytesPerRow:0
+                                               bitsPerPixel:0] autorelease];
+    NSGraphicsContext *gc 
+      = [NSGraphicsContext graphicsContextWithBitmapImageRep:imageRep];
+    [NSGraphicsContext saveGraphicsState];
+    [NSGraphicsContext setCurrentContext:gc];
+    [baseImage drawInRect:GTMNSRectOfSize(baseImageSize)
+                 fromRect:GTMNSRectOfSize(baseImageSize)
+                operation:NSCompositeCopy fraction:1.0];
+    [favicon drawInRect:NSMakeRect(baseImageSize.width / 2, 
+                                   0, 
+                                   baseImageSize.height / 2, 
+                                   baseImageSize.width / 2) 
+               fromRect:GTMNSRectOfSize(faviconSize) 
+              operation:NSCompositeSourceOver 
                fraction:1.0];
-  [favicon drawInRect:NSMakeRect(56,8,32,32) 
-             fromRect:GTMNSRectOfSize(faviconSize)
-            operation:NSCompositeSourceOver 
-             fraction:1.0];
-  [NSGraphicsContext restoreGraphicsState];
-  [icon addRepresentation:imageRep];
+    [NSGraphicsContext restoreGraphicsState];
+    [icon addRepresentation:imageRep];
+    
+    baseImageSize = iconSize;
+    faviconSize = NSMakeSize(32, 32);
+    [baseImage setSize:baseImageSize];
+    [favicon setScalesWhenResized:YES];
+    [favicon setSize:faviconSize];
+    imageRep 
+      = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL 
+                                                 pixelsWide:baseImageSize.width
+                                                 pixelsHigh:baseImageSize.height
+                                              bitsPerSample:8 
+                                            samplesPerPixel:4 
+                                                   hasAlpha:YES 
+                                                   isPlanar:NO 
+                                             colorSpaceName:NSCalibratedRGBColorSpace 
+                                               bitmapFormat:0 
+                                                bytesPerRow:0 
+                                               bitsPerPixel:0] autorelease];
+    gc = [NSGraphicsContext graphicsContextWithBitmapImageRep:imageRep];
+    [NSGraphicsContext saveGraphicsState];
+    [NSGraphicsContext setCurrentContext:gc];
+    [baseImage drawInRect:GTMNSRectOfSize(baseImageSize)
+                 fromRect:GTMNSRectOfSize(baseImageSize)
+                operation:NSCompositeCopy 
+                 fraction:1.0];
+    [favicon drawInRect:NSMakeRect(56,8,32,32) 
+               fromRect:GTMNSRectOfSize(faviconSize)
+              operation:NSCompositeSourceOver 
+               fraction:1.0];
+    [NSGraphicsContext restoreGraphicsState];
+    [icon addRepresentation:imageRep];
+  } else {
+    [favicon setScalesWhenResized:YES];
+    [favicon setSize:NSMakeSize(32,32)];
+    icon = favicon;
+  }
   if (icon) {
     [sharedIconProvider setIcon:icon forResult:result_];
   }
