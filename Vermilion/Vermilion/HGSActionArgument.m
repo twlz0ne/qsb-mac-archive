@@ -175,6 +175,7 @@ static NSString* const kHGSActionArgumentSourceIdentifier
 // Hate to do this with load, but it's an effective way of getting us
 // so that we can load with the rest of the extensions.
 + (void)load {
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   if ([[self class] isEqual:[HGSActionArgumentSource class]]) {
     HGSPluginLoader *sharedLoader = [HGSPluginLoader sharedPluginLoader];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -183,6 +184,7 @@ static NSString* const kHGSActionArgumentSourceIdentifier
                name:kHGSPluginLoaderDidLoadPluginsNotification 
              object:sharedLoader];
   }
+  [pool release];
 }
 
 // We can now load ourself safely.
