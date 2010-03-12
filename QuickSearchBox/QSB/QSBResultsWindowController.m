@@ -117,6 +117,7 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   [window setAlphaValue:0];
   [window setLevel:kCGStatusWindowLevel + 1];
   [window orderFront:self];
+  [window setIgnoresMouseEvents:YES];
   [resultsView_ setAutoresizesSubviews:NO];
   [resultsView_ setFrame:NSZeroRect];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
