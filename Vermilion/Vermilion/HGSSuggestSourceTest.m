@@ -32,31 +32,38 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSSuggestSourceTest.h"
+#import "GTMSenTestCase.h"
 
 #import <Foundation/Foundation.h>
+#import <JSON/JSON.h>
+
 #import "HGSSuggestSource.h"
-#import "GDSourceConfigProvider.h"
-#import "HGSPredicate.h"
-#import "HGSTestingSupport.h"
+
+@interface HGSSuggestSourceTest : GTMTestCase {
+ @private
+  HGSSuggestSource *source_;
+}
+
+@end
 
 @interface HGSSuggestSource (PrivateMethods)
 - (NSArray *)responseWithJSONData:(NSData *)responseData;
 - (NSMutableArray *)suggestionsWithResponse:(NSArray *)response
-                                  withQuery:(HGSPredicate *)query;
+                                  withQuery:(HGSQuery *)query;
 @end
 
 @implementation HGSSuggestSourceTest
 
 - (void)setUp {
-  // Disable caching.
-  [[GDSourceConfigProvider defaultConfig] setSuggestCacheDbPath:nil];
-  //
-  source_ = [[HGSSuggestSource alloc] initWithName:@"com.google.suggest"];
-  [source_ deferredInit];
-  testFirstTier_ = NO;
-  testEnabled_ = YES;
-  testPerformSearchOperation_ = YES;
+  NSDictionary *configDict 
+    = [NSDictionary dictionaryWithObjectsAndKeys:
+       HGSGetPluginBundle(), kHGSExtensionBundleKey,
+       @"com.google.qsb.core.suggest.source.test", kHGSExtensionIdentifierKey,
+       @"Suggest Test", kHGSExtensionUserVisibleNameKey,
+       @"text.suggestion", kHGSSearchSourceSupportedTypesKey,
+       nil];
+  source_ = [[HGSSuggestSource alloc] initWithConfiguration:configDict];
+  STAssertNotNil(source_, nil);
 }
 
 - (void)tearDown {
@@ -68,29 +75,6 @@
 // Tests
 //
 
-- (void)testSearchOperationForQueryWithObserver {
-  [super testSearchOperationForQueryWithObserver];
-}
-
-- (void)testPerformSearchOperation {
-  [super testPerformSearchOperation];
-  // Setup comparator that only compares the String Value and Type.
-  NSArray* stringValueAndKey = [NSArray arrayWithObjects:
-    kHGSObjectAttributeUTIKey,
-    kHGSObjectAttributeStringValueKey,
-    nil];
-
-  NSInvocation* comparator = [HGSTestingSupport resultComparator];
-  [comparator setArgument:&stringValueAndKey atIndex:4];
-
-  // TODO(altse): Instead of testing against results that change every week
-  //              we should just test for the number of results and existence
-  //              of navsuggest and suggest
-//  [self _testSingleQuery:[HGSPredicate predicateWithQueryString:@"google"]
-//        expectingResults:[HGSTestingSupport objectsFromBundleResource:@"Suggest_google"]
-//              comparator:comparator];
-
-}
 
 - (void)testSuggestionsWithResponseWithQuery {
   NSMutableArray *results = nil;

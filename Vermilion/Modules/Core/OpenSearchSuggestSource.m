@@ -30,7 +30,7 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSSuggestSource.h"
+#import <Vermilion/HGSSuggestSource.h>
 
 #import <GTM/GTMMethodCheck.h>
 #import <GTM/GTMNSString+URLArguments.h>
