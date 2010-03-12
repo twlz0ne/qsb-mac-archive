@@ -945,6 +945,7 @@
 		8B8481E91149B0B7002C460B /* HGSSuggestSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B8481E71149B0B7002C460B /* HGSSuggestSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B8481EB1149B0C1002C460B /* HGSSuggestSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8481EA1149B0C1002C460B /* HGSSuggestSourceTest.m */; };
 		8B8482551149B520002C460B /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
+		8B84860A1149FD4E002C460B /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6128A30F4641BF00E29B40 /* JSON.framework */; };
 		8B8516C9100278CC00880329 /* QSBResultIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8516C6100278CC00880329 /* QSBResultIconView.m */; };
 		8B85296E1006931E00880329 /* WebBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B85296D1006931E00880329 /* WebBookmarksSource.m */; };
 		8B852A381006AC7900880329 /* FirefoxBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B852A371006AC7900880329 /* FirefoxBookmarksSource.m */; };
@@ -1698,6 +1699,13 @@
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 8B61289E0F4641BF00E29B40;
+			remoteInfo = JSON;
+		};
+		8B8486081149FD42002C460B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B61289E0F4641BF00E29B40 /* JSON */;
 			remoteInfo = JSON;
 		};
 		8B852B9A1007AD1B00880329 /* PBXContainerItemProxy */ = {
@@ -3943,6 +3951,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B84860A1149FD4E002C460B /* JSON.framework in Frameworks */,
 				8BD988280E645F0300F5C83B /* GTM.framework in Frameworks */,
 				E4D1B0DD0DD0B253004BFB52 /* Security.framework in Frameworks */,
 				8B6F2EEB0DA2B9DF0052CA40 /* Carbon.framework in Frameworks */,
@@ -6970,6 +6979,7 @@
 			);
 			comments = "We set FRAMEWORK_SEARCH_PATHS to /System/Library/Frameworks intentionally because some internal Google Tools install Python 2.4 in /Library/Frameworks, and we don't want to link with that one on Google machines because it will cause Vermilion built on Google machines to not load on non-Google machines.";
 			dependencies = (
+				8B8486091149FD42002C460B /* PBXTargetDependency */,
 				8BC6744E0F58B097003B5C6A /* PBXTargetDependency */,
 				8BD988260E645EFF00F5C83B /* PBXTargetDependency */,
 			);
@@ -9878,6 +9888,11 @@
 			isa = PBXTargetDependency;
 			target = 8B61289E0F4641BF00E29B40 /* JSON */;
 			targetProxy = 8B84820E1149B517002C460B /* PBXContainerItemProxy */;
+		};
+		8B8486091149FD42002C460B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B61289E0F4641BF00E29B40 /* JSON */;
+			targetProxy = 8B8486081149FD42002C460B /* PBXContainerItemProxy */;
 		};
 		8B852B991007AD1B00880329 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
