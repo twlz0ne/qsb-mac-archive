@@ -66,7 +66,7 @@
   NSString *normalizedQuery = [HGSPython stringAttribute:@"normalized_query"
                                               fromObject:py];
   STAssertNotNil(normalizedQuery, nil);
-  STAssertEqualObjects(normalizedQuery, @"hello˽world", nil);
+  STAssertEqualObjects(normalizedQuery, @"hello world", nil);
   
   PyObject *pivotObjectString = PyString_FromString("pivot_object");
   STAssertNotNULL(pivotObjectString, nil);
