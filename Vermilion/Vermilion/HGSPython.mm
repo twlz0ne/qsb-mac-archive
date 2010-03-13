@@ -443,7 +443,16 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         if (args) {
           // Create the normalized_query argument (ref stolen by PyTuple_SetItem
           HGSTokenizedString *tokenizedQuery = [query tokenizedQueryString];
-          const char *utf8 = [[tokenizedQuery tokenizedString] UTF8String];
+          NSString *tokenizedString = [tokenizedQuery tokenizedString];
+          
+          // Tokenized Query has [HGSTokenizer tokenizerSeparatorString]
+          // separating tokens. Replace with spaces before sending to python.
+          NSString *separator = [HGSTokenizer tokenizerSeparatorString];
+          tokenizedString 
+            = [tokenizedString stringByReplacingOccurrencesOfString:separator
+                                                         withString:@" "];
+          
+          const char *utf8 = [tokenizedString UTF8String];
           if (utf8) {
             PyTuple_SetItem(args, 0, PyString_FromString(utf8));
           } else {
