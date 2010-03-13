@@ -120,7 +120,6 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                   password:password
                                persistence:NSURLCredentialPersistenceNone]];
       [bookmarkRequest setHTTPMethod:@"POST"];
-      [bookmarkRequest setHTTPShouldHandleCookies:NO];
       [fetcher_ setRequest:bookmarkRequest];
     }
       
@@ -224,6 +223,10 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                afterDelay:60.0];
     return;
   }
+  
+  [fetcher_ release];
+  fetcher_ = nil;
+  
   // If the login changes, we should update immediately, and make sure the
   // periodic refresh is enabled (it would have been shut down if the previous
   // credentials were incorrect).
