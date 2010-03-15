@@ -62,7 +62,9 @@ static NSString *const kHGSSearchSourceRankerSourceIDKey
 - (UInt32)promotionCount;
 @end
 
-static NSInteger HGSSearchSourceRankerSort(id src1, id src2, void *rankDict) {
+static NSInteger HGSSearchSourceRankerPerformanceSort(id src1, 
+                                                      id src2, 
+                                                      void *rankDict) {
   HGSSearchSource *source1 = (HGSSearchSource *)src1;
   HGSSearchSource *source2 = (HGSSearchSource *)src2;
   HGSAssert([source1 isKindOfClass:[HGSSearchSource class]], nil);
@@ -74,21 +76,21 @@ static NSInteger HGSSearchSourceRankerSort(id src1, id src2, void *rankDict) {
   HGSAssert([id2 length], nil);
   HGSSearchSourceRankerDataPoint *dp1 = [rankDictionary objectForKey:id1];
   HGSSearchSourceRankerDataPoint *dp2 = [rankDictionary objectForKey:id2];
-  UInt32 promoteCount1 = [dp1 promotionCount];
-  UInt32 promoteCount2 = [dp2 promotionCount];
   NSInteger order = NSOrderedSame;
-  if (promoteCount1 > promoteCount2) {
+  UInt64 time1 = [dp1 averageTime];
+  UInt64 time2 = [dp2 averageTime];
+  if (time1 > time2) {
     order = NSOrderedDescending;
-  } else if (promoteCount1 < promoteCount2) {
+  } else if (time1 < time2) {
     order = NSOrderedAscending;
   } else {
-    UInt64 time1 = [dp1 averageTime];
-    UInt64 time2 = [dp2 averageTime];
-    if (time1 > time2) {
+    UInt32 promoteCount1 = [dp1 promotionCount];
+    UInt32 promoteCount2 = [dp2 promotionCount];
+    if (promoteCount1 > promoteCount2) {
       order = NSOrderedDescending;
-    } else if (time1 < time2) {
+    } else if (promoteCount1 < promoteCount2) {
       order = NSOrderedAscending;
-    } else if (time1 == 0 && time2 == 0) {
+    } else {
       // If we have no data on either of them, run memory search sources first.
       // This will mainly apply for our first searches we run.
       Class memSourceClass = [HGSMemorySearchSource class]; 
@@ -235,7 +237,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
   NSMutableArray *sources 
     = [NSMutableArray arrayWithArray:[sourcesPoint extensions]];
   @synchronized (self) {
-    [sources sortUsingFunction:HGSSearchSourceRankerSort 
+    [sources sortUsingFunction:HGSSearchSourceRankerPerformanceSort 
                        context:rankDictionary_];
   }
   return sources;

@@ -50,5 +50,13 @@
 		<key>runtime</key>
 		<integer>1</integer>
 	</dict>
+	<dict>
+		<key>HGSSearchSourceRankerSourceID</key>
+		<string>com.google.qsb.spotlightfiles.source</string>
+		<key>promotions</key>
+		<integer>0</integer>
+		<key>runtime</key>
+		<integer>999999999999</integer>
+	</dict>
 </array>
 </plist>
