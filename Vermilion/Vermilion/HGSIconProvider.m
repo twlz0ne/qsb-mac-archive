@@ -93,10 +93,10 @@ static NSString* IconURLStringForResult(HGSResult *result) {
         urlPath = [urlPath stringByAppendingPathComponent:@"favicon.ico"];
       }
     }
-  } else if ([urlPath rangeOfString:@"://"].location == NSNotFound) {
+  } else if ([urlPath hasPrefix:@"/"]) {
     urlPath 
       = [urlPath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    urlPath = [@"file://" stringByAppendingString:urlPath];
+    urlPath = [@"file://localhost/" stringByAppendingString:urlPath];
   }
   return urlPath;
 }

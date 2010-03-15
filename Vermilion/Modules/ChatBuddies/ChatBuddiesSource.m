@@ -206,6 +206,10 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   [super dealloc];
 }
 
+- (BOOL)providesIconsForResults {
+  return YES;
+}
+
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   // TODO(mrossetti): break this method up. It's too complex.
   id value = nil;
