@@ -134,6 +134,7 @@
 				8D5B49AF048680CD000E48DA /* Resources */,
 				8D5B49B1048680CD000E48DA /* Sources */,
 				8D5B49B3048680CD000E48DA /* Frameworks */,
+				8B848F78114B5680002C460B /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -179,6 +180,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		8B848F78114B5680002C460B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Install the plugin for us.\n\nmkdir -p \"${USER_LIBRARY_DIR}/Application Support/Quick Search Box/PlugIns\"\nln -sf ${CONFIGURATION_BUILD_DIR}/${FULL_PRODUCT_NAME} \"${USER_LIBRARY_DIR}/Application Support/Quick Search Box/PlugIns/${FULL_PRODUCT_NAME}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8D5B49B1048680CD000E48DA /* Sources */ = {
