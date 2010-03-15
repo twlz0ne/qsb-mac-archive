@@ -31,33 +31,54 @@
 //
 
 #import "QSBApplication.h"
+
+#import <GTM/GTMCarbonEvent.h>
+#import <GTM/GTMDebugSelectorValidation.h>
+
 #import "QSBApplicationDelegate.h"
-#import "GTMCarbonEvent.h"
-#import "GTMDebugSelectorValidation.h"
+#import "QSBSearchWindowController.h"
 
 static const EventTypeSpec kModifierEventTypeSpec[] 
   = { { kEventClassKeyboard, kEventRawKeyModifiersChanged } };
 static const size_t kModifierEventTypeSpecSize 
   = sizeof(kModifierEventTypeSpec) / sizeof(EventTypeSpec);
 
+static const EventTypeSpec kApplicationEventTypeSpec[] 
+  = { { kEventClassApplication, kEventAppFrontSwitched } };
+static const size_t kApplicationEventTypeSpecSize 
+  = sizeof(kApplicationEventTypeSpec) / sizeof(EventTypeSpec);
+
 @implementation QSBApplication
 
 // Allows me to intercept the "control" double tap to activate QSB. There 
 // appears to be no way to do this from straight Cocoa.
 - (void)awakeFromNib {
-  GTMCarbonEventMonitorHandler *handler 
+  GTMCarbonEventMonitorHandler *monitorHandler 
     = [GTMCarbonEventMonitorHandler sharedEventMonitorHandler];
-  [handler registerForEvents:kModifierEventTypeSpec 
-                       count:kModifierEventTypeSpecSize];
-  [handler setDelegate:self];
+  [monitorHandler registerForEvents:kModifierEventTypeSpec 
+                              count:kModifierEventTypeSpecSize];
+  [monitorHandler setDelegate:self];
+  
+  GTMCarbonEventApplicationEventHandler *applicationHandler
+    = [GTMCarbonEventApplicationEventHandler sharedApplicationEventHandler];
+  [applicationHandler registerForEvents:kApplicationEventTypeSpec 
+                                  count:kApplicationEventTypeSpecSize];
+  [applicationHandler setDelegate:self];
 }
 
 - (void) dealloc {
-  GTMCarbonEventMonitorHandler *handler 
+  GTMCarbonEventMonitorHandler *monitorHandler 
     = [GTMCarbonEventMonitorHandler sharedEventMonitorHandler];
-  [handler unregisterForEvents:kModifierEventTypeSpec 
-                         count:kModifierEventTypeSpecSize];
-  [handler setDelegate:nil];
+  [monitorHandler unregisterForEvents:kModifierEventTypeSpec 
+                                count:kModifierEventTypeSpecSize];
+  [monitorHandler setDelegate:nil];
+
+  GTMCarbonEventApplicationEventHandler *applicationHandler
+    = [GTMCarbonEventApplicationEventHandler sharedApplicationEventHandler];
+  [applicationHandler unregisterForEvents:kApplicationEventTypeSpec 
+                                    count:kApplicationEventTypeSpecSize];
+  [applicationHandler setDelegate:nil];
+
   [super dealloc];
 }
 
@@ -78,8 +99,8 @@ static const size_t kModifierEventTypeSpecSize
 }
 
 - (void)sendEvent:(NSEvent *)theEvent {
-  NSUInteger type = [theEvent type];
   QSBApplicationDelegate *delegate = [self delegate];
+  NSEventType type = [theEvent type];
   if (type == NSFlagsChanged) {
     [delegate modifiersChangedWhileActive:theEvent];
   } else if (type == NSKeyDown || type == NSKeyUp) {
@@ -92,8 +113,10 @@ static const size_t kModifierEventTypeSpecSize
                receivedEvent:(GTMCarbonEvent *)event 
                      handler:(EventHandlerCallRef)handler {
   OSStatus status = eventNotHandledErr;
-  if ([event eventClass] == kEventClassKeyboard &&
-      [event eventKind] == kEventRawKeyModifiersChanged) {
+  EventClass theClass = [event eventClass];
+  EventKind theKind = [event eventKind];
+  if (theClass == kEventClassKeyboard &&
+      theKind == kEventRawKeyModifiersChanged) {
     UInt32 modifiers;
     if ([event getUInt32ParameterNamed:kEventParamKeyModifiers
                                   data:&modifiers]) {
@@ -109,6 +132,21 @@ static const size_t kModifierEventTypeSpecSize
                                          isARepeat:NO
                                            keyCode:0];
       [[self delegate] modifiersChangedWhileInactive:nsEvent];
+    }
+  } else if (theClass == kEventClassApplication &&
+             theKind == kEventAppFrontSwitched) {
+    ProcessSerialNumber psn;
+    if ([event getParameterNamed:kEventParamProcessID
+                            type:typeProcessSerialNumber
+                            size:sizeof(psn)
+                            data:&psn]) {
+      ProcessSerialNumber myPSN;
+      MacGetCurrentProcess(&myPSN);
+      Boolean equal;
+      if (SameProcess(&psn, &myPSN, &equal) == noErr && !equal) {
+        QSBApplicationDelegate *delegate = [self delegate];
+        [[delegate searchWindowController] hideSearchWindow:self];
+      }
     }
   }
   return status;
