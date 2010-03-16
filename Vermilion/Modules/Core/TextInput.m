@@ -31,6 +31,8 @@
 //
 
 #import <Vermilion/Vermilion.h>
+#import <GTM/GTMDefines.h>
+#import "TextActions.h"
 
 static NSString *const kInputPrefix = @" ";
 
@@ -43,7 +45,7 @@ static NSString *const kDateTimeMarker = @"[DTS]";
 
 @implementation TextInput
 - (HGSAction *)defaultAction {
-  NSString *actionName = @"com.google.text.action.largetype";
+  NSString *actionName = GTM_NSSTRINGIFY(kCoreTextActionLargeTypeID);
   HGSAction *action 
     = [[HGSExtensionPoint actionsPoint] extensionWithIdentifier:actionName];
   if (!action) {

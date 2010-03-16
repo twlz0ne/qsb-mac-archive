@@ -31,9 +31,12 @@
 //
 
 #import <Vermilion/Vermilion.h>
+
+#import <GTM/GTMMethodCheck.h>
+#import <GTM/GTMNSNumber+64Bit.h>
+
 #import "CalculatePrivate.h"
-#import "GTMNSNumber+64Bit.h"
-#import "GTMMethodCheck.h"
+#import "TextActions.h"
 
 @interface CalculatorSource : HGSCallbackSearchSource {
  @private
@@ -76,6 +79,18 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   [nonAlphanumericSet_ release];
   [calculatorAppPath_ release];
   [super dealloc];
+}
+
+#pragma mark Private Methods
+
+- (HGSAction *)defaultAction {
+  NSString *actionName = GTM_NSSTRINGIFY(kCoreTextActionLargeTypeID);
+  HGSAction *action
+    = [[HGSExtensionPoint actionsPoint] extensionWithIdentifier:actionName];
+  if (!action) {
+    HGSLog(@"Unable to get large type action (%@)", actionName);
+  }
+  return action;
 }
 
 #pragma mark -
@@ -144,10 +159,16 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       NSDictionary *pasteboardData
         = [NSDictionary dictionaryWithObject:answerString
                                       forKey:NSStringPboardType];
-      NSDictionary *attributes
-        = [NSDictionary dictionaryWithObjectsAndKeys:
-           pasteboardData, kHGSObjectAttributePasteboardValueKey,
-           nil];
+      NSMutableDictionary *attributes
+           = [NSMutableDictionary dictionaryWithObject:pasteboardData
+                                                forKey:kHGSObjectAttributePasteboardValueKey];
+      
+      HGSAction *largeTypeAction = [self defaultAction];
+      if (largeTypeAction) {
+        [attributes setObject:largeTypeAction
+                       forKey:kHGSObjectAttributeDefaultActionKey];
+      }
+      
       HGSScoredResult *rankedHGSObject
         = [HGSScoredResult resultWithURI:calculatorAppPath_
                                     name:resultString
