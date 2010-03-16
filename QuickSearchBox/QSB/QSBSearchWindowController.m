@@ -549,7 +549,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   BOOL hadText = [[searchTextField_ string] length];
   [self resetSearchString:self];
   // Hide the results window if it's showing.
-  if ([[resultsWindowController_ window] alphaValue] > 0) {
+  if (![[resultsWindowController_ window] ignoresMouseEvents]) {
     [resultsWindowController_ hideResultsWindow:self];
   } else if (!hadText) {
     [self hideSearchWindow:self];
