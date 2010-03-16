@@ -256,10 +256,18 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
                                     startingAt:0];
 }
 
+- (void)scrollToBeginningOfDocument:(id)sender {
+  [self moveToBeginningOfDocument:sender];
+}
+
 - (void)moveToEndOfDocument:(id)sender {
   NSInteger lastRow = [self numberOfRows] - 1;
   [self selectFirstSelectableRowByIncrementing:NO
                                     startingAt:lastRow];
+}
+
+- (void)scrollToEndOfDocument:(id)sender {
+  [self moveToEndOfDocument:sender];
 }
 
 - (void)moveDownAndModifySelection:(id)sender {
