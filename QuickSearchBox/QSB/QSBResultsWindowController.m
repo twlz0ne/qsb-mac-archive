@@ -182,19 +182,20 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 }
 
 - (void)setActiveResultsViewController:(QSBResultsViewBaseController *)controller {
+  // Remove any old observers.
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self 
+                name:NSTableViewSelectionDidChangeNotification
+              object:nil];
+  [nc removeObserver:self 
+                name:kQSBResultTableViewDidReloadData
+              object:nil];
   NSResponder *nextResponder = [self nextResponder];
   if ([nextResponder isKindOfClass:[QSBResultsViewBaseController class]]) {
     QSBResultsViewBaseController *oldActiveResultsViewController 
       = (QSBResultsViewBaseController *)nextResponder;
     nextResponder = [oldActiveResultsViewController nextResponder];
     [oldActiveResultsViewController setNextResponder:nil];
-    [nc removeObserver:self 
-                  name:NSTableViewSelectionDidChangeNotification
-                object:[oldActiveResultsViewController resultsTableView]];
-    [nc removeObserver:self 
-                  name:kQSBResultTableViewDidReloadData
-                object:[oldActiveResultsViewController resultsTableView]];
   }
   if (controller) {
     [controller setNextResponder:nextResponder];
