@@ -65,7 +65,7 @@ static NSString * const kWebSourceSiteSearchOverrideKey = @"WebSourceSiteSearchU
     if (pivotObject) {
       NSString *template
         = [pivotObject valueForKey:kHGSObjectAttributeWebSearchTemplateKey];
-      BOOL allowsSearchSite = [pivotObject conformsToType:kHGSTypeWebpage];
+      BOOL allowsSearchSite = [pivotObject isOfType:kHGSTypeWebpage];
       isValid = (template!= nil) || allowsSearchSite;
     } else {
       HGSTokenizedString *tokenizedQueryString = [query tokenizedQueryString];

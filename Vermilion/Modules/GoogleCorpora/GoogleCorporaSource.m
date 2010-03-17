@@ -30,259 +30,52 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "GoogleCorporaSource.h"
-#import "GTMMethodCheck.h"
-#import "NSString+ReadableURL.h"
-#import "HGSGoogleAccountTypes.h"
 #import <Vermilion/Vermilion.h>
 
-static NSString *const kHGSCorporaSourceAttributeIconNameKey 
-  = @"HGSCorporaSourceAttributeIconName";  // NSString
-static NSString *const kHGSCorporaSourceAttributeHideCorpusKey
-  = @"HGSCorporaSourceAttributeHideCorpus";  // BOOL
-static NSString *const kHGSCorporaSourceAttributeHideFromDesktopKey
-  = @"HGSCorporaSourceAttributeHideFromDesktop";  // BOOL
-static NSString *const kHGSCorporaSourceAttributeURIStringKey
-  = @"HGSCorporaSourceAttributeURIString";  //NSString
-static NSString *const kHGSObjectAttributeHideFromDropdownKey
-  = @"HGSObjectAttributeHideFromDropdown";  // BOOL
-static NSString *const kHGSObjectAttributeHideFromResultsKey
-  = @"HGSObjectAttributeHideFromResults";   // BOOL
-
-@interface GoogleCorporaSource ()
-- (BOOL)loadCorpora;
+@interface GoogleCorporaSource : HGSCorporaSource
 @end
-
+  
 @implementation GoogleCorporaSource
 
-GTM_METHOD_CHECK(NSString, readableURLString);
-
-- (id)init {
-  self = [self initWithConfiguration:nil];
-  return self;
-}
-
 - (id)initWithConfiguration:(NSDictionary *)configuration {
-  if ((self = [super initWithConfiguration:configuration])) {
-    if (![self loadCorpora]) {
-      HGSLogDebug(@"Unable to load corpora");
-      [self release];
-      self = nil;
-    }
-    HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(didAddOrRemoveAccount:) 
-               name:kHGSExtensionPointDidAddExtensionNotification 
-             object:accountsPoint];
-    [nc addObserver:self 
-           selector:@selector(didAddOrRemoveAccount:) 
-               name:kHGSExtensionPointDidRemoveExtensionNotification 
-             object:accountsPoint];
-  }
+  self = [super initWithConfiguration:configuration];
   return self;
 }
 
-- (void)dealloc {
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc removeObserver:self];
-  [searchableCorpora_ release];
-  [visibleCorpora_ release];
-  [super dealloc];
+- (NSString *)dasherAccountDomain:(HGSAccount *)account {
+  NSString *name = [account userName];
+  NSString *domain = nil;
+  NSInteger location = [name rangeOfString:@"@"].location;
+  if (location != NSNotFound) {
+    domain = [name substringFromIndex:location + 1]; 
+  }
+  return domain;
 }
 
-- (NSArray *)groupedSearchableCorpora {
-    return searchableCorpora_;
+- (NSString *)uriForCorpus:(NSDictionary *)corpusDict 
+                   account:(HGSAccount *)account {
+  NSString *domain = [self dasherAccountDomain:account];
+  NSString *uri = [super uriForCorpus:corpusDict account:account];
+  return [NSString stringWithFormat:uri, domain];
 }
 
-- (NSArray *)dasherDomains {
-  HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
-  NSArray *googleAppsAccounts
-    = [accountsPoint accountsForType:kHGSGoogleAppsAccountType];
-  NSMutableArray *domains = [NSMutableArray array];
-  for (HGSAccount *account in googleAppsAccounts) {
-    NSString *name = [account userName];
-    NSInteger location = [name rangeOfString:@"@"].location;
-    if (location != NSNotFound) {
-      NSString *domain = [name substringFromIndex:location + 1]; 
-      [domains addObject:domain];
-    }
+- (NSString *)webSearchTemplateForCorpus:(NSDictionary *)corpusDict 
+                                 account:(HGSAccount *)account {
+  NSString *domain = [self dasherAccountDomain:account];
+  NSString *template = [super webSearchTemplateForCorpus:corpusDict
+                                                 account:account];
+  if (template) {
+    template = [NSString stringWithFormat:template, domain];
   }
-  return domains;
+  return template;
 }
 
-- (HGSResult *)corpusObjectForDictionary:(NSDictionary *)corpusDict 
-                                inDomain:(NSString *)domain {
-  if ([corpusDict objectForKey:kHGSCorporaSourceAttributeHideCorpusKey]) {
-    return nil;
-  }
-#if !TARGET_OS_IPHONE
-  if ([corpusDict objectForKey:kHGSCorporaSourceAttributeHideFromDesktopKey]) {
-    return nil;
-  }
-#endif
-  
-  NSMutableDictionary *objectDict 
-    = [NSMutableDictionary dictionaryWithDictionary:corpusDict];
-  NSString *identifier 
-    = [corpusDict objectForKey:kHGSCorporaSourceAttributeURIStringKey];
-  
-  // Dasherize the URL and the web search template
-  identifier = [NSString stringWithFormat:identifier, domain];
-  [objectDict setObject:identifier
-                 forKey:kHGSObjectAttributeURIKey];
-  
-  NSString *name = [objectDict objectForKey:kHGSObjectAttributeNameKey];
-  NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-  NSString *localizedName = [bundle localizedStringForKey:name 
-                                                    value:nil 
-                                                    table:nil];
-  [objectDict setObject:[NSString stringWithFormat:localizedName, domain]
-                 forKey:kHGSObjectAttributeNameKey];
-  
-  
-  NSString *webTemplate 
-    = [objectDict objectForKey:kHGSObjectAttributeWebSearchTemplateKey];
-  if (webTemplate) {
-    [objectDict setObject:[NSString stringWithFormat:webTemplate, domain]
-                   forKey:kHGSObjectAttributeWebSearchTemplateKey];
-  }
-  
-  NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag];  
-  [objectDict setObject:rankFlags forKey:kHGSObjectAttributeRankFlagsKey];
-  
-  NSString *details = identifier;
-  if (details) {
-    [objectDict setObject:details
-                   forKey:kHGSObjectAttributeSourceURLKey];
-  } else {
-    HGSLog(@"Unable to get readable URL for %@ from corpora %@", 
-           identifier, corpusDict);
-  }  
-  
-  [objectDict setObject:kHGSTypeWebApplication
-                 forKey:kHGSObjectAttributeTypeKey];
-  
-  NSString *iconName 
-    = [objectDict objectForKey:kHGSCorporaSourceAttributeIconNameKey];
-  if (iconName) {
-#if TARGET_OS_IPHONE
-    // For mobile, we must append .png
-    iconName = [iconName stringByAppendingPathExtension:@"png"];
-#endif
-    NSImage *icon = [NSImage imageNamed:iconName];
-    if (icon) {
-      icon = [[icon copy] autorelease];
-      [objectDict setObject:icon forKey:kHGSObjectAttributeIconKey];
-    } else {
-      HGSLog(@"Unable to load an icon for corpus %@", corpusDict);
-    }
-    [objectDict removeObjectForKey:kHGSCorporaSourceAttributeIconNameKey];
-  }
-  HGSUnscoredResult *corpus = [HGSUnscoredResult resultWithDictionary:objectDict
-                                                               source:self];
-  return corpus;  
-}
-
-
-- (BOOL)loadCorpora {
-  // TODO(dmaclach): mumble
-  // TODO(mrossetti): mumble
-  //  -- If/When we get support for config info in the plugin registration, it
-  // might make sense for the DefaultCorp info to go into the normal plugin
-  // registation make config it's own source instead of having this one source
-  // cycle through them.  That would also allow those individual configs to be
-  // enabled/disabled.
-
-  // Initialization code
-  NSMutableArray *allCorpora = [NSMutableArray array];
-  NSBundle *pluginBundle = [self bundle];
-  NSString *plistPath = [pluginBundle pathForResource:@"DefaultCorpora"
-                                               ofType:@"plist"];
-  NSArray *corporaPlist = [NSArray arrayWithContentsOfFile:plistPath];
-  
-  for (NSDictionary *corpusDict in corporaPlist) {
-    HGSResult *corpus = [self corpusObjectForDictionary:corpusDict
-                                               inDomain:nil];
-    if (corpus) [allCorpora addObject:corpus];
-  }
-  
-  plistPath = [pluginBundle pathForResource:@"DasherCorpora"
-                                     ofType:@"plist"];
-  corporaPlist = [NSArray arrayWithContentsOfFile:plistPath];
-  
-  
-  for (NSString *domain in [self dasherDomains]) {
-    for (NSDictionary *corpusDict in corporaPlist) {
-      HGSResult *corpus = [self corpusObjectForDictionary:corpusDict 
-                                                 inDomain:domain];
-      if (corpus) [allCorpora addObject:corpus];
-    }
-  }
-  
-  plistPath = [pluginBundle pathForResource:@"InternalCorpora"
-                                     ofType:@"plist"];
-  corporaPlist = [NSArray arrayWithContentsOfFile:plistPath];
-  
-  for (NSDictionary *corpusDict in corporaPlist) {
-    HGSResult *corpus = [self corpusObjectForDictionary:corpusDict
-                                               inDomain:nil];
-    if (corpus) [allCorpora addObject:corpus];
-  }  
-  
-  NSMutableArray *visibleCorpora = [NSMutableArray array];
-  NSMutableArray *searchableCorpora = [NSMutableArray array];
-  
-  for (HGSResult *corpus in allCorpora) {
-    if ([corpus valueForKey:kHGSObjectAttributeWebSearchTemplateKey]
-    && ![[corpus valueForKey:kHGSObjectAttributeHideFromDropdownKey] boolValue]) {
-      [searchableCorpora addObject:corpus];
-    }
-    if (![[corpus valueForKey:kHGSObjectAttributeHideFromResultsKey] boolValue]) {
-      [visibleCorpora addObject:corpus];
-    } 
-  }
-  
-  visibleCorpora_ = [visibleCorpora retain];
-  searchableCorpora_ = [searchableCorpora retain];
- 
-  [self clearResultIndex];
-  
-  for (HGSResult *corpus in visibleCorpora_) {
-    [self indexResult:corpus];
-  }
-  
-  return YES;
-}
-
-- (NSMutableDictionary *)archiveRepresentationForResult:(HGSResult *)result {
-  return [NSMutableDictionary
-            dictionaryWithObject:[result uri]
-                          forKey:kHGSObjectAttributeURIKey];
-}
-
-- (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
-  HGSResult *result = nil;
-  NSString *identifier = [representation objectForKey:kHGSObjectAttributeURIKey];
-  NSArray *totalCorpora 
-    = [searchableCorpora_ arrayByAddingObjectsFromArray:visibleCorpora_];
-  for (HGSResult *corpus in totalCorpora) {
-    NSString *uri = [corpus uri];
-    if ([uri isEqual:identifier]) {
-      result = corpus;
-      break;
-    }
-  }
-  return result;
-}
-
-- (void)didAddOrRemoveAccount:(NSNotification *)notification {
-  NSDictionary *userInfo = [notification userInfo];
-  HGSAccount *account = [userInfo objectForKey:kHGSExtensionKey];
-  NSString *accountType = [account type];
-  if ([accountType isEqualToString:kHGSGoogleAppsAccountType]) {
-    [self loadCorpora];
-  }
+- (NSString *)displayNameForCorpus:(NSDictionary *)corpusDict 
+                           account:(HGSAccount *)account {
+  NSString *domain = [self dasherAccountDomain:account];
+  NSString *name = [super displayNameForCorpus:corpusDict
+                                       account:account];
+  return [NSString stringWithFormat:name, domain];
 }
 
 @end

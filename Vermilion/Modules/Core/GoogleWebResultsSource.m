@@ -350,12 +350,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
   if (isValid) {
     HGSResult *pivotObject = [query pivotObject];
     NSURL *url = [pivotObject url];
-#if TARGET_OS_IPHONE
     NSNumber *hideResults 
-      = [pivotObject valueForKey:@"HGSObjectAttributeGoogleAPIAlwaysHideResults"];
-#else 
-    NSNumber *hideResults = nil;
-#endif
+      = [pivotObject valueForKey:kHGSCorporaSourceAttributeHideGoogleSiteSearchResultsKey];
     if ([hideResults boolValue]) {
       isValid = NO;
     } else if ([[url scheme] isEqualToString:@"http"]) {

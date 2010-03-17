@@ -39,13 +39,13 @@
 #import <GTM/GTMNSImage+Scaling.h>
 #import <GTM/GTMNSObject+KeyValueObserving.h>
 #import <GTM/GTMNSAppleEventDescriptor+Foundation.h>
+#import <Vermilion/Vermilion.h>
 
 #import "QSBApplicationDelegate.h"
 #import "QSBTextField.h"
 #import "QSBActionPresenter.h"
 #import "QSBPreferences.h"
 #import "QSBSearchController.h"
-#import "GoogleCorporaSource.h"
 #import "QSBResultsViewBaseController.h"
 #import "QLUIPrivate.h"
 #import "NSString+CaseInsensitive.h"
@@ -364,19 +364,17 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 }
 
 - (NSArray *)corpora {
-  NSArray *corpora = nil;
+  NSMutableArray *allCorpora = [NSMutableArray array];
   HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
-  HGSExtension *corporaSource 
-    = [sourcesPoint extensionWithIdentifier:kGoogleCorporaSourceIdentifier];
-  SEL selector = NSSelectorFromString(@"groupedSearchableCorpora");
-  if ([corporaSource respondsToSelector:selector]) {
-    corpora = [[corporaSource performSelector:selector] retain];
-  } else {
-    corpora = [[NSArray array] retain];
-    HGSLogDebug(@"Corpora %@ doesn't respond to groupedSearchableCorpora",
-                corporaSource);
+  for (HGSExtension *extension in [sourcesPoint extensions]) {
+    if ([extension isKindOfClass:[HGSCorporaSource class]]) {
+      NSArray *corpora = [(HGSCorporaSource *)extension searchableCorpora];
+      if (corpora) {
+        [allCorpora addObjectsFromArray:corpora];
+      }
+    }
   }
-  return corpora;
+  return allCorpora;
 }
 
 - (void)searchForString:(NSString *)string {
@@ -808,8 +806,10 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 - (void)menuNeedsUpdate:(NSMenu *)menu {
   // If this isn't the expected menu return
   if ([windowMenuButton_ menu] != menu) return;
-  // If we've already added the items, return
-  if ([menu indexOfItemWithTag:kBaseCorporaTagValue] != -1) return;
+  NSUInteger menuItemCount = [menu numberOfItems] - 3;
+  for (NSUInteger i = 2; i < menuItemCount; ++i) {
+    [menu removeItemAtIndex:2];
+  }
   // Add our items.
   NSArray *corpora = [self corpora];
   for (unsigned int i = 0; i < [corpora count]; i++) {
@@ -879,7 +879,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   if (![queryString length]) {
     queryString = nil;
   }
-  [actionPresenter_ searchFor:queryString];  
+  [actionPresenter_ searchFor:queryString];
   [self updateWindowVisibilityBasedOnQueryString];
 }
 

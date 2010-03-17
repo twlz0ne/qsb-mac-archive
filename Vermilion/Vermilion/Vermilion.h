@@ -39,7 +39,7 @@
 #import <Vermilion/HGSBundle.h>
 #import <Vermilion/HGSCallbackSearchSource.h>
 #import <Vermilion/HGSCoreExtensionPoints.h>
-#import <Vermilion/HGSDelegate.h>
+#import <Vermilion/HGSCorporaSource.h>
 #import <Vermilion/HGSDelegate.h>
 #import <Vermilion/HGSExtension.h>
 #import <Vermilion/HGSExtensionPoint.h>
