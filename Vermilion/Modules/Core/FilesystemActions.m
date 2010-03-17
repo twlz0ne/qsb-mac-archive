@@ -59,9 +59,6 @@
 @interface FileSystemRenameAction : HGSAction
 @end
 
-@interface FileSystemMoveToAction : HGSAction
-@end
-
 @interface FileSystemSetCommentAction : HGSAction
 @end
 
@@ -74,6 +71,9 @@
 @interface FileSystemScriptAction : HGSAction
 + (NSAppleScript *)fileSystemActionScript;
 - (NSString *)handlerName;
+@end
+
+@interface FileSystemMoveToAction : FileSystemScriptAction
 @end
 
 @interface FileSystemShowInFinderAction : FileSystemScriptAction
@@ -426,6 +426,7 @@
   HGSAssert(NO, @"handlerName must be overridden by subclasses");
   return nil;
 }
+
 @end
 
 @implementation FileSystemShowInFinderAction
@@ -533,31 +534,30 @@
 @implementation FileSystemMoveToAction
 
 - (BOOL)performWithInfo:(NSDictionary *)info {
-  BOOL wasGood = NO;
-  HGSResultArray *directObjects 
+  HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
   HGSResultArray *directories
     = [info objectForKey:@"com.google.core.filesystem.action.moveto.location"];
-  if ([directObjects count] && [directories count]) {
-    HGSResult *dirResult = [directories objectAtIndex:0];
-    NSString *dir = [dirResult filePath];
-    if (dir) {
-      NSFileManager *fm = [NSFileManager defaultManager];
-      wasGood = YES;
-      for (HGSResult *result in directObjects) {
-        NSString *filePath = [result filePath];
-        NSString *newFile = [filePath lastPathComponent];
-        newFile = [dir stringByAppendingPathComponent:newFile];
-        NSError *error = nil;
-        if (![fm moveItemAtPath:filePath toPath:newFile error:&error]) {
-          wasGood = NO;
-          [NSApp presentError:error];
-          break;
-        }
-      }
-    }
+  NSArray *froms = [directObjects filePaths];
+  NSArray *tos = [directories filePaths];
+  NSArray *args = [NSArray arrayWithObjects:froms, [tos objectAtIndex:0], nil];
+  NSDictionary *error = nil;
+  NSAppleScript *script = [FileSystemScriptAction fileSystemActionScript];
+  NSString *handlerName = [self handlerName];
+  NSAppleEventDescriptor *answer
+    = [script gtm_executePositionalHandler:handlerName
+                                parameters:args
+                                     error:&error];
+  BOOL isGood = YES;
+  if (!answer || error) {
+    HGSLogDebug(@"Unable to execute handler '%@': %@", handlerName, error);
+    isGood = NO;
   }
-  return wasGood;
+  return isGood;
+}
+
+- (NSString *)handlerName {
+  return @"moveto";
 }
 
 @end

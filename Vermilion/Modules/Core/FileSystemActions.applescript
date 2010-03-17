@@ -47,3 +47,13 @@ on getInfo(x)
 	end repeat
 	tell application "Finder" to activate
 end getInfo
+
+-- Script for FileSystemMoveToAction
+on moveto(sourceFiles, dest)
+	set macdest to POSIX file dest as text
+	repeat with sourceFile in sourceFiles
+		set macsource to POSIX file sourceFile as text
+		tell application "Finder" to move macsource to macdest
+	end repeat
+	tell application "Finder" to activate
+end moveto
