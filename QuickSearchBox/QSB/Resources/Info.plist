@@ -132,6 +132,8 @@
 	<string>http://groups.google.com/group/qsb-mac-discuss</string>
 	<key>QSBHomepageURL</key>
 	<string>http://code.google.com/p/qsb-mac</string>
+	<key>GoogleBreakpadSendAndExit</key>
+	<string>NO</string>
 	<key>GTMGoogleSearchClientAppArgs</key>
 	<dict>
 		<key>client</key>
