@@ -240,11 +240,18 @@
     }
   }
   if ([operation isValid]) {
+    // Create a non mutable copy of the operation and perform it,
+    // in case someone attempts to change our current operation before
+    // the operation gets a chance to be performed.
+    HGSActionOperation *operationToPerform = [[operation copy] autorelease];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    NSDictionary *userInfo 
+      = [NSDictionary dictionaryWithObject:operationToPerform
+                                    forKey:kQSBActionOperationKey];
     [nc postNotificationName:kQSBActionPresenterWillPerformActionNotification
                       object:self
-                    userInfo:nil];
-    [operation performAction];
+                    userInfo:userInfo];
+    [operationToPerform performAction];
   }
 }
 
@@ -283,6 +290,10 @@
   [nc postNotificationName:kQSBActionPresenterDidUnpivotNotification
                     object:self 
                   userInfo:userInfo];  
+}
+
+- (IBAction)qsb_delimitResult:(id)sender {
+  // TODO(dmaclach): Here's where we would support the comma operator.
 }
 
 @end

@@ -107,6 +107,12 @@
 */
 - (IBAction)qsb_unpivotOnSelection:(id)sender;
 
+/*!
+ Request that the model stop with the current search, store it,
+ and start a new search.
+*/
+- (IBAction)qsb_delimitResult:(id)sender;
+
 @end
 
 /*!
@@ -123,9 +129,18 @@
  If you want to know that an action did get performed, look for the
  HGSActionDidPerformNotification.
  Object is the actionPresenter
+ UserInfo contains kQSBActioOperationnKey which is the action operation being 
+ performed.
 */
 #define kQSBActionPresenterWillPerformActionNotification \
   @"QSBActionPresenterWillPerformActionNotification"
+
+/*!
+ Key in the user info dictionary for 
+ kQSBActionPresenterWillPerformActionNotification denoting the action being
+ performed. HGSActionOperation.
+*/
+#define kQSBActionOperationKey @"QSBActionOperation"
 
 /*!
  Notifications for pivoting
