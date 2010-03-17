@@ -133,9 +133,6 @@
 /* A checkbox controlling if the QSB should be opened automatically when the user logs in. */
 "Open Quick Search Box at login" = "Abrir cuadro de búsqueda rápida al acceder";
 
-/* A checkbox controlling if the user will allow us to send usage statistics to Google. */
-"Send usage statistics to Google" = "Enviar estadísticas de utilización a Google";
-
 /* A label for an edit field allowing the user to set the keyboard shortcut to show and hide QSB. */
 "Keyboard shortcut:" = "Keyboard shortcuts:";
 
