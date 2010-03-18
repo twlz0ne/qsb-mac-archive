@@ -1,5 +1,5 @@
 //
-//  PFMoveApplication.m, version 1.1
+//  PFMoveApplication.m, version 1.3
 //  LetsMove
 //
 //  Created by Andy Kim at Potion Factory LLC on 9/17/09
@@ -10,7 +10,8 @@
 //	  Andy Kim
 //    John Brayton
 //    Chad Sellers
-//    Eita Hayashi (Japanese localization)
+//    Kevin LaCoste
+//    Rasmus Andersson / Spotify
 //
 
 #import "PFMoveApplication.h"
@@ -45,16 +46,22 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 
 	// File Manager
 	NSFileManager *fm = [NSFileManager defaultManager];
+	BOOL bundlePathIsWritable = [fm isWritableFileAtPath:bundlePath];
+
+	// Guess if we have launched from a disk image
+	BOOL isLaunchedFromDMG = ([bundlePath hasPrefix:@"/Volumes/"] && !bundlePathIsWritable);
 
 	// Fail silently if there's no access to delete the original application
-	if (![fm isWritableFileAtPath:bundlePath]) {
-		NSLog(@"No access to delete the app. Not offering to move it.");
+	if (!isLaunchedFromDMG && !bundlePathIsWritable) {
+		NSLog(@"INFO -- No access to delete the app. Not offering to move it.");
 		return;
 	}
 
 	// Since we are good to go, get the preferred installation directory.
 	BOOL installToUserApplications = NO;
 	NSString *applicationsDirectory = PreferredInstallLocation(&installToUserApplications);
+	NSString *bundleName = [bundlePath lastPathComponent];
+	NSString *destinationPath = [applicationsDirectory stringByAppendingPathComponent:bundleName];
 
 	// Check if we need admin password to write to the Applications directory
 	BOOL needAuthorization = ([fm isWritableFileAtPath:applicationsDirectory] == NO);
@@ -109,11 +116,13 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
   [[[alert suppressionButton] cell] setControlSize:NSSmallControlSize];
   [[[alert suppressionButton] cell] setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];
 
+	// Activate app -- work-around for focus issues related to "scary file from internet" OS dialog.
+	if (![NSApp isActive]) {
+		[NSApp activateIgnoringOtherApps:YES];
+	}
+	
 	if ([alert runModal] == NSAlertFirstButtonReturn) {
 		NSLog(@"Moving myself to the Applications folder");
-
-		NSString *bundleName = [bundlePath lastPathComponent];
-		NSString *destinationPath = [applicationsDirectory stringByAppendingPathComponent:bundleName];
 
 		if (needAuthorization) {
 			BOOL authorizationCanceled;
@@ -145,7 +154,7 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 		// NOTE: This final delete does not work if the source bundle is in a network mounted volume.
 		//       Calling rm or file manager's delete method doesn't work either. It's unlikely to happen
 		//       but it'd be great if someone could fix this.
-		if (!Trash(bundlePath)) {
+		if (!isLaunchedFromDMG && !Trash(bundlePath)) {
 			NSLog(@"WARNING -- Could not delete application after moving it to Applications folder");
 		}
 
@@ -153,19 +162,40 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 		// The shell script waits until the original app process terminates.
 		// This is done so that the relaunched app opens as the front-most app.
 		int pid = [[NSProcessInfo processInfo] processIdentifier];
-		NSString *script = [NSString stringWithFormat:@"while [ `ps -p %d | wc -l` -gt 1 ]; do sleep 0.1; done; open '%@'", pid, destinationPath];
-		[NSTask launchedTaskWithLaunchPath:@"/bin/sh" 
-                             arguments:[NSArray arrayWithObjects:@"-c", script, nil]];
+
+		// Command run just before running open /final/path
+		NSString *preOpenCmd = @"";
+
+		// OS X >=10.5:
+		// Before we launch the new app, clear xattr:com.apple.quarantine to avoid
+		// duplicate "scary file from the internet" dialog.
+#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
+		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4) {
+			preOpenCmd = [NSString stringWithFormat:@"/usr/bin/xattr -d -r com.apple.quarantine '%@';", destinationPath];
+		}
+#endif
+
+		NSString *script = [NSString stringWithFormat:@"(while [ `ps -p %d | wc -l` -gt 1 ]; do sleep 0.1; done; %@ open '%@') &", pid, preOpenCmd, destinationPath];
+
+		[NSTask launchedTaskWithLaunchPath:@"/bin/sh" arguments:[NSArray arrayWithObjects:@"-c", script, nil]];
+
+		// Launched from within a DMG? -- unmount (if no files are open after 5 seconds,
+		// otherwise leave it mounted).
+		if (isLaunchedFromDMG) {
+			script = [NSString stringWithFormat:@"(sleep 5 && hdiutil detach '%@') &", [bundlePath stringByDeletingLastPathComponent]];
+			[NSTask launchedTaskWithLaunchPath:@"/bin/sh" arguments:[NSArray arrayWithObjects:@"-c", script, nil]];
+		}
+
 		[NSApp terminate:nil];
 	}
 	else {
 		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4) {
 			// Save the alert suppress preference if checked
-			#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
 			if ([[alert suppressionButton] state] == NSOnState) {
 				[[NSUserDefaults standardUserDefaults] setBool:YES forKey:AlertSuppressKey];
 			}
-			#endif
+#endif
 		}
 		else {
 			// Always suppress after the first decline on 10.4 since there is no suppression checkbox
@@ -311,8 +341,8 @@ static BOOL AuthorizedInstall(NSString *srcPath,
 
   const char *cpArgs[] = {
     "-pR", 
-    [srcPath UTF8String], 
-    [dstPath UTF8String], 
+    [srcPath fileSystemRepresentation], 
+    [dstPath fileSystemRepresentation], 
     NULL
   };
   err = AuthorizationExecuteWithPrivileges(myAuthorizationRef, 
