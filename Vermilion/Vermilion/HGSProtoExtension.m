@@ -197,11 +197,17 @@
     factoredExtension = [[self copyWithFactor:account
                                        forKey:kHGSExtensionAccountKey]
                          autorelease];
-    // For account-based extensions we disable unless this has been
-    // specifically overridden in the plist.
+    // By default we disable account-based source extensions and enable
+    // account-based action extensions unless the enable state has been
+    // specifically overridden in the extension's configuration.
     NSNumber *isEnabledByDefaultValue 
       = [configuration_ objectForKey:kHGSExtensionIsEnabledByDefaultKey];
     BOOL doEnable = [isEnabledByDefaultValue boolValue];
+    NSString *extensionPoint = [self extensionPointKey];
+    if (!isEnabledByDefaultValue
+        && [extensionPoint isEqualToString:kHGSActionsExtensionPoint]) {
+      doEnable = YES;
+    }
     if (!doEnable || ![account isAuthenticated]) {
       // Set isEnabled_ directly--we don't want the setter side-effects.
       factoredExtension->enabled_ = NO;
