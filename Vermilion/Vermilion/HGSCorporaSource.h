@@ -57,13 +57,25 @@
 */
 @property (readonly, nonatomic, retain) NSArray *searchableCorpora;
 
-/*! Return a URI for the corpus described by corpusDict and account. */
+/*! 
+ Return a URI for the corpus described by corpusDict and account. 
+ @param corpusDict The dictionary describing the corpus.
+ @param account The account that is going to be accessing the 
+                corpus. This can be nil.
+ @result The URI for the corpus.
+*/
 - (NSString *)uriForCorpus:(NSDictionary *)corpusDict 
                    account:(HGSAccount *)account;
 
 /*! 
  Return a web search template for the corpus described by corpusDict and 
  account. 
+ @param corpusDict The dictionary describing the corpus.
+ @param account The account that is going to be accessing the 
+                corpus. This can be nil.
+ @result The web search template for the corpus that contains "{searchterms}"
+         which is a placemarker that will be replaced with the actual 
+         search terms.
 */
 - (NSString *)webSearchTemplateForCorpus:(NSDictionary *)corpusDict 
                                  account:(HGSAccount *)account;
@@ -71,6 +83,10 @@
 /*! 
  Return a web search template for the corpus described by corpusDict and 
  account. 
+ @param corpusDict The dictionary describing the corpus.
+ @param account The account that is going to be accessing the 
+                corpus. This can be nil.
+ @result The display name for the corpus.
  */
 - (NSString *)displayNameForCorpus:(NSDictionary *)corpusDict 
                            account:(HGSAccount *)account;
@@ -80,6 +96,10 @@
  account. This calls uriForCorpus:account:, webSearchTemplateForCorpus:account:
  and displayNameForCorpus:account:, so only override this if you can't get
  what you want using the above methods.
+ @param corpusDict The dictionary describing the corpus.
+ @param account The account that is going to be accessing the 
+                corpus. This can be nil.
+ @result A result representing the corpus.
 */
 - (HGSResult *)resultForCorpus:(NSDictionary *)corpusDict 
                        account:(HGSAccount *)account;
@@ -92,16 +112,26 @@
 */
 extern NSString *const kHGSCorporaDefinitionsKey;
 
-/*! Hide this corpus on iPhone. BOOL value. Default NO. */
+/*! 
+ @const
+ Hide this corpus on iPhone. BOOL value. Default NO. 
+*/
 extern NSString *const kHGSCorporaSourceAttributeHideFromiPhoneKey;
 
-/*! Hide this corpus on Desktop. BOOL value. Default NO. */
+/*! 
+ @const
+Hide this corpus on Desktop. BOOL value. Default NO. 
+*/
 extern NSString *const kHGSCorporaSourceAttributeHideFromDesktopKey;
 
-/*! Don't put this corpus in the drop down menu. BOL value. Default NO. */
+/*! 
+ @const
+ Don't put this corpus in the drop down menu. BOL value. Default NO. 
+*/
 extern NSString *const kHGSCorporaSourceAttributeHideFromDropdownKey;
 
 /*! 
+ @const
  Prevent Google Web Source from searching this corpus using site search.
  BOOL value. Default NO.
 */

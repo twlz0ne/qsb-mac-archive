@@ -41,7 +41,7 @@
 					<key>HGSObjectAttributeSearchInline</key>
 					<true/>
 					<key>HGSObjectAttributeName</key>
-					<string>Google.com</string>
+					<string>^Google.com</string>
 					<key>HGSObjectAttributeURI</key>
 					<string>http://www.google.com/</string>
 					<key>HGSObjectAttributeWebSearchDisplayString</key>
@@ -57,7 +57,7 @@
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>alt-local</string>
 					<key>HGSObjectAttributeName</key>
-					<string>Local</string>
+					<string>^Local</string>
 					<key>HGSCorporaSourceAttributeHideFromDropdown</key>
 					<true/>
 					<key>HGSObjectAttributeURI</key>
@@ -73,7 +73,7 @@
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>maps</string>
 					<key>HGSObjectAttributeName</key>
-					<string>Google Maps</string>
+					<string>^Google Maps</string>
 					<key>HGSCorporaSourceAttributeHideFromDropdown</key>
 					<true/>
 					<key>HGSObjectAttributeGoogleAPIURL</key>
@@ -129,7 +129,7 @@
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>calendar</string>
 					<key>HGSObjectAttributeName</key>
-					<string>Google Calendar</string>
+					<string>^Google Calendar</string>
 					<key>HGSObjectAttributeURI</key>
 					<string>http://www.google.com/calendar</string>
 					<key>HGSCorporaSourceAttributeMobileURIString</key>
@@ -169,7 +169,7 @@
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>groups-icon</string>
 					<key>HGSObjectAttributeName</key>
-					<string>Google Groups</string>
+					<string>^Google Groups</string>
 					<key>HGSCorporaSourceAttributeHideCorpus</key>
 					<true/>
 					<key>HGSObjectAttributeURI</key>
@@ -197,7 +197,7 @@
 					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeName</key>
-					<string>Google Reader</string>
+					<string>^Google Reader</string>
 					<key>HGSCorporaSourceAttributeMobileURIString</key>
 					<string>http://www.google.com/m#reader</string>
 					<key>HGSObjectAttributeURI</key>
@@ -205,9 +205,11 @@
 				</dict>
 				<dict>
 					<key>HGSObjectAttributeName</key>
-					<string>Google Talk</string>
+					<string>^Google Talk</string>
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>talk</string>
+					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<true/>
 					<key>HGSObjectAttributeURI</key>
 					<string>http://talkgadget.google.com/talkgadget/popout</string>
 					<key>HGSCorporaSourceAttributeMobileURIString</key>
@@ -318,7 +320,7 @@
 			<array>
 				<dict>
 					<key>HGSObjectAttributeName</key>
-					<string>%@ Mail</string>
+					<string>^%@ Mail</string>
 					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeIconPreviewFile</key>
@@ -332,7 +334,7 @@
 				</dict>
 				<dict>
 					<key>HGSObjectAttributeName</key>
-					<string>%@ Calendar</string>
+					<string>^%@ Calendar</string>
 					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeIconPreviewFile</key>
@@ -344,7 +346,7 @@
 				</dict>
 				<dict>
 					<key>HGSObjectAttributeName</key>
-					<string>%@ Docs</string>
+					<string>^%@ Docs</string>
 					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeIconPreviewFile</key>
@@ -356,20 +358,6 @@
 					<key>HGSAccountTypeKey</key>
 					<string>com.google.qsb.googleapps.account</string>
 				</dict>
-				<dict>
-					<key>HGSObjectAttributeName</key>
-					<string>%@ Talk</string>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
-					<true/>
-					<key>HGSObjectAttributeIconPreviewFile</key>
-					<string>talk</string>
-					<key>HGSObjectAttributeURI</key>
-					<string>http://hostedtalkgadget.google.com/a/%@/talkgadget/popout</string>
-					<key>HGSCorporaSourceAttributeMobileURIString</key>
-					<string>http://hostedtalkgadget.google.com/a/%@/talkgadget/m</string>
-					<key>HGSAccountTypeKey</key>
-					<string>com.google.qsb.googleapps.account</string>
-				</dict>
 			</array>
 		</dict>
 		<dict>
@@ -378,7 +366,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Wikipedia</string>
+			<string>^Wikipedia</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.wikipediacorpora.source</string>
 			<key>HGSSearchSourceSupportedTypes</key>
@@ -405,7 +393,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Amazon</string>
+			<string>^Amazon</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.amazoncorpora.source</string>
 			<key>HGSSearchSourceSupportedTypes</key>
@@ -416,7 +404,7 @@
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>amazon-icon</string>
 					<key>HGSObjectAttributeName</key>
-					<string>Amazon</string>
+					<string>^Amazon</string>
 					<key>HGSObjectAttributeURI</key>
 					<string>http://www.amazon.com</string>
 					<key>HGSObjectAttributeWebSearchTemplate</key>
@@ -430,7 +418,7 @@
 			<key>HGSExtensionPoint</key>
 			<string>HGSSourcesExtensionPoint</string>
 			<key>HGSExtensionUserVisibleName</key>
-			<string>Internet Movie Data Base</string>
+			<string>^IMDB</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.imdbcorpora.source</string>
 			<key>HGSSearchSourceSupportedTypes</key>
@@ -441,7 +429,7 @@
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>imdb-icon</string>
 					<key>HGSObjectAttributeName</key>
-					<string>IMDB</string>
+					<string>^IMDB</string>
 					<key>HGSObjectAttributeURI</key>
 					<string>http://www.imdb.com</string>
 					<key>HGSObjectAttributeWebSearchTemplate</key>

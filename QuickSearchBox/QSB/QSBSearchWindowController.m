@@ -804,10 +804,15 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 // Delegate callback for the window menu, this propogates the dropdown of 
 // search sites
 - (void)menuNeedsUpdate:(NSMenu *)menu {
+  // We have some items at the top and bottom of the menu that we don't want
+  // to delete when we refresh it.
+  const NSInteger kNumberOfItemsAtStartOfMenu = 2;
+  const NSInteger kNumberOfItemsAtEndOfMenu = 3;
+  
   // If this isn't the expected menu return
   if ([windowMenuButton_ menu] != menu) return;
-  NSUInteger menuItemCount = [menu numberOfItems] - 3;
-  for (NSUInteger i = 2; i < menuItemCount; ++i) {
+  NSUInteger menuItemCount = [menu numberOfItems] - kNumberOfItemsAtEndOfMenu;
+  for (NSUInteger i = kNumberOfItemsAtStartOfMenu; i < menuItemCount; ++i) {
     [menu removeItemAtIndex:2];
   }
   // Add our items.
