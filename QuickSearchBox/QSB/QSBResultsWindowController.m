@@ -347,6 +347,11 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   [NSAnimationContext endGrouping];
 }
 
+- (IBAction)pathControlClick:(id)sender {
+  QSBResultsViewBaseController *controller
+    = [[self currentResultsViewControllerTrio] activeResultsViewController];
+  [controller pathControlClick:sender];
+}
 
 #pragma mark Notifications
 

@@ -60,6 +60,7 @@
 - (IBAction)showResultsWindow:(id)sender;
 - (IBAction)qsb_showTopResults:(id)sender;
 - (IBAction)qsb_showMoreResults:(id)sender;
+- (IBAction)pathControlClick:(id)sender;
 @end
 
 // Notification that the selected result did change.
