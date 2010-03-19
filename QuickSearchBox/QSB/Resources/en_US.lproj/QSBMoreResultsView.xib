@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="145"/>
+			<integer value="146"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -111,9 +111,8 @@
 												<reference key="NSColor" ref="677698522"/>
 											</object>
 										</object>
-										<int key="NSResizingMask">3</int>
+										<int key="NSResizingMask">1</int>
 										<bool key="NSIsResizeable">YES</bool>
-										<bool key="NSIsEditable">YES</bool>
 										<reference key="NSTableView" ref="732561302"/>
 									</object>
 								</object>
@@ -437,12 +436,14 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>qsb_delimitResult:</string>
 							<string>qsb_pickCurrentSourceTableResult:</string>
 							<string>qsb_pivotOnSelection:</string>
 							<string>qsb_unpivotOnSelection:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
