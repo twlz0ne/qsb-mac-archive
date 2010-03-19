@@ -2,7 +2,7 @@
 "^Google Apps" = "Google Apps";
 
 /* A label denoting the name of the Google Apps For your domain Source. It is a source that allows you to access various Google corpora such as calendar etc. Do not include ^ in localization.*/
-"^Google Apps For Your Domain" = "^Google Apps For Your Domain";
+"^Google Apps For Your Domain" = "Google Apps For Your Domain";
 
 /* A label denoting the name of the Wikipedia Source. It is a source that allows you to search wikipedia. Do not include ^ in localization.*/
 "^Wikipedia" = "Wikipedia";
