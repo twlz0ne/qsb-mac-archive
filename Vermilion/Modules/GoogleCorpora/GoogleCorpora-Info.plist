@@ -369,6 +369,8 @@
 			<string>^Wikipedia</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.wikipediacorpora.source</string>
+			<key>HGSExtensionIsUserVisible</key>
+			<false/>
 			<key>HGSSearchSourceSupportedTypes</key>
 			<string>webpage.application</string>
 			<key>HGSCorporaDefinitions</key>
@@ -398,6 +400,8 @@
 			<string>com.google.qsb.amazoncorpora.source</string>
 			<key>HGSSearchSourceSupportedTypes</key>
 			<string>webpage.application</string>
+			<key>HGSExtensionIsUserVisible</key>
+			<false/>
 			<key>HGSCorporaDefinitions</key>
 			<array>
 				<dict>
@@ -423,6 +427,8 @@
 			<string>com.google.qsb.imdbcorpora.source</string>
 			<key>HGSSearchSourceSupportedTypes</key>
 			<string>webpage.application</string>
+			<key>HGSExtensionIsUserVisible</key>
+			<false/>
 			<key>HGSCorporaDefinitions</key>
 			<array>
 				<dict>
