@@ -32,6 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 #import <GData/GDataHTTPFetcher.h>
+#import <QSBPluginUI/QSBHGSResultAttributeKeys.h>
 #import "HGSKeychainItem.h"
 #import "GTMGoogleSearch.h"
 
@@ -47,6 +48,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   HGSSimpleAccount *account_;
   GDataHTTPFetcher *fetcher_;
   BOOL currentlyFetching_;
+  NSURL *baseURL_;
 }
 
 - (void)setUpPeriodicRefresh;
@@ -76,6 +78,13 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   return self;
 }
 
+- (void)dealloc {
+  [fetcher_ release];
+  [account_ release];
+  [baseURL_ release];
+  [super dealloc];
+}
+
 - (void)uninstall {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [updateTimer_ invalidate];
@@ -99,6 +108,17 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
         = [gsearch searchURLFor:nil 
                          ofType:@"bookmarks/find" 
                       arguments:args];
+      NSRange findRange = [bookmarkRequestString rangeOfString:@"/find?"];
+      HGSAssert(findRange.location != NSNotFound, nil);
+      NSString *baseURLString
+        = [bookmarkRequestString substringToIndex:findRange.location];
+      baseURL_ = [[NSURL URLWithString:baseURLString] retain];
+      bookmarkRequestString
+        = [bookmarkRequestString
+           stringByReplacingOccurrencesOfString:@"http:"
+                                     withString:@"https:"
+                                        options:NSLiteralSearch | NSAnchoredSearch
+                                          range:NSMakeRange(0, 5)];
       NSURL *bookmarkRequestURL = [NSURL URLWithString:bookmarkRequestString];
       NSMutableURLRequest *bookmarkRequest
         = [NSMutableURLRequest
@@ -175,18 +195,58 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   
   NSImage *icon = [NSImage imageNamed:@"blue-nav"];
   NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSUnderHomeRankFlag];
+
+  // Compose the contents of the path control:
+  //  - account name
+  //  - host
+  //  - subdomain (if any)
+  NSMutableArray *cellArray = [NSMutableArray array];
+  NSString *userName = [account_ userName];
+  NSDictionary *userCell = [NSDictionary dictionaryWithObjectsAndKeys:
+                            userName, kQSBPathCellDisplayTitleKey,
+                            baseURL_, kQSBPathCellURLKey,
+                            nil];
+  [cellArray addObject:userCell];
+  
+  NSRange range = [url rangeOfString:@"://"];
+  NSUInteger hostPos = NSMaxRange(range);
+  NSString *host = [url substringFromIndex:hostPos];
+  NSString *subdomain = nil;
+  range = [host rangeOfString:@"/"];
+  if (range.location != NSNotFound) {
+    // No subdomain found.
+    hostPos += NSMaxRange(range);
+    subdomain = [host substringFromIndex:range.location];
+    host = [host substringToIndex:range.location];
+  }
+  NSURL *hostURL = [NSURL URLWithString:[url substringToIndex:hostPos]];
+  NSDictionary *hostCell = [NSDictionary dictionaryWithObjectsAndKeys:
+                            host, kQSBPathCellDisplayTitleKey,
+                            hostURL, kQSBPathCellURLKey,
+                            nil];
+  [cellArray addObject:hostCell];
+  
+  if ([subdomain length] > 1) {
+    NSDictionary *subdomainCell = [NSDictionary dictionaryWithObjectsAndKeys:
+                                   subdomain, kQSBPathCellDisplayTitleKey,
+                                   [NSURL URLWithString:url], kQSBPathCellURLKey,
+                                   nil];
+    [cellArray addObject:subdomainCell];
+  }
+
   NSDictionary *attributes 
     = [NSDictionary dictionaryWithObjectsAndKeys:
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        url, kHGSObjectAttributeSourceURLKey,
        icon, kHGSObjectAttributeIconKey,
+       cellArray, kQSBObjectAttributePathCellsKey,
        @"star-flag", kHGSObjectAttributeFlagIconNameKey,
        nil];
   HGSUnscoredResult* result 
     = [HGSUnscoredResult resultWithURI:url
                                   name:([title length] > 0 ? title : url)
                                   type:HGS_SUBTYPE(kHGSTypeWebBookmark,
-                                           @"googlebookmarks")
+                                                   @"googlebookmarks")
                                 source:self
                             attributes:attributes];
   [self indexResult:result
