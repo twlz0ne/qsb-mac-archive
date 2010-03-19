@@ -82,13 +82,37 @@
 			buildPhases = (
 			);
 			dependencies = (
-				8BC6E47F0FAABEC6005A0F6F /* PBXTargetDependency */,
-				8BF627BC110A663F000AB941 /* PBXTargetDependency */,
+				8BDB853F11518A7E00C411B1 /* PBXTargetDependency */,
 				8BC6E4830FAABEE1005A0F6F /* PBXTargetDependency */,
 				8BC6E4810FAABEC9005A0F6F /* PBXTargetDependency */,
 			);
 			name = "Build All";
 			productName = "QSB Application";
+		};
+		8BDB84E911518A1F00C411B1 /* Create DMGs */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 8BDB853D11518A4B00C411B1 /* Build configuration list for PBXAggregateTarget "Create DMGs" */;
+			buildPhases = (
+				8BDB84E811518A1F00C411B1 /* ShellScript */,
+			);
+			dependencies = (
+				8BDB862A115194CE00C411B1 /* PBXTargetDependency */,
+			);
+			name = "Create DMGs";
+			productName = "Create DMGs";
+		};
+		8BDB8622115194B700C411B1 /* Codesign */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 8BDB8635115194DD00C411B1 /* Build configuration list for PBXAggregateTarget "Codesign" */;
+			buildPhases = (
+				8BDB8621115194B700C411B1 /* ShellScript */,
+			);
+			dependencies = (
+				8BDB8628115194CC00C411B1 /* PBXTargetDependency */,
+				8BDB863E115194FD00C411B1 /* PBXTargetDependency */,
+			);
+			name = Codesign;
+			productName = Codesign;
 		};
 		8BF627AD110A661A000AB941 /* Transference */ = {
 			isa = PBXAggregateTarget;
@@ -1163,6 +1187,7 @@
 		8BDB79751150372F00C411B1 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
 		8BDB79781150373F00C411B1 /* GTM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8BDB79791150374900C411B1 /* GoogleCorporaSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F34589C0DDE16C00050702F /* GoogleCorporaSource.m */; };
+		8BDB889E1152B68B00C411B1 /* GTM.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8BDC55F8112F4D1400988421 /* QSBPivotTextAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC55F6112F4D1400988421 /* QSBPivotTextAttachment.m */; };
 		8BDCC73F0F1827E000CDDA78 /* gmail.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4730F17C7BF00896770 /* gmail.icns */; };
 		8BDCCA8A0F18646700CDDA78 /* GoogleBreakpad.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BDCCA840F18645800CDDA78 /* GoogleBreakpad.framework */; };
@@ -1779,13 +1804,6 @@
 			remoteGlobalIDString = 8B77E0DB0F28FC3B00FA2A3C;
 			remoteInfo = GData;
 		};
-		8BC6E47E0FAABEC6005A0F6F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA;
-			remoteInfo = "QSB Application";
-		};
 		8BC6E4800FAABEC9005A0F6F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1820,6 +1838,34 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			remoteInfo = Vermilion;
+		};
+		8BDB853E11518A7E00C411B1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BDB84E911518A1F00C411B1 /* Create DMGs */;
+			remoteInfo = "Create DMGs";
+		};
+		8BDB8627115194CC00C411B1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
+			remoteInfo = "QSB Application";
+		};
+		8BDB8629115194CE00C411B1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BDB8622115194B700C411B1 /* Codesign */;
+			remoteInfo = Codesign;
+		};
+		8BDB863D115194FD00C411B1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BF627AD110A661A000AB941 /* Transference */;
+			remoteInfo = Transference;
 		};
 		8BE34079114FF1CB002D047A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1883,13 +1929,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8BF62022110A60C2000AB941;
 			remoteInfo = "Transference Beacon";
-		};
-		8BF627BB110A663F000AB941 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8BF627AD110A661A000AB941;
-			remoteInfo = Transference;
 		};
 		E46932F70DDB7A0200C5A64A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2127,6 +2166,17 @@
 				8B85325A100B909D00880329 /* profilesWith2Profiles.ini in Copy Firefox Test Data */,
 			);
 			name = "Copy Firefox Test Data";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BDB88E91152B6A400C411B1 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				8BDB889E1152B68B00C411B1 /* GTM.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F4EF8F730ECB3EFF008DD6DA /* CopyFiles */ = {
@@ -3510,6 +3560,9 @@
 		8BD46A810E43DD3C00BF3562 /* GTMNSAppleEventDescriptor+Foundation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSAppleEventDescriptor+Foundation.h"; sourceTree = "<group>"; };
 		8BD83CAE0F1EC46400098475 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		8BD97D0A0E636D8C00F5C83B /* GTM.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = GTM.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BDB84E61151888400C411B1 /* CreateDiskImages.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = CreateDiskImages.sh; sourceTree = "<group>"; };
+		8BDB85C9115193F800C411B1 /* Codesign.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = Codesign.sh; sourceTree = "<group>"; };
+		8BDB86BD115298CE00C411B1 /* BuildSDKPackage.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = BuildSDKPackage.sh; sourceTree = "<group>"; };
 		8BDC55F6112F4D1400988421 /* QSBPivotTextAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPivotTextAttachment.m; sourceTree = "<group>"; };
 		8BDC55F7112F4D1400988421 /* QSBPivotTextAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPivotTextAttachment.h; sourceTree = "<group>"; };
 		8BDCC8A20F183BA200CDDA78 /* QSB.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = QSB.xcconfig; sourceTree = "<group>"; };
@@ -4683,7 +4736,10 @@
 		8B07C41B0B69234900827344 /* BuildScripts */ = {
 			isa = PBXGroup;
 			children = (
+				8BDB86BD115298CE00C411B1 /* BuildSDKPackage.sh */,
 				8BA5246811212488001D2E0E /* BuildSDKProjects.sh */,
+				8BDB84E61151888400C411B1 /* CreateDiskImages.sh */,
+				8BDB85C9115193F800C411B1 /* Codesign.sh */,
 				8B4A7048104F113B0058ABDD /* RunUnitTests.sh */,
 				8B3F6F73101A5C4C004FACA9 /* Localization.sh */,
 				8B6870871017DF6600ADEA67 /* PostBuild.sh */,
@@ -7254,6 +7310,7 @@
 			buildPhases = (
 				8BF62712110A6519000AB941 /* Resources */,
 				8BF62713110A6519000AB941 /* Sources */,
+				8BDB88E91152B6A400C411B1 /* Copy Frameworks */,
 				8BF62714110A6519000AB941 /* Frameworks */,
 			);
 			buildRules = (
@@ -7436,13 +7493,15 @@
 			targets = (
 				8BC6E3ED0FAABE71005A0F6F /* Build All */,
 				795F071909870215004C6BFE /* Test All */,
-				8BAB339110BC81A7002E1AC9 /* Delete Preferences */,
-				8B53EB3410DC0E84007E6AF2 /* Open Build Folder */,
+				8BDB84E911518A1F00C411B1 /* Create DMGs */,
+				8BDB8622115194B700C411B1 /* Codesign */,
 				F4EF8F740ECB3EFF008DD6DA /* QSB Application */,
 				8B77DEFE0F284A4C00FA2A3C /* Release Notes */,
 				8B2E2A400F99018600F80E11 /* HeaderDoc */,
 				8B148D860F705F35002E05FA /* QSB SDK */,
 				8BF627AD110A661A000AB941 /* Transference */,
+				8BAB339110BC81A7002E1AC9 /* Delete Preferences */,
+				8B53EB3410DC0E84007E6AF2 /* Open Build Folder */,
 				8B3EECE20CEA86A100D933C0 /* QSB Core */,
 				8BF62715110A6519000AB941 /* Transference Demo */,
 				620CB3080FAA827E0029801C /* QSBPluginUI */,
@@ -8305,7 +8364,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\necho \"Building SDK Package\"\n\nSDK_PACKAGE_DIR=\"${TEMP_DIR}/QSB SDK\"\nTEMPLATE_DIR=\"${SDK_PACKAGE_DIR}/Library/Application Support/Developer/Shared/Xcode/Project Templates/QSB\"\nPLUGIN_DIR=\"${SDK_PACKAGE_DIR}/Library/Application Support/Developer/Shared/Xcode/Plug-ins/\"\nDOCUMENTATION_DIR=\"${SDK_PACKAGE_DIR}/Library/Developer/Shared/Documentation/DocSets/com.google.qsb.docset\"\nDOCUMENTATION_CONTENTS_DIR=\"${DOCUMENTATION_DIR}/Contents\"\nDOCUMENTATION_RESOURCES_DIR=\"${DOCUMENTATION_CONTENTS_DIR}/Resources\"\nDOCUMENTATION_DOCUMENTS_DIR=\"${DOCUMENTATION_RESOURCES_DIR}/Documents\"\nINSTALLER_DIR=\"${SDK_PACKAGE_DIR}/Google Quick Search Box SDK\"\n\nif [ -d \"${SDK_PACKAGE_DIR}\" ]; then\n  rm -Rf  \"${SDK_PACKAGE_DIR}\"\nfi\n\nmkdir -p \"${TEMPLATE_DIR}\"\nmkdir -p \"${PLUGIN_DIR}\"\nmkdir -p \"${DOCUMENTATION_DOCUMENTS_DIR}\"\nmkdir -p \"${INSTALLER_DIR}\"\n\nditto \"${SRCROOT}/SDK/Templates\" \"${TEMPLATE_DIR}\"\nditto \"${SRCROOT}/SDK/Plugins\" \"${PLUGIN_DIR}\"\nditto \"${BUILT_PRODUCTS_DIR}/Documentation/Vermilion\" \"${DOCUMENTATION_DOCUMENTS_DIR}\"\ncp \"${SRCROOT}/SDK/DocumentationResources/Info.plist\" \"${DOCUMENTATION_CONTENTS_DIR}/Info.plist\"\ncp \"${SRCROOT}/SDK/DocumentationResources/Nodes.xml\" \"${DOCUMENTATION_RESOURCES_DIR}/Nodes.xml\"\n\n# Index documentation\n\"${SYSTEM_DEVELOPER_BIN_DIR}/docsetutil\" index \"${DOCUMENTATION_DIR}\"\n\nfind \"${SDK_PACKAGE_DIR}\" -name \"*.pbxuser\" ! -name \"default.pbxuser\" -exec rm {} \\;\n\nchmod -R 755 \"${SDK_PACKAGE_DIR}\"\n\n\"${SYSTEM_DEVELOPER_UTILITIES_DIR}/PackageMaker.app/Contents/MacOS/PackageMaker\" -v --root \"${SDK_PACKAGE_DIR}\" -x \"/CVS$\" -x \"/\\.svn$\" -x \"/\\.cvsignore$\" -x \"/\\.cvspass$\" -x /\"\\.DS_Store$\" -x \"/build$\" -x \"/*\\.mode*\" --out \"${INSTALLER_DIR}/Google Quick Search Box SDK.pkg\" -t \"Google Quick Search Box SDK\" --resources \"${SRCROOT}/SDK/PackageResources\" --domain system --id \"com.google.qsb.sdk.pkg\" --version \"${GOOGLE_VERSIONINFO_LONG}\" --info \"${SRCROOT}/SDK/Info.plist\" --target 10.4 \n\necho \"Creating SDK Disk Image\"\n/usr/bin/hdiutil create -format UDRO -srcfolder \"${INSTALLER_DIR}\" -volname \"Google Quick Search Box SDK\" -ov \"${CONFIGURATION_BUILD_DIR}/GoogleQuickSearchBoxSDK-${GOOGLE_VERSIONINFO_LONG}.${CONFIGURATION}.dmg\"";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/BuildSDKPackage.sh\"";
 		};
 		8B148F950F7156B6002E05FA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8960,6 +9019,32 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\n\"${SRCROOT}/../../Vermilion/Modules/AppleScriptPlugins/Scripts/Common/AppleScriptPluginBuildCommon.sh\"";
+		};
+		8BDB84E811518A1F00C411B1 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/CreateDiskImages.sh\"";
+		};
+		8BDB8621115194B700C411B1 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/Codesign.sh\"";
 		};
 		8BF62032110A60C2000AB941 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -9941,11 +10026,6 @@
 			target = 8B77E0DB0F28FC3B00FA2A3C /* GData */;
 			targetProxy = 8BC6744D0F58B097003B5C6A /* PBXContainerItemProxy */;
 		};
-		8BC6E47F0FAABEC6005A0F6F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
-			targetProxy = 8BC6E47E0FAABEC6005A0F6F /* PBXContainerItemProxy */;
-		};
 		8BC6E4810FAABEC9005A0F6F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B148D860F705F35002E05FA /* QSB SDK */;
@@ -9965,6 +10045,26 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 8BDB7965115036F600C411B1 /* PBXContainerItemProxy */;
+		};
+		8BDB853F11518A7E00C411B1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BDB84E911518A1F00C411B1 /* Create DMGs */;
+			targetProxy = 8BDB853E11518A7E00C411B1 /* PBXContainerItemProxy */;
+		};
+		8BDB8628115194CC00C411B1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
+			targetProxy = 8BDB8627115194CC00C411B1 /* PBXContainerItemProxy */;
+		};
+		8BDB862A115194CE00C411B1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BDB8622115194B700C411B1 /* Codesign */;
+			targetProxy = 8BDB8629115194CE00C411B1 /* PBXContainerItemProxy */;
+		};
+		8BDB863E115194FD00C411B1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BF627AD110A661A000AB941 /* Transference */;
+			targetProxy = 8BDB863D115194FD00C411B1 /* PBXContainerItemProxy */;
 		};
 		8BE3407A114FF1CB002D047A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -10010,11 +10110,6 @@
 			isa = PBXTargetDependency;
 			target = 8BF62022110A60C2000AB941 /* Transference Beacon */;
 			targetProxy = 8BF627B5110A6637000AB941 /* PBXContainerItemProxy */;
-		};
-		8BF627BC110A663F000AB941 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8BF627AD110A661A000AB941 /* Transference */;
-			targetProxy = 8BF627BB110A663F000AB941 /* PBXContainerItemProxy */;
 		};
 		E46932F60DDB7A0200C5A64A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -12958,6 +13053,62 @@
 			};
 			name = Release;
 		};
+		8BDB853A11518A1F00C411B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "Create DMGs";
+			};
+			name = Debug;
+		};
+		8BDB853B11518A1F00C411B1 /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "Create DMGs";
+			};
+			name = "Debug-gcov";
+		};
+		8BDB853C11518A1F00C411B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "Create DMGs";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		8BDB8623115194B800C411B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = Codesign;
+			};
+			name = Debug;
+		};
+		8BDB8624115194B800C411B1 /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = Codesign;
+			};
+			name = "Debug-gcov";
+		};
+		8BDB8625115194B800C411B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = Codesign;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		8BF62034110A60C2000AB941 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
@@ -13724,6 +13875,26 @@
 				8BD97D0C0E636D8D00F5C83B /* Debug */,
 				8B95CBB60F6B1DEE003BDBDD /* Debug-gcov */,
 				8BD97D0D0E636D8D00F5C83B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8BDB853D11518A4B00C411B1 /* Build configuration list for PBXAggregateTarget "Create DMGs" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BDB853A11518A1F00C411B1 /* Debug */,
+				8BDB853B11518A1F00C411B1 /* Debug-gcov */,
+				8BDB853C11518A1F00C411B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8BDB8635115194DD00C411B1 /* Build configuration list for PBXAggregateTarget "Codesign" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BDB8623115194B800C411B1 /* Debug */,
+				8BDB8624115194B800C411B1 /* Debug-gcov */,
+				8BDB8625115194B800C411B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -121,7 +121,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Copy the plugin so it can be used\n\nmkdir -p \"${USER_LIBRARY_DIR}/Application Support/Quick Search Box/PlugIns\"\nln -sf ${CONFIGURATION_BUILD_DIR}/${FULL_PRODUCT_NAME} \"${USER_LIBRARY_DIR}/Application Support/Quick Search Box/PlugIns/${FULL_PRODUCT_NAME}\"";
+			shellScript = "# Copy the plugin so it can be used\n\nmkdir -p \"${USER_LIBRARY_DIR}/Application Support/Quick Search Box/PlugIns\"\nln -sf \"${CONFIGURATION_BUILD_DIR}/${FULL_PRODUCT_NAME}\" \"${USER_LIBRARY_DIR}/Application Support/Quick Search Box/PlugIns/${FULL_PRODUCT_NAME}\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
