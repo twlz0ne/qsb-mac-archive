@@ -168,7 +168,7 @@ static NSString *const kGrowlNotificationName = @"QSB User Message";
 GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionaryForActiveApp);
 GTM_METHOD_CHECK(GTMHotKeyTextField, stringForKeycode:useGlyph:resourceBundle:);
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
-GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
+GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 
 @synthesize applicationASDictionary = applicationASDictionary_;
 @synthesize searchWindowController = searchWindowController_;
@@ -226,24 +226,9 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 
 - (void)dealloc {
   [self stopObservingProtoExtensions];
+  [self gtm_stopObservingAllKeyPaths];
   [userMessenger_ release];
   [statusItem_ release];
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  [defaults gtm_removeObserver:self
-                    forKeyPath:kQSBHotKeyKey
-                      selector:@selector(hotKeyValueChanged:)];
-  [defaults gtm_removeObserver:self
-                    forKeyPath:kQSBHotKeyKeyEnabled
-                      selector:@selector(hotKeyValueChanged:)];
-  [defaults gtm_removeObserver:self
-                    forKeyPath:kQSBHotKeyKey2
-                      selector:@selector(hotKeyValueChanged:)];
-  [defaults gtm_removeObserver:self
-                    forKeyPath:kQSBHotKeyKey2Enabled
-                      selector:@selector(hotKeyValueChanged:)];
-  [defaults gtm_removeObserver:self
-                    forKeyPath:kQSBIconInMenubarKey
-                      selector:@selector(iconInMenubarValueChanged:)];
   NSNotificationCenter *workspaceNC
     = [[NSWorkspace sharedWorkspace] notificationCenter];
   [workspaceNC removeObserver:self];

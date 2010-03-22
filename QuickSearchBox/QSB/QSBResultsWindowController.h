@@ -49,6 +49,7 @@
   QSBAnimatedScroll *pivotAnimation_;
   NSMutableArray *resultsViewControllerTrios_;
   QSBResultsViewControllerTrio *pivotTrio_;
+  NSTimer *resetWindowSizeTimer_;
 }
 
 @property (readonly, assign) QSBActionPresenter *actionPresenter;

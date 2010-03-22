@@ -138,7 +138,7 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 
 GTM_METHOD_CHECK(NSObject, 
                  gtm_addObserver:forKeyPath:selector:userInfo:options:);
-GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
+GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 GTM_METHOD_CHECK(NSAppleEventDescriptor, gtm_arrayValue);
 GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 
@@ -249,10 +249,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 }
   
 - (void)dealloc {
-  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-  [ud gtm_removeObserver:self 
-              forKeyPath:kQSBUserPrefBackgroundColorKey
-                selector:@selector(backgroundColorChanged:)];
+  [self gtm_stopObservingAllKeyPaths];
   [queryResetTimer_ invalidate];
   queryResetTimer_ = nil;
   [displayResultsTimer_ invalidate];

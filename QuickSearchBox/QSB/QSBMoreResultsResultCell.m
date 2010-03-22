@@ -48,6 +48,7 @@ static const NSInteger kQSBMoreResultsResultCellDrawingOptions
 
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
 GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
+GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 
 - (void)drawSourceResult:(QSBSourceTableResult *)result 
                withFrame:(NSRect)cellFrame 
@@ -164,12 +165,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)dealloc {
-  id oldObject = [self representedObject];
-  if ([oldObject isKindOfClass:[QSBSourceTableResult class]]) {
-    [oldObject gtm_removeObserver:self 
-                       forKeyPath:@"displayIcon" 
-                         selector:@selector(displayIconChanged:)];
-  }
+  [self gtm_stopObservingAllKeyPaths];
   [super dealloc];
 }
 

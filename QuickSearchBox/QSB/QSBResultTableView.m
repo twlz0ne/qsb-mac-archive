@@ -59,6 +59,9 @@
 GTM_METHOD_CHECK(NSBezierPath, gtm_fillAxiallyFrom:to:extendingStart:extendingEnd:shading:);
 GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
 
+@synthesize maxTableHeight = maxTableHeight_;
+@synthesize minTableHeight = minTableHeight_;
+
 - (void)highlightSelectionInClipRect:(NSRect)rect {
   NSInteger selectedRow = [self selectedRow];
   if (selectedRow != -1) {
@@ -98,6 +101,8 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
 
 - (void)awakeFromNib {
   [self setDraggingSourceOperationMask:NSDragOperationEvery forLocal:NO];
+  minTableHeight_ = 42.0;
+  maxTableHeight_ = 1024.0;
 }
 
 - (BOOL)canDragRowsWithIndexes:(NSIndexSet *)rowIndexes 
@@ -223,6 +228,27 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
     visibleRowRange_ = visibleRows;
   }
   return adjustRect;
+}
+
+- (CGFloat)tableHeight {
+  // All of the view components have a fixed height relationship.  Base all
+  // calculations on the change in the scrollview's height.  The scrollview's
+  // height is determined from the tableview's height but within limits.
+  
+  // Determine the new tableview height.
+  CGFloat newTableHeight = 0.0;
+  NSInteger lastCellRow = [self numberOfRows] - 1;
+  if (lastCellRow > -1) {
+    NSRect firstCellFrame = [self frameOfCellAtColumn:0 row:0];
+    NSRect lastCellFrame = [self frameOfCellAtColumn:0 
+                                                 row:lastCellRow];
+    newTableHeight = fabs(NSMinY(firstCellFrame) - NSMaxY(lastCellFrame));
+  }
+  CGFloat minTableHeight = [self minTableHeight];
+  CGFloat maxTableHeight = [self maxTableHeight];
+  newTableHeight = MAX(newTableHeight, minTableHeight);
+  newTableHeight = MIN(newTableHeight, maxTableHeight);
+  return newTableHeight;
 }
 
 - (void)reloadData {

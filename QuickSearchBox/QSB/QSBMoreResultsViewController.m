@@ -92,7 +92,7 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
 - (void)awakeFromNib {  
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
   [resultsTableView setIntercellSpacing:NSMakeSize(0.0, 3.0)];
-
+  [resultsTableView setMaxTableHeight:550.0];
   [super awakeFromNib];
 }
 
@@ -104,12 +104,6 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   [sortedCategories_ release];
   [cachedRows_ release];
   [super dealloc];
-}
-
-- (CGFloat)maximumTableHeight {
-  // TODO(mrossetti): We probably want to calculate the following based
-  // on the screen geometry.
-  return 550.0;
 }
 
 - (NSUInteger)resultCountForCategory:(QSBCategory *)category {
@@ -207,6 +201,7 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
       }
     }
     [self cacheTableResult:object forRow:row];
+    object = object;
   }
   return object;
 }
@@ -290,10 +285,11 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
 }
 
 - (void)uncacheAllTableResults {
-  for (NSNumber *key in cachedRows_) {
+  NSArray *keys = [cachedRows_ allKeys];
+  for (NSNumber *key in keys) {
     [self removeCachedTableResultObserver:key];
+    [cachedRows_ removeObjectForKey:key];
   }
-  [cachedRows_ removeAllObjects];
 }
 
 #pragma mark NSResponder Overrides

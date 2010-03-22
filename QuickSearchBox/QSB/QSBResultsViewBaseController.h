@@ -38,11 +38,9 @@
 
 // Abstract base class for the result views which manages the presentation
 // of results in the Top Results and the More Results views.
-//
 @interface QSBResultsViewBaseController : NSViewController {
  @private
   IBOutlet QSBResultsViewTableView *resultsTableView_;
-  CGFloat lastTableHeight_;  // Remember last calculated table height.
   QSBSearchController *searchController_;
 }
 
@@ -54,22 +52,16 @@
 // Return the various views associated with this controller.
 - (QSBResultsViewTableView *)resultsTableView;
 
-// Get some UI metrics
-- (CGFloat)minimumTableHeight;
-- (CGFloat)maximumTableHeight;
-
 // Return the last selected table item.
 - (QSBTableResult *)selectedTableResult;
 
 // For a given row in the table, return the associated QSBTableResult
 - (QSBTableResult *)tableResultForRow:(NSInteger)row;
 
-// Return the most recently calculated table height to properly show ourself.
-- (CGFloat)tableHeight;
-
 // Respond to a click in the path control.
 - (void)pathControlClick:(id)sender;
 
 // Called when the results have been updated.
 - (void)searchControllerDidUpdateResults:(NSNotification *)notification;
+
 @end

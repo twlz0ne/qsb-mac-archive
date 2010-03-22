@@ -41,16 +41,6 @@
 #import "GTMGeometryUtils.h"
 #import "QSBSearchController.h"
 
-static const CGFloat kScrollViewMinusTableHeight = 7.0;
-static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
-
-@interface QSBResultsViewBaseController ()
-
-// Update the metrics of our results presentation and propose a new table height.
-- (void)updateTableHeight;
-@end
-
-
 @implementation QSBResultsViewBaseController
 
 @synthesize searchController = searchController_;
@@ -69,7 +59,7 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
 }
 
 - (void)awakeFromNib {
-  [resultsTableView_ setDoubleAction:@selector(insertNewline:)];
+  [resultsTableView_ setDoubleAction:@selector(qsb_pickCurrentTableResult:)];
   [resultsTableView_ setTarget:nil];
 }
 
@@ -82,41 +72,8 @@ static NSString * const kQSBArrangedObjectsKVOKey = @"arrangedObjects";
   return resultsTableView_;
 }
 
-- (CGFloat)minimumTableHeight {
-  return 42.0;
-}
-
-- (CGFloat)maximumTableHeight {
-  return 1024.0;
-}
-
 - (QSBTableResult *)selectedTableResult {
   return [self tableResultForRow:[resultsTableView_ selectedRow]];
-}
-
-- (void)updateTableHeight {
-  // All of the view components have a fixed height relationship.  Base all
-  // calculations on the change in the scrollview's height.  The scrollview's
-  // height is determined from the tableview's height but within limits.
-  
-  // Determine the new tableview height.
-  CGFloat newTableHeight = 0.0;
-  NSInteger lastCellRow = [resultsTableView_ numberOfRows] - 1;
-  if (lastCellRow > -1) {
-    NSRect firstCellFrame = [resultsTableView_ frameOfCellAtColumn:0 row:0];
-    NSRect lastCellFrame = [resultsTableView_ frameOfCellAtColumn:0 
-                                                              row:lastCellRow];
-    newTableHeight = fabs(NSMinY(firstCellFrame) - NSMaxY(lastCellFrame));
-  }
-  CGFloat minTableHeight = [self minimumTableHeight];
-  CGFloat maxTableHeight = [self maximumTableHeight];
-  newTableHeight = MAX(newTableHeight, minTableHeight);
-  newTableHeight = MIN(newTableHeight, maxTableHeight);
-  lastTableHeight_ = newTableHeight;
-}
-
-- (CGFloat)tableHeight {
-  return lastTableHeight_;
 }
 
 - (void)searchControllerDidUpdateResults:(NSNotification *)notification {
@@ -142,6 +99,14 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
               row:(NSInteger)rowIndex {
   QSBTableResult *result = [self tableResultForRow:rowIndex];
   [aCell setRepresentedObject:result];
+}
+
+- (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell 
+                   rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tc 
+                    row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation {
+  QSBTableResult *result = [self tableResultForRow:row];
+  NSString *tip = [result displayToolTip];
+  return tip;
 }
 
 - (QSBTableResult *)tableResultForRow:(NSInteger)row {

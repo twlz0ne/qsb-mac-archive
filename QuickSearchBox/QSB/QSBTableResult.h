@@ -100,6 +100,11 @@
 - (NSImage *)displayIcon;
 
 /*!
+ Return a tooltip.
+*/
+- (NSString*)displayToolTip;
+
+/*!
   Return a thumbnail.
 */
 - (NSImage *)displayThumbnail;

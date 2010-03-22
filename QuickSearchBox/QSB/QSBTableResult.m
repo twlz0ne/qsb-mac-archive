@@ -314,6 +314,10 @@ static NSDictionary *gBaseStringAttributes_ = nil;
   return nil;
 }
 
+- (NSString*)displayToolTip {
+  return @"";
+}
+
 - (NSImage *)flagIcon {
   return nil;
 }
@@ -332,7 +336,7 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 @implementation QSBSourceTableResult : QSBTableResult
 
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
-GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
+GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 
 @synthesize representedResult = representedResult_;
 @synthesize categoryName = categoryName_;
@@ -354,9 +358,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)dealloc {
-  [representedResult_ gtm_removeObserver:self
-                              forKeyPath:kHGSObjectAttributeIconKey
-                                selector:@selector(objectIconChanged:)];
+  [self gtm_stopObservingAllKeyPaths];
   [representedResult_ release];
   [super dealloc];
 }
@@ -457,16 +459,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (NSString*)displayToolTip {
-  NSString *displayString = nil;
-#if DEBUG
-  NSString *sourceName = [[[self representedResult] source] displayName];
-  if (!sourceName) {
-    NSBeep();
-  }
-  displayString = [NSString stringWithFormat:@"%@ (Score: %.2f, Source: %@)",
-                   displayString, [self score], sourceName];
-#else  // DEBUG
-  displayString = [self displayName];
+  NSString *displayString = [self displayName];
   HGSScoredResult *result = [self representedResult];
   NSString *snippetString
     = [result valueForKey:kHGSObjectAttributeSnippetKey];
@@ -479,7 +472,11 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
     displayString = [displayString stringByAppendingFormat:@" — %@",
                      resultSourceURL];
   }
-#endif  // DEBUG
+#if DEBUG
+  NSString *sourceName = [[[self representedResult] source] displayName];
+  displayString = [NSString stringWithFormat:@"%@ (Score: %.2f, Source: %@)",
+                   displayString, [self score], sourceName];
+#endif  
   return displayString;
 }
 

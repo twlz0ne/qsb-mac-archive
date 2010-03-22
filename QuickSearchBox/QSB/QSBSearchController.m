@@ -86,7 +86,7 @@ const NSTimeInterval kQSBDisplayTimerStages[] = { 0.1, 0.3, 0.7 };
 
 GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
-GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
+GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 
 + (void)initialize {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -124,10 +124,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)dealloc {
-  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-  [prefs gtm_removeObserver:self
-                 forKeyPath:kQSBResultCountKey
-                   selector:@selector(resultCountValueChanged:)];
+  [self gtm_stopObservingAllKeyPaths];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self];
 

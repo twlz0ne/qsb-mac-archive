@@ -36,7 +36,14 @@
 @interface QSBResultTableView : NSTableView {
  @private
   NSRange visibleRowRange_;
+  CGFloat maxTableHeight_;
+  CGFloat minTableHeight_;
 }
+
+// Return the most recently calculated table height to properly show ourself.
+@property (readonly, assign) CGFloat tableHeight;
+@property (readwrite, assign) CGFloat maxTableHeight;
+@property (readwrite, assign) CGFloat minTableHeight;
 
 // Tries to select a row in a table. Checks the current selection
 // and if it isn't good, increments or decrements (depending on |incrementing|)
