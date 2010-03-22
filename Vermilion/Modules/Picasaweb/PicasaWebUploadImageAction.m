@@ -37,10 +37,7 @@
 // An action that will upload one or more images and/or videoa
 // to a Picasa account.
 //
-@interface PicasaWebUploadImageAction : HGSGDataUploadAction {
- @private
-  NSURL *imagePostURL_;
-}
+@interface PicasaWebUploadImageAction : HGSGDataUploadAction 
 
 // Bottleneck function to upload a single image.
 - (void)uploadImage:(HGSResult *)image

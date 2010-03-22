@@ -46,7 +46,7 @@ static NSString *const kQSBDisplayIconKVOKey = @"representedObject.displayIcon";
 
 @implementation QSBResultIconView
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
-GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
+GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 
 - (void)awakeFromNib {
   [controller_ gtm_addObserver:self 
@@ -58,9 +58,7 @@ GTM_METHOD_CHECK(NSObject, gtm_removeObserver:forKeyPath:selector:);
 }
 
 - (void)dealloc {
-  [controller_ gtm_removeObserver:self 
-                       forKeyPath:kQSBDisplayIconKVOKey
-                         selector:@selector(displayIconValueChanged:)];
+  [self gtm_stopObservingAllKeyPaths];
   [controller_ release];
   [super dealloc];
 }
