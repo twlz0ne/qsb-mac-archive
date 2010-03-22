@@ -55,7 +55,6 @@
 - (id)initWithQuery:(HGSQuery*)query source:(HGSSearchSource *)source {
   if ((self = [super initWithQuery:query source:source])) {
     hgsResults_ = [[NSMutableDictionary alloc] init];
-    groupToCategoryIndexMap_ = [(SLFilesSource *)source groupToCategoryIndexMap];
   }
   return self;
 }
@@ -138,7 +137,9 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
   if (!mdCategoryQuery_) return;
   MDQuerySetMatchesSupportFiles(mdTopQuery_, NO);
   MDQuerySetMatchesSupportFiles(mdCategoryQuery_, NO);
-  _MDQuerySetGroupComparator(mdCategoryQuery_, SLFilesCategoryIndexForItem, groupToCategoryIndexMap_);
+  _MDQuerySetGroupComparator(mdCategoryQuery_, 
+                             SLFilesCategoryIndexForItem, 
+                             [slSource groupToCategoryIndexMap]);
   BOOL goodQuery = MDQueryExecute(mdTopQuery_, kMDQuerySynchronous);
   if (goodQuery) {
     goodQuery = MDQueryExecute(mdCategoryQuery_, kMDQuerySynchronous);
@@ -198,7 +199,7 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
              group:(NSUInteger)group {
   id value = nil;
   if (query) {
-    if (group == 0) {
+    if (group == MDItemPrivateGroupLast) {
       value = MDQueryGetAttributeValueOfResultAtIndex(query, attribute, idx);
     } else {
       value = _MDQueryGetAttributeValueOfResultAtIndexForGroup(query, attribute, idx, group);
@@ -418,7 +419,7 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
                                index:(NSUInteger)idx {
   MDItemRef mdItem = NULL;
   MDQueryRef query = NULL;
-  if (group == 0) {
+  if (group == MDItemPrivateGroupLast) {
     query = mdTopQuery_;
     mdItem = (MDItemRef)MDQueryGetResultAtIndex(query, idx);
   } else {
@@ -490,10 +491,10 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
     NSSet *suggestSet = [NSSet setWithObject:kHGSTypeSuggest];
     HGSTypeFilter *filter 
       = [HGSTypeFilter filterWithDoesNotConformTypes:suggestSet];
-    NSNumber *zero = [NSNumber numberWithUnsignedInt:0];
-    [filterToCategoryIndexMap setObject:zero forKey:filter];
+    NSNumber *last = [NSNumber numberWithUnsignedInt:MDItemPrivateGroupLast];
+    [filterToCategoryIndexMap setObject:last forKey:filter];
     filter = [HGSTypeFilter filterAllowingAllTypes];
-    [filterToCategoryIndexMap setObject:zero forKey:filter];
+    [filterToCategoryIndexMap setObject:last forKey:filter];
     filterToCategoryIndexMap_ = [filterToCategoryIndexMap retain];
   }
   return self;

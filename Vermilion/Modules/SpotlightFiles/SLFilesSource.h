@@ -40,7 +40,6 @@
   MDQueryRef mdCategoryQuery_;
   NSMutableDictionary *hgsResults_;
   NSDictionary *resultCountByFilter_;
-  NSUInteger *groupToCategoryIndexMap_;
 }
 @end
 
