@@ -82,11 +82,24 @@
 			buildPhases = (
 			);
 			dependencies = (
-				8BDB899C1152C58500C411B1 /* PBXTargetDependency */,
+				8BC88E0D11595B6900A6E783 /* PBXTargetDependency */,
 				8BC6E4810FAABEC9005A0F6F /* PBXTargetDependency */,
 			);
 			name = "Build All";
 			productName = "QSB Application";
+		};
+		8BC88DC41159580C00A6E783 /* Create Appcast */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 8BC88DE5115958A400A6E783 /* Build configuration list for PBXAggregateTarget "Create Appcast" */;
+			buildPhases = (
+				8BC88DC31159580C00A6E783 /* ShellScript */,
+			);
+			dependencies = (
+				8BC88E0B11595B4900A6E783 /* PBXTargetDependency */,
+				8BC88DCF1159589700A6E783 /* PBXTargetDependency */,
+			);
+			name = "Create Appcast";
+			productName = "Create Appcast";
 		};
 		8BDB84E911518A1F00C411B1 /* Create DMGs */ = {
 			isa = PBXAggregateTarget;
@@ -120,8 +133,7 @@
 				8BDB89961152C55000C411B1 /* ShellScript */,
 			);
 			dependencies = (
-				8BDB89E61152C66100C411B1 /* PBXTargetDependency */,
-				8BDB89E81152C66400C411B1 /* PBXTargetDependency */,
+				8BC88DC91159588200A6E783 /* PBXTargetDependency */,
 			);
 			name = "Create Keystone Config";
 			productName = "Create Keystone Config";
@@ -1823,6 +1835,34 @@
 			remoteGlobalIDString = 8B148D860F705F35002E05FA;
 			remoteInfo = "QSB SDK";
 		};
+		8BC88DC81159588200A6E783 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BC88DC41159580C00A6E783 /* Create Appcast */;
+			remoteInfo = "Create Appcast";
+		};
+		8BC88DCE1159589700A6E783 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B77DEFE0F284A4C00FA2A3C /* Release Notes */;
+			remoteInfo = "Release Notes";
+		};
+		8BC88E0A11595B4900A6E783 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BDB84E911518A1F00C411B1 /* Create DMGs */;
+			remoteInfo = "Create DMGs";
+		};
+		8BC88E0C11595B6900A6E783 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BDB89971152C55000C411B1 /* Create Keystone Config */;
+			remoteInfo = "Create Keystone Config";
+		};
 		8BCCB03B10348ABE0051B567 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8B637B4C0F2777C300997738 /* GData.xcodeproj */;
@@ -1841,50 +1881,29 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
+			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
 		};
 		8BDB8627115194CC00C411B1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
+			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA;
 			remoteInfo = "QSB Application";
 		};
 		8BDB8629115194CE00C411B1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8BDB8622115194B700C411B1 /* Codesign */;
+			remoteGlobalIDString = 8BDB8622115194B700C411B1;
 			remoteInfo = Codesign;
 		};
 		8BDB863D115194FD00C411B1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8BF627AD110A661A000AB941 /* Transference */;
+			remoteGlobalIDString = 8BF627AD110A661A000AB941;
 			remoteInfo = Transference;
-		};
-		8BDB899B1152C58500C411B1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8BDB89971152C55000C411B1 /* Create Keystone Config */;
-			remoteInfo = "Create Keystone Config";
-		};
-		8BDB89E51152C66100C411B1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8BDB84E911518A1F00C411B1 /* Create DMGs */;
-			remoteInfo = "Create DMGs";
-		};
-		8BDB89E71152C66400C411B1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8B77DEFE0F284A4C00FA2A3C /* Release Notes */;
-			remoteInfo = "Release Notes";
 		};
 		8BE34079114FF1CB002D047A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -3537,6 +3556,7 @@
 		8BC771C0111351AA008B08BD /* MDItemPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDItemPrivate.h; sourceTree = "<group>"; };
 		8BC771C1111351AA008B08BD /* MDQueryPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDQueryPrivate.h; sourceTree = "<group>"; };
 		8BC771C2111351AA008B08BD /* MDQueryPrivate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDQueryPrivate.m; sourceTree = "<group>"; };
+		8BC88D4A1159549700A6E783 /* CreateAppcast.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = CreateAppcast.sh; sourceTree = "<group>"; };
 		8BC964C60FB292F90095555F /* headerdoc2html.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = headerdoc2html.config; sourceTree = "<group>"; };
 		8BC964C70FB292F90095555F /* toctemplate.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html.documentation; path = toctemplate.html; sourceTree = "<group>"; };
 		8BC964C80FB292F90095555F /* vermilion.hdoc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vermilion.hdoc; sourceTree = "<group>"; };
@@ -4758,6 +4778,7 @@
 		8B07C41B0B69234900827344 /* BuildScripts */ = {
 			isa = PBXGroup;
 			children = (
+				8BC88D4A1159549700A6E783 /* CreateAppcast.sh */,
 				8BDB86BD115298CE00C411B1 /* BuildSDKPackage.sh */,
 				8BA5246811212488001D2E0E /* BuildSDKProjects.sh */,
 				8BDB84E61151888400C411B1 /* CreateDiskImages.sh */,
@@ -7526,14 +7547,15 @@
 			targets = (
 				8BC6E3ED0FAABE71005A0F6F /* Build All */,
 				795F071909870215004C6BFE /* Test All */,
-				8BDB84E911518A1F00C411B1 /* Create DMGs */,
 				8BDB89971152C55000C411B1 /* Create Keystone Config */,
+				8BC88DC41159580C00A6E783 /* Create Appcast */,
+				8BDB84E911518A1F00C411B1 /* Create DMGs */,
 				8BDB8622115194B700C411B1 /* Codesign */,
 				F4EF8F740ECB3EFF008DD6DA /* QSB Application */,
-				8B77DEFE0F284A4C00FA2A3C /* Release Notes */,
-				8B2E2A400F99018600F80E11 /* HeaderDoc */,
-				8B148D860F705F35002E05FA /* QSB SDK */,
 				8BF627AD110A661A000AB941 /* Transference */,
+				8B77DEFE0F284A4C00FA2A3C /* Release Notes */,
+				8B148D860F705F35002E05FA /* QSB SDK */,
+				8B2E2A400F99018600F80E11 /* HeaderDoc */,
 				8BAB339110BC81A7002E1AC9 /* Delete Preferences */,
 				8B53EB3410DC0E84007E6AF2 /* Open Build Folder */,
 				8B3EECE20CEA86A100D933C0 /* QSB Core */,
@@ -9015,6 +9037,19 @@
 			shellPath = /bin/sh;
 			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/Localization.sh\"";
 		};
+		8BC88DC31159580C00A6E783 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/CreateAppcast.sh\"";
+		};
 		8BCCD2690EC8E5EC00688D64 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -10078,6 +10113,26 @@
 			target = 8B148D860F705F35002E05FA /* QSB SDK */;
 			targetProxy = 8BC6E4800FAABEC9005A0F6F /* PBXContainerItemProxy */;
 		};
+		8BC88DC91159588200A6E783 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BC88DC41159580C00A6E783 /* Create Appcast */;
+			targetProxy = 8BC88DC81159588200A6E783 /* PBXContainerItemProxy */;
+		};
+		8BC88DCF1159589700A6E783 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B77DEFE0F284A4C00FA2A3C /* Release Notes */;
+			targetProxy = 8BC88DCE1159589700A6E783 /* PBXContainerItemProxy */;
+		};
+		8BC88E0B11595B4900A6E783 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BDB84E911518A1F00C411B1 /* Create DMGs */;
+			targetProxy = 8BC88E0A11595B4900A6E783 /* PBXContainerItemProxy */;
+		};
+		8BC88E0D11595B6900A6E783 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BDB89971152C55000C411B1 /* Create Keystone Config */;
+			targetProxy = 8BC88E0C11595B6900A6E783 /* PBXContainerItemProxy */;
+		};
 		8BD988260E645EFF00F5C83B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8BD97D090E636D8C00F5C83B /* GTM */;
@@ -10102,21 +10157,6 @@
 			isa = PBXTargetDependency;
 			target = 8BF627AD110A661A000AB941 /* Transference */;
 			targetProxy = 8BDB863D115194FD00C411B1 /* PBXContainerItemProxy */;
-		};
-		8BDB899C1152C58500C411B1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8BDB89971152C55000C411B1 /* Create Keystone Config */;
-			targetProxy = 8BDB899B1152C58500C411B1 /* PBXContainerItemProxy */;
-		};
-		8BDB89E61152C66100C411B1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8BDB84E911518A1F00C411B1 /* Create DMGs */;
-			targetProxy = 8BDB89E51152C66100C411B1 /* PBXContainerItemProxy */;
-		};
-		8BDB89E81152C66400C411B1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8B77DEFE0F284A4C00FA2A3C /* Release Notes */;
-			targetProxy = 8BDB89E71152C66400C411B1 /* PBXContainerItemProxy */;
 		};
 		8BE3407A114FF1CB002D047A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -11927,9 +11967,6 @@
 		8B148D870F705F36002E05FA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = "QSB SDK";
 			};
 			name = Debug;
@@ -11944,11 +11981,7 @@
 		8B148D890F705F36002E05FA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = "QSB SDK";
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -12164,9 +12197,6 @@
 		8B53EB3510DC0E85007E6AF2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = "Open Build Folder";
 			};
 			name = Debug;
@@ -12181,11 +12211,7 @@
 		8B53EB3710DC0E85007E6AF2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = "Open Build Folder";
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -12357,9 +12383,6 @@
 		8B77DF3D0F284A4D00FA2A3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = "Release Notes";
 			};
 			name = Debug;
@@ -12367,11 +12390,7 @@
 		8B77DF3E0F284A4D00FA2A3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = "Release Notes";
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -12543,9 +12562,6 @@
 		8B95CBB40F6B1DEE003BDBDD /* Debug-gcov */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = "Release Notes";
 			};
 			name = "Debug-gcov";
@@ -12977,9 +12993,6 @@
 		8BAB339210BC81A8002E1AC9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = "Delete Preferences";
 			};
 			name = Debug;
@@ -12994,11 +13007,7 @@
 		8BAB339410BC81A8002E1AC9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = "Delete Preferences";
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -13020,6 +13029,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "Build All";
+			};
+			name = Release;
+		};
+		8BC88DC51159580C00A6E783 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "Create Appcast";
+			};
+			name = Debug;
+		};
+		8BC88DC61159580C00A6E783 /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "Create Appcast";
+			};
+			name = "Debug-gcov";
+		};
+		8BC88DC71159580C00A6E783 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "Create Appcast";
 			};
 			name = Release;
 		};
@@ -13108,9 +13138,6 @@
 		8BDB853A11518A1F00C411B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = "Create DMGs";
 			};
 			name = Debug;
@@ -13125,20 +13152,13 @@
 		8BDB853C11518A1F00C411B1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = "Create DMGs";
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		8BDB8623115194B800C411B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = Codesign;
 			};
 			name = Debug;
@@ -13153,20 +13173,13 @@
 		8BDB8625115194B800C411B1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = Codesign;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		8BDB89981152C55000C411B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = "Create Keystone Config";
 			};
 			name = Debug;
@@ -13181,11 +13194,7 @@
 		8BDB899A1152C55000C411B1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = "Create Keystone Config";
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -13261,9 +13270,6 @@
 		8BF627B0110A661B000AB941 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = Transference;
 			};
 			name = Debug;
@@ -13278,11 +13284,7 @@
 		8BF627B2110A661B000AB941 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = Transference;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -13915,6 +13917,16 @@
 				8BC6E3FB0FAABE73005A0F6F /* Debug */,
 				8BC6E3FC0FAABE73005A0F6F /* Debug-gcov */,
 				8BC6E3FD0FAABE73005A0F6F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8BC88DE5115958A400A6E783 /* Build configuration list for PBXAggregateTarget "Create Appcast" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BC88DC51159580C00A6E783 /* Debug */,
+				8BC88DC61159580C00A6E783 /* Debug-gcov */,
+				8BC88DC71159580C00A6E783 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
