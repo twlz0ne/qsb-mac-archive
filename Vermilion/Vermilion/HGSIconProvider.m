@@ -582,18 +582,44 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
            forKey:(NSString *)key 
             cache:(HGSLRUCache *)cache {
   if (icon) {
-    // Figure out rough size of image
-    size_t size = 0;
-    for (NSBitmapImageRep *rep in [icon representations]) {
+    // Create up cached values in the sizes we care about
+    NSImage *newIcon 
+      = [[[NSImage alloc] initWithSize:NSMakeSize(96, 96)] autorelease];
+    NSUInteger sizes[] = { 96, 32, 16 };
+    size_t totalSize = 0;
+    for (size_t i = 0; i < sizeof(sizes) / sizeof(sizes[0]); ++i) {
+      NSBitmapImageRep *imageRep 
+        = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL 
+                                                   pixelsWide:sizes[i]
+                                                   pixelsHigh:sizes[i]
+                                                bitsPerSample:8 
+                                              samplesPerPixel:4 
+                                                     hasAlpha:YES 
+                                                     isPlanar:NO 
+                                               colorSpaceName:NSCalibratedRGBColorSpace 
+                                                 bitmapFormat:0 
+                                                  bytesPerRow:0 
+                                                 bitsPerPixel:0] autorelease];
+      NSGraphicsContext *gc 
+        = [NSGraphicsContext graphicsContextWithBitmapImageRep:imageRep];
+      [NSGraphicsContext saveGraphicsState];
+      [NSGraphicsContext setCurrentContext:gc];
+      [gc setImageInterpolation:NSImageInterpolationHigh];
+      [icon drawInRect:GTMNSRectOfSize(NSMakeSize(sizes[i], sizes[i]))
+              fromRect:GTMNSRectOfSize([icon size])
+             operation:NSCompositeCopy 
+              fraction:1.0];
+      [NSGraphicsContext restoreGraphicsState];
+      [newIcon addRepresentation:imageRep];
       // * 4 because we have 4 samples for pixel
       // / 8 because we have 8 pixels in a byte
-      size_t repSize = ([rep pixelsHigh] 
-                        * [rep pixelsWide] 
-                        * [rep bitsPerSample] * 4 / 8);
-      size += repSize;
+      size_t repImageSize = ([imageRep pixelsHigh] 
+                             * [imageRep pixelsWide] 
+                             * [imageRep bitsPerSample] * 4 / 8);
+      totalSize += repImageSize;
     }
     @synchronized(cache) {
-      [cache setValue:icon forKey:key size:size];
+      [cache setValue:newIcon forKey:key size:totalSize];
     }
   }
 }
