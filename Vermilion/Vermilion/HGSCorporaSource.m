@@ -213,7 +213,7 @@ NSString *const kHGSCorporaSourceAttributeHideGoogleSiteSearchResultsKey
 - (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
   HGSResult *result = nil;
   NSString *identifier = [representation objectForKey:kHGSObjectAttributeURIKey];
-  for (HGSResult *corpus in searchableCorpora_) {
+  for (HGSResult *corpus in corpora_) {
     NSString *uri = [corpus uri];
     if ([uri isEqual:identifier]) {
       result = corpus;
