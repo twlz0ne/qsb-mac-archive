@@ -178,7 +178,13 @@ static HGSTypeFilter *sHGSTypeFilterAllTypes = nil;
   if ((self = [super init])) {
     conformTypes_ = [conformTypes copy];
     doesNotConformTypes_ = [doesNotConformTypes copy];
-    hash_ = [conformTypes_ hash] + [doesNotConformTypes_ hash];
+    // NSSets us their count as a their hash. We would like better.
+    for (NSString *type in conformTypes_) {
+      hash_ += [type hash];
+    }
+    for (NSString *type in doesNotConformTypes_) {
+      hash_ += [type hash];
+    }
 #if DEBUG
     // Debug runtime check to make sure our types are sane.
     if ([doesNotConformTypes_ count]) {
