@@ -178,7 +178,8 @@ static HGSTypeFilter *sHGSTypeFilterAllTypes = nil;
   if ((self = [super init])) {
     conformTypes_ = [conformTypes copy];
     doesNotConformTypes_ = [doesNotConformTypes copy];
-    // NSSets us their count as a their hash. We would like better.
+    // NSSets use their count as their hash. We want a better hash, so we
+    // iterate through the immutable elements.
     for (NSString *type in conformTypes_) {
       hash_ += [type hash];
     }
