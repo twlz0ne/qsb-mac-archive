@@ -344,7 +344,10 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   NSWindow *window = [self window];
   if (![window ignoresMouseEvents]) return;
   [window setIgnoresMouseEvents:NO];
-  
+  if (![window parentWindow]) {
+    NSWindow *searchWindow = [searchWindowController_ window];
+    [searchWindow addChildWindow:window ordered:NSWindowBelow];
+  }
   NSRect frame = [window frame];
   CGFloat alphaValue = [window alphaValue];
   if (alphaValue <= 0.0) {

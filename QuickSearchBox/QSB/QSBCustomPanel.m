@@ -32,6 +32,16 @@
 
 #import "QSBCustomPanel.h"
 
+#import <QuartzCore/QuartzCore.h>
+
+// Allows us to order ourself out at the end of an alpha animation.
+@interface QSBCustomPanelAlphaValueAnimationDelegate : NSObject {
+ @private
+  NSWindow *window_;
+}
+- (id)initWithWindow:(NSWindow *)window;
+@end
+
 @implementation QSBCustomPanel
 
 // Standard window init method. Sets up some special stuff for custom windows.
@@ -72,9 +82,52 @@
   // Disable screen updates so that we can force the window to resign key
   // by orderering it out, and then bringing it back to the front.
   NSDisableScreenUpdates();
-	[self orderOut:self];
-	[self orderFront:self];
-	NSEnableScreenUpdates();
+  [self orderOut:self];
+  [self orderFront:self];
+  NSEnableScreenUpdates();
+}
+
+// Supply our custom animation for alphaValue.
+- (id)animationForKey:(NSString *)key {
+  id animation = [super animationForKey:key];
+  if ([key isEqualToString:@"alphaValue"]) {
+    QSBCustomPanelAlphaValueAnimationDelegate *delegate
+      = [[[QSBCustomPanelAlphaValueAnimationDelegate alloc] initWithWindow:self]
+         autorelease];
+    [animation setDelegate:delegate];
+  }
+  return animation;
 }
 
 @end
+
+@implementation QSBCustomPanelAlphaValueAnimationDelegate
+
+- (id)initWithWindow:(NSWindow *)window {
+  if ((self = [super init])) {
+    window_ = [window retain];
+  }
+  return self;
+}
+
+- (void)dealloc {
+  [window_ release];
+  [super dealloc];
+}
+
+- (void)animationDidStop:(CABasicAnimation *)anim finished:(BOOL)flag {
+  if ([[anim toValue] doubleValue] < 0.5) {
+    // Calling orderOut: on a child window makes the parent window go away
+    // as well. We don't want this in the case of a result window (in fact
+    // I can't think why any window would really want this but I digress).
+    // Anyways, detach us from any parent windows before ordering us out.
+    NSWindow *parentWindow = [window_ parentWindow];
+    if (parentWindow) {
+      [parentWindow removeChildWindow:window_];
+    }
+    [window_ orderOut:nil];
+  }
+}
+
+@end
+

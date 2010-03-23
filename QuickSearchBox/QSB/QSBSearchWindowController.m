@@ -303,8 +303,6 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   [searchTextField_ setEditable:NO];
   
   [thumbnailView_ setHidden:YES];
-  [searchWindow addChildWindow:[resultsWindowController_ window] 
-                       ordered:NSWindowBelow];
   
   if (welcomeController_) {
     NSWindow *welcomeWindow = [welcomeController_ window];
