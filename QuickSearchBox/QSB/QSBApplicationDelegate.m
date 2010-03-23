@@ -771,9 +771,13 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
+  // Load the search window
+  [searchWindowController_ window];
+  
   if (activateOnStartup_) {
     [searchWindowController_ showSearchWindow:self];
   }
+  
   // Inventory and process all plugins and extensions.
   [self inventoryPlugins];
 
