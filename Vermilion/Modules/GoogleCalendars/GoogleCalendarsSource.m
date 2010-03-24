@@ -225,23 +225,13 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
       && [result conformsToType:kHGSTypeWebCalendarEvent]) {
     // We're pivoted but it's safe to assume that we're dealing with the
     // calendar associated with this event so proceed.
-
-    // Score based on proximity to the current time.  Two years out is
-    // equivalent to a score of 0.0.
-    NSDate *startTime = [result valueForKey:kGoogleCalendarEventStartTimeKey];
-    NSTimeInterval timeFromNow = fabs([startTime timeIntervalSinceNow]);
-    if (timeFromNow < kTwoYearInterval) {
-      CGFloat score = ((kTwoYearInterval - timeFromNow) / kTwoYearInterval)
-                      * HGSCalibratedScore(kHGSCalibratedPerfectScore);
-      result = [HGSScoredResult resultWithResult:result
-                                         score:score
-                                    flagsToSet:eHGSSpecialUIRankFlag
-                                  flagsToClear:0
-                                   matchedTerm:[result matchedTerm]
-                                matchedIndexes:[result matchedIndexes]];
-    } else {
-      result = nil;
-    }
+    CGFloat score = HGSCalibratedScore(kHGSCalibratedStrongScore);
+    result = [HGSScoredResult resultWithResult:result
+                                       score:score
+                                  flagsToSet:eHGSSpecialUIRankFlag
+                                flagsToClear:0
+                                 matchedTerm:[result matchedTerm]
+                              matchedIndexes:[result matchedIndexes]];
   }
   return result;
 }
@@ -409,6 +399,10 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 
   [attributes setObject:calendarIcon_ forKey:kHGSObjectAttributeIconKey];
   
+  // Don't site search our calendar.
+  [attributes setObject:[NSNumber numberWithBool:YES] 
+                 forKey:kHGSObjectAttributeHideGoogleSiteSearchResultsKey];
+  
   // Add calendarEntry description and tags to enhance searching.
   NSString* calendarDescription = [[calendarEntry summary] stringValue];
   if (calendarDescription) {
@@ -547,6 +541,12 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
           [attributes setObject:snippet forKey:kHGSObjectAttributeSnippetKey];
         }
         [attributes setObject:eventIcon_ forKey:kHGSObjectAttributeIconKey];
+        
+        // Invert date to set last used date
+        NSTimeInterval interval = [startTime timeIntervalSinceNow];
+        NSDate *lastUsed = [[NSDate date] addTimeInterval:-interval];
+        [attributes setObject:lastUsed forKey:kHGSObjectAttributeLastUsedDateKey];
+        
         NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
         [formatter setDateStyle:NSDateFormatterShortStyle];
         NSString *dateString = [formatter stringFromDate:startTime];
@@ -591,13 +591,16 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
   // All-day is indicated by a start time with just a date (i.e. no time).
   // An 'instant' is indicated by no end time.
   NSString *snippet = weekdayName;
+  NSDateFormatter *timeFormatter = [[[NSDateFormatter alloc] init] autorelease];
+  NSDateFormatterStyle dateStyle
+    = snippet ? NSDateFormatterNoStyle : NSDateFormatterShortStyle;
+  NSDateFormatterStyle timeStyle
+    = allDay ? NSDateFormatterNoStyle : NSDateFormatterShortStyle;
+  [timeFormatter setDateStyle:dateStyle];
+  [timeFormatter setTimeStyle:timeStyle];
+  NSString *startTimeString = [timeFormatter stringFromDate:startTime];
+  
   if (!allDay) {
-    NSDateFormatter *timeFormatter = [[[NSDateFormatter alloc] init] autorelease];
-    NSDateFormatterStyle style
-      = snippet ? NSDateFormatterNoStyle : NSDateFormatterShortStyle;
-    [timeFormatter setDateStyle:style];
-    [timeFormatter setTimeStyle:NSDateFormatterShortStyle];
-    NSString *startTimeString = [timeFormatter stringFromDate:startTime];
     if (snippet) {
       snippet = [snippet stringByAppendingFormat:@", %@", startTimeString];
     } else {
@@ -611,11 +614,10 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
   } else {
     NSString *allDayString
       = HGSLocalizedString(@"^All Day", @"The event will last all day.");
-    if (snippet) {
-      snippet = [snippet stringByAppendingFormat:@", %@", allDayString];
-    } else {
-      snippet = allDayString;
+    if (!snippet) {
+      snippet = startTimeString;
     }
+    snippet = [snippet stringByAppendingFormat:@", %@", allDayString];
   }
   
   // Add location to the snippet.
@@ -688,7 +690,7 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
   NSCalendar *calendar
     = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar]
        autorelease];
-  NSUInteger const kComponentBits = (NSYearCalendarUnit | NSMonthCalendarUnit
+  const NSUInteger kComponentBits = (NSYearCalendarUnit | NSMonthCalendarUnit
                                      | NSDayCalendarUnit | NSHourCalendarUnit
                                      | NSMinuteCalendarUnit
                                      | NSSecondCalendarUnit);
@@ -758,7 +760,7 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 + (GDataDateTime *)dateTimeForTodayAtHour:(int)hour
                                    minute:(int)minute
                                    second:(int)second {
-  NSUInteger const kComponentBits = (NSYearCalendarUnit | NSMonthCalendarUnit
+  const NSUInteger kComponentBits = (NSYearCalendarUnit | NSMonthCalendarUnit
                                      | NSDayCalendarUnit | NSHourCalendarUnit
                                      | NSMinuteCalendarUnit
                                      | NSSecondCalendarUnit);
