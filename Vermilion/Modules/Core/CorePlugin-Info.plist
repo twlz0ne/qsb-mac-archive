@@ -344,6 +344,22 @@
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.core.url.action.shortenurl</string>
 		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>GoogleFeelingLuckyAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^I&apos;m Feeling Lucky</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<array>
+				<string>text.suggestion.googlesuggest</string>
+				<string>webpage.googlenavsuggest</string>
+				<string>text.search.googlesearch</string>
+			</array>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.core.google.action.feelinglucky</string>
+		</dict>
 	</array>
 	<key>HGSPluginAPIVersion</key>
 	<string>${VERMILLION_PLUGIN_API_VERSION}</string>

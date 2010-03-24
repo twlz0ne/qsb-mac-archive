@@ -60,3 +60,6 @@
 
 /* A label denoting the name of the Shorten URL action which allows you to Shorten URLs. Do not include ^ in localization. */
 "^Shorten URL" = "Shorten URL";
+
+/* A label denoting the name of the Feeling Lucky action which allows you to open google search via feeling lucky button. Do not include ^ in localization. */
+"^I'm Feeling Lucky" = "I'm Feeling Lucky";

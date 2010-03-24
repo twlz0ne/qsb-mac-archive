@@ -386,7 +386,6 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   // We want to pivot on non-suggestions, non-qsb stuff, and non-actions.
   HGSScoredResult *result = [self representedResult];
   BOOL pivotable = YES;
-  if ([result conformsToType:kHGSTypeGoogleSuggest]) pivotable = NO;
   if ([result conformsToType:kHGSTypeAction]) {
     HGSAction *action = [result valueForKey:kHGSObjectAttributeDefaultActionKey];
     pivotable = [[action arguments] count] > 0;

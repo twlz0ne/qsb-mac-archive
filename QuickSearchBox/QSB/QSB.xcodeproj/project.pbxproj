@@ -1150,6 +1150,8 @@
 		8BC88EAC1159706A00A6E783 /* GTMScriptRunner.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC88EAA1159706100A6E783 /* GTMScriptRunner.m */; };
 		8BC88EAD1159706E00A6E783 /* GTMScriptRunner.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BC88EAB1159706100A6E783 /* GTMScriptRunner.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BC88EAF115971A200A6E783 /* QSBKeystoneRemover.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC88EA811596ECB00A6E783 /* QSBKeystoneRemover.m */; };
+		8BC89321115A873F00A6E783 /* GoogleActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC89320115A873F00A6E783 /* GoogleActions.m */; };
+		8BC89323115A874D00A6E783 /* GoogleActionsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC89322115A874D00A6E783 /* GoogleActionsTest.m */; };
 		8BCCD2B10EC8E67300688D64 /* closeDiskTray.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A20EC8E67300688D64 /* closeDiskTray.icns */; };
 		8BCCD2B30EC8E67300688D64 /* ejectDiskTray.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A40EC8E67300688D64 /* ejectDiskTray.icns */; };
 		8BCCD2B40EC8E67300688D64 /* emptyTrash.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A50EC8E67300688D64 /* emptyTrash.icns */; };
@@ -3563,6 +3565,9 @@
 		8BC88EA811596ECB00A6E783 /* QSBKeystoneRemover.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBKeystoneRemover.m; sourceTree = "<group>"; };
 		8BC88EAA1159706100A6E783 /* GTMScriptRunner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMScriptRunner.m; sourceTree = "<group>"; };
 		8BC88EAB1159706100A6E783 /* GTMScriptRunner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMScriptRunner.h; sourceTree = "<group>"; };
+		8BC8931F115A873F00A6E783 /* GoogleActions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleActions.h; sourceTree = "<group>"; };
+		8BC89320115A873F00A6E783 /* GoogleActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleActions.m; sourceTree = "<group>"; };
+		8BC89322115A874D00A6E783 /* GoogleActionsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleActionsTest.m; sourceTree = "<group>"; };
 		8BC964C60FB292F90095555F /* headerdoc2html.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = headerdoc2html.config; sourceTree = "<group>"; };
 		8BC964C70FB292F90095555F /* toctemplate.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html.documentation; path = toctemplate.html; sourceTree = "<group>"; };
 		8BC964C80FB292F90095555F /* vermilion.hdoc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vermilion.hdoc; sourceTree = "<group>"; };
@@ -4734,6 +4739,9 @@
 				8B8478B31149870A002C460B /* FilesystemActions.h */,
 				8B8478B41149870A002C460B /* FilesystemActions.m */,
 				8B8478B51149870A002C460B /* FileSystemActions.applescript */,
+				8BC89320115A873F00A6E783 /* GoogleActions.m */,
+				8BC8931F115A873F00A6E783 /* GoogleActions.h */,
+				8BC89322115A874D00A6E783 /* GoogleActionsTest.m */,
 				8B8478BF1149881F002C460B /* OpenSearchSuggestSource.m */,
 				8B8478BD1149872F002C460B /* URLDetectionSource.m */,
 				8B8478B91149871A002C460B /* TextInput.m */,
@@ -9648,6 +9656,7 @@
 				8B847E2D1149977F002C460B /* NSArray+CommonPrefixDetection.m in Sources */,
 				8B847C34114996CD002C460B /* NSArray+CommonPrefixDetectionTest.m in Sources */,
 				8BE34077114FF1B8002D047A /* TextActionsTest.m in Sources */,
+				8BC89323115A874D00A6E783 /* GoogleActionsTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9859,6 +9868,7 @@
 				8B847A1A11498A5D002C460B /* WebSearchSource.m in Sources */,
 				8B847B7B11499645002C460B /* NSArray+CommonPrefixDetection.m in Sources */,
 				8B847FE311499F7F002C460B /* URLActions.m in Sources */,
+				8BC89321115A873F00A6E783 /* GoogleActions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
