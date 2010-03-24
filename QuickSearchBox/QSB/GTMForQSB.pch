@@ -37,3 +37,7 @@
 #include "HGSLog.h"
 #define _GTMDevLog(...) HGSLog(__VA_ARGS__)
 #define _GTMDevAssert(c, ...) HGSAssert(c, __VA_ARGS__)
+
+// Must turn off KVO checks because Sparkle has issues with them
+// and will cause an exception to be thrown that kills us on 10.6.
+#define GTM_PERFORM_KVO_CHECKS 0
