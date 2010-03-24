@@ -62,10 +62,15 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
   HGSQuery *query = [self query];
   HGSActionArgument *actionArg = [query actionArgument];
   if (actionArg) {
+    HGSTypeFilter *argTypeFilter = [actionArg typeFilter];
     NSMutableArray *actionScoredResults 
       = [NSMutableArray arrayWithCapacity:resultsCount];
     [actionArg willScoreForQuery:query];
     for (HGSScoredResult *result in results) {
+      // Filter out all types that our action arg won't take.
+      if (![argTypeFilter isValidType:[result type]]) {
+        continue;
+      }
       result = [actionArg scoreResult:result forQuery:query];
       if (result) {
         [actionScoredResults addObject:result];
