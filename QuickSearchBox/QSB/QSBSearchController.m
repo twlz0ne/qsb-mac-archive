@@ -341,10 +341,10 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   [self stopQuery];
   HGSTokenizedString *oldString = [self tokenizedQueryString];
   HGSResultArray *oldPivots = [self pivotObjects];
-  BOOL hadQuery = [oldString tokenizedLength] || [oldPivots count];
+  BOOL hadQuery = [oldString originalLength] || [oldPivots count];
   [self setTokenizedQueryString:tokenizedQueryString];
   [self setPivotObjects:pivotObjects];
-  if ([tokenizedQueryString tokenizedLength] || [pivotObjects count]) {
+  if ([tokenizedQueryString originalLength] || [pivotObjects count]) {
     [self performQuery];
   } else if (hadQuery) {
     [topResults_ removeAllObjects];
