@@ -652,14 +652,16 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   // isValidSourceForQuery instead of 
   // preFilterResult:matchesForQuery:pivotObject: because we want to avoid 
   // the extra work when this attribute isn't present at all.
-  HGSResult *pivotObject = [query pivotObject];
-  if (pivotObject) {
-    // Default to not handling the search when pivoting
-    isValidSource = NO;
-    if ([pivotObject valueForKey:kHGSObjectAttributeEmailAddressesKey]) {
-      isValidSource = YES;
-    } else if ([pivotObject isOfType:kTypeContactAddressBook]) {
-      isValidSource = YES;
+  if (isValidSource) {
+    HGSResult *pivotObject = [query pivotObject];
+    if (pivotObject) {
+      // Default to not handling the search when pivoting
+      isValidSource = NO;
+      if ([pivotObject valueForKey:kHGSObjectAttributeEmailAddressesKey]) {
+        isValidSource = YES;
+      } else if ([pivotObject isOfType:kTypeContactAddressBook]) {
+        isValidSource = YES;
+      }
     }
   }
   return isValidSource;
