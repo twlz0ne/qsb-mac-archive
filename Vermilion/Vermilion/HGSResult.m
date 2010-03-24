@@ -79,6 +79,8 @@ NSString* const kHGSObjectAttributeWebSuggestTemplateKey = @"HGSObjectAttributeW
 NSString* const kHGSObjectAttributeStringValueKey = @"HGSObjectAttributeStringValue";
 NSString* const kHGSObjectAttributePasteboardValueKey = @"HGSObjectAttributePasteboardValue";
 NSString* const kHGSObjectAttributeUTTypeKey = @"HGSObjectAttributeUTType";
+NSString *const kHGSObjectAttributeHideGoogleSiteSearchResultsKey
+  = @"HGSObjectAttributeHideGoogleSiteSearchResults";
 
 // Contact related keys
 NSString* const kHGSObjectAttributeContactEmailKey = @"HGSObjectAttributeContactEmail";  

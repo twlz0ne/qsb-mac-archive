@@ -48,8 +48,6 @@ NSString *const kHGSCorporaSourceAttributeHideFromDesktopKey
   = @"HGSCorporaSourceAttributeHideFromDesktop";  // BOOL
 NSString *const kHGSCorporaSourceAttributeHideFromDropdownKey
   = @"HGSCorporaSourceAttributeHideFromDropdown";  // BOOL
-NSString *const kHGSCorporaSourceAttributeHideGoogleSiteSearchResultsKey
-  = @"HGSCorporaSourceAttributeHideGoogleSiteSearchResults"; // BOOL
 
 @interface HGSCorporaSource ()
 - (BOOL)loadCorpora:(NSArray *)corpora;
@@ -85,6 +83,7 @@ NSString *const kHGSCorporaSourceAttributeHideGoogleSiteSearchResultsKey
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self];
   [searchableCorpora_ release];
+  [validCorpora_ release];
   [corpora_ release];
   [super dealloc];
 }
@@ -193,6 +192,10 @@ NSString *const kHGSCorporaSourceAttributeHideGoogleSiteSearchResultsKey
     }
   }
   
+  [validCorpora_ autorelease];
+  [searchableCorpora_ autorelease];
+  
+  validCorpora_ = [allCorpora retain];
   searchableCorpora_ = [searchableCorpora retain];
  
   [self clearResultIndex];
@@ -213,7 +216,7 @@ NSString *const kHGSCorporaSourceAttributeHideGoogleSiteSearchResultsKey
 - (HGSResult *)resultWithArchivedRepresentation:(NSDictionary *)representation {
   HGSResult *result = nil;
   NSString *identifier = [representation objectForKey:kHGSObjectAttributeURIKey];
-  for (HGSResult *corpus in corpora_) {
+  for (HGSResult *corpus in validCorpora_) {
     NSString *uri = [corpus uri];
     if ([uri isEqual:identifier]) {
       result = corpus;

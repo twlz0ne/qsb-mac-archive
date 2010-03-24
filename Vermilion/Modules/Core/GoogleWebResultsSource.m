@@ -351,7 +351,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
     HGSResult *pivotObject = [query pivotObject];
     NSURL *url = [pivotObject url];
     NSNumber *hideResults 
-      = [pivotObject valueForKey:kHGSCorporaSourceAttributeHideGoogleSiteSearchResultsKey];
+      = [pivotObject valueForKey:kHGSObjectAttributeHideGoogleSiteSearchResultsKey];
     if ([hideResults boolValue]) {
       isValid = NO;
     } else if ([[url scheme] isEqualToString:@"http"]) {

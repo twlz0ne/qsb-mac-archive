@@ -48,6 +48,7 @@
 @interface HGSCorporaSource : HGSMemorySearchSource {
  @private
   NSArray *corpora_;
+  NSArray *validCorpora_;
   NSMutableArray *searchableCorpora_;
 }
 
@@ -129,10 +130,3 @@ extern NSString *const kHGSCorporaSourceAttributeHideFromDesktopKey;
  Don't put this corpus in the drop down menu. BOL value. Default NO. 
 */
 extern NSString *const kHGSCorporaSourceAttributeHideFromDropdownKey;
-
-/*! 
- @const
- Prevent Google Web Source from searching this corpus using site search.
- BOOL value. Default NO.
-*/
-extern NSString *const kHGSCorporaSourceAttributeHideGoogleSiteSearchResultsKey;

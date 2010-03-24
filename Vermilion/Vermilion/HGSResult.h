@@ -91,6 +91,13 @@ extern NSString* const kHGSObjectAttributeMatchedTermKey;  // NSString the term 
 
 extern NSString* const kHGSObjectAttributeAddressBookRecordIdentifierKey;  // NSValue (NSInteger)
 
+/*! 
+ @const
+ Prevent Google Web Source from searching this result using site search.
+ BOOL value. Default NO.
+ */
+extern NSString *const kHGSObjectAttributeHideGoogleSiteSearchResultsKey;
+
 enum {
   eHGSNameMatchRankFlag = 1 << 0,
   eHGSUserPersistentPathRankFlag = 1 << 1,

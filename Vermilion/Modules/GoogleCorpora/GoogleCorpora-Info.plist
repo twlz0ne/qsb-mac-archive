@@ -110,7 +110,7 @@
 					<true/>
 				</dict>
 				<dict>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>gmail</string>
@@ -124,7 +124,7 @@
 					<string>http://www.google.com/m#gmail</string>
 				</dict>
 				<dict>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>calendar</string>
@@ -180,7 +180,7 @@
 				<dict>
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>alt-shopping</string>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeName</key>
 					<string>^Google Product Search</string>
@@ -194,7 +194,7 @@
 				<dict>
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>reader</string>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeName</key>
 					<string>^Google Reader</string>
@@ -208,7 +208,7 @@
 					<string>^Google Talk</string>
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>talk</string>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeURI</key>
 					<string>http://talkgadget.google.com/talkgadget/popout</string>
@@ -242,7 +242,7 @@
 					<string>igoogle</string>
 					<key>HGSObjectAttributeName</key>
 					<string>iGoogle</string>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeURI</key>
 					<string>http://www.google.com/ig</string>
@@ -256,7 +256,7 @@
 					<string>http://www.google.com/notebook/m</string>
 					<key>HGSObjectAttributeURI</key>
 					<string>http://www.google.com/notebook/</string>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 				</dict>
 				<dict>
@@ -264,7 +264,7 @@
 					<string>goog411</string>
 					<key>HGSObjectAttributeName</key>
 					<string>GOOG-411</string>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeURI</key>
 					<string>tel:800-4664-411</string>
@@ -292,7 +292,7 @@
 				<dict>
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>finance</string>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeName</key>
 					<string>Google Finance</string>
@@ -321,7 +321,7 @@
 				<dict>
 					<key>HGSObjectAttributeName</key>
 					<string>^%@ Mail</string>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>gmail</string>
@@ -335,7 +335,7 @@
 				<dict>
 					<key>HGSObjectAttributeName</key>
 					<string>^%@ Calendar</string>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>calendar</string>
@@ -347,7 +347,7 @@
 				<dict>
 					<key>HGSObjectAttributeName</key>
 					<string>^%@ Docs</string>
-					<key>HGSCorporaSourceAttributeHideGoogleSiteSearchResults</key>
+					<key>HGSObjectAttributeHideGoogleSiteSearchResults</key>
 					<true/>
 					<key>HGSObjectAttributeIconPreviewFile</key>
 					<string>docs</string>
