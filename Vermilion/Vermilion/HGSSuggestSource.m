@@ -489,7 +489,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 #endif
 
   [self filterDuplicateSuggests:suggestions];
-
+  [suggestions sortUsingFunction:HGSMixerScoredResultSort context:NULL];
   return suggestions;
 }
 

@@ -202,7 +202,7 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
 
 - (NSString*)description {
   return [NSString stringWithFormat:
-          @"<%@:%p> [%@ - %@ (%@ from %@)]", 
+          @"<%@:%p> %@ - %@ (%@ from %@)", 
           [self class], self, 
           [self displayName], [self type], [self class], [self source]];
 }
@@ -682,6 +682,11 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     score = score + 1.0 * promotionMultiplier;
   }
   return score;
+}
+
+- (NSString*)description {
+  NSString *desc = [super description];
+  return [NSString stringWithFormat:@"%@ score: %0.5f", desc, [self score]];
 }
 
 - (void)dealloc {
