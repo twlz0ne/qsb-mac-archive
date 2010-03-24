@@ -1147,6 +1147,9 @@
 		8BC685570F5ED38C003B5C6A /* SetUpAccount.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8BC685550F5ED38C003B5C6A /* SetUpAccount.xib */; };
 		8BC771C3111351AA008B08BD /* MDItemPrivate.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BC771BF111351AA008B08BD /* MDItemPrivate.c */; };
 		8BC771C4111351AA008B08BD /* MDQueryPrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC771C2111351AA008B08BD /* MDQueryPrivate.m */; };
+		8BC88EAC1159706A00A6E783 /* GTMScriptRunner.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC88EAA1159706100A6E783 /* GTMScriptRunner.m */; };
+		8BC88EAD1159706E00A6E783 /* GTMScriptRunner.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BC88EAB1159706100A6E783 /* GTMScriptRunner.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8BC88EAF115971A200A6E783 /* QSBKeystoneRemover.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC88EA811596ECB00A6E783 /* QSBKeystoneRemover.m */; };
 		8BCCD2B10EC8E67300688D64 /* closeDiskTray.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A20EC8E67300688D64 /* closeDiskTray.icns */; };
 		8BCCD2B30EC8E67300688D64 /* ejectDiskTray.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A40EC8E67300688D64 /* ejectDiskTray.icns */; };
 		8BCCD2B40EC8E67300688D64 /* emptyTrash.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A50EC8E67300688D64 /* emptyTrash.icns */; };
@@ -3557,6 +3560,9 @@
 		8BC771C1111351AA008B08BD /* MDQueryPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDQueryPrivate.h; sourceTree = "<group>"; };
 		8BC771C2111351AA008B08BD /* MDQueryPrivate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDQueryPrivate.m; sourceTree = "<group>"; };
 		8BC88D4A1159549700A6E783 /* CreateAppcast.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = CreateAppcast.sh; sourceTree = "<group>"; };
+		8BC88EA811596ECB00A6E783 /* QSBKeystoneRemover.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBKeystoneRemover.m; sourceTree = "<group>"; };
+		8BC88EAA1159706100A6E783 /* GTMScriptRunner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMScriptRunner.m; sourceTree = "<group>"; };
+		8BC88EAB1159706100A6E783 /* GTMScriptRunner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMScriptRunner.h; sourceTree = "<group>"; };
 		8BC964C60FB292F90095555F /* headerdoc2html.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = headerdoc2html.config; sourceTree = "<group>"; };
 		8BC964C70FB292F90095555F /* toctemplate.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html.documentation; path = toctemplate.html; sourceTree = "<group>"; };
 		8BC964C80FB292F90095555F /* vermilion.hdoc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vermilion.hdoc; sourceTree = "<group>"; };
@@ -5004,6 +5010,7 @@
 				8BE8488D0E9425C200C611B0 /* QSBKeyMap.h */,
 				8BE8488E0E9425C200C611B0 /* QSBKeyMap.m */,
 				8BE848B30E94313A00C611B0 /* QSBKeyMapTest.m */,
+				8BC88EA811596ECB00A6E783 /* QSBKeystoneRemover.m */,
 				7F620ED90EF18DA100BBFEE1 /* QSBLargeIconView.h */,
 				7F620ED80EF18DA100BBFEE1 /* QSBLargeIconView.m */,
 				8B488A470F15DE6A00786C1E /* QSBMenuButton.h */,
@@ -6365,6 +6372,8 @@
 				64C385BC0DBFDCF9005EBA69 /* GTMObjC2Runtime.m */,
 				8B95CD1E0F6EDF9D003BDBDD /* GTMRegex.h */,
 				8B95CD1F0F6EDF9D003BDBDD /* GTMRegex.m */,
+				8BC88EAA1159706100A6E783 /* GTMScriptRunner.m */,
+				8BC88EAB1159706100A6E783 /* GTMScriptRunner.h */,
 				8BA019C30F14303400926923 /* GTMSQLite.h */,
 				8BA019C20F14303400926923 /* GTMSQLite.m */,
 				332AD7380DC910A20009A7E9 /* GTMSystemVersion.h */,
@@ -6528,6 +6537,7 @@
 				8B44636A10F2740C00561E62 /* GTMUnitTestDevLog.h in Headers */,
 				8BF2573A10F67CBD000490C8 /* GTMTypeCasting.h in Headers */,
 				8BC5AEBF1141C02C000DB67C /* GTMNSAnimation+Duration.h in Headers */,
+				8BC88EAD1159706E00A6E783 /* GTMScriptRunner.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9497,6 +9507,7 @@
 				8B06221B11339D8C0003CC70 /* QSBActionModel.m in Sources */,
 				8B06240B113452F20003CC70 /* QSBActionPresenter.m in Sources */,
 				8B0634421135ECDC0003CC70 /* QSBAnimatedScroll.m in Sources */,
+				8BC88EAF115971A200A6E783 /* QSBKeystoneRemover.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9711,6 +9722,7 @@
 				8B0F073110C7465900C1A6FD /* NSString+CaseInsensitive.m in Sources */,
 				8B44661B10F2874C00561E62 /* GTMBase64.m in Sources */,
 				8BC5AEBE1141C029000DB67C /* GTMNSAnimation+Duration.m in Sources */,
+				8BC88EAC1159706A00A6E783 /* GTMScriptRunner.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
