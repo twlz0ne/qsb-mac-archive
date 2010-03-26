@@ -1,0 +1,72 @@
+#!/bin/bash
+
+function Log() {
+  syslog -s -l 3 $1
+}
+
+function PathForBundleID() {
+  ksadmin -pP $1 | grep xc= | sed -E 's/.+path=(.+)>$/\1/g'
+}
+
+cd "$1" || exit 1
+
+app_name="<APP_NAME>"
+bundle_id="<BUNDLE_ID>"
+
+dest_path=$(PathForBundleID "$bundle_id")
+version=$(defaults read "$dest_path/Contents/Info" CFBundleVersion)
+
+if [ -z "$version" ]; then
+  Log "Error(1): Can't find QSB version"
+  echo exit=1
+  exit 1
+fi
+
+dest_dir=$(dirname "$dest_path")
+
+if [[ "${#dest_path}" -le 5 ||
+     ! -e "$dest_path" ||
+     "$app_name" -ef "$dest_path" ||
+     ! -e "$dest_dir" ||
+     "$dest_dir" -ef "/" ]]; then
+  Log "Error(77): Invalid dest path \"$dest_path\""
+  echo exit=77
+  exit 77  # Try again later
+fi
+
+noauth="--noauth"
+if [ "${KS_INTERACTIVE}" == "YES" ]; then
+  noauth=""
+fi
+"${app_name}/Contents/Resources/Google Installer Helper" ${noauth} \
+      -i "${app_name}/Contents/Resources/GDSHelperIcon.png" \
+      "${app_name}" "${dest_path}"
+
+if [[ $? -ne 0 ]]; then
+  Log "Error($?): The Google Installer Helper encountered an error"
+  echo $?
+  exit $?
+fi
+
+lsrtail="Frameworks/LaunchServices.framework/Support/lsregister"
+lsregister="/System/Library/Frameworks/CoreServices.framework/$lsrtail"
+if [ ! -x "$lsregister" ]; then
+  lsregister="/System/Library/Frameworks/ApplicationServices.framework/$lsrtail"
+fi
+
+$lsregister "$dest_path"
+
+if [[ $? -ne 0 ]]; then
+  Log "Error($?): Unable to $lsregister $dest_path"
+fi
+
+# Remove the QSB ticket
+ksadmin -d -P com.google.qsb
+
+# If this above command fails we don't care.  If Keystone is not installed,
+# great we don't have a ticket.  If there was no ticket to delete, great
+# our job was already done for us.
+
+# The postinstall script needs this path to restart QSB
+echo dest_path=$dest_path
+exit 0

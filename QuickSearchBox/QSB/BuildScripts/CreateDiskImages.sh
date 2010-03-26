@@ -42,6 +42,7 @@ QSB_NAME="Quick Search Box"
 QSB_NEW_DIR="${DERIVED_FILES_DIR}/${QSB_NAME}"
 QSB_NEW_FILE="${BUILT_PRODUCTS_DIR}/QuickSearchBox-${GOOGLE_VERSIONINFO_LONG}.${CONFIGURATION}.dmg"
 QSB_APP_NAME="${QSB_NAME}.app"
+QSB_INSTALLER_SOURCES="${SRCROOT}/installer"
 
 if [ -f "${QSB_NEW_FILE}" ]
 then
@@ -50,6 +51,14 @@ fi
 
 mkdir -p "${QSB_NEW_DIR}"
 ditto "${BUILT_PRODUCTS_DIR}/${QSB_APP_NAME}" "${QSB_NEW_DIR}/${QSB_APP_NAME}"
+
+ditto "${QSB_INSTALLER_SOURCES}/keystone_preinstall" "${QSB_NEW_DIR}/.keystone_preinstall"
+ditto "${QSB_INSTALLER_SOURCES}/keystone_install" "${QSB_NEW_DIR}/.keystone_install"
+ditto "${QSB_INSTALLER_SOURCES}/keystone_postinstall" "${QSB_NEW_DIR}/.keystone_postinstall"
+chmod 755 "${QSB_NEW_DIR}/.keystone_preinstall"
+chmod 755 "${QSB_NEW_DIR}/.keystone_install"
+chmod 755 "${QSB_NEW_DIR}/.keystone_postinstall"
+
 pushd "${SRCROOT}/../externals/yoursway-create-dmg"
 ./create-dmg --volname "${QSB_NAME}" --window-pos 128 128 --window-size 256 256 --icon-size 64 --icon "${QSB_APP_NAME}" 128 112 "${QSB_NEW_FILE}" "${QSB_NEW_DIR}"
 popd

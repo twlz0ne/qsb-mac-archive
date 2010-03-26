@@ -120,7 +120,7 @@
 				8BDB8621115194B700C411B1 /* ShellScript */,
 			);
 			dependencies = (
-				8BDB8628115194CC00C411B1 /* PBXTargetDependency */,
+				8BC8A2D3115D6F3E00A6E783 /* PBXTargetDependency */,
 				8BDB863E115194FD00C411B1 /* PBXTargetDependency */,
 			);
 			name = Codesign;
@@ -1152,6 +1152,9 @@
 		8BC88EAF115971A200A6E783 /* QSBKeystoneRemover.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC88EA811596ECB00A6E783 /* QSBKeystoneRemover.m */; };
 		8BC89321115A873F00A6E783 /* GoogleActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC89320115A873F00A6E783 /* GoogleActions.m */; };
 		8BC89323115A874D00A6E783 /* GoogleActionsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BC89322115A874D00A6E783 /* GoogleActionsTest.m */; };
+		8BC8A23B115D669200A6E783 /* keystone_preinstall in Resources */ = {isa = PBXBuildFile; fileRef = 8BC8A237115D669200A6E783 /* keystone_preinstall */; };
+		8BC8A23C115D669200A6E783 /* keystone_postinstall in Resources */ = {isa = PBXBuildFile; fileRef = 8BC8A238115D669200A6E783 /* keystone_postinstall */; };
+		8BC8A23D115D669200A6E783 /* keystone_install in Resources */ = {isa = PBXBuildFile; fileRef = 8BC8A239115D669200A6E783 /* keystone_install */; };
 		8BCCD2B10EC8E67300688D64 /* closeDiskTray.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A20EC8E67300688D64 /* closeDiskTray.icns */; };
 		8BCCD2B30EC8E67300688D64 /* ejectDiskTray.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A40EC8E67300688D64 /* ejectDiskTray.icns */; };
 		8BCCD2B40EC8E67300688D64 /* emptyTrash.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD2A50EC8E67300688D64 /* emptyTrash.icns */; };
@@ -1868,6 +1871,13 @@
 			remoteGlobalIDString = 8BDB89971152C55000C411B1 /* Create Keystone Config */;
 			remoteInfo = "Create Keystone Config";
 		};
+		8BC8A2D2115D6F3E00A6E783 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
+			remoteInfo = "QSB Application";
+		};
 		8BCCB03B10348ABE0051B567 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8B637B4C0F2777C300997738 /* GData.xcodeproj */;
@@ -1888,13 +1898,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8B6F2CE00DA2B7F50052CA40;
 			remoteInfo = Vermilion;
-		};
-		8BDB8627115194CC00C411B1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA;
-			remoteInfo = "QSB Application";
 		};
 		8BDB8629115194CE00C411B1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -3568,6 +3571,9 @@
 		8BC8931F115A873F00A6E783 /* GoogleActions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleActions.h; sourceTree = "<group>"; };
 		8BC89320115A873F00A6E783 /* GoogleActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleActions.m; sourceTree = "<group>"; };
 		8BC89322115A874D00A6E783 /* GoogleActionsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleActionsTest.m; sourceTree = "<group>"; };
+		8BC8A237115D669200A6E783 /* keystone_preinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = keystone_preinstall; sourceTree = "<group>"; };
+		8BC8A238115D669200A6E783 /* keystone_postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = keystone_postinstall; sourceTree = "<group>"; };
+		8BC8A239115D669200A6E783 /* keystone_install */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = keystone_install; sourceTree = "<group>"; };
 		8BC964C60FB292F90095555F /* headerdoc2html.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = headerdoc2html.config; sourceTree = "<group>"; };
 		8BC964C70FB292F90095555F /* toctemplate.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html.documentation; path = toctemplate.html; sourceTree = "<group>"; };
 		8BC964C80FB292F90095555F /* vermilion.hdoc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vermilion.hdoc; sourceTree = "<group>"; };
@@ -4322,6 +4328,7 @@
 				D45B92550A3F6E68003A5A05 /* Libraries */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
+			comments = "Do not set build independent targets in parallel because the disk images creating targets (SDK vs QSB) will conflict and screw each other up.";
 			name = GoogleDesktop;
 			sourceTree = "<group>";
 		};
@@ -4635,6 +4642,9 @@
 		62D5150710DAD701007ECA33 /* installer */ = {
 			isa = PBXGroup;
 			children = (
+				8BC8A237115D669200A6E783 /* keystone_preinstall */,
+				8BC8A238115D669200A6E783 /* keystone_postinstall */,
+				8BC8A239115D669200A6E783 /* keystone_install */,
 				62D5150810DAD701007ECA33 /* QSBUpdateAppcast.xml */,
 			);
 			path = installer;
@@ -7501,7 +7511,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = YES;
+				BuildIndependentTargetsInParallel = NO;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "QSB" */;
 			compatibilityVersion = "Xcode 3.1";
@@ -8103,6 +8113,9 @@
 				8B687490101836C700ADEA67 /* Localizable.strings in Resources */,
 				8B6AE880112231F400D5D636 /* HGSSearchTermScorerTestData.plist in Resources */,
 				8B533A8F113865D700B89BAA /* InfoPlist.strings in Resources */,
+				8BC8A23B115D669200A6E783 /* keystone_preinstall in Resources */,
+				8BC8A23C115D669200A6E783 /* keystone_postinstall in Resources */,
+				8BC8A23D115D669200A6E783 /* keystone_install in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10155,6 +10168,11 @@
 			target = 8BDB89971152C55000C411B1 /* Create Keystone Config */;
 			targetProxy = 8BC88E0C11595B6900A6E783 /* PBXContainerItemProxy */;
 		};
+		8BC8A2D3115D6F3E00A6E783 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
+			targetProxy = 8BC8A2D2115D6F3E00A6E783 /* PBXContainerItemProxy */;
+		};
 		8BD988260E645EFF00F5C83B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8BD97D090E636D8C00F5C83B /* GTM */;
@@ -10164,11 +10182,6 @@
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
 			targetProxy = 8BDB7965115036F600C411B1 /* PBXContainerItemProxy */;
-		};
-		8BDB8628115194CC00C411B1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
-			targetProxy = 8BDB8627115194CC00C411B1 /* PBXContainerItemProxy */;
 		};
 		8BDB862A115194CE00C411B1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
