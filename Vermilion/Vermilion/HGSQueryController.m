@@ -76,6 +76,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 
 @interface HGSQueryController()
 - (void)cancelPendingSearchOperations:(NSTimer*)timer;
+- (void)invalidateSlowSourceTimer;
 @end
 
 @implementation HGSQueryController
@@ -202,9 +203,18 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   }
 }
 
-- (void)cancelPendingSearchOperations:(NSTimer*)timer {
+- (void)invalidateSlowSourceTimer {
+  // There are cases where slowSourceTimer_ is the last object holding
+  // onto self. We don't want to disappear immediately when slowSourceTimer
+  // is invalidated, so we do a retain/autorelease to make sure that we
+  // survive until the end of this autorelease pool.
+  [[self retain] autorelease];
   [slowSourceTimer_ invalidate];
   slowSourceTimer_ = nil;
+}
+
+- (void)cancelPendingSearchOperations:(NSTimer*)timer {
+  [self invalidateSlowSourceTimer];
   if ([self queriesFinished]) return;
 
   NSUserDefaults *sd = [NSUserDefaults standardUserDefaults];
@@ -238,8 +248,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
     [nc removeObserver:self name:nil object:operation];
     [operation cancel];
   }
-  [slowSourceTimer_ invalidate];
-  slowSourceTimer_ = nil;
+  [self invalidateSlowSourceTimer];
   cancelled_ = YES;
 }
 
@@ -414,8 +423,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   // If this is the last query operation to complete then report as overall
   // query completion and cancel our timer.
   if ([self queriesFinished]) {
-    [slowSourceTimer_ invalidate];
-    slowSourceTimer_ = nil;
+    [self invalidateSlowSourceTimer];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:kHGSQueryControllerDidFinishNotification 
                       object:self];
