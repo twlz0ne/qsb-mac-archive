@@ -69,13 +69,13 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 	// Setup the alert
 	NSAlert *alert = [[[NSAlert alloc] init] autorelease];
 
-  [alert setMessageText:NSLocalizedStringFromTable(@"Install Google Quick Search Box", 
+  [alert setMessageText:NSLocalizedStringFromTable(@"^Install Quick Search Box", 
                                                    @"MoveApplication", nil)];
   
   NSString *informativeText = nil;
 
   if ((IsInDownloadsFolder(bundlePath))) {
-    informativeText = NSLocalizedStringFromTable(@"Google Quick Search Box is currently located in your Downloads folder.", 
+    informativeText = NSLocalizedStringFromTable(@"^Quick Search Box is currently located in your Downloads folder.", 
                                                  @"MoveApplication", nil);
     informativeText = [informativeText stringByAppendingString:@" "];
   } else {
@@ -84,11 +84,11 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
   
   NSString *moveText = nil;
   if (installToUserApplications) {
-    moveText = NSLocalizedStringFromTable(@"Would you like to move it to the Applications folder in your Home folder?", 
+    moveText = NSLocalizedStringFromTable(@"^Would you like to move it to the Applications folder in your Home folder?", 
                                           @"MoveApplication", nil);
   }
   else {
-    moveText = NSLocalizedStringFromTable(@"Would you like to move it to the Applications folder?", 
+    moveText = NSLocalizedStringFromTable(@"^Would you like to move it to the Applications folder?", 
                                           @"MoveApplication", nil);
   }
 
@@ -96,18 +96,18 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
   
   if (needAuthorization) {
     informativeText = [informativeText stringByAppendingString:@"\n\n"];
-    informativeText = [informativeText stringByAppendingString:NSLocalizedStringFromTable(@"Note that this will require an administrator password.", 
+    informativeText = [informativeText stringByAppendingString:NSLocalizedStringFromTable(@"^Note that this will require an administrator password.", 
                                                                                           @"MoveApplication", nil)];
   }
     
   [alert setInformativeText:informativeText];
 
   // Add accept button
-  [alert addButtonWithTitle:NSLocalizedStringFromTable(@"Move to Applications Folder", 
+  [alert addButtonWithTitle:NSLocalizedStringFromTable(@"^Move to Applications Folder", 
                                                        @"MoveApplication", nil)];
 
   // Add deny button
-  NSButton *cancelButton = [alert addButtonWithTitle:NSLocalizedStringFromTable(@"Do Not Move", 
+  NSButton *cancelButton = [alert addButtonWithTitle:NSLocalizedStringFromTable(@"^Do Not Move", 
                                                                                 @"MoveApplication", nil)];
   [cancelButton setKeyEquivalent:@"\e"];
 
@@ -208,7 +208,7 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 fail:
   // Show failure message
   alert = [[[NSAlert alloc] init] autorelease];
-  [alert setMessageText:NSLocalizedStringFromTable(@"Could not move Google Quick Search Box to the Applications folder.", 
+  [alert setMessageText:NSLocalizedStringFromTable(@"^Could not move Quick Search Box to the Applications folder.", 
                                                    @"MoveApplication", nil)];
   [alert runModal];
 }
