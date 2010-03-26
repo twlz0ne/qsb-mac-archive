@@ -49,8 +49,6 @@
 #import "QSBHGSResultAttributeKeys.h"
 #import "QSBActionPresenter.h"
 
-static const CGFloat kQSBResultsAnimationDistance = 12.0;
-
 @interface QSBResultsViewControllerTrio : NSObject {
  @private
   QSBTopResultsViewController *topResultsViewController_;
@@ -174,7 +172,7 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   [pivotAnimation_ setDelegate:self];
   [pivotAnimation_ setUserInfo:userInfo];
   [pivotAnimation_ gtm_setDuration:[pivotAnimation_ duration]
-                         eventMask:kGTMLeftMouseDownAndKeyDownMask]; 
+                         eventMask:kGTMLeftMouseDownAndKeyDownMask];
   [pivotAnimation_ startAnimation];
 }
 
@@ -349,20 +347,12 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
     [searchWindow addChildWindow:window ordered:NSWindowBelow];
   }
   NSRect frame = [window frame];
-  CGFloat alphaValue = [window alphaValue];
-  if (alphaValue <= 0.0) {
-    [window setFrame:NSOffsetRect(frame, 0.0, kQSBResultsAnimationDistance) 
-             display:YES
-             animate:YES];
-  }
-  
   [NSAnimationContext beginGrouping];
   [[NSAnimationContext currentContext] gtm_setDuration:kQSBShowDuration
                                              eventMask:kGTMLeftMouseDownAndKeyDownMask];
   [[window animator] setAlphaValue:1.0];
   NSRect newFrame 
-    = [searchWindowController_ setResultsWindowFrameWithHeight:NSHeight(frame) 
-                                                     animating:YES];
+    = [searchWindowController_ setResultsWindowFrameWithHeight:NSHeight(frame)];
   QSBResultsViewBaseController *activeResultsViewController 
     = [self activeResultsViewController];
   NSView *resultsView = [activeResultsViewController view];

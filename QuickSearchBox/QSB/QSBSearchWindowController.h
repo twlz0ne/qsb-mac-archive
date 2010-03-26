@@ -82,8 +82,7 @@ extern const NSTimeInterval kQSBHideDuration;
 // Attempt to set the height of the results window while insuring that
 // the results window fits comfortably on the screen along with the
 // search box window.
-- (NSRect)setResultsWindowFrameWithHeight:(CGFloat)height
-                                animating:(BOOL)animating;
+- (NSRect)setResultsWindowFrameWithHeight:(CGFloat)height;
 
 // Grab the selection from the Finder
 - (IBAction)grabSelection:(id)sender;

@@ -443,11 +443,10 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   
 }
 
-- (NSRect)setResultsWindowFrameWithHeight:(CGFloat)newHeight
-                                animating:(BOOL)animating {
+- (NSRect)setResultsWindowFrameWithHeight:(CGFloat)newHeight {
   NSWindow *queryWindow = [self window];
-  
-  BOOL resultsVisible = [[resultsWindowController_ window] isVisible];
+  NSWindow *resultsWindow = [resultsWindowController_ window];
+  BOOL resultsVisible = [resultsWindow isVisible];
   NSRect baseFrame = [resultsOffsetterView_ frame];
   baseFrame.origin = [queryWindow convertBaseToScreen:baseFrame.origin];
   // Always start with the baseFrame and enlarge it to fit the height
@@ -471,12 +470,11 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
       
       NSRect queryFrame = NSOffsetRect([queryWindow frame],
                                 deltaPoint.x, deltaPoint.y);
-      [queryWindow setFrame:queryFrame display:YES animate:animating];
+      [[queryWindow animator] setFrame:queryFrame display:YES];
     }
-    
-    [[resultsWindowController_ window] setFrame:actualFrame 
-                                        display:YES 
-                                        animate:animating];
+    NSPoint upperLeft = NSMakePoint(NSMinX(actualFrame), NSMaxY(actualFrame));
+    [resultsWindow setFrameTopLeftPoint:upperLeft];
+    [[resultsWindow animator] setFrame:actualFrame display:YES];
   }
   return actualFrame;
 }
