@@ -144,9 +144,13 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     }
       
     currentlyFetching_ = YES;
-    [fetcher_ beginFetchWithDelegate:self
-                   didFinishSelector:@selector(httpFetcher:finishedWithData:)
-                     didFailSelector:@selector(httpFetcher:didFail:)];
+    HGSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
+    HGSInvocationOperation *op 
+      = [HGSInvocationOperation networkInvocationOperationWithTarget:self 
+                                                          forFetcher:fetcher_ 
+                                                   didFinishSelector:@selector(httpFetcher:finishedWithData:) 
+                                                     didFailSelector:@selector(httpFetcher:didFail:)];
+    [queue addOperation:op];
   }
 }
 
