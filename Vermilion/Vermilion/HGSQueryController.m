@@ -208,9 +208,11 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   // onto self. We don't want to disappear immediately when slowSourceTimer
   // is invalidated, so we do a retain/autorelease to make sure that we
   // survive until the end of this autorelease pool.
-  [[self retain] autorelease];
-  [slowSourceTimer_ invalidate];
-  slowSourceTimer_ = nil;
+  if (slowSourceTimer_) {
+    [[self retain] autorelease];
+    [slowSourceTimer_ invalidate];
+    slowSourceTimer_ = nil;
+  }
 }
 
 - (void)cancelPendingSearchOperations:(NSTimer*)timer {
