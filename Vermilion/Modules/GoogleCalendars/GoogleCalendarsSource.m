@@ -33,6 +33,7 @@
 #import <Vermilion/Vermilion.h>
 #import <GData/GData.h>
 #import <GTM/GTMNSEnumerator+Filter.h>
+#import <GTM/GTMDebugThreadValidation.h>
 #import "GoogleAccountsConstants.h"
 #import "HGSKeychainItem.h"
 #import "QSBHGSResultAttributeKeys.h"
@@ -45,6 +46,11 @@ static NSString *const kGoogleCalendarEventStartTimeKey
 static NSString *const kGoogleCalendarEventEndTimeKey
   = @"GoogleCalendarEventEndTimeKey";
 
+// This is a key for the fetch type that we add to the userInfo of NSErrors
+// when errors occur in fetches.
+static NSString *const kGoogleCalendarFetchTypeErrorKey 
+  = @"GoogleCalendarFetchType";
+
 static const NSTimeInterval kRefreshSeconds = 300.0;  // 5 minutes.
 static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
@@ -53,12 +59,20 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 @interface GoogleCalendarsSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
   GDataServiceGoogleCalendar *service_;
+  // We use activeTickets_ as a form of an event queue between threads.
+  // Once it is empty the indexing thread will stop.
+  // Be careful to synchronize when referencing it.
   NSMutableSet *activeTickets_;
   __weak NSTimer *updateTimer_;
   HGSAccount *account_;
   NSTimeInterval previousErrorReportingTime_;
   NSImage *calendarIcon_;
   NSImage *eventIcon_;
+  HGSInvocationOperation *indexOp_;
+  NSDateFormatter *shortDateShortTimeFormatter_;
+  NSDateFormatter *noDateShortTimeFormatter_;
+  NSDateFormatter *shortDateNoTimeFormatter_;
+  NSDateFormatter *dayOfWeekFormatter_;
 }
 
 // Used to schedule refreshes of the calendar cache.
@@ -90,8 +104,7 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 - (NSString *)accountCalendarURLString;
 
 // Utility function for reporting fetch errors.
-- (void)reportErrorForFetchType:(NSString *)fetchType
-                          error:(NSError *)error;
+- (void)reportError:(NSError *)error;
 
 @end
 
@@ -102,6 +115,13 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 + (GDataDateTime *)dateTimeForTodayAtHour:(int)hour
                                    minute:(int)minute
                                    second:(int)second;
+
+@end
+
+@interface NSError (GoogleCalendarsSource)
+
+// Create a new error by adding a fetch type to an existing errors userInfo.
+- (NSError *)gcs_errorByAddingFetchType:(NSString *)fetchType;
 
 @end
 
@@ -154,6 +174,19 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
       HGSCheckDebug(calendarIcon_, nil);
       eventIcon_ = [[self imageNamed:@"gcalendarevent"] retain];
       HGSCheckDebug(eventIcon_, nil);
+      
+      // Creating NSDateFormatters is expensive, so we cache these ones.
+      shortDateShortTimeFormatter_ = [[NSDateFormatter alloc] init];
+      [shortDateShortTimeFormatter_ setDateStyle:NSDateFormatterShortStyle];
+      [shortDateShortTimeFormatter_ setTimeStyle:NSDateFormatterShortStyle];
+      
+      noDateShortTimeFormatter_ = [[NSDateFormatter alloc] init];
+      [noDateShortTimeFormatter_ setDateStyle:NSDateFormatterNoStyle];
+      [noDateShortTimeFormatter_ setTimeStyle:NSDateFormatterShortStyle];
+      
+      shortDateNoTimeFormatter_ = [[NSDateFormatter alloc] init];
+      [shortDateNoTimeFormatter_ setDateStyle:NSDateFormatterShortStyle];
+      [shortDateNoTimeFormatter_ setTimeStyle:NSDateFormatterNoStyle];
     } else {
       HGSLogDebug(@"Missing account identifier for GoogleCalendarsSource '%@'",
                   [self identifier]);
@@ -167,6 +200,9 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self cancelAllTickets];
+  [shortDateShortTimeFormatter_ release];
+  [noDateShortTimeFormatter_ release];
+  [shortDateNoTimeFormatter_ release];
   [activeTickets_ release];
   [service_ release];
   [updateTimer_ invalidate];
@@ -177,8 +213,10 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 }
 
 - (void)cancelAllTickets {
-  [activeTickets_ makeObjectsPerformSelector:@selector(cancelTicket)];
-  [activeTickets_ removeAllObjects];
+  @synchronized (self) {
+    [activeTickets_ makeObjectsPerformSelector:@selector(cancelTicket)];
+    [activeTickets_ removeAllObjects];
+  }
   [service_ release];
   service_ = nil;
 }
@@ -294,46 +332,71 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 #pragma mark Calendar Fetching
 
 - (void)startAsyncCalendarsListFetch {
-  if ([activeTickets_ count] == 0) {
-    if (!service_) {
-      HGSKeychainItem* keychainItem 
-        = [HGSKeychainItem keychainItemForService:[account_ identifier]
-                                         username:nil];
-      NSString *username = [keychainItem username];
-      NSString *password = [keychainItem password];
-      if ([username length]) {
-        service_ = [[GDataServiceGoogleCalendar alloc] init];
-        [service_ setUserAgent:@"google-qsb-1.0"];
-        // If there is no password then we will only fetch public albums.
-        if ([password length]) {
-          [service_ setUserCredentialsWithUsername:username
-                                          password:password];
-        }
-        [service_ setServiceShouldFollowNextLinks:YES];
-        [service_ setIsServiceRetryEnabled:YES];
-      } else {
-        [updateTimer_ invalidate];
-        updateTimer_ = nil;
-        return;
+  if (!service_) {
+    HGSKeychainItem* keychainItem 
+      = [HGSKeychainItem keychainItemForService:[account_ identifier]
+                                       username:nil];
+    NSString *username = [keychainItem username];
+    NSString *password = [keychainItem password];
+    if ([username length]) {
+      service_ = [[GDataServiceGoogleCalendar alloc] init];
+      [service_ setUserAgent:@"google-qsb-1.0"];
+      // If there is no password then we will only fetch public albums.
+      if ([password length]) {
+        [service_ setUserCredentialsWithUsername:username
+                                        password:password];
+      }
+      [service_ setServiceShouldFollowNextLinks:YES];
+      [service_ setIsServiceRetryEnabled:YES];
+    } else {
+      [updateTimer_ invalidate];
+      updateTimer_ = nil;
+      return;
+    }
+  }
+  @synchronized (self) {
+    if ([activeTickets_ count] == 0) {
+      HGSOperationQueue *opQueue = [HGSOperationQueue sharedOperationQueue];
+      HGSInvocationOperation *op 
+        = [HGSInvocationOperation memoryInvocationOperationWithTarget:self 
+                                                             selector:@selector(asyncCalendarListFetchOperation:) 
+                                                               object:service_];
+      [opQueue addOperation:op];
+    }
+  }
+}
+
+- (void)asyncCalendarListFetchOperation:(GDataServiceGoogleCalendar*)service {
+  GDataServiceTicket *calendarTicket
+    = [service fetchFeedWithURL:[NSURL URLWithString:
+                                 kGDataGoogleCalendarDefaultOwnCalendarsFeed]
+                       delegate:self
+              didFinishSelector:@selector(calendarFeedTicket:
+                                          finishedWithFeed:
+                                          error:)];
+  @synchronized (self) {
+    [activeTickets_ addObject:calendarTicket];
+  }
+  while (YES) {
+    NSDate *date = [[NSDate alloc] initWithTimeIntervalSinceNow:1];
+    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode 
+                             beforeDate:date];
+    [date release];
+    @synchronized (self) {
+      if ([activeTickets_ count] == 0) {
+        break;
       }
     }
-    
-    GDataServiceTicket *calendarTicket
-      = [service_ fetchFeedWithURL:[NSURL URLWithString:
-                                    kGDataGoogleCalendarDefaultOwnCalendarsFeed]
-                          delegate:self
-                 didFinishSelector:@selector(calendarFeedTicket:
-                                             finishedWithFeed:
-                                             error:)];
-    [activeTickets_ addObject:calendarTicket];
   }
 }
 
 - (void)calendarFeedTicket:(GDataServiceTicket *)ticket
           finishedWithFeed:(GDataFeedCalendar *)feed
                      error:(NSError *)error {
-  HGSCheckDebug([activeTickets_ containsObject:ticket], nil);
-  [activeTickets_ removeObject:ticket];
+  @synchronized (self) {
+    HGSCheckDebug([activeTickets_ containsObject:ticket], nil);
+    [activeTickets_ removeObject:ticket];
+  }
   if (!error) {
     NSArray *entries = [feed entries];
     for (GDataEntryCalendar *entry in entries) {
@@ -343,7 +406,11 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
     NSString *fetchType = HGSLocalizedString(@"^calendar", 
                                              @"A label denoting a Google "
                                              @"Calendar.");
-    [self reportErrorForFetchType:fetchType error:error];
+    NSError *fetchError = [error gcs_errorByAddingFetchType:fetchType];
+    
+    [self performSelectorOnMainThread:@selector(reportError:) 
+                           withObject:fetchError 
+                        waitUntilDone:NO];
   }
 }
 
@@ -445,7 +512,9 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
                                                error:)];
     [calendarEntry setProperty:calendarURL forKey:kGoogleCalendarURLKey];
     [eventTicket setProperty:calendarEntry forKey:kGoogleCalendarEntryKey];
-    [activeTickets_ addObject:eventTicket];
+    @synchronized (self) {
+      [activeTickets_ addObject:eventTicket];
+    }
   }
 }
 
@@ -455,8 +524,10 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 - (void)eventsFetcher:(GDataServiceTicket *)ticket
      finishedWithFeed:(GDataFeedCalendarEvent *)eventFeed
                error:(NSError *)error {
-  HGSCheckDebug([activeTickets_ containsObject:ticket], nil);
-  [activeTickets_ removeObject:ticket];
+  @synchronized (self) {
+    HGSCheckDebug([activeTickets_ containsObject:ticket], nil);
+    [activeTickets_ removeObject:ticket];
+  }
   if (!error) {
     NSArray *eventList = [eventFeed entries];
     for (GDataEntryCalendarEvent *eventEntry in eventList) {
@@ -468,8 +539,12 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
     NSString *fetchType
       = HGSLocalizedString(@"^event", 
                            @"A label denoting a Google Calendar event");
-    [self reportErrorForFetchType:fetchType error:error];
-  }    
+    NSError *fetchError = [error gcs_errorByAddingFetchType:fetchType];
+    
+    [self performSelectorOnMainThread:@selector(reportError:) 
+                           withObject:fetchError 
+                        waitUntilDone:NO];
+  }
 }
 
 - (void)indexEvent:(GDataEntryCalendarEvent *)eventEntry
@@ -547,9 +622,8 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
         NSDate *lastUsed = [[NSDate date] addTimeInterval:-interval];
         [attributes setObject:lastUsed forKey:kHGSObjectAttributeLastUsedDateKey];
         
-        NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
-        [formatter setDateStyle:NSDateFormatterShortStyle];
-        NSString *dateString = [formatter stringFromDate:startTime];
+        NSString *dateString 
+          = [shortDateNoTimeFormatter_ stringFromDate:startTime];
         // Uniquify the eventURL.
         NSString *eventURLString
           = [baseURLString stringByAppendingFormat:@"&qsb-event-index=%d",
@@ -591,14 +665,15 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
   // All-day is indicated by a start time with just a date (i.e. no time).
   // An 'instant' is indicated by no end time.
   NSString *snippet = weekdayName;
-  NSDateFormatter *timeFormatter = [[[NSDateFormatter alloc] init] autorelease];
-  NSDateFormatterStyle dateStyle
-    = snippet ? NSDateFormatterNoStyle : NSDateFormatterShortStyle;
-  NSDateFormatterStyle timeStyle
-    = allDay ? NSDateFormatterNoStyle : NSDateFormatterShortStyle;
-  [timeFormatter setDateStyle:dateStyle];
-  [timeFormatter setTimeStyle:timeStyle];
-  NSString *startTimeString = [timeFormatter stringFromDate:startTime];
+  NSDateFormatter *formatter = nil;
+  if (snippet && !allDay) {
+    formatter = noDateShortTimeFormatter_;
+  } else if (!snippet && allDay) {
+    formatter = shortDateNoTimeFormatter_;
+  } else if (!snippet && !allDay) {
+    formatter = shortDateShortTimeFormatter_;
+  }
+  NSString *startTimeString = [formatter stringFromDate:startTime];
   
   if (!allDay) {
     if (snippet) {
@@ -607,8 +682,7 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
       snippet = startTimeString;
     }
     if (endTime) {
-      [timeFormatter setDateStyle:NSDateFormatterNoStyle];
-      NSString *endTimeString = [timeFormatter stringFromDate:endTime];
+      NSString *endTimeString = [noDateShortTimeFormatter_ stringFromDate:endTime];
       snippet = [snippet stringByAppendingFormat:@" — %@", endTimeString];
     }
   } else {
@@ -636,8 +710,8 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
   return snippet;
 }
 
-- (void)reportErrorForFetchType:(NSString *)fetchType
-                          error:(NSError *)error {
+- (void)reportError:(NSError *)error {
+  GTMAssertRunningOnMainThread();
   NSInteger errorCode = [error code];
   // If nothing has changed since we last checked then don't have a cow,
   // and don't report not-connected-to-Internet errors.
@@ -663,6 +737,8 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
         } else {
           errorString = @"fetch failed";
         }
+        NSString *fetchType 
+          = [[error userInfo] objectForKey:kGoogleCalendarFetchTypeErrorKey];
         HGSLog(@"GoogleCalendarsSource (%@InfoFetcher) %@ for account '%@': "
                @"error=%d '%@'.", fetchType, errorString,
                [account_ displayName], errorCode, [error localizedDescription]);
@@ -781,3 +857,17 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 }
 
 @end
+
+@implementation NSError (GoogleCalendarsSource)
+
+- (NSError *)gcs_errorByAddingFetchType:(NSString *)fetchType {
+  NSMutableDictionary *userInfo 
+    = [NSMutableDictionary dictionaryWithDictionary:[self userInfo]];
+  [userInfo setObject:fetchType forKey:kGoogleCalendarFetchTypeErrorKey];
+  return [NSError errorWithDomain:[self domain] 
+                             code:[self code] 
+                         userInfo:userInfo];
+}
+
+@end
+
