@@ -127,6 +127,7 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
                               didFinishSelector:@selector(uploadFileTicket:
                                                           finishedWithEntry:
                                                           error:)];
+  [uploadTicket setUserData:entryTitle];
   [uploadTicket retain];
   @synchronized (activeTickets_) {
     [activeTickets_ addObject:uploadTicket];
@@ -214,7 +215,10 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
   @synchronized (activeTickets_) {
     [activeTickets_ removeObject:ticket];
   }
-  NSString *title = [[dataEntry title] stringValue];
+  
+  // Can't use title from dataEntry because if we have an error, dataEntry
+  // is nil.
+  NSString *title = [ticket userData];
   if (!error) {
     // Only notify the user for the first success.
     if (![self userWasNoticed]) {
