@@ -10,8 +10,8 @@ function PathForBundleID() {
 
 cd "$1" || exit 1
 
-app_name="<APP_NAME>"
-bundle_id="<BUNDLE_ID>"
+app_name="Quick Search Box.app"
+bundle_id="com.google.qsb"
 
 dest_path=$(PathForBundleID "$bundle_id")
 version=$(defaults read "$dest_path/Contents/Info" CFBundleVersion)
@@ -34,19 +34,23 @@ if [[ "${#dest_path}" -le 5 ||
   exit 77  # Try again later
 fi
 
-noauth="--noauth"
-if [ "${KS_INTERACTIVE}" == "YES" ]; then
-  noauth=""
-fi
-"${app_name}/Contents/Resources/Google Installer Helper" ${noauth} \
-      -i "${app_name}/Contents/Resources/GDSHelperIcon.png" \
-      "${app_name}" "${dest_path}"
+backup_path="$dest_path.backup"
+mv "$dest_path" "$backup_path" || exit 2
 
-if [[ $? -ne 0 ]]; then
-  Log "Error($?): The Google Installer Helper encountered an error"
-  echo $?
-  exit $?
+status=0
+tar cf - "$app_name" | tar xf - -C "$dest_dir"
+if [[ $? -eq 0 ]]; then
+  status=$?
+  chmod -R u+w "$backup_path"
+  rm -rf "$backup_path"
+else
+  status=$?
+  chmod -R u+w "$dest_path"
+  rm -rf "$dest_path"
+  mv "$backup_path" "$dest_path"
 fi
+
+xattr -d com.apple.quarantine "$dest_path"
 
 lsrtail="Frameworks/LaunchServices.framework/Support/lsregister"
 lsregister="/System/Library/Frameworks/CoreServices.framework/$lsrtail"
