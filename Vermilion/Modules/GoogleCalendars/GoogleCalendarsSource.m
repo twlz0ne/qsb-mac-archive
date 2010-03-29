@@ -552,7 +552,9 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
   NSURL* eventURL = [[eventEntry HTMLLink] URL];
   GDataEventStatus *eventStatus = [eventEntry eventStatus];
   NSString *statusString = [eventStatus stringValue];
-  if (eventURL && ![statusString isEqualToString:kGDataEventStatusCanceled]) {
+  if (eventURL
+      && ![statusString isEqualToString:kGDataEventStatusCanceled]
+      && ![eventEntry originalEvent]) {
     NSString *calendarID = [calendarEntry identifier];
     NSMutableDictionary *attributes
       = [NSMutableDictionary dictionaryWithObject:calendarID
@@ -683,7 +685,7 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
     }
     if (endTime) {
       NSString *endTimeString = [noDateShortTimeFormatter_ stringFromDate:endTime];
-      snippet = [snippet stringByAppendingFormat:@" — %@", endTimeString];
+      snippet = [snippet stringByAppendingFormat:@" ‚Äî %@", endTimeString];
     }
   } else {
     NSString *allDayString
