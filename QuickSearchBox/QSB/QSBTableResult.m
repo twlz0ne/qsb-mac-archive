@@ -352,7 +352,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
                              forKeyPath:kHGSObjectAttributeIconKey
                                selector:@selector(objectIconChanged:)
                                userInfo:nil
-                                options:0];
+                                options:NSKeyValueObservingOptionNew];
   }
   return self;
 }
@@ -360,6 +360,8 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 - (void)dealloc {
   [self gtm_stopObservingAllKeyPaths];
   [representedResult_ release];
+  [thumbnailImage_ release];
+  [icon_ release];
   [super dealloc];
 }
 
@@ -377,9 +379,17 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 
 - (void)objectIconChanged:(GTMKeyValueChangeNotification *)notification {
   [self willChangeValueForKey:@"displayIcon"];
-  [self didChangeValueForKey:@"displayIcon"];
   [self willChangeValueForKey:@"displayThumbnail"];
+  NSDictionary *change = [notification change];
+  NSImage *newIcon = [change objectForKey:NSKeyValueChangeNewKey];
+  if (newIcon) {
+    [icon_ release];
+    [thumbnailImage_ release];
+    icon_ = [newIcon retain];
+    thumbnailImage_ = [newIcon retain];
+  }
   [self didChangeValueForKey:@"displayThumbnail"];
+  [self didChangeValueForKey:@"displayIcon"];
 }
 
 - (BOOL)isPivotable {
@@ -453,8 +463,11 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 }
 
 - (NSImage *)displayIcon {
-  HGSScoredResult *result = [self representedResult];
-  return [result valueForKey:kHGSObjectAttributeIconKey];
+  if (!icon_) {
+    HGSScoredResult *result = [self representedResult];
+    icon_ = [[result valueForKey:kHGSObjectAttributeIconKey] retain];
+  }
+  return icon_;
 }
 
 - (NSString*)displayToolTip {
@@ -480,8 +493,12 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 }
 
 - (NSImage *)displayThumbnail {
-  HGSScoredResult *result = [self representedResult];
-  return [result valueForKey:kHGSObjectAttributeImmediateIconKey];
+  if (!thumbnailImage_) {
+    HGSScoredResult *result = [self representedResult];
+    thumbnailImage_
+      = [[result valueForKey:kHGSObjectAttributeImmediateIconKey] retain];
+  }
+  return thumbnailImage_;
 }
 
 - (NSMutableAttributedString*)genericTitleLine {

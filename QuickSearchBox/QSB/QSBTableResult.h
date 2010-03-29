@@ -137,6 +137,8 @@
 @interface QSBSourceTableResult : QSBTableResult {
  @private
   HGSScoredResult *representedResult_;
+  NSImage *thumbnailImage_;
+  NSImage *icon_;
   NSString *categoryName_;
 }
 
