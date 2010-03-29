@@ -307,6 +307,18 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
         CGFloat base = 1.0;
         for (NSDictionary *resultDict in resultArray) {
           HGSResult *result = [self unarchiveResult:resultDict];
+          
+          // If we have an action, check to see if it can be displayed right
+          // now.
+          if ([result conformsToType:kHGSTypeAction]) {
+            HGSAction *action 
+              = [result valueForKey:kHGSObjectAttributeDefaultActionKey];
+            if (![action showInGlobalSearchResults]) {
+              // Can't be shown right now, so nil out result.
+              result = nil;
+            }
+          }
+          
           HGSScoredResult *scoredResult = nil;
           if (result) {
             score = score * base;
@@ -377,12 +389,23 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   
   HGSResultArray *directObjects 
     = [operation argumentForKey:kHGSActionDirectObjectsKey];
-  if ([directObjects count] == 1) {
-    HGSScoredResult *directObject = [directObjects objectAtIndex:0];
+  NSUInteger count = [directObjects count];
+  HGSScoredResult *result = nil;
+  if (count == 0) {
+    // If we have no direct objects, we are likely an action.
+    QSBSourceTableResult *tableResult 
+      = GTM_DYNAMIC_CAST(QSBSourceTableResult, [presenter selectedTableResult]);
+    if (tableResult) {
+      result = [tableResult representedResult];
+    }
+  } else if (count == 1) {
+    result = [directObjects objectAtIndex:0];
+  }
+  if (result) {
     HGSTokenizedString *shortcut = [searchController tokenizedQueryString];
     if ([shortcut originalLength] > 0) {
       [self updateShortcutForTokenizedString:[searchController tokenizedQueryString]
-                            withRankedResult:directObject];
+                            withRankedResult:result];
     }
   }
 }
