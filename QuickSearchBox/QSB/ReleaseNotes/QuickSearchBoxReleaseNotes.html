@@ -2,12 +2,48 @@
 <body style="font-family:lucida grande;font-size:13px;">
 <h2>Google Quick Search Box {VERSION} ({CODENAME})</h2>
 <div style="border:1px solid #ccc; background-color:#eee; padding-left:20px;line-height:150%;-webkit-border-radius: 4px;">
-<p>Thank you for working with QSB and giving us so much encouragement and feedback. We really appreciate it.</p>
-<p>Please consider joining our mailing list at
-  <a href="http://groups.google.com/group/qsb-mac-discuss">
-    http://groups.google.com/group/qsb-mac-discuss
-  </a>.
-</p>
+  <p>
+    Thank you for working with QSB and giving us so much encouragement and 
+   feedback. We really appreciate it.
+  </p>
+  <p>
+   Here is the long awaited next beta. Hopefully you find it has been
+   worth the wait. A handful of the many, many issues we have fixed are listed below,
+   but some of the big highlights are:
+   <ul>
+     <li>
+       Support for Move To.. and Open With.. and other more complex actions.
+     </li>
+     <li>
+       Support for searching Google Calendars.
+     </li>
+     <li>
+       Faster Spotlight searches.
+     </li>
+   </ul>
+   <p>
+   You will also notice the branding has changed significantly. We are moving
+   from being a Google project, to a fully open sourced project. This means that
+   we will are now soliciting external developers. If you are interested in
+   helping out, please join the <a href="http://groups.google.com/group/qsb-mac-dev">
+    http://groups.google.com/group/qsb-mac-dev</a> mailing list and get in touch.
+   </p>
+   <p>
+   You will also notice that some features have been removed (the big one
+   being the Twitter plugin) but fear not. These have been moved to our
+   plugins page. You can find them here 
+   <a href="http://code.google.com/p/qsb-mac-plugins/">
+   http://code.google.com/p/qsb-mac-plugins/</a>. You may find some new
+   functionality that you didn't know existed.
+   </p>
+   <p>
+   This is still a beta, so please file issues on any bugs you see.
+   </p>
+   <p>Please consider joining our mailing list at
+     <a href="http://groups.google.com/group/qsb-mac-discuss">
+       http://groups.google.com/group/qsb-mac-discuss
+     </a>.
+   </p>
 <p>Issues can be filed on our issues list at
   <a href="http://code.google.com/p/qsb-mac/issues/list">
     http://code.google.com/p/qsb-mac/issues/list
@@ -162,12 +198,6 @@
         being complete decoded.
     </li>
     <li>
-       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=17">
-        Issue 17</a>: Added a Directory Service search source that provides
-        contact results from Open/Active/LDAP directories to which the computer
-        is bound.
-    </li>
-    <li>
        <a href="http://code.google.com/p/qsb-mac/issues/detail?id=568">
         Issue 568</a>: QuickLook should no longer block up our UI, and icons in
         general should load faster.
@@ -275,10 +305,6 @@
       Issue 674</a>: Fixed Calculator source so it always shows the answer.
     </li>
     <li>
-      <a href="http://code.google.com/p/qsb-mac/issues/detail?id=755">
-      Issue 755</a>: Now compiles 64 bit.
-    </li>
-    <li>
       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=484">
       Issue 484</a>: Turned on the sudden termination flag for Snow Leopard.
     </li>
@@ -373,14 +399,6 @@
       for these encodings.
     </li>
     <li>
-      Added a new factor (match spread factor) to the scoring algorithm.
-      This modifies the score by considering the distance between the first
-      matching character and the last matching character. The scoring
-      algorithm now scores single character word matches, and also gives a
-      boost to adjacency when matching characters span words. Also adjusted
-      the calibration scores.
-    </li>
-    <li>
       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=815">
       Issue 815</a>: The results view no longer flickers in and out after
       the query reset timer triggers.
@@ -439,18 +457,9 @@
       unique PDF tag.
     </li>
     <li>
-      <a href="http://code.google.com/p/qsb-mac/issues/detail?id=860">
-      Issue 860</a>: Web Search source results after a pivot were not being
-      scored.
-    </li>
-    <li>
       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=125">
       Issue 125</a>: Adopt <a href="http://sparkle.andymatuschak.org">Sparkle</a>
       as the update mechanism.
-    </li>
-    <li>
-      Removed the Directory Services plugin as it was hanging regularly and 
-      the API has been deprecated in Snow Leopard.
     </li>
     <li>
       <a href="http://code.google.com/p/qsb-mac/issues/detail?id=625">
