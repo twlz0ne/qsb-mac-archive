@@ -540,8 +540,8 @@ GTM_METHOD_CHECK(NSAttributedString, attrStringWithString:attributes:);
       [storage deleteCharactersInRange:intersection];
       [storage endEditing];
     }
-    lastCompletionRange_ = NSMakeRange(0,0);
   }
+  lastCompletionRange_ = NSMakeRange(0, 0);
 }
 
 - (void)handleMoveBack:(id)sender command:(SEL)command {
