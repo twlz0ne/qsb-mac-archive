@@ -394,8 +394,8 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
   if (count == 0) {
     // If we have no direct objects, we are likely an action.
     QSBSourceTableResult *tableResult 
-      = GTM_DYNAMIC_CAST(QSBSourceTableResult, [presenter selectedTableResult]);
-    if (tableResult) {
+      = (QSBSourceTableResult*)[presenter selectedTableResult];
+    if ([tableResult respondsToSelector:@selector(representedResult)]) {
       result = [tableResult representedResult];
     }
   } else if (count == 1) {
