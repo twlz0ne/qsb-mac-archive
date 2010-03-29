@@ -129,17 +129,19 @@ NSString *const kHGSSearchSourceCannotArchiveKey
     if (pivotObjects && pivotTypes) {
       NSSet *allPivots = [NSSet setWithObject:@"*"];
       if (![pivotTypes isEqual:allPivots]) {
-        for (NSString *pivotType in pivotTypes) {
-          for (HGSResult *pivotObject in pivotObjects) {
+        for (HGSResult *pivotObject in pivotObjects) {
+          BOOL goodObject = NO;
+          for (NSString *pivotType in pivotTypes) {
             if ([pivotObject conformsToType:kHGSTypeAction]) {
-              isValid = YES;
+              goodObject = YES;
             } else {
-              isValid = [pivotObject conformsToType:pivotType];
+              goodObject = [pivotObject conformsToType:pivotType];
             }
-            if (!isValid) {
+            if (goodObject) {
               break;
             }
           }
+          isValid = isValid & goodObject;
           if (!isValid) {
             break;
           }
