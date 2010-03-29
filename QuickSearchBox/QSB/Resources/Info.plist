@@ -134,6 +134,8 @@
 	<string>http://code.google.com/p/qsb-mac</string>
 	<key>GoogleBreakpadSendAndExit</key>
 	<string>NO</string>
+	<key>GoogleBreakpadProduct</key>
+	<string>Google_QuickSearchBox_Mac</string>
 	<key>GTMGoogleSearchClientAppArgs</key>
 	<dict>
 		<key>client</key>
