@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <channel>
+      <title>Quick Search Box Changelog</title>
+      <link>http://qsb-mac.googlecode.com/svn/trunk/QuickSearchBox/QSB/installer/QSBUpdateAppcast.xml</link>
+      <description>Most recent changes with links to updates.</description>
+      <language>en</language>
+         <item>
+            <title>Version 2.0.0.3246</title>
+						<sparkle:releaseNotesLink>
+							http://qsb-mac.googlecode.com/svn/trunk/release_notes/QuickSearchBoxReleaseNotes_2.0.0.3246_Cobalt.html
+						</sparkle:releaseNotesLink>
+            <pubDate>Mon, 29 Mar 2010 15:46:09 -0700</pubDate>
+            <enclosure url="http://qsb-mac.googlecode.com/files/QuickSearchBox-2.0.0.3246.Release.dmg"
+              sparkle:version="2.0.0.3246"
+              length="4852948"
+              type="application/octet-stream"
+              sparkle:dsaSignature="MCwCFCYGp+N++Tn+l8Ff9ZWMCxXZk+unAhR+zfYPrF31Q75gGMnV6g27PmNT5g==" />
+         </item>
+   </channel>
+</rss>
