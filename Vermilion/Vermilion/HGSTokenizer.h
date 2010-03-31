@@ -50,7 +50,6 @@
  @private
   NSString *originalString_;
   NSString *tokenizedString_;
-  NSString *normalizedString_;
   NSUInteger count_;
   struct HGSRangeMapping *mappings_;
 }
