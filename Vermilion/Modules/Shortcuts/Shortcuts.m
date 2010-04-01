@@ -139,18 +139,19 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
 #endif
     shortcuts_ = [[self readShortcuts:shortcutsFilePath_] retain];
     writeShortcutsTimer_ 
-      = [NSTimer scheduledTimerWithTimeInterval:300 
-                                         target:self 
-                                       selector:@selector(writeShortcuts:) 
-                                       userInfo:nil 
-                                        repeats:YES];
+      = [[NSTimer scheduledTimerWithTimeInterval:300 
+                                          target:self 
+                                        selector:@selector(writeShortcuts:) 
+                                        userInfo:nil 
+                                         repeats:YES] retain];
     
   }
   return self;
 }
 
-- (void) dealloc{
+- (void)dealloc {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [writeShortcutsTimer_ release];
   [nc removeObserver:self];
   [shortcuts_ release];
   [shortcutsFilePath_ release];
@@ -432,7 +433,6 @@ static inline NSInteger KeyLength(NSString *a, NSString *b, void *c) {
 // the timer which is retaining us.
 - (void)uninstall {
   [writeShortcutsTimer_ invalidate];
-  writeShortcutsTimer_ = nil;
   [self writeShortcuts:nil];
   [super uninstall];
 }
