@@ -199,6 +199,7 @@ extensionPointIdentifier:(NSString *)extensionPointIdentifier {
   for (HGSExtension *extension in loadedExtensions_) {
     [[extension protoExtension] uninstall];
   }
+  [loadedExtensions_ removeAllObjects];
   extension_ = nil;
   [super tearDown];
 }
@@ -207,21 +208,35 @@ extensionPointIdentifier:(NSString *)extensionPointIdentifier {
                           fromPluginNamed:(NSString *)pluginName
                  extensionPointIdentifier:(NSString *)extensionPointID
                                  delegate:(HGSUnitTestingDelegate *)delegate {
-  NSBundle *hgsBundle = HGSGetPluginBundle();
-  NSString *bundlePath = [hgsBundle bundlePath];
-  NSString *workingDir = [bundlePath stringByDeletingLastPathComponent];
-  NSString *path = [workingDir stringByAppendingPathComponent:pluginName];
-  path = [path stringByAppendingPathExtension:@"hgs"];
-  if (!delegate) {
-    delegate = [[[HGSUnitTestingDelegate alloc] initWithPath:path] autorelease];
+  HGSExtension *extension = nil;
+  HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
+  HGSPlugin *plugin = [pluginsPoint extensionWithIdentifier:pluginName];
+  if (plugin) {
+    NSArray *extensions = [plugin extensionsWithType:extensionPointID];
+    for (HGSProtoExtension *protoExtension in extensions) {
+      if ([[protoExtension identifier] isEqual:identifier]) {
+        [protoExtension install];
+        extension = [protoExtension extension];
+        break;
+      }
+    }
+  } else {
+    NSBundle *hgsBundle = HGSGetPluginBundle();
+    NSString *bundlePath = [hgsBundle bundlePath];
+    NSString *workingDir = [bundlePath stringByDeletingLastPathComponent];
+    NSString *path = [workingDir stringByAppendingPathComponent:pluginName];
+    path = [path stringByAppendingPathExtension:@"hgs"];
+    if (!delegate) {
+      delegate = [[[HGSUnitTestingDelegate alloc] initWithPath:path] autorelease];
+    }
+    BOOL didLoad = [HGSUnitTestingPluginLoader loadPluginWithDelegate:delegate];
+    STAssertTrue(didLoad, @"Unable to load %@", path);
+    HGSExtensionPoint *extensionPoint 
+      = [HGSExtensionPoint pointWithIdentifier:extensionPointID];
+    STAssertNotNil(extensionPoint, 
+                   @"Unable to get extensionpoint %@", extensionPointID);
+    extension = [extensionPoint extensionWithIdentifier:identifier];
   }
-  BOOL didLoad = [HGSUnitTestingPluginLoader loadPluginWithDelegate:delegate];
-  STAssertTrue(didLoad, @"Unable to load %@", path);
-  HGSExtensionPoint *extensionPoint 
-    = [HGSExtensionPoint pointWithIdentifier:extensionPointID];
-  STAssertNotNil(extensionPoint, 
-                 @"Unable to get extensionpoint %@", extensionPointID);
-  HGSExtension *extension = [extensionPoint extensionWithIdentifier:identifier];
   STAssertNotNil(extension, @"Unable to get extension %@ from %@ on %@", 
                  identifier, pluginName, extensionPointID);
   [loadedExtensions_ addObject:extension];
