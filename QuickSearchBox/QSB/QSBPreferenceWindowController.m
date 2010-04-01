@@ -50,6 +50,12 @@ NSString *const kQSBEditAccountWindowNibName = @"QSBEditAccountWindowNibName";
 NSString *const kQSBEditAccountWindowControllerClassName
   = @"QSBEditAccountWindowControllerClassName";
 
+// This is equivalent to kLSSharedFileListLoginItemHidden which is supported on
+// 10.5 and higher, but somehow missing from Apple's 10.5 headers.
+// http://openradar.appspot.com/6482251
+NSString *const kQSBSharedFileListLoginItemHidden
+  = @"com.apple.loginitem.HideOnLaunch";
+
 static void OpenAtLoginItemsChanged(LSSharedFileListRef inList, void *context);
 
 @interface QSBPreferenceWindowController ()
@@ -596,12 +602,10 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   NSString *bundlePath = [ourBundle bundlePath];
   NSURL *bundleURL = [NSURL fileURLWithPath:bundlePath];
   if (opened) {
-    // Hidden isn't set in 10.5.6
-    // http://openradar.appspot.com/6482251
     NSNumber *nsTrue = [NSNumber numberWithBool:YES];
     NSDictionary *propertiesToSet 
       = [NSDictionary dictionaryWithObject:nsTrue 
-                                    forKey:(id)kLSSharedFileListItemHidden];
+                                    forKey:kQSBSharedFileListLoginItemHidden];
     LSSharedFileListItemRef item 
       = LSSharedFileListInsertItemURL(openAtLoginItemsList_, 
                                       kLSSharedFileListItemLast, 
