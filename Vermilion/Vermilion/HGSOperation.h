@@ -32,114 +32,77 @@
 
 /*!
  @header NSInvocationOperation and NSOperationQueue Specializations
- HGSInvocationOperation and HGSOperationQueue provide serialization and
- threading control.
 */
 
 #import <Foundation/Foundation.h>
 
 @class GDataHTTPFetcher;
 
-@interface NSOperation(HGSInvocationOperation)
-- (BOOL)isDiskOperation;
-@end
-
-/*! 
- @enum InvocationType Internal use only.
- @constant NORMAL_INVOCATION Standard NSInvocationOperation invocation.
- @constant DISK_INVOCATION Serialize with other disk invocations.
- @constant NETWORK_INVOCATION Invoke with multiple finish selectors.
- @constant MEMORY_INVOCATION Invoke with low priority.
- */
-typedef enum {
-  NORMAL_INVOCATION = 0,
-  DISK_INVOCATION,
-  NETWORK_INVOCATION,
-  MEMORY_INVOCATION
-} InvocationType;
+/*!
+ Simple category on NSInvocationOperation that passes the operation being run
+ into the selector.
+*/
+@interface NSInvocationOperation (HGSInvocationOperation)
 
 /*!
- Add invocations specialized for serialization, priority and dispatching
- of multiple finishers.
+ @param target The target for sel.
+ @param sel A selector that must be of the form:
+ <p><code>- (void)selector:(id)arg operation:(NSOperation *)op</code></p>
+ op can then be used to check for cancellation.
+ @param arg The argument to be passed to sel.
+ @result The object.
 */
-@interface HGSInvocationOperation : NSInvocationOperation {
+- (id)hgs_initWithTarget:(id)target selector:(SEL)sel object:(id)arg;
+
+@end
+
+/*!
+ An operation that wraps around a fetcher. All callbacks will be made on the
+ operation thread.
+*/
+@interface HGSFetcherOperation : NSOperation {
  @private
-  InvocationType invocationType_;
+  GDataHTTPFetcher *fetcher_;
   id target_;
-  SEL selector_;
+  SEL didFinishSel_;
+  SEL didFailSel_;
+  BOOL didFinish_;
 }
 
-/*!
-  Create an HGSInvocationOperation that behaves like a standard
-  non-concurrent (in the NSOperation sense of "concurrent")
-  NSInvocationOperation with one exception: when added to an
-  HGSOperationQueue, disk invocations are run sequentially, without
-  the possibility of running coincident to other disk invocations. This
-  ensures that only one thread is hitting the disk at any time.
-*/
-+ (HGSInvocationOperation *)diskInvocationOperationWithTarget:(id)target
-                                                     selector:(SEL)sel
-                                                       object:(id)arg;
+@property (readonly, retain) GDataHTTPFetcher *fetcher;
 
 /*!
-  Helper for GDataHTTPFetcher which calls the finish selectors using
-  NSOperations rather than running them on the same thread that made
-  the initial async request. This call replaces GDataHTTPFetcher's
-  beginFetchWithDelegate method. For instance:
- 
-@textblock
-  GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:req];
-  [fetcher beginFetchWithDelegate:self
-                didFinishSelector:@selector(httpFetcher:finishedWithData:)
-                  didFailSelector:@selector(httpFetcher:failedWithError:)];
-@/textblock
-
-  Becomes:
-
-@textblock
-  GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:req];
-  HGSInvocationOperation *op = [HGSInvocationOperation
-    networkInvocationOperationWithTarget:self
-                              forFetcher:fetcher
-                       didFinishSelector:@selector(httpFetcher:finishedWithData:)
-                         didFailSelector:@selector(httpFetcher:failedWithError:)];
-  [[HGSOperationQueue sharedOperationQueue] addOperation:op];
-@/textblock
+ @param target The target for the finished and failed selectors.
+ @param fetcher The fetcher to run.
+ @param didFinishSel A selector to run when the fetcher is done. Must be of the
+        form:
+ <p><code>
+   - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+      finishedWithData:(NSData *)retrievedData
+             operation:(NSOperation *)operation;
+ </code></p>
+        This selector will be called on the operation thread.
+ @param failedSel A selector to run when the fetcher has an error. Must be of the
+        form:
+ <p><code>
+   - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+       failedWithError:(NSError *)error
+             operation:(NSOperation *)operation;
+ </code></p>
+        This selector will be called on the operation thread.
 */
-+ (HGSInvocationOperation *)networkInvocationOperationWithTarget:(id)target
-                                                      forFetcher:(GDataHTTPFetcher *)fetcher
-                                               didFinishSelector:(SEL)didFinishSel
-                                                 didFailSelector:(SEL)failedSEL;
-
-/*!
-  Creates a NSInvocationOperation that runs at a low priority relative
-  to disk and network operations.
-*/
-+ (HGSInvocationOperation *)memoryInvocationOperationWithTarget:(id)target
-                                                       selector:(SEL)sel
-                                                         object:(id)arg;
-
-/*!
-  Returns a pointer to the currently executing operation, or nil
-  if the current thread is not operating within the context of a
-  non-concurrent HGSInvocationOperation.
-*/
-+ (HGSInvocationOperation *)currentOperation;
+- (id)initWithTarget:(id)target
+          forFetcher:(GDataHTTPFetcher *)fetcher
+   didFinishSelector:(SEL)didFinishSel
+     didFailSelector:(SEL)failedSel;
 @end
 
 /*!
-  Singleton class that manages the shared NSOperationQueue and implements
-  HGSInvocationOperation semantics (e.g., keeping disk operations from
-  running simultaneously). Like NSOperationQueue, you may instantiate
-  multiple HGSOperationQueues, but each one will maintain its own separate
-  set of book keeping. That means if you want to keep all of your disk
-  operations sequential, you need to use a single (preferably the singleton)
-  HGSOperationQueue.
-
-  This class performs some extra work for HGSInvocationOperations, but
-  any NSOperation can be added to it (the NSOperation just won't get any
-  special behavior applied to it).
+ Shared operation queue that can be used so we don't have multiple unnecessary
+ operation queues created.
 */
 @interface HGSOperationQueue : NSOperationQueue
+
 + (HGSOperationQueue *)sharedOperationQueue;
+
 @end

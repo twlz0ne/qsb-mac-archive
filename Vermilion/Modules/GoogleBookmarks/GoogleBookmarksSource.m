@@ -44,17 +44,16 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 @interface GoogleBookmarksSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
-  __weak NSTimer *updateTimer_;
+  NSTimer *updateTimer_;
+  HGSFetcherOperation *fetchOperation_;
   HGSSimpleAccount *account_;
-  GDataHTTPFetcher *fetcher_;
-  BOOL currentlyFetching_;
   NSURL *baseURL_;
 }
 
 - (void)setUpPeriodicRefresh;
 - (void)startAsynchronousBookmarkFetch;
-- (void)indexBookmarksFromData:(NSData*)data;
-- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode;
+- (void)indexBookmarksFromData:(NSData*)data operation:(NSOperation *)op;
+- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode operation:(NSOperation *)op;
 
 @end
 
@@ -79,88 +78,85 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 }
 
 - (void)dealloc {
-  [fetcher_ release];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [fetchOperation_ release];
+  [updateTimer_ release];
   [account_ release];
   [baseURL_ release];
   [super dealloc];
 }
 
 - (void)uninstall {
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [fetchOperation_ cancel];
   [updateTimer_ invalidate];
-  updateTimer_ = nil;
-  [fetcher_ release];
-  fetcher_ = nil;
-  [account_ release];
+  [super uninstall];
 }
-
 
 #pragma mark -
 #pragma mark Bookmarks Fetching
 
 - (void)startAsynchronousBookmarkFetch {
-  if (!currentlyFetching_) {
-    if (!fetcher_) {
-      GTMGoogleSearch *gsearch = [GTMGoogleSearch sharedInstance];
-      NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
-                            @"rss", @"output", @"10000", @"num", nil];
-      NSString *bookmarkRequestString
-        = [gsearch searchURLFor:nil 
-                         ofType:@"bookmarks/find" 
-                      arguments:args];
-      NSRange findRange = [bookmarkRequestString rangeOfString:@"/find?"];
-      HGSAssert(findRange.location != NSNotFound, nil);
-      NSString *baseURLString
-        = [bookmarkRequestString substringToIndex:findRange.location];
-      baseURL_ = [[NSURL URLWithString:baseURLString] retain];
-      bookmarkRequestString
-        = [bookmarkRequestString
-           stringByReplacingOccurrencesOfString:@"http:"
-                                     withString:@"https:"
-                                        options:NSLiteralSearch | NSAnchoredSearch
-                                          range:NSMakeRange(0, 5)];
-      NSURL *bookmarkRequestURL = [NSURL URLWithString:bookmarkRequestString];
-      NSMutableURLRequest *bookmarkRequest
-        = [NSMutableURLRequest
-           requestWithURL:bookmarkRequestURL 
-              cachePolicy:NSURLRequestReloadIgnoringCacheData 
-          timeoutInterval:15.0];
-      fetcher_ = [[GDataHTTPFetcher httpFetcherWithRequest:bookmarkRequest]
-                  retain];
-      if (!fetcher_) {
-        HGSLog(@"Failed to allocate GDataAuthenticationFetcher.");
-      }
-      HGSKeychainItem* keychainItem 
-        = [HGSKeychainItem keychainItemForService:[account_ identifier]
-                                         username:nil];
-      NSString *userName = [keychainItem username];
-      NSString *password = [keychainItem password];
-      [fetcher_ setCredential:
-       [NSURLCredential credentialWithUser:userName
-                                  password:password
-                               persistence:NSURLCredentialPersistenceNone]];
-      [bookmarkRequest setHTTPMethod:@"POST"];
-      [fetcher_ setRequest:bookmarkRequest];
+  if (!fetchOperation_ || [fetchOperation_ isFinished]) {
+    GTMGoogleSearch *gsearch = [GTMGoogleSearch sharedInstance];
+    NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
+                          @"rss", @"output", @"10000", @"num", nil];
+    NSString *bookmarkRequestString
+      = [gsearch searchURLFor:nil 
+                       ofType:@"bookmarks/find" 
+                    arguments:args];
+    NSRange findRange = [bookmarkRequestString rangeOfString:@"/find?"];
+    HGSAssert(findRange.location != NSNotFound, nil);
+    NSString *baseURLString
+      = [bookmarkRequestString substringToIndex:findRange.location];
+    baseURL_ = [[NSURL URLWithString:baseURLString] retain];
+    bookmarkRequestString
+      = [bookmarkRequestString
+         stringByReplacingOccurrencesOfString:@"http:"
+                                   withString:@"https:"
+                                      options:NSLiteralSearch | NSAnchoredSearch
+                                        range:NSMakeRange(0, 5)];
+    NSURL *bookmarkRequestURL = [NSURL URLWithString:bookmarkRequestString];
+    NSMutableURLRequest *bookmarkRequest
+      = [NSMutableURLRequest
+         requestWithURL:bookmarkRequestURL 
+            cachePolicy:NSURLRequestReloadIgnoringCacheData 
+        timeoutInterval:15.0];
+    GDataHTTPFetcher *fetcher 
+      = [GDataHTTPFetcher httpFetcherWithRequest:bookmarkRequest];
+    
+    if (!fetcher) {
+      HGSLog(@"Failed to allocate GDataHTTPFetcher.");
     }
+    HGSKeychainItem* keychainItem 
+      = [HGSKeychainItem keychainItemForService:[account_ identifier]
+                                       username:nil];
+    NSString *userName = [keychainItem username];
+    NSString *password = [keychainItem password];
+    [fetcher setCredential:
+     [NSURLCredential credentialWithUser:userName
+                                password:password
+                             persistence:NSURLCredentialPersistenceNone]];
+    [bookmarkRequest setHTTPMethod:@"POST"];
+    [fetcher setRequest:bookmarkRequest];
       
-    currentlyFetching_ = YES;
     HGSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
-    HGSInvocationOperation *op 
-      = [HGSInvocationOperation networkInvocationOperationWithTarget:self 
-                                                          forFetcher:fetcher_ 
-                                                   didFinishSelector:@selector(httpFetcher:finishedWithData:) 
-                                                     didFailSelector:@selector(httpFetcher:didFail:)];
-    [queue addOperation:op];
+    [fetchOperation_ release];
+    fetchOperation_ 
+      = [[HGSFetcherOperation alloc] initWithTarget:self 
+                                         forFetcher:fetcher 
+                                  didFinishSelector:@selector(httpFetcher:finishedWithData:operation:) 
+                                    didFailSelector:@selector(httpFetcher:didFail:operation:)];
+   [queue addOperation:fetchOperation_];
   }
 }
 
 - (void)refreshBookmarks:(NSTimer *)timer {
-  updateTimer_ = nil;
   [self startAsynchronousBookmarkFetch];
   [self setUpPeriodicRefresh];
 }
 
-- (void)indexBookmarksFromData:(NSData *)data {
+- (void)indexBookmarksFromData:(NSData *)data operation:(NSOperation *)op {
+  if ([op isCancelled]) return;
   NSXMLDocument* bookmarksXML 
     = [[[NSXMLDocument alloc] initWithData:data
                                    options:0
@@ -170,11 +166,12 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   NSEnumerator *nodeEnumerator = [bookmarkNodes objectEnumerator];
   NSXMLNode *bookmark;
   while ((bookmark = [nodeEnumerator nextObject])) {
-    [self indexBookmarkNode:bookmark];
+    if ([op isCancelled]) break;
+    [self indexBookmarkNode:bookmark operation:op];
   }
 }
 
-- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode {
+- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode operation:(NSOperation *)op {
   NSString *title = nil;
   NSString *url = nil;
   NSMutableArray *otherTermStrings = [NSMutableArray array];
@@ -192,8 +189,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
       [otherTermStrings addObject:infoNodeString];
     }
   }
+  
 
-  if (!url) {
+  if (!url || [op isCancelled]) {
     return;
   }
   
@@ -262,15 +260,15 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 #pragma mark GDataHTTPFetcher Helpers
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   finishedWithData:(NSData *)retrievedData {
-  currentlyFetching_ = NO;
-  [self indexBookmarksFromData:retrievedData];
+   finishedWithData:(NSData *)retrievedData 
+          operation:(NSOperation *)operation {
+  [self indexBookmarksFromData:retrievedData operation:operation];
 }
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-            didFail:(NSError *)error {
+            didFail:(NSError *)error 
+          operation:(NSOperation *)operation {
   HGSLog(@"httpFetcher failed: %@ %@", error, [[fetcher request] URL]);
-  currentlyFetching_ = NO;
 }
 
 #pragma mark -
@@ -281,15 +279,12 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
             @"Notification from bad account!");
   // Make sure we aren't in the middle of waiting for results; if we are, try
   // again later instead of changing things in the middle of the fetch.
-  if (currentlyFetching_) {
+  if (![fetchOperation_ isFinished]) {
     [self performSelector:@selector(loginCredentialsChanged:)
                withObject:notification
                afterDelay:60.0];
     return;
   }
-  
-  [fetcher_ release];
-  fetcher_ = nil;
   
   // If the login changes, we should update immediately, and make sure the
   // periodic refresh is enabled (it would have been shut down if the previous
@@ -300,14 +295,15 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 - (void)setUpPeriodicRefresh {
   [updateTimer_ invalidate];
+  [updateTimer_ release];
   // We add 5 minutes worth of random jitter.
   NSTimeInterval jitter = arc4random() / (LONG_MAX / (NSTimeInterval)300.0);
   updateTimer_ 
-    = [NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
-                                       target:self
-                                     selector:@selector(refreshBookmarks:)
-                                     userInfo:nil
-                                      repeats:NO];
+    = [[NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
+                                        target:self
+                                      selector:@selector(refreshBookmarks:)
+                                      userInfo:nil
+                                       repeats:NO] retain];
 }
 
 #pragma mark -

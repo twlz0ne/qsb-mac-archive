@@ -34,6 +34,7 @@
 #import <GData/GData.h>
 #import <GTM/GTMNSEnumerator+Filter.h>
 #import <GTM/GTMDebugThreadValidation.h>
+#import <GTM/GTMTypeCasting.h>
 #import "GoogleAccountsConstants.h"
 #import "HGSKeychainItem.h"
 #import "QSBHGSResultAttributeKeys.h"
@@ -59,16 +60,12 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 @interface GoogleCalendarsSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
   GDataServiceGoogleCalendar *service_;
-  // We use activeTickets_ as a form of an event queue between threads.
-  // Once it is empty the indexing thread will stop.
-  // Be careful to synchronize when referencing it.
-  NSMutableSet *activeTickets_;
-  __weak NSTimer *updateTimer_;
+  NSTimer *updateTimer_;
   HGSAccount *account_;
   NSTimeInterval previousErrorReportingTime_;
   NSImage *calendarIcon_;
   NSImage *eventIcon_;
-  HGSInvocationOperation *indexOp_;
+  NSInvocationOperation *indexOp_;
   NSDateFormatter *shortDateShortTimeFormatter_;
   NSDateFormatter *noDateShortTimeFormatter_;
   NSDateFormatter *shortDateNoTimeFormatter_;
@@ -83,14 +80,16 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 
 // Call this function whenever all calendar fetches should be shut down and
 // the service reset.
-- (void)cancelAllTickets;
+- (void)cancelFetchAndResetService;
 
 // Indexing function for each calendar associated with the account.
-- (void)indexCalendar:(GDataEntryCalendar *)calendarEntry;
+- (void)indexCalendar:(GDataEntryCalendar *)calendarEntry
+            operation:(NSOperation *)operation;
 
 // Indexing function for each event associated with a calendar.
 - (void)indexEvent:(GDataEntryCalendarEvent *)eventEntry
-      withCalendar:(GDataEntryCalendar *)calendarEntry;
+      withCalendar:(GDataEntryCalendar *)calendarEntry
+         operation:(NSOperation *)operation;
 
 // Make a nice snippet string giving times and locations for the event.
 - (NSString *)snippetForEvent:(GDataEntryCalendarEvent *)eventEntry
@@ -154,7 +153,6 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
     // Keep track of active tickets so we can cancel them if necessary.
-    activeTickets_ = [[NSMutableSet alloc] init];
     account_ = [[configuration objectForKey:kHGSExtensionAccountKey] retain];
     if (account_) {
       // Get calendarEntry and event metadata now, and schedule a timer to
@@ -199,24 +197,26 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [self cancelAllTickets];
   [shortDateShortTimeFormatter_ release];
   [noDateShortTimeFormatter_ release];
   [shortDateNoTimeFormatter_ release];
-  [activeTickets_ release];
   [service_ release];
-  [updateTimer_ invalidate];
   [account_ release];
   [calendarIcon_ release];
   [eventIcon_ release];
+  [updateTimer_ release];
+  [indexOp_ release];
   [super dealloc];
 }
 
-- (void)cancelAllTickets {
-  @synchronized (self) {
-    [activeTickets_ makeObjectsPerformSelector:@selector(cancelTicket)];
-    [activeTickets_ removeAllObjects];
-  }
+- (void)uninstall {
+  [indexOp_ cancel];
+  [updateTimer_ invalidate];
+  [super uninstall];
+}
+
+- (void)cancelFetchAndResetService {
+  [indexOp_ cancel];
   [service_ release];
   service_ = nil;
 }
@@ -276,18 +276,18 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 
 - (void)setUpPeriodicRefresh {
   [updateTimer_ invalidate];
+  [updateTimer_ release];
   // We add a minutes worth of random jitter.
   NSTimeInterval jitter = arc4random() / (LONG_MAX / (NSTimeInterval)60.0);
   updateTimer_
-    = [NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
-                                       target:self
-                                     selector:@selector(refreshCalendars:)
-                                     userInfo:nil
-                                      repeats:NO];
+    = [[NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
+                                        target:self
+                                      selector:@selector(refreshCalendars:)
+                                      userInfo:nil
+                                       repeats:NO] retain];
 }
 
 - (void)refreshCalendars:(NSTimer*)timer {
-  updateTimer_ = nil;
   [self startAsyncCalendarsListFetch];
   [self setUpPeriodicRefresh];
 }
@@ -295,7 +295,7 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 - (void)loginCredentialsChanged:(NSNotification *)notification {
   HGSAssert([notification object] == account_, 
             @"Notification from unexpected account!");
-  [self cancelAllTickets];
+  [self cancelFetchAndResetService];
   // If the login changes, we should update immediately, and make sure the
   // periodic refresh is enabled (it would have been shut down if the previous
   // credentials were incorrect).
@@ -350,23 +350,20 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
       [service_ setIsServiceRetryEnabled:YES];
     } else {
       [updateTimer_ invalidate];
-      updateTimer_ = nil;
       return;
     }
   }
-  @synchronized (self) {
-    if ([activeTickets_ count] == 0) {
-      HGSOperationQueue *opQueue = [HGSOperationQueue sharedOperationQueue];
-      HGSInvocationOperation *op 
-        = [HGSInvocationOperation memoryInvocationOperationWithTarget:self 
-                                                             selector:@selector(asyncCalendarListFetchOperation:) 
-                                                               object:service_];
-      [opQueue addOperation:op];
-    }
-  }
+  [indexOp_ cancel];
+  [indexOp_ release];
+  indexOp_ 
+    = [[NSInvocationOperation alloc] hgs_initWithTarget:self 
+                                               selector:@selector(asyncCalendarListFetch:operation:) 
+                                                 object:service_];
+  [[HGSOperationQueue sharedOperationQueue] addOperation:indexOp_];
 }
 
-- (void)asyncCalendarListFetchOperation:(GDataServiceGoogleCalendar*)service {
+- (void)asyncCalendarListFetch:(GDataServiceGoogleCalendar *)service 
+                     operation:(NSOperation *)operation {
   GDataServiceTicket *calendarTicket
     = [service fetchFeedWithURL:[NSURL URLWithString:
                                  kGDataGoogleCalendarDefaultOwnCalendarsFeed]
@@ -374,33 +371,21 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
               didFinishSelector:@selector(calendarFeedTicket:
                                           finishedWithFeed:
                                           error:)];
-  @synchronized (self) {
-    [activeTickets_ addObject:calendarTicket];
-  }
-  while (YES) {
-    NSDate *date = [[NSDate alloc] initWithTimeIntervalSinceNow:1];
-    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode 
-                             beforeDate:date];
-    [date release];
-    @synchronized (self) {
-      if ([activeTickets_ count] == 0) {
-        break;
-      }
-    }
+  [calendarTicket setUserData:operation];
+  while (![operation isFinished]) {
+    CFRunLoopRun();
   }
 }
 
 - (void)calendarFeedTicket:(GDataServiceTicket *)ticket
           finishedWithFeed:(GDataFeedCalendar *)feed
                      error:(NSError *)error {
-  @synchronized (self) {
-    HGSCheckDebug([activeTickets_ containsObject:ticket], nil);
-    [activeTickets_ removeObject:ticket];
-  }
   if (!error) {
     NSArray *entries = [feed entries];
+    NSOperation *operation = GTM_STATIC_CAST(NSOperation, [ticket userData]);
     for (GDataEntryCalendar *entry in entries) {
-      [self indexCalendar:entry];
+      if ([operation isCancelled]) break;
+      [self indexCalendar:entry operation:operation];
     }
   } else {
     NSString *fetchType = HGSLocalizedString(@"^calendar", 
@@ -412,9 +397,11 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
                            withObject:fetchError 
                         waitUntilDone:NO];
   }
+  CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
-- (void)indexCalendar:(GDataEntryCalendar *)calendarEntry {
+- (void)indexCalendar:(GDataEntryCalendar *)calendarEntry
+            operation:(NSOperation *)operation {
   NSString* calendarTitle = [[calendarEntry title] stringValue];
   NSString *calendarID = [calendarEntry identifier];
   NSMutableDictionary *attributes
@@ -512,9 +499,7 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
                                                error:)];
     [calendarEntry setProperty:calendarURL forKey:kGoogleCalendarURLKey];
     [eventTicket setProperty:calendarEntry forKey:kGoogleCalendarEntryKey];
-    @synchronized (self) {
-      [activeTickets_ addObject:eventTicket];
-    }
+    [eventTicket setUserData:operation];
   }
 }
 
@@ -524,16 +509,16 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 - (void)eventsFetcher:(GDataServiceTicket *)ticket
      finishedWithFeed:(GDataFeedCalendarEvent *)eventFeed
                error:(NSError *)error {
-  @synchronized (self) {
-    HGSCheckDebug([activeTickets_ containsObject:ticket], nil);
-    [activeTickets_ removeObject:ticket];
-  }
   if (!error) {
     NSArray *eventList = [eventFeed entries];
+    NSOperation *operation = GTM_STATIC_CAST(NSOperation, [ticket userData]);
     for (GDataEntryCalendarEvent *eventEntry in eventList) {
+      if ([operation isCancelled]) break;
       GDataEntryCalendar *calendarEntry
         = [ticket propertyForKey:kGoogleCalendarEntryKey];
-      [self indexEvent:eventEntry withCalendar:calendarEntry];
+      [self indexEvent:eventEntry 
+          withCalendar:calendarEntry 
+             operation:operation];
     }
   } else {
     NSString *fetchType
@@ -548,7 +533,8 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 }
 
 - (void)indexEvent:(GDataEntryCalendarEvent *)eventEntry
-      withCalendar:(GDataEntryCalendar *)calendarEntry {
+      withCalendar:(GDataEntryCalendar *)calendarEntry
+         operation:(NSOperation *)operation {
   NSURL* eventURL = [[eventEntry HTMLLink] URL];
   GDataEventStatus *eventStatus = [eventEntry eventStatus];
   NSString *statusString = [eventStatus stringValue];
@@ -600,6 +586,7 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
     NSUInteger eventCount = 0;
     NSString *baseURLString = [eventURL absoluteString];
     for (GDataWhen *when in whens) {
+      if ([operation isCancelled]) break;
       GDataDateTime *startDateTime = [when startTime];
       NSDate *whenDate = [startDateTime date];
       if ([whenDate gcs_isAtOrAfter:startOfToday]) {
@@ -722,7 +709,6 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
     if (errorCode == kGDataBadAuthentication) {
       // If the login credentials are bad, don't keep trying.
       [updateTimer_ invalidate];
-      updateTimer_ = nil;
       // Tickle the account so that if the user happens to have the preference
       // window open showing either the account or the search source they
       // will immediately see that the account status has changed.
@@ -755,7 +741,7 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
 
 - (BOOL)accountWillBeRemoved:(HGSAccount *)account {
   HGSAssert(account == account_, @"Notification from bad account!");
-  [self cancelAllTickets];
+  [self cancelFetchAndResetService];
   return YES;
 }
 

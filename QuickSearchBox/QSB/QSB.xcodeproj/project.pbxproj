@@ -1068,6 +1068,8 @@
 		8BA01A860F1431DD00926923 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BB275AB0D6F81EA008DC1CA /* libsqlite3.dylib */; };
 		8BA01C020F147DB000926923 /* GTMNSWorkspace+Running.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BA01C000F147DB000926923 /* GTMNSWorkspace+Running.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BA01C030F147DB000926923 /* GTMNSWorkspace+Running.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BA01C010F147DB000926923 /* GTMNSWorkspace+Running.m */; };
+		8BA0DBAA11667FAC00839F5C /* GTMLightweightProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BA0DBA811667FAC00839F5C /* GTMLightweightProxy.m */; };
+		8BA0DBAB11667FAC00839F5C /* GTMLightweightProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BA0DBA911667FAC00839F5C /* GTMLightweightProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BA3FCCC105965E500A299FE /* SampleBookmark.webloc in Resources */ = {isa = PBXBuildFile; fileRef = 8BA3FCCB105965E500A299FE /* SampleBookmark.webloc */; };
 		8BA5249011212671001D2E0E /* QSBPluginUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 620CB3090FAA827E0029801C /* QSBPluginUI.framework */; };
 		8BA61B920F0ADEAD008182B5 /* QuickLook.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B6ECB620E154F08006A815D /* QuickLook.png */; };
@@ -1847,35 +1849,35 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8BC88DC41159580C00A6E783 /* Create Appcast */;
+			remoteGlobalIDString = 8BC88DC41159580C00A6E783;
 			remoteInfo = "Create Appcast";
 		};
 		8BC88DCE1159589700A6E783 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B77DEFE0F284A4C00FA2A3C /* Release Notes */;
+			remoteGlobalIDString = 8B77DEFE0F284A4C00FA2A3C;
 			remoteInfo = "Release Notes";
 		};
 		8BC88E0A11595B4900A6E783 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8BDB84E911518A1F00C411B1 /* Create DMGs */;
+			remoteGlobalIDString = 8BDB84E911518A1F00C411B1;
 			remoteInfo = "Create DMGs";
 		};
 		8BC88E0C11595B6900A6E783 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8BDB89971152C55000C411B1 /* Create Keystone Config */;
+			remoteGlobalIDString = 8BDB89971152C55000C411B1;
 			remoteInfo = "Create Keystone Config";
 		};
 		8BC8A2D2115D6F3E00A6E783 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
+			remoteGlobalIDString = F4EF8F740ECB3EFF008DD6DA;
 			remoteInfo = "QSB Application";
 		};
 		8BCCB03B10348ABE0051B567 /* PBXContainerItemProxy */ = {
@@ -3467,6 +3469,8 @@
 		8BA019C30F14303400926923 /* GTMSQLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMSQLite.h; sourceTree = "<group>"; };
 		8BA01C000F147DB000926923 /* GTMNSWorkspace+Running.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSWorkspace+Running.h"; sourceTree = "<group>"; };
 		8BA01C010F147DB000926923 /* GTMNSWorkspace+Running.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSWorkspace+Running.m"; sourceTree = "<group>"; };
+		8BA0DBA811667FAC00839F5C /* GTMLightweightProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMLightweightProxy.m; sourceTree = "<group>"; };
+		8BA0DBA911667FAC00839F5C /* GTMLightweightProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMLightweightProxy.h; sourceTree = "<group>"; };
 		8BA3FCCB105965E500A299FE /* SampleBookmark.webloc */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = SampleBookmark.webloc; sourceTree = "<group>"; };
 		8BA5246811212488001D2E0E /* BuildSDKProjects.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = BuildSDKProjects.sh; sourceTree = "<group>"; };
 		8BA61DBA0F0AEF78008182B5 /* AddToPartyShuffle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AddToPartyShuffle.icns; sourceTree = "<group>"; };
@@ -6359,6 +6363,8 @@
 				332AD95E0DC946470009A7E9 /* GTMGeometryUtils.h */,
 				332AD95F0DC946470009A7E9 /* GTMGeometryUtils.m */,
 				8BF442D10FC74ED500C29AA1 /* GTMGoogleSearch.h */,
+				8BA0DBA811667FAC00839F5C /* GTMLightweightProxy.m */,
+				8BA0DBA911667FAC00839F5C /* GTMLightweightProxy.h */,
 				8BF442D20FC74ED500C29AA1 /* GTMGoogleSearch.m */,
 				8B834B540FBCD00000862FF5 /* GTMLogger.h */,
 				8B834AFB0FBCCFE200862FF5 /* GTMLogger.m */,
@@ -6556,6 +6562,7 @@
 				8BF2573A10F67CBD000490C8 /* GTMTypeCasting.h in Headers */,
 				8BC5AEBF1141C02C000DB67C /* GTMNSAnimation+Duration.h in Headers */,
 				8BC88EAD1159706E00A6E783 /* GTMScriptRunner.h in Headers */,
+				8BA0DBAB11667FAC00839F5C /* GTMLightweightProxy.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9745,6 +9752,7 @@
 				8B44661B10F2874C00561E62 /* GTMBase64.m in Sources */,
 				8BC5AEBE1141C029000DB67C /* GTMNSAnimation+Duration.m in Sources */,
 				8BC88EAC1159706A00A6E783 /* GTMScriptRunner.m in Sources */,
+				8BA0DBAA11667FAC00839F5C /* GTMLightweightProxy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

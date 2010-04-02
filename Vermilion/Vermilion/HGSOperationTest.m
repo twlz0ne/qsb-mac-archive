@@ -56,7 +56,8 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
 @implementation HGSOperationTest
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   finishedWithData:(NSData *)retrievedData {
+   finishedWithData:(NSData *)retrievedData 
+          operation:(NSOperation *)operation {
   finishedWithData_ = YES;
   STAssertNotNil(fetcher, @"finishedWithData got a nil GDataHTTPFetcher");
   STAssertNotNil(fetcher, @"finishedWithData got a nil retrievedData");
@@ -71,19 +72,20 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   // chance cancel us. Then, sleep for a couple of seconds after signalling
   // the condition to give testNetworkOperations a chance to cancel.
   NSCondition *condition = [fetcher userData];
-  STAssertFalse([[HGSInvocationOperation currentOperation] isCancelled],
+  STAssertFalse([operation isCancelled],
                 @"finishedWithData operation was cancelled");
   [condition lock];
   finishedWithDataIsRunning_ = YES;
   [condition signal];
   [condition unlock];
   usleep(kNetworkOperationLength); // testNetworkOperations is now cancelling...
-  STAssertTrue([[HGSInvocationOperation currentOperation] isCancelled],
+  STAssertTrue([operation isCancelled],
                @"finishedWithData operation was not cancelled");
 }
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-    failedWithError:(NSError *)error {
+    failedWithError:(NSError *)error 
+          operation:(NSOperation *)operation {
   // Just confirm that both GDataHTTPFetcher's status errors and network errors
   // come to this callback.
   if ([[error domain] isEqual:kGDataHTTPFetcherStatusDomain]) {
@@ -117,17 +119,14 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   }
 }
 
-- (void)memoryOperationCounter:(id)obj {
-  STAssertNotNil([HGSInvocationOperation currentOperation],
-                 @"currentOperation not present");
+- (id)memoryOperationCounter:(id)obj operation:(NSOperation *)op {
   @synchronized(self) {
     memoryOperations_++;
   }
+  return nil;
 }
 
 - (void)normalOperationCounter:(id)obj {
-  STAssertNil([HGSInvocationOperation currentOperation],
-              @"currentOperation is present");
   @synchronized(self) {
     normalOperations_++;
   }
@@ -142,11 +141,12 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   NSURLRequest *request = [NSURLRequest requestWithURL:url];
   GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
   [fetcher setUserData:condition];
-  NSOperation *networkOp = [HGSInvocationOperation
-     networkInvocationOperationWithTarget:self
-                               forFetcher:fetcher
-                        didFinishSelector:@selector(httpFetcher:finishedWithData:)
-                          didFailSelector:@selector(httpFetcher:failedWithError:)];
+  NSOperation *networkOp 
+    = [[[HGSFetcherOperation alloc] initWithTarget:self
+                                        forFetcher:fetcher
+                                 didFinishSelector:@selector(httpFetcher:finishedWithData:operation:)
+                                   didFailSelector:@selector(httpFetcher:failedWithError:operation:)]
+       autorelease];
   STAssertNotNil(networkOp, @"failed to create network op for %@", kGoogleUrl);
   [queue addOperation:networkOp];
   [condition lock];
@@ -160,11 +160,12 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   url = [NSURL URLWithString:kGoogle404Url];
   request = [NSURLRequest requestWithURL:url];
   fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
-  networkOp = [HGSInvocationOperation
-     networkInvocationOperationWithTarget:self
-                               forFetcher:fetcher
-                        didFinishSelector:@selector(httpFetcher:finishedWithData:)
-                          didFailSelector:@selector(httpFetcher:failedWithError:)];
+  networkOp
+     = [[[HGSFetcherOperation alloc] initWithTarget:self
+                                         forFetcher:fetcher
+                                  didFinishSelector:@selector(httpFetcher:finishedWithData:operation:)
+                                    didFailSelector:@selector(httpFetcher:failedWithError:operation:)]
+       autorelease];
   STAssertNotNil(networkOp, @"failed to create network op for %@", kGoogle404Url);
   [queue addOperation:networkOp];
   
@@ -172,11 +173,12 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   url = [NSURL URLWithString:kGoogleNonExistentUrl];
   request = [NSURLRequest requestWithURL:url];
   fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
-  networkOp = [HGSInvocationOperation
-     networkInvocationOperationWithTarget:self
-                               forFetcher:fetcher
-                        didFinishSelector:@selector(httpFetcher:finishedWithData:)
-                          didFailSelector:@selector(httpFetcher:failedWithError:)];
+  networkOp 
+     = [[[HGSFetcherOperation alloc] initWithTarget:self
+                                         forFetcher:fetcher
+                                  didFinishSelector:@selector(httpFetcher:finishedWithData:operation:)
+                                    didFailSelector:@selector(httpFetcher:failedWithError:operation:)]
+       autorelease];
   STAssertNotNil(networkOp, @"failed to create network op for %@", kGoogleNonExistentUrl);
   [queue addOperation:networkOp];
   
@@ -190,15 +192,16 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
                @"failedWithError: not called for network error by network operation");
 }
 
-- (void)testMemoryOperations {
+- (void)testHGSInvocationOperations {
   NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
   for (NSInteger i = 0; i < kMemoryOperationCount; i++) {
-    NSOperation *memoryOp = [HGSInvocationOperation
-                             memoryInvocationOperationWithTarget:self
-                                                        selector:@selector(memoryOperationCounter:)
-                                                          object:self];
+    NSOperation *memoryOp 
+      = [[NSInvocationOperation alloc] hgs_initWithTarget:self
+                                                 selector:@selector(memoryOperationCounter:operation:)
+                                                   object:self];
     STAssertNotNil(memoryOp, @"failed to create memory op");
     [queue addOperation:memoryOp];
+    [memoryOp release];
   }
   
   [queue waitUntilAllOperationsAreFinished];

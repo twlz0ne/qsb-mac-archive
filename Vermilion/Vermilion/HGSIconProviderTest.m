@@ -43,12 +43,6 @@
 @interface HGSIconProviderTest : GTMTestCase 
 @end
 
-@interface HGSIconOperation
-+ (HGSIconOperation *)iconOperationForResult:(HGSResult*)result
-                                   skipBasic:(BOOL)skipBasic;
-- (NSUInteger)hash;
-@end
-
 @implementation HGSIconProviderTest
 - (void)testProvideIconForResult {  
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
@@ -113,49 +107,6 @@
   [image addRepresentation:bitmap];
   image = [provider imageWithRoundRectAndDropShadow:image];
   GTMAssertObjectImageEqualToImageNamed(image, @"RoundRectAndDropShadow", nil);
-}
-
-- (void)testIconOperationHash {
-  NSMutableSet *iconOperations = [NSMutableSet setWithCapacity:2];
-  id searchSourceMock = [OCMockObject mockForClass:[HGSSearchSource class]];
-
-  NSMutableDictionary* infoA = [NSMutableDictionary dictionary];
-  NSString* pathA = @"file:///etc/";
-  [infoA setObject:pathA forKey:kHGSObjectAttributeURIKey];
-  [infoA setObject:@"fooA" forKey:kHGSObjectAttributeNameKey];
-  [infoA setObject:@"barA" forKey:kHGSObjectAttributeTypeKey];
-  HGSUnscoredResult* resultA 
-    = [HGSUnscoredResult resultWithDictionary:infoA
-                                       source:searchSourceMock];
-  NSUInteger expectedHashA = [resultA hash];
-  HGSIconOperation *operationA
-    = [HGSIconOperation iconOperationForResult:resultA skipBasic:NO];
-  [iconOperations addObject:operationA];
-  NSUInteger hashA = [operationA hash];
-  STAssertEquals(expectedHashA, hashA, nil);
-
-  NSMutableDictionary* infoB = [NSMutableDictionary dictionary];
-  NSString* pathB = @"file:///bin/";
-  [infoB setObject:pathB forKey:kHGSObjectAttributeURIKey];
-  [infoB setObject:@"fooB" forKey:kHGSObjectAttributeNameKey];
-  [infoB setObject:@"barB" forKey:kHGSObjectAttributeTypeKey];
-  HGSUnscoredResult* resultB 
-    = [HGSUnscoredResult resultWithDictionary:infoB
-                                       source:searchSourceMock];
-  NSUInteger expectedHashB = [resultB hash];
-  HGSIconOperation *operationB
-    = [HGSIconOperation iconOperationForResult:resultB skipBasic:NO];
-  [iconOperations addObject:operationB];
-  NSUInteger hashB = [operationB hash];
-  STAssertEquals(hashB, expectedHashB, nil);
-  
-  STAssertNotEquals(hashA, hashB, nil);
-  
-  [iconOperations removeObject:operationA];
-  id objectA = [iconOperations member:operationA];
-  STAssertNil(objectA, nil);
-  id objectB = [iconOperations member:operationB];
-  STAssertNotNil(objectB, nil);
 }
   
 @end

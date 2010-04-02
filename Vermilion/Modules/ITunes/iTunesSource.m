@@ -131,18 +131,18 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
 @interface ITunesSource : HGSCallbackSearchSource {
  @private
   GTMSQLiteDatabase *db_;
-  __weak NSTimer *updateTimer_;
+  NSTimer *updateTimer_;
+  NSInvocationOperation *updateOperation_;
   // TODO(hawk): Should these all go in the icon cache?
   NSImage *albumIcon_;
   NSImage *artistIcon_;
   NSImage *composerIcon_;
   NSImage *genreIcon_;
   NSImage *playlistIcon_;
-  BOOL indexing_;
   NSMutableDictionary *genreIconCache_;
 }
 
-- (void)updateIndex;
+- (void)updateIndex:(id)sender operation:(NSOperation *)operation;
 - (void)updateIndexTimerFired:(NSTimer *)timer;
 - (GTMSQLiteDatabase *)createDatabase;
 - (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
@@ -205,12 +205,17 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
     // Periodically update the index
     updateTimer_
-      = [NSTimer scheduledTimerWithTimeInterval:kUpdateTimeInterval
-                                         target:self
-                                       selector:@selector(updateIndexTimerFired:)
-                                       userInfo:nil
-                                        repeats:YES];
-
+      = [[NSTimer scheduledTimerWithTimeInterval:kUpdateTimeInterval
+                                          target:self
+                                        selector:@selector(updateIndexTimerFired:)
+                                        userInfo:nil
+                                         repeats:YES] retain];
+    
+    // Perform the first index of the iTunes library after a small delay
+    // to avoid the synchronous hit at startup time
+    NSDate *fireDate = [NSDate dateWithTimeIntervalSinceNow:kInitialIndexDelay];
+    [updateTimer_ setFireDate:fireDate];
+    
     genreIconCache_ = [[NSMutableDictionary alloc] init];
 
     HGSAssert(db_, nil);
@@ -221,18 +226,13 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     HGSAssert(playlistIcon_, nil);
     HGSAssert(updateTimer_, nil);
     HGSAssert(genreIconCache_, nil);
-
-    // Perform the first index of the iTunes library after a small delay
-    // to avoid the synchronous hit at startup time
-    [self performSelector:@selector(updateIndexTimerFired:)
-               withObject:nil
-               afterDelay:kInitialIndexDelay];
   }
   return self;
 }
 
 - (void)dealloc {
-  [updateTimer_ invalidate];
+  [updateTimer_ release];
+  [updateOperation_ release];
   [db_ release];
   [albumIcon_ release];
   [artistIcon_ release];
@@ -241,6 +241,12 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   [playlistIcon_ release];
   [genreIconCache_ release];
   [super dealloc];
+}
+
+- (void)uninstall {
+  [updateOperation_ cancel];
+  [updateTimer_ invalidate];
+  [super uninstall];
 }
 
 - (NSString *)libraryLocation {
@@ -256,132 +262,122 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return [libraryLocation stringByExpandingTildeInPath];
 }
 
-- (void)updateIndex {
+- (void)updateIndex:(id)sender operation:(NSOperation *)operation {
   GTMSQLiteDatabase *db = nil;
+    
+  NSString *pathToITunesXml = [self libraryLocation];
+  NSDictionary *rootDictionary
+    = [NSDictionary dictionaryWithContentsOfFile:pathToITunesXml];
+  if (!rootDictionary) {
+    HGSLogDebug(@"iTunes source failed to parse %@", pathToITunesXml);
+    return;
+  }
 
-  // Only one indexing operation at a time
-  @synchronized (updateTimer_) {
-    if (indexing_) {
-      return;
+  // Create the sqlite in-memory database that we'll use to store iTunes data
+  db = [self createDatabase];
+
+  // Insert the tracks into database using chunked transactions; this
+  // increases the sqlite insert speed by an order of magnitude. Perform
+  // the inserts in chunks so we don't exhaust memory
+  int sqliteErr;
+  NSArray *tracks = [rootDictionary objectForKey:kTracksKey];
+  NSInteger trackCount = [tracks count];
+  NSEnumerator *trackEnumerator = [tracks objectEnumerator];
+  for (NSInteger chunkIteration = 0; chunkIteration < trackCount;) {
+    if ([operation isCancelled]) return;
+    NSAutoreleasePool *loopPool = [[NSAutoreleasePool alloc] init];
+    NSString *trackSql = @"BEGIN TRANSACTION;\n";
+    for (NSInteger trackIteration = 0;
+         trackIteration < kInsertsPerTransaction
+           && chunkIteration < trackCount;
+         trackIteration++, chunkIteration++) {
+      NSDictionary *track = [trackEnumerator nextObject];
+      NSString *trackName = [track objectForKey:@"Name"];
+      if (trackName) {
+        trackName = [GTMSQLiteStatement quoteAndEscapeString:trackName];
+      }
+      NSString *trackArtist = [track objectForKey:@"Artist"];
+      if (trackArtist) {
+        trackArtist = [GTMSQLiteStatement quoteAndEscapeString:trackArtist];
+      }
+      NSString *trackAlbum = [track objectForKey:@"Album"];
+      if (trackAlbum) {
+        trackAlbum = [GTMSQLiteStatement quoteAndEscapeString:trackAlbum];
+      }
+      NSString *trackComposer = [track objectForKey:@"Composer"];
+      if (trackComposer) {
+        trackComposer
+          = [GTMSQLiteStatement quoteAndEscapeString:trackComposer];
+      }
+      NSString *trackGenre = [track objectForKey:@"Genre"];
+      if (trackGenre) {
+        trackGenre = [GTMSQLiteStatement quoteAndEscapeString:trackGenre];
+      }
+      NSString *trackLocation = [track objectForKey:@"Location"];
+      if (trackLocation) {
+        trackLocation
+          = [GTMSQLiteStatement quoteAndEscapeString:trackLocation];
+      }
+      trackSql = [trackSql stringByAppendingFormat:kTrackInsertSql,
+                  [[track objectForKey:@"Track ID"] intValue],
+                  trackName ? trackName : @"''",
+                  trackArtist ? trackArtist : @"''",
+                  trackAlbum ? trackAlbum : @"''",
+                  trackComposer ? trackComposer : @"''",
+                  trackGenre ? trackGenre : @"''",
+                  trackLocation ? trackLocation : @"''"];
     }
-    indexing_ = YES;
-
-    //
-    NSString *pathToITunesXml = [self libraryLocation];
-    NSDictionary *rootDictionary
-      = [NSDictionary dictionaryWithContentsOfFile:pathToITunesXml];
-    if (!rootDictionary) {
-      HGSLogDebug(@"iTunes source failed to parse %@", pathToITunesXml);
-      indexing_ = NO;
-      return;
+    trackSql = [trackSql stringByAppendingString:@"COMMIT;\n"];
+    if ((sqliteErr = [db executeSQL:trackSql]) != SQLITE_OK) {
+      HGSLog(@"iTunes source could not insert track info into its database "
+             @"(%i, %@)", sqliteErr, [db lastErrorString]);
+      HGSLogDebug(@"%@", trackSql);
     }
-
-    // Create the sqlite in-memory database that we'll use to store iTunes data
-    db = [self createDatabase];
-
-    // Insert the tracks into database using chunked transactions; this
-    // increases the sqlite insert speed by an order of magnitude. Perform
-    // the inserts in chunks so we don't exhaust memory
-    int sqliteErr;
-    NSArray *tracks = [rootDictionary objectForKey:kTracksKey];
-    NSInteger trackCount = [tracks count];
-    NSEnumerator *trackEnumerator = [tracks objectEnumerator];
+    [loopPool release];
+  }
+  NSArray *playlists = [rootDictionary objectForKey:kPlaylistsKey];
+  for (NSDictionary *playlist in playlists) {
+    if ([operation isCancelled]) return;
+    if ([[playlist objectForKey:@"Master"] boolValue]) {
+      // Don't index the master playlist, it's a rehash of everything we've
+      // already indexed above
+      continue;
+    }
+    NSInteger playlistId = [[playlist objectForKey:@"Playlist ID"] intValue];
+    NSString *playlistName = [playlist objectForKey:@"Name"];
+    playlistName = [GTMSQLiteStatement quoteAndEscapeString:playlistName];
+    NSString *playlistSql  = [NSString stringWithFormat:kPlaylistInsertSql,
+                              playlistId,
+                              playlistName ? playlistName : @"''"];
+    if ((sqliteErr = [db executeSQL:playlistSql]) != SQLITE_OK) {
+      HGSLog(@"iTunes source could not insert playlist info into its "
+             @"database (%i, %@)", sqliteErr, [db lastErrorString]);
+      HGSLogDebug(@"%@", playlistSql);
+    }
+    NSArray *playlistItems = [playlist objectForKey:@"Playlist Items"];
+    trackCount = [playlistItems count];
+    trackEnumerator = [playlistItems objectEnumerator];
     for (NSInteger chunkIteration = 0; chunkIteration < trackCount;) {
       NSAutoreleasePool *loopPool = [[NSAutoreleasePool alloc] init];
-      NSString *trackSql = @"BEGIN TRANSACTION;\n";
+      NSString *playlistTrackSql = @"BEGIN TRANSACTION;\n";
       for (NSInteger trackIteration = 0;
            trackIteration < kInsertsPerTransaction
              && chunkIteration < trackCount;
            trackIteration++, chunkIteration++) {
         NSDictionary *track = [trackEnumerator nextObject];
-        NSString *trackName = [track objectForKey:@"Name"];
-        if (trackName) {
-          trackName = [GTMSQLiteStatement quoteAndEscapeString:trackName];
-        }
-        NSString *trackArtist = [track objectForKey:@"Artist"];
-        if (trackArtist) {
-          trackArtist = [GTMSQLiteStatement quoteAndEscapeString:trackArtist];
-        }
-        NSString *trackAlbum = [track objectForKey:@"Album"];
-        if (trackAlbum) {
-          trackAlbum = [GTMSQLiteStatement quoteAndEscapeString:trackAlbum];
-        }
-        NSString *trackComposer = [track objectForKey:@"Composer"];
-        if (trackComposer) {
-          trackComposer
-            = [GTMSQLiteStatement quoteAndEscapeString:trackComposer];
-        }
-        NSString *trackGenre = [track objectForKey:@"Genre"];
-        if (trackGenre) {
-          trackGenre = [GTMSQLiteStatement quoteAndEscapeString:trackGenre];
-        }
-        NSString *trackLocation = [track objectForKey:@"Location"];
-        if (trackLocation) {
-          trackLocation
-            = [GTMSQLiteStatement quoteAndEscapeString:trackLocation];
-        }
-        trackSql = [trackSql stringByAppendingFormat:kTrackInsertSql,
-                    [[track objectForKey:@"Track ID"] intValue],
-                    trackName ? trackName : @"''",
-                    trackArtist ? trackArtist : @"''",
-                    trackAlbum ? trackAlbum : @"''",
-                    trackComposer ? trackComposer : @"''",
-                    trackGenre ? trackGenre : @"''",
-                    trackLocation ? trackLocation : @"''"];
+        playlistTrackSql
+          = [playlistTrackSql stringByAppendingFormat:kPlaylistTrackInsertSql,
+             playlistId, [[track objectForKey:@"Track ID"] intValue]];
       }
-      trackSql = [trackSql stringByAppendingString:@"COMMIT;\n"];
-      if ((sqliteErr = [db executeSQL:trackSql]) != SQLITE_OK) {
-        HGSLog(@"iTunes source could not insert track info into its database "
-               @"(%i, %@)", sqliteErr, [db lastErrorString]);
-        HGSLogDebug(@"%@", trackSql);
+      playlistTrackSql
+        = [playlistTrackSql stringByAppendingString:@"COMMIT;\n"];
+      if ((sqliteErr = [db executeSQL:playlistTrackSql]) != SQLITE_OK) {
+        HGSLog(@"iTunes source could not insert playlist track info into "
+               @"its database (%i, %@)", sqliteErr, [db lastErrorString]);
+        HGSLogDebug(@"%@", playlistTrackSql);
       }
       [loopPool release];
     }
-    NSArray *playlists = [rootDictionary objectForKey:kPlaylistsKey];
-    for (NSDictionary *playlist in playlists) {
-      if ([[playlist objectForKey:@"Master"] boolValue]) {
-        // Don't index the master playlist, it's a rehash of everything we've
-        // already indexed above
-        continue;
-      }
-      NSInteger playlistId = [[playlist objectForKey:@"Playlist ID"] intValue];
-      NSString *playlistName = [playlist objectForKey:@"Name"];
-      playlistName = [GTMSQLiteStatement quoteAndEscapeString:playlistName];
-      NSString *playlistSql  = [NSString stringWithFormat:kPlaylistInsertSql,
-                                playlistId,
-                                playlistName ? playlistName : @"''"];
-      if ((sqliteErr = [db executeSQL:playlistSql]) != SQLITE_OK) {
-        HGSLog(@"iTunes source could not insert playlist info into its "
-               @"database (%i, %@)", sqliteErr, [db lastErrorString]);
-        HGSLogDebug(@"%@", playlistSql);
-      }
-      NSArray *playlistItems = [playlist objectForKey:@"Playlist Items"];
-      trackCount = [playlistItems count];
-      trackEnumerator = [playlistItems objectEnumerator];
-      for (NSInteger chunkIteration = 0; chunkIteration < trackCount;) {
-        NSAutoreleasePool *loopPool = [[NSAutoreleasePool alloc] init];
-        NSString *playlistTrackSql = @"BEGIN TRANSACTION;\n";
-        for (NSInteger trackIteration = 0;
-             trackIteration < kInsertsPerTransaction
-               && chunkIteration < trackCount;
-             trackIteration++, chunkIteration++) {
-          NSDictionary *track = [trackEnumerator nextObject];
-          playlistTrackSql
-            = [playlistTrackSql stringByAppendingFormat:kPlaylistTrackInsertSql,
-               playlistId, [[track objectForKey:@"Track ID"] intValue]];
-        }
-        playlistTrackSql
-          = [playlistTrackSql stringByAppendingString:@"COMMIT;\n"];
-        if ((sqliteErr = [db executeSQL:playlistTrackSql]) != SQLITE_OK) {
-          HGSLog(@"iTunes source could not insert playlist track info into "
-                 @"its database (%i, %@)", sqliteErr, [db lastErrorString]);
-          HGSLogDebug(@"%@", playlistTrackSql);
-        }
-        [loopPool release];
-      }
-    }
-
-    indexing_ = NO;
   }
 
   // Swap the newly indexed database with the previous one
@@ -395,10 +391,13 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (void)updateIndexTimerFired:(NSTimer *)timer {
   NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
-  [queue addOperation:[HGSInvocationOperation
-   diskInvocationOperationWithTarget:self
-                            selector:@selector(updateIndex)
-                              object:nil]];
+  [updateOperation_ cancel];
+  [updateOperation_ release];
+  updateOperation_ 
+    = [[NSInvocationOperation alloc] hgs_initWithTarget:self
+                                               selector:@selector(updateIndex:operation:)
+                                                 object:nil];
+  [queue addOperation:updateOperation_];
 }
 
 - (GTMSQLiteDatabase *)createDatabase {
@@ -501,8 +500,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       while ((![operation isCancelled]) 
              && ([statement stepRow] == SQLITE_ROW)) {
         NSString *track = [statement resultStringAtPosition:1];
-        if (![query tokenizedLength]
-            || [track rangeOfString:[query tokenizedString]
+        if (![query originalLength]
+            || [track rangeOfString:[query originalString]
                             options:kResultStringCompareOptions].location
             != NSNotFound) {
           int trackId = [[statement resultStringAtPosition:0] intValue];
@@ -548,8 +547,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       while ((![operation isCancelled]) 
              && ([statement stepRow] == SQLITE_ROW)) {
         NSString *track = [statement resultStringAtPosition:1];
-        if (![query tokenizedLength]
-            || [track rangeOfString:[query tokenizedString]
+        if (![query originalLength]
+            || [track rangeOfString:[query originalString]
                             options:kResultStringCompareOptions].location
             != NSNotFound) {
           int trackId = [[statement resultStringAtPosition:0] intValue];
@@ -616,8 +615,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
              && ([statement stepRow] == SQLITE_ROW)
              && ([results count] < kMaxSearchResults)) {
         NSString *album = [statement resultStringAtPosition:0];
-        if (![query tokenizedLength]
-            || [album rangeOfString:[query tokenizedString]
+        if (![query originalLength]
+            || [album rangeOfString:[query originalString]
                             options:kResultStringCompareOptions].location
             != NSNotFound) {
           NSString *artist = [statement resultStringAtPosition:1];
@@ -669,8 +668,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                         withQuery:tokenizedQuery];
     }
   } else {
-    NSString *tokenizedString = [tokenizedQuery tokenizedString];
-    NSString *likeString = [NSString stringWithFormat:@"%%%@%%", tokenizedString];
+    NSString *originalString = [tokenizedQuery originalString];
+    NSString *likeString = [NSString stringWithFormat:@"%%%@%%", originalString];
     likeString = [GTMSQLiteStatement quoteAndEscapeString:likeString];
     sqlSelect = [NSString stringWithFormat:kSqlSelectStatement,
                  likeString, likeString, likeString, likeString, likeString];
@@ -696,7 +695,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
           // We matched at least one column, figure out which column(s) matched
           // and create an appropriate result object for it
-          if ([track rangeOfString:tokenizedString
+          if ([track rangeOfString:originalString
                            options:kResultStringCompareOptions].location
               != NSNotFound) {
             // Track name matched
@@ -711,14 +710,14 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                       playListID:nil
                                        matchedBy:tokenizedQuery]];
           }
-          NSRange range = [artist rangeOfString:tokenizedString
+          NSRange range = [artist rangeOfString:originalString
                                         options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Artist matched
             [results addObject:[self artistResult:artist 
                                         matchedBy:tokenizedQuery]];
           }
-          range = [album rangeOfString:tokenizedString
+          range = [album rangeOfString:originalString
                                options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Album matched
@@ -729,14 +728,14 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                    withIconFile:location
                                        matchedBy:tokenizedQuery]];
           }
-          range = [composer rangeOfString:tokenizedString
+          range = [composer rangeOfString:originalString
                                   options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Composer matched
             [results addObject:[self composerResult:composer 
                                           matchedBy:tokenizedQuery]];
           }
-          range = [genre rangeOfString:tokenizedString
+          range = [genre rangeOfString:originalString
                                options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Genre matched
@@ -1062,10 +1061,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                 matchedBy:(HGSTokenizedString *)queryString 
            matchedIndexes:(NSIndexSet **)matchedIndexes {
   CGFloat score = 0;
-  if ([string length] && [queryString tokenizedLength]) {
+  NSUInteger length = [queryString tokenizedLength];
+  if ([string length] && length) {
     HGSTokenizedString *tokenizedString = [HGSTokenizer tokenizeString:string];
     score = HGSScoreTermForItem(queryString, tokenizedString, matchedIndexes);
-  } else if ([queryString tokenizedLength] == 0) {
+  } else if (length == 0) {
     score = HGSCalibratedScore(kHGSCalibratedWeakScore);
   }
   return score;

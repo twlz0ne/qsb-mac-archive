@@ -38,7 +38,8 @@
 // Implements a Search Source for finding Safari Bookmarks.
 //
 @interface HGSSafariBookmarksSource : WebBookmarksSource 
-- (void)indexSafariBookmarksForDict:(NSDictionary *)dict;
+- (void)indexSafariBookmarksForDict:(NSDictionary *)dict 
+                          operation:(NSOperation *)operation;
 - (void)indexBookmark:(NSDictionary*)dict;
 @end
 
@@ -67,18 +68,20 @@
 
 #pragma mark -
 
-- (void)indexSafariBookmarksForDict:(NSDictionary *)dict {
+- (void)indexSafariBookmarksForDict:(NSDictionary *)dict 
+                          operation:(NSOperation *)operation {
   NSString *title = [dict objectForKey:@"Title"];
   if ([title isEqualToString:@"Archive"]) return; // Skip Archive folder
 
   NSEnumerator *childEnum = [[dict objectForKey:@"Children"] objectEnumerator];
   NSDictionary *child;
   while ((child = [childEnum nextObject])) {
+    if ([operation isCancelled]) return;
     NSString *type = [child objectForKey:@"WebBookmarkType"];
     if ([type isEqualToString:@"WebBookmarkTypeLeaf"]) {
       [self indexBookmark:child];
     } else if ([type isEqualToString:@"WebBookmarkTypeList"]) {
-      [self indexSafariBookmarksForDict:child];
+      [self indexSafariBookmarksForDict:child operation:operation];
     }
   }
 }
@@ -93,10 +96,13 @@
   [self indexResultNamed:title URL:urlString otherAttributes:nil];
 }
 
-- (void)updateIndexForPath:(NSString *)path; {
-  NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
-  if (dict) {
-    [self indexSafariBookmarksForDict:dict];
+- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation {
+  if (![operation isCancelled]) {
+    [super updateIndexForPath:path operation:operation];
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
+    if (dict) {
+      [self indexSafariBookmarksForDict:dict operation:operation];
+    }
   }
 }
 

@@ -33,7 +33,8 @@
 #import "WebBookmarksSource.h"
 
 @interface HGSCaminoBookmarksSource : WebBookmarksSource
-- (void)indexCaminoBookmarksForDict:(NSDictionary *)dict;
+- (void)indexCaminoBookmarksForDict:(NSDictionary *)dict
+                          operation:(NSOperation *)operation;
 - (void)indexBookmark:(NSDictionary*)dict;
 @end
 
@@ -61,11 +62,13 @@
                           fileToWatch:fileToWatch];
 }
 
-- (void)indexCaminoBookmarksForDict:(NSDictionary *)dict {
+- (void)indexCaminoBookmarksForDict:(NSDictionary *)dict 
+                          operation:(NSOperation *)operation {
   NSArray *children = [dict objectForKey:@"Children"];
   if (children) {
     for (NSDictionary *child in children) {
-      [self indexCaminoBookmarksForDict:child];
+      if ([operation isCancelled]) return;
+      [self indexCaminoBookmarksForDict:child operation:operation];
     }
   } else {
     [self indexBookmark:dict];
@@ -118,10 +121,13 @@
 }
 
 
-- (void)updateIndexForPath:(NSString *)path {
-  NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
-  if (dict) {
-    [self indexCaminoBookmarksForDict:dict];
+- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation {
+  if (![operation isCancelled]) {
+    [super updateIndexForPath:path operation:operation];
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
+    if (dict) {
+      [self indexCaminoBookmarksForDict:dict operation:operation];
+    }
   }
 }
 

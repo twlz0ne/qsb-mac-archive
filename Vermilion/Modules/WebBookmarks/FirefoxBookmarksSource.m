@@ -88,7 +88,9 @@
 }
 // COV_NF_END
 
-- (void)updateIndexForPath:(NSString *)path {
+- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation {
+  if ([operation isCancelled]) return;
+  [super updateIndexForPath:path operation:operation];
   NSString *bookmarksPath = [bookmarksDirectoryKQueue_ path];
   NSString *pluginsPath = [searchPluginsDirectoryKQueue_ path];
   if (![path isEqual:bookmarksPath] && ![path isEqual:pluginsPath]) {

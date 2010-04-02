@@ -46,11 +46,16 @@
  @private
   GTMFileSystemKQueue *fileKQueue_;
   NSString *browserTypeName_;
+  NSString *path_;
+  NSInvocationOperation *indexingOperation_;
+  NSTimer *pathCheckTimer_;
 }
 - (id)initWithConfiguration:(NSDictionary *)configuration
             browserTypeName:(NSString *)browserTypeName
                 fileToWatch:(NSString *)path;
-- (void)updateIndexForPath:(NSString *)path;
+
+- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation;
+
 - (void)indexResultNamed:(NSString *)name 
                      URL:(NSString *)url 
          otherAttributes:(NSDictionary *)otherAttributes;

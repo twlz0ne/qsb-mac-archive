@@ -44,7 +44,7 @@ extern const CFStringRef kLSItemArchitecturesValidOnCurrentSystem;
   NSMetadataQuery *query_;
 }
 
-- (void)startQuery:(NSTimer *)timer;
+- (void)startQuery;
 
 // Do a fast index of the most likely app locations 
 // (/Applications and ~/Applications).
@@ -63,7 +63,7 @@ static NSString *const kApplicationSourcePredicateString
     if (![self loadResultsCache]) {
       [self fastIndex];
     }
-    [self performSelector:@selector(startQuery:)
+    [self performSelector:@selector(startQuery)
                withObject:nil
                afterDelay:10];
   }
@@ -77,12 +77,7 @@ static NSString *const kApplicationSourcePredicateString
   [super dealloc];
 }
 
-- (void)uninstall {
-  [NSObject cancelPreviousPerformRequestsWithTarget:self];
-  [super uninstall];
-}
-
-- (void)startQuery:(NSTimer *)timer {
+- (void)startQuery {
   // kick off a spotlight query for applications. it'll be a standing
   // query that we keep around for the duration of this source.
   query_ = [[NSMetadataQuery alloc] init];

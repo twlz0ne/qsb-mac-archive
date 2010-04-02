@@ -31,414 +31,117 @@
 //
 
 #import "HGSOperation.h"
-#import "GTMObjectSingleton.h"
-#import "GTMDebugSelectorValidation.h"
+#import <GTM/GTMObjectSingleton.h>
+#import <GTM/GTMDebugSelectorValidation.h>
+#import <GTM/GTMLightweightProxy.h>
 #import <GData/GDataHTTPFetcher.h>
 #import "HGSLog.h"
 
-static const NSOperationQueuePriority kDiskQueuePriority = NSOperationQueuePriorityNormal;
-static const NSOperationQueuePriority kNetworkQueuePriority = NSOperationQueuePriorityNormal;
-static const NSOperationQueuePriority kNetworkFinishQueuePriority = NSOperationQueuePriorityNormal;
-static const NSOperationQueuePriority kMemoryQueuePriority = NSOperationQueuePriorityLow;
+@implementation NSInvocationOperation (HGSInvocationOperation)
 
-static NSString * const kHGSInvocationOperationThreadKey = @"kHGSInvocationOperationThreadKey";
-static NSString * const kCallbackTypeKey = @"kCallbackTypeKey";
-static NSString * const kCallbackTypeData = @"kCallbackTypeData";
-static NSString * const kCallbackTypeError = @"kCallbackTypeError";
-static NSString * const kCallbackDataKey = @"kCallbackDataKey";
-static NSString * const kCallbackErrorKey = @"kCallbackErrorKey";
-static NSString * const kHGSOperationQueueLockObject = @"";
-
-static const CFTimeInterval kNetworkOperationTimeout = 60; // seconds
-
-
-@interface HGSInvocationOperation()
-- (id)initWithTarget:(id)target selector:(SEL)sel object:(id)arg;
-- (id)initWithInvocation:(NSInvocation *)inv;
-- (id)init;
-- (InvocationType)invocationType;
-- (void)setInvocationType:(InvocationType)type;
-- (id)target;
-- (void)setTarget:(id)target;
-- (SEL)selector;
-- (void)setSelector:(SEL)selector;
-@end
-
-
-@interface HGSNetworkOperation : HGSInvocationOperation {
-  NSDictionary *callbackDict_;  // STRONG
-  GDataHTTPFetcher *fetcher_;  // STRONG
-  id fetcherTarget_;  // STRONG
-  BOOL isReady_;
-  SEL didFinishSel_;
-  SEL didFailSel_;
-}
-- (id)initWithTarget:(id)target
-                 forFetcher:(GDataHTTPFetcher *)fetcher
-          didFinishSelector:(SEL)didFinishSel
-            didFailSelector:(SEL)didFailWithErrorSel;
-- (void)beginFetch;
-@end
-
-
-@interface HGSFetcherThread : NSObject {
- @private
-  CFRunLoopSourceRef rlSource_;
-  NSMutableArray  *fetches_;   
-  NSLock *fetchesLock_;
-  CFRunLoopRef runLoop_;
-}
-+ (HGSFetcherThread *)sharedFetcherThread;
-- (void)enqueue:(HGSNetworkOperation *)op;
-- (void)beginOps;
-@end
-
-
-// HGSFetcherThread is a long lived thread that on which the NSURLConnections
-// for all HGSNetworkOperations run. The order of operation is:
-//   Application instantiates an HGSNetworkOperation
-//   The HTTP fetch occurs on the HGSFetcherThread
-//   The HGSNetworkOperation isReady method returns NO until the fetch completes
-//   The fetch completes, isReady returns YES, and the GDataHTTPFetcher
-//   callbacks run on the HGSNetworkOperation thread
-// All HTTP fetches run on the same HGSFetcherThread, which is instantiated
-// when the first HGSNetworkOperations is created.
-@implementation HGSFetcherThread
-
-GTMOBJECT_SINGLETON_BOILERPLATE(HGSFetcherThread, sharedFetcherThread);
-
-static void HGSFetcherThreadPerformCallBack(void *info) {
-  HGSFetcherThread *thread = (HGSFetcherThread *)info;
-  [thread beginOps];
-}
-
-- (id)init {
-  self = [super init];
-  if (self) {
-    CFRunLoopSourceContext context;
-    bzero(&context, sizeof(context));
-    context.info = self;
-    context.perform = HGSFetcherThreadPerformCallBack;
-    rlSource_ = CFRunLoopSourceCreate(NULL, 0, &context);
-    fetchesLock_ = [[NSLock alloc] init];
-    fetches_ = [[NSMutableArray alloc] init];
-    NSCondition *runLoopCondition = [[[NSCondition alloc] init] autorelease];
-    if (!rlSource_ || !fetchesLock_ || !runLoopCondition) {
-      [self release];
-      return nil;
-    }
-    [runLoopCondition lock];
-    [NSThread detachNewThreadSelector:@selector(main:) 
-                             toTarget:self 
-                           withObject:runLoopCondition];
-    while (!runLoop_) {
-      [runLoopCondition wait];
-    }
-    [runLoopCondition unlock];
+- (id)hgs_initWithTarget:(id)target selector:(SEL)sel object:(id)arg {
+  GTMAssertSelectorNilOrImplementedWithArguments(target, 
+                                                 sel, 
+                                                 @encode(id), 
+                                                 @encode(NSOperation *), 
+                                                 NULL);
+  NSMethodSignature *sig = [target methodSignatureForSelector:sel];
+  NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
+  
+  // GTMLightweightProxy is being used here because NSInvocationOperation
+  // retains its arguments according to the documentation. Since it is unclear
+  // when the retaining of the arguments occurs (at init, or just before the
+  // invocation is invoked, or elsewhere) the proxy is required to make sure
+  // that the invocation doesn't retain 'self' or else there will be a retain
+  // loop.
+  GTMLightweightProxy *proxy = [[[GTMLightweightProxy alloc] init] autorelease];
+  [invocation setTarget:target];
+  [invocation setSelector:sel];
+  [invocation setArgument:&arg atIndex:2];
+  [invocation setArgument:&proxy atIndex:3];
+  if ((self = [self initWithInvocation:invocation])) {
+    [proxy setRepresentedObject:self];
   }
   return self;
 }
 
-// COV_NF_START
-// As a singleton, this is never called.
-- (void)dealloc {
-  [fetches_ release];
-  [fetchesLock_ release];
-  if (rlSource_) {
-    if (runLoop_) {
-      CFRunLoopRemoveSource(runLoop_, rlSource_, kCFRunLoopDefaultMode);
-    }
-    CFRelease(rlSource_);
-  }
-  [super dealloc];
-}// COV_NF_END
-
-
-- (void)enqueue:(HGSNetworkOperation *)op {
-  [fetchesLock_ lock];
-  // Wrap this in a try catch block so we don't unintentionally deadlock.
-  // should never happen with a simple add.
-  @try {
-    [fetches_ addObject:op];
-  }
-  @catch(NSException *e) {
-    HGSLog(@"Unexpected exception in enqueue: %@", e);
-  }
-  [fetchesLock_ unlock];
-  CFRunLoopSourceSignal(rlSource_);
-  CFRunLoopWakeUp(runLoop_);
-}
-
-- (void)beginOps {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  [fetchesLock_ lock];
- 
-  for (HGSNetworkOperation *op in fetches_) {
-    // Wrap this in a try catch block so we don't unintentionally deadlock.
-    @try {
-      [op beginFetch];
-    }
-    @catch(NSException *e) {
-      HGSLog(@"Unexpected exception in beginOps: %@", e);
-    }
-  }  
-  [fetches_ removeAllObjects];
-  [fetchesLock_ unlock];
-  [pool release];
-}
-
-- (void)main:(NSCondition *)runLoopCondition {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  
-  // init our run loop
-  [runLoopCondition lock];
-  runLoop_ = CFRunLoopGetCurrent();
-  CFRunLoopAddSource(runLoop_, rlSource_, kCFRunLoopDefaultMode);
-  [runLoopCondition signal];
-  [runLoopCondition unlock];
-  
-  [pool release];
-  CFRunLoopRun();
-}
-
 @end
 
-
-@implementation HGSNetworkOperation
+@implementation HGSFetcherOperation
 
 - (id)initWithTarget:(id)target
           forFetcher:(GDataHTTPFetcher *)fetcher
    didFinishSelector:(SEL)didFinishSel
-     didFailSelector:(SEL)didFailSel {
-  self = [super initWithTarget:self
-                      selector:@selector(main)
-                        object:nil];
-  if (self) {
-    fetcherTarget_ = [target retain];
+     didFailSelector:(SEL)failedSel {
+  GTMAssertSelectorNilOrImplementedWithArguments(target,
+                                                 didFinishSel,
+                                                 @encode(GDataHTTPFetcher *),
+                                                 @encode(NSData *),
+                                                 @encode(NSOperation *),
+                                                 NULL);
+  GTMAssertSelectorNilOrImplementedWithArguments(target,
+                                                 failedSel,
+                                                 @encode(GDataHTTPFetcher *),
+                                                 @encode(NSError *),
+                                                 @encode(NSOperation *),
+                                                 NULL);  
+  if ((self = [super init])) {
     fetcher_ = [fetcher retain];
+    target_ = [target retain];
     didFinishSel_ = didFinishSel;
-    didFailSel_ = didFailSel;
-    [self setInvocationType:NETWORK_INVOCATION];
-    [self setQueuePriority:kNetworkQueuePriority];
-
-    GTMAssertSelectorNilOrImplementedWithArguments(target,
-                                                   didFinishSel_,
-                                                   @encode(GDataHTTPFetcher *),
-                                                   @encode(NSData *),
-                                                   NULL);
-    GTMAssertSelectorNilOrImplementedWithArguments(target,
-                                                   didFailSel_,
-                                                   @encode(GDataHTTPFetcher *),
-                                                   @encode(NSError *),
-                                                   NULL);
+    didFailSel_ = failedSel;
   }
   return self;
 }
 
 - (void)dealloc {
-  [callbackDict_ release];
   [fetcher_ release];
-  [fetcherTarget_ release];
-  [super dealloc];
-}
-
-- (void)beginFetch {
-  [fetcher_ beginFetchWithDelegate:self
-                 didFinishSelector:@selector(httpFetcher:finishedWithData:)
-                   didFailSelector:@selector(httpFetcher:failedWithError:)];
-}
-
-- (BOOL)isReady {
-  if ([super isReady]) {
-    return isReady_;
-  }
-  return NO;
-}
-
-- (void)setIsReady:(BOOL)isReady {
-  [self willChangeValueForKey:@"isReady"];
-  isReady_ = isReady;
-  [self didChangeValueForKey:@"isReady"];
-}
-
-- (void)main {
-  [[[NSThread currentThread] threadDictionary] setObject:self
-                                                  forKey:kHGSInvocationOperationThreadKey];
-  NSInvocation *invocation = nil;
-  NSString *callbackType = [callbackDict_ objectForKey:kCallbackTypeKey];
-  if ([callbackType isEqual:kCallbackTypeData]) {
-    NSData *data = [callbackDict_ objectForKey:kCallbackDataKey];
-    NSMethodSignature *signature = [fetcherTarget_ methodSignatureForSelector:didFinishSel_];
-    invocation = [NSInvocation invocationWithMethodSignature:signature];
-    [invocation setSelector:didFinishSel_];
-    [invocation setTarget:fetcherTarget_];
-    [invocation setArgument:&fetcher_ atIndex:2];
-    [invocation setArgument:&data atIndex:3];
-  } else if ([callbackType isEqual:kCallbackTypeError]) {
-    NSError *error = [callbackDict_ objectForKey:kCallbackErrorKey];
-    NSMethodSignature *signature = [fetcherTarget_ methodSignatureForSelector:didFailSel_];
-    invocation = [NSInvocation invocationWithMethodSignature:signature];
-    [invocation setSelector:didFailSel_];
-    [invocation setTarget:fetcherTarget_];
-    [invocation setArgument:&fetcher_ atIndex:2];
-    [invocation setArgument:&error atIndex:3];
-  }
-  [invocation invoke];
-  [[[NSThread currentThread] threadDictionary] removeObjectForKey:kHGSInvocationOperationThreadKey];
-}
-
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   finishedWithData:(NSData *)retrievedData {
-  if (callbackDict_) {
-    HGSLogDebug(@"httpFetcher:finishedWithData: called after another callback");
-  }
-  callbackDict_ = [[NSDictionary dictionaryWithObjectsAndKeys:
-                   kCallbackTypeData, kCallbackTypeKey,
-                   [NSData dataWithData:retrievedData], kCallbackDataKey,
-                   nil] retain];
-  [self setIsReady:YES];
-}
-
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-    failedWithError:(NSError *)error {
-  if (callbackDict_) {
-    HGSLogDebug(@"httpFetcher:failedWithError: called after another callback");
-  }
-  callbackDict_ = [[NSDictionary dictionaryWithObjectsAndKeys:
-                   kCallbackTypeError, kCallbackTypeKey,
-                   [[error copy] autorelease], kCallbackErrorKey,
-                   nil] retain];
-  [self setIsReady:YES];
-}
-
-@end
-
-
-@implementation HGSInvocationOperation
-
-+ (HGSInvocationOperation *)diskInvocationOperationWithTarget:(id)target
-                                                     selector:(SEL)selector
-                                                       object:(id)object {
-  HGSInvocationOperation *result = [[[HGSInvocationOperation alloc]
-                                    initWithTarget:target
-                                          selector:selector
-                                            object:object] autorelease];
-  [result setInvocationType:DISK_INVOCATION];
-  [result setQueuePriority:kDiskQueuePriority];
-  return result;
-}
-
-+ (HGSInvocationOperation *)
-   networkInvocationOperationWithTarget:(id)target
-                             forFetcher:(GDataHTTPFetcher *)fetcher
-                      didFinishSelector:(SEL)didFinishSel
-                        didFailSelector:(SEL)didFailSel {
-  HGSNetworkOperation *networkOp = [[[HGSNetworkOperation alloc]
-                                    initWithTarget:target
-                                        forFetcher:fetcher
-                                 didFinishSelector:didFinishSel
-                                     didFailSelector:didFailSel] autorelease];
-  [[HGSFetcherThread sharedFetcherThread] enqueue:networkOp];
-  return networkOp;
-}
-
-+ (HGSInvocationOperation *)memoryInvocationOperationWithTarget:(id)target
-                                                       selector:(SEL)sel
-                                                         object:(id)arg {
-  HGSInvocationOperation *result = [[[HGSInvocationOperation alloc]
-                                    initWithTarget:target
-                                          selector:sel
-                                            object:arg] autorelease];
-  [result setInvocationType:MEMORY_INVOCATION];
-  [result setQueuePriority:kMemoryQueuePriority];
-  return result;
-}
-
-- (id)initWithTarget:(id)target selector:(SEL)sel object:(id)arg {
-  self = [super initWithTarget:self
-                      selector:@selector(intermediateInvocation:)
-                        object:arg];
-  if (self) {
-    [self setInvocationType:NORMAL_INVOCATION];
-    [self setTarget:target];
-    [self setSelector:sel];
-  }
-  return self;
-}
-
-- (void)dealloc {
   [target_ release];
   [super dealloc];
 }
 
-- (id)initWithInvocation:(NSInvocation *)inv {
-  self = [super initWithInvocation:inv];
-  if (self) {
-    [self setInvocationType:NORMAL_INVOCATION];
-  }
-  return self;
+- (GDataHTTPFetcher *)fetcher {
+  return [[fetcher_ retain] autorelease];
 }
 
-- (id)init {
-  HGSAssert(NO, @"Do not use init; use initWithTarget: or "
-                @"initWithInvocation: instead.");
-  [self release];
-  return nil;
-}
-
-- (InvocationType)invocationType {
-  return invocationType_;
-}
-
-- (void)setInvocationType:(InvocationType)type {
-  invocationType_ = type;
-}
-
-- (id)target {
-  return target_;
-}
-
-- (void)setTarget:(id)target {
-  if (target_ != target) {
-    [target_ release];
-    target_ = [target retain];
+- (void)main {
+  didFinish_ = NO;
+  [fetcher_ beginFetchWithDelegate:self
+                 didFinishSelector:@selector(httpFetcher:finishedWithData:)
+                   didFailSelector:@selector(httpFetcher:failedWithError:)];
+  while (!didFinish_) {
+    CFRunLoopRun();
   }
 }
 
-- (SEL)selector {
-  return selector_;
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)retrievedData {
+  NSMethodSignature *sig = [target_ methodSignatureForSelector:didFinishSel_];
+  NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
+  [invocation setTarget:target_];
+  [invocation setSelector:didFinishSel_];
+  [invocation setArgument:&fetcher_ atIndex:2];
+  [invocation setArgument:&retrievedData atIndex:3];
+  [invocation setArgument:&self atIndex:4];
+  [invocation invoke];
+  didFinish_ = YES;
+  CFRunLoopRef rl = CFRunLoopGetCurrent();
+  CFRunLoopStop(rl);
 }
 
-- (void)setSelector:(SEL)selector {
-  selector_ = selector;
-}
-
-- (void)intermediateInvocation:(id)obj {
-   if (![self isConcurrent]) {
-    [[[NSThread currentThread] threadDictionary] setObject:self
-                                                    forKey:kHGSInvocationOperationThreadKey];
-  }
-  NSMethodSignature *signature = [target_ methodSignatureForSelector:selector_];
-  if ([signature numberOfArguments] == 4) {
-    [target_ performSelector:selector_ withObject:obj withObject:self];
-  } else {
-    [target_ performSelector:selector_ withObject:obj];
-  }
-  [[[NSThread currentThread] threadDictionary] removeObjectForKey:kHGSInvocationOperationThreadKey];
-}
-
-+ (HGSInvocationOperation *)currentOperation {
-  return [[[NSThread currentThread] threadDictionary] objectForKey:kHGSInvocationOperationThreadKey];
-}
-
-@end
-
-
-@implementation NSOperation(HGSInvocationOperation)
-
-- (BOOL)isDiskOperation {
- return ([self isKindOfClass:[HGSInvocationOperation class]] &&
-         [(HGSInvocationOperation *)self invocationType] == DISK_INVOCATION);
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+    failedWithError:(NSError *)error {
+  NSMethodSignature *sig = [target_ methodSignatureForSelector:didFailSel_];
+  NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
+  [invocation setTarget:target_];
+  [invocation setSelector:didFailSel_];
+  [invocation setArgument:&fetcher_ atIndex:2];
+  [invocation setArgument:&error atIndex:3];
+  [invocation setArgument:&self atIndex:4];
+  [invocation invoke];
+  didFinish_ = YES;
+  CFRunLoopRef rl = CFRunLoopGetCurrent();
+  CFRunLoopStop(rl);
 }
 
 @end

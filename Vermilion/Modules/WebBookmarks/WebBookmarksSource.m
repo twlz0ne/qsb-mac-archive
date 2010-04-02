@@ -33,46 +33,59 @@
 #import "WebBookmarksSource.h"
 #import "GTMFileSystemKQueue.h"
 
+@interface WebBookmarksSource ()
+- (void)pathCheckTimer:(NSTimer *)timer;
+@end
+
 @implementation WebBookmarksSource
 
 - (id)initWithConfiguration:(NSDictionary *)configuration 
             browserTypeName:(NSString *)browserTypeName
                 fileToWatch:(NSString *)path {
   if ((self = [super initWithConfiguration:configuration])) {
-    GTMFileSystemKQueueEvents queueEvents = (kGTMFileSystemKQueueDeleteEvent 
-                                             | kGTMFileSystemKQueueWriteEvent
-                                             | kGTMFileSystemKQueueRenameEvent);
-    fileKQueue_ 
-      = [[GTMFileSystemKQueue alloc] initWithPath:path
-                                        forEvents:queueEvents
-                                    acrossReplace:YES
-                                           target:self
-                                           action:@selector(fileChanged:event:)];
     browserTypeName_ = [browserTypeName copy];
-    if (fileKQueue_ && browserTypeName_) {
-      NSOperation *operation 
-        = [HGSInvocationOperation diskInvocationOperationWithTarget:self
-                                                           selector:@selector(updateIndexForPath:)
-                                                             object:path];
-      [[HGSOperationQueue sharedOperationQueue] addOperation:operation];
-    } else {
-      // Either we've got bad args, or the file we're looking for doesn't
-      // exist.
-      [self release];
-      self = nil;
-    }
+    path_ = [path copy];
+    [self pathCheckTimer:nil];
   }
   return self;  
 }
 
-// COV_NF_START
 - (void)dealloc {
-  // plugins are never unloaded
+  [indexingOperation_ release];
+  [pathCheckTimer_ release];
   [fileKQueue_ release];
   [browserTypeName_ release];
   [super dealloc];
 }
-// COV_NF_END
+
+- (void)uninstall {
+  [indexingOperation_ cancel];
+  [pathCheckTimer_ invalidate];
+  [super uninstall];
+}
+
+- (void)pathCheckTimer:(NSTimer *)timer {
+  GTMFileSystemKQueueEvents queueEvents = (kGTMFileSystemKQueueDeleteEvent 
+                                           | kGTMFileSystemKQueueWriteEvent
+                                           | kGTMFileSystemKQueueRenameEvent);
+  fileKQueue_ 
+    = [[GTMFileSystemKQueue alloc] initWithPath:path_
+                                      forEvents:queueEvents
+                                  acrossReplace:YES
+                                         target:self
+                                         action:@selector(fileChanged:event:)];
+  if (!fileKQueue_) {
+    // the file we are looking for isn't around, so we'll set a timer
+    // so we can look for it in the future
+    [pathCheckTimer_ release];
+    pathCheckTimer_ 
+      = [[NSTimer scheduledTimerWithTimeInterval:60
+                                          target:self 
+                                        selector:@selector(pathCheckTimer:) 
+                                        userInfo:nil 
+                                         repeats:NO] retain];
+  }
+}
 
 - (void)indexResultNamed:(NSString *)name 
                      URL:(NSString *)urlString
@@ -107,9 +120,13 @@
 
 - (void)fileChanged:(GTMFileSystemKQueue *)queue 
               event:(GTMFileSystemKQueueEvents)event {
-  [[self retain] autorelease];
-  [self clearResultIndex];
-  [self updateIndexForPath:[queue path]];
+  [indexingOperation_ cancel];
+  [indexingOperation_ release];
+  indexingOperation_ 
+    = [[NSInvocationOperation alloc] hgs_initWithTarget:self
+                                               selector:@selector(updateIndexForPath:operation:)
+                                                 object:path_];
+  [[HGSOperationQueue sharedOperationQueue] addOperation:indexingOperation_];
 }
 
 - (NSString *)domainURLForURLString:(NSString *)urlString {
@@ -133,10 +150,8 @@
   return domainString;
 }
 
-// COV_NF_START
-- (void)updateIndexForPath:(NSString *)path {
-  HGSAssert(NO, @"Must be overridden by subclasses!");  
+- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation {
+  [self clearResultIndex];
 }
-// COV_NF_END
 
 @end

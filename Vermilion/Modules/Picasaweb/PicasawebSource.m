@@ -32,10 +32,11 @@
 
 #import <Vermilion/Vermilion.h>
 #import <QSBPluginUI/QSBPluginUI.h>
-
+#import <GTM/GTMMethodCheck.h>
+#import <GTM/GTMNSString+URLArguments.h>
+#import <GTM/GTMTypeCasting.h>
 #import <GData/GData.h>
-#import "GTMMethodCheck.h"
-#import "GTMNSString+URLArguments.h"
+
 #import "HGSKeychainItem.h"
 
 static NSString *const kPhotosAlbumKey = @"kPhotosAlbumKey";
@@ -46,8 +47,8 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 @interface PicasawebSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
   GDataServiceGooglePhotos *picasawebService_;
-  NSMutableSet *activeTickets_;
-  __weak NSTimer *updateTimer_;
+  NSInvocationOperation *indexOp_;
+  NSTimer *updateTimer_;
   HGSAccount *account_;
   NSTimeInterval previousErrorReportingTime_;
   NSImage *placeholderIcon_;
@@ -56,9 +57,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 - (void)setUpPeriodicRefresh;
 - (void)startAlbumInfoFetch;
 
-- (void)cancelAllTickets;
+- (void)cancelFetch;
 
-- (void)indexAlbum:(GDataEntryPhotoAlbum *)album;
+- (void)indexAlbum:(GDataEntryPhotoAlbum *)album operation:(NSOperation *)op;
 - (void)indexPhoto:(GDataEntryPhoto *)photo
          withAlbum:(GDataEntryPhotoAlbum *)album;
 
@@ -91,8 +92,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    // Keep track of active tickets so we can cancel them if necessary.
-    activeTickets_ = [[NSMutableSet alloc] init];
     
     account_ = [[configuration objectForKey:kHGSExtensionAccountKey] retain];
 
@@ -123,18 +122,23 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [self cancelAllTickets];
-  [activeTickets_ release];
+  [self cancelFetch];
   [picasawebService_ release];
-  [updateTimer_ invalidate];
   [account_ release];
   [placeholderIcon_ release];
+  [updateTimer_ release];
+  [indexOp_ release];
   [super dealloc];
 }
 
-- (void)cancelAllTickets {
-  [activeTickets_ makeObjectsPerformSelector:@selector(cancelTicket)];
-  [activeTickets_ removeAllObjects];
+- (void)uninstall {
+  [indexOp_ cancel];
+  [updateTimer_ invalidate];
+  [super uninstall];
+}
+
+- (void)cancelFetch {
+  [indexOp_ cancel];
 }
 
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
@@ -194,30 +198,39 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 #pragma mark Album Fetching
 
 - (void)startAlbumInfoFetch {
-  if ([activeTickets_ count] == 0) {
-    if (!picasawebService_) {
-      HGSKeychainItem* keychainItem 
-        = [HGSKeychainItem keychainItemForService:[account_ identifier]
-                                         username:nil];
-      NSString *username = [keychainItem username];
-      NSString *password = [keychainItem password];
-      if ([username length]) {
-        picasawebService_ = [[GDataServiceGooglePhotos alloc] init];
-        [picasawebService_ setUserAgent:@"google-qsb-1.0"];
-        // If there is no password then we will only fetch public albums.
-        if ([password length]) {
-          [picasawebService_ setUserCredentialsWithUsername:username
-                                                   password:password];
-        }
-        [picasawebService_ setServiceShouldFollowNextLinks:YES];
-        [picasawebService_ setIsServiceRetryEnabled:YES];
-      } else {
-        [updateTimer_ invalidate];
-        updateTimer_ = nil;
-        return;
+  if (!picasawebService_) {
+    HGSKeychainItem* keychainItem 
+      = [HGSKeychainItem keychainItemForService:[account_ identifier]
+                                       username:nil];
+    NSString *username = [keychainItem username];
+    NSString *password = [keychainItem password];
+    if ([username length]) {
+      picasawebService_ = [[GDataServiceGooglePhotos alloc] init];
+      [picasawebService_ setUserAgent:@"google-qsb-1.0"];
+      // If there is no password then we will only fetch public albums.
+      if ([password length]) {
+        [picasawebService_ setUserCredentialsWithUsername:username
+                                                 password:password];
       }
+      [picasawebService_ setServiceShouldFollowNextLinks:YES];
+      [picasawebService_ setIsServiceRetryEnabled:YES];
+    } else {
+      [updateTimer_ invalidate];
+      return;
     }
+  }
+  [indexOp_ cancel];
+  [indexOp_ release];
+  indexOp_ 
+    = [[NSInvocationOperation alloc] hgs_initWithTarget:self 
+                                               selector:@selector(asyncAlbumInfoFetch:operation:) 
+                                                 object:picasawebService_];
+  [[HGSOperationQueue sharedOperationQueue] addOperation:indexOp_];
+  
+}
 
+- (void)asyncAlbumInfoFetch:(GDataServiceGooglePhotos *)service
+                  operation:(NSOperation *)operation {
     // Mark us as in the middle of a fetch so that if credentials change during
     // a fetch we don't destroy the service out from under ourselves.
     NSString *userName = [picasawebService_ username];
@@ -234,24 +247,26 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                           didFinishSelector:@selector(albumInfoFetcher:
                                                       finishedWithAlbum:
                                                       error:)];
-    [activeTickets_ addObject:albumFetchTicket];
+  [albumFetchTicket setUserData:operation];
+  while (![operation isFinished]) {
+    CFRunLoopRun();
   }
 }
 
 - (void)setUpPeriodicRefresh {
   [updateTimer_ invalidate];
+  [updateTimer_ release];
   // We add 5 minutes worth of random jitter.
   NSTimeInterval jitter = arc4random() / (LONG_MAX / (NSTimeInterval)300.0);
   updateTimer_
-    = [NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
-                                       target:self
-                                     selector:@selector(refreshAlbums:)
-                                     userInfo:nil
-                                      repeats:NO];
+    = [[NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
+                                        target:self
+                                      selector:@selector(refreshAlbums:)
+                                      userInfo:nil
+                                       repeats:NO] retain];
 }
 
 - (void)refreshAlbums:(NSTimer*)timer {
-  updateTimer_ = nil;
   [self startAlbumInfoFetch];
   [self setUpPeriodicRefresh];
 }
@@ -260,7 +275,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   HGSAssert([notification object] == account_, 
             @"Notification from unexpected account!");
   // If we're in the middle of a fetch then cancel it first.
-  [self cancelAllTickets];
+  [self cancelFetch];
   
   // Clear the service so that we make a new one with the correct credentials.
   [picasawebService_ release];
@@ -275,7 +290,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 #pragma mark -
 #pragma mark Album information Extraction
 
-- (void)indexAlbum:(GDataEntryPhotoAlbum *)album {
+- (void)indexAlbum:(GDataEntryPhotoAlbum *)album 
+         operation:(NSOperation *)operation {
   NSString* albumTitle = [[album title] stringValue];
   NSURL* albumURL = [[album HTMLLink] URL];
   if (albumURL) {
@@ -348,7 +364,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                                                         finishedWithPhoto:
                                                         error:)];
       [photoInfoTicket setProperty:album forKey:kPhotosAlbumKey];
-      [activeTickets_ addObject:photoInfoTicket];
+      [photoInfoTicket setUserData:operation];
     }
   }
 }
@@ -356,13 +372,12 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (void)albumInfoFetcher:(GDataServiceTicket *)ticket
        finishedWithAlbum:(GDataFeedPhotoUser *)albumFeed
                    error:(NSError *)error {
-  HGSCheckDebug([activeTickets_ containsObject:ticket], nil);
-  [activeTickets_ removeObject:ticket];
   if (!error) {
     [self clearResultIndex];
-    
+    NSOperation *operation = GTM_STATIC_CAST(NSOperation, [ticket userData]);
     for (GDataEntryPhotoAlbum* album in [albumFeed entries]) {
-      [self indexAlbum:album];
+      if ([operation isCancelled]) break;
+      [self indexAlbum:album operation:operation];
     }
   } else {
     // If nothing has changed since we last checked then don't have a cow.
@@ -371,7 +386,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       if (errorCode == kGDataBadAuthentication) {
         // If the login credentials are bad, don't keep trying.
         [updateTimer_ invalidate];
-        updateTimer_ = nil;
       }
       NSString *fetchType = HGSLocalizedString(@"album", 
                                                @"A label denoting a Picasaweb "
@@ -379,6 +393,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       [self reportErrorForFetchType:fetchType error:error];
     }
   }
+  CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
 #pragma mark -
@@ -477,11 +492,11 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (void)photoInfoFetcher:(GDataServiceTicket *)ticket
        finishedWithPhoto:(GDataFeedPhotoAlbum *)photoFeed
                    error:(NSError *)error {
-  HGSCheckDebug([activeTickets_ containsObject:ticket], nil);
-  [activeTickets_ removeObject:ticket];
   if (!error) {
+    NSOperation *operation = GTM_STATIC_CAST(NSOperation, [ticket userData]);
     NSArray *photoList = [photoFeed entries];
     for (GDataEntryPhoto *photo in photoList) {
+      if ([operation isCancelled]) break;
       GDataEntryPhotoAlbum *album = [ticket propertyForKey:kPhotosAlbumKey];
       [self indexPhoto:photo withAlbum:album];
     }
@@ -492,7 +507,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       if (errorCode == kGDataBadAuthentication) {
         // If the login credentials are bad, don't keep trying.
         [updateTimer_ invalidate];
-        updateTimer_ = nil;
         // Tickle the account so that if the user happens to have the preference
         // window open showing either the account or the search source they
         // will immediately see that the account status has changed.
@@ -559,7 +573,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   HGSAssert(account == account_, @"Notification from bad account!");
   
   // Cancel any outstanding fetches.
-  [self cancelAllTickets];
+  [self cancelFetch];
     
   // And get rid of the service.
   [picasawebService_ release];
