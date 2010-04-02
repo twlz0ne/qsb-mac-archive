@@ -236,6 +236,7 @@ static NSString *const kHGSPluginAPIVersionKey
                   name:kHGSExtensionPointDidAddExtensionNotification
                 object:accountsPoint];
   }
+  [super uninstall];
 }
 
 - (NSString *)bundleIdentifier {
