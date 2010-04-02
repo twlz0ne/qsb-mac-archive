@@ -149,7 +149,9 @@
 - (id)defaultObjectForKey:(NSString *)key;
 
 /*!
-  Called when an extension is being uninstalled.
+  Called when an extension is being uninstalled. Good place to handle
+  cancelling operations and invalidating timers. All implementations should
+  be sure to call [super uninstall].
 */
 - (void)uninstall;
 
