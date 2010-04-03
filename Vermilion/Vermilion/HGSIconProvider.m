@@ -535,7 +535,13 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
                                               (CFURLRef)url, 
                                               CGSizeMake(96, 96),
                                               (CFDictionaryRef)dict);
-      if ([op isCancelled]) return nil;
+      if ([op isCancelled]) {
+        if (ref) {
+          CFRelease(ref);
+        }
+        return nil;
+      }
+      
       if (ref) {
         NSBitmapImageRep *bitmapImageRep 
           = [[NSBitmapImageRep alloc] initWithCGImage:ref];

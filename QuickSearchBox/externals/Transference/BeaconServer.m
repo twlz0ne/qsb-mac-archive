@@ -239,8 +239,8 @@ static NSString *const kResultActionKey = @"ResultAction";
 }
 
 - (NSArray *)convertResultsToTransferenceResults:(NSArray *)results {
-  NSMutableArray *returnResults =
-    [[NSMutableArray alloc] initWithCapacity:[results count]];
+  NSMutableArray *returnResults 
+    = [NSMutableArray arrayWithCapacity:[results count]];
   // When we send results to the client we want them to be in simple objects.
   // This avoids us from requiring the Vermillion framework on both ends.  What
   // we are going to do is break out the information the client is interested
@@ -380,8 +380,8 @@ static NSString *const kResultActionKey = @"ResultAction";
     = [NSDictionary dictionaryWithObject:resultArray 
                                   forKey:kHGSActionDirectObjectsKey];
   HGSActionOperation *operation =
-    [[HGSActionOperation alloc] initWithAction:action
-                                     arguments:arguments];
+    [[[HGSActionOperation alloc] initWithAction:action
+                                      arguments:arguments] autorelease];
 
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc addObserver:self

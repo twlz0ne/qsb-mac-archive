@@ -54,17 +54,13 @@
  @private
   NSDate *startupTime_;           // Stores all of the stats we care about.
   NSDictionary *generalStats_;    // Contains the general stats information
-
   NSMutableArray *clients_;       // list of all of the connected clients
   NSMutableDictionary *lastSearchStats_;  // Contains info about the last search
 
   // Contains the ranked results from the last search
   NSArray *lastSearchResultsRanked_;
   NSArray *plugins_;              // List of all plugins loaded by QSB
-
   __weak id delegate_;
-  __weak NSThread *beaconThread_; // (WEAK) reference to the module thread 
-
   BOOL actionWillBePerformed_;    // Flag set when the QSB performs an action
 }
 

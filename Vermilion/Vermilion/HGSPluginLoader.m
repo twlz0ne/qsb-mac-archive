@@ -721,8 +721,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
                          AES_ENCRYPT);
         [[NSData dataWithBytes:encData length:totalLength]
          writeToFile:whitelistPath atomically:YES];
-        free(encData);
       }
+      free(encData);
     }
   }
 }

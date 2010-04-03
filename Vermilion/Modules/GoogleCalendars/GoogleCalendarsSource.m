@@ -69,7 +69,6 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
   NSDateFormatter *shortDateShortTimeFormatter_;
   NSDateFormatter *noDateShortTimeFormatter_;
   NSDateFormatter *shortDateNoTimeFormatter_;
-  NSDateFormatter *dayOfWeekFormatter_;
 }
 
 // Used to schedule refreshes of the calendar cache.

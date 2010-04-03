@@ -53,8 +53,6 @@
 
   __weak id delegate_;  // Object that will implement the delegate methods
 
-  NSArray *QSBPlugins_; // List of QSBPlugin objects
-
   NSString *query_;     // Query term from the last time a search was performed
 
   NSArray *results_;    // Storage for the results returned from the server
