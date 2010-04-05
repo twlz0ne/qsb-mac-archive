@@ -35,6 +35,8 @@
 
 @interface WebBookmarksSource ()
 - (void)pathCheckTimer:(NSTimer *)timer;
+- (void)fileChanged:(GTMFileSystemKQueue *)queue 
+              event:(GTMFileSystemKQueueEvents)event;
 @end
 
 @implementation WebBookmarksSource
@@ -46,6 +48,12 @@
     browserTypeName_ = [browserTypeName copy];
     path_ = [path copy];
     [self pathCheckTimer:nil];
+    if (fileKQueue_) {
+      // Force an indexing at startup.
+      // Startup lag shouldn't be much of an issue, as it will immediately
+      // spawn an operation.
+      [self fileChanged:fileKQueue_ event:kGTMFileSystemKQueueWriteEvent];
+    }
   }
   return self;  
 }
