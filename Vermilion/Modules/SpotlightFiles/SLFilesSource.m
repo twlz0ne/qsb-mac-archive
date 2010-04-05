@@ -125,25 +125,33 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
   
   // Build the query
   NSArray *valueListAttrs = [slSource valueListAttributes];
-  mdTopQuery_ = MDQueryCreate(kCFAllocatorDefault,
-                           (CFStringRef)predicateString,
-                           (CFArrayRef)valueListAttrs,
-                           (CFArrayRef)[NSArray arrayWithObject:(id)kMDItemLastUsedDate]);
-  if (!mdTopQuery_) return;
-  mdCategoryQuery_ = MDQueryCreate(kCFAllocatorDefault,
-                                   (CFStringRef)predicateString,
-                                   (CFArrayRef)valueListAttrs,
-                                   (CFArrayRef)[NSArray arrayWithObject:(id)kMDItemLastUsedDate]);
-  if (!mdCategoryQuery_) return;
-  MDQuerySetMatchesSupportFiles(mdTopQuery_, NO);
-  MDQuerySetMatchesSupportFiles(mdCategoryQuery_, NO);
-  _MDQuerySetGroupComparator(mdCategoryQuery_, 
-                             SLFilesCategoryIndexForItem, 
-                             [slSource groupToCategoryIndexMap]);
-  BOOL goodQuery = MDQueryExecute(mdTopQuery_, kMDQuerySynchronous);
-  if (goodQuery) {
+  @synchronized(self) {
+    // Synchronize here so that if cancel is called on another thread, we don't
+    // try and cancel half-created queries.
+    mdTopQuery_ = MDQueryCreate(kCFAllocatorDefault,
+                                (CFStringRef)predicateString,
+                                (CFArrayRef)valueListAttrs,
+                                (CFArrayRef)[NSArray arrayWithObject:(id)kMDItemLastUsedDate]);
+    if (!mdTopQuery_) return;
+    mdCategoryQuery_ = MDQueryCreate(kCFAllocatorDefault,
+                                     (CFStringRef)predicateString,
+                                     (CFArrayRef)valueListAttrs,
+                                     (CFArrayRef)[NSArray arrayWithObject:(id)kMDItemLastUsedDate]);
+    if (!mdCategoryQuery_) return;
+    MDQuerySetMatchesSupportFiles(mdTopQuery_, NO);
+    MDQuerySetMatchesSupportFiles(mdCategoryQuery_, NO);
+    _MDQuerySetGroupComparator(mdCategoryQuery_, 
+                               SLFilesCategoryIndexForItem, 
+                               [slSource groupToCategoryIndexMap]);
+  }
+  BOOL goodQuery = NO;
+  if (![self isCancelled]) {
+    goodQuery = MDQueryExecute(mdTopQuery_, kMDQuerySynchronous);
+  }
+  if (goodQuery && ![self isCancelled]) {
     goodQuery = MDQueryExecute(mdCategoryQuery_, kMDQuerySynchronous);
   }
+  
   if (!goodQuery && ![self isCancelled]) {
     // COV_NF_START
     CFStringRef queryString = MDQueryCopyQueryString(mdTopQuery_);
@@ -188,8 +196,14 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
 
 - (void)cancel {
   [super cancel];
-  MDQueryStop(mdTopQuery_);
-  MDQueryStop(mdCategoryQuery_);
+  @synchronized(self) {
+    if (mdTopQuery_) {
+      MDQueryStop(mdTopQuery_);
+    }
+    if (mdCategoryQuery_) {
+      MDQueryStop(mdCategoryQuery_);
+    }
+  }
 }
 
 - (id)getAttribute:(CFStringRef)attribute 
