@@ -69,6 +69,7 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
   NSDateFormatter *shortDateShortTimeFormatter_;
   NSDateFormatter *noDateShortTimeFormatter_;
   NSDateFormatter *shortDateNoTimeFormatter_;
+  BOOL finishedIndexing_;
 }
 
 // Used to schedule refreshes of the calendar cache.
@@ -371,7 +372,8 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
                                           finishedWithFeed:
                                           error:)];
   [calendarTicket setUserData:operation];
-  while (![operation isFinished]) {
+  finishedIndexing_ = NO;
+  while (!finishedIndexing_) {
     CFRunLoopRun();
   }
 }
@@ -396,6 +398,7 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
                            withObject:fetchError 
                         waitUntilDone:NO];
   }
+  finishedIndexing_ = YES;
   CFRunLoopStop(CFRunLoopGetCurrent());
 }
 

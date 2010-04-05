@@ -52,6 +52,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   HGSAccount *account_;
   NSTimeInterval previousErrorReportingTime_;
   NSImage *placeholderIcon_;
+  BOOL finishedIndexing_;
 }
 
 - (void)setUpPeriodicRefresh;
@@ -248,7 +249,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                                                       finishedWithAlbum:
                                                       error:)];
   [albumFetchTicket setUserData:operation];
-  while (![operation isFinished]) {
+  finishedIndexing_ = NO;
+  while (!finishedIndexing_) {
     CFRunLoopRun();
   }
 }
@@ -393,6 +395,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       [self reportErrorForFetchType:fetchType error:error];
     }
   }
+  finishedIndexing_ = YES;
   CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
