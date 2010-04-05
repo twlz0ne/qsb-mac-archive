@@ -373,8 +373,14 @@ static const NSTimeInterval kTwoYearInterval = 365.0 * 2.0 * 24.0 * 60.0 * 60.0;
                                           error:)];
   [calendarTicket setUserData:operation];
   finishedIndexing_ = NO;
-  while (!finishedIndexing_) {
+  while (!finishedIndexing_ && ![operation isCancelled]) {
     CFRunLoopRun();
+  }
+  
+  if (!finishedIndexing_) {
+    // If we didn't finish indexing, we must have cancelled, so kill off the
+    // ticket before we disappear.
+    [calendarTicket cancelTicket];
   }
 }
 

@@ -44,6 +44,28 @@ static NSString *const kPhotosAlbumKey = @"kPhotosAlbumKey";
 static const NSTimeInterval kRefreshSeconds = 3600.0;  // 60 minutes.
 static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
+// Keeps track of a indexing operation and all of its tickets.
+// As long as there are tickets, the operation is valid.
+@interface PicasawebIndexContext : NSObject {
+ @private
+  NSOperation *operation_;
+  NSMutableArray *tickets_;
+}
+
+- (id)initWithOperation:(NSOperation *)operation;
+- (void)addTicket:(GDataServiceTicket *)ticket;
+- (void)removeTicket:(GDataServiceTicket *)ticket;
+
+// Cancel outstanding tickets
+- (void)cancelTickets;
+
+// Is the operation done (either finished or cancelled).
+- (BOOL)isFinished;
+
+// Is the operation cancelled.
+- (BOOL)isCancelled;
+@end
+
 @interface PicasawebSource : HGSMemorySearchSource <HGSAccountClientProtocol> {
  @private
   GDataServiceGooglePhotos *picasawebService_;
@@ -52,7 +74,6 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   HGSAccount *account_;
   NSTimeInterval previousErrorReportingTime_;
   NSImage *placeholderIcon_;
-  BOOL finishedIndexing_;
 }
 
 - (void)setUpPeriodicRefresh;
@@ -60,7 +81,8 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 - (void)cancelFetch;
 
-- (void)indexAlbum:(GDataEntryPhotoAlbum *)album operation:(NSOperation *)op;
+- (void)indexAlbum:(GDataEntryPhotoAlbum *)album 
+           context:(PicasawebIndexContext *)context;
 - (void)indexPhoto:(GDataEntryPhoto *)photo
          withAlbum:(GDataEntryPhotoAlbum *)album;
 
@@ -76,7 +98,6 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                              inAttributes:(NSMutableDictionary *)attributes;
 
 @end
-
 
 @interface GDataMediaGroup (VermillionAdditions)
 
@@ -155,7 +176,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   BOOL isValid = [super isValidSourceForQuery:query];
-  // If we're pivoting on an ablum then we can provide
+  // If we're pivoting on an album then we can provide
   // a list of all of that albums images as results.
   if (!isValid) {
     HGSResult *pivotObject = [query pivotObject];
@@ -248,11 +269,15 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                           didFinishSelector:@selector(albumInfoFetcher:
                                                       finishedWithAlbum:
                                                       error:)];
-  [albumFetchTicket setUserData:operation];
-  finishedIndexing_ = NO;
-  while (!finishedIndexing_) {
+  PicasawebIndexContext *context 
+    = [[[PicasawebIndexContext alloc] initWithOperation:operation] autorelease];
+  [context addTicket:albumFetchTicket];
+  [albumFetchTicket setUserData:context];
+  while (![context isFinished]) {
     CFRunLoopRun();
   }
+  // If we finished successfully, the below should be a no-op.
+  [context cancelTickets];
 }
 
 - (void)setUpPeriodicRefresh {
@@ -293,7 +318,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 #pragma mark Album information Extraction
 
 - (void)indexAlbum:(GDataEntryPhotoAlbum *)album 
-         operation:(NSOperation *)operation {
+           context:(PicasawebIndexContext *)context {
+  HGSAssert(context, nil);
   NSString* albumTitle = [[album title] stringValue];
   NSURL* albumURL = [[album HTMLLink] URL];
   if (albumURL) {
@@ -366,7 +392,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                                                         finishedWithPhoto:
                                                         error:)];
       [photoInfoTicket setProperty:album forKey:kPhotosAlbumKey];
-      [photoInfoTicket setUserData:operation];
+      [photoInfoTicket setUserData:context];
+      [context addTicket:photoInfoTicket];
     }
   }
 }
@@ -374,12 +401,14 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 - (void)albumInfoFetcher:(GDataServiceTicket *)ticket
        finishedWithAlbum:(GDataFeedPhotoUser *)albumFeed
                    error:(NSError *)error {
+  PicasawebIndexContext *context
+    = GTM_STATIC_CAST(PicasawebIndexContext, [ticket userData]);
+  HGSAssert(context, nil);
   if (!error) {
     [self clearResultIndex];
-    NSOperation *operation = GTM_STATIC_CAST(NSOperation, [ticket userData]);
     for (GDataEntryPhotoAlbum* album in [albumFeed entries]) {
-      if ([operation isCancelled]) break;
-      [self indexAlbum:album operation:operation];
+      if ([context isCancelled]) break;
+      [self indexAlbum:album context:context];
     }
   } else {
     // If nothing has changed since we last checked then don't have a cow.
@@ -395,7 +424,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       [self reportErrorForFetchType:fetchType error:error];
     }
   }
-  finishedIndexing_ = YES;
+  [context removeTicket:ticket];
   CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
@@ -484,22 +513,22 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                                                             type:kHGSTypeWebImage
                                                           source:self
                                                       attributes:attributes];
-    
     [self indexResult:result
                  name:photoTitle
-           otherTerms:otherStrings];
-    
+           otherTerms:otherStrings];    
   }
 }
 
 - (void)photoInfoFetcher:(GDataServiceTicket *)ticket
        finishedWithPhoto:(GDataFeedPhotoAlbum *)photoFeed
                    error:(NSError *)error {
+  PicasawebIndexContext *context
+    = GTM_STATIC_CAST(PicasawebIndexContext, [ticket userData]);
+  HGSAssert(context, nil);
   if (!error) {
-    NSOperation *operation = GTM_STATIC_CAST(NSOperation, [ticket userData]);
     NSArray *photoList = [photoFeed entries];
     for (GDataEntryPhoto *photo in photoList) {
-      if ([operation isCancelled]) break;
+      if ([context isCancelled]) break;
       GDataEntryPhotoAlbum *album = [ticket propertyForKey:kPhotosAlbumKey];
       [self indexPhoto:photo withAlbum:album];
     }
@@ -520,7 +549,9 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                                                @"photo");
       [self reportErrorForFetchType:fetchType error:error];
     }
-  }    
+  }
+  [context removeTicket:ticket];
+  CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
 - (void)reportErrorForFetchType:(NSString *)fetchType
@@ -609,6 +640,46 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     }
   }
   return bestThumbnail;
+}
+
+@end
+
+#pragma mark -
+
+@implementation PicasawebIndexContext
+
+- (id)initWithOperation:(NSOperation *)operation {
+  if ((self = [super init])) {
+    operation_ = [operation retain];
+    tickets_ = [[NSMutableArray alloc] init];
+  }
+  return self;
+}
+
+- (void)addTicket:(GDataServiceTicket *)ticket {
+  [tickets_ addObject:ticket];
+}
+
+- (void)removeTicket:(GDataServiceTicket *)ticket {
+  [tickets_ removeObject:ticket];
+}
+
+- (void)cancelTickets {
+  [tickets_ makeObjectsPerformSelector:@selector(cancelTicket)];
+}
+
+- (BOOL)isFinished {
+  return ([self isCancelled]) || ([tickets_ count] == 0);
+}
+
+- (BOOL)isCancelled {
+  return [operation_ isCancelled];
+}
+
+- (void)dealloc {
+  [operation_ release];
+  [tickets_ release];
+  [super dealloc];
 }
 
 @end
