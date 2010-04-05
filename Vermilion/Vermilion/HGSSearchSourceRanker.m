@@ -292,9 +292,12 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
 
 - (void)searchOperationDidFinish:(NSNotification *)notification {
   HGSSearchOperation *operation = [notification object];
-  UInt64 runTime = [operation runTime];
-  [self addTimeDataPoint:runTime
-               forSource:[operation source]];
+  if (![operation isCancelled]) {
+    // only add a data point if the op wasn't cancelled.
+    UInt64 runTime = [operation runTime];
+    [self addTimeDataPoint:runTime
+                 forSource:[operation source]];
+  }
 }
 
 @end
