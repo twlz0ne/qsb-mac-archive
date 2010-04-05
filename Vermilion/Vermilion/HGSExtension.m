@@ -162,8 +162,9 @@ NSString *const kHGSExtensionAccountKey = @"HGSExtensionAccount";
   [super dealloc];
 }
 
-// Base class does nothing.
 - (void)uninstall {
+  // Kill off any perform request with target so we can officially shutdown.
+  [NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 - (NSString *)defaultIconName {
