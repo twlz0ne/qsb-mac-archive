@@ -96,11 +96,6 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
   return self;
 }
 
-- (void)dealloc {
-  [attachment_ release];
-  [super dealloc];
-}
-
 #pragma mark Private Methods
 
 - (BOOL)isActionCell {
@@ -264,8 +259,7 @@ GTM_METHOD_CHECK(NSBezierPath, gtm_bezierPathWithRoundRect:cornerRadius:);
 }
 
 - (void)setAttachment:(NSTextAttachment *)anObject {
-  [attachment_ autorelease];
-  attachment_ = [anObject retain];
+  attachment_ = anObject;
 }
 
 - (NSTextAttachment *)attachment {

@@ -43,7 +43,7 @@
 
 @interface QSBPivotTextAttachmentCell : NSCell <NSTextAttachmentCell> {
  @private
-  NSTextAttachment *attachment_;
+  __weak NSTextAttachment *attachment_;
   NSRect titleBounds_;
 }
 
