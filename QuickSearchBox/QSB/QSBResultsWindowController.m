@@ -146,7 +146,8 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   
   QSBSearchController *controller = [actionPresenter_ activeSearchController];
   pivotTrio_
-    = [[QSBResultsViewControllerTrio alloc] initWithSearchController:controller];
+    = [[[QSBResultsViewControllerTrio alloc] 
+        initWithSearchController:controller] autorelease];
   [resultsViewControllerTrios_ addObject:pivotTrio_];
   [self actionPresenterDidPivot:nil];
 }
@@ -275,10 +276,11 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
     NSRect topFrame = [topResultsView frame];
     QSBResultTableView *moreTableView 
       = [moreResultsViewController resultsTableView];
+    CGFloat height = [moreTableView tableHeight];
     moreFrame = NSMakeRect(NSMinX(topFrame), 
-                           NSMaxY(topFrame), 
+                           NSMinY(topFrame) + height, 
                            NSWidth(visibleRect), 
-                           [moreTableView tableHeight]);
+                           height);
     [moreResultsView setFrame:moreFrame];
     
     NSRect resultsFrame = [resultsView_ frame];
@@ -414,7 +416,8 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   QSBActionPresenter *presenter = [notification object];
   QSBSearchController *controller = [presenter activeSearchController];
   pivotTrio_
-    = [[QSBResultsViewControllerTrio alloc] initWithSearchController:controller];
+    = [[[QSBResultsViewControllerTrio alloc] 
+        initWithSearchController:controller] autorelease];
   [resultsViewControllerTrios_ addObject:pivotTrio_];
   [self actionPresenterDidPivot:nil];
 }
