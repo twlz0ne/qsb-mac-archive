@@ -668,6 +668,8 @@
 		8B31346E10581C1A00D57495 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B31346F10581C1C00D57495 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B338A9411188E0C007E3342 /* QSBCategoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B338A9311188E0C007E3342 /* QSBCategoryTest.m */; };
+		8B39EAF9116CE77600D9743F /* NSString+SymlinksAndAliases.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B39EAF6116CE77600D9743F /* NSString+SymlinksAndAliases.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B39EAFA116CE77600D9743F /* NSString+SymlinksAndAliases.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39EAF7116CE77600D9743F /* NSString+SymlinksAndAliases.m */; };
 		8B3D26760EAE8E7A004EA504 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		8B3D26770EAE8E7A004EA504 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		8B3D26790EAE8E7A004EA504 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
@@ -1334,7 +1336,7 @@
 			outputFiles = (
 				"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${INPUT_FILE_BASE}.sdef",
 			);
-			script = "${SRCROOT}/../externals/google-toolbox-for-mac/BuildScripts/SDEFCompiler.sh";
+			script = "\"${SRCROOT}/../externals/google-toolbox-for-mac/BuildScripts/SDEFCompiler.sh\"";
 		};
 		62E496FA106955CB001915DF /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -1345,7 +1347,7 @@
 			outputFiles = (
 				"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${INPUT_FILE_BASE}.sdef",
 			);
-			script = "${SRCROOT}/../externals/google-toolbox-for-mac/BuildScripts/SDEFCompiler.sh";
+			script = "\"${SRCROOT}/../externals/google-toolbox-for-mac/BuildScripts/SDEFCompiler.sh\"";
 		};
 		8B338BFD1118CA80007E3342 /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -1356,7 +1358,7 @@
 			outputFiles = (
 				"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${INPUT_FILE_BASE}.plist",
 			);
-			script = "${SRCROOT}/../externals/google-toolbox-for-mac/BuildScripts/PListCompiler.sh";
+			script = "\"${SRCROOT}/../externals/google-toolbox-for-mac/BuildScripts/PListCompiler.sh\"";
 		};
 		8B559BB41069322B00DB256C /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -1367,7 +1369,7 @@
 			outputFiles = (
 				"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${INPUT_FILE_BASE}.sdef",
 			);
-			script = "${SRCROOT}/../externals/google-toolbox-for-mac/BuildScripts/SDEFCompiler.sh";
+			script = "\"${SRCROOT}/../externals/google-toolbox-for-mac/BuildScripts/SDEFCompiler.sh\"";
 		};
 		8B9C0F9F111BE726008C869F /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -1378,7 +1380,7 @@
 			outputFiles = (
 				"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${INPUT_FILE_BASE}.plist",
 			);
-			script = "${SRCROOT}/../externals/google-toolbox-for-mac/BuildScripts/PListCompiler.sh";
+			script = "\"${SRCROOT}/../externals/google-toolbox-for-mac/BuildScripts/PListCompiler.sh\"";
 		};
 /* End PBXBuildRule section */
 
@@ -2662,6 +2664,9 @@
 		8B338A9311188E0C007E3342 /* QSBCategoryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCategoryTest.m; sourceTree = "<group>"; };
 		8B338AF411189477007E3342 /* QSBCategories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBCategories.h; sourceTree = "<group>"; };
 		8B3424F0114587240033A89B /* Shortcuts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shortcuts.h; sourceTree = "<group>"; };
+		8B39EAF6116CE77600D9743F /* NSString+SymlinksAndAliases.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+SymlinksAndAliases.h"; sourceTree = "<group>"; };
+		8B39EAF7116CE77600D9743F /* NSString+SymlinksAndAliases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+SymlinksAndAliases.m"; sourceTree = "<group>"; };
+		8B39EAF8116CE77600D9743F /* ReadMe.Google.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.Google.txt; sourceTree = "<group>"; };
 		8B3D26690EAE8E73004EA504 /* DeveloperDocumentation-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "DeveloperDocumentation-Info.plist"; sourceTree = "<group>"; };
 		8B3D266A0EAE8E73004EA504 /* DeveloperDocumentationSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeveloperDocumentationSource.m; sourceTree = "<group>"; };
 		8B3D267E0EAE8E7A004EA504 /* DeveloperDocumentation.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeveloperDocumentation.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -4884,6 +4889,16 @@
 			path = TestData;
 			sourceTree = "<group>";
 		};
+		8B39EAF5116CE77600D9743F /* NSString+SymlinksAndAliases */ = {
+			isa = PBXGroup;
+			children = (
+				8B39EAF6116CE77600D9743F /* NSString+SymlinksAndAliases.h */,
+				8B39EAF7116CE77600D9743F /* NSString+SymlinksAndAliases.m */,
+				8B39EAF8116CE77600D9743F /* ReadMe.Google.txt */,
+			);
+			path = "NSString+SymlinksAndAliases";
+			sourceTree = "<group>";
+		};
 		8B3D26680EAE8E73004EA504 /* DeveloperDocumentation */ = {
 			isa = PBXGroup;
 			children = (
@@ -6025,6 +6040,7 @@
 		8BA62B350F13B128008182B5 /* externals */ = {
 			isa = PBXGroup;
 			children = (
+				8B39EAF5116CE77600D9743F /* NSString+SymlinksAndAliases */,
 				8BF620CE110A60F5000AB941 /* Transference */,
 				8B627CC910D81B9700F166D1 /* Sparkle */,
 				8BDB89BF1152C5E100C411B1 /* Keystone */,
@@ -6563,6 +6579,7 @@
 				8BC5AEBF1141C02C000DB67C /* GTMNSAnimation+Duration.h in Headers */,
 				8BC88EAD1159706E00A6E783 /* GTMScriptRunner.h in Headers */,
 				8BA0DBAB11667FAC00839F5C /* GTMLightweightProxy.h in Headers */,
+				8B39EAF9116CE77600D9743F /* NSString+SymlinksAndAliases.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9753,6 +9770,7 @@
 				8BC5AEBE1141C029000DB67C /* GTMNSAnimation+Duration.m in Sources */,
 				8BC88EAC1159706A00A6E783 /* GTMScriptRunner.m in Sources */,
 				8BA0DBAA11667FAC00839F5C /* GTMLightweightProxy.m in Sources */,
+				8B39EAFA116CE77600D9743F /* NSString+SymlinksAndAliases.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12574,7 +12592,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624C00F12C79E008182B5 /* QSBDebug.xcconfig */;
 			buildSettings = {
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
 				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -13335,7 +13352,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624C00F12C79E008182B5 /* QSBDebug.xcconfig */;
 			buildSettings = {
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"$(GTM_GENERAL_GCC_PREPROCESSOR_DEFINITIONS)",
@@ -13350,7 +13366,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624C10F12C79E008182B5 /* QSBRelease.xcconfig */;
 			buildSettings = {
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"$(GTM_GENERAL_GCC_PREPROCESSOR_DEFINITIONS)",

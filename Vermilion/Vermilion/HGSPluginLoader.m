@@ -40,6 +40,8 @@
 #import <openssl/evp.h>
 #import <openssl/x509.h>
 #import <openssl/x509v3.h>
+#import <GTM/NSString+SymlinksAndAliases.h>
+#import <GTM/GTMMethodCheck.h>
 
 @interface HGSPluginLoader()
 // Returns an array containing the full paths for all bundles
@@ -105,6 +107,7 @@ NSString *const kHGSPluginLoaderWillInstallPluginNotification
 @implementation HGSPluginLoader
 
 GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
+GTM_METHOD_CHECK(NSString, stringByResolvingSymlinksAndAliases);
 
 @synthesize delegate = delegate_;
 @synthesize plugins = plugins_;
@@ -343,6 +346,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSPluginLoader, sharedPluginLoader);
       NSString *pluginName = [fullPath lastPathComponent];
       HGSPlugin *plugin = nil;
       if (pluginClass) {
+        fullPath = [fullPath stringByResolvingSymlinksAndAliases];
         NSBundle *pluginBundle = [NSBundle bundleWithPath:fullPath];
         // Get the name.
         NSString *betterPluginName 
