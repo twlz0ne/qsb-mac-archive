@@ -47,23 +47,23 @@ dmg_path="${BUILT_PRODUCTS_DIR}/${dmg_name}"
 release_notes_name=$(basename "${QSB_RELEASE_NOTE_PATH}")
 
 # Make sure everything we need exists
-test -r $omaha_cfg_template || exit 2
-test -r $dmg_path || exit 3
+test -r "${omaha_cfg_template}" || exit 2
+test -r "${dmg_path}" || exit 3
 
 d=$(date +%Y-%m-%d)
-h=$("${SRCROOT}/../externals/Keystone/kshash.sh" $dmg_path | awk '{print $2}')
-s=$(stat -f%z $dmg_path)
+h=$("${SRCROOT}/../externals/Keystone/kshash.sh" "${dmg_path}" | awk '{print $2}')
+s=$(stat -f%z "${dmg_path}")
 
 v="${GOOGLE_VERSIONINFO_LONG}"
 cn="${QSB_CODE_NAME}"
 bundle_id="${QSB_BUNDLE_ID}"
 
-cat ${omaha_cfg_template} > $omaha_cfg
-perl -p -i -e "s,<DMG_NAME>,$dmg_name,g" $omaha_cfg
-perl -p -i -e "s,<RELEASE_NOTES_NAME>,$release_notes_name,g" $omaha_cfg
-perl -p -i -e "s,<VERSION>,$v,g" $omaha_cfg
-perl -p -i -e "s,<DATE>,$d,g" $omaha_cfg
-perl -p -i -e "s,<HASH>,$h,g" $omaha_cfg
-perl -p -i -e "s,<SIZE>,$s,g" $omaha_cfg
-perl -p -i -e "s,<CODE_NAME>,$cn,g" $omaha_cfg
-perl -p -i -e "s,<BUNDLE_ID>,$bundle_id,g" $omaha_cfg
+cat "${omaha_cfg_template}" > "${omaha_cfg}"
+perl -p -i -e "s,<DMG_NAME>,$dmg_name,g" "${omaha_cfg}"
+perl -p -i -e "s,<RELEASE_NOTES_NAME>,$release_notes_name,g" "${omaha_cfg}"
+perl -p -i -e "s,<VERSION>,$v,g" "${omaha_cfg}"
+perl -p -i -e "s,<DATE>,$d,g" "${omaha_cfg}"
+perl -p -i -e "s,<HASH>,$h,g" "${omaha_cfg}"
+perl -p -i -e "s,<SIZE>,$s,g" "${omaha_cfg}"
+perl -p -i -e "s,<CODE_NAME>,$cn,g" "${omaha_cfg}"
+perl -p -i -e "s,<BUNDLE_ID>,$bundle_id,g" "${omaha_cfg}"
