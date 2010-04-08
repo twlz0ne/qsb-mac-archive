@@ -4,8 +4,11 @@
 /* A label denoting the name of the Safari Bookmarks Source. It is a source that allows the user to search the web bookmarks of the Safari Application. Do not include ^ in localization. */
 "^Safari Bookmarks" = "Safari-Lesezeichen";
 
-/* A label denoting the name of the Chrome Bookmarks Source. It is a source that allows the user to search the web bookmarks of the Chrome Application. Do not include ^ in localization. */
-"^Chrome Bookmarks" = "Chrome Bookmarks";
+/* A label denoting the name of the Chromium Bookmarks Source. It is a source that allows the user to search the web bookmarks of the Chromium Application. Do not include ^ in localization. */
+"^Chromium Bookmarks" = "Chromium-Lesezeichen";
+
+/* A label denoting the name of the Google Chrome Bookmarks Source. It is a source that allows the user to search the web bookmarks of the Google Chrome Application. Do not include ^ in localization. */
+"^Google Chrome Bookmarks" = "Google Chrome-Lesezeichen";
 
 /* A label denoting the name of the Firefox Bookmarks Source. It is a source that allows the user to search the web bookmarks of the Firefox Application. Do not include ^ in localization. */
-"^Firefox Bookmarks" = "Firefox Bookmarks";
+"^Firefox Bookmarks" = "Firefox-Lesezeichen";

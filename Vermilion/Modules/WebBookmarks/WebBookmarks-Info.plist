@@ -48,6 +48,38 @@
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
+			<string>ChromeBookmarksSource</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.webbookmarks.chromium.source</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSSourcesExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Chromium Bookmarks</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>webpage</string>
+			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
+			<string>com.apple.safari.bookmark</string>
+			<key>ChromeBookmarksSourceSubdirectory</key>
+			<string>Chromium</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
+			<string>ChromeBookmarksSource</string>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.qsb.webbookmarks.chrome.source</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSSourcesExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Google Chrome Bookmarks</string>
+			<key>HGSSearchSourceSupportedTypes</key>
+			<string>webpage</string>
+			<key>HGSSearchSourceUTIsToExcludeFromDiskSources</key>
+			<string>com.apple.safari.bookmark</string>
+			<key>ChromeBookmarksSourceSubdirectory</key>
+			<string>Google/Chrome</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
 			<string>HGSSafariBookmarksSource</string>
 			<key>HGSExtensionIdentifier</key>
 			<string>com.google.qsb.webbookmarks.safari.source</string>

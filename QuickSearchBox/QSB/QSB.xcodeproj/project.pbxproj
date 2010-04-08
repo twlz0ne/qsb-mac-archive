@@ -670,6 +670,7 @@
 		8B338A9411188E0C007E3342 /* QSBCategoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B338A9311188E0C007E3342 /* QSBCategoryTest.m */; };
 		8B39EAF9116CE77600D9743F /* NSString+SymlinksAndAliases.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B39EAF6116CE77600D9743F /* NSString+SymlinksAndAliases.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B39EAFA116CE77600D9743F /* NSString+SymlinksAndAliases.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39EAF7116CE77600D9743F /* NSString+SymlinksAndAliases.m */; };
+		8B39EF33116D31C200D9743F /* ChromeBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39EF32116D31C200D9743F /* ChromeBookmarksSource.m */; };
 		8B3D26760EAE8E7A004EA504 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		8B3D26770EAE8E7A004EA504 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		8B3D26790EAE8E7A004EA504 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
@@ -2667,6 +2668,7 @@
 		8B39EAF6116CE77600D9743F /* NSString+SymlinksAndAliases.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+SymlinksAndAliases.h"; sourceTree = "<group>"; };
 		8B39EAF7116CE77600D9743F /* NSString+SymlinksAndAliases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+SymlinksAndAliases.m"; sourceTree = "<group>"; };
 		8B39EAF8116CE77600D9743F /* ReadMe.Google.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.Google.txt; sourceTree = "<group>"; };
+		8B39EF32116D31C200D9743F /* ChromeBookmarksSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChromeBookmarksSource.m; sourceTree = "<group>"; };
 		8B3D26690EAE8E73004EA504 /* DeveloperDocumentation-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "DeveloperDocumentation-Info.plist"; sourceTree = "<group>"; };
 		8B3D266A0EAE8E73004EA504 /* DeveloperDocumentationSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeveloperDocumentationSource.m; sourceTree = "<group>"; };
 		8B3D267E0EAE8E7A004EA504 /* DeveloperDocumentation.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeveloperDocumentation.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -5289,6 +5291,7 @@
 		8B64A6B00FF419630000D893 /* WebBookmarks */ = {
 			isa = PBXGroup;
 			children = (
+				8B39EF32116D31C200D9743F /* ChromeBookmarksSource.m */,
 				8B6EB5E2101A0B0E006CFF7A /* Resources */,
 				8B852EEB1007D93300880329 /* TestData */,
 				8B852A371006AC7900880329 /* FirefoxBookmarksSource.m */,
@@ -8489,7 +8492,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build OCMock the way we want into our build folder\ncd \"${SRCROOT}/../externals/OCMock/Source\"\n/usr/bin/xcodebuild -project OCMock.xcodeproj -target OCMock -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"OCMock\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/OCMock.build/${CONFIGURATION}/OCMock.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/PostBuild.sh\"\n";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build OCMock the way we want into our build folder\ncd \"${SRCROOT}/../externals/OCMock/Source\"\n/usr/bin/xcodebuild -project OCMock.xcodeproj -target OCMock -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"OCMock\"\nOBJECT_FILE_DIR_normal=\"${CONFIGURATION_TEMP_DIR}/OCMock.build/Objects-normal\"\nif [ -d ${OBJECT_FILE_DIR_normal} ]; then\n  \"${SRCROOT}/BuildScripts/PostBuild.sh\"\nelse\n  ERROR_TITLE=\"OCMockBuildScript:0:\"\n  echo $ERROR_TITLE error: Missing $OBJECT_FILE_DIR_normal\n  exit 1\nfi\n";
 		};
 		8B2E2A3F0F99018600F80E11 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8578,7 +8581,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build JSON the way we want into our build folder\ncd \"${SRCROOT}/../externals/json-framework\"\n/usr/bin/xcodebuild -project JSON.xcodeproj -target JSON -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" SDKROOT=\"${SDKROOT}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"JSON\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/JSON.build/${CONFIGURATION}/JSON.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/PostBuild.sh\"";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build JSON the way we want into our build folder\ncd \"${SRCROOT}/../externals/json-framework\"\n/usr/bin/xcodebuild -project JSON.xcodeproj -target JSON -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" SDKROOT=\"${SDKROOT}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"JSON\"\nOBJECT_FILE_DIR_normal=\"${CONFIGURATION_TEMP_DIR}/JSON.build/Objects-normal\"\nif [ -d ${OBJECT_FILE_DIR_normal} ]; then\n  \"${SRCROOT}/BuildScripts/PostBuild.sh\"\nelse\n  ERROR_TITLE=\"JSONBuildScript:0:\"\n  echo $ERROR_TITLE error: Missing $OBJECT_FILE_DIR_normal\n  exit 1\nfi";
 		};
 		8B637BA20F27783A00997738 /* Breakpad */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8660,7 +8663,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${OBJROOT}/GData.build/${CONFIGURATION}/GDataFramework.build/Objects-normal\"\n\"${SRCROOT}/BuildScripts/PostBuild.sh\"";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${CONFIGURATION_TEMP_DIR}/GDataFramework.build/Objects-normal\"\nif [ -d ${OBJECT_FILE_DIR_normal} ]; then\n  \"${SRCROOT}/BuildScripts/PostBuild.sh\"\nelse\n  ERROR_TITLE=\"GDataBuildScript:0:\"\n  echo $ERROR_TITLE error: Missing $OBJECT_FILE_DIR_normal\n  exit 1\nfi";
 		};
 		8B847B9211499653002C460B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -9248,6 +9251,7 @@
 				8B85296E1006931E00880329 /* WebBookmarksSource.m in Sources */,
 				8B852A381006AC7900880329 /* FirefoxBookmarksSource.m in Sources */,
 				8BF627C4110A673E000AB941 /* HGSBundle.m in Sources */,
+				8B39EF33116D31C200D9743F /* ChromeBookmarksSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
