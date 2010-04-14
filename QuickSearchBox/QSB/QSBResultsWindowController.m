@@ -65,7 +65,7 @@
 @end
 
 @interface QSBResultsWindowController ()
-- (void)animatedScrollToPoint:(NSPoint)point 
+- (void)animatedScrollToPoint:(NSPoint)point
                      userInfo:(id<NSObject>)userInfo;
 - (QSBResultsViewBaseController *)activeResultsViewController;
 - (void)setActiveResultsViewController:(QSBResultsViewBaseController *)controller;
@@ -79,7 +79,7 @@
 - (void)actionPresenterDidUnpivot:(NSNotification *)notification;
 - (void)updateWindowHeightBasedOnTable:(QSBResultTableView *)tableView;
 @end
-  
+
 @implementation QSBResultsWindowController
 
 GTM_METHOD_CHECK(NSAnimationContext, gtm_setDuration:eventMask:);
@@ -109,7 +109,7 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 #pragma mark Overrides
 
 - (void)windowDidLoad {
-  HGSAssert(searchWindowController_ != nil, 
+  HGSAssert(searchWindowController_ != nil,
             @"Did you forget to hook up searchWindowController_ in the nib?");
   QSBCustomPanel *window = (QSBCustomPanel*)[self window];
   [window setCanBecomeKeyWindow:NO];
@@ -118,35 +118,35 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   [window setLevel:kCGStatusWindowLevel + 1];
   [window orderFront:self];
   [window setIgnoresMouseEvents:YES];
-  
+
   [resultsView_ setAutoresizesSubviews:NO];
   [resultsView_ setFrame:NSZeroRect];
-  
+
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self 
+  [nc addObserver:self
          selector:@selector(actionPresenterDidReset:)
-             name:kQSBActionPresenterDidResetNotification 
+             name:kQSBActionPresenterDidResetNotification
            object:actionPresenter_];
-  [nc addObserver:self 
+  [nc addObserver:self
          selector:@selector(actionPresenterWillPivot:)
-             name:kQSBActionPresenterWillPivotNotification 
+             name:kQSBActionPresenterWillPivotNotification
            object:actionPresenter_];
-  [nc addObserver:self 
+  [nc addObserver:self
          selector:@selector(actionPresenterDidPivot:)
-             name:kQSBActionPresenterDidPivotNotification 
+             name:kQSBActionPresenterDidPivotNotification
            object:actionPresenter_];
-  [nc addObserver:self 
+  [nc addObserver:self
          selector:@selector(actionPresenterWillUnpivot:)
-             name:kQSBActionPresenterWillUnpivotNotification 
+             name:kQSBActionPresenterWillUnpivotNotification
            object:actionPresenter_];
-  [nc addObserver:self 
+  [nc addObserver:self
          selector:@selector(actionPresenterDidUnpivot:)
-             name:kQSBActionPresenterDidUnpivotNotification 
+             name:kQSBActionPresenterDidUnpivotNotification
            object:actionPresenter_];
-  
+
   QSBSearchController *controller = [actionPresenter_ activeSearchController];
   pivotTrio_
-    = [[[QSBResultsViewControllerTrio alloc] 
+    = [[[QSBResultsViewControllerTrio alloc]
         initWithSearchController:controller] autorelease];
   [resultsViewControllerTrios_ addObject:pivotTrio_];
   [self actionPresenterDidPivot:nil];
@@ -164,16 +164,16 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 
 #pragma mark Private Methods
 
-- (void)animatedScrollToPoint:(NSPoint)point 
+- (void)animatedScrollToPoint:(NSPoint)point
                      userInfo:(id<NSObject>)userInfo {
   [pivotAnimation_ stopAnimation];
   [pivotAnimation_ release];
-  pivotAnimation_ = [[QSBAnimatedScroll alloc] initWithView:resultsView_ 
+  pivotAnimation_ = [[QSBAnimatedScroll alloc] initWithView:resultsView_
                                                    endPoint:point];
   [pivotAnimation_ setDelegate:self];
   [pivotAnimation_ setUserInfo:userInfo];
   [pivotAnimation_ gtm_setDuration:[pivotAnimation_ duration]
-                         eventMask:kGTMLeftMouseDownAndKeyDownMask];
+                         eventMask:kGTMLeftMouseUpAndKeyDownMask];
   [pivotAnimation_ startAnimation];
 }
 
@@ -188,38 +188,38 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 - (void)setActiveResultsViewController:(QSBResultsViewBaseController *)controller {
   // Remove any old observers.
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc removeObserver:self 
+  [nc removeObserver:self
                 name:NSTableViewSelectionDidChangeNotification
               object:nil];
-  [nc removeObserver:self 
+  [nc removeObserver:self
                 name:kQSBResultTableViewDidReloadData
               object:nil];
   NSResponder *nextResponder = [self nextResponder];
   if ([nextResponder isKindOfClass:[QSBResultsViewBaseController class]]) {
-    QSBResultsViewBaseController *oldActiveResultsViewController 
+    QSBResultsViewBaseController *oldActiveResultsViewController
       = (QSBResultsViewBaseController *)nextResponder;
     nextResponder = [oldActiveResultsViewController nextResponder];
     [oldActiveResultsViewController setNextResponder:nil];
   }
-  
+
   if (controller) {
     [controller setNextResponder:nextResponder];
     [self setNextResponder:controller];
     QSBResultTableView *tableView = [controller resultsTableView];
     [[self window] makeFirstResponder:tableView];
     [nc addObserver:self
-           selector:@selector(tableViewSelectionDidChange:) 
-               name:NSTableViewSelectionDidChangeNotification 
+           selector:@selector(tableViewSelectionDidChange:)
+               name:NSTableViewSelectionDidChangeNotification
              object:tableView];
     [nc addObserver:self
-           selector:@selector(tableViewDidReloadData:) 
-               name:kQSBResultTableViewDidReloadData 
+           selector:@selector(tableViewDidReloadData:)
+               name:kQSBResultTableViewDidReloadData
              object:tableView];
     [[self currentResultsViewControllerTrio] setActiveResultsViewController:controller];
-    NSNotification *notification 
+    NSNotification *notification
       = [NSNotification notificationWithName:NSTableViewSelectionDidChangeNotification
                                       object:tableView];
-    [self tableViewSelectionDidChange:notification]; 
+    [self tableViewSelectionDidChange:notification];
     // If there are any views overlapping our controller view, move them out
     // of the way so that the controller view is unobscured.
     NSView *view = [controller view];
@@ -252,18 +252,18 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 
 - (void)updateWindowHeightBasedOnTable:(QSBResultTableView *)tableView {
   [resetWindowSizeTimer_ invalidate];
-  resetWindowSizeTimer_ 
-    = [NSTimer scheduledTimerWithTimeInterval:0.3 
-                                       target:self 
-                                     selector:@selector(updateTableHeight:) 
-                                     userInfo:tableView 
+  resetWindowSizeTimer_
+    = [NSTimer scheduledTimerWithTimeInterval:0.3
+                                       target:self
+                                     selector:@selector(updateTableHeight:)
+                                     userInfo:tableView
                                       repeats:NO];
 }
 
 #pragma mark Responder Chain Actions
 
 - (void)qsb_showMoreResults:(id)sender {
-  QSBMoreResultsViewController *moreResultsViewController 
+  QSBMoreResultsViewController *moreResultsViewController
     = [self currentMoreResultsViewController];
   NSView *moreResultsView = [moreResultsViewController view];
   NSScrollView *scrollView = [resultsView_ enclosingScrollView];
@@ -274,15 +274,15 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
       = [self currentTopResultsViewController];
     NSView *topResultsView = [topResultsViewController view];
     NSRect topFrame = [topResultsView frame];
-    QSBResultTableView *moreTableView 
+    QSBResultTableView *moreTableView
       = [moreResultsViewController resultsTableView];
     CGFloat height = [moreTableView tableHeight];
-    moreFrame = NSMakeRect(NSMinX(topFrame), 
-                           NSMinY(topFrame) + height, 
-                           NSWidth(visibleRect), 
+    moreFrame = NSMakeRect(NSMinX(topFrame),
+                           NSMinY(topFrame) + height,
+                           NSWidth(visibleRect),
                            height);
     [moreResultsView setFrame:moreFrame];
-    
+
     NSRect resultsFrame = [resultsView_ frame];
     BOOL updateFrame = NO;
     if (NSMaxX(resultsFrame) < NSMaxX(moreFrame)) {
@@ -296,7 +296,7 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
     if (updateFrame) {
       [resultsView_ setFrame:resultsFrame];
     }
-    
+
     [self setActiveResultsViewController:moreResultsViewController];
     [self animatedScrollToPoint:moreFrame.origin userInfo:nil];
   }
@@ -310,16 +310,16 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   NSRect visibleRect = [scrollView documentVisibleRect];
   NSRect topFrame = [topResultsView frame];
   if (!(NSEqualPoints(topFrame.origin, visibleRect.origin))) {
-    QSBMoreResultsViewController *moreResultsViewController 
+    QSBMoreResultsViewController *moreResultsViewController
       = [self currentMoreResultsViewController];
     NSView *moreResultsView = [moreResultsViewController view];
     NSRect moreFrame = [moreResultsView frame];
-    QSBResultTableView *topTableView 
+    QSBResultTableView *topTableView
       = [topResultsViewController resultsTableView];
     CGFloat height = [topTableView tableHeight];
-    topFrame = NSMakeRect(NSMinX(moreFrame), 
-                          NSMinY(moreFrame) - height, 
-                          NSWidth(visibleRect), 
+    topFrame = NSMakeRect(NSMinX(moreFrame),
+                          NSMinY(moreFrame) - height,
+                          NSWidth(visibleRect),
                           height);
     [topResultsView setFrame:topFrame];
     [self setActiveResultsViewController:topResultsViewController];
@@ -330,12 +330,12 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 - (IBAction)hideResultsWindow:(id)sender {
   NSWindow *window = [self window];
   if ([window ignoresMouseEvents]) return;
-  
+
   [window setIgnoresMouseEvents:YES];
 
   [NSAnimationContext beginGrouping];
   [[NSAnimationContext currentContext] gtm_setDuration:kQSBHideDuration
-                                             eventMask:kGTMLeftMouseDownAndKeyDownMask];
+                                             eventMask:kGTMLeftMouseUpAndKeyDownMask];
   [[window animator] setAlphaValue:0.0];
   [NSAnimationContext endGrouping];
 }
@@ -351,11 +351,11 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   NSRect frame = [window frame];
   [NSAnimationContext beginGrouping];
   [[NSAnimationContext currentContext] gtm_setDuration:kQSBShowDuration
-                                             eventMask:kGTMLeftMouseDownAndKeyDownMask];
+                                             eventMask:kGTMLeftMouseUpAndKeyDownMask];
   [[window animator] setAlphaValue:1.0];
-  NSRect newFrame 
+  NSRect newFrame
     = [searchWindowController_ setResultsWindowFrameWithHeight:NSHeight(frame)];
-  QSBResultsViewBaseController *activeResultsViewController 
+  QSBResultsViewBaseController *activeResultsViewController
     = [self activeResultsViewController];
   NSView *resultsView = [activeResultsViewController view];
   frame = [resultsView frame];
@@ -383,29 +383,29 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   }
   NSCell *cell = [tableView preparedCellAtColumn:0 row:row];
   QSBTableResult *tableResult = GTM_STATIC_CAST(QSBTableResult,
-                                                [cell representedObject]);    
+                                                [cell representedObject]);
   NSArray *cellValues = nil;
   if ([tableResult respondsToSelector:@selector(representedResult)]) {
-    HGSScoredResult *result 
+    HGSScoredResult *result
       = [(QSBSourceTableResult *)tableResult representedResult];
     cellValues = [result valueForKey:kQSBObjectAttributePathCellsKey];
   }
   [statusBar_ setObjectValue:cellValues];
-  
+
   NSDictionary *userInfo = nil;
   if (tableResult) {
-    userInfo = [NSDictionary dictionaryWithObject:tableResult 
+    userInfo = [NSDictionary dictionaryWithObject:tableResult
                                            forKey:kQSBSelectedTableResultKey];
   }
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kQSBSelectedTableResultDidChangeNotification
-                    object:self 
-                  userInfo:userInfo];  
+                    object:self
+                  userInfo:userInfo];
 }
 
 - (void)tableViewDidReloadData:(NSNotification *)notification {
   [self tableViewSelectionDidChange:notification];
-  QSBResultsViewTableView *tableView = GTM_STATIC_CAST(QSBResultsViewTableView, 
+  QSBResultsViewTableView *tableView = GTM_STATIC_CAST(QSBResultsViewTableView,
                                                        [notification object]);
   [self updateWindowHeightBasedOnTable:tableView];
 }
@@ -416,7 +416,7 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   QSBActionPresenter *presenter = [notification object];
   QSBSearchController *controller = [presenter activeSearchController];
   pivotTrio_
-    = [[[QSBResultsViewControllerTrio alloc] 
+    = [[[QSBResultsViewControllerTrio alloc]
         initWithSearchController:controller] autorelease];
   [resultsViewControllerTrios_ addObject:pivotTrio_];
   [self actionPresenterDidPivot:nil];
@@ -426,17 +426,17 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   HGSAssert(!pivotTrio_, nil);
   pivotTrio_ = [self currentResultsViewControllerTrio];
   NSDictionary *userInfo = [notification userInfo];
-  QSBSearchController *controller 
+  QSBSearchController *controller
     = [userInfo objectForKey:kQSBNewSearchControllerKey];
-  QSBResultsViewControllerTrio *newTrio 
-    = [[[QSBResultsViewControllerTrio alloc] 
+  QSBResultsViewControllerTrio *newTrio
+    = [[[QSBResultsViewControllerTrio alloc]
         initWithSearchController:controller] autorelease];
   [resultsViewControllerTrios_ addObject:newTrio];
 }
 
 - (void)actionPresenterDidPivot:(NSNotification *)notification {
   // Add topview
-  QSBTopResultsViewController *topController 
+  QSBTopResultsViewController *topController
     = [self currentTopResultsViewController];
   NSView *topView = [topController view];
   [resultsView_ addSubview:topView positioned:NSWindowAbove relativeTo:nil];
@@ -445,7 +445,7 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   NSPoint origin = NSZeroPoint;
   NSScrollView *scrollView = [resultsView_ enclosingScrollView];
   NSRect visibleRect = [scrollView documentVisibleRect];
-  QSBResultsViewBaseController *activeController 
+  QSBResultsViewBaseController *activeController
     = [pivotTrio_ activeResultsViewController];
   NSView *tableScrollView = [activeController view];
   QSBResultTableView *tableView = [activeController resultsTableView];
@@ -454,10 +454,10 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
     origin = scrollRect.origin;
     origin.x += NSWidth(visibleRect);
   }
-  NSRect topFrame = NSMakeRect(origin.x, origin.y, 
+  NSRect topFrame = NSMakeRect(origin.x, origin.y,
                                visibleRect.size.width, [tableView tableHeight]);
   [topView setFrame:topFrame];
-  
+
   NSRect resultsFrame = [resultsView_ frame];
   BOOL updateFrame = NO;
   if (NSMaxX(resultsFrame) < NSMaxX(topFrame)) {
@@ -471,9 +471,9 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   if (updateFrame) {
     [resultsView_ setFrame:resultsFrame];
   }
-  
+
   // Add moreview
-  QSBMoreResultsViewController *moreController 
+  QSBMoreResultsViewController *moreController
     = [self currentMoreResultsViewController];
   NSView *moreView = [moreController view];
   [resultsView_ addSubview:moreView positioned:NSWindowBelow relativeTo:nil];
@@ -490,12 +490,12 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 
 - (void)actionPresenterDidUnpivot:(NSNotification *)notification {
   HGSAssert(pivotTrio_, nil);
-  QSBResultsViewBaseController *newViewController 
+  QSBResultsViewBaseController *newViewController
     = [self activeResultsViewController];
   NSView *newView = [newViewController view];
   NSScrollView *scrollView = [resultsView_ enclosingScrollView];
   NSRect visibleRect = [scrollView documentVisibleRect];
-  
+
   // Align our new view with the current view
   NSPoint origin = NSZeroPoint;
   NSView *tableScrollView = [[pivotTrio_ activeResultsViewController] view];
@@ -503,21 +503,21 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   origin = scrollRect.origin;
   origin.x -= NSWidth(visibleRect);
   QSBResultTableView *newTableView = [newViewController resultsTableView];
-  NSRect newFrame = NSMakeRect(origin.x, 
-                               origin.y, 
+  NSRect newFrame = NSMakeRect(origin.x,
+                               origin.y,
                                visibleRect.size.width,
                                [newTableView tableHeight]);
   [newView setFrame:newFrame];
-  
+
   [self setActiveResultsViewController:newViewController];
-  
-  // Reset the selection so that the tableview sends out a 
+
+  // Reset the selection so that the tableview sends out a
   // NSTableViewSelectionDidChangeNotification notification.
   NSInteger selectedRow = [newTableView selectedRow];
   [newTableView deselectRow:selectedRow];
   [newTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedRow]
             byExtendingSelection:NO];
-  [self animatedScrollToPoint:newFrame.origin 
+  [self animatedScrollToPoint:newFrame.origin
                      userInfo:pivotTrio_];
   [pivotTrio_ release];
   pivotTrio_ = nil;
@@ -527,9 +527,9 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 
 - (void)updateTableHeight:(NSTimer *)timer {
   HGSCheckDebug(timer == resetWindowSizeTimer_, nil);
-  QSBResultTableView *tableView = GTM_STATIC_CAST(QSBResultTableView, 
+  QSBResultTableView *tableView = GTM_STATIC_CAST(QSBResultTableView,
                                                   [timer userInfo]);
-  
+
   // Extra Window Height
   NSWindow *window = [self window];
   NSRect windowFrame = [window frame];
@@ -539,26 +539,26 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   CGFloat statusMaxY = NSMaxY(statusFrame);
   CGFloat windowHeight = NSHeight(windowFrame);
   CGFloat extraWindowHeight = windowHeight - resultsScrollMaxY + statusMaxY;
-  
+
   // Get our new height
   CGFloat height = [tableView tableHeight];
-  
+
   // Set our scroll frame (upper left)
   NSScrollView *scrollView = [tableView enclosingScrollView];
   NSRect scrollFrame = [scrollView frame];
   scrollFrame.size.height = height;
-  
+
   // Set our results view frame (upper left)
   NSRect resultsFrame = [resultsView_ frame];
   if (NSHeight(resultsFrame) < height) {
     resultsFrame.size.height = height;
     [resultsView_ setFrame:resultsFrame];
   }
-  
+
   // Window frame (lower left)
-  NSRect contentRect = NSMakeRect(0, 
-                                  0, 
-                                  NSWidth(scrollFrame), 
+  NSRect contentRect = NSMakeRect(0,
+                                  0,
+                                  NSWidth(scrollFrame),
                                   height + extraWindowHeight);
   CGFloat top = NSMaxY(windowFrame);
   windowFrame.size = contentRect.size;
@@ -582,9 +582,9 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 
 - (id)initWithSearchController:(QSBSearchController *)controller {
   if ((self = [super init])) {
-    topResultsViewController_ 
+    topResultsViewController_
       = [[QSBTopResultsViewController alloc] initWithSearchController:controller];
-    moreResultsViewController_ 
+    moreResultsViewController_
       = [[QSBMoreResultsViewController alloc] initWithSearchController:controller];
     activeResultsViewController_ = topResultsViewController_;
   }
