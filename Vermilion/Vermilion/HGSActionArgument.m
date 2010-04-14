@@ -219,7 +219,7 @@ static NSString* const kHGSActionArgumentSourceIdentifier
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   BOOL isValid = NO;
   HGSActionArgument *argument = [query actionArgument];
-  if ([argument respondsToSelector:@selector(resultsForQuery:)]) {
+  if ([argument respondsToSelector:@selector(resultsForQuery:source:)]) {
     HGSResultArray *pivotObjects = [query pivotObjects];
     if ([pivotObjects count] == 1) {
       HGSResult *result = [pivotObjects objectAtIndex:0];
@@ -234,7 +234,7 @@ static NSString* const kHGSActionArgumentSourceIdentifier
 - (void)performSearchOperation:(HGSCallbackSearchOperation *)operation {
   HGSQuery *query = [operation query];
   HGSActionArgument *argument = [query actionArgument];
-  NSArray *results = [argument resultsForQuery:query];
+  NSArray *results = [argument resultsForQuery:query source:self];
   [operation setRankedResults:results];
 }
 

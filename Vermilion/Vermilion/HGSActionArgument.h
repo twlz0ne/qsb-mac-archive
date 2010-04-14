@@ -41,6 +41,7 @@
 @class HGSScoredResult;
 @class HGSQuery;
 @class HGSActionArgumentSource;
+@class HGSSearchSource;
 
 /*!
  All of the routines that an action argument is required to implement.
@@ -114,9 +115,10 @@
  Return a custom set of results for this argument based on query.
  If implemented, the action argument will be asked to return values.
  @param query The query to return results for.
- @result The results.
+ @param source The source to create the results for.
+ @result An array of HGSScoredResults.
 */
-- (NSArray *)resultsForQuery:(HGSQuery *)query;
+- (NSArray *)resultsForQuery:(HGSQuery *)query source:(HGSSearchSource *)source;
 
 @end
 
