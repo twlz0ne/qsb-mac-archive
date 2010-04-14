@@ -87,3 +87,14 @@ else
     fi
   fi  
 fi
+
+ERROR_HEADER="GenerateBreakpadSymbols.sh:0:"
+if [ ! -f "${BREAKPAD_FILE_386}" ]; then
+  echo ${ERROR_HEADER} error: Unable to generate "${BREAKPAD_FILE_386}"
+  exit 1
+fi
+
+if [ ! -f "${BREAKPAD_FILE_PPC}" ]; then
+  echo ${ERROR_HEADER} error: Unable to generate "${BREAKPAD_FILE_PPC}"
+  exit 1
+fi
