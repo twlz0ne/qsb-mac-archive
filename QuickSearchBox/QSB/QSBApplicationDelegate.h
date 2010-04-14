@@ -65,8 +65,9 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
   EventHotKeyRef hotKey_;  // the hot key we're looking for. 
   NSUInteger hotModifiers_;  // if we are getting double taps, the mods to look for.
   NSUInteger hotModifiersState_;
+  NSUInteger oldHotModifiers_;  // Keep track of the last modifier state
   NSTimeInterval lastHotModifiersEventCheckedTime_;
-  NSStatusItem *statusItem_;  // STRONG
+  NSStatusItem *statusItem_;
   ProcessSerialNumber otherQSBPSN_;  // The psn of any other qsb that is running
   QSBPreferenceWindowController *prefsWindowController_;
   QSBHGSDelegate *hgsDelegate_;

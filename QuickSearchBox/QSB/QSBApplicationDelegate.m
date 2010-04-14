@@ -302,9 +302,15 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   // and if we are in the process of activating, we want to ignore the hotkey
   // so we don't try to process it twice.
   if (!hotModifiers_ || [NSApp keyWindow]) return;
+  
+  // There is no way of knowing what the previous state of the modifiers was
+  // without saving it off. We only want to start this sequence if the 
+  // previous state was no modifiers, so we track the modifier state at all
+  // times and keep it stored in oldHotModifiers_.
+  NSUInteger oldHotModifiers = oldHotModifiers_;
+  oldHotModifiers_ = [event qsbModifierFlags];
+  if (oldHotModifiers || oldHotModifiers_ != hotModifiers_) return;
 
-  NSUInteger flags = [event qsbModifierFlags];
-  if (flags != hotModifiers_) return;
   const useconds_t oneMilliSecond = 10000;
   UInt16 modifierKeys[] = {
     0,
@@ -364,7 +370,8 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   while(([NSDate timeIntervalSinceReferenceDate] - startDate)
         < [self doubleClickTime]) {
     QSBKeyMap *currentKeyMap = [QSBKeyMap currentKeyMap];
-    if ([currentKeyMap containsAnyKeyIn:invertedHotMap]) {
+    if ([currentKeyMap containsAnyKeyIn:invertedHotMap]
+        || GetCurrentButtonState()) {
       return;
     }
     if (![currentKeyMap containsAnyKeyIn:hotMap]) {
@@ -375,6 +382,9 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
     usleep(oneMilliSecond);
   }
   if (isGood) {
+    // Once we are "active" we no longer will receive modifier notifications
+    // through this channel, so reset it to the "clean" state.
+    oldHotModifiers_ = 0;
     [self hitHotKey:self];
   }
 }
