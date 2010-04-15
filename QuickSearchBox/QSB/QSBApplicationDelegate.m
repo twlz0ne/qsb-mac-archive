@@ -42,7 +42,7 @@
 #import <GTM/GTMGeometryUtils.h>
 #import <GTM/GTMMethodCheck.h>
 #import <GTM/GTMSystemVersion.h>
-#import <GTM/GTMUnitTestingUtilities.h>
+#import <GTM/GTMFoundationUnitTestingUtilities.h>
 #import <GTM/GTMHotKeyTextField.h>
 #import <GTM/GTMNSWorkspace+Running.h>
 #import <GTM/GTMNSObject+KeyValueObserving.h>
@@ -594,7 +594,8 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 -(BOOL)suppressStartupDialogs {
   NSDictionary *envVars = [[NSProcessInfo processInfo] environment];
   NSString *value = [envVars objectForKey:@"QSBSuppressStartupDialogs"];
-  return [value boolValue] || [GTMUnitTestingUtilities areWeBeingUnitTested];
+  return ([value boolValue] 
+          || [GTMFoundationUnitTestingUtilities areWeBeingUnitTested]);
 }
 
 #pragma mark Actions

@@ -629,8 +629,6 @@
 		8B0634421135ECDC0003CC70 /* QSBAnimatedScroll.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B0634411135ECDC0003CC70 /* QSBAnimatedScroll.m */; };
 		8B0E66700FD82C6300461C4A /* GTMHotKeyTextField.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B0E665E0FD82C6300461C4A /* GTMHotKeyTextField.strings */; };
 		8B0E67140FD8643900461C4A /* Command.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 8B0E67130FD8643900461C4A /* Command.pdf */; };
-		8B0F054A10C73BD400C1A6FD /* GTMUnitTestingUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B0F054910C73BD400C1A6FD /* GTMUnitTestingUtilities.m */; };
-		8B0F054C10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B0F054B10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B0F073110C7465900C1A6FD /* NSString+CaseInsensitive.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7C373C0D78A415009885B4 /* NSString+CaseInsensitive.m */; };
 		8B0F073210C7465E00C1A6FD /* NSString+CaseInsensitive.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B7C373B0D78A415009885B4 /* NSString+CaseInsensitive.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B0FFC7010C6033800C1A6FD /* GTMSenTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */; };
@@ -647,6 +645,8 @@
 		8B10A6FD0FA5F5E50087DE20 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B10AB690FA679A60087DE20 /* HGSAppleScriptHandlerTest.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
 		8B1490A80F715781002E05FA /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
+		8B170032117799ED00E7A908 /* GTMFoundationUnitTestingUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B17001A117798D600E7A908 /* GTMFoundationUnitTestingUtilities.m */; };
+		8B170033117799ED00E7A908 /* GTMFoundationUnitTestingUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B17001B117798D600E7A908 /* GTMFoundationUnitTestingUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B21631F0EB9022300183DE4 /* QSBDetailedRowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B21631E0EB9022300183DE4 /* QSBDetailedRowViewController.m */; };
 		8B232E811062B46800AF7287 /* grabicon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B232E801062B46800AF7287 /* grabicon.icns */; };
 		8B23300E1062C12700AF7287 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B23300C1062C12700AF7287 /* Localizable.strings */; };
@@ -2640,13 +2640,15 @@
 		8B0E666E0FD82C6300461C4A /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/GTMHotKeyTextField.strings; sourceTree = "<group>"; };
 		8B0E666F0FD82C6300461C4A /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/GTMHotKeyTextField.strings; sourceTree = "<group>"; };
 		8B0E67130FD8643900461C4A /* Command.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Command.pdf; sourceTree = "<group>"; };
-		8B0F054910C73BD400C1A6FD /* GTMUnitTestingUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMUnitTestingUtilities.m; sourceTree = "<group>"; };
-		8B0F054B10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMUnitTestingUtilities.h; sourceTree = "<group>"; };
 		8B0FFC8110C6033800C1A6FD /* Shortcuts Test.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Shortcuts Test.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B0FFD1110C603D900C1A6FD /* ShortcutsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShortcutsTest.m; sourceTree = "<group>"; };
 		8B10AB5F0FA679810087DE20 /* HGSAppleScriptHandlerTest.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = HGSAppleScriptHandlerTest.applescript; sourceTree = "<group>"; };
 		8B148F720F715697002E05FA /* OCMock.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = OCMock.xcodeproj; sourceTree = "<group>"; };
 		8B148F9A0F7156B6002E05FA /* OCMock.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OCMock.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B170018117798D600E7A908 /* GTMAppKitUnitTestingUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMAppKitUnitTestingUtilities.m; sourceTree = "<group>"; };
+		8B170019117798D600E7A908 /* GTMAppKitUnitTestingUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMAppKitUnitTestingUtilities.h; sourceTree = "<group>"; };
+		8B17001A117798D600E7A908 /* GTMFoundationUnitTestingUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMFoundationUnitTestingUtilities.m; sourceTree = "<group>"; };
+		8B17001B117798D600E7A908 /* GTMFoundationUnitTestingUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMFoundationUnitTestingUtilities.h; sourceTree = "<group>"; };
 		8B1B49330E5F994800A08972 /* GTMExceptionalInlines.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMExceptionalInlines.m; sourceTree = "<group>"; };
 		8B1B49340E5F994800A08972 /* GTMExceptionalInlines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMExceptionalInlines.h; sourceTree = "<group>"; };
 		8B21631D0EB9022300183DE4 /* QSBDetailedRowViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBDetailedRowViewController.h; sourceTree = "<group>"; };
@@ -4984,6 +4986,10 @@
 		8B55D9010E786B5D00D39CB0 /* UnitTesting */ = {
 			isa = PBXGroup;
 			children = (
+				8B170018117798D600E7A908 /* GTMAppKitUnitTestingUtilities.m */,
+				8B170019117798D600E7A908 /* GTMAppKitUnitTestingUtilities.h */,
+				8B17001A117798D600E7A908 /* GTMFoundationUnitTestingUtilities.m */,
+				8B17001B117798D600E7A908 /* GTMFoundationUnitTestingUtilities.h */,
 				8BCB416D0E82E879007F8FD6 /* GTMTestTimer.h */,
 				8B55DAE40E78829300D39CB0 /* GTMAppKit+UnitTesting.m */,
 				8B55DAE50E78829300D39CB0 /* GTMAppKit+UnitTesting.h */,
@@ -4993,8 +4999,6 @@
 				8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */,
 				8B95CCB30F6EDD8C003BDBDD /* GTMUnitTestDevLog.h */,
 				8B95CCB40F6EDD8C003BDBDD /* GTMUnitTestDevLog.m */,
-				8B0F054B10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h */,
-				8B0F054910C73BD400C1A6FD /* GTMUnitTestingUtilities.m */,
 				8B55D9250E786B5D00D39CB0 /* RunMacOSUnitTests.sh */,
 			);
 			path = UnitTesting;
@@ -6574,7 +6578,6 @@
 				8BF442D30FC74ED500C29AA1 /* GTMGoogleSearch.h in Headers */,
 				623B19261003E19C009B702D /* GTMNSScanner+JSON.h in Headers */,
 				8B3082DE1056EE1F006C4C7A /* GTMNSNumber+64Bit.h in Headers */,
-				8B0F054C10C73BDB00C1A6FD /* GTMUnitTestingUtilities.h in Headers */,
 				8B0F073210C7465E00C1A6FD /* NSString+CaseInsensitive.h in Headers */,
 				8B44636710F2740100561E62 /* GTMBase64.h in Headers */,
 				8B44636A10F2740C00561E62 /* GTMUnitTestDevLog.h in Headers */,
@@ -6583,6 +6586,7 @@
 				8BC88EAD1159706E00A6E783 /* GTMScriptRunner.h in Headers */,
 				8BA0DBAB11667FAC00839F5C /* GTMLightweightProxy.h in Headers */,
 				8B39EAF9116CE77600D9743F /* NSString+SymlinksAndAliases.h in Headers */,
+				8B170033117799ED00E7A908 /* GTMFoundationUnitTestingUtilities.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9768,13 +9772,13 @@
 				8BF442D40FC74ED500C29AA1 /* GTMGoogleSearch.m in Sources */,
 				623B19251003E19C009B702D /* GTMNSScanner+JSON.m in Sources */,
 				8B3082DD1056EE1F006C4C7A /* GTMNSNumber+64Bit.m in Sources */,
-				8B0F054A10C73BD400C1A6FD /* GTMUnitTestingUtilities.m in Sources */,
 				8B0F073110C7465900C1A6FD /* NSString+CaseInsensitive.m in Sources */,
 				8B44661B10F2874C00561E62 /* GTMBase64.m in Sources */,
 				8BC5AEBE1141C029000DB67C /* GTMNSAnimation+Duration.m in Sources */,
 				8BC88EAC1159706A00A6E783 /* GTMScriptRunner.m in Sources */,
 				8BA0DBAA11667FAC00839F5C /* GTMLightweightProxy.m in Sources */,
 				8B39EAFA116CE77600D9743F /* NSString+SymlinksAndAliases.m in Sources */,
+				8B170032117799ED00E7A908 /* GTMFoundationUnitTestingUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

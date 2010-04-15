@@ -454,8 +454,9 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
     origin = scrollRect.origin;
     origin.x += NSWidth(visibleRect);
   }
+  CGFloat height = [tableView tableHeight];
   NSRect topFrame = NSMakeRect(origin.x, origin.y,
-                               visibleRect.size.width, [tableView tableHeight]);
+                               visibleRect.size.width, height);
   [topView setFrame:topFrame];
 
   NSRect resultsFrame = [resultsView_ frame];
