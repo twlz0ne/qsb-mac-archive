@@ -56,7 +56,6 @@
 #endif  // TARGET_OS_IPHONE
 
 #import <GTM/GTMMethodCheck.h>
-#import <GTM/GTMObjectSingleton.h>
 #import <GTM/GTMExceptionalInlines.h>
 #import <GTM/GTMTypeCasting.h>
 

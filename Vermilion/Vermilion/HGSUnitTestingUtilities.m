@@ -30,9 +30,8 @@
 //
 
 #import "HGSUnitTestingUtilities.h"
-#import "GTMObjectSingleton.h"
-#import "GTMGarbageCollection.h"
-#import "GTMDebugThreadValidation.h"
+#import <GTM/GTMGarbageCollection.h>
+#import <GTM/GTMDebugThreadValidation.h>
 #import <objc/runtime.h>
 #import <sys/param.h>
 

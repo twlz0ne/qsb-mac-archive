@@ -46,7 +46,6 @@
 #import "HGSMemorySearchSource.h"
 #import "HGSBundle.h"
 #import "HGSTokenizer.h"
-#import "GTMObjectSingleton.h"
 #import <mach/mach_time.h>
 
 NSString *const kHGSQueryControllerWillStartNotification 
