@@ -34,7 +34,6 @@
 #import <QSBPluginUI/QSBPluginUI.h>
 #import "GTMGarbageCollection.h"
 #import "FilesystemActions.h"
-#import "QSBPluginVerifyWindowController.h"
 #import "QSBActionSaveAsControllerProtocol.h"
 #import "QSBTableResult.h"
 
@@ -74,7 +73,6 @@ static NSString *const kWebURLsWithTitlesPboardType
 - (void)dealloc {
   [preferredLanguage_ release];
   [pluginPaths_ release];
-  [pluginVerifyWindowController_ release];
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [cachedTableResults_ release];
   [super dealloc];
@@ -172,16 +170,6 @@ static NSString *const kWebURLsWithTitlesPboardType
 
 - (NSString *)clientID {
   return @"qsb-mac";
-}
-
-- (HGSPluginLoadResult)shouldLoadPluginAtPath:(NSString *)path
-                                withSignature:(HGSCodeSignature *)signature {
-  if (!pluginVerifyWindowController_) {
-    pluginVerifyWindowController_ =
-      [[QSBPluginVerifyWindowController alloc] init];
-  }
-  return [pluginVerifyWindowController_ runForPluginAtPath:path
-                                             withSignature:signature];
 }
 
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {

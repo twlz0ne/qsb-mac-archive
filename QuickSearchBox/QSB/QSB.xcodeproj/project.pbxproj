@@ -317,10 +317,7 @@
 		33EEA6E70DD0DBEC005766AB /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		5A0BB19E0FAB8A7D00AA4858 /* Screensaver.py in Resources */ = {isa = PBXBuildFile; fileRef = 5A0BB19C0FAB8A7D00AA4858 /* Screensaver.py */; };
 		5A0BB2EB0FAB8B4400AA4858 /* Screensaver.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */; };
-		5A0BB3750FAB9CDA00AA4858 /* HGSPluginBlacklist.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A0BB3730FAB9CDA00AA4858 /* HGSPluginBlacklist.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A0BB3760FAB9CDA00AA4858 /* HGSPluginBlacklist.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0BB3740FAB9CDA00AA4858 /* HGSPluginBlacklist.m */; };
 		5A0BB3B20FABB1F500AA4858 /* PubSub.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A0BB3B10FABB1F500AA4858 /* PubSub.framework */; };
-		5A0BB67B0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0BB67A0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m */; };
 		5A11A3020E78414C007F4D67 /* iTunes.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 5A11A2DC0E784051007F4D67 /* iTunes.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
 		5A20A2AF0FD71946009F0A92 /* SecurityInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A20A2AE0FD71946009F0A92 /* SecurityInterface.framework */; };
 		5A2710B90ECA52F200C72257 /* Vermilion.py in Resources */ = {isa = PBXBuildFile; fileRef = 5A2710B20ECA52F200C72257 /* Vermilion.py */; };
@@ -332,8 +329,6 @@
 		5A2710BF0ECA52F200C72257 /* HGSPythonSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5A2710B80ECA52F200C72257 /* HGSPythonSource.mm */; };
 		5A2711030ECA567B00C72257 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A2711020ECA567B00C72257 /* Python.framework */; };
 		5A4D237C0F462D2000F5C05B /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A4D237B0F462D2000F5C05B /* libcrypto.dylib */; };
-		5A4D23FC0F4CD22B00F5C05B /* HGSCodeSignature.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5A4D23FD0F4CD22B00F5C05B /* HGSCodeSignature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */; };
 		5A583243100BFC4D00EC32CF /* ClipboardSearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A58323D100BFC4D00EC32CF /* ClipboardSearchSource.m */; };
 		5A58326A100BFD2100EC32CF /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		5A5832C2100BFD7100EC32CF /* Clipboard.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */; };
@@ -354,8 +349,6 @@
 		5A8A3B1A0E71BCBB00A0DB4F /* PreviousSong.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B110E71BCBB00A0DB4F /* PreviousSong.icns */; };
 		5AC3E77A0F7C29A900F171EB /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A2711020ECA567B00C72257 /* Python.framework */; };
 		5AC3E8240F7C2F7300F171EB /* VermilionTest.py in Resources */ = {isa = PBXBuildFile; fileRef = 5AC3E8230F7C2F6200F171EB /* VermilionTest.py */; };
-		5ACEF2B80F40EAF5007EA38B /* QSBPluginVerifyWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACEF2B70F40EAF5007EA38B /* QSBPluginVerifyWindowController.m */; };
-		5ACEF2CB0F40EBFC007EA38B /* PluginVerifyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ACEF2C90F40EBFC007EA38B /* PluginVerifyWindow.xib */; };
 		5AEC5C5B0FBA2897005608EA /* SharedScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEC5C580FBA283C005608EA /* SharedScript.m */; };
 		5AEC5C720FBA2A29005608EA /* SharedScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEC5C580FBA283C005608EA /* SharedScript.m */; };
 		5AEC5C730FBA2A2A005608EA /* SharedScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEC5C580FBA283C005608EA /* SharedScript.m */; };
@@ -928,7 +921,6 @@
 		8B7911040F9FCAD3006BFE1E /* HGSActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = E4D28A4C0DF98DFF00FC6C31 /* HGSActionTest.m */; };
 		8B7911050F9FCAD3006BFE1E /* HGSBundleTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA9A0F6B09FE003BDBDD /* HGSBundleTest.m */; };
 		8B7911060F9FCAD3006BFE1E /* HGSCallbackSearchSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA30F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m */; };
-		8B7911070F9FCAD3006BFE1E /* HGSCodeSignatureTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0F7D70F68489A0041E0B9 /* HGSCodeSignatureTest.m */; };
 		8B7911080F9FCAD3006BFE1E /* HGSCoreExtensionPointsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA8610F813E2A00DF4F12 /* HGSCoreExtensionPointsTest.m */; };
 		8B7911090F9FCAD3006BFE1E /* HGSExtensionPointTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BAAA8600F813E2A00DF4F12 /* HGSExtensionPointTest.m */; };
 		8B79110A0F9FCAD3006BFE1E /* HGSExtensionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA950F6B09FE003BDBDD /* HGSExtensionTest.m */; };
@@ -2306,10 +2298,7 @@
 		5A0BB1680FAB8A6300AA4858 /* Screensaver.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Screensaver.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A0BB19B0FAB8A7D00AA4858 /* Screensaver-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Screensaver-Info.plist"; sourceTree = "<group>"; };
 		5A0BB19C0FAB8A7D00AA4858 /* Screensaver.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Screensaver.py; sourceTree = "<group>"; };
-		5A0BB3730FAB9CDA00AA4858 /* HGSPluginBlacklist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSPluginBlacklist.h; sourceTree = "<group>"; };
-		5A0BB3740FAB9CDA00AA4858 /* HGSPluginBlacklist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPluginBlacklist.m; sourceTree = "<group>"; };
 		5A0BB3B10FABB1F500AA4858 /* PubSub.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PubSub.framework; path = System/Library/Frameworks/PubSub.framework; sourceTree = SDKROOT; };
-		5A0BB67A0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPluginBlacklistTest.m; sourceTree = "<group>"; };
 		5A11A2DC0E784051007F4D67 /* iTunes.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = iTunes.applescript; sourceTree = "<group>"; };
 		5A20A2AE0FD71946009F0A92 /* SecurityInterface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityInterface.framework; path = System/Library/Frameworks/SecurityInterface.framework; sourceTree = SDKROOT; };
 		5A2710B20ECA52F200C72257 /* Vermilion.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Vermilion.py; sourceTree = "<group>"; };
@@ -2321,8 +2310,6 @@
 		5A2710B80ECA52F200C72257 /* HGSPythonSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HGSPythonSource.mm; sourceTree = "<group>"; };
 		5A2711020ECA567B00C72257 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		5A4D237B0F462D2000F5C05B /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
-		5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSCodeSignature.h; sourceTree = "<group>"; };
-		5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCodeSignature.m; sourceTree = "<group>"; };
 		5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Clipboard.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A58323C100BFC4D00EC32CF /* Clipboard-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Clipboard-Info.plist"; sourceTree = "<group>"; };
 		5A58323D100BFC4D00EC32CF /* ClipboardSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClipboardSearchSource.m; sourceTree = "<group>"; };
@@ -2341,9 +2328,6 @@
 		5A8A3B110E71BCBB00A0DB4F /* PreviousSong.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PreviousSong.icns; sourceTree = "<group>"; };
 		5AB442230FFC36E800001976 /* DirectoryService.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DirectoryService.framework; path = System/Library/Frameworks/DirectoryService.framework; sourceTree = SDKROOT; };
 		5AC3E8230F7C2F6200F171EB /* VermilionTest.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = VermilionTest.py; sourceTree = "<group>"; };
-		5ACEF2B60F40EAF5007EA38B /* QSBPluginVerifyWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPluginVerifyWindowController.h; sourceTree = "<group>"; };
-		5ACEF2B70F40EAF5007EA38B /* QSBPluginVerifyWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPluginVerifyWindowController.m; sourceTree = "<group>"; };
-		5ACEF2CA0F40EBFC007EA38B /* en_US */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en_US; path = en_US.lproj/PluginVerifyWindow.xib; sourceTree = "<group>"; };
 		5AEC5C580FBA283C005608EA /* SharedScript.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharedScript.m; sourceTree = "<group>"; };
 		5AED32B80EAFDF1F004C7187 /* HGSOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSOperation.h; sourceTree = "<group>"; };
 		5AED32B90EAFDF1F004C7187 /* HGSOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSOperation.m; sourceTree = "<group>"; };
@@ -2362,7 +2346,6 @@
 		5AF0F4880F671D9C0041E0B9 /* Mount.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Mount.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AF0F4F10F671E440041E0B9 /* Mount-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Mount-Info.plist"; sourceTree = "<group>"; };
 		5AF0F4F20F671E440041E0B9 /* MountSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MountSearchSource.m; sourceTree = "<group>"; };
-		5AF0F7D70F68489A0041E0B9 /* HGSCodeSignatureTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSCodeSignatureTest.m; sourceTree = "<group>"; };
 		5AF2C4860E5E19A400F4D546 /* iTunes.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iTunes.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AF2C5A70E5E1C5700F4D546 /* iTunesAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iTunesAction.m; sourceTree = "<group>"; };
 		5AF2C5AA0E5E1C5700F4D546 /* iTunesSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunesSource.h; sourceTree = "<group>"; };
@@ -5072,8 +5055,6 @@
 				62AD18A50F16B034000D380C /* QSBPathControl.m */,
 				8BDC55F6112F4D1400988421 /* QSBPivotTextAttachment.m */,
 				8BDC55F7112F4D1400988421 /* QSBPivotTextAttachment.h */,
-				5ACEF2B60F40EAF5007EA38B /* QSBPluginVerifyWindowController.h */,
-				5ACEF2B70F40EAF5007EA38B /* QSBPluginVerifyWindowController.m */,
 				F487E34E0E59D0A5005B47E6 /* QSBPreferences.h */,
 				F487E3A80E59D4D0005B47E6 /* QSBPreferences.m */,
 				625A2C960E5614F3008CA9BF /* QSBPreferenceWindowController.h */,
@@ -5157,7 +5138,6 @@
 				7F3EB48D0E5F02B500A7A75E /* MenuArrowBlack.png */,
 				7F3EB48C0E5F02B500A7A75E /* MenuArrowWhite.png */,
 				7F838BF60DB79DB200530EAE /* NewButton.png */,
-				5ACEF2C90F40EBFC007EA38B /* PluginVerifyWindow.xib */,
 				621B1E390E4CD7B800EEF553 /* PreferencesWindow.xib */,
 				8B4893FF0F16EA5300786C1E /* QSBIcon.icns */,
 				8B4894540F16EB1E00786C1E /* QSBPlugin.icns */,
@@ -5759,9 +5739,6 @@
 				F4E3C82F0EBFA78700CB713D /* HGSCallbackSearchSource.h */,
 				F4E3C8300EBFA78700CB713D /* HGSCallbackSearchSource.m */,
 				8B95CAA30F6B09FE003BDBDD /* HGSCallbackSearchSourceTest.m */,
-				5A4D23FA0F4CD22A00F5C05B /* HGSCodeSignature.h */,
-				5A4D23FB0F4CD22B00F5C05B /* HGSCodeSignature.m */,
-				5AF0F7D70F68489A0041E0B9 /* HGSCodeSignatureTest.m */,
 				8BAAA8620F813E2A00DF4F12 /* HGSCoreExtensionPoints.h */,
 				8BAAA85D0F813E2A00DF4F12 /* HGSCoreExtensionPoints.m */,
 				8BAAA8610F813E2A00DF4F12 /* HGSCoreExtensionPointsTest.m */,
@@ -5800,9 +5777,6 @@
 				62A16A8D0ED484DF0074F41B /* HGSPlugin.h */,
 				62A16A8E0ED484DF0074F41B /* HGSPlugin.m */,
 				8B95CA970F6B09FE003BDBDD /* HGSPluginTest.m */,
-				5A0BB3730FAB9CDA00AA4858 /* HGSPluginBlacklist.h */,
-				5A0BB3740FAB9CDA00AA4858 /* HGSPluginBlacklist.m */,
-				5A0BB67A0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m */,
 				8BAAA85F0F813E2A00DF4F12 /* HGSPluginLoader.h */,
 				8BAAA85C0F813E2A00DF4F12 /* HGSPluginLoader.m */,
 				8BAAA85A0F813E2A00DF4F12 /* HGSPluginLoaderTest.m */,
@@ -6503,14 +6477,12 @@
 				62D0E96F0EF05D0E0028522C /* HGSAccountsExtensionPoint.h in Headers */,
 				62D56E240EF317A900D3EB5F /* HGSAccount.h in Headers */,
 				62C051BA0F31307100DFBB1B /* HGSSimpleAccount.h in Headers */,
-				5A4D23FC0F4CD22B00F5C05B /* HGSCodeSignature.h in Headers */,
 				8BAAA8640F813E2A00DF4F12 /* HGSExtensionPoint.h in Headers */,
 				8BAAA8680F813E2A00DF4F12 /* HGSPluginLoader.h in Headers */,
 				8BAAA86B0F813E2A00DF4F12 /* HGSCoreExtensionPoints.h in Headers */,
 				62FF5B870F8D846F00B21B5D /* HGSAccountType.h in Headers */,
 				627B43C00FA0E3D9006BE269 /* HGSGoogleAccountTypes.h in Headers */,
 				8B791D860FA1FC24006BFE1E /* HGSAppleScriptAction.h in Headers */,
-				5A0BB3750FAB9CDA00AA4858 /* HGSPluginBlacklist.h in Headers */,
 				62E3FF4110112F5D005D77F2 /* NSNotificationCenter+MainThread.h in Headers */,
 				62541753102C904A00808254 /* HGSSearchTermScorer.h in Headers */,
 				8B2B01911071813D00427404 /* HGSSimpleArraySearchOperation.h in Headers */,
@@ -8079,7 +8051,6 @@
 				7F7F90940F32570F00B39433 /* TopSearchForResultView.xib in Resources */,
 				7F1804F90F38F61500E687CA /* Search14Small.png in Resources */,
 				7F1804FA0F38F61500E687CA /* Search14.png in Resources */,
-				5ACEF2CB0F40EBFC007EA38B /* PluginVerifyWindow.xib in Resources */,
 				62E72ABF0F4F6EB900A68815 /* growl-bsd-license.html in Resources */,
 				7FE2542C0F5CE3E4004FE5A6 /* blue-nav.icns in Resources */,
 				8BC685570F5ED38C003B5C6A /* SetUpAccount.xib in Resources */,
@@ -9543,7 +9514,6 @@
 				62AD18A60F16B034000D380C /* QSBPathControl.m in Sources */,
 				624137530F2A657B009229E6 /* QSBSetUpAccountWindowController.m in Sources */,
 				7F3F7EC50F39FCE70054680A /* QSBHGSResult+NSPasteboard.m in Sources */,
-				5ACEF2B80F40EAF5007EA38B /* QSBPluginVerifyWindowController.m in Sources */,
 				626585230F43BD4C008A94B2 /* QSBUserMessenger.m in Sources */,
 				8B611BFC0F43949600E29B40 /* QSBPathForFileURLCommand.m in Sources */,
 				8B453B390FB9EFA900C0E951 /* QSBWelcomeController.m in Sources */,
@@ -9634,14 +9604,12 @@
 				62D0E96B0EF059B40028522C /* HGSAccount.m in Sources */,
 				62D0E9700EF05D0E0028522C /* HGSAccountsExtensionPoint.m in Sources */,
 				6211C51D0F312E7E003A5122 /* HGSSimpleAccount.m in Sources */,
-				5A4D23FD0F4CD22B00F5C05B /* HGSCodeSignature.m in Sources */,
 				8B8B19B00EEF0DF000E543D0 /* HGSBundle.m in Sources */,
 				8BAAA8650F813E2A00DF4F12 /* HGSPluginLoader.m in Sources */,
 				8BAAA8660F813E2A00DF4F12 /* HGSCoreExtensionPoints.m in Sources */,
 				8BAAA8670F813E2A00DF4F12 /* HGSExtensionPoint.m in Sources */,
 				62FF5B860F8D846F00B21B5D /* HGSAccountType.m in Sources */,
 				8B791D850FA1FC24006BFE1E /* HGSAppleScriptAction.m in Sources */,
-				5A0BB3760FAB9CDA00AA4858 /* HGSPluginBlacklist.m in Sources */,
 				62E3FF4210112F5D005D77F2 /* NSNotificationCenter+MainThread.m in Sources */,
 				62541754102C904A00808254 /* HGSSearchTermScorer.m in Sources */,
 				8B2B01921071813D00427404 /* HGSSimpleArraySearchOperation.m in Sources */,
@@ -9841,7 +9809,6 @@
 				8B7911040F9FCAD3006BFE1E /* HGSActionTest.m in Sources */,
 				8B7911050F9FCAD3006BFE1E /* HGSBundleTest.m in Sources */,
 				8B7911060F9FCAD3006BFE1E /* HGSCallbackSearchSourceTest.m in Sources */,
-				8B7911070F9FCAD3006BFE1E /* HGSCodeSignatureTest.m in Sources */,
 				8B7911080F9FCAD3006BFE1E /* HGSCoreExtensionPointsTest.m in Sources */,
 				8B7911090F9FCAD3006BFE1E /* HGSExtensionPointTest.m in Sources */,
 				8B79110A0F9FCAD3006BFE1E /* HGSExtensionTest.m in Sources */,
@@ -9867,7 +9834,6 @@
 				8B79111F0F9FCAD3006BFE1E /* HGSTokenizerTest.m in Sources */,
 				8B7911210F9FCAD3006BFE1E /* NSString+ReadableURLTest.m in Sources */,
 				8B791D890FA1FC35006BFE1E /* HGSAppleScriptActionTest.m in Sources */,
-				5A0BB67B0FAF9C9700AA4858 /* HGSPluginBlacklistTest.m in Sources */,
 				62DDD6DA1035D7BF00C0EABD /* HGSSearchTermScorerTest.m in Sources */,
 				8B2B01961071815700427404 /* HGSSimpleArraySearchOperationTest.m in Sources */,
 				8B53E17D10D95790007E6AF2 /* HGSSearchSourceRankerTest.m in Sources */,
@@ -10410,14 +10376,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		5ACEF2C90F40EBFC007EA38B /* PluginVerifyWindow.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5ACEF2CA0F40EBFC007EA38B /* en_US */,
-			);
-			name = PluginVerifyWindow.xib;
-			sourceTree = "<group>";
-		};
 		621044E5113C856600AF95F8 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (

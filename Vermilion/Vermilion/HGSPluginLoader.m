@@ -30,53 +30,28 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Vermilion/Vermilion.h>
-#import "GTMObjectSingleton.h"
-#import "HGSDelegate.h"
-#import "HGSCodeSignature.h"
-#import "HGSPluginBlacklist.h"
-#import "HGSKeychainItem.h"
-#import <openssl/aes.h>
-#import <openssl/evp.h>
-#import <openssl/x509.h>
-#import <openssl/x509v3.h>
+#import "HGSPluginLoader.h"
+#import <GTM/GTMObjectSingleton.h>
 #import <GTM/NSString+SymlinksAndAliases.h>
 #import <GTM/GTMMethodCheck.h>
+#import "HGSCoreExtensionPoints.h"
+#import "HGSDelegate.h"
+#import "HGSLog.h"
+#import "HGSPlugin.h"
 
 @interface HGSPluginLoader()
 // Returns an array containing the full paths for all bundles
 // found within the given plugin's path.
 + (NSArray *)bundlePathsForPluginPath:(NSString *)pluginPath;
-- (BOOL)isPluginBundleCertified:(NSBundle *)pluginBundle;
-- (BOOL)pluginIsWhitelisted:(NSBundle *)pluginBundle
-          withCodeSignature:(HGSCodeSignature *)pluginCodeSignature;
-- (void)addPluginToWhitelist:(NSBundle *)pluginBundle
-           withCodeSignature:(HGSCodeSignature *)pluginCodeSignature;
-- (BOOL)retrieveEncryptionKey:(unsigned char *)key;
-- (void)deleteEncryptionKey;
-- (BOOL)generateRandomBytes:(unsigned char *)bytes count:(NSUInteger)count;
-- (void)readPluginSignatureInfo;
-- (void)writePluginSignatureInfo;
 - (void)loadPluginsAtPath:(NSString*)pluginsPath 
                 sdefPaths:(NSMutableArray *)sdefPaths
                    errors:(NSArray **)errors;
 @end
 
-static NSString *kPluginPathKey = @"PluginPathKey";
-static NSString *kPluginSignatureKey = @"PluginSignatureKey";
-static NSString *kPluginWhitelistKey = @"PluginWhitelistKey";
-static NSString *kKeychainName = @"Plugins";
-static NSString *kWhitelistFileName = @"PluginInfo";
-static const UInt32 kEncryptionKeyLength = 16; // bytes, i.e., 128 bits
-static const UInt32 kEncryptionIvLength = 16;
-static const long kTenYearsInSeconds = 60 * 60 * 24 * 365 * 10;
-
 NSString *const kHGSPluginLoaderPluginPathKey
   = @"HGSPluginLoaderPluginPathKey";
 NSString *const kHGSPluginLoaderPluginFailureKey
   = @"HGSPluginLoaderPluginFailureKey";
-NSString *const kHGSPluginLoaderPluginFailedCertification
-  = @"HGSPluginLoaderPluginFailedCertification";
 NSString *const kHGSPluginLoaderPluginFailedAPICheck
   = @"HGSPluginLoaderPluginFailedAPICheck";
 NSString *const kHGSPluginLoaderPluginFailedInstantiation
@@ -116,24 +91,6 @@ GTM_METHOD_CHECK(NSString, stringByResolvingSymlinksAndAliases);
 - (id)init {
   if ((self = [super init])) {
     extensionMap_ = [[NSMutableDictionary alloc] init];
-    NSBundle *bnd = [NSBundle bundleForClass:[self class]];
-    NSString *currentFrameworkPath
-      = [[bnd bundlePath] stringByAppendingPathComponent:@"Versions/A"];
-    bnd = [NSBundle bundleWithPath:currentFrameworkPath];
-    frameworkSignature_
-      = [[HGSCodeSignature codeSignatureForBundle:bnd] retain];
-    executableSignature_
-      = [[HGSCodeSignature codeSignatureForBundle:[NSBundle mainBundle]]
-         retain];
-    if ([frameworkSignature_ verifySignature] == eSignatureStatusOK &&
-        [executableSignature_ verifySignature] == eSignatureStatusOK) {
-      frameworkCertificate_ = [frameworkSignature_ copySignerCertificate];
-    } else {
-      [frameworkSignature_ release];
-      frameworkSignature_ = nil;
-      [executableSignature_ release];
-      executableSignature_ = nil;
-    }
   }
   return self;
 }
@@ -142,13 +99,7 @@ GTM_METHOD_CHECK(NSString, stringByResolvingSymlinksAndAliases);
 // Singleton, so never called.
 - (void)dealloc {
   [extensionMap_ release];
-  [executableSignature_ release];
-  [frameworkSignature_ release];
-  [pluginSignatureInfo_ release];
   [plugins_ release];
-  if (frameworkCertificate_) {
-    CFRelease(frameworkCertificate_);
-  }
   [super dealloc];
 }
 // COV_NF_END
@@ -364,33 +315,29 @@ GTM_METHOD_CHECK(NSString, stringByResolvingSymlinksAndAliases);
         [nc postNotificationName:kHGSPluginLoaderWillLoadPluginNotification
                           object:self 
                         userInfo:willLoadUserInfo];
-        if ([self isPluginBundleCertified:pluginBundle]) {
-          if ([pluginClass isPluginBundleValidAPI:pluginBundle]) {
-            plugin 
-              = [[[pluginClass alloc] initWithBundle:pluginBundle] autorelease];
-            if (plugin) {
-              HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
-              [pluginsPoint extendWithObject:plugin];
-              // Is it scriptable?
-              BOOL pluginScriptable 
-                = [[pluginBundle objectForInfoDictionaryKey:@"NSAppleScriptEnabled"]
-                   boolValue];
-              if (pluginScriptable) {
-                // Does it have any sdefs?
-                NSArray *sdefResourcePaths
-                  = [pluginBundle pathsForResourcesOfType:@"sdef" inDirectory:nil];
-                if (sdefResourcePaths) {
-                  [sdefPaths addObjectsFromArray:sdefResourcePaths];
-                }
+        if ([pluginClass isPluginBundleValidAPI:pluginBundle]) {
+          plugin 
+            = [[[pluginClass alloc] initWithBundle:pluginBundle] autorelease];
+          if (plugin) {
+            HGSExtensionPoint *pluginsPoint = [HGSExtensionPoint pluginsPoint];
+            [pluginsPoint extendWithObject:plugin];
+            // Is it scriptable?
+            BOOL pluginScriptable 
+              = [[pluginBundle objectForInfoDictionaryKey:@"NSAppleScriptEnabled"]
+                 boolValue];
+            if (pluginScriptable) {
+              // Does it have any sdefs?
+              NSArray *sdefResourcePaths
+                = [pluginBundle pathsForResourcesOfType:@"sdef" inDirectory:nil];
+              if (sdefResourcePaths) {
+                [sdefPaths addObjectsFromArray:sdefResourcePaths];
               }
-            } else {
-              errorType = kHGSPluginLoaderPluginFailedInstantiation;
             }
           } else {
-            errorType = kHGSPluginLoaderPluginFailedAPICheck;
+            errorType = kHGSPluginLoaderPluginFailedInstantiation;
           }
         } else {
-          errorType = kHGSPluginLoaderPluginFailedCertification;
+          errorType = kHGSPluginLoaderPluginFailedAPICheck;
         }
       } else {
         errorType = kHGSPluginLoaderPluginFailedUnknownPluginType;
@@ -443,291 +390,6 @@ GTM_METHOD_CHECK(NSString, stringByResolvingSymlinksAndAliases);
     }
     #endif
     [extensionMap_ setObject:cls forKey:extension];
-  }
-}
-
-#pragma mark -
-
-- (BOOL)isPluginBundleCertified:(NSBundle *)pluginBundle {
-  // Blacklisted plugins are never certified
-  HGSPluginBlacklist *bl = [HGSPluginBlacklist sharedPluginBlacklist];
-  if ([bl bundleIsBlacklisted:pluginBundle]) {
-    HGSLog(@"Blocked loading of blacklisted bundle %@", pluginBundle);
-    return NO;
-  }
-  
-  if (!executableSignature_ || !frameworkSignature_) {
-    // If the host application is not signed, do not perform validation.
-    return YES;
-  }
-  
-  HGSCodeSignature *signature
-    = [HGSCodeSignature codeSignatureForBundle:pluginBundle];
-  
-  if ([self pluginIsWhitelisted:pluginBundle withCodeSignature:signature]) {
-    // User has previously approved the plugin.
-    return YES;
-  }
-  
-  // Plugin must have a valid signature
-  BOOL shouldLoad = ([signature verifySignature] == eSignatureStatusOK);
-  // Plugin must have been signed by the same identity that signed
-  // the application
-  if (shouldLoad) {
-    SecCertificateRef pluginCertificate = [signature copySignerCertificate];
-    if (pluginCertificate) {
-      shouldLoad = [HGSCodeSignature certificate:frameworkCertificate_
-                                         isEqual:pluginCertificate];
-      CFRelease(pluginCertificate);
-    } else {
-      shouldLoad = NO;
-    }
-  }
-  
-  // Plugin is either not signed, or signed with an unknown
-  // certificate. Ask the user to approve the plugin.
-  if (!shouldLoad) {
-    switch ([delegate_ shouldLoadPluginAtPath:[pluginBundle bundlePath]
-                                withSignature:signature]) {
-      case eHGSAllowAlways:
-        [self addPluginToWhitelist:pluginBundle
-                 withCodeSignature:signature];
-        shouldLoad = YES;
-        break;
-      case eHGSAllowOnce:
-        shouldLoad = YES;
-        break;
-      default:
-        shouldLoad = NO;
-        break;
-    }
-  }
-  
-  return shouldLoad;
-}
-
-- (BOOL)pluginIsWhitelisted:(NSBundle *)pluginBundle
-          withCodeSignature:(HGSCodeSignature *)pluginCodeSignature {
-  BOOL isWhitelisted = NO;
-  
-  if (!pluginSignatureInfo_) {
-    [self readPluginSignatureInfo];
-  }
-  
-  NSString *path = [pluginBundle bundlePath];
-  NSMutableArray *whitelist
-    = [pluginSignatureInfo_ objectForKey:kPluginWhitelistKey];
-  for (NSDictionary *whitelisted in whitelist) {
-    if ([[whitelisted objectForKey:kPluginPathKey] isEqual:path]) {
-      NSData *signatureData = [whitelisted objectForKey:kPluginSignatureKey];
-      if (signatureData &&
-          [pluginCodeSignature verifyDetachedSignature:signatureData]) {
-        isWhitelisted = YES;
-      }
-    }
-  }
-  
-  return isWhitelisted;
-}
-
-- (void)addPluginToWhitelist:(NSBundle *)pluginBundle
-           withCodeSignature:(HGSCodeSignature *)pluginCodeSignature {
-  if ([self pluginIsWhitelisted:pluginBundle
-              withCodeSignature:pluginCodeSignature]) {
-    return;
-  }
-  
-  NSData *signatureData = [pluginCodeSignature generateDetachedSignature];
-  if (signatureData) {
-    NSDictionary *entry = [NSDictionary dictionaryWithObjectsAndKeys:
-                           [pluginBundle bundlePath], kPluginPathKey,
-                           signatureData, kPluginSignatureKey, nil];
-    NSMutableArray *whitelist
-      = [pluginSignatureInfo_ objectForKey:kPluginWhitelistKey];
-    if (!whitelist) {
-      whitelist = [NSMutableArray array];
-    }
-    [whitelist addObject:entry];
-    [pluginSignatureInfo_ setObject:whitelist forKey:kPluginWhitelistKey];
-    [self writePluginSignatureInfo];
-  }
-}
-
-- (BOOL)retrieveEncryptionKey:(unsigned char *)key {
-  BOOL gotKey = NO;
-  
-  NSString *appName = [[NSBundle mainBundle]
-                       objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-
-  UInt32 keyMaterialLengthFromKeychain;
-  void *keyMaterialFromKeychain;
-  OSStatus status = SecKeychainFindGenericPassword(NULL,
-                                                   (UInt32)[appName length],
-                                                   [appName UTF8String],
-                                                   (UInt32)[kKeychainName length],
-                                                   [kKeychainName UTF8String],
-                                                   &keyMaterialLengthFromKeychain,
-                                                   &keyMaterialFromKeychain,
-                                                   NULL);
-  if (![HGSKeychainItem reportIfKeychainError:status]) {
-    if (keyMaterialLengthFromKeychain == kEncryptionKeyLength) {
-      // Keychain has an existing key, return that
-      memcpy(key, keyMaterialFromKeychain, kEncryptionKeyLength);
-      gotKey = YES;
-    }
-    status = SecKeychainItemFreeContent(NULL,
-                                        keyMaterialFromKeychain);
-    [HGSKeychainItem reportIfKeychainError:status];
-  }
-  
-  if (!gotKey) {
-    // Key material unavailable, create a new keychain item
-    [self deleteEncryptionKey];
-    if ([self generateRandomBytes:key count:kEncryptionKeyLength]) {
-      status = SecKeychainAddGenericPassword(NULL,
-                                             (UInt32)[appName length],
-                                             [appName UTF8String],
-                                             (UInt32)[kKeychainName length],
-                                             [kKeychainName UTF8String],
-                                             kEncryptionKeyLength,
-                                             key,
-                                             NULL);
-      if (![HGSKeychainItem reportIfKeychainError:status]) {
-        gotKey = YES;
-      }
-    }
-  }
-  
-  return gotKey;
-}
-
-- (void)deleteEncryptionKey {
-  NSString *appName = [[NSBundle mainBundle]
-                       objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-  SecKeychainItemRef itemRef;
-  UInt32 keyMaterialLengthFromKeychain;
-  void *keyMaterialFromKeychain;
-  OSStatus status = SecKeychainFindGenericPassword(NULL,
-                                                   (UInt32)[appName length],
-                                                   [appName UTF8String],
-                                                   (UInt32)[kKeychainName length],
-                                                   [kKeychainName UTF8String],
-                                                   &keyMaterialLengthFromKeychain,
-                                                   &keyMaterialFromKeychain,
-                                                   &itemRef);
-  if (![HGSKeychainItem reportIfKeychainError:status]) {
-    status = SecKeychainItemFreeContent(NULL,
-                                        keyMaterialFromKeychain);
-    [HGSKeychainItem reportIfKeychainError:status];
-    status = SecKeychainItemDelete(itemRef);
-    [HGSKeychainItem reportIfKeychainError:status];
-    CFRelease(itemRef);
-  }
-}
-   
-- (BOOL)generateRandomBytes:(unsigned char *)bytes count:(NSUInteger)count {
-  NSUInteger pos = 0;
-  
-  int devRandFD = open("/dev/urandom", O_RDONLY | O_NONBLOCK);
-  if (devRandFD > 0) {
-    do {
-      ssize_t amountRead = read(devRandFD, bytes + pos, count - pos);
-      if (amountRead <= 0) {
-        if (errno == EAGAIN || errno == EINTR) {
-          continue;
-        }
-        break;
-      }
-      pos += (NSUInteger)amountRead;
-    } while (pos < count);
-    close(devRandFD);
-  }
-
-  return (pos == count);
-}
-
-- (void)readPluginSignatureInfo {
-  NSData *decryptedData = nil;
-  NSString *whitelistPath
-    = [[delegate_ userApplicationSupportFolderForApp]
-       stringByAppendingPathComponent:kWhitelistFileName];
-  NSData *encryptedData = [NSData dataWithContentsOfFile:whitelistPath];
-  if ([encryptedData length] > kEncryptionIvLength) {
-    unsigned char encKey[16];
-    if ([self retrieveEncryptionKey:encKey]) {
-      unsigned char *plaintext = malloc([encryptedData length]);
-      if (plaintext) {
-        NSUInteger encLength = [encryptedData length] - kEncryptionIvLength;
-        [encryptedData getBytes:plaintext];
-        int cfbNum = 0;
-        AES_KEY aesKey;
-        AES_set_encrypt_key(encKey, kEncryptionKeyLength * 8, &aesKey);
-        AES_cfb8_encrypt(plaintext + kEncryptionIvLength,
-                         plaintext + kEncryptionIvLength,
-                         encLength,
-                         &aesKey,
-                         plaintext,
-                         &cfbNum,
-                         AES_DECRYPT);
-        decryptedData = [NSData dataWithBytes:plaintext + kEncryptionIvLength
-                                       length:encLength];
-        free(plaintext);
-      }
-    }
-  }
-  
-  if (decryptedData) {
-    [pluginSignatureInfo_ release];
-    pluginSignatureInfo_ = nil;
-    @try {
-      pluginSignatureInfo_
-        = [NSKeyedUnarchiver unarchiveObjectWithData:decryptedData];
-    }
-    @catch (NSException *e) {
-      // Just to be safe, in case the file was corrupted. The
-      // unarchiveObjectWithData: method is documented to return nil if the
-      // the input cannot be decoded, but it throws more often than not.
-      HGSLog(@"Unable to unarchive plugin info (%@)", e);
-    }
-  }
-  if (!pluginSignatureInfo_) {
-    pluginSignatureInfo_ = [[NSMutableDictionary alloc] init];
-  }
-}
-
-- (void)writePluginSignatureInfo {
-  NSData *data;
-  data = [NSKeyedArchiver archivedDataWithRootObject:pluginSignatureInfo_];
-  NSString *whitelistPath
-    = [[delegate_ userApplicationSupportFolderForApp]
-       stringByAppendingPathComponent:kWhitelistFileName];
-  
-  // Data is AES encrypted in CFB mode, stored with the 16 byte IV prepended
-  unsigned char key[16];
-  if ([self retrieveEncryptionKey:key]) {
-    NSUInteger totalLength = [data length] + kEncryptionIvLength;
-    unsigned char *encData = malloc(totalLength);
-    if (encData) {
-      unsigned char iv[16];
-      if ([self generateRandomBytes:iv count:kEncryptionIvLength]) {
-        memcpy(encData, iv, kEncryptionIvLength);
-        [data getBytes:encData + kEncryptionIvLength];
-        
-        int cfbNum = 0;
-        AES_KEY aesKey;
-        AES_set_encrypt_key(key, kEncryptionKeyLength * 8, &aesKey);
-        AES_cfb8_encrypt(encData + kEncryptionIvLength,
-                         encData + kEncryptionIvLength,
-                         [data length],
-                         &aesKey,
-                         iv,
-                         &cfbNum,
-                         AES_ENCRYPT);
-        [[NSData dataWithBytes:encData length:totalLength]
-         writeToFile:whitelistPath atomically:YES];
-      }
-      free(encData);
-    }
   }
 }
 

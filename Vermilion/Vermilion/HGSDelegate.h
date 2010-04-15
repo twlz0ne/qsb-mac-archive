@@ -35,20 +35,8 @@
  @discussion HGSDelegate
  */
 
-@class HGSCodeSignature;
 @class HGSResult;
 
-/*!
-  @enum HGSPluginLoadResult
-  @constant eHGSAllowAlways Permanently allow the plugin.
-  @constant eHGSAllowOnce Allow the plugin for this run of the application.
-  @constant eHGSDisallow Don't allow the plugin (ask again at next launch).
-*/
-typedef enum {
-  eHGSAllowAlways = 1,
-  eHGSAllowOnce = 2,
-  eHGSDisallow = 3
-} HGSPluginLoadResult;
 
 /*!
   This protocol is used for a delegate so the core HGS code can get information
@@ -72,15 +60,6 @@ typedef enum {
 
 /*! Return a string uniquely identifying the client. */
 - (NSString *)clientID;
-
-/*!
-  When a new plugin is loaded, this method is called to approve it. certRef
-  will contain the certificate that was used to code sign the plugin
-  bundle, or nil if the plugin bundle was unsigned or has an invalid
-  signature.
-*/
-- (HGSPluginLoadResult)shouldLoadPluginAtPath:(NSString *)path
-                                withSignature:(HGSCodeSignature *)signature;
 
 /*!
   Given a result provide a value for the key. This is for keys that are

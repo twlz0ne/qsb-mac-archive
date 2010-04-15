@@ -84,8 +84,6 @@
 // Choose a color from the drop down
 - (IBAction)setColorFromMenu:(id)sender;
 
-// "Under the Hood" actions
-- (void)doubleClickPluginTable:(NSArray *)selectedPlugins;
 @end
 
 /*!

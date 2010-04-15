@@ -266,30 +266,6 @@
 /* A label denoting a table describing the plugins that have been loaded into the QSB. */
 "Plug-ins:" = "プラグイン:";
 
-/* A text string in a dialog asking the user if we should enable a plugin. We are asking the user because we can't verify that the plugin is an official QSB plugin. */
-"Should Google Quick Search enable this plugin?" = "Google クイック検索でこのプラグインを有効にしますか？";
-
-/* A label denoting a group of controls giving details as to why we are not immediately accepting the plugin. */
-"Details" = "詳細";
-
-/* A label for a control that shows where the plugin is located. */
-"Plugin Location:" = "プラグインの場所:";
-
-/* A label for a control that tells you what the plugin can do. */
-"Provides:" = "提供:";
-
-/* A button label denoting that you always want the untrusted plugin enabled. */
-"Always Enable" = "常に有効にする";
-
-/* A button label denoting that you don't want to enable the untrusted plugin. */
-"Deny" = "拒否";
-
-/* A button label denoting that you want to enable the untrusted plugin one time. */
-"Enable" = "有効にする";
-
-/* A text string telling the user that the plugin is untrusted. */
-"The %@ plugin \"%@\" is untrusted." = "この %1$@ プラグイン「%2$@」は信頼できません。";
-
 /* A label for a menu item that allows you to choose a type of account. */
 "Account Type:" = "アカウントの種類:";
 

@@ -266,30 +266,6 @@
 /* A label denoting a table describing the plugins that have been loaded into the QSB. */
 "Plug-ins:" = "Plug-ins:";
 
-/* A text string in a dialog asking the user if we should enable a plugin. We are asking the user because we can't verify that the plugin is an official QSB plugin. */
-"Should Google Quick Search enable this plugin?" = "Soll die Schnellsuche von Google dieses Plug-in aktivieren?";
-
-/* A label denoting a group of controls giving details as to why we are not immediately accepting the plugin. */
-"Details" = "Details";
-
-/* A label for a control that shows where the plugin is located. */
-"Plugin Location:" = "Plug-in-Position:";
-
-/* A label for a control that tells you what the plugin can do. */
-"Provides:" = "Bietet:";
-
-/* A button label denoting that you always want the untrusted plugin enabled. */
-"Always Enable" = "Immer aktivieren";
-
-/* A button label denoting that you don't want to enable the untrusted plugin. */
-"Deny" = "Ablehnen";
-
-/* A button label denoting that you want to enable the untrusted plugin one time. */
-"Enable" = "Aktivieren";
-
-/* A text string telling the user that the plugin is untrusted. */
-"The %@ plugin \"%@\" is untrusted." = "Das %1$@-Plug-in \"%2$@\" ist nicht vertrauenswürdig.";
-
 /* A label for a menu item that allows you to choose a type of account. */
 "Account Type:" = "Kontotyp:";
 

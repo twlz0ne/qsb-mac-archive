@@ -76,28 +76,6 @@
   NSMutableDictionary *extensionMap_;
   
   /*!
-    The code signature on this framework.
-  */
-  HGSCodeSignature *frameworkSignature_;
-  
-  /*!
-    The code signature on the executable hosting this framework.
-  */
-  HGSCodeSignature *executableSignature_;
-  
-  /*!
-    The certificate that was used to sign the this framework, or NULL if the
-    framework is unsigned or has an invalid signature.
-  */
-  SecCertificateRef frameworkCertificate_;
-  
-  /*!
-    A dictionary containing the whitelist of untrusted-but-OK'd-by-the-user
-    plugins. The whitelist is stored in persistent form in an encrypted file.
-  */
-  NSMutableDictionary *pluginSignatureInfo_;
-  
-  /*!
    An array of paths to SDEFs in plugins.
   */
   NSArray *pluginsSDEFPaths_;
@@ -140,22 +118,22 @@
   Path of the failed plugin (NSString)
 */
 extern NSString *const kHGSPluginLoaderPluginPathKey;
+
 /*!
   Reason for failure (NSString)
 */
 extern NSString *const kHGSPluginLoaderPluginFailureKey;
-/*!
-  Failed because it wasn't certified
-*/
-extern NSString *const kHGSPluginLoaderPluginFailedCertification;
+
 /*!
   Failed because it's API version was incorrect
 */
 extern NSString *const kHGSPluginLoaderPluginFailedAPICheck;
+
 /*!
   Failed because unable to instantiate
 */
 extern NSString *const kHGSPluginLoaderPluginFailedInstantiation;
+
 /*!
   Failed because we don't recognize the type of the plugin
 */

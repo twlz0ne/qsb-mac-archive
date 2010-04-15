@@ -266,30 +266,6 @@
 /* A label denoting a table describing the plugins that have been loaded into the QSB. */
 "Plug-ins:" = "外掛程式：";
 
-/* A text string in a dialog asking the user if we should enable a plugin. We are asking the user because we can't verify that the plugin is an official QSB plugin. */
-"Should Google Quick Search enable this plugin?" = "是否要在「Google 快速搜尋框」啟用此外掛程式？";
-
-/* A label denoting a group of controls giving details as to why we are not immediately accepting the plugin. */
-"Details" = "詳細資訊";
-
-/* A label for a control that shows where the plugin is located. */
-"Plugin Location:" = "外掛程式位置：";
-
-/* A label for a control that tells you what the plugin can do. */
-"Provides:" = "功能：";
-
-/* A button label denoting that you always want the untrusted plugin enabled. */
-"Always Enable" = "永遠啟用";
-
-/* A button label denoting that you don't want to enable the untrusted plugin. */
-"Deny" = "拒絕";
-
-/* A button label denoting that you want to enable the untrusted plugin one time. */
-"Enable" = "啟用";
-
-/* A text string telling the user that the plugin is untrusted. */
-"The %@ plugin \"%@\" is untrusted." = "%1$@ 的「%2$@」是不受信任的外掛程式。";
-
 /* A label for a menu item that allows you to choose a type of account. */
 "Account Type:" = "帳戶類型：";
 
