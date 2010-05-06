@@ -128,7 +128,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
 
 - (void)collectActions {
   rebuildCache_ = NO;
-  [self clearResultIndex];
+  HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
 
   HGSExtensionPoint* actionPoint = [HGSExtensionPoint actionsPoint];
   for (HGSAction *action in [actionPoint extensions]) {
@@ -136,10 +136,11 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     HGSResult *actionObject = [self objectFromAction:action
                                          resultArray:nil];
     // Index our result
-    [self indexResult:actionObject 
-                 name:[actionObject displayName] 
-           otherTerms:[[action otherTerms] allObjects]];
+    [database indexResult:actionObject 
+                     name:[actionObject displayName] 
+               otherTerms:[[action otherTerms] allObjects]];
   }
+  [self replaceCurrentDatabaseWith:database];
 }
 
 #pragma mark -

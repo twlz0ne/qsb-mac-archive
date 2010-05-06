@@ -32,12 +32,89 @@
 
 
 #import "GTMSenTestCase.h"
-#import "HGSSearchSourceRanker.h"
+#import <OCMock/OCMock.h>
 
-@interface HGSSearchSourceRankerTest : GTMTestCase 
+#import "HGSSearchSourceRanker.h"
+#import "HGSExtensionPoint.h"
+#import "HGSSearchSource.h"
+
+@interface HGSSearchSourceRankerTest : GTMTestCase {
+ @private
+  HGSSearchSourceRanker *ranker_;
+  id sourcesPoint_;
+}
+
 @end
 
 @implementation HGSSearchSourceRankerTest
-// TODO(dmaclach): add tests here.
-// http://code.google.com/p/qsb-mac/issues/detail?id=845
+
+- (void)setUp {
+  NSBundle *bundle = [NSBundle bundleForClass:[HGSSearchSourceRanker class]];
+  STAssertNotNil(bundle, nil);
+  NSString *plistPath 
+    = [bundle pathForResource:@"HGSSearchSourceRankerCalibration"
+                     ofType:@"plist"];
+  STAssertNotNil(plistPath, nil);
+  NSArray *array = [NSArray arrayWithContentsOfFile:plistPath];
+  STAssertNotNil(array, nil);
+  
+  sourcesPoint_ = [[OCMockObject mockForClass:[HGSExtensionPoint class]] retain];
+  ranker_ = [[HGSSearchSourceRanker alloc] initWithRankerData:array
+                                                 sourcesPoint:sourcesPoint_];
+  STAssertNotNil(ranker_, nil);
+}
+
+- (void)tearDown {
+  [ranker_ release];
+  [sourcesPoint_ release];
+}
+
+- (void)testOrderedSources {
+  id bundle = [OCMockObject mockForClass:[NSBundle class]];
+  NSString *name = @"searchSourceRankerTestActionsSource";
+  [[[bundle expect] andReturn:name] qsb_localizedInfoPListStringForKey:name];
+  HGSSimpleNamedSearchSource *source1
+    = [HGSSimpleNamedSearchSource sourceWithName:name
+                                      identifier:@"com.google.qsb.actions.source"
+                                          bundle:bundle];
+  STAssertNotNil(source1, nil);
+  
+  name = @"searchSourceRankerTestApplicationsSource";
+  [[[bundle expect] andReturn:name] qsb_localizedInfoPListStringForKey:name];
+  HGSSimpleNamedSearchSource *source2
+    = [HGSSimpleNamedSearchSource sourceWithName:name
+                                      identifier:@"com.google.qsb.applications.source"
+                                          bundle:bundle];
+  STAssertNotNil(source2, nil);
+
+  
+  name = @"searchSourceRankerTestSpotlightSource";
+  [[[bundle expect] andReturn:name] qsb_localizedInfoPListStringForKey:name];
+  HGSSimpleNamedSearchSource *source3
+    = [HGSSimpleNamedSearchSource sourceWithName:name
+                                      identifier:@"com.google.qsb.spotlightfiles.source"
+                                          bundle:bundle];
+  STAssertNotNil(source3, nil);
+  NSArray *sources = [NSArray arrayWithObjects:source3, source1, source2, nil];
+  
+  [[[sourcesPoint_ expect] andReturn:sources] extensions];
+  NSArray *orderedSources = [ranker_ orderedSourcesByPerformance];
+  NSArray *expectedOrder = [NSArray arrayWithObjects:source2, source1, source3, nil];
+  STAssertEqualObjects(orderedSources, expectedOrder, nil);
+}
+
+- (void)testDescription {
+  id bundle = [OCMockObject mockForClass:[NSBundle class]];
+  NSString *name = @"searchSourceRankerTestDescriptionSource";
+  [[[bundle expect] andReturn:name] qsb_localizedInfoPListStringForKey:name];
+  HGSSimpleNamedSearchSource *source
+    = [HGSSimpleNamedSearchSource sourceWithName:name
+                                      identifier:@"com.google.qsb.test.source"
+                                          bundle:bundle];
+  NSArray *sources = [NSArray arrayWithObject:source];
+  [[[sourcesPoint_ expect] andReturn:sources] extensions];
+  NSString *description = [ranker_ description];
+  STAssertNotNil(description, nil);
+}
+
 @end

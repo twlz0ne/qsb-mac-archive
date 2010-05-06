@@ -32,8 +32,8 @@
 
 #import <Vermilion/Vermilion.h>
 #import <GData/GData.h>
-#import "GoogleDocsSource.h"
 #import "GoogleDocsConstants.h"
+#import <GTM/GTMTypeCasting.h>
 
 static NSString *const kDocumentDownloadFormat
   = @"http://docs.google.com/feeds/download/documents/Export?"
@@ -111,9 +111,10 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
       }
 
       docID = [GDataUtilities stringByURLEncodingForURI:docID];
-      GoogleDocsSource *source
-        = (GoogleDocsSource *)[directObject source];
-      GDataServiceGoogle *service = [source serviceForDoc:directObject];
+      GDataServiceGoogle *service = nil;      
+      HGSGDataServiceSource *source = GTM_STATIC_CAST(HGSGDataServiceSource, [directObject source]);
+      service = [source service];
+     
       HGSAssert(service, nil);
 
       // The method of retrieving the document is different for

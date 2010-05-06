@@ -54,10 +54,15 @@
             browserTypeName:(NSString *)browserTypeName
                 fileToWatch:(NSString *)path;
 
-- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation;
-
 - (void)indexResultNamed:(NSString *)name 
                      URL:(NSString *)url 
-         otherAttributes:(NSDictionary *)otherAttributes;
+         otherAttributes:(NSDictionary *)otherAttributes
+                    into:(HGSMemorySearchSourceDB *)database;
+
 - (NSString *)domainURLForURLString:(NSString *)urlString;
+
+// Methods for subclasses to override
+- (void)updateDatabase:(HGSMemorySearchSourceDB *)database
+               forPath:(NSString *)path 
+             operation:(NSOperation *)operation;
 @end

@@ -252,13 +252,14 @@ static void ListChanged(LSSharedFileListRef inList, void *context);
 }
 
 // Reset our HGSMemorySource index with all of our values.
-- (void)loadFileLists {  
-  [self clearResultIndex];
+- (void)loadFileLists {
+  HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
   for (SharedFileListStorage* storage in storage_) {
     for (HGSResult *result in [storage results]) {
-      [self indexResult:result];   
+      [database indexResult:result];   
     }
   }
+  [self replaceCurrentDatabaseWith:database];
 }
 
 // The list has changed, so we reindex it and then update our master

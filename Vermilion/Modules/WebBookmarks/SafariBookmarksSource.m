@@ -38,9 +38,11 @@
 // Implements a Search Source for finding Safari Bookmarks.
 //
 @interface HGSSafariBookmarksSource : WebBookmarksSource 
-- (void)indexSafariBookmarksForDict:(NSDictionary *)dict 
+- (void)indexSafariBookmarksForDict:(NSDictionary *)dict
+                               into:(HGSMemorySearchSourceDB *)database 
                           operation:(NSOperation *)operation;
-- (void)indexBookmark:(NSDictionary*)dict;
+- (void)indexBookmark:(NSDictionary*)dict 
+                 into:(HGSMemorySearchSourceDB *)database;
 @end
 
 @implementation HGSSafariBookmarksSource
@@ -68,7 +70,8 @@
 
 #pragma mark -
 
-- (void)indexSafariBookmarksForDict:(NSDictionary *)dict 
+- (void)indexSafariBookmarksForDict:(NSDictionary *)dict
+                               into:(HGSMemorySearchSourceDB *)database 
                           operation:(NSOperation *)operation {
   NSString *title = [dict objectForKey:@"Title"];
   if ([title isEqualToString:@"Archive"]) return; // Skip Archive folder
@@ -79,29 +82,33 @@
     if ([operation isCancelled]) return;
     NSString *type = [child objectForKey:@"WebBookmarkType"];
     if ([type isEqualToString:@"WebBookmarkTypeLeaf"]) {
-      [self indexBookmark:child];
+      [self indexBookmark:child into:database];
     } else if ([type isEqualToString:@"WebBookmarkTypeList"]) {
-      [self indexSafariBookmarksForDict:child operation:operation];
+      [self indexSafariBookmarksForDict:child
+                                   into:database
+                              operation:operation];
     }
   }
 }
 
-- (void)indexBookmark:(NSDictionary*)dict {
+- (void)indexBookmark:(NSDictionary*)dict 
+                 into:(HGSMemorySearchSourceDB *)database {
   NSString* title = [[dict objectForKey:@"URIDictionary"] objectForKey:@"title"];
   NSString* urlString = [dict objectForKey:@"URLString"];
   
   if (!title || !urlString) {
     return;
   }
-  [self indexResultNamed:title URL:urlString otherAttributes:nil];
+  [self indexResultNamed:title URL:urlString otherAttributes:nil into:database];
 }
 
-- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation {
+- (void)updateDatabase:(HGSMemorySearchSourceDB *)database
+               forPath:(NSString *)path 
+             operation:(NSOperation *)operation {
   if (![operation isCancelled]) {
-    [super updateIndexForPath:path operation:operation];
     NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
     if (dict) {
-      [self indexSafariBookmarksForDict:dict operation:operation];
+      [self indexSafariBookmarksForDict:dict into:database operation:operation];
     }
   }
 }

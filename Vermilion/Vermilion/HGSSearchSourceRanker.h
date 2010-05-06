@@ -39,6 +39,7 @@
 */
 
 @class HGSSearchSource;
+@class HGSExtensionPoint;
 
 /*!
  Keeps track of the ranking of search sources. Currently this is only the
@@ -48,6 +49,7 @@
 @interface HGSSearchSourceRanker : NSObject {
  @private
   NSMutableDictionary *rankDictionary_;
+  HGSExtensionPoint *sourcesPoint_;
   UInt64 promotionCount_;
   BOOL dirty_;
 }
@@ -68,8 +70,11 @@
  Designated initializer. Initialize with data previously obtained from
  rankerData. In general you should always use +sharedSearchSourceRanker.
  This exists mainly for unittesting.
+ @param data Data to initialize the ranker with.
+ @param point HGSExtensionPoint to get sources from.
+ @result HGSSearchSourceRanker instance.
 */
-- (id)initWithRankerData:(id)data;
+- (id)initWithRankerData:(id)data sourcesPoint:(HGSExtensionPoint*)point;
 
 /*!
  Archives the current ranker data in a form that can be stored in a plist.

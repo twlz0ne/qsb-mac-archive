@@ -43,6 +43,7 @@
 #import <Vermilion/HGSDelegate.h>
 #import <Vermilion/HGSExtension.h>
 #import <Vermilion/HGSExtensionPoint.h>
+#import <Vermilion/HGSGDataServiceSource.h>
 #import <Vermilion/HGSGDataUploadAction.h>
 #import <Vermilion/HGSIconProvider.h>
 #import <Vermilion/HGSLog.h>

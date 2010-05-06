@@ -198,11 +198,13 @@ NSString *const kHGSCorporaSourceAttributeHideFromDropdownKey
   validCorpora_ = [allCorpora retain];
   searchableCorpora_ = [searchableCorpora retain];
  
-  [self clearResultIndex];
+  HGSMemorySearchSourceDB *db = [HGSMemorySearchSourceDB database];
   
   for (HGSResult *corpus in allCorpora) {
-    [self indexResult:corpus];
+    [db indexResult:corpus];
   }
+  
+  [self replaceCurrentDatabaseWith:db];
   
   return YES;
 }

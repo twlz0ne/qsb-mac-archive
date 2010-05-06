@@ -36,50 +36,71 @@
 
 static const NSTimeInterval kServiceResolutionTimeout = 5.0;
 
+@class MountSearchSourceResolver;
+
 @interface MountSearchSource : HGSMemorySearchSource {
  @private
   NSMutableArray *services_;
   NSMutableDictionary *browsers_;
   NSDictionary *configuration_;
+  CFRunLoopSourceRef rlSource_;
+  MountSearchSourceResolver *resolver_;
+  BOOL cancelled_;
 }
+@property (readonly, retain) NSDictionary *configuration;
+@property (readonly, retain) NSArray *services;
+@property (readwrite, assign, getter=isCancelled) BOOL cancelled;
+
 - (void)updateResultsIndex;
 @end
 
+@interface MountSearchSourceResolver :  NSObject {
+ @private
+  HGSMemorySearchSourceDB *database_;
+  __weak MountSearchSource *source_;
+  NSMutableArray *services_;
+}
+- (id)initWithMountSearchSource:(MountSearchSource *)source;
+
+@end
+
 @implementation MountSearchSource
+
+@synthesize configuration = configuration_;
+@synthesize services = services_;
+@synthesize cancelled = cancelled_;
+
+void cancelThread(void *info) {
+  MountSearchSource *source = (MountSearchSource *)info;
+  [source setCancelled:YES];
+}
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
     configuration_ = [configuration objectForKey:@"MountSearchSourceServices"]; 
     browsers_ = [[NSMutableDictionary alloc] init];
     services_ = [[NSMutableArray alloc] init];
-
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self
-           selector:@selector(willRemoveExtensionNotification:)
-               name:kHGSExtensionPointWillRemoveExtensionNotification
-             object:nil];
+    CFRunLoopSourceContext context = {
+    0, self, NULL, NULL, NULL, NULL, NULL, NULL, NULL, cancelThread 
+    };
+    rlSource_ = CFRunLoopSourceCreate(NULL, 0, &context);
     
-    for (NSString *key in configuration_) {
-      NSNetServiceBrowser *browser
-        = [[[NSNetServiceBrowser alloc] init] autorelease];
-      [browser setDelegate:self];
-      [browser searchForServicesOfType:key inDomain:@""];
-      [browsers_ setObject:browser forKey:key];
-    }
+    [NSThread detachNewThreadSelector:@selector(mountSearchSourceTracker:) 
+                             toTarget:self 
+                           withObject:nil];
   }
   return self;
 }
 
 - (void)dealloc {
-  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc removeObserver:self];
   [browsers_ release];
   [configuration_ release];
   [services_ release];
+  [resolver_ release];
   [super dealloc];
 }
 
-- (void)willRemoveExtensionNotification:(NSNotification *)notification {
+- (void)uninstall {
   for (NSString *key in browsers_) {
     NSNetServiceBrowser *browser = [browsers_ objectForKey:key];
     [browser stop];
@@ -91,18 +112,32 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
   }
   [services_ release];
   services_ = nil;
+  [resolver_ release];
+  resolver_ = nil;
 }
 
-- (void)updateResultsIndex {
-  [self clearResultIndex];
-  for (NSNetService *service in services_) {
-    if (![service delegate]) {
-      // If the delegate has not been set then it's new and we haven't started
-      // resolving it. So set the delegate, and start resolving.
-      [service setDelegate:self];
-      [service resolveWithTimeout:kServiceResolutionTimeout];
-    }
+- (void)mountSearchSourceTracker:(void *)ignored {
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  for (NSString *key in configuration_) {
+    NSNetServiceBrowser *browser
+    = [[[NSNetServiceBrowser alloc] init] autorelease];
+    [browser setDelegate:self];
+    [browser searchForServicesOfType:key inDomain:@""];
+    [browsers_ setObject:browser forKey:key];
   }
+  CFRunLoopRef rl = CFRunLoopGetCurrent();
+  CFRunLoopAddSource(rl, rlSource_, kCFRunLoopDefaultMode);
+  while (![self isCancelled]) {
+    CFRunLoopRun();
+  }
+  CFRunLoopRemoveSource(rl, rlSource_, kCFRunLoopDefaultMode);
+  [pool drain];
+}
+  
+- (void)updateResultsIndex {
+  [resolver_ release];
+  resolver_ 
+    = [[MountSearchSourceResolver alloc] initWithMountSearchSource:self];
 }
 
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
@@ -129,7 +164,53 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
   }
 }
 
-- (void)netServiceDidResolveAddress:(NSNetService *)service {  
+- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
+  id value = nil;
+  if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
+    NSURL *appURL = nil;
+    if (noErr == LSGetApplicationForURL((CFURLRef)[result url],
+                                        kLSRolesViewer,
+                                        NULL,
+                                        (CFURLRef *)&appURL)) {
+      // TODO(alcor): badge this with the bonjour icon
+      // NSImage *bonjour = [NSImage imageNamed:NSImageNameBonjour];
+      value = [[NSWorkspace sharedWorkspace] iconForFile:[appURL path]];
+      GTMCFAutorelease(appURL);
+    }
+  
+  }
+  return value;
+}
+@end
+
+@implementation MountSearchSourceResolver
+
+- (id)initWithMountSearchSource:(MountSearchSource *)source {
+  if ((self = [super init])) {
+    database_ = [[HGSMemorySearchSourceDB alloc] init];
+    NSArray *services = [source services];
+    services_ = [services mutableCopy];
+    source_ = source;
+    
+    for (NSNetService *service in services) {
+      [service setDelegate:self];
+      [service resolveWithTimeout:kServiceResolutionTimeout];
+    }
+  }
+  return self;
+}
+
+- (void)dealloc {
+  for (NSNetService *service in services_) {
+    [service stop];
+    [service setDelegate:nil];
+  }
+  [services_ release];
+  [database_ release];
+  [super dealloc];
+}
+
+- (void)netServiceDidResolveAddress:(NSNetService *)service {
   struct sockaddr_in *inetAddress = NULL;
   for (NSData *addressBytes in [service addresses]) {
     inetAddress = (struct sockaddr_in *)[addressBytes bytes];
@@ -147,13 +228,13 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
     switch (inetAddress->sin_family) {
       case AF_INET:
         ipCString = inet_ntop(inetAddress->sin_family, &inetAddress->sin_addr,
-                             ipStringBuffer, (socklen_t)sizeof(ipStringBuffer));
+                              ipStringBuffer, (socklen_t)sizeof(ipStringBuffer));
         ipString = [NSString stringWithUTF8String:ipCString];
         break;
       case AF_INET6:
         ipCString = inet_ntop(inetAddress->sin_family,
-                             &((struct sockaddr_in6 *)inetAddress)->sin6_addr,
-                            ipStringBuffer, (socklen_t)sizeof(ipStringBuffer));
+                              &((struct sockaddr_in6 *)inetAddress)->sin6_addr,
+                              ipStringBuffer, (socklen_t)sizeof(ipStringBuffer));
         ipString = [NSString stringWithFormat:@"[%s]", ipCString];
         break;
     }
@@ -167,10 +248,10 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
       NSMutableArray *otherTerms = [NSMutableArray arrayWithObjects:
                                     mount, share, nil];
       NSString *urlString = nil, *type = nil, *scheme = nil;
-      
-      for (NSString *key in configuration_) {
+      NSDictionary *configuration = [source_ configuration];
+      for (NSString *key in configuration) {
         if ([[service type] hasPrefix:key]) {
-          NSDictionary *dict = [configuration_ objectForKey:key];
+          NSDictionary *dict = [configuration objectForKey:key];
           scheme = [dict objectForKey:@"scheme"];
           urlString = [NSString stringWithFormat:@"%@://%@/", scheme, ipString];
           type = [dict objectForKey:@"type"];
@@ -191,37 +272,32 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
           = [HGSUnscoredResult resultWithURI:urlString
                                         name:displayName
                                         type:type
-                                      source:self
+                                      source:source_
                                   attributes:attributes];
-        [self indexResult:hgsResult 
-                     name:name 
-               otherTerms:otherTerms];
+        [database_ indexResult:hgsResult 
+                          name:name 
+                    otherTerms:otherTerms];
       }
     }
   }
-}
-
-- (void)netService:(NSNetService *)sender
-     didNotResolve:(NSDictionary *)errorDict {
-  HGSLogDebug(@"Mount did not resolve: %@ (%@)", sender,
-              [errorDict objectForKey:NSNetServicesErrorCode]);
-}
-
-- (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
-  id value = nil;
-  if ([key isEqualToString:kHGSObjectAttributeIconKey]) {
-    NSURL *appURL = nil;
-    if (noErr == LSGetApplicationForURL((CFURLRef)[result url],
-                                        kLSRolesViewer,
-                                        NULL,
-                                        (CFURLRef *)&appURL)) {
-      // TODO(alcor): badge this with the bonjour icon
-      // NSImage *bonjour = [NSImage imageNamed:NSImageNameBonjour];
-      value = [[NSWorkspace sharedWorkspace] iconForFile:[appURL path]];
-      GTMCFAutorelease(appURL);
-    }
-  
+  [services_ removeObject:service];
+  if ([services_ count] == 0) {
+    [source_ replaceCurrentDatabaseWith:database_];
   }
-  return value;
 }
+
+- (void)netService:(NSNetService *)service
+     didNotResolve:(NSDictionary *)errorDict {
+  NSNumber *error = [errorDict objectForKey:NSNetServicesErrorCode];
+  OSStatus err = [error longValue];
+  if (err != NSNetServicesActivityInProgress 
+      && err != NSNetServicesCancelledError) {
+    HGSLogDebug(@"Mount did not resolve: %@ (%d)", service, err);
+  }
+  [services_ removeObject:service];
+  if ([services_ count] == 0) {
+    [source_ replaceCurrentDatabaseWith:database_];
+  }  
+}
+
 @end

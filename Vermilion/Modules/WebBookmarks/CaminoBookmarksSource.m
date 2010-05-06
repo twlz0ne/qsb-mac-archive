@@ -34,8 +34,10 @@
 
 @interface HGSCaminoBookmarksSource : WebBookmarksSource
 - (void)indexCaminoBookmarksForDict:(NSDictionary *)dict
+                               into:(HGSMemorySearchSourceDB *)database
                           operation:(NSOperation *)operation;
-- (void)indexBookmark:(NSDictionary*)dict;
+- (void)indexBookmark:(NSDictionary*)dict
+                 into:(HGSMemorySearchSourceDB *)database;
 @end
 
 @implementation HGSCaminoBookmarksSource
@@ -62,20 +64,24 @@
                           fileToWatch:fileToWatch];
 }
 
-- (void)indexCaminoBookmarksForDict:(NSDictionary *)dict 
+- (void)indexCaminoBookmarksForDict:(NSDictionary *)dict
+                               into:(HGSMemorySearchSourceDB *)database
                           operation:(NSOperation *)operation {
   NSArray *children = [dict objectForKey:@"Children"];
   if (children) {
     for (NSDictionary *child in children) {
       if ([operation isCancelled]) return;
-      [self indexCaminoBookmarksForDict:child operation:operation];
+      [self indexCaminoBookmarksForDict:child
+                                   into:database
+                              operation:operation];
     }
   } else {
-    [self indexBookmark:dict];
+    [self indexBookmark:dict into:database];
   }
 }
 
-- (void)indexBookmark:(NSDictionary*)dict {
+- (void)indexBookmark:(NSDictionary*)dict 
+                 into:(HGSMemorySearchSourceDB *)database {
   NSString* title = [dict objectForKey:@"Title"];
   NSString* urlString = [dict objectForKey:@"URL"];
   if (!title || !urlString) {
@@ -117,16 +123,20 @@
                      forKey:kHGSObjectAttributeWebSearchTemplateKey];
     }
   }
-  [self indexResultNamed:nameString URL:urlString otherAttributes:attributes];
+  [self indexResultNamed:nameString 
+                     URL:urlString 
+         otherAttributes:attributes
+                    into:database];
 }
 
 
-- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation {
+- (void)updateDatabase:(HGSMemorySearchSourceDB *)database
+               forPath:(NSString *)path 
+             operation:(NSOperation *)operation {
   if (![operation isCancelled]) {
-    [super updateIndexForPath:path operation:operation];
     NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
     if (dict) {
-      [self indexCaminoBookmarksForDict:dict operation:operation];
+      [self indexCaminoBookmarksForDict:dict into:database operation:operation];
     }
   }
 }

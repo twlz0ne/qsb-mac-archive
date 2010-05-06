@@ -164,7 +164,6 @@ static NSString *const kApplicationSourcePredicateString
 }
 
 - (void)parseResultsOperation:(NSMetadataQuery *)query {
-  [self clearResultIndex];
   NSArray *mdAttributeNames = [NSArray arrayWithObjects:
                                (NSString *)kMDItemDisplayName,
                                (NSString *)kMDItemPath,
@@ -186,6 +185,7 @@ static NSString *const kApplicationSourcePredicateString
                                                 @"result is a System "
                                                 @"Preference Pane");
   NSFileManager *fileManager = [NSFileManager defaultManager];
+  HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
   for (NSUInteger i = 0; i < resultCount; ++i) {
     NSMetadataItem *result = [query resultAtIndex:i];
     NSDictionary *mdAttributes = [result valuesForAttributes:mdAttributeNames];
@@ -263,7 +263,7 @@ static NSString *const kApplicationSourcePredicateString
                                        source:self
                                    attributes:attributes];
 
-    [self indexResult:hgsResult
+    [database indexResult:hgsResult
                  name:name
             otherTerm:fileSystemName];
     
@@ -291,11 +291,11 @@ static NSString *const kApplicationSourcePredicateString
                                   source:self
                               attributes:regularAttributes];
     
-    [self indexResult:hgsResult];
+    [database indexResult:hgsResult];
   } else {
     HGSLog(@"Unable to find Network.prefpane");
   }
-
+  [self replaceCurrentDatabaseWith:database];
   [self saveResultsCache];
   [query enableUpdates];
 }
@@ -352,6 +352,7 @@ static NSString *const kApplicationSourcePredicateString
   NSMutableDictionary *regularAttributes
     = [NSMutableDictionary dictionaryWithObject:rankFlags
                                          forKey:kHGSObjectAttributeRankFlagsKey];
+  HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
   NSFileManager *fm = [NSFileManager defaultManager];
   for (NSString *appPath in applicationFolders) {
     NSDirectoryEnumerator *fileEnumerator = [fm enumeratorAtPath:appPath];
@@ -370,12 +371,13 @@ static NSString *const kApplicationSourcePredicateString
                                         source:self
                                     attributes:regularAttributes];
           
-          [self indexResult:hgsResult];
+          [database indexResult:hgsResult];
         }
         [fileEnumerator skipDescendents];
       }
     }
   }
+  [self replaceCurrentDatabaseWith:database];
 }
         
         

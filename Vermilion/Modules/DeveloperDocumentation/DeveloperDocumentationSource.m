@@ -54,7 +54,8 @@ static NSString *const kiPhoneReferenceDocSetPath
   NSImage *docSetIcon_;
 }
 - (void)indexDocumentationOperation;
-- (void)indexDocSetAtPath:(NSString *)docSetPath;
+- (void)indexDocSetAtPath:(NSString *)docSetPath 
+                     into:(HGSMemorySearchSourceDB *)database;
 @end
 
 @implementation DeveloperDocumentationSource
@@ -83,7 +84,8 @@ static NSString *const kiPhoneReferenceDocSetPath
   return self;
 }
 
-- (void)indexDocSetAtPath:(NSString *)docSetPath {
+- (void)indexDocSetAtPath:(NSString *)docSetPath 
+                     into:(HGSMemorySearchSourceDB *)database {
   
   if (!docSetPath) return;
   
@@ -158,7 +160,7 @@ static NSString *const kiPhoneReferenceDocSetPath
                                       type:HGS_SUBTYPE(kHGSTypeFile, @"developerdocs")
                                     source:self
                                 attributes:attributes];  
-      [self indexResult:result];
+      [database indexResult:result];
       [url autorelease];
     }
     [innerPool release];
@@ -168,7 +170,7 @@ static NSString *const kiPhoneReferenceDocSetPath
 
 - (void)indexDocumentationOperation {
   [condition_ lock];
-  [self clearResultIndex];
+  HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
   NSString *xcodePath = [ws fullPathForApplication:@"Xcode"];
   if (xcodePath) {
@@ -189,8 +191,9 @@ static NSString *const kiPhoneReferenceDocSetPath
       = [developerPath stringByAppendingPathComponent:kCoreReferenceDocSetPath];
     NSString *iPhoneReference 
       = [developerPath stringByAppendingPathComponent:kiPhoneReferenceDocSetPath];
-    [self indexDocSetAtPath:coreReference];
-    [self indexDocSetAtPath:iPhoneReference];
+    [self indexDocSetAtPath:coreReference into:database];
+    [self indexDocSetAtPath:iPhoneReference into:database];
+    [self replaceCurrentDatabaseWith:database];
   }
   indexed_ = YES;
   [condition_ signal];

@@ -37,6 +37,7 @@
 - (void)pathCheckTimer:(NSTimer *)timer;
 - (void)fileChanged:(GTMFileSystemKQueue *)queue 
               event:(GTMFileSystemKQueueEvents)event;
+- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation;
 @end
 
 @implementation WebBookmarksSource
@@ -97,7 +98,8 @@
 
 - (void)indexResultNamed:(NSString *)name 
                      URL:(NSString *)urlString
-         otherAttributes:(NSDictionary *)otherAttributes {
+         otherAttributes:(NSDictionary *)otherAttributes
+                    into:(HGSMemorySearchSourceDB *)database {
   if (!name || !urlString) {
     HGSLogDebug(@"Missing name (%@) or url (%@) for bookmark. Source %@",
                 name, urlString, self);
@@ -123,7 +125,7 @@
                                   type:type
                                 source:self
                             attributes:attributes];
-  [self indexResult:result];
+  [database indexResult:result];
 }
 
 - (void)fileChanged:(GTMFileSystemKQueue *)queue 
@@ -159,7 +161,16 @@
 }
 
 - (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation {
-  [self clearResultIndex];
+  HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
+  [self updateDatabase:database forPath:path operation:operation];
+  if (![operation isCancelled]) {
+    [self replaceCurrentDatabaseWith:database];
+  }
 }
 
+- (void)updateDatabase:(HGSMemorySearchSourceDB *)database
+               forPath:(NSString *)path 
+             operation:(NSOperation *)operation {
+  [self doesNotRecognizeSelector:_cmd];
+}
 @end

@@ -279,11 +279,12 @@ static NSString *const kClipboardCopyAction
           [recentResults_ removeObjectAtIndex:0];
         }
         [recentResults_ addObject:result];
-        [self clearResultIndex];
-        [self indexResult:clipboardResult_]; 
+        HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
+        [database indexResult:clipboardResult_]; 
         for (HGSResult *recentResult in recentResults_) {
-          [self indexResult:recentResult];
+          [database indexResult:recentResult];
         }
+        [self replaceCurrentDatabaseWith:database];
       }
     }
     

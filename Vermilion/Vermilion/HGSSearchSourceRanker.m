@@ -33,7 +33,6 @@
 #import "HGSSearchSourceRanker.h"
 #import "HGSMemorySearchSource.h"
 #import "HGSCoreExtensionPoints.h"
-#import "GTMObjectSingleton.h"
 #import "HGSResult.h"
 #import "HGSLog.h"
 #import "HGSBundle.h"
@@ -86,9 +85,9 @@ static NSInteger HGSSearchSourceRankerPerformanceSort(id src1,
   } else {
     UInt32 promoteCount1 = [dp1 promotionCount];
     UInt32 promoteCount2 = [dp2 promotionCount];
-    if (promoteCount1 > promoteCount2) {
+    if (promoteCount1 < promoteCount2) {
       order = NSOrderedDescending;
-    } else if (promoteCount1 < promoteCount2) {
+    } else if (promoteCount1 > promoteCount2) {
       order = NSOrderedAscending;
     } else {
       // If we have no data on either of them, run memory search sources first.
@@ -122,10 +121,24 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
   return order;
 }
 
+
 @implementation HGSSearchSourceRanker
-GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker, 
-                                sharedSearchSourceRanker);
+
 @synthesize dirty = dirty_;
+
+
++ (HGSSearchSourceRanker *)sharedSearchSourceRanker {
+  // Not using GTMObjectSingleton because we want to be able to
+  // have both a shared version and be able to initialize these
+  // ourselves for unit testing purposes.
+  static HGSSearchSourceRanker *sharedRanker = nil;
+  @synchronized (@"HGSSearchSourceSharedRankerSynchronization") {
+    if (!sharedRanker) {
+      sharedRanker = [[HGSSearchSourceRanker alloc] init];
+    }
+  }
+  return sharedRanker;
+}
 
 - (id)init {
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -139,7 +152,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
     array = [NSArray arrayWithContentsOfFile:plistPath];
   }
   HGSAssert(array, nil);
-  self = [self initWithRankerData:array];
+  self = [self initWithRankerData:array 
+                     sourcesPoint:[HGSExtensionPoint sourcesPoint]];
   if (self) {
     [NSTimer scheduledTimerWithTimeInterval:10 
                                      target:self 
@@ -150,16 +164,18 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
   return self;
 }
 
-- (id)initWithRankerData:(id)data {
+- (id)initWithRankerData:(id)data sourcesPoint:(HGSExtensionPoint*)point {
   if ((self = [super init])) {
+    HGSAssert(point, nil);
     HGSAssert([data isKindOfClass:[NSArray class]], nil);
     rankDictionary_ = [[NSMutableDictionary alloc] init];
+    sourcesPoint_ = [point retain];
     if (data) {
       for (NSDictionary *entry in data) {
         NSString *key = [entry objectForKey:kHGSSearchSourceRankerSourceIDKey];
         HGSSearchSourceRankerDataPoint *dp 
-        = [[[HGSSearchSourceRankerDataPoint alloc] initWithDictionary:entry] 
-           autorelease];
+          = [[[HGSSearchSourceRankerDataPoint alloc] initWithDictionary:entry] 
+             autorelease];
         if (dp) {
           [rankDictionary_ setObject:dp forKey:key];
           promotionCount_ += [dp promotionCount];
@@ -182,6 +198,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
 
 - (void)dealloc {
   [rankDictionary_ release];
+  [sourcesPoint_ release];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self];
   [super dealloc];
@@ -233,9 +250,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSSearchSourceRanker,
 }
 
 - (NSArray *)orderedSourcesByPerformance {
-  HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
   NSMutableArray *sources 
-    = [NSMutableArray arrayWithArray:[sourcesPoint extensions]];
+    = [NSMutableArray arrayWithArray:[sourcesPoint_ extensions]];
   @synchronized (self) {
     [sources sortUsingFunction:HGSSearchSourceRankerPerformanceSort 
                        context:rankDictionary_];

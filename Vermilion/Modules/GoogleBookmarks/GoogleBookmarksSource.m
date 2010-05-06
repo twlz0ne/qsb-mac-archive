@@ -53,7 +53,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 - (void)setUpPeriodicRefresh;
 - (void)startAsynchronousBookmarkFetch;
 - (void)indexBookmarksFromData:(NSData*)data operation:(NSOperation *)op;
-- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode operation:(NSOperation *)op;
+- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode 
+                operation:(NSOperation *)op 
+                     into:(HGSMemorySearchSourceDB*)database;
 
 @end
 
@@ -162,16 +164,19 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                    options:0
                                      error:nil] autorelease];
   NSArray *bookmarkNodes = [bookmarksXML nodesForXPath:@"//item" error:NULL];
-  [self clearResultIndex];
+  HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
   NSEnumerator *nodeEnumerator = [bookmarkNodes objectEnumerator];
   NSXMLNode *bookmark;
   while ((bookmark = [nodeEnumerator nextObject])) {
     if ([op isCancelled]) break;
-    [self indexBookmarkNode:bookmark operation:op];
+    [self indexBookmarkNode:bookmark operation:op into:database];
   }
+  [self replaceCurrentDatabaseWith:database];
 }
 
-- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode operation:(NSOperation *)op {
+- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode 
+                operation:(NSOperation *)op
+                     into:(HGSMemorySearchSourceDB*)database {
   NSString *title = nil;
   NSString *url = nil;
   NSMutableArray *otherTermStrings = [NSMutableArray array];
@@ -251,9 +256,9 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                                    @"googlebookmarks")
                                 source:self
                             attributes:attributes];
-  [self indexResult:result
-               name:title
-         otherTerms:otherTermStrings];
+  [database indexResult:result
+                   name:title
+             otherTerms:otherTermStrings];
 }
 
 #pragma mark -

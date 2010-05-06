@@ -32,7 +32,6 @@
 
 #import <Vermilion/Vermilion.h>
 #import <GData/GData.h>
-#import "GoogleDocsSource.h"
 #import "GoogleDocsConstants.h"
 #import "HGSKeychainItem.h"
 

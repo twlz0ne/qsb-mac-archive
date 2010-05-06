@@ -89,7 +89,7 @@
 }
 
 - (void)recacheContents {
-  [self clearResultIndex];
+  HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
   
   NSFileManager *manager = [NSFileManager defaultManager];
   NSArray *array = [manager directoryContentsAtPath:path_];
@@ -120,8 +120,9 @@
     HGSUnscoredResult *result = [HGSUnscoredResult resultWithFilePath:subpath
                                                                source:self
                                                            attributes:nil];
-    [self indexResult:result];
+    [database indexResult:result];
   }
+  [self replaceCurrentDatabaseWith:database];
   [self saveResultsCache];
 }
 

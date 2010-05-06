@@ -37,8 +37,10 @@ static NSString *const kChromeBookmarksSourceSubdirectoryKey
   = @"ChromeBookmarksSourceSubdirectory";
 
 @interface ChromeBookmarksSource : WebBookmarksSource
-- (void)indexChromeBookmark:(NSDictionary *)dict;
+- (void)indexChromeBookmark:(NSDictionary *)dict
+                       into:(HGSMemorySearchSourceDB *)database;
 - (void)indexChromeBookmarksForDict:(NSDictionary *)dict
+                               into:(HGSMemorySearchSourceDB *)database
                           operation:(NSOperation *)operation;
 @end
 
@@ -70,30 +72,38 @@ static NSString *const kChromeBookmarksSourceSubdirectoryKey
                           fileToWatch:fileToWatch];
 }
 
-- (void)indexChromeBookmark:(NSDictionary*)dict {
+- (void)indexChromeBookmark:(NSDictionary*)dict
+                       into:(HGSMemorySearchSourceDB *)database {
   NSString* nameString = [dict objectForKey:@"name"];
   NSString* urlString = [dict objectForKey:@"url"];
   if (nameString && urlString) {
-    [self indexResultNamed:nameString URL:urlString otherAttributes:nil];
+    [self indexResultNamed:nameString 
+                       URL:urlString 
+           otherAttributes:nil 
+                      into:database];
   }
 }
 
 - (void)indexChromeBookmarksForDict:(NSDictionary *)dict
-                          operation:(NSOperation *)operation {
+                               into:(HGSMemorySearchSourceDB *)database 
+                          operation:(NSOperation *)operation{
   NSArray *children = [dict objectForKey:@"children"];
   if (!children) {
-    [self indexChromeBookmark:dict];
+    [self indexChromeBookmark:dict into:database];
   } else {
     for (NSDictionary *child in children) {
       if ([operation isCancelled]) return;
-      [self indexChromeBookmarksForDict:child operation:operation];
+      [self indexChromeBookmarksForDict:child 
+                                   into:database 
+                              operation:operation];
     }
   }
 }
 
-- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation {
+- (void)updateDatabase:(HGSMemorySearchSourceDB *)database
+               forPath:(NSString *)path 
+             operation:(NSOperation *)operation {
   if (![operation isCancelled]) {
-    [super updateIndexForPath:path operation:operation];
     NSString *json = [NSString stringWithContentsOfFile:path
                                                encoding:NSUTF8StringEncoding
                                                   error:nil];
@@ -101,7 +111,9 @@ static NSString *const kChromeBookmarksSourceSubdirectoryKey
     if (roots) {
       for (NSString *name in roots) {
         NSDictionary *dict = [roots objectForKey:name];
-        [self indexChromeBookmarksForDict:dict operation:operation];
+        [self indexChromeBookmarksForDict:dict 
+                                     into:database 
+                                operation:operation];
       }
     }
   }

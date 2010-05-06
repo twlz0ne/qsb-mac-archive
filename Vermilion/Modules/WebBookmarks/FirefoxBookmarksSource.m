@@ -88,9 +88,10 @@
 }
 // COV_NF_END
 
-- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation {
+- (void)updateDatabase:(HGSMemorySearchSourceDB *)database
+               forPath:(NSString *)path 
+             operation:(NSOperation *)operation {
   if ([operation isCancelled]) return;
-  [super updateIndexForPath:path operation:operation];
   NSString *bookmarksPath = [bookmarksDirectoryKQueue_ path];
   NSString *pluginsPath = [searchPluginsDirectoryKQueue_ path];
   if (![path isEqual:bookmarksPath] && ![path isEqual:pluginsPath]) {
@@ -125,7 +126,10 @@
   for(NSDictionary *plugin in plugins) {
     NSString *name = [plugin objectForKey:kHGSObjectAttributeNameKey];
     NSString *urlString = [plugin objectForKey:kHGSObjectAttributeURIKey];
-    [self indexResultNamed:name URL:urlString otherAttributes:nil];
+    [self indexResultNamed:name 
+                       URL:urlString 
+           otherAttributes:nil 
+                      into:database];
   }
   NSFileManager *fm = [NSFileManager defaultManager];
   NSString *bookmarksFile = [fm mostRecentFileInDirectory:bookmarksPath];
@@ -140,7 +144,8 @@
                                     forKey:kHGSObjectAttributeLastUsedDateKey];
     [self indexResultNamed:name 
                        URL:urlString 
-           otherAttributes:otherAttributes];
+           otherAttributes:otherAttributes
+                      into:database];
   }
 }
 

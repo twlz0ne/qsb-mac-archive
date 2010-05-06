@@ -109,9 +109,15 @@
   [fetcher_ beginFetchWithDelegate:self
                  didFinishSelector:@selector(httpFetcher:finishedWithData:)
                    didFailSelector:@selector(httpFetcher:failedWithError:)];
+  CFRunLoopSourceContext context;
+  bzero(&context, sizeof(context));
+  CFRunLoopSourceRef source = CFRunLoopSourceCreate(NULL, 0, &context);
+  CFRunLoopRef runloop = CFRunLoopGetCurrent();
+  CFRunLoopAddSource(runloop, source, kCFRunLoopDefaultMode);
   while (!didFinish_) {
     CFRunLoopRun();
   }
+  CFRunLoopRemoveSource(runloop, source, kCFRunLoopDefaultMode);
 }
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher

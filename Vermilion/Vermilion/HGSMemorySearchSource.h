@@ -39,6 +39,7 @@
 
 @class HGSQuery;
 @class HGSResultArray;
+@class HGSMemorySearchSourceDB;
 
 /*!
  Subclass of HGSCallbackSearchSource that handles the search logic for simple
@@ -61,50 +62,17 @@
 */
 @interface HGSMemorySearchSource : HGSCallbackSearchSource {
  @private
-  NSMutableArray* resultsArray_;
+  HGSMemorySearchSourceDB* resultsDatabase_;
   NSUInteger cacheHash_;
   NSString *cachePath_;
 }
 
-/*! Clear out the data currenting indexing w/in the source. */
-- (void)clearResultIndex;
 
 /*!
- Add a result to the memory index.
- 
- The two strings (name and otherTerm) will be properly tokenized for the caller, 
- so pass them in as raw unnormalized, untokenized strings.
- @param hgsResult the result to index
- @param name are the words that count as name matches for hgsResult. 
- @param otherTerm is another term that can be used to match hgsResult but is
-        of less importance than name. This argument is optional and can be nil.
+ Swaps out the current database with the new database. It makes a copy
+ of the database so you can mutate your instance.
 */
-- (void)indexResult:(HGSResult *)hgsResult
-               name:(NSString *)name
-          otherTerm:(NSString *)otherTerm;
-
-/*!
- Add a result to the memory index. 
- 
- The strings (name and otherTerms) will be properly tokenized for the caller, 
- so pass them in as raw unnormalized, untokenized strings.
- @param hgsResult the result to index
- @param name are the words that count as name matches for hgsResult. 
- @param otherTerms is an array of terms that can be used to match hgsResult but 
- are of less importance than name. This argument is optional and can be nil.
-*/
-- (void)indexResult:(HGSResult *)hgsResult
-               name:(NSString *)name
-         otherTerms:(NSArray *)otherTerms;
-
-/*!
- Add a result to the memory index. 
- Equivalent to calling 
- @link indexResult:name:otherTerm: indexResult:name:otherTerm: @/link
- with name set to the displayName of the hgsResult, and nil for otherTerm. 
- @param hgsResult the result to index
-*/
-- (void)indexResult:(HGSResult *)hgsResult;
+- (void)replaceCurrentDatabaseWith:(HGSMemorySearchSourceDB *)database;
 
 /*!
  Save the contents of the memory index to disk. If the contents of the index
@@ -129,7 +97,7 @@
 
 /*!
  Return an array of HGSRankedResults that match query.
- @param results Array of HGSResults
+ @param database database of indexed results
  @param operation Operation to match
  @result array of HGSRankedResults
 */
@@ -161,3 +129,55 @@
                                pivotObjects:(HGSResultArray *)pivotObjects;
  
 @end
+
+@interface HGSMemorySearchSourceDB : NSObject <NSCopying> {
+ @private
+  NSMutableArray* storage_;
+}
+
+/*!
+ Return an empty database.
+ @result an empty autoreleased HGSMemorySearchSourceDB instance.
+*/
++ (id)database;
+
+/*!
+ Add a result.
+ 
+ The two strings (name and otherTerm) will be properly tokenized for the caller, 
+ so pass them in as raw unnormalized, untokenized strings.
+ @param hgsResult the result to index.
+ @param name is the word that counts as a name match for hgsResult. 
+ @param otherTerm is another term that can be used to match hgsResult but is
+ of less importance than name. This argument is optional and can be nil.
+ */
+- (void)indexResult:(HGSResult *)hgsResult
+               name:(NSString *)name
+          otherTerm:(NSString *)otherTerm;
+
+/*!
+ Add a result.
+ 
+ The strings (name and otherTerms) will be properly tokenized for the caller, 
+ so pass them in as raw unnormalized, untokenized strings.
+ @param hgsResult the result to index
+ @param name is the word that counts as a name match for hgsResult. 
+ @param otherTerms is an array of terms that can be used to match hgsResult but 
+ are of less importance than name. This argument is optional and can be nil.
+ */
+- (void)indexResult:(HGSResult *)hgsResult
+               name:(NSString *)name
+         otherTerms:(NSArray *)otherTerms;
+
+/*!
+ Add a result.
+ Equivalent to calling 
+ @link indexResult:name:otherTerm:into: indexResult:name:otherTerm:into: @/link
+ with name set to the displayName of the hgsResult, and nil for otherTerm. 
+ @param hgsResult the result to index.
+ @param database the database to store the the indexed result in.
+ */
+- (void)indexResult:(HGSResult *)hgsResult;
+
+@end
+

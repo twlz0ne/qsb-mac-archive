@@ -132,7 +132,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   indexing_ = YES;
   
   // clear the existing info
-  [self clearResultIndex];
+  HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
   NSMutableArray *newResults = [NSMutableArray array];
   
   ABAddressBook *sab = [ABAddressBook sharedAddressBook];
@@ -203,7 +203,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                     source:self
                                 attributes:attributes];
       [newResults addObject:hgsResult];
-      [self indexResult:hgsResult
+      [database indexResult:hgsResult
                    name:name
              otherTerms:otherTermStrings];
     }
@@ -214,7 +214,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     [results_ release];
     results_ = [newResults retain];
   }
-  
+  [self replaceCurrentDatabaseWith:database];
   indexing_ = NO;
   [condition_ signal];
   [condition_ unlock];

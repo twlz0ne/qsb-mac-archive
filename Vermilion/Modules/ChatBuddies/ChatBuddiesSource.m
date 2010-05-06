@@ -455,17 +455,18 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (void)updateIndex {
   rebuildIndex_ = NO;
-  [self clearResultIndex];
+  HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
 
   @synchronized(buddyResults_) {
     for (HGSResult *buddyResult in buddyResults_) {
       NSString *name = [self nameStringForBuddy:buddyResult];
       NSArray *otherStrings = [self otherTermStringsForBuddy:buddyResult];
-      [self indexResult:buddyResult
-                   name:name
-             otherTerms:otherStrings];
+      [database indexResult:buddyResult
+                       name:name
+                 otherTerms:otherStrings];
     }
   }
+  [self replaceCurrentDatabaseWith:database];
 }
 
 - (void)infoChangedNotification:(NSNotification*)notification {
@@ -500,26 +501,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         if (buddyResult) {
           // Remove the results and add it new to pick up the changes
           [buddyResults_ removeObjectIdenticalTo:buddyResult];
-          HGSResult *newBuddy
-            = [self contactResultFromIMBuddy:userInfo
-                                     service:service
-                                      source:self];
-          [buddyResults_ addObject:newBuddy];
-          // Next search will rebuild the index (since it doesn't support remove)
-          rebuildIndex_ = YES;
-        } else {
-          // This must be a new buddy but if it's a |statusChange| do nothing.
-          HGSResult *newBuddy = [self contactResultFromIMBuddy:userInfo
-                                                       service:service
-                                                        source:self];
-          [buddyResults_ addObject:newBuddy];
-          // Add it to the index
-          NSString *name = [self nameStringForBuddy:newBuddy];
-          NSArray *terms = [self otherTermStringsForBuddy:newBuddy];
-          [self indexResult:newBuddy
-                       name:name
-                 otherTerms:terms];
-        }
+        } 
+        HGSResult *newBuddy = [self contactResultFromIMBuddy:userInfo
+                                                     service:service
+                                                      source:self];
+        [buddyResults_ addObject:newBuddy];
+        // Next search will rebuild the index
+        rebuildIndex_ = YES;
       }  // @syncronized(buddyResults_)
     } else {
       HGSLogDebug(@"IMService notification missing screen name.");

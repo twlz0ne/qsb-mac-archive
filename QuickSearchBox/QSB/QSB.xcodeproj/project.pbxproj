@@ -640,6 +640,8 @@
 		8B1490A80F715781002E05FA /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B148F9A0F7156B6002E05FA /* OCMock.framework */; };
 		8B170032117799ED00E7A908 /* GTMFoundationUnitTestingUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B17001A117798D600E7A908 /* GTMFoundationUnitTestingUtilities.m */; };
 		8B170033117799ED00E7A908 /* GTMFoundationUnitTestingUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B17001B117798D600E7A908 /* GTMFoundationUnitTestingUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B1702CB1177C16000E7A908 /* HGSGDataServiceSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B1702C91177C16000E7A908 /* HGSGDataServiceSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B1702CC1177C16000E7A908 /* HGSGDataServiceSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1702CA1177C16000E7A908 /* HGSGDataServiceSource.m */; };
 		8B21631F0EB9022300183DE4 /* QSBDetailedRowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B21631E0EB9022300183DE4 /* QSBDetailedRowViewController.m */; };
 		8B232E811062B46800AF7287 /* grabicon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B232E801062B46800AF7287 /* grabicon.icns */; };
 		8B23300E1062C12700AF7287 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B23300C1062C12700AF7287 /* Localizable.strings */; };
@@ -2464,7 +2466,6 @@
 		62D9B78C0F93EB42005EF9BC /* QSBEditSimpleAccountWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBEditSimpleAccountWindowController.m; sourceTree = "<group>"; };
 		62D9B86B0F94E453005EF9BC /* QSBEditAccountWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBEditAccountWindowController.m; sourceTree = "<group>"; };
 		62D9B86C0F94E453005EF9BC /* QSBEditAccountWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBEditAccountWindowController.h; sourceTree = "<group>"; };
-		62DA51430FFAA86C002B008E /* GoogleDocsSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDocsSource.h; sourceTree = "<group>"; };
 		62DA51440FFAA86C002B008E /* GoogleDocsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDocsSource.m; sourceTree = "<group>"; };
 		62DDD6D51035D53400C0EABD /* HGSSearchTermScorerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSearchTermScorerTest.m; sourceTree = "<group>"; };
 		62DF2008105964A500AF1801 /* GoogleAccounts.sdefsrc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = GoogleAccounts.sdefsrc; sourceTree = "<group>"; };
@@ -2632,6 +2633,8 @@
 		8B170019117798D600E7A908 /* GTMAppKitUnitTestingUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMAppKitUnitTestingUtilities.h; sourceTree = "<group>"; };
 		8B17001A117798D600E7A908 /* GTMFoundationUnitTestingUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMFoundationUnitTestingUtilities.m; sourceTree = "<group>"; };
 		8B17001B117798D600E7A908 /* GTMFoundationUnitTestingUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMFoundationUnitTestingUtilities.h; sourceTree = "<group>"; };
+		8B1702C91177C16000E7A908 /* HGSGDataServiceSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSGDataServiceSource.h; sourceTree = "<group>"; };
+		8B1702CA1177C16000E7A908 /* HGSGDataServiceSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSGDataServiceSource.m; sourceTree = "<group>"; };
 		8B1B49330E5F994800A08972 /* GTMExceptionalInlines.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMExceptionalInlines.m; sourceTree = "<group>"; };
 		8B1B49340E5F994800A08972 /* GTMExceptionalInlines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMExceptionalInlines.h; sourceTree = "<group>"; };
 		8B21631D0EB9022300183DE4 /* QSBDetailedRowViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBDetailedRowViewController.h; sourceTree = "<group>"; };
@@ -4410,7 +4413,6 @@
 				8B6EB4231019FE26006CFF7A /* Resources */,
 				62F595AF0FEB278A0076CDDA /* GoogleDocsConstants.h */,
 				62F595B00FEB278A0076CDDA /* GoogleDocsConstants.m */,
-				62DA51430FFAA86C002B008E /* GoogleDocsSource.h */,
 				62DA51440FFAA86C002B008E /* GoogleDocsSource.m */,
 				62F594B40FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.h */,
 				62F594B50FEB06A60076CDDA /* GoogleDocsSaveAsAccessoryController.m */,
@@ -5751,6 +5753,8 @@
 				8BAAA85B0F813E2A00DF4F12 /* HGSExtensionPoint.h */,
 				8BAAA85E0F813E2A00DF4F12 /* HGSExtensionPoint.m */,
 				8BAAA8600F813E2A00DF4F12 /* HGSExtensionPointTest.m */,
+				8B1702C91177C16000E7A908 /* HGSGDataServiceSource.h */,
+				8B1702CA1177C16000E7A908 /* HGSGDataServiceSource.m */,
 				62917AAB112B5B9300653562 /* HGSGDataUploadAction.h */,
 				62917AAC112B5B9300653562 /* HGSGDataUploadAction.m */,
 				6274BD82112C69D2008D56D7 /* HGSGDataUploadActionTest.m */,
@@ -6496,6 +6500,7 @@
 				8B062F051135A2D30003CC70 /* HGSActionArgument.h in Headers */,
 				8B8481E91149B0B7002C460B /* HGSSuggestSource.h in Headers */,
 				8BE3428111501D5A002D047A /* HGSCorporaSource.h in Headers */,
+				8B1702CB1177C16000E7A908 /* HGSGDataServiceSource.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9622,6 +9627,7 @@
 				8B062F061135A2D30003CC70 /* HGSActionArgument.m in Sources */,
 				8B8481E81149B0B7002C460B /* HGSSuggestSource.m in Sources */,
 				8BE3428211501D5A002D047A /* HGSCorporaSource.m in Sources */,
+				8B1702CC1177C16000E7A908 /* HGSGDataServiceSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
