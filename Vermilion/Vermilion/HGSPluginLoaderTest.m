@@ -54,22 +54,23 @@
 - (NSString *)userApplicationSupportFolderForApp {
   return nil;
 }
+
 - (NSString *)userCacheFolderForApp {
   return nil;
 }
+
 - (NSString *)suggestLanguage {
   return nil;
 }
+
 - (NSString *)clientID {
   return nil;
 }
-- (HGSPluginLoadResult)shouldLoadPluginAtPath:(NSString *)path
-                                withSignature:(HGSCodeSignature *)signature {
-  return 0;
-}
+
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   return nil;
 }
+
 - (NSDictionary *)getActionSaveAsInfoFor:(NSDictionary *)request {
   return nil;
 }

@@ -124,11 +124,6 @@
   return @"qsb_mac_unit_testing";
 }
 
-- (HGSPluginLoadResult)shouldLoadPluginAtPath:(NSString *)path
-                                withSignature:(HGSCodeSignature *)signature {
-  return YES;
-}
-
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   return nil;
 }

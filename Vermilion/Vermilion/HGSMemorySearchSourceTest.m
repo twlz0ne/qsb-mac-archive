@@ -126,9 +126,10 @@
   [[[searchSourceMock expect] 
     andReturn:nil] 
    provideValueForKey:kHGSObjectAttributeRankFlagsKey result:result];
-  [memSource indexResult:result
-                    name:@"testName"
-              otherTerms:[NSArray arrayWithObjects:@"foo", @"bar", @"bam", nil]];
+  HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
+  [database indexResult:result
+                   name:@"testName"
+             otherTerms:[NSArray arrayWithObjects:@"foo", @"bar", @"bam", nil]];
   
   id searchQueryMock = [OCMockObject mockForClass:[HGSQuery class]];
   HGSCallbackSearchOperation *op 
@@ -138,6 +139,7 @@
   [[[searchQueryMock expect] andReturn:tokenString] tokenizedQueryString];
   [[[searchQueryMock expect] andReturn:nil] pivotObjects];
   [[[searchQueryMock expect] andReturn:nil] actionArgument];
+  [memSource replaceCurrentDatabaseWith:database];
   [memSource performSearchOperation:op];
 }
 @end
