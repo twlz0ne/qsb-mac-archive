@@ -97,7 +97,7 @@
 
 /*!
  Return an array of HGSRankedResults that match query.
- @param database database of indexed results
+ @param results initial array of results
  @param operation Operation to match
  @result array of HGSRankedResults
 */
@@ -130,6 +130,10 @@
  
 @end
 
+/*! 
+ A database that contains indexed HGSResults. Used by HGSMemorySearchSource
+ for quickly finding and sorting results.
+*/
 @interface HGSMemorySearchSourceDB : NSObject <NSCopying> {
  @private
   NSMutableArray* storage_;
@@ -172,10 +176,9 @@
 /*!
  Add a result.
  Equivalent to calling 
- @link indexResult:name:otherTerm:into: indexResult:name:otherTerm:into: @/link
+ @link indexResult:name:otherTerm: indexResult:name:otherTerm: @/link
  with name set to the displayName of the hgsResult, and nil for otherTerm. 
  @param hgsResult the result to index.
- @param database the database to store the the indexed result in.
  */
 - (void)indexResult:(HGSResult *)hgsResult;
 
