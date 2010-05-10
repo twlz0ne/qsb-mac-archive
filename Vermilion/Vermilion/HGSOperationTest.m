@@ -61,9 +61,9 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   finishedWithData_ = YES;
   STAssertNotNil(fetcher, @"finishedWithData got a nil GDataHTTPFetcher");
   STAssertNotNil(fetcher, @"finishedWithData got a nil retrievedData");
-  STAssertTrue([retrievedData length] != 0,
+  STAssertNotEquals([retrievedData length], (NSUInteger)0,
                @"finishedWithData got an empty retrievedData");
-  STAssertTrue([[[[fetcher request] URL] absoluteString] isEqual:kGoogleUrl],
+  STAssertEqualObjects([[[fetcher request] URL] absoluteString], kGoogleUrl,
                @"finishedWithData URL incorrect");
 
   // Simulate a long-running operation that gets cancelled. This operation will
