@@ -46,8 +46,8 @@
 /* Application menu item that displays the preferences dialog. */
 "Preferences…" = "Preferences…";
 
-/* Application menu item that opens the feedback webpage for sending QSB feedback to Google. */
-"Send Feedback To Google" = "Send Feedback To Google";
+/* Application menu item that opens the feedback webpage for sending QSB feedback. */
+"Send Feedback…" = "Send Feedback…";
 
 /* Application menu item that opens the QSB homepage. Do not localize $APPNAME$. */
 "Open $APPNAME$ Homepage" = "Open $APPNAME$ Homepage";

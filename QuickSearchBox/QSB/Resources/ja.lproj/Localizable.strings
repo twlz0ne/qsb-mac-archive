@@ -46,8 +46,8 @@
 /* Application menu item that displays the preferences dialog. */
 "Preferences…" = "設定...";
 
-/* Application menu item that opens the feedback webpage for sending QSB feedback to Google. */
-"Send Feedback To Google" = "Google にご意見・ご感想を送信";
+/* Application menu item that opens the feedback webpage for sending QSB feedback. */
+"Send Feedback…" = "にご意見・ご感想を送信…";
 
 /* Application menu item that opens the QSB homepage. Do not localize $APPNAME$. */
 "Open $APPNAME$ Homepage" = "$APPNAME$ ホームページを開く";

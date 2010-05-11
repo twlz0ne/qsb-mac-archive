@@ -44,10 +44,10 @@
 "About $APPNAME$" = "關於 $APPNAME$";
 
 /* Application menu item that displays the preferences dialog. */
-"Preferences…" = "偏好設定...";
+"Preferences…" = "偏好設定…";
 
-/* Application menu item that opens the feedback webpage for sending QSB feedback to Google. */
-"Send Feedback To Google" = "傳送意見給 Google";
+/* Application menu item that opens the feedback webpage for sending QSB feedback. */
+"Send Feedback…" = "傳送意見…";
 
 /* Application menu item that opens the QSB homepage. Do not localize $APPNAME$. */
 "Open $APPNAME$ Homepage" = "開啟·$APPNAME$ 首頁";
