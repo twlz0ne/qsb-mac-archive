@@ -39,7 +39,9 @@ static const useconds_t kDiskOperationLength = 500000; // microseconds
 static const useconds_t kNetworkOperationLength = 500000; // microseconds
 static const NSInteger kMemoryOperationCount = 10;
 static const NSInteger kNormalOperationCount = 5;
-static NSString * const kGoogleUrl = @"http://www.google.com/";
+// Use a prefix instead of full URL in case we are running our tests in a
+// non-US based country
+static NSString * const kGoogleUrlPrefix = @"http://www.google.";
 static NSString * const kGoogle404Url = @"http://www.google.com/dfhasjhdfkhdgkshg";
 static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.google.com/";
 
@@ -63,8 +65,8 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   STAssertNotNil(fetcher, @"finishedWithData got a nil retrievedData");
   STAssertNotEquals([retrievedData length], (NSUInteger)0,
                @"finishedWithData got an empty retrievedData");
-  STAssertEqualObjects([[[fetcher request] URL] absoluteString], kGoogleUrl,
-               @"finishedWithData URL incorrect");
+  STAssertTrue([[[[fetcher request] URL] absoluteString] hasPrefix:kGoogleUrlPrefix],
+               @"finishedWithData URL incorrect %@, [[fetcher request] URL]");
 
   // Simulate a long-running operation that gets cancelled. This operation will
   // start off non-cancelled. Signal the condition variable
@@ -95,8 +97,8 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
     NSString *urlString = [[[fetcher request] URL] absoluteString];
     if ([urlString isEqual:kGoogle404Url]) {
       STAssertEquals(status, (NSInteger)404, @"failedWithStatus expected a 404 response");
-    } else if ([urlString isEqual:kGoogleUrl]) {
-      STFail(@"Google home page request failed");
+    } else if ([urlString hasPrefix:kGoogleUrlPrefix]) {
+      STFail(@"Google home page request failed (%@)", urlString);
       NSCondition *condition = [fetcher userData];
       [condition lock];
       finishedWithDataIsRunning_ = YES;
@@ -137,7 +139,8 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   NSCondition *condition = [[[NSCondition alloc] init] autorelease];
   
   // Request Google's home page
-  NSURL *url = [NSURL URLWithString:kGoogleUrl];
+  NSString *googleURL = [kGoogleUrlPrefix stringByAppendingString:@"com"];
+  NSURL *url = [NSURL URLWithString:googleURL];
   NSURLRequest *request = [NSURLRequest requestWithURL:url];
   GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
   [fetcher setUserData:condition];
@@ -147,7 +150,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
                                  didFinishSelector:@selector(httpFetcher:finishedWithData:operation:)
                                    didFailSelector:@selector(httpFetcher:failedWithError:operation:)]
        autorelease];
-  STAssertNotNil(networkOp, @"failed to create network op for %@", kGoogleUrl);
+  STAssertNotNil(networkOp, @"failed to create network op for %@", googleURL);
   [queue addOperation:networkOp];
   [condition lock];
   while (!finishedWithDataIsRunning_) {
