@@ -32,7 +32,7 @@
 
 #import <Vermilion/Vermilion.h>
 
-// Private LSInfo attribute. Returns a CFArray with valid architectures 
+// Private LSInfo attribute. Returns a CFArray with valid architectures
 // (i386, ppc, etc.).
 extern const CFStringRef kLSItemArchitecturesValidOnCurrentSystem;
 
@@ -46,10 +46,11 @@ extern const CFStringRef kLSItemArchitecturesValidOnCurrentSystem;
 
 - (void)startQuery;
 
-// Do a fast index of the most likely app locations 
+// Do a fast index of the most likely app locations
 // (/Applications and ~/Applications).
 - (void)fastIndex;
 
+- (void)queryNotification:(NSNotification *)notification;
 @end
 
 static NSString *const kApplicationSourcePredicateString
@@ -109,9 +110,9 @@ static NSString *const kApplicationSourcePredicateString
     FSRef fsRef;
     if (CFURLGetFSRef((CFURLRef)url, &fsRef)) {
       CFTypeRef archs;
-      if (LSCopyItemAttribute(&fsRef, 
-                              kLSRolesAll, 
-                              kLSItemArchitecturesValidOnCurrentSystem, 
+      if (LSCopyItemAttribute(&fsRef,
+                              kLSRolesAll,
+                              kLSItemArchitecturesValidOnCurrentSystem,
                               &archs) == noErr) {
         if (archs) {
           launchable = CFArrayGetCount(archs) > 0;
@@ -221,7 +222,7 @@ static NSString *const kApplicationSourcePredicateString
         attributes = belowFoldAttributes;
       }
     }
-    
+
     if (attributes != belowFoldAttributes) {
       if (![self pathIsLaunchable:path]) {
         attributes = belowFoldAttributes;
@@ -266,7 +267,7 @@ static NSString *const kApplicationSourcePredicateString
     [database indexResult:hgsResult
                  name:name
             otherTerm:fileSystemName];
-    
+
   }
 
   // Due to a bug in 10.5.6 we can't find the network prefpane
@@ -290,7 +291,7 @@ static NSString *const kApplicationSourcePredicateString
                                     type:kHGSTypeFileApplication
                                   source:self
                               attributes:regularAttributes];
-    
+
     [database indexResult:hgsResult];
   } else {
     HGSLog(@"Unable to find Network.prefpane");
@@ -345,8 +346,8 @@ static NSString *const kApplicationSourcePredicateString
 // A real quick and dirty fast pass on the expected locations.
 - (void)fastIndex {
   NSArray *applicationFolders
-    = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, 
-                                          NSUserDomainMask | NSLocalDomainMask, 
+    = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory,
+                                          NSUserDomainMask | NSLocalDomainMask,
                                           YES);
   NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag];
   NSMutableDictionary *regularAttributes
@@ -361,7 +362,7 @@ static NSString *const kApplicationSourcePredicateString
       if ([extension length]) {
         if ([extension isEqualToString:@"app"]) {
           NSString *fullPath = [appPath stringByAppendingPathComponent:path];
-          NSString *uriPath 
+          NSString *uriPath
             = [fullPath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
           NSString *url = [@"file://localhost" stringByAppendingString:uriPath];
           HGSUnscoredResult *hgsResult
@@ -370,7 +371,7 @@ static NSString *const kApplicationSourcePredicateString
                                           type:kHGSTypeFileApplication
                                         source:self
                                     attributes:regularAttributes];
-          
+
           [database indexResult:hgsResult];
         }
         [fileEnumerator skipDescendents];
@@ -379,8 +380,8 @@ static NSString *const kApplicationSourcePredicateString
   }
   [self replaceCurrentDatabaseWith:database];
 }
-        
-        
-      
+
+
+
 @end
 

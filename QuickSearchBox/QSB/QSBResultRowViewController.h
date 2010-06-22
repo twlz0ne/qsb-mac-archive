@@ -37,12 +37,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class HGSScoredResult;
+
 /*!
  The abstract base view controller class for the various nibs used to present
  a row in a results table.  There are several child classes which support
  the presentation of results for the Top and the More windows as well as
  for showing dividers, category summaries, and the Top and More folds.
- 
+
  Support is also provided for result sources that wish to present their own
  view for drawing in place of the right-hand side detail shown by default.
  A custom result view will be width constrained but may have a variable
@@ -73,4 +75,11 @@
 // Designated initializer.
 - (id)initWithNib:(NSNib *)nib;
 
+@end
+
+/*!
+ Methods that a custom result view may want to implement
+*/
+@protocol QSBCustomResultView
+- (NSNumber *)qsb_setResult:(HGSScoredResult *)result;
 @end

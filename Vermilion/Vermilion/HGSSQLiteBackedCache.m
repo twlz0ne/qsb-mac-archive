@@ -59,8 +59,9 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
 - (void)commitPendingTouches:(NSMutableArray *)touches;
 
 - (void)invalidateEntriesNotAccessedAfter:(NSDate *)date;
-- (void)invalidateLeastRecentlyUsedFrom:(NSUInteger)currentRows 
+- (void)invalidateLeastRecentlyUsedFrom:(NSUInteger)currentRows
                                      to:(NSUInteger)decreasedRows;
+- (void)flushTimer:(NSTimer *)ignored;
 @end
 
 @implementation HGSSQLiteBackedCache
@@ -72,18 +73,18 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
   return [self initWithPath:path version:(NSString *)version useArchiver:NO];
 }
 
-- (id)initWithPath:(NSString *)path 
-           version:(NSString *)version 
+- (id)initWithPath:(NSString *)path
+           version:(NSString *)version
        useArchiver:(BOOL)flag {
   self = [super init];
   if (self) {
     dbPath_ = [path retain];
     pendingTouches_ = [[NSMutableArray alloc] init];
-    flushTimer_ 
+    flushTimer_
       = [NSTimer scheduledTimerWithTimeInterval:kCacheDefaultFlushInterval
-                                         target:self 
-                                       selector:@selector(flushTimer:) 
-                                       userInfo:nil 
+                                         target:self
+                                       selector:@selector(flushTimer:)
+                                       userInfo:nil
                                         repeats:YES];
     maximumAge_ = kCacheDefaultMaximumAge;
     hardMaximumEntries_ = kCacheDefaultMaxEntries;
@@ -124,7 +125,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
     if (!directoryExists) {
       [fm createDirectoryAtPath:directory attributes:nil];
     }
-    
+
     db_ = [[GTMSQLiteDatabase alloc] initWithPath:dbPath_
                                   withCFAdditions:NO
                                              utf8:YES
@@ -134,7 +135,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
       return NO;
     }
   }
-  
+
   // Create the table if it does not exist.
   errorCode = [db_ executeSQL:kCacheSchema];
   if (errorCode != SQLITE_OK) {
@@ -147,7 +148,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
     return NO;
   }
   NSString *getVersionStatement = @"SELECT value FROM metadata WHERE key = ?";
-  GTMSQLiteStatement *statement 
+  GTMSQLiteStatement *statement
     = [GTMSQLiteStatement statementWithSQL:getVersionStatement
                                 inDatabase:db_
                                  errorCode:&errorCode];
@@ -167,13 +168,13 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
     // the future, but for right now, just wipe out all of their
     // shortcuts.
     [self removeAllObjects];
-    NSString *setVersionStatement 
+    NSString *setVersionStatement
       = @"INSERT OR REPLACE INTO metadata VALUES(?, ?)";
-    statement 
+    statement
       = [GTMSQLiteStatement statementWithSQL:setVersionStatement
                                   inDatabase:db_
                                    errorCode:&errorCode];
-    if ([statement bindStringAtPosition:1 
+    if ([statement bindStringAtPosition:1
                                  string:kMetaDataVersionKey] != SQLITE_OK) {
       HGSLog(@"Unable to bind key: %@", [db_ lastErrorString]);
       return NO;
@@ -198,7 +199,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
 - (NSUInteger)count {
   int errorCode;
   NSString *countStatement = @"SELECT COUNT(*) FROM cache";
-  GTMSQLiteStatement *statement 
+  GTMSQLiteStatement *statement
     = [GTMSQLiteStatement statementWithSQL:countStatement
                                 inDatabase:db_
                                  errorCode:&errorCode];
@@ -207,7 +208,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
   if (result == SQLITE_ROW) {
     count = [[statement resultNumberAtPosition:0] unsignedIntValue];
   } else {
-    HGSLog(@"Unable to get count of cache: %@", [db_ lastErrorString]);  
+    HGSLog(@"Unable to get count of cache: %@", [db_ lastErrorString]);
   }
   [statement finalizeStatement];
   return count;
@@ -229,9 +230,9 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
 }
 
 - (void)commitPendingTouches:(NSMutableArray *)touches {
-  int errorCode;  
+  int errorCode;
   NSString* touchStatement = @"UPDATE cache SET accessed = ? WHERE key = ?";
-  GTMSQLiteStatement *statement 
+  GTMSQLiteStatement *statement
     = [GTMSQLiteStatement statementWithSQL:touchStatement
                                 inDatabase:db_
                                  errorCode:&errorCode];
@@ -239,21 +240,21 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
     HGSLog(@"Error create statement: %@", [db_ lastErrorString]);
     return;
   }
-  
+
   [db_ beginDeferredTransaction];
   {
-    // TODO(altse): Needs testing.    
+    // TODO(altse): Needs testing.
     for (NSDictionary *touch in touches) {
       NSString *pendingTouch = [touch objectForKey:kCachePendingTouchKey];
       NSNumber *timeStamp = [touch objectForKey:kCachePendingTouchTimestamp];
-      [statement bindStringAtPosition:1 string:pendingTouch];  
+      [statement bindStringAtPosition:1 string:pendingTouch];
       [statement bindLongLongAtPosition:2 value:[timeStamp longLongValue]];
       [statement stepRow];
     }
     [statement finalizeStatement];
   }
   [db_ commit];
-  [touches removeAllObjects];  
+  [touches removeAllObjects];
 }
 
 #pragma mark Compressing
@@ -261,20 +262,20 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
 - (void)removeAllObjects {
   static NSString* const kDeleteStatement = @"DELETE FROM cache";
   int errorCode;
-  GTMSQLiteStatement *statement 
+  GTMSQLiteStatement *statement
     = [GTMSQLiteStatement statementWithSQL:kDeleteStatement
                                 inDatabase:db_
                                  errorCode:&errorCode];
   [statement stepRow];
-  [statement finalizeStatement];  
-} 
+  [statement finalizeStatement];
+}
 
 - (void)invalidateEntriesNotAccessedAfter:(NSDate *)date {
   NSTimeInterval unixTimestamp = [date timeIntervalSince1970];
-  static NSString* const kDeleteByDateStatement = 
+  static NSString* const kDeleteByDateStatement =
   @"DELETE FROM cache WHERE accessed < ?";
   int errorCode;
-  GTMSQLiteStatement *statement 
+  GTMSQLiteStatement *statement
     = [GTMSQLiteStatement statementWithSQL:kDeleteByDateStatement
                                 inDatabase:db_
                                  errorCode:&errorCode];
@@ -282,7 +283,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
     HGSLog(@"Unable to create SQLite statement: %@", [db_ lastErrorString]);
     return;
   }
-  
+
   [statement bindLongLongAtPosition:1 value:(long long)unixTimestamp];
   if ([statement stepRow] == SQLITE_ERROR) {
     HGSLog(@"Unable to delete by date: %@", [db_ lastErrorString]);
@@ -290,16 +291,16 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
   [statement finalizeStatement];
 }
 
-- (void)invalidateLeastRecentlyUsedFrom:(NSUInteger)currentRows 
+- (void)invalidateLeastRecentlyUsedFrom:(NSUInteger)currentRows
                                      to:(NSUInteger)decreasedRows {
   int errorCode;
   NSUInteger toRemove = currentRows - decreasedRows;
-  static NSString* const kDeleteOldExpression = 
+  static NSString* const kDeleteOldExpression =
     @"DELETE FROM cache WHERE key IN "
     @" (SELECT key FROM cache ORDER BY accessed LIMIT %d)";
-  
+
   NSString *sql = [NSString stringWithFormat:kDeleteOldExpression, toRemove];
-  GTMSQLiteStatement *statement 
+  GTMSQLiteStatement *statement
     = [GTMSQLiteStatement statementWithSQL:sql
                                 inDatabase:db_
                                  errorCode:&errorCode];
@@ -307,7 +308,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
     HGSLog(@"Unable to create SQLite statement: %@", [db_ lastErrorString]);
     return;
   }
-  
+
   [statement stepRow];
   [statement finalizeStatement];
 }
@@ -326,11 +327,11 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
   // the machine from going to sleep.
   if ([pendingTouches_ count]) {
     [self commitPendingTouches:pendingTouches_];
-  
-    NSDate *oldestEntryDate 
+
+    NSDate *oldestEntryDate
       = [NSDate dateWithTimeIntervalSinceNow:(-1 * maximumAge_)];
     [self invalidateEntriesNotAccessedAfter:oldestEntryDate];
-    
+
     // If our size still exceeds our maximum entries, get rid of least recently
     // accessed entries.
     NSUInteger count = [self count];
@@ -354,7 +355,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
     HGSLog(@"Unable to create SQLite statement: %@", [db_ lastErrorString]);
     return nil;
   }
-  
+
   if ([statement bindStringAtPosition:1 string:key] != SQLITE_OK) {
     HGSLog(@"Unable to bind key: %@", [db_ lastErrorString]);
     return nil;
@@ -362,7 +363,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
   // Execute
   int result = [statement stepRow];
   if (result == SQLITE_ERROR) {
-    [statement finalizeStatement];  
+    [statement finalizeStatement];
     HGSLog(@"Error occurred executing statement: %@", [db_ lastErrorString]);
     return nil;
   }
@@ -371,14 +372,14 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
     [statement finalizeStatement];
     return nil;
   }
-  
+
   NSData *valueData = [statement resultBlobDataAtPosition:0];
   [statement finalizeStatement];
   if (!valueData) {
     HGSLog(@"Unable to retrieve value: nil returned.");
     return nil;
   }
-  
+
   id theValue;
   if (useNSArchiver_) {
     @try {
@@ -390,8 +391,8 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
     }
   } else {
     NSString *errorString = nil;
-    theValue 
-      = [NSPropertyListSerialization propertyListFromData:valueData 
+    theValue
+      = [NSPropertyListSerialization propertyListFromData:valueData
                                          mutabilityOption:NSPropertyListImmutable
                                                    format:nil
                                          errorDescription:&errorString];
@@ -400,7 +401,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
       return nil;
     }
   }
-  
+
   [self addPendingTouch:key];
   return theValue;
 }
@@ -408,11 +409,11 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
 - (void)setValue:(id)value forKey:(NSString *)key {
   NSString* errorString = nil;
   NSData* valueData = nil;
-  
+
   if (useNSArchiver_) {
     valueData = [NSKeyedArchiver archivedDataWithRootObject:value];
   } else {
-    valueData 
+    valueData
       = [NSPropertyListSerialization dataFromPropertyList:value
                                                    format:NSPropertyListBinaryFormat_v1_0
                                          errorDescription:&errorString];
@@ -421,12 +422,12 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
       return;
     }
   }
-  
+
   NSTimeInterval unixTimestamp = [[NSDate date] timeIntervalSince1970];
-  
+
   NSString* insertStatement = @"INSERT OR REPLACE INTO cache VALUES (?, ?, ?, ?)";
   int errorCode;
-  GTMSQLiteStatement *statement 
+  GTMSQLiteStatement *statement
     = [GTMSQLiteStatement statementWithSQL:insertStatement
                                 inDatabase:db_
                                  errorCode:&errorCode];
@@ -446,7 +447,7 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
 - (void)setNilValueForKey:(NSString *)key {
   NSString* deleteStatement = @"DELETE FROM cache WHERE key = ?";
   int errorCode;
-  GTMSQLiteStatement *statement 
+  GTMSQLiteStatement *statement
     = [GTMSQLiteStatement statementWithSQL:deleteStatement
                                 inDatabase:db_
                                  errorCode:&errorCode];

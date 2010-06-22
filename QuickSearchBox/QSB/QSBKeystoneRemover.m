@@ -37,30 +37,31 @@
 // In charge of removing old keystone tickets. Does it on a timer so as to
 // not get in the way of startup.
 
-static NSString *const kKeystoneAdminPath 
+static NSString *const kKeystoneAdminPath
   = @"Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/MacOS/ksadmin";
 
 @interface QSBKeystoneRemover : NSObject
+- (void)removeKeystone:(NSTimer *)timer;
 @end
 
-@implementation QSBKeystoneRemover 
+@implementation QSBKeystoneRemover
 + (void)load {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   QSBKeystoneRemover *remover = [[[QSBKeystoneRemover alloc] init] autorelease];
-  [NSTimer scheduledTimerWithTimeInterval:20 
-                                   target:remover 
-                                 selector:@selector(removeKeystone:) 
-                                 userInfo:nil 
+  [NSTimer scheduledTimerWithTimeInterval:20
+                                   target:remover
+                                 selector:@selector(removeKeystone:)
+                                 userInfo:nil
                                   repeats:NO];
   [pool release];
 }
 
 - (void)removeKeystone:(NSTimer *)timer {
-  NSArray *systemLibs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, 
-                                                            NSAllDomainsMask, 
+  NSArray *systemLibs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
+                                                            NSAllDomainsMask,
                                                             YES);
   NSFileManager *fm = [NSFileManager defaultManager];
-  
+
   for (NSString *path in systemLibs) {
     path = [path stringByAppendingPathComponent:kKeystoneAdminPath];
     if ([fm isExecutableFileAtPath:path]) {

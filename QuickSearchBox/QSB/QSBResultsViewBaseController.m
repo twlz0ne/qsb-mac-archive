@@ -50,9 +50,9 @@
   if ((self = [super initWithNibName:nibName bundle:nil])) {
     searchController_ = [controller retain];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(searchControllerDidUpdateResults:) 
-               name:kQSBSearchControllerDidUpdateResultsNotification 
+    [nc addObserver:self
+           selector:@selector(searchControllerDidUpdateResults:)
+               name:kQSBSearchControllerDidUpdateResultsNotification
              object:searchController_];
   }
   return self;
@@ -86,23 +86,23 @@
 }
 
 - (BOOL)tableView:(NSTableView *)tv
-writeRowsWithIndexes:(NSIndexSet *)rowIndexes 
+writeRowsWithIndexes:(NSIndexSet *)rowIndexes
      toPasteboard:(NSPasteboard*)pb {
   NSUInteger row = [rowIndexes firstIndex];
   QSBTableResult *tableResult = [self tableResultForRow:row];
   return [tableResult copyToPasteboard:pb];
 }
 
-- (void)tableView:(NSTableView *)aTableView 
-  willDisplayCell:(id)aCell 
-   forTableColumn:(NSTableColumn *)aTableColumn 
+- (void)tableView:(NSTableView *)aTableView
+  willDisplayCell:(id)aCell
+   forTableColumn:(NSTableColumn *)aTableColumn
               row:(NSInteger)rowIndex {
   QSBTableResult *result = [self tableResultForRow:rowIndex];
   [aCell setRepresentedObject:result];
 }
 
-- (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell 
-                   rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tc 
+- (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell
+                   rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tc
                     row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation {
   QSBTableResult *result = [self tableResultForRow:row];
   NSString *tip = [result displayToolTip];
@@ -114,12 +114,12 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   return nil;
 }
 
-- (void)pathControlClick:(id)sender {
+- (IBAction)pathControlClick:(id)sender {
   // If the cell has a URI then dispatch directly to that URI, otherwise
   // ask the object if it wants to handle the click and, if so, tell it
   // which cell was clicked.
   NSPathControl *pathControl = sender;
-  NSPathComponentCell *clickedComponentCell 
+  NSPathComponentCell *clickedComponentCell
     = [pathControl clickedPathComponentCell];
   if (clickedComponentCell) {
     NSURL *pathURL = [clickedComponentCell URL];
@@ -131,7 +131,7 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
                                 valueForKey:kQSBObjectAttributePathCellClickHandlerKey]);
       if (cellClickHandler) {
         NSArray *pathComponentCells = [pathControl pathComponentCells];
-        NSUInteger clickedCell 
+        NSUInteger clickedCell
           = [pathComponentCells indexOfObject:clickedComponentCell];
         NSNumber *cellNumber = [NSNumber numberWithUnsignedInteger:clickedCell];
         [selectedObject performSelector:cellClickHandler withObject:cellNumber];
@@ -140,7 +140,7 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   }
 }
 
-- (void)qsb_pickCurrentTableResult:(id)sender {
+- (IBAction)qsb_pickCurrentTableResult:(id)sender {
   QSBTableResult *result = [self selectedTableResult];
   [result performAction:self];
 }
@@ -160,7 +160,7 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   if ([anItem action] == @selector(copy:)) {
     QSBTableResult *qsbTableResult = [self selectedTableResult];
     validated = [qsbTableResult isKindOfClass:[QSBSourceTableResult class]];
-  } 
+  }
   return validated;
 }
 

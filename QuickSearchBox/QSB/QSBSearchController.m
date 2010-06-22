@@ -62,17 +62,21 @@ const NSTimeInterval kQSBDisplayTimerStages[] = { 0.1, 0.3, 0.7 };
 
 - (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification;
 
-// Perform the actual query.  
+// Perform the actual query.
 - (void)performQuery;
 - (NSDictionary *)resultCountByCategory;
 
 - (void)updateCategorySummaryString:(NSDictionary *)resultCountByCategory;
+- (void)queryControllerWillStart:(NSNotification *)notification;
+- (void)queryControllerDidFinish:(NSNotification *)notification;
+- (void)queryControllerDidUpdateResults:(NSNotification *)notification;
 
 @property(nonatomic, assign, getter=isQueryInProcess) BOOL queryInProcess;
 @property(nonatomic, assign, getter=isQueryFinished) BOOL queryFinished;
 @property(nonatomic, readwrite, copy) NSString *categorySummaryString;
 @property(nonatomic, readwrite, retain) HGSTokenizedString *tokenizedQueryString;
 @property(nonatomic, readwrite, retain) HGSResultArray *pivotObjects;
+
 @end
 
 @implementation QSBSearchController
@@ -98,13 +102,13 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 - (id)initWithActionPresenter:(QSBActionPresenter *)actionPresenter {
   if ((self = [super init])) {
     topResults_ = [[NSMutableArray alloc] init];
-    
+
     // Set up our cache for where we store moreResults that we generate.
     // Unlike the topResults we generate these on demand.
     // NSPointerArrays are implemented as sparse arrays according to bbum:
     // http://stackoverflow.com/questions/1354955/how-to-do-sparse-array-in-cocoa/1357899
     NSArray *categories = [[QSBCategoryManager sharedManager] categories];
-    NSMutableDictionary *moreResults 
+    NSMutableDictionary *moreResults
       = [NSMutableDictionary dictionaryWithCapacity:[categories count]];
     for (QSBCategory *category in categories) {
       NSPointerArray *cache = [NSPointerArray pointerArrayWithStrongObjects];
@@ -159,26 +163,26 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   HGSQuery *query = [queryController_ query];
   HGSResult *pivotObject = [query pivotObject];
-  
+
   // Get our top results that aren't suggestions. We group suggestions.
   NSRange resultRange = NSMakeRange(0, currentResultDisplayCount_);
   NSSet *suggestSet = [NSSet setWithObject:kHGSTypeSuggest];
-  HGSTypeFilter *notSuggestionsFilter 
+  HGSTypeFilter *notSuggestionsFilter
     = [HGSTypeFilter filterWithDoesNotConformTypes:suggestSet];
-  NSArray *rankedHGSResults 
-    = [queryController_ rankedResultsInRange:resultRange 
+  NSArray *rankedHGSResults
+    = [queryController_ rankedResultsInRange:resultRange
                                   typeFilter:notSuggestionsFilter
                             removeDuplicates:YES];
 
   // Keep what was locked in
-  NSMutableArray *topQSBTableResults 
+  NSMutableArray *topQSBTableResults
     = [NSMutableArray arrayWithArray:lockedResults_];
-  NSMutableArray *hgsResults 
+  NSMutableArray *hgsResults
     = [topQSBTableResults valueForKey:@"representedResult"];
   HGSAssert(![hgsResults containsObject:[NSNull null]], nil);
   hgsResults = [NSMutableArray arrayWithArray:hgsResults];
   NSMutableArray *moreQSBTableResults = [NSMutableArray array];
-  
+
   for (HGSScoredResult *scoredResult in rankedHGSResults) {
     if ([topQSBTableResults count] >= currentResultDisplayCount_) {
       break;
@@ -212,14 +216,14 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
     [topQSBTableResults addObjectsFromArray:moreQSBTableResults];
     topCount = [topQSBTableResults count];
   }
-  
+
   // If we have more than currentResultDisplayCount_ object, trim the array.
   if (topCount > currentResultDisplayCount_) {
-    NSRange trimRange = NSMakeRange(currentResultDisplayCount_, 
+    NSRange trimRange = NSMakeRange(currentResultDisplayCount_,
                                     topCount - currentResultDisplayCount_);
     [topQSBTableResults removeObjectsInRange:trimRange];
   }
-  
+
   // Anything that ends up in the main results section should be locked down
   // to prevent any rearranging.
   [lockedResults_ release];
@@ -232,28 +236,28 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
     NSInteger suggestCount = [userDefaults integerForKey:kGoogleSuggestCountKey];
     if (suggestCount && queryLength >= 3 && queryLength <= 20) {
       NSRange suggestRange = NSMakeRange(0, suggestCount);
-      HGSTypeFilter *suggestionsFilter 
+      HGSTypeFilter *suggestionsFilter
         = [HGSTypeFilter filterWithConformTypes:suggestSet];
-      
-      hgsSuggestions = [queryController_ rankedResultsInRange:suggestRange 
+
+      hgsSuggestions = [queryController_ rankedResultsInRange:suggestRange
                                                    typeFilter:suggestionsFilter
                                              removeDuplicates:YES];
-      NSArray *hgsTableSuggestions 
+      NSArray *hgsTableSuggestions
         = [hgsSuggestions valueForKey:kQSBObjectTableResultAttributeKey];
       HGSAssert(![hgsTableSuggestions containsObject:[NSNull null]], nil);
       [topQSBTableResults addObjectsFromArray:hgsTableSuggestions];
     }
   }
-  
+
   // If there were more results than could be shown in TOP then we'll
   // need a 'More' fold.
-  NSUInteger resultCount 
+  NSUInteger resultCount
     = [queryController_ resultCountForFilter:notSuggestionsFilter];
   BOOL showMore = (resultCount > currentResultDisplayCount_
                    && ![userDefaults boolForKey:@"disableMoreResults"]);
   if (showMore) {
     [topQSBTableResults addObject:[QSBSeparatorTableResult tableResult]];
-    QSBFoldTableResult *result 
+    QSBFoldTableResult *result
       = [QSBFoldTableResult tableResultWithSearchController:self];
     [topQSBTableResults addObject:result];
   }
@@ -269,12 +273,12 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   }
   [self updateCategorySummaryString:resultCountByCategory];
   resultsNeedUpdating_ = NO;
-  
-  NSDictionary *infoDict 
+
+  NSDictionary *infoDict
     = [NSDictionary dictionaryWithObjectsAndKeys:
        resultCountByCategory, kQSBSearchControllerResultCountByCategoryKey,
        [NSNumber numberWithUnsignedInteger:resultCount],
-       kQSBSearchControllerResultCountKey, 
+       kQSBSearchControllerResultCountKey,
        nil];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kQSBSearchControllerDidUpdateResultsNotification
@@ -298,7 +302,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   return [topResults_ count];
 }
 
-- (QSBSourceTableResult *)rankedResultForCategory:(QSBCategory *)category 
+- (QSBSourceTableResult *)rankedResultForCategory:(QSBCategory *)category
                                           atIndex:(NSInteger)idx {
   // Check our cache, and if we don't have anything, generate it lazily and
   // cache it.
@@ -311,7 +315,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
                                              removeDuplicates:NO];
     if ([results count]) {
       HGSScoredResult *scoredResult = [results objectAtIndex:0];
-      QSBSourceTableResult *tableResult 
+      QSBSourceTableResult *tableResult
         = [scoredResult valueForKey:kQSBObjectTableResultAttributeKey];
       if (!result) {
         result = tableResult;
@@ -325,7 +329,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 - (NSDictionary *)resultCountByCategory {
   QSBCategoryManager *categoryMgr = [QSBCategoryManager sharedManager];
   NSArray *categories = [categoryMgr categories];
-  NSMutableDictionary *resultCountByCategory 
+  NSMutableDictionary *resultCountByCategory
     = [NSMutableDictionary dictionaryWithCapacity:[categories count]];
   for (QSBCategory *category in categories) {
     HGSTypeFilter *typeFilter = [category typeFilter];
@@ -373,7 +377,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
       flags |= eHGSQueryShowAlternatesFlag;
     }
 
-    HGSQuery *query 
+    HGSQuery *query
       = [[[HGSQuery alloc] initWithTokenizedString:tokenizedQueryString_
                                    actionArgument:[actionPresenter_ currentActionArgument]
                                    actionOperation:[actionPresenter_ actionOperation]
@@ -392,9 +396,9 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
            selector:@selector(queryControllerDidFinish:)
                name:kHGSQueryControllerDidFinishNotification
              object:queryController_];
-    [nc addObserver:self 
-           selector:@selector(queryControllerDidUpdateResults:) 
-               name:kHGSQueryControllerDidUpdateResultsNotification 
+    [nc addObserver:self
+           selector:@selector(queryControllerDidUpdateResults:)
+               name:kHGSQueryControllerDidUpdateResultsNotification
              object:queryController_];
 
     // This became a separate call because some sources come back before
@@ -447,14 +451,14 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"<%@: %p> query:%@ pivots:%@", 
-          [self class], self, [tokenizedQueryString_ originalString], 
+  return [NSString stringWithFormat:@"<%@: %p> query:%@ pivots:%@",
+          [self class], self, [tokenizedQueryString_ originalString],
           [self pivotObjects]];
 }
 
 #pragma mark Notifications
 
-- (void)queryControllerWillStart:(NSNotification *)notification { 
+- (void)queryControllerWillStart:(NSNotification *)notification {
   [self setQueryInProcess:YES];
   resultsNeedUpdating_ = YES;
 }
@@ -463,7 +467,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 // completed.  May be called even when there are more results that are
 // possible, but the query has been stopped by the user or by the query
 // reaching a time threshold.
-- (void)queryControllerDidFinish:(NSNotification *)notification { 
+- (void)queryControllerDidFinish:(NSNotification *)notification {
   currentResultDisplayCount_ = [self maximumResultsToCollect];
   [self setQueryInProcess:NO];
   [self updateResults];
@@ -481,17 +485,17 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 - (void)displayTimerElapsed:(NSTimer*)timer {
   [self updateResults];
   ++displayTimerStage_;
-  NSUInteger stages 
+  NSUInteger stages
     = sizeof(kQSBDisplayTimerStages) / sizeof(kQSBDisplayTimerStages[0]);
-  NSTimeInterval stage 
-    = displayTimerStage_ >= stages ? 1.0 
+  NSTimeInterval stage
+    = displayTimerStage_ >= stages ? 1.0
                                    : kQSBDisplayTimerStages[displayTimerStage_];
   displayTimer_
     = [NSTimer scheduledTimerWithTimeInterval:stage
                                        target:self
                                      selector:@selector(displayTimerElapsed:)
                                      userInfo:@"displayTimer"
-                                      repeats:NO];   
+                                      repeats:NO];
 }
 
 - (void)resultCountValueChanged:(GTMKeyValueChangeNotification *)notification {

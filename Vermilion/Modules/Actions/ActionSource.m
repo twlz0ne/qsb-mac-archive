@@ -45,6 +45,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   BOOL rebuildCache_;
 }
 - (void)extensionPointActionsChanged:(NSNotification*)notification;
+- (void)pluginLoaderDidInstallPlugins:(NSNotification *)notification;
 - (void)collectActions;
 @end
 
@@ -54,9 +55,9 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   if ((self = [super initWithConfiguration:configuration])) {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     HGSPluginLoader *pluginLoader = [HGSPluginLoader sharedPluginLoader];
-    [nc addObserver:self 
+    [nc addObserver:self
            selector:@selector(pluginLoaderDidInstallPlugins:)
-               name:kHGSPluginLoaderDidInstallPluginsNotification 
+               name:kHGSPluginLoaderDidInstallPluginsNotification
              object:pluginLoader];
   }
   return self;
@@ -81,8 +82,8 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
          selector:@selector(extensionPointActionsChanged:)
              name:kHGSExtensionPointDidRemoveExtensionNotification
            object:actionsPoint];
-  [nc removeObserver:self 
-                name:kHGSPluginLoaderDidInstallPluginsNotification 
+  [nc removeObserver:self
+                name:kHGSPluginLoaderDidInstallPluginsNotification
               object:[notification object]];
   [self collectActions];
 }
@@ -94,15 +95,15 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   rebuildCache_ = YES;
 }
 
-- (HGSResult *)objectFromAction:(HGSAction *)action 
+- (HGSResult *)objectFromAction:(HGSAction *)action
                     resultArray:(HGSResultArray *)array {
   // Set some of the flags to bump them up in the result's ranks
-  NSNumber *rankFlags 
-    = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag 
-       | eHGSSpecialUIRankFlag 
-       | eHGSUnderHomeRankFlag 
+  NSNumber *rankFlags
+    = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag
+       | eHGSSpecialUIRankFlag
+       | eHGSUnderHomeRankFlag
        | eHGSHomeChildRankFlag];
-  NSMutableDictionary *attributes 
+  NSMutableDictionary *attributes
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        action, kHGSObjectAttributeDefaultActionKey,
@@ -115,7 +116,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   NSString *name = [action displayNameForResults:nil];
   NSString *extensionIdentifier = [action identifier];
   NSString *urlStr = [NSString stringWithFormat:@"action:%@", extensionIdentifier];
-  
+
   HGSUnscoredResult *actionObject
     = [HGSUnscoredResult resultWithURI:urlStr
                                   name:name
@@ -136,8 +137,8 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     HGSResult *actionObject = [self objectFromAction:action
                                          resultArray:nil];
     // Index our result
-    [database indexResult:actionObject 
-                     name:[actionObject displayName] 
+    [database indexResult:actionObject
+                     name:[actionObject displayName]
                otherTerms:[[action otherTerms] allObjects]];
   }
   [self replaceCurrentDatabaseWith:database];
@@ -171,7 +172,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
                           resultArray:nil];
     }
   }
-  
+
   return result;
 }
 
@@ -185,7 +186,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
   [super performSearchOperation:operation];
 }
 
-- (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)scoredResult 
+- (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)scoredResult
                             matchesForQuery:(HGSQuery *)query
                                pivotObjects:(HGSResultArray *)pivotObjects {
   HGSResultArray *queryPivotObjects = [query pivotObjects];
@@ -195,14 +196,14 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
     // action.
     HGSAction *action
       = [scoredResult valueForKey:kHGSObjectAttributeDefaultActionKey];
-    if ([action appliesToResults:queryPivotObjects]) {   
+    if ([action appliesToResults:queryPivotObjects]) {
       HGSResult *actionResult = [self objectFromAction:action
                                            resultArray:queryPivotObjects];
       CGFloat score = [scoredResult score];
       HGSTokenizedString *matchedTerm = [scoredResult matchedTerm];
       HGSRankFlags flagsToSet = 0;
-      
-      if ([matchedTerm tokenizedLength] == 0) {        
+
+      if ([matchedTerm tokenizedLength] == 0) {
         // This gives some ordering to actions, putting more specific actions
         // first.
         HGSCalibratedScoreType scoreType;
@@ -216,15 +217,15 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
         score = HGSCalibratedScore(scoreType);
       }
       NSIndexSet *matchedIndexes = [scoredResult matchedIndexes];
-      rankedActionResult = [HGSScoredResult resultWithResult:actionResult 
-                                                       score:score 
-                                                  flagsToSet:flagsToSet 
-                                                flagsToClear:0 
-                                                 matchedTerm:matchedTerm 
+      rankedActionResult = [HGSScoredResult resultWithResult:actionResult
+                                                       score:score
+                                                  flagsToSet:flagsToSet
+                                                flagsToClear:0
+                                                 matchedTerm:matchedTerm
                                               matchedIndexes:matchedIndexes];
     }
   } else {
-    
+
     // No pivot: so just include the actions that are valid for a top level
     // query.
     HGSAction *action
@@ -233,7 +234,7 @@ static NSString * const kActionIdentifierArchiveKey = @"ActionIdentifier";
       rankedActionResult = scoredResult;
     }
   }
-  
+
   return rankedActionResult;
 }
 

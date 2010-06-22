@@ -76,6 +76,15 @@ static NSString *const kGoogleCalendarEventEndTimeKey
 // calendar view in a browser.
 - (NSString *)accountCalendarURLString;
 
+// Handle a calendar fetch.
+- (void)calendarFeedTicket:(GDataServiceTicket *)ticket
+          finishedWithFeed:(GDataFeedCalendar *)feed
+                     error:(NSError *)error;
+
+// Handle an event fetch.
+- (void)eventsFetcher:(GDataServiceTicket *)ticket
+     finishedWithFeed:(GDataFeedCalendarEvent *)eventFeed
+                error:(NSError *)error;
 @end
 
 
@@ -115,22 +124,22 @@ static NSString *const kGoogleCalendarEventEndTimeKey
 @implementation GoogleCalendarsSource
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
-  if ((self = [super initWithConfiguration:configuration])) {      
+  if ((self = [super initWithConfiguration:configuration])) {
     // Cache the Google Calendar icon
     calendarIcon_ = [[self imageNamed:@"gcalendar"] retain];
     HGSCheckDebug(calendarIcon_, nil);
     eventIcon_ = [[self imageNamed:@"gcalendarevent"] retain];
     HGSCheckDebug(eventIcon_, nil);
-    
+
     // Creating NSDateFormatters is expensive, so we cache these ones.
     shortDateShortTimeFormatter_ = [[NSDateFormatter alloc] init];
     [shortDateShortTimeFormatter_ setDateStyle:NSDateFormatterShortStyle];
     [shortDateShortTimeFormatter_ setTimeStyle:NSDateFormatterShortStyle];
-    
+
     noDateShortTimeFormatter_ = [[NSDateFormatter alloc] init];
     [noDateShortTimeFormatter_ setDateStyle:NSDateFormatterNoStyle];
     [noDateShortTimeFormatter_ setTimeStyle:NSDateFormatterShortStyle];
-    
+
     shortDateNoTimeFormatter_ = [[NSDateFormatter alloc] init];
     [shortDateNoTimeFormatter_ setDateStyle:NSDateFormatterShortStyle];
     [shortDateNoTimeFormatter_ setTimeStyle:NSDateFormatterNoStyle];
@@ -158,7 +167,7 @@ static NSString *const kGoogleCalendarEventEndTimeKey
   return isValid;
 }
 
-- (HGSResult *)preFilterResult:(HGSResult *)result 
+- (HGSResult *)preFilterResult:(HGSResult *)result
                matchesForQuery:(HGSQuery*)query
                   pivotObjects:(HGSResultArray *)pivotObjects {
   // Remove events that aren't from this calendar.
@@ -178,7 +187,7 @@ static NSString *const kGoogleCalendarEventEndTimeKey
   return result;
 }
 
-- (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)result 
+- (HGSScoredResult *)postFilterScoredResult:(HGSScoredResult *)result
                             matchesForQuery:(HGSQuery *)query
                                pivotObjects:(HGSResultArray *)pivotObjects {
   // If we're pivoting on the calendar then score the result based on its
@@ -256,7 +265,7 @@ static NSString *const kGoogleCalendarEventEndTimeKey
       [self indexCalendar:entry context:context];
     }
   } else {
-    NSString *fetchType = HGSLocalizedString(@"^calendar", 
+    NSString *fetchType = HGSLocalizedString(@"^calendar",
                                              @"A label denoting a Google "
                                              @"Calendar.");
     [self handleErrorForFetchType:fetchType error:error];
@@ -271,11 +280,11 @@ static NSString *const kGoogleCalendarEventEndTimeKey
   NSMutableDictionary *attributes
     = [NSMutableDictionary dictionaryWithObject:calendarID
                                          forKey:kGoogleCalendarIDKey];
-  
+
   // We can't get last-used, so just use last-modified.
   [attributes setObject:[[calendarEntry updatedDate] date]
                  forKey:kHGSObjectAttributeLastUsedDateKey];
-  
+
   // Come up with a unique calendar URL.  Since an account may own multiple
   // calendars and since there is no URL for going directly to a specific
   // calendar we must create our own so that the mixer does not think that
@@ -285,7 +294,7 @@ static NSString *const kGoogleCalendarEventEndTimeKey
   // web page.  This may be different from the account associated with
   // this calendar.
   NSString *googleCalendarTitle
-    = HGSLocalizedString(@"^Google Calendar", 
+    = HGSLocalizedString(@"^Google Calendar",
                          @"A label denoting the Google Calendar service.");
   NSString *urlString = [self accountCalendarURLString];
   NSString *encodedAccountName
@@ -313,19 +322,19 @@ static NSString *const kGoogleCalendarEventEndTimeKey
   NSArray *cellArray
     = [HGSPathCellElement pathCellArrayWithElements:pathCellElements];
   if (cellArray) {
-    [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
+    [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey];
   }
 
   [attributes setObject:calendarIcon_ forKey:kHGSObjectAttributeIconKey];
-  
+
   // Don't site search our calendar.
-  [attributes setObject:[NSNumber numberWithBool:YES] 
+  [attributes setObject:[NSNumber numberWithBool:YES]
                  forKey:kHGSObjectAttributeHideGoogleSiteSearchResultsKey];
-  
+
   // Add calendarEntry description and tags to enhance searching.
   NSString* calendarDescription = [[calendarEntry summary] stringValue];
   if (calendarDescription) {
-    [attributes setObject:calendarDescription 
+    [attributes setObject:calendarDescription
                    forKey:kHGSObjectAttributeSnippetKey];
   }
   NSString *calendarAccount = [calendarTitle stringByAppendingFormat:@" (%@)",
@@ -336,13 +345,13 @@ static NSString *const kGoogleCalendarEventEndTimeKey
                                   type:kHGSTypeWebCalendar
                                 source:self
                             attributes:attributes];
-  NSString *otherTerm = HGSLocalizedString(@"^calendar", 
+  NSString *otherTerm = HGSLocalizedString(@"^calendar",
                                            @"A label denoting a Google "
                                            @"Calendar.");
   [[context database] indexResult:result
                              name:calendarAccount
                         otherTerm:otherTerm];
-  
+
   // Now index today's events in the calendarEntry.
   // NOTE: This may pull all-day events from 'tomorrow' because of timezone
   // differences.
@@ -384,13 +393,13 @@ static NSString *const kGoogleCalendarEventEndTimeKey
       if ([context isCancelled]) break;
       GDataEntryCalendar *calendarEntry
         = [ticket propertyForKey:kGoogleCalendarEntryKey];
-      [self indexEvent:eventEntry 
-          withCalendar:calendarEntry 
+      [self indexEvent:eventEntry
+          withCalendar:calendarEntry
              context:context];
     }
   } else {
     NSString *fetchType
-      = HGSLocalizedString(@"^event", 
+      = HGSLocalizedString(@"^event",
                            @"A label denoting a Google Calendar event");
     [self handleErrorForFetchType:fetchType error:error];
   }
@@ -410,14 +419,14 @@ static NSString *const kGoogleCalendarEventEndTimeKey
     NSMutableDictionary *attributes
       = [NSMutableDictionary dictionaryWithObject:calendarID
                                            forKey:kGoogleCalendarIDKey];
-    
+
     // Compose the contents of the path control:
     // 'Google Calendar'/username/calendar name/event title.
     // The first three links will go to the account's calendar web page.
     // The event cell will be linked to the cell details web page.
     NSURL *calendarURL = [calendarEntry propertyForKey:kGoogleCalendarURLKey];
     NSString *googleCalendarTitle
-      = HGSLocalizedString(@"^Google Calendar", 
+      = HGSLocalizedString(@"^Google Calendar",
                            @"A label denoting the Google Calendar service.");
     NSString* calendarTitle = [[calendarEntry title] stringValue];
     NSString* eventTitle = [[eventEntry title] stringValue];
@@ -434,15 +443,15 @@ static NSString *const kGoogleCalendarEventEndTimeKey
     NSArray *cellArray
       = [HGSPathCellElement pathCellArrayWithElements:pathCellElements];
     if (cellArray) {
-      [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
+      [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey];
     }
-    
+
     // Add eventEntry description and tags to enhance searching.
     NSString* eventDescription = [[eventEntry content] stringValue];
     if ([eventDescription length] == 0) {
       eventDescription = eventTitle;
     }
-    
+
     // Find the closest future (that is, from the start of the current
     // day) instance of the event. The event times are not sorted, so, if
     // it's an array of more than one time, scan the (unsorted) event dates
@@ -472,13 +481,13 @@ static NSString *const kGoogleCalendarEventEndTimeKey
           [attributes setObject:snippet forKey:kHGSObjectAttributeSnippetKey];
         }
         [attributes setObject:eventIcon_ forKey:kHGSObjectAttributeIconKey];
-        
+
         // Invert date to set last used date
         NSTimeInterval interval = [startTime timeIntervalSinceNow];
         NSDate *lastUsed = [[NSDate date] addTimeInterval:-interval];
         [attributes setObject:lastUsed forKey:kHGSObjectAttributeLastUsedDateKey];
-        
-        NSString *dateString 
+
+        NSString *dateString
           = [shortDateNoTimeFormatter_ stringFromDate:startTime];
         // Uniquify the eventURL.
         NSString *eventURLString
@@ -490,7 +499,7 @@ static NSString *const kGoogleCalendarEventEndTimeKey
                                         type:kHGSTypeWebCalendarEvent
                                       source:self
                                   attributes:attributes];
-        
+
         NSMutableArray *otherStrings = [NSMutableArray arrayWithObjects:
                                         eventDescription,
                                         calendarTitle,
@@ -503,7 +512,7 @@ static NSString *const kGoogleCalendarEventEndTimeKey
           if (![weekdayName isEqualToString:todayName]) {
             [otherStrings addObject:todayName];
           }
-        } 
+        }
         [database indexResult:result
                      name:eventTitle
                otherTerms:otherStrings];
@@ -530,7 +539,7 @@ static NSString *const kGoogleCalendarEventEndTimeKey
     formatter = shortDateShortTimeFormatter_;
   }
   NSString *startTimeString = [formatter stringFromDate:startTime];
-  
+
   if (!allDay) {
     if (snippet) {
       snippet = [snippet stringByAppendingFormat:@", %@", startTimeString];
@@ -549,7 +558,7 @@ static NSString *const kGoogleCalendarEventEndTimeKey
     }
     snippet = [snippet stringByAppendingFormat:@", %@", allDayString];
   }
-  
+
   // Add location to the snippet.
   NSString *where = nil;
   NSArray *locations = [eventEntry locations];
@@ -610,7 +619,7 @@ static NSString *const kGoogleCalendarEventEndTimeKey
 - (NSString *)gcs_weekdayName {
   NSString *weekdayName = nil;
   NSDate *startOfToday = [NSDate gcs_startOfToday];
-  NSDate *aWeekAway = [startOfToday gcs_addDays:7]; 
+  NSDate *aWeekAway = [startOfToday gcs_addDays:7];
   if ([aWeekAway gcs_isAtOrAfter:self]) {
     NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
     [formatter setDateFormat:@"cccc"];
@@ -622,14 +631,14 @@ static NSString *const kGoogleCalendarEventEndTimeKey
 - (NSString *)gcs_todayOrTomorrow {
   NSString *dayName = nil;
   NSDate *startOfToday = [NSDate gcs_startOfToday];
-  NSDate *startOfTomorrow = [startOfToday gcs_addDays:1]; 
-  NSDate *startOfDayAfterTomorrow = [startOfTomorrow gcs_addDays:1]; 
+  NSDate *startOfTomorrow = [startOfToday gcs_addDays:1];
+  NSDate *startOfDayAfterTomorrow = [startOfTomorrow gcs_addDays:1];
   if ([self gcs_isAtOrAfter:startOfToday]
       && [startOfTomorrow gcs_isAtOrAfter:self]) {
-    dayName = HGSLocalizedString(@"^Today", 
+    dayName = HGSLocalizedString(@"^Today",
                                  @"The event occurs today.");
   } else if ([startOfDayAfterTomorrow gcs_isAtOrAfter:self]) {
-    dayName = HGSLocalizedString(@"^Tomorrow", 
+    dayName = HGSLocalizedString(@"^Tomorrow",
                                  @"The event occurs tomorrow.");
   } else  {
     dayName = [self gcs_weekdayName];

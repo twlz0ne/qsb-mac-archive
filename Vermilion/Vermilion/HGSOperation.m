@@ -40,14 +40,14 @@
 @implementation NSInvocationOperation (HGSInvocationOperation)
 
 - (id)hgs_initWithTarget:(id)target selector:(SEL)sel object:(id)arg {
-  GTMAssertSelectorNilOrImplementedWithArguments(target, 
-                                                 sel, 
-                                                 @encode(id), 
-                                                 @encode(NSOperation *), 
+  GTMAssertSelectorNilOrImplementedWithArguments(target,
+                                                 sel,
+                                                 @encode(id),
+                                                 @encode(NSOperation *),
                                                  NULL);
   NSMethodSignature *sig = [target methodSignatureForSelector:sel];
   NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
-  
+
   // GTMLightweightProxy is being used here because NSInvocationOperation
   // retains its arguments according to the documentation. Since it is unclear
   // when the retaining of the arguments occurs (at init, or just before the
@@ -67,6 +67,15 @@
 
 @end
 
+@interface HGSFetcherOperation ()
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)retrievedData;
+
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+    failedWithError:(NSError *)error;
+@end
+
+
 @implementation HGSFetcherOperation
 
 - (id)initWithTarget:(id)target
@@ -84,7 +93,7 @@
                                                  @encode(GDataHTTPFetcher *),
                                                  @encode(NSError *),
                                                  @encode(NSOperation *),
-                                                 NULL);  
+                                                 NULL);
   if ((self = [super init])) {
     fetcher_ = [fetcher retain];
     target_ = [target retain];

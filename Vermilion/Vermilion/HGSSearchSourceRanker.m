@@ -37,13 +37,13 @@
 #import "HGSLog.h"
 #import "HGSBundle.h"
 
-static NSString *const kHGSSearchSourceRankerDataPointRunTimeKey 
+static NSString *const kHGSSearchSourceRankerDataPointRunTimeKey
   = @"runtime";
-static NSString *const kHGSSearchSourceRankerDataPointPromotionsKey 
+static NSString *const kHGSSearchSourceRankerDataPointPromotionsKey
   = @"promotions";
-static NSString *const kHGSSearchSourceRankerDataKey 
+static NSString *const kHGSSearchSourceRankerDataKey
   = @"HGSSearchSourceRankerData";
-static NSString *const kHGSSearchSourceRankerSourceIDKey 
+static NSString *const kHGSSearchSourceRankerSourceIDKey
   = @"HGSSearchSourceRankerSourceID";
 
 // Ranks sources in the order that we should run them
@@ -61,8 +61,16 @@ static NSString *const kHGSSearchSourceRankerSourceIDKey
 - (UInt32)promotionCount;
 @end
 
-static NSInteger HGSSearchSourceRankerPerformanceSort(id src1, 
-                                                      id src2, 
+@interface HGSSearchSourceRanker ()
+
+- (void)saveToPreferencesTimer:(NSTimer *)timer;
+- (void)resultDidPromote:(NSNotification *)notification;
+- (void)searchOperationDidFinish:(NSNotification *)notification;
+
+@end
+
+static NSInteger HGSSearchSourceRankerPerformanceSort(id src1,
+                                                      id src2,
                                                       void *rankDict) {
   HGSSearchSource *source1 = (HGSSearchSource *)src1;
   HGSSearchSource *source2 = (HGSSearchSource *)src2;
@@ -92,7 +100,7 @@ static NSInteger HGSSearchSourceRankerPerformanceSort(id src1,
     } else {
       // If we have no data on either of them, run memory search sources first.
       // This will mainly apply for our first searches we run.
-      Class memSourceClass = [HGSMemorySearchSource class]; 
+      Class memSourceClass = [HGSMemorySearchSource class];
       BOOL src1IsMemorySource = [source1 isKindOfClass:memSourceClass];
       BOOL src2IsMemorySource = [source2 isKindOfClass:memSourceClass];
       if (src1IsMemorySource && !src2IsMemorySource) {
@@ -106,9 +114,9 @@ static NSInteger HGSSearchSourceRankerPerformanceSort(id src1,
 }
 
 static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
-  NSNumber *numA 
+  NSNumber *numA
     = [a objectForKey:kHGSSearchSourceRankerDataPointPromotionsKey];
-  NSNumber *numB 
+  NSNumber *numB
     = [b objectForKey:kHGSSearchSourceRankerDataPointPromotionsKey];
   UInt32 promoteA = [numA unsignedLongValue];
   UInt32 promoteB = [numB unsignedLongValue];
@@ -146,19 +154,19 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
   if (!array) {
     // Load defaults
     NSBundle *bundle = HGSGetPluginBundle();
-    NSString *plistPath 
+    NSString *plistPath
       = [bundle pathForResource:@"HGSSearchSourceRankerCalibration"
                          ofType:@"plist"];
     array = [NSArray arrayWithContentsOfFile:plistPath];
   }
   HGSAssert(array, nil);
-  self = [self initWithRankerData:array 
+  self = [self initWithRankerData:array
                      sourcesPoint:[HGSExtensionPoint sourcesPoint]];
   if (self) {
-    [NSTimer scheduledTimerWithTimeInterval:10 
-                                     target:self 
-                                   selector:@selector(saveToPreferencesTimer:) 
-                                   userInfo:@"saveToPreferencesTimer" 
+    [NSTimer scheduledTimerWithTimeInterval:10
+                                     target:self
+                                   selector:@selector(saveToPreferencesTimer:)
+                                   userInfo:@"saveToPreferencesTimer"
                                     repeats:YES];
   }
   return self;
@@ -173,22 +181,22 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
     if (data) {
       for (NSDictionary *entry in data) {
         NSString *key = [entry objectForKey:kHGSSearchSourceRankerSourceIDKey];
-        HGSSearchSourceRankerDataPoint *dp 
-          = [[[HGSSearchSourceRankerDataPoint alloc] initWithDictionary:entry] 
+        HGSSearchSourceRankerDataPoint *dp
+          = [[[HGSSearchSourceRankerDataPoint alloc] initWithDictionary:entry]
              autorelease];
         if (dp) {
           [rankDictionary_ setObject:dp forKey:key];
           promotionCount_ += [dp promotionCount];
         }
       }
-    } 
+    }
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(resultDidPromote:) 
+    [nc addObserver:self
+           selector:@selector(resultDidPromote:)
                name:kHGSResultDidPromoteNotification
              object:nil];
-    [nc addObserver:self 
-           selector:@selector(searchOperationDidFinish:) 
+    [nc addObserver:self
+           selector:@selector(searchOperationDidFinish:)
                name:kHGSSearchOperationDidFinishNotification
              object:nil];
   }
@@ -208,10 +216,10 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
   NSMutableArray *array = [NSMutableArray array];
   @synchronized (self) {
     for (NSString *sourceID in rankDictionary_) {
-      HGSSearchSourceRankerDataPoint *dp 
+      HGSSearchSourceRankerDataPoint *dp
         = [rankDictionary_ objectForKey:sourceID];
-      NSMutableDictionary *entry 
-        = [NSMutableDictionary dictionaryWithObject:sourceID 
+      NSMutableDictionary *entry
+        = [NSMutableDictionary dictionaryWithObject:sourceID
                                            forKey:kHGSSearchSourceRankerSourceIDKey];
       [dp encodeToDictionary:entry];
       [array addObject:entry];
@@ -221,11 +229,11 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
   return array;
 }
 
-- (void)addTimeDataPoint:(UInt64)machTime 
+- (void)addTimeDataPoint:(UInt64)machTime
                forSource:(HGSSearchSource *)source {
   NSString *sourceID = [source identifier];
   @synchronized (self) {
-    HGSSearchSourceRankerDataPoint *dp 
+    HGSSearchSourceRankerDataPoint *dp
       = [rankDictionary_ objectForKey:sourceID];
     if (!dp) {
       dp = [[[HGSSearchSourceRankerDataPoint alloc] init] autorelease];
@@ -240,7 +248,7 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
   UInt64 avgTime = 0;
   NSString *sourceID = [source identifier];
   @synchronized (self) {
-    HGSSearchSourceRankerDataPoint *dp 
+    HGSSearchSourceRankerDataPoint *dp
       = [rankDictionary_ objectForKey:sourceID];
     if (dp) {
       avgTime = [dp averageTime];
@@ -250,10 +258,10 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
 }
 
 - (NSArray *)orderedSourcesByPerformance {
-  NSMutableArray *sources 
+  NSMutableArray *sources
     = [NSMutableArray arrayWithArray:[sourcesPoint_ extensions]];
   @synchronized (self) {
-    [sources sortUsingFunction:HGSSearchSourceRankerPerformanceSort 
+    [sources sortUsingFunction:HGSSearchSourceRankerPerformanceSort
                        context:rankDictionary_];
   }
   return sources;
@@ -265,18 +273,18 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
 
 - (UInt64)promotionCountForSource:(HGSSearchSource *)source {
   NSString *identifier = [source identifier];
-  HGSSearchSourceRankerDataPoint *dp 
+  HGSSearchSourceRankerDataPoint *dp
     = [rankDictionary_ objectForKey:identifier];
   return [dp promotionCount];
 }
 
 - (NSString *)description {
   NSArray *orderedSources = [self orderedSourcesByPerformance];
-  NSMutableString *desc 
+  NSMutableString *desc
     = [NSMutableString stringWithString:[super description]];
   for(HGSSearchSource *source in orderedSources) {
     NSString *identifier = [source identifier];
-    HGSSearchSourceRankerDataPoint *dp 
+    HGSSearchSourceRankerDataPoint *dp
       = [rankDictionary_ objectForKey:identifier];
     [desc appendFormat:@" %15lld %@\n", [dp averageTime], [source displayName]];
   }
@@ -298,7 +306,7 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
   HGSSearchSource *source = [result source];
   NSString *sourceID = [source identifier];
   @synchronized (self) {
-    HGSSearchSourceRankerDataPoint *dp 
+    HGSSearchSourceRankerDataPoint *dp
       = [rankDictionary_ objectForKey:sourceID];
     [dp promote];
     [self setDirty:YES];
@@ -322,7 +330,7 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
 
 - (id)initWithDictionary:(NSDictionary *)dict {
   if ((self = [super init])) {
-    NSNumber *number 
+    NSNumber *number
       = [dict objectForKey:kHGSSearchSourceRankerDataPointRunTimeKey];
     averageTime_ = [number unsignedLongLongValue];
     number = [dict objectForKey:kHGSSearchSourceRankerDataPointPromotionsKey];
@@ -332,9 +340,9 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
 }
 
 - (void)encodeToDictionary:(NSMutableDictionary *)dict {
-  [dict setObject:[NSNumber numberWithUnsignedLongLong:[self averageTime]] 
+  [dict setObject:[NSNumber numberWithUnsignedLongLong:[self averageTime]]
            forKey:kHGSSearchSourceRankerDataPointRunTimeKey];
-  [dict setObject:[NSNumber numberWithUnsignedLongLong:promotions_] 
+  [dict setObject:[NSNumber numberWithUnsignedLongLong:promotions_]
            forKey:kHGSSearchSourceRankerDataPointPromotionsKey];
  }
 
@@ -357,7 +365,7 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"promotions %lu averageTime: %llu)", 
+  return [NSString stringWithFormat:@"promotions %lu averageTime: %llu)",
           [self promotionCount], [self averageTime]];
 }
 

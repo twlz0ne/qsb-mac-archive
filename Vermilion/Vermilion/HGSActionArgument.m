@@ -44,25 +44,26 @@
 
 NSString* const kHGSActionArgumentBundleKey = @"HGSActionArgumentBundle";
 NSString* const kHGSActionArgumentIdentifierKey = @"HGSActionArgumentIdentifier";
-NSString* const kHGSActionArgumentSupportedTypesKey 
+NSString* const kHGSActionArgumentSupportedTypesKey
   = @"HGSActionArgumentSupportedTypes";
 NSString* const kHGSActionArgumentUnsupportedTypesKey
   = @"HGSActionArgumentUnsupportedTypes";
 NSString* const kHGSActionArgumentOptionalKey = @"HGSActionArgumentOptional";
-NSString* const kHGSActionArgumentUserVisibleOtherTermsKey 
+NSString* const kHGSActionArgumentUserVisibleOtherTermsKey
   = @"HGSActionArgumentUserVisibleOtherTerms";
-NSString* const kHGSActionArgumentUserVisibleNameKey 
+NSString* const kHGSActionArgumentUserVisibleNameKey
   = @"HGSActionArgumentUserVisibleName";
-NSString* const kHGSActionArgumentUserVisibleDescriptionKey 
+NSString* const kHGSActionArgumentUserVisibleDescriptionKey
   = @"HGSActionArgumentUserVisibleDescription";
 NSString* const kHGSActionArgumentClassKey = @"HGSActionArgumentClass";
 
-static NSString* const kHGSActionArgumentSourceIdentifier 
+static NSString* const kHGSActionArgumentSourceIdentifier
   = @"com.google.vermilion.actionargument.source";
 
 // A simple source that returns custom values for action arguments if the
 // action argument is configured to do so.
 @interface HGSActionArgumentSource : HGSCallbackSearchSource
++ (void)pluginLoaderDidLoadPlugins:(NSNotification *)notification;
 @end
 
 @implementation HGSActionArgument
@@ -76,49 +77,49 @@ static NSString* const kHGSActionArgumentSourceIdentifier
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super init])) {
-    
+
     NSBundle *bundle = [configuration objectForKey:kHGSActionArgumentBundleKey];
     HGSCheckDebug(bundle, @"Action argument needs a bundle! %@", self);
-    
-    identifier_ 
+
+    identifier_
       = [[configuration objectForKey:kHGSActionArgumentIdentifierKey] retain];
     HGSCheckDebug(identifier_, @"Action argument needs an identifier! %@", self);
-    
+
     id value = [configuration objectForKey:kHGSActionArgumentSupportedTypesKey];
     NSSet *supportedTypes = [NSSet qsb_setFromId:value];
-    
+
     value = [configuration objectForKey:kHGSActionArgumentUnsupportedTypesKey];
     NSSet *unsupportedTypes = [NSSet qsb_setFromId:value];
-    
-    typeFilter_ = [[HGSTypeFilter alloc] initWithConformTypes:supportedTypes 
+
+    typeFilter_ = [[HGSTypeFilter alloc] initWithConformTypes:supportedTypes
                                           doesNotConformTypes:unsupportedTypes];
-    
-    HGSCheckDebug(typeFilter_, 
+
+    HGSCheckDebug(typeFilter_,
                   @"Action Argument %@ must have supported type", self);
 
-    optional_ 
+    optional_
       = [[configuration objectForKey:kHGSActionArgumentOptionalKey] boolValue];
 
-    displayName_ 
+    displayName_
       = [configuration objectForKey:kHGSActionArgumentUserVisibleNameKey];
-    displayName_ 
+    displayName_
       = [[bundle qsb_localizedInfoPListStringForKey:displayName_] retain];
-    HGSCheckDebug(!optional_ || displayName_, 
+    HGSCheckDebug(!optional_ || displayName_,
                   @"Optional Action Argument %@ must have a display name", self);
     HGSCheckDebug(!displayName_ || [displayName_ characterAtIndex:0] != '^',
                   @"Display name not localized %@", self);
-    displayDescription_ 
+    displayDescription_
       = [configuration objectForKey:kHGSActionArgumentUserVisibleDescriptionKey];
-    displayDescription_ 
+    displayDescription_
       = [[bundle qsb_localizedInfoPListStringForKey:displayDescription_] retain];
-    HGSCheckDebug((!displayDescription_ 
+    HGSCheckDebug((!displayDescription_
                    || [displayDescription_ characterAtIndex:0] != '^'),
                   @"Display name not localized %@", self);
-   
+
     value = [configuration objectForKey:kHGSActionArgumentUserVisibleOtherTermsKey];
     NSSet *terms = [NSSet qsb_setFromId:value];
     if ([terms count]) {
-      NSMutableSet *localizedTerms 
+      NSMutableSet *localizedTerms
         = [[NSMutableSet alloc] initWithCapacity:[terms count]];
       for (NSString *term in terms) {
         term = [bundle qsb_localizedInfoPListStringForKey:term];
@@ -147,11 +148,11 @@ static NSString* const kHGSActionArgumentSourceIdentifier
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"<%@:%p identifier='%@' name='%@'>", 
+  return [NSString stringWithFormat:@"<%@:%p identifier='%@' name='%@'>",
           [self class], self, [self identifier], [self displayName]];
 }
 
-- (HGSScoredResult *)scoreResult:(HGSScoredResult *)result 
+- (HGSScoredResult *)scoreResult:(HGSScoredResult *)result
                         forQuery:(HGSQuery *)query {
   return result;
 }
@@ -164,7 +165,7 @@ static NSString* const kHGSActionArgumentSourceIdentifier
 
 + (HGSActionArgumentSource *)defaultActionArgumentSource {
   HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
-  return [sourcesPoint 
+  return [sourcesPoint
           extensionWithIdentifier:kHGSActionArgumentSourceIdentifier];
 }
 
@@ -179,9 +180,9 @@ static NSString* const kHGSActionArgumentSourceIdentifier
   if ([[self class] isEqual:[HGSActionArgumentSource class]]) {
     HGSPluginLoader *sharedLoader = [HGSPluginLoader sharedPluginLoader];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(pluginLoaderDidLoadPlugins:) 
-               name:kHGSPluginLoaderDidLoadPluginsNotification 
+    [nc addObserver:self
+           selector:@selector(pluginLoaderDidLoadPlugins:)
+               name:kHGSPluginLoaderDidLoadPluginsNotification
              object:sharedLoader];
   }
   [pool release];
@@ -195,13 +196,13 @@ static NSString* const kHGSActionArgumentSourceIdentifier
   BOOL addedSource = [sourcesPoint extendWithObject:source];
   HGSAssert(addedSource, nil);
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc removeObserver:self 
-                name:kHGSPluginLoaderDidLoadPluginsNotification 
+  [nc removeObserver:self
+                name:kHGSPluginLoaderDidLoadPluginsNotification
               object:[notification object]];
 }
 
 - (id)init {
-  NSDictionary *configDictionary 
+  NSDictionary *configDictionary
     = [NSDictionary dictionaryWithObjectsAndKeys:
        HGSGetPluginBundle(), kHGSExtensionBundleKey,
        kHGSActionArgumentSourceIdentifier, kHGSExtensionIdentifierKey,

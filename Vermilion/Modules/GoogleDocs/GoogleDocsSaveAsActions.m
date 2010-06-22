@@ -63,7 +63,7 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
 // Common function that receives a download URL, the GData service
 // associated with the download request, and the saveAs information
 // needed by the fetcher handlers for completing the save.
-- (void)downloadDocument:(NSString *)downloadCommand 
+- (void)downloadDocument:(NSString *)downloadCommand
                  service:(GDataServiceGoogle *)service
               saveAsInfo:(NSDictionary *)saveAsInfo;
 
@@ -71,6 +71,8 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
 - (void)informUserWithDescription:(NSString *)description
                              type:(HGSUserMessageType)type
                           fetcher:(GDataHTTPFetcher *)fetcher;
+- (void)fetcher:(GDataHTTPFetcher *)fetcher finishedWithData:(NSData *)data;
+- (void)fetcher:(GDataHTTPFetcher *)fetcher failedWithError:(NSError *)error;
 @end
 
 
@@ -111,10 +113,10 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
       }
 
       docID = [GDataUtilities stringByURLEncodingForURI:docID];
-      GDataServiceGoogle *service = nil;      
+      GDataServiceGoogle *service = nil;
       HGSGDataServiceSource *source = GTM_STATIC_CAST(HGSGDataServiceSource, [directObject source]);
       service = [source service];
-     
+
       HGSAssert(service, nil);
 
       // The method of retrieving the document is different for
@@ -155,7 +157,7 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
   return YES;
 }
 
-- (void)downloadDocument:(NSString *)downloadCommand 
+- (void)downloadDocument:(NSString *)downloadCommand
                  service:(GDataServiceGoogle *)service
               saveAsInfo:(NSDictionary *)saveAsInfo {
   NSURL *downloadURL = [NSURL URLWithString:downloadCommand];
@@ -182,7 +184,7 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
                               error:&error];
   if (!didWrite) {
     NSString *errorFormat
-      = HGSLocalizedString(@"Could not save Google Doc ‘%@’! (%d)", 
+      = HGSLocalizedString(@"Could not save Google Doc ‘%@’! (%d)",
                            @"A dialog label explaining to the user that we could "
                            @"not save a Google Doc. %d is an error code.");
     NSString *errorString = [NSString stringWithFormat:errorFormat,
@@ -197,7 +199,7 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
 
 - (void)fetcher:(GDataHTTPFetcher *)fetcher failedWithError:(NSError *)error {
   NSString *errorFormat
-    = HGSLocalizedString(@"Could not fetch Google Doc! (%d)", 
+    = HGSLocalizedString(@"Could not fetch Google Doc! (%d)",
                          @"A dialog label explaining to the user that we could "
                          @"not fetch a Google Doc. %d is an error code.");
   NSString *errorString = [NSString stringWithFormat:errorFormat,
@@ -217,12 +219,12 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
   HGSAssert(category, nil);
   category = [NSString stringWithFormat:@"gdoc%@.icns", category];
   NSImage *categoryIcon = [self imageNamed:category];
-  NSString *summary 
+  NSString *summary
     = HGSLocalizedString(@"Google Docs", @"A dialog title.");
-  [HGSUserMessenger displayUserMessage:summary 
-                           description:description 
-                                  name:kGoogleDocsUserMessageName 
-                                 image:categoryIcon 
+  [HGSUserMessenger displayUserMessage:summary
+                           description:description
+                                  name:kGoogleDocsUserMessageName
+                                 image:categoryIcon
                                   type:type];
   }
 

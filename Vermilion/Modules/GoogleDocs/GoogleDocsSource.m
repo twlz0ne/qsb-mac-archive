@@ -52,9 +52,11 @@
 - (NSArray*)authorArrayForGDataPeople:(NSArray*)people;
 
 // Main indexing function for each document associated with the account.
-- (void)indexDoc:(GDataEntryBase *)doc 
+- (void)indexDoc:(GDataEntryBase *)doc
          context:(HGSGDataServiceIndexContext *)context;
-
+- (void)docFeedTicket:(GDataServiceTicket *)ticket
+     finishedWithFeed:(GDataFeedBase *)docFeed
+                error:(NSError *)error;
 @end
 
 @implementation GoogleDocsSource
@@ -63,14 +65,14 @@ GTM_METHOD_CHECK(NSEnumerator,
                  gtm_enumeratorByMakingEachObjectPerformSelector:withObject:);
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
-  if ((self = [super initWithConfiguration:configuration])) {    
+  if ((self = [super initWithConfiguration:configuration])) {
     // Cache the Google Docs icons
     NSImage *docImage = [self imageNamed:@"gdocdocument"];
     NSImage *presImage = [self imageNamed:@"gdocpresentation"];
     NSImage *pdfImage = [self imageNamed:@"gdocpdfdocument"];
     NSImage *spreadSheetImage = [self imageNamed:@"gdocspreadsheet"];
     docIcons_ = [[NSDictionary alloc] initWithObjectsAndKeys:
-                 docImage, kDocCategoryDocument, 
+                 docImage, kDocCategoryDocument,
                  presImage, kDocCategoryPresentation,
                  pdfImage, kDocCategoryPDFDocument,
                  spreadSheetImage, kDocCategorySpreadsheet,
@@ -111,13 +113,13 @@ GTM_METHOD_CHECK(NSEnumerator,
 }
 
 - (NSArray*)authorArrayForGDataPeople:(NSArray*)people {
-  NSMutableArray *peopleTerms 
+  NSMutableArray *peopleTerms
   = [NSMutableArray arrayWithCapacity:(2 * [people count])];
   NSCharacterSet *wsSet = [NSCharacterSet whitespaceCharacterSet];
   NSEnumerator *enumerator = [people objectEnumerator];
   GDataPerson *person;
   while ((person = [enumerator nextObject])) {
-    
+
     NSString *authorName = [[person name] stringByTrimmingCharactersInSet:wsSet];
     if ([authorName length] > 0) {
       [peopleTerms addObject:authorName];
@@ -157,7 +159,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   HGSGDataServiceIndexContext *context
     = GTM_STATIC_CAST(HGSGDataServiceIndexContext, [ticket userData]);
   HGSAssert(context, nil);
-  
+
   if (!error) {
     NSArray *docs = [docFeed entries];
     for (GDataEntryBase *doc in docs) {
@@ -165,14 +167,14 @@ GTM_METHOD_CHECK(NSEnumerator,
       [self indexDoc:doc context:context];
     }
   } else {
-    NSString *fetchType = HGSLocalizedString(@"doc", 
+    NSString *fetchType = HGSLocalizedString(@"doc",
                                              @"A label denoting a GoogleDoc");
     [self handleErrorForFetchType:fetchType error:error];
   }
   [self ticketHandled:ticket forContext:context];
 }
 
-- (void)indexDoc:(GDataEntryBase *)doc 
+- (void)indexDoc:(GDataEntryBase *)doc
          context:(HGSGDataServiceIndexContext *)context {
   NSString *docTitle = [[doc title] stringValue];
   NSURL *docURL = [[doc HTMLLink] URL];
@@ -209,7 +211,7 @@ GTM_METHOD_CHECK(NSEnumerator,
   if (!icon) {
     icon = [docIcons_ objectForKey:kDocCategoryDocument];
   }
-  
+
   // Compose the contents of the path control.  First cell will be 'Google Docs',
   // followed by the account name in the second cell, with the last cell being
   // the document name.  A middle cell may be added if there is a folder, but
@@ -220,16 +222,16 @@ GTM_METHOD_CHECK(NSEnumerator,
                                              path:@"/"]
                     autorelease];
   NSMutableArray *cellArray = [NSMutableArray array];
-  NSString *docsString = HGSLocalizedString(@"Google Docs", 
+  NSString *docsString = HGSLocalizedString(@"Google Docs",
                                             @"A label denoting a Google Docs "
                                             @"result");
-  NSDictionary *googleDocsCell 
+  NSDictionary *googleDocsCell
     = [NSDictionary dictionaryWithObjectsAndKeys:
        docsString, kQSBPathCellDisplayTitleKey,
        baseURL, kQSBPathCellURLKey,
        nil];
   [cellArray addObject:googleDocsCell];
-  
+
   NSString *userName = [[self service] username];
   NSDictionary *userCell = [NSDictionary dictionaryWithObjectsAndKeys:
                             userName, kQSBPathCellDisplayTitleKey,
@@ -249,26 +251,26 @@ GTM_METHOD_CHECK(NSEnumerator,
                                 nil];
     [cellArray addObject:folderCell];
   }
-  
+
   NSDictionary *resultDocCell = [NSDictionary dictionaryWithObjectsAndKeys:
                                  docTitle, kQSBPathCellDisplayTitleKey,
                                  docURL, kQSBPathCellURLKey,
                                  nil];
   [cellArray addObject:resultDocCell];
-  
+
   // Let's consider Docs to be an extension of home.
   // TODO(stuartmorgan): maybe this should be true only for docs where the
   // user is an author (or, if we can get it from GData, "owned by me")?
-  // Consider "starred" to be equivalent to things like the Dock.  
+  // Consider "starred" to be equivalent to things like the Dock.
   NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSUnderHomeRankFlag
                          | eHGSUserPersistentPathRankFlag];
-  
+
   // We can't get last-used, so just use last-modified.
   NSDate *date = [[doc updatedDate] date];
   if (!date) {
     date = [NSDate distantPast];
   }
-  
+
   NSString *flagName = isStarred ? @"star-flag" : nil;
   NSString *docID = [doc identifier];
   docID = [docID lastPathComponent];
@@ -291,7 +293,7 @@ GTM_METHOD_CHECK(NSEnumerator,
                                                           type:kHGSTypeGoogleDoc
                                                         source:self
                                                     attributes:attributes];
-  
+
 
   // Add other search term helpers such as the type of the document,
   // the authors, and if the document was starred.
@@ -329,7 +331,7 @@ GTM_METHOD_CHECK(NSEnumerator,
                            @"Google Docs.");
     [otherTerms addObject:starredTerm];
   }
-  
+
   [[context database] indexResult:result
                              name:docTitle
                        otherTerms:otherTerms];

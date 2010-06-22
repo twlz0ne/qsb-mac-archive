@@ -46,7 +46,7 @@ static NSString *const kPhotosAlbumKey = @"kPhotosAlbumKey";
   NSImage *placeholderIcon_;
 }
 
-- (void)indexAlbum:(GDataEntryPhotoAlbum *)album 
+- (void)indexAlbum:(GDataEntryPhotoAlbum *)album
            context:(HGSGDataServiceIndexContext *)context;
 - (void)indexPhoto:(GDataEntryPhoto *)photo
          withAlbum:(GDataEntryPhotoAlbum *)album
@@ -59,6 +59,12 @@ static NSString *const kPhotosAlbumKey = @"kPhotosAlbumKey";
 + (void)setBestFitThumbnailFromMediaGroup:(GDataMediaGroup *)mediaGroup
                              inAttributes:(NSMutableDictionary *)attributes;
 
+- (void)albumInfoFetcher:(GDataServiceTicket *)ticket
+       finishedWithAlbum:(GDataFeedPhotoUser *)albumFeed
+                   error:(NSError *)error;
+- (void)photoInfoFetcher:(GDataServiceTicket *)ticket
+       finishedWithPhoto:(GDataFeedPhotoAlbum *)photoFeed
+                   error:(NSError *)error;
 @end
 
 @interface GDataMediaGroup (VermillionAdditions)
@@ -108,7 +114,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return isValid;
 }
 
-- (HGSResult *)preFilterResult:(HGSResult *)result 
+- (HGSResult *)preFilterResult:(HGSResult *)result
                matchesForQuery:(HGSQuery*)query
                   pivotObjects:(HGSResultArray *)pivotObjects {
   // Remove things that aren't from this album.
@@ -168,24 +174,24 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 #pragma mark -
 #pragma mark Album information Extraction
 
-- (void)indexAlbum:(GDataEntryPhotoAlbum *)album 
+- (void)indexAlbum:(GDataEntryPhotoAlbum *)album
            context:(HGSGDataServiceIndexContext *)context {
   HGSAssert(context, nil);
   NSString* albumTitle = [[album title] stringValue];
   NSURL* albumURL = [[album HTMLLink] URL];
   if (albumURL) {
     NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-    
+
     // We can't get last-used, so just use last-modified.
     [attributes setObject:[[album updatedDate] date]
                    forKey:kHGSObjectAttributeLastUsedDateKey];
-    
+
     // Compose the contents of the path control:
     // 'Picasaweb'/username/album name.
     NSURL *baseURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/",
                                            [albumURL scheme],
                                            [albumURL host]]];
-    NSString *picasaWeb = HGSLocalizedString(@"Picasaweb", 
+    NSString *picasaWeb = HGSLocalizedString(@"Picasaweb",
                                              @"A label denoting the picasaweb "
                                              @"service.");
     NSString *username = [[context service] username];
@@ -204,27 +210,27 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     NSArray *cellArray
       = [HGSPathCellElement pathCellArrayWithElements:pathCellElements];
     if (cellArray) {
-      [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
+      [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey];
     }
-    
+
     // Remember the first photo's URL to ease on-demand fetching later.
     [PicasawebSource setBestFitThumbnailFromMediaGroup:[album mediaGroup]
                                           inAttributes:attributes];
-      
+
     // Add album description and tags to enhance searching.
     NSString* albumDescription = [[album photoDescription] stringValue];
-    
+
 
     // Set up the snippet and detail.
-    [attributes setObject:albumDescription 
+    [attributes setObject:albumDescription
                    forKey:kHGSObjectAttributeSnippetKey];
-    NSString *albumDetail = HGSLocalizedString(@"%u photos", 
+    NSString *albumDetail = HGSLocalizedString(@"%u photos",
                                                @"A label denoting %u number of "
                                                @"online photos");
     NSUInteger photoCount = [[album photosUsed] unsignedIntValue];
     albumDetail = [NSString stringWithFormat:albumDetail, photoCount],
     [attributes setObject:albumDetail forKey:kHGSObjectAttributeSnippetKey];
-    
+
     HGSUnscoredResult* result = [HGSUnscoredResult resultWithURL:albumURL
                                                             name:albumTitle
                                                             type:kHGSTypeWebPhotoAlbum
@@ -233,7 +239,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     [[context database] indexResult:result
                                name:albumTitle
                           otherTerm:albumDescription];
-    
+
     // Now index the photos in the album.
     NSURL *photoInfoFeedURL = [[album feedLink] URL];
     if (photoInfoFeedURL) {
@@ -263,7 +269,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       [self indexAlbum:album context:context];
     }
   } else {
-    NSString *fetchType = HGSLocalizedString(@"album", 
+    NSString *fetchType = HGSLocalizedString(@"album",
                                              @"A label denoting a Picasaweb "
                                              @"Photo Album");
     [self handleErrorForFetchType:fetchType error:error];
@@ -281,17 +287,17 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   if (photoURL) {
     NSString* photoDescription = [[photo photoDescription] stringValue];
     NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-    
+
     // We can't get last-used, so just use last-modified.
     [attributes setObject:[[photo updatedDate] date]
                    forKey:kHGSObjectAttributeLastUsedDateKey];
-    
+
     // Compose the contents of the path control:
     // 'Picasaweb'/username/album name/photo title.
     NSURL *baseURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/",
                                            [photoURL scheme],
                                            [photoURL host]]];
-    NSString *picasaWeb = HGSLocalizedString(@"Picasaweb", 
+    NSString *picasaWeb = HGSLocalizedString(@"Picasaweb",
                                              @"A label denoting the picasaweb "
                                              @"service.");
     NSString *username = [[context service] username];
@@ -313,16 +319,16 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     NSArray *cellArray
       = [HGSPathCellElement pathCellArrayWithElements:pathCellElements];
     if (cellArray) {
-      [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
+      [attributes setObject:cellArray forKey:kQSBObjectAttributePathCellsKey];
     }
     if ([photoDescription length] == 0) {
       photoDescription = photoTitle;
     }
-    
+
     // Remember the photo's first image URL.
     [PicasawebSource setBestFitThumbnailFromMediaGroup:[photo mediaGroup]
                                           inAttributes:attributes];
-    
+
     // Add photo description and tags to enhance searching.
     NSMutableArray *otherStrings
       = [NSMutableArray arrayWithObjects:photoDescription,
@@ -332,9 +338,9 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     // Add tags (aka 'keywords').
     NSArray *keywords = [[[photo mediaGroup] mediaKeywords] keywords];
     [otherStrings addObjectsFromArray:keywords];
-    
+
     // TODO(mrossetti): Add name tags when available via the PWA API.
-    
+
     // Set up the snippet and detail.
     NSString *photoSnippet = albumTitle;
     GDataPhotoTimestamp *photoTimestamp = [photo timestamp];
@@ -348,8 +354,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       photoSnippet
         = [timestampString stringByAppendingFormat:@" (%@)", photoSnippet];
     }
-    
-    
+
+
     photoSnippet = [photoSnippet stringByAppendingFormat:@"\r%@", photoTitle];
     [attributes setObject:photoSnippet forKey:kHGSObjectAttributeSnippetKey];
     HGSUnscoredResult* result = [HGSUnscoredResult resultWithURL:photoURL
@@ -359,7 +365,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
                                                       attributes:attributes];
     [[context database] indexResult:result
                                name:photoTitle
-                         otherTerms:otherStrings];    
+                         otherTerms:otherStrings];
   }
 }
 
@@ -377,7 +383,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       [self indexPhoto:photo withAlbum:album context:context];
     }
   } else {
-    NSString *fetchType = HGSLocalizedString(@"photo", 
+    NSString *fetchType = HGSLocalizedString(@"photo",
                                              @"A label denoting a Picasaweb "
                                              @"photo");
     [self handleErrorForFetchType:fetchType error:error];

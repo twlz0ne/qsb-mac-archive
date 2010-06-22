@@ -41,20 +41,24 @@
 #import "QSBSearchController.h"
 #import "QSBTableResult.h"
 
-@implementation QSBActionPresenter 
+@interface QSBActionPresenter ()
+- (void)selectedTableResultDidChange:(NSNotification *)notification;
+@end
+
+@implementation QSBActionPresenter
 
 @synthesize currentActionArgument = currentActionArgument_;
 
 - (id)initWithActionModel:(QSBActionModel *)model {
   if ((self = [super init])) {
     actionModel_ = [model retain];
-    QSBSearchController *newController 
+    QSBSearchController *newController
       = [[[QSBSearchController alloc] initWithActionPresenter:self] autorelease];
     [actionModel_ pushSearchController:newController];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(selectedTableResultDidChange:) 
-               name:kQSBSelectedTableResultDidChangeNotification 
+    [nc addObserver:self
+           selector:@selector(selectedTableResultDidChange:)
+               name:kQSBSelectedTableResultDidChangeNotification
              object:nil];
     if (!actionModel_) {
       [self release];
@@ -62,7 +66,7 @@
       HGSLogDebug(@"Nil model passed into %@", NSStringFromSelector(_cmd));
     }
   }
-  return self;  
+  return self;
 }
 
 - (id)init {
@@ -78,7 +82,7 @@
 - (NSString *)description {
   return [NSString stringWithFormat:@"<%@: %p> Action: %@ "
           @"SearchControllerDepth: %d", [self class], self,
-          [[[self actionOperation] action] displayName], 
+          [[[self actionOperation] action] displayName],
           [actionModel_ searchControllerCount]];
 }
 
@@ -105,9 +109,9 @@
 - (void)pivotOnObjects:(HGSResultArray *)pivotObjects {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   QSBSearchController *oldSearchController = [self activeSearchController];
-  QSBSearchController *newController 
+  QSBSearchController *newController
     = [[[QSBSearchController alloc] initWithActionPresenter:self] autorelease];
-  NSDictionary *userInfo 
+  NSDictionary *userInfo
     = [NSDictionary dictionaryWithObjectsAndKeys:
        oldSearchController, kQSBOldSearchControllerKey,
        newController, kQSBNewSearchControllerKey,
@@ -115,42 +119,42 @@
   [nc postNotificationName:kQSBActionPresenterWillPivotNotification
                     object:self userInfo:userInfo];
   [actionModel_ pushSearchController:newController];
-   
+
   NSUInteger pivotCount = [pivotObjects count];
   QSBSearchController *activeController = [self activeSearchController];
-  
+
   if (pivotCount) {
     HGSAction *action = [self actionFromPivotObjects:pivotObjects];
     if (action) {
       HGSMutableActionOperation *operation = [actionModel_ actionOperation];
       [operation setAction:action];
-      HGSResultArray *directObjects 
-        = [[pivotObjects lastObject] 
+      HGSResultArray *directObjects
+        = [[pivotObjects lastObject]
            valueForKey:kHGSObjectAttributeActionDirectObjectsKey];
       [operation setArgument:directObjects forKey:kHGSActionDirectObjectsKey];
       currentActionArgument_ = [action nextArgumentToFillIn:operation];
     }
   }
-  
+
   [activeController setTokenizedQueryString:nil
-                               pivotObjects:pivotObjects]; 
+                               pivotObjects:pivotObjects];
   [nc postNotificationName:kQSBActionPresenterDidPivotNotification
-                    object:self 
-                  userInfo:userInfo];  
+                    object:self
+                  userInfo:userInfo];
 }
 
 - (void)reset {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kQSBActionPresenterWillResetNotification
-                    object:self 
+                    object:self
                   userInfo:nil];
   [actionModel_ reset];
-  QSBSearchController *newController 
+  QSBSearchController *newController
     = [[[QSBSearchController alloc] initWithActionPresenter:self] autorelease];
   [actionModel_ pushSearchController:newController];
   currentActionArgument_ = nil;
   [nc postNotificationName:kQSBActionPresenterDidResetNotification
-                    object:self 
+                    object:self
                   userInfo:nil];
 }
 
@@ -175,24 +179,24 @@
 }
 
 - (NSAttributedString *)pivotAttributedString {
-  NSMutableAttributedString *pivotString 
+  NSMutableAttributedString *pivotString
     = [[[NSMutableAttributedString alloc] init] autorelease];
   NSUInteger controllerCount = [actionModel_ searchControllerCount];
   for (NSUInteger i = 1; i < controllerCount; ++i) {
     QSBSearchController *controller = [actionModel_ searchControllerAtIndex:i];
-    QSBPivotTextAttachment *attachment 
-      = [[[QSBPivotTextAttachment alloc] 
+    QSBPivotTextAttachment *attachment
+      = [[[QSBPivotTextAttachment alloc]
           initWithSearchController:controller] autorelease];
-    NSAttributedString *attachmentString = 
+    NSAttributedString *attachmentString =
       [NSAttributedString attributedStringWithAttachment:attachment];
     [pivotString appendAttributedString:attachmentString];
   }
-  QSBSearchController *controller 
+  QSBSearchController *controller
     = [actionModel_ searchControllerAtIndex:controllerCount - 1];
   HGSTokenizedString *query = [controller tokenizedQueryString];
   NSString *string = [query originalString];
   if (string) {
-    NSAttributedString *attrString 
+    NSAttributedString *attrString
       = [[[NSAttributedString alloc] initWithString:string] autorelease];
     [pivotString appendAttributedString:attrString];
   }
@@ -201,7 +205,7 @@
 
 #pragma mark Notifications
 - (void)selectedTableResultDidChange:(NSNotification *)notification {
-  QSBTableResult *tableResult 
+  QSBTableResult *tableResult
     = [[notification userInfo] objectForKey:kQSBSelectedTableResultKey];
   [actionModel_ setSelectedTableResult:tableResult];
 }
@@ -209,11 +213,11 @@
 #pragma mark Actions
 
 - (IBAction)qsb_pickCurrentSourceTableResult:(id)sender {
-  QSBSourceTableResult *tableResult 
+  QSBSourceTableResult *tableResult
     = GTM_STATIC_CAST(QSBSourceTableResult, [actionModel_ selectedTableResult]);
   HGSScoredResult *scoredResult = [tableResult representedResult];
   HGSMutableActionOperation *operation = [actionModel_ actionOperation];
-  
+
   if (currentActionArgument_) {
     HGSTypeFilter *filter = [currentActionArgument_ typeFilter];
     if ([filter isValidType:[scoredResult type]]) {
@@ -229,7 +233,7 @@
       [operation setAction:action];
       HGSResultArray *directObjects = nil;
       if ([scoredResult conformsToType:kHGSTypeAction]) {
-        directObjects 
+        directObjects
           = [scoredResult valueForKey:kHGSObjectAttributeActionDirectObjectsKey];
       } else {
         directObjects = [HGSResultArray arrayWithResult:scoredResult];
@@ -245,7 +249,7 @@
     // the operation gets a chance to be performed.
     HGSActionOperation *operationToPerform = [[operation copy] autorelease];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    NSDictionary *userInfo 
+    NSDictionary *userInfo
       = [NSDictionary dictionaryWithObject:operationToPerform
                                     forKey:kQSBActionOperationKey];
     [nc postNotificationName:kQSBActionPresenterWillPerformActionNotification
@@ -257,9 +261,9 @@
 
 - (IBAction)qsb_pivotOnSelection:(id)sender {
   if (![self canPivot]) return;
- 
+
   QSBTableResult *tableResult = [self selectedTableResult];
-  QSBSourceTableResult *sourceTableResult = GTM_STATIC_CAST(QSBSourceTableResult, 
+  QSBSourceTableResult *sourceTableResult = GTM_STATIC_CAST(QSBSourceTableResult,
                                                             tableResult);
   HGSResult *pivotObject = [sourceTableResult representedResult];
   HGSResultArray *pivotObjects = [HGSResultArray arrayWithResult:pivotObject];
@@ -271,9 +275,9 @@
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   QSBSearchController *oldSearchController = [self activeSearchController];
   NSUInteger count = [actionModel_ searchControllerCount];
-  QSBSearchController *newController 
+  QSBSearchController *newController
     = [actionModel_ searchControllerAtIndex:count - 1];
-  NSDictionary *userInfo 
+  NSDictionary *userInfo
   = [NSDictionary dictionaryWithObjectsAndKeys:
      oldSearchController, kQSBOldSearchControllerKey,
      newController, kQSBNewSearchControllerKey,
@@ -288,8 +292,8 @@
   }
   [actionModel_ popSearchController];
   [nc postNotificationName:kQSBActionPresenterDidUnpivotNotification
-                    object:self 
-                  userInfo:userInfo];  
+                    object:self
+                  userInfo:userInfo];
 }
 
 - (IBAction)qsb_delimitResult:(id)sender {

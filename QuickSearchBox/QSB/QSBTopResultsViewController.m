@@ -38,15 +38,16 @@
 #import "QSBResultsViewTableView.h"
 #import "QSBTableResult.h"
 #import "QSBTopResultsRowViewControllers.h"
+#import "QSBResultsWindowController.h"
 
 @implementation QSBTopResultsViewController
 
 - (id)initWithSearchController:(QSBSearchController *)controller {
-  return [super initWithSearchController:controller 
+  return [super initWithSearchController:controller
                                  nibName:@"QSBTopResultsView"];
 }
 
-- (void)awakeFromNib {  
+- (void)awakeFromNib {
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
   [resultsTableView setIntercellSpacing:NSMakeSize(0.0, 0.0)];
   rowViewControllers_ = [[NSMutableDictionary dictionary] retain];
@@ -60,7 +61,7 @@
 
 #pragma mark QSBResultsViewBaseController Overrides
 
-- (QSBTableResult *)tableResultForRow:(NSInteger)row { 
+- (QSBTableResult *)tableResultForRow:(NSInteger)row {
   return [[self searchController] topResultForIndex:row];
 }
 
@@ -72,8 +73,8 @@
   if (newRow >= [self numberOfRowsInTableView:nil]) {
     QSBTableResult *result = [self selectedTableResult];
     if ([result isKindOfClass:[QSBFoldTableResult class]]) {
-      BOOL handled = [NSApp sendAction:@selector(qsb_showMoreResults:) 
-                                  to:nil 
+      BOOL handled = [NSApp sendAction:@selector(qsb_showMoreResults:)
+                                  to:nil
                                 from:self];
       HGSCheckDebug(handled, @"qsb_showMoreResults not handled");
     }
@@ -81,7 +82,7 @@
     [tableView selectFirstSelectableRowByIncrementing:YES startingAt:newRow];
   }
 }
-  
+
 #pragma mark NSTableView Delegate Methods
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
@@ -101,7 +102,7 @@
   shouldSelectRow:(NSInteger)rowIndex {
   QSBTableResult *object = [self tableResultForRow:rowIndex];
   BOOL isSeparator = [object isKindOfClass:[QSBSeparatorTableResult class]];
-  BOOL isMessage = [object isKindOfClass:[QSBMessageTableResult class]]; 
+  BOOL isMessage = [object isKindOfClass:[QSBMessageTableResult class]];
   BOOL isSelectable = object && !(isSeparator || isMessage);
   return isSelectable;
 }
@@ -129,16 +130,16 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
   QSBResultRowViewController *oldController
     = [rowViewControllers_ objectForKey:[NSNumber numberWithInteger:row]];
   QSBResultRowViewController *newController = nil;
-  
+
   // Decide what kind of view we want to use based on the result.
   QSBTableResult *result = [self tableResultForRow:row];
-  Class aRowViewControllerClass 
+  Class aRowViewControllerClass
     = [result topResultsRowViewControllerClass];
   if (aRowViewControllerClass) {
-    if (!oldController 
+    if (!oldController
         || [oldController class] != aRowViewControllerClass) {
       newController
-        = [[[aRowViewControllerClass alloc] init] autorelease];          
+        = [[[aRowViewControllerClass alloc] init] autorelease];
       [rowViewControllers_ setObject:newController
                               forKey:[NSNumber numberWithInteger:row]];
       [newController loadView];
@@ -148,13 +149,13 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
     if ([newController representedObject] != result) {
       [newController setRepresentedObject:result];
     }
-  } 
-  
+  }
+
   if (!newController) {
     HGSLogDebug(@"Unable to determine result row view for result %@ (row %d).",
                 result, row);
   }
-  
+
   NSView *newView = [newController view];
   return newView;
 }

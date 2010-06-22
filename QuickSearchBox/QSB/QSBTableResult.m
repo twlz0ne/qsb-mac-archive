@@ -43,6 +43,9 @@
 #import "QSBTopResultsRowViewControllers.h"
 #import "ClipboardSearchSource.h"
 #import "QSBSearchController.h"
+#import "QSBActionPresenter.h"
+#import "QSBResultsWindowController.h"
+#import "QSBMoreResultsViewController.h"
 
 typedef enum {
   kQSBResultDescriptionTitle = 0,
@@ -82,8 +85,12 @@ static NSString *const kClipboardCopyActionIdentifier
 // Return a string containing the sourceURL/URL, if any, to be presented for a
 // result, otherwise return nil.
 - (NSAttributedString*)sourceURLString;
+
 @end
 
+@interface QSBSourceTableResult ()
+- (void)objectIconChanged:(GTMKeyValueChangeNotification *)notification;
+@end
 
 @interface NSString(QSBDisplayPathAdditions)
 // Converts a path to a pretty, localized, arrow separated version
@@ -121,8 +128,8 @@ static NSDictionary *gBaseStringAttributes_ = nil;
 }
 
 + (NSColor *)secondaryTitleColor {
-  return [NSColor colorWithCalibratedRed:165.0/255.0 
-                                   green:180.0/255.0 
+  return [NSColor colorWithCalibratedRed:165.0/255.0
+                                   green:180.0/255.0
                                     blue:204.0/255.0 alpha:1.0];
 }
 
@@ -227,7 +234,7 @@ static NSDictionary *gBaseStringAttributes_ = nil;
                      value:[[self class] secondaryTitleColor]];
       break;
     case kQSBResultDescriptionFold:
-      [string addAttribute:NSFontAttributeName 
+      [string addAttribute:NSFontAttributeName
                      value:[NSFont systemFontOfSize:12]];
       break;
     default:
@@ -400,7 +407,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
     HGSAction *action = [result valueForKey:kHGSObjectAttributeDefaultActionKey];
     pivotable = [[action arguments] count] > 0;
   }
-    
+
   return pivotable;
 }
 
@@ -488,7 +495,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   NSString *sourceName = [[[self representedResult] source] displayName];
   displayString = [NSString stringWithFormat:@"%@ (Score: %.2f, Source: %@)",
                    displayString, [self score], sourceName];
-#endif  
+#endif
   return displayString;
 }
 
@@ -627,7 +634,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 
 @implementation QSBFoldTableResult
 
-+ (id)tableResultWithSearchController:(QSBSearchController *)controller {  
++ (id)tableResultWithSearchController:(QSBSearchController *)controller {
   return [[[[self class] alloc] initWithSearchController:controller] autorelease];
 }
 
@@ -695,7 +702,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
                                        @"A table result label for an item that "
                                        @"will show the user all x things where "
                                        @"x is %u and the things are %@.");
-  NSString *title 
+  NSString *title
     = [NSString stringWithFormat:format, categoryCount_, [self categoryName]];
   return [self mutableAttributedStringWithString:title];
 }

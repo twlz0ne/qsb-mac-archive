@@ -7555,16 +7555,16 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 8B989F150FA7B93C009DC652 /* Products */;
-					ProjectRef = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+					ProductGroup = 8B989F360FA7B93C009DC652 /* Products */;
+					ProjectRef = 8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
 					ProductGroup = 8B989F2B0FA7B93C009DC652 /* Products */;
 					ProjectRef = 8B989F2A0FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
-					ProductGroup = 8B989F360FA7B93C009DC652 /* Products */;
-					ProjectRef = 8B989F350FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
+					ProductGroup = 8B989F150FA7B93C009DC652 /* Products */;
+					ProjectRef = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
 					ProductGroup = 8B637B4D0F2777C300997738 /* Products */;
@@ -11856,10 +11856,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\\\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\\\"",
-				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleAccounts/GoogleAccounts-Info.plist";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
 				INFOPLIST_PREPROCESS = YES;
@@ -11872,10 +11868,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\\\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\\\"",
-				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleAccounts/GoogleAccounts-Info.plist";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
 				INFOPLIST_PREPROCESS = YES;
@@ -12980,10 +12972,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\\\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\\\"",
-				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/GoogleAccounts/GoogleAccounts-Info.plist";
 				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/../../Vermilion/Vermilion/HGSGoogleAccountTypes.h";
 				INFOPLIST_PREPROCESS = YES;

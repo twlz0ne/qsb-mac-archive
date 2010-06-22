@@ -61,7 +61,10 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
 
 // Bottleneck function for retrying the upload a single doc.
 - (void)retryUploadGDataEntry:(GDataEntryBase *)dataEntry;
-
+- (void)loginCredentialsChanged:(NSNotification *)notification;
+- (void)uploadFileTicket:(GDataServiceTicket *)ticket
+       finishedWithEntry:(GDataEntryDocBase *)dataEntry
+                   error:(NSError *)error;
 @end
 
 
@@ -112,8 +115,8 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
   GDataServiceGoogle *uploadService = [self uploadService];
   NSURL *uploadURL = [self uploadURL];
   HGSAssert(uploadURL, nil);
-  
-  // Run the upload on our thread. Sleep for a second and then check 
+
+  // Run the upload on our thread. Sleep for a second and then check
   // to see if an upload has completed or if we've recorded some progress
   // in an upload byte-wise.  Give up if there has been no progress for
   // a while.
@@ -132,13 +135,13 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
   @synchronized (activeTickets_) {
     [activeTickets_ addObject:uploadTicket];
   }
-  
+
   // Let the user know that the upload has started, but only for the first item.
   if (item == 0) {
     NSString *formattedString = nil;
     if (count == 1) {
       NSString *format
-        = HGSLocalizedString(@"Uploading '%@'.", 
+        = HGSLocalizedString(@"Uploading '%@'.",
                              @"A message explaining to the user that a "
                              @"file is being uploaded. %@ is the display "
                              @"name of the file that is being uploaded.");
@@ -157,7 +160,7 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
     [self informUserWithDescription:formattedString
                                type:kHGSUserMessageNoteType];
   }
-  
+
   unsigned long long lastBytesSent = 0;
   do {
     // Reset endTime if some progress occurred.  While |bytesSent| may be
@@ -179,7 +182,7 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
       }
       NSString *errorString
         = HGSLocalizedString(@"Upload of '%@' timed out. Please "
-                             @"check your connection to the Internet.", 
+                             @"check your connection to the Internet.",
                              @"A message explaining that the file, identified "
                              @"by %@, could not be uploaded because it was "
                              @"taking too long.");
@@ -215,7 +218,7 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
   @synchronized (activeTickets_) {
     [activeTickets_ removeObject:ticket];
   }
-  
+
   // Can't use title from dataEntry because if we have an error, dataEntry
   // is nil.
   NSString *title = [ticket userData];
@@ -257,23 +260,23 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
       if (delay <= 0 || delay >= kMaxUploadRetryDelay) {
         delay = (NSTimeInterval)(2 << attempt);
       }
-      
+
       GDataServiceGoogle *uploadService = [self uploadService];
       NSArray *modes = [uploadService runLoopModes];
       if (modes) {
-        [self performSelector:@selector(retryUploadDocEntry:)
+        [self performSelector:@selector(retryUploadGDataEntry:)
                    withObject:dataEntry
                    afterDelay:delay
                       inModes:modes];
       }
       else {
-        [self performSelector:@selector(retryUploadDocEntry:)
+        [self performSelector:@selector(retryUploadGDataEntry:)
                    withObject:dataEntry
                    afterDelay:delay];
       }
     } else {
       NSString *errorFormat
-        = HGSLocalizedString(@"Could not upload '%1$@'. \"%2$@\" (%3$d)", 
+        = HGSLocalizedString(@"Could not upload '%1$@'. \"%2$@\" (%3$d)",
                              @"A message explaining to the user that we "
                              @"could not upload a file. %1$@ is the name "
                              @"of the file to be uploaded.  %2$@ is the error "
@@ -289,8 +292,8 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
   }
 }
 
-- (void)inputStream:(GDataProgressMonitorInputStream *)stream 
-          bytesSent:(unsigned long long)bytesSent 
+- (void)inputStream:(GDataProgressMonitorInputStream *)stream
+          bytesSent:(unsigned long long)bytesSent
          totalBytes:(unsigned long long)totalBytes {
   [self setBytesSent:bytesSent];
 }
@@ -308,7 +311,7 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
 - (GDataServiceGoogle *)uploadService {
   HGSSimpleAccount *account = [self account];
   if (!uploadService_) {
-    HGSKeychainItem* keychainItem 
+    HGSKeychainItem* keychainItem
       = [HGSKeychainItem keychainItemForService:[account identifier]
                                        username:nil];
     NSString *username = [keychainItem username];
@@ -330,7 +333,7 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
   if (!uploadService_) {
     NSString *errorString
       = HGSLocalizedString(@"Could not perform upload. Please check the "
-                           @"password for account '%@'.", 
+                           @"password for account '%@'.",
                            @"A message explaining that the user could "
                            @"not upload Picasa Web images due to a bad "
                            @"password for account %@.");
@@ -389,14 +392,14 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
 - (void)informUserWithDescription:(NSString *)description
                              type:(HGSUserMessageType)type {
   NSImage *docIcon = [self serviceIcon];
-  NSString *summary 
-    = HGSLocalizedString(@"Upload to %@", 
+  NSString *summary
+    = HGSLocalizedString(@"Upload to %@",
                          @"A dialog title. %@ is replaced by a product name.");
   summary = [NSString stringWithFormat:summary, [self serviceName]];
-  [HGSUserMessenger displayUserMessage:summary 
-                           description:description 
-                                  name:kGDataUploadUserMessageName 
-                                 image:docIcon 
+  [HGSUserMessenger displayUserMessage:summary
+                           description:description
+                                  name:kGDataUploadUserMessageName
+                                 image:docIcon
                                   type:type];
 }
 

@@ -51,7 +51,7 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
 #if QSB_BUILD_WITH_GROWL
 #define QSBApplicationDelegateSuperclass NSObject <GrowlApplicationBridgeDelegate>
 #else  // QSB_BUILD_WITH_GROWL
-#define QSBApplicationDelegateSuperclass NSObject 
+#define QSBApplicationDelegateSuperclass NSObject
 #endif  // QSB_BUILD_WITH_GROWL
 
 @interface QSBApplicationDelegate : QSBApplicationDelegateSuperclass {
@@ -60,9 +60,9 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
   IBOutlet NSMenu *dockMenu_;
   IBOutlet NSMenuItem *statusShowSearchBoxItem_;
   IBOutlet NSMenuItem *dockShowSearchBoxItem_;
-  
+
   QSBSearchWindowController *searchWindowController_;
-  EventHotKeyRef hotKey_;  // the hot key we're looking for. 
+  EventHotKeyRef hotKey_;  // the hot key we're looking for.
   NSUInteger hotModifiers_;  // if we are getting double taps, the mods to look for.
   NSUInteger hotModifiersState_;
   NSUInteger oldHotModifiers_;  // Keep track of the last modifier state
@@ -89,6 +89,9 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
 
 // Show the about box
 - (IBAction)orderFrontStandardAboutPanel:(id)sender;
+
+// Show the debug window
+- (IBAction)showDebugWindow:(id)sender;
 
 // method that is called when the modifier keys are hit and we are inactive
 - (void)modifiersChangedWhileInactive:(NSEvent*)event;

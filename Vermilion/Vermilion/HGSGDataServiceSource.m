@@ -36,9 +36,9 @@
 #import "HGSKeychainItem.h"
 #import "HGSOperation.h"
 
-NSString *const kHGSGDataServiceSourceRefreshIntervalKey 
+NSString *const kHGSGDataServiceSourceRefreshIntervalKey
   = @"HGSGDataServiceSourceRefreshIntervalKey";
-NSString *const kHGSGDataServiceSourceRefreshJitterKey 
+NSString *const kHGSGDataServiceSourceRefreshJitterKey
   = @"HGSGDataServiceSourceRefreshJitterKey";
 NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
   = @"HGSGDataServiceSourceErrorReportingIntervalKey";
@@ -54,6 +54,8 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
 @interface HGSGDataServiceSource ()
 - (void)setUpPeriodicRefresh:(NSTimeInterval)interval
                   withJitter:(NSTimeInterval)jitter;
+- (void)loginCredentialsChanged:(NSNotification *)notification;
+- (void)refreshIndex:(NSTimer*)timer;
 @end
 
 @implementation HGSGDataServiceSource
@@ -63,9 +65,9 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    
+
     account_ = [[configuration objectForKey:kHGSExtensionAccountKey] retain];
-    NSNumber *number 
+    NSNumber *number
       = [configuration objectForKey:kHGSGDataServiceSourceRefreshIntervalKey];
     if (number) {
       refreshInterval_ = [number doubleValue];
@@ -73,7 +75,7 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
     if (!(refreshInterval_ > 0)) {
       refreshInterval_ = 300.0;  // 5 minutes
     }
-    number 
+    number
       = [configuration objectForKey:kHGSGDataServiceSourceRefreshIntervalKey];
     if (number) {
       refreshJitter_ = [number doubleValue];
@@ -81,7 +83,7 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
     if (!(refreshJitter_ > 0)) {
       refreshJitter_ = 300.0;  // 5 minutes
     }
-    number 
+    number
       = [configuration objectForKey:kHGSGDataServiceSourceErrorReportingIntervalKey];
     if (number) {
       errorReportingInterval_ = [number doubleValue];
@@ -89,7 +91,7 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
     if (!(refreshJitter_ > 0)) {
       errorReportingInterval_ = 3600.0;  // 60 minutes
     }
-    
+
     if (account_) {
       // Watch for credential changes.
       NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -131,8 +133,8 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
          operation:(NSOperation *)operation {
   GDataServiceTicket *ticket = [self fetchTicketForService:service];
   HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
-  HGSGDataServiceIndexContext *context 
-    = [[[HGSGDataServiceIndexContext alloc] 
+  HGSGDataServiceIndexContext *context
+    = [[[HGSGDataServiceIndexContext alloc]
         initWithOperation:operation service:service database:database]
        autorelease];
   [context addTicket:ticket];
@@ -141,7 +143,7 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
   bzero(&rlContext, sizeof(rlContext));
   CFRunLoopSourceRef source = CFRunLoopSourceCreate(NULL, 0, &rlContext);
   CFRunLoopRef runloop = CFRunLoopGetCurrent();
-  CFRunLoopAddSource(runloop, source, kCFRunLoopDefaultMode);  
+  CFRunLoopAddSource(runloop, source, kCFRunLoopDefaultMode);
   while (![context isFinished]) {
     CFRunLoopRun();
   }
@@ -181,7 +183,7 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
 
 - (void)refreshIndex:(NSTimer*)timer {
   if (!service_) {
-    HGSKeychainItem* keychainItem 
+    HGSKeychainItem* keychainItem
       = [HGSKeychainItem keychainItemForService:[account_ identifier]
                                      username:nil];
     NSString *username = [keychainItem username];
@@ -203,21 +205,21 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
   }
   [indexOp_ cancel];
   [indexOp_ release];
-  indexOp_ 
-    = [[NSInvocationOperation alloc] hgs_initWithTarget:self 
-                                               selector:@selector(asyncFetch:operation:) 
+  indexOp_
+    = [[NSInvocationOperation alloc] hgs_initWithTarget:self
+                                               selector:@selector(asyncFetch:operation:)
                                                  object:service_];
   [[HGSOperationQueue sharedOperationQueue] addOperation:indexOp_];
-  
+
   [self setUpPeriodicRefresh];
 }
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
-  HGSAssert([notification object] == account_, 
+  HGSAssert([notification object] == account_,
             @"Notification from unexpected account!");
   // If we're in the middle of a fetch then cancel it first.
   [indexOp_ cancel];
-  
+
   // Clear the service so that we make a new one with the correct credentials.
   [service_ release];
   service_ = nil;
@@ -240,7 +242,7 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
       // Tickle the account so that if the user happens to have the preference
       // window open showing either the account or the search source they
       // will immediately see that the account status has changed.
-      [account_ authenticate]; 
+      [account_ authenticate];
     }
     if (errorCode != NSURLErrorNotConnectedToInternet) {
       NSError *fetchError = [error hgs_errorByAddingFetchType:fetchType];
@@ -256,7 +258,7 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
           errorString = @"fetch failed";
         }
         HGSLog(@"%@ (%@InfoFetcher) %@ for account '%@': "
-               @"error=%d '%@'.", [self class], fetchType, errorString, 
+               @"error=%d '%@'.", [self class], fetchType, errorString,
                [account_ displayName], errorCode, [fetchError localizedDescription]);
       }
     }
@@ -278,10 +280,10 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
 
 - (BOOL)accountWillBeRemoved:(HGSAccount *)account {
   HGSAssert(account == account_, @"Notification from bad account!");
-  
+
   // Cancel any outstanding fetches.
   [indexOp_ cancel];
-    
+
   // And get rid of the service.
   [service_ release];
   service_ = nil;
@@ -349,11 +351,11 @@ static NSString *const kGoogleFetchTypeErrorKey = @"GoogleFetchType";
 @implementation NSError (HGSGDataServiceSource)
 
 - (NSError *)hgs_errorByAddingFetchType:(NSString *)fetchType {
-  NSMutableDictionary *userInfo 
+  NSMutableDictionary *userInfo
   = [NSMutableDictionary dictionaryWithDictionary:[self userInfo]];
   [userInfo setObject:fetchType forKey:kGoogleFetchTypeErrorKey];
-  return [NSError errorWithDomain:[self domain] 
-                             code:[self code] 
+  return [NSError errorWithDomain:[self domain]
+                             code:[self code]
                          userInfo:userInfo];
 }
 

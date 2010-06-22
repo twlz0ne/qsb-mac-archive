@@ -51,6 +51,11 @@
  @private
   GDataHTTPFetcher *fetcher_;
 }
+
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)retrievedData;
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher didFail:(NSError *)error;
+
 @end
 
 @interface GoogleWebResultsSource : HGSSearchSource
@@ -110,7 +115,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
 }
 
 - (NSString *)displayName {
-  return HGSLocalizedString(@"Google", 
+  return HGSLocalizedString(@"Google",
                             @"A label representing Google as a search source.");
 }
 
@@ -124,15 +129,15 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
   }
 
   HGSResult *pivotObject = [query pivotObject];
-  
+
   NSURL *identifier = [pivotObject url];
   NSString *host = [identifier host];
   NSString *site = nil;
 
-  
+
   if ([host isEqualToString:@"www.google.com"]
       || [host isEqualToString:@"google.com"]) {
-    site = nil; 
+    site = nil;
   } else if ([host isEqualToString:@"www.wikipedia.com"]
       || [host isEqualToString:@"wikipedia.com"]) {
     // We hardcode www to en for wikipedia alone
@@ -231,7 +236,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
     urlString = [urlString gtm_stringByUnescapingFromURLArgument];
     NSImage *image = nil;
     NSString *imageURL = nil;
-    
+
     // Get a small preview icon from google.
     NSString *tableImageURL = [resultDict objectForKey:@"tbUrl"];
     tableImageURL = [tableImageURL gtm_stringByUnescapingFromHTML];
@@ -257,10 +262,10 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
         image = [NSImage imageNamed:@"web-localresult"];
       }
     } else {
-      
+
       [attributes setObject:[resultDict objectForKey:@"unescapedUrl"]
                      forKey:kHGSObjectAttributeSnippetKey];
-      
+
 #if TARGET_OS_IPHONE
       [attributes setObject:[NSNumber numberWithBool:YES]
                      forKey:kHGSObjectAttributeAllowSiteSearchKey];
@@ -280,7 +285,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
     } else if (image) {
       [attributes setObject:image forKey:kHGSObjectAttributeIconKey];
     }
-    
+
 #if TARGET_OS_IPHONE
     // The phone doesn't support attributed strings :(
     if (content) {
@@ -293,14 +298,14 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
     if (content) {
       [attributes setObject:content forKey:kHGSObjectAttributeSnippetKey];
     }
-    
+
     if ([commonPrefix length] < [name length]) {
       name = [name substringFromIndex:[commonPrefix length]];
     }
     if ([commonSuffix length] < [name length]) {
       name = [name substringToIndex:[name length] - [commonSuffix length]];
     }
-    
+
     HGSScoredResult *result = [HGSScoredResult resultWithURI:urlString
                                                         name:name
                                                         type:kHGSTypeWebpage // TODO: more complete type?
@@ -311,7 +316,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
                                                 matchedTerm:tokenizedQueryString
                                               matchedIndexes:nil];
     score *= 0.9;
-    
+
     [results addObject:result];
 
     // Only contribute 1 result to global search
@@ -350,7 +355,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
   if (isValid) {
     HGSResult *pivotObject = [query pivotObject];
     NSURL *url = [pivotObject url];
-    NSNumber *hideResults 
+    NSNumber *hideResults
       = [pivotObject valueForKey:kHGSObjectAttributeHideGoogleSiteSearchResultsKey];
     if ([hideResults boolValue]) {
       isValid = NO;

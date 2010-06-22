@@ -36,7 +36,7 @@
 */
 
 #import <Vermilion/Vermilion.h>
-@class GTMFileSystemKQueue;
+#import <GTM/GTMFileSystemKQueue.h>
 
 /*!
   An abstract base class simplifying the loading of bookmarks from various
@@ -54,15 +54,18 @@
             browserTypeName:(NSString *)browserTypeName
                 fileToWatch:(NSString *)path;
 
-- (void)indexResultNamed:(NSString *)name 
-                     URL:(NSString *)url 
+- (void)indexResultNamed:(NSString *)name
+                     URL:(NSString *)url
          otherAttributes:(NSDictionary *)otherAttributes
                     into:(HGSMemorySearchSourceDB *)database;
 
 - (NSString *)domainURLForURLString:(NSString *)urlString;
 
+- (void)fileChanged:(GTMFileSystemKQueue *)queue
+              event:(GTMFileSystemKQueueEvents)event;
+
 // Methods for subclasses to override
 - (void)updateDatabase:(HGSMemorySearchSourceDB *)database
-               forPath:(NSString *)path 
+               forPath:(NSString *)path
              operation:(NSOperation *)operation;
 @end

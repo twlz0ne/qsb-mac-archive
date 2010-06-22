@@ -154,6 +154,20 @@ static NSString *const kGrowlNotificationName = @"QSB User Message";
 - (NSTimeInterval)doubleClickTime;
 
 - (BOOL)suppressStartupDialogs;
+
+- (void)actionWillPerformNotification:(NSNotification *)notification;
+- (void)actionDidPerformNotification:(NSNotification *)notification;
+- (void)pluginOrExtensionDidChangeEnabled:(NSNotification*)notification;
+- (void)pluginsDidInstall:(NSNotification *)notification;
+- (void)pluginsValueChanged:(GTMKeyValueChangeNotification *)notification;
+- (void)protoExtensionsValueChanged:(GTMKeyValueChangeNotification *)note;
+- (void)didAddOrRemoveAccount:(NSNotification *)notification;
+- (void)didLaunchApplication:(NSNotification *)notification;
+- (void)didTerminateApplication:(NSNotification *)notification;
+- (void)presentMessageToUser:(NSNotification *)notification;
+
+- (void)handleGetSDEFEvent:(NSAppleEventDescriptor *)event
+            withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
 @end
 
 
@@ -278,12 +292,12 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   [dockShowSearchBoxItem_ setAction:@selector(showSearchWindow:)];
 #if DEBUG
   [statusItemMenu_ addItem:[NSMenuItem separatorItem]];
-  [statusItemMenu_ addItemWithTitle:@"Show Debug Window" 
-                             action:@selector(showDebugWindow:)  
+  [statusItemMenu_ addItemWithTitle:@"Show Debug Window"
+                             action:@selector(showDebugWindow:)
                       keyEquivalent:@""];
   [dockMenu_ addItem:[NSMenuItem separatorItem]];
-  [dockMenu_ addItemWithTitle:@"Show Debug Window" 
-                       action:@selector(showDebugWindow:)  
+  [dockMenu_ addItemWithTitle:@"Show Debug Window"
+                       action:@selector(showDebugWindow:)
                 keyEquivalent:@""];
 #endif
 }
@@ -302,9 +316,9 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   // and if we are in the process of activating, we want to ignore the hotkey
   // so we don't try to process it twice.
   if (!hotModifiers_ || [NSApp keyWindow]) return;
-  
+
   // There is no way of knowing what the previous state of the modifiers was
-  // without saving it off. We only want to start this sequence if the 
+  // without saving it off. We only want to start this sequence if the
   // previous state was no modifiers, so we track the modifier state at all
   // times and keep it stored in oldHotModifiers_.
   NSUInteger oldHotModifiers = oldHotModifiers_;
@@ -594,7 +608,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 -(BOOL)suppressStartupDialogs {
   NSDictionary *envVars = [[NSProcessInfo processInfo] environment];
   NSString *value = [envVars objectForKey:@"QSBSuppressStartupDialogs"];
-  return ([value boolValue] 
+  return ([value boolValue]
           || [GTMFoundationUnitTestingUtilities areWeBeingUnitTested]);
 }
 
@@ -758,9 +772,9 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
   // If the user launches us hidden we don't want to activate.
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-  NSDictionary *processDict 
+  NSDictionary *processDict
     = [ws gtm_processInfoDictionary];
-  NSNumber *nsDoNotActivateOnStartup 
+  NSNumber *nsDoNotActivateOnStartup
     = [processDict valueForKey:kGTMWorkspaceRunningIsHidden];
   activateOnStartup_ = ![nsDoNotActivateOnStartup boolValue];
   if (activateOnStartup_) {
@@ -784,11 +798,11 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
   // Load the search window
   [searchWindowController_ window];
-  
+
   if (activateOnStartup_) {
     [searchWindowController_ showSearchWindow:self];
   }
-  
+
   // Inventory and process all plugins and extensions.
   [self inventoryPlugins];
 
@@ -823,13 +837,13 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
            object:accountsPoint];
   // Inventory the application and plugin Apple Script sdef files.
   [self composeApplicationAEDictionary];
-  
+
   // Install a custom scripting dictionary event handler.
   NSAppleEventManager *aeManager = [NSAppleEventManager sharedAppleEventManager];
   [aeManager setEventHandler:self
                  andSelector:@selector(handleGetSDEFEvent:withReplyEvent:)
                forEventClass:kASAppleScriptSuite
-                  andEventID:'gsdf'];  
+                  andEventID:'gsdf'];
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication
@@ -911,7 +925,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
                               attributes:nil
                                    error:&error];
     }
-    if (wasGood) {    
+    if (wasGood) {
       for (NSString *plugIn in plugIns) {
         NSString *name = [plugIn lastPathComponent];
         NSString *newPath = [pluginsDir stringByAppendingPathComponent:name];
@@ -931,9 +945,9 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
     HGSResultArray *results = [HGSResultArray arrayWithFilePaths:otherFiles];
     [searchWindowController_ selectResults:results saveText:NO];
     [searchWindowController_ showSearchWindow:self];
-    
+
   }
-  NSApplicationDelegateReply reply = NSApplicationDelegateReplySuccess; 
+  NSApplicationDelegateReply reply = NSApplicationDelegateReplySuccess;
   if (!wasGood) {
     NSAlert *alert = [NSAlert alertWithError:error];
     // TODO(dmaclach): Better error alerts. The default ones are pathetic.
@@ -995,7 +1009,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 #if QSB_BUILD_WITH_GROWL
   [GrowlApplicationBridge setGrowlDelegate:self];
 #endif  // QSB_BUILD_WITH_GROWL
-  
+
 }
 
 - (void)pluginsValueChanged:(GTMKeyValueChangeNotification *)notification {
@@ -1068,7 +1082,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
       [imageView setImage:newImage];
       [tile setContentView:imageView];
       [tile display];
-    }  
+    }
   }
 }
 
@@ -1102,7 +1116,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   HGSAssert([bundleSDEFPaths count] > 0, nil);
   NSArray *pluginsSDEFPaths
     = [[HGSPluginLoader sharedPluginLoader] pluginsSDEFPaths];
-  NSArray *sdefPaths 
+  NSArray *sdefPaths
     = [bundleSDEFPaths arrayByAddingObjectsFromArray:pluginsSDEFPaths];
 
   if ([sdefPaths count]) {
@@ -1110,7 +1124,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
     // from the app and the plugins will be combined into one NSXMLDocument and
     // then copied into the response Apple event descriptor as UTF-8 XML text.
     NSString *sdefPath = [sdefPaths objectAtIndex:0];
-    sdefPaths 
+    sdefPaths
       = [sdefPaths subarrayWithRange:NSMakeRange(1, [sdefPaths count] - 1)];
     NSURL *sdefURL = [NSURL fileURLWithPath:sdefPath];
     NSError *xmlError = nil;
@@ -1249,15 +1263,15 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
     case kHGSUserMessageErrorType:
       priority = 1;
       break;
-      
+
     case kHGSUserMessageWarningType:
       priority = 0;
       break;
-      
+
     case kHGSUserMessageNoteType:
       priority = -1;
       break;
-      
+
     default:
       HGSLogDebug(@"Unknown priority %d", [successCode intValue]);
       priority = 0;

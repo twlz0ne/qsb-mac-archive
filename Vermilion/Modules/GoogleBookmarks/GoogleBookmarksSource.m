@@ -53,10 +53,16 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 - (void)setUpPeriodicRefresh;
 - (void)startAsynchronousBookmarkFetch;
 - (void)indexBookmarksFromData:(NSData*)data operation:(NSOperation *)op;
-- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode 
-                operation:(NSOperation *)op 
+- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode
+                operation:(NSOperation *)op
                      into:(HGSMemorySearchSourceDB*)database;
-
+- (void)loginCredentialsChanged:(NSNotification *)notification;
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)retrievedData
+          operation:(NSOperation *)operation;
+- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+            didFail:(NSError *)error
+          operation:(NSOperation *)operation;
 @end
 
 @implementation GoogleBookmarksSource
@@ -103,8 +109,8 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
                           @"rss", @"output", @"10000", @"num", nil];
     NSString *bookmarkRequestString
-      = [gsearch searchURLFor:nil 
-                       ofType:@"bookmarks/find" 
+      = [gsearch searchURLFor:nil
+                       ofType:@"bookmarks/find"
                     arguments:args];
     NSRange findRange = [bookmarkRequestString rangeOfString:@"/find?"];
     HGSAssert(findRange.location != NSNotFound, nil);
@@ -120,16 +126,16 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     NSURL *bookmarkRequestURL = [NSURL URLWithString:bookmarkRequestString];
     NSMutableURLRequest *bookmarkRequest
       = [NSMutableURLRequest
-         requestWithURL:bookmarkRequestURL 
-            cachePolicy:NSURLRequestReloadIgnoringCacheData 
+         requestWithURL:bookmarkRequestURL
+            cachePolicy:NSURLRequestReloadIgnoringCacheData
         timeoutInterval:15.0];
-    GDataHTTPFetcher *fetcher 
+    GDataHTTPFetcher *fetcher
       = [GDataHTTPFetcher httpFetcherWithRequest:bookmarkRequest];
-    
+
     if (!fetcher) {
       HGSLog(@"Failed to allocate GDataHTTPFetcher.");
     }
-    HGSKeychainItem* keychainItem 
+    HGSKeychainItem* keychainItem
       = [HGSKeychainItem keychainItemForService:[account_ identifier]
                                        username:nil];
     NSString *userName = [keychainItem username];
@@ -140,13 +146,13 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                              persistence:NSURLCredentialPersistenceNone]];
     [bookmarkRequest setHTTPMethod:@"POST"];
     [fetcher setRequest:bookmarkRequest];
-      
+
     HGSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
     [fetchOperation_ release];
-    fetchOperation_ 
-      = [[HGSFetcherOperation alloc] initWithTarget:self 
-                                         forFetcher:fetcher 
-                                  didFinishSelector:@selector(httpFetcher:finishedWithData:operation:) 
+    fetchOperation_
+      = [[HGSFetcherOperation alloc] initWithTarget:self
+                                         forFetcher:fetcher
+                                  didFinishSelector:@selector(httpFetcher:finishedWithData:operation:)
                                     didFailSelector:@selector(httpFetcher:didFail:operation:)];
    [queue addOperation:fetchOperation_];
   }
@@ -159,7 +165,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 
 - (void)indexBookmarksFromData:(NSData *)data operation:(NSOperation *)op {
   if ([op isCancelled]) return;
-  NSXMLDocument* bookmarksXML 
+  NSXMLDocument* bookmarksXML
     = [[[NSXMLDocument alloc] initWithData:data
                                    options:0
                                      error:nil] autorelease];
@@ -174,7 +180,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   [self replaceCurrentDatabaseWith:database];
 }
 
-- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode 
+- (void)indexBookmarkNode:(NSXMLNode*)bookmarkNode
                 operation:(NSOperation *)op
                      into:(HGSMemorySearchSourceDB*)database {
   NSString *title = nil;
@@ -194,12 +200,12 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
       [otherTermStrings addObject:infoNodeString];
     }
   }
-  
+
 
   if (!url || [op isCancelled]) {
     return;
   }
-  
+
   NSImage *icon = [NSImage imageNamed:@"blue-nav"];
   NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSUnderHomeRankFlag];
 
@@ -214,7 +220,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                             baseURL_, kQSBPathCellURLKey,
                             nil];
   [cellArray addObject:userCell];
-  
+
   NSRange range = [url rangeOfString:@"://"];
   NSUInteger hostPos = NSMaxRange(range);
   NSString *host = [url substringFromIndex:hostPos];
@@ -232,7 +238,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                             hostURL, kQSBPathCellURLKey,
                             nil];
   [cellArray addObject:hostCell];
-  
+
   if ([subdomain length] > 1) {
     NSDictionary *subdomainCell = [NSDictionary dictionaryWithObjectsAndKeys:
                                    subdomain, kQSBPathCellDisplayTitleKey,
@@ -241,7 +247,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
     [cellArray addObject:subdomainCell];
   }
 
-  NSDictionary *attributes 
+  NSDictionary *attributes
     = [NSDictionary dictionaryWithObjectsAndKeys:
        rankFlags, kHGSObjectAttributeRankFlagsKey,
        url, kHGSObjectAttributeSourceURLKey,
@@ -249,7 +255,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
        cellArray, kQSBObjectAttributePathCellsKey,
        @"star-flag", kHGSObjectAttributeFlagIconNameKey,
        nil];
-  HGSUnscoredResult* result 
+  HGSUnscoredResult* result
     = [HGSUnscoredResult resultWithURI:url
                                   name:([title length] > 0 ? title : url)
                                   type:HGS_SUBTYPE(kHGSTypeWebBookmark,
@@ -265,13 +271,13 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 #pragma mark GDataHTTPFetcher Helpers
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   finishedWithData:(NSData *)retrievedData 
+   finishedWithData:(NSData *)retrievedData
           operation:(NSOperation *)operation {
   [self indexBookmarksFromData:retrievedData operation:operation];
 }
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-            didFail:(NSError *)error 
+            didFail:(NSError *)error
           operation:(NSOperation *)operation {
   HGSLog(@"httpFetcher failed: %@ %@", error, [[fetcher request] URL]);
 }
@@ -280,7 +286,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 #pragma mark Authentication & Refresh
 
 - (void)loginCredentialsChanged:(NSNotification *)notification {
-  HGSAssert([notification object] == account_, 
+  HGSAssert([notification object] == account_,
             @"Notification from bad account!");
   // Make sure we aren't in the middle of waiting for results; if we are, try
   // again later instead of changing things in the middle of the fetch.
@@ -290,7 +296,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                afterDelay:60.0];
     return;
   }
-  
+
   // If the login changes, we should update immediately, and make sure the
   // periodic refresh is enabled (it would have been shut down if the previous
   // credentials were incorrect).
@@ -303,7 +309,7 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   [updateTimer_ release];
   // We add 5 minutes worth of random jitter.
   NSTimeInterval jitter = arc4random() / (LONG_MAX / (NSTimeInterval)300.0);
-  updateTimer_ 
+  updateTimer_
     = [[NSTimer scheduledTimerWithTimeInterval:kRefreshSeconds + jitter
                                         target:self
                                       selector:@selector(refreshBookmarks:)

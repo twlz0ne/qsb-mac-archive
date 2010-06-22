@@ -36,7 +36,7 @@
 #import <Carbon/Carbon.h>
 
 // Handles the QSBSearchForCommand. Allows you to implement searches with and
-// without handlers. Here's a simple example of a applescript qsb interface 
+// without handlers. Here's a simple example of a applescript qsb interface
 // working with an AppleScript callback.
 
 // using terms from application "Google Quick Search"
@@ -47,15 +47,15 @@
 //     end repeat
 //     tell me
 //       activate
-//       display dialog "Query: " & query & return & "Results: " & return 
+//       display dialog "Query: " & query & return & "Results: " & return
 //            & resultText buttons {"OK"} default button "OK"
 //       doQuery()
 //     end tell
 //   end results received
 // end using terms from
-// 
+//
 // on doQuery()
-//   set query to display dialog "Search For:" default answer "" 
+//   set query to display dialog "Search For:" default answer ""
 //    buttons {"Quit", "Search"} default button "Search"
 //   if (button returned of query) is "Quit" then
 //     tell me to quit
@@ -65,13 +65,13 @@
 //     end tell
 //   end if
 // end doQuery
-// 
+//
 // on run
 //   doQuery()
 // end run
 
 @interface QSBSearchForCommand : NSScriptCommand {
- @private 
+ @private
   NSAppleEventDescriptor *returnAddress_;
   HGSQueryController *queryController_;
   NSAppleScript *handler_;
@@ -81,6 +81,8 @@
 }
 
 @property BOOL queryHasFinished;
+
+- (void)queryControllerDidFinish:(NSNotification *)notification;
 
 @end
 
@@ -97,40 +99,40 @@
 - (id)performDefaultImplementation {
   // Store off our return address so we can call back below in finished.
   NSAppleEventDescriptor *appleEvent = [self appleEvent];
-  returnAddress_ 
+  returnAddress_
     = [[appleEvent attributeDescriptorForKeyword:keyAddressAttr] retain];
-  
+
   // get the query
   NSString *text = [self directParameter];
-  
+
   // set up our internals
   HGSQuery *query = [[[HGSQuery alloc] initWithString:text
                                        actionArgument:nil
                                       actionOperation:nil
                                          pivotObjects:nil
                                            queryFlags:0] autorelease];
-  
+
   HGSAssert(!queryController_, @"QueryController should be nil");
   queryController_ = [[HGSQueryController alloc] initWithQuery:query];
 
   // store off the handler if there is one. Optional arg.
   NSDictionary *args = [self evaluatedArguments];
   handler_ = [[args objectForKey:@"handler"] retain];
-  
+
   // Set up the range of results to find.
   NSInteger maxResults = [[args objectForKey:@"maxResults"] integerValue];
   if (maxResults <= 0) maxResults = 100;
   resultRange_ = NSMakeRange(0, maxResults);
-  
+
   // Set up notifications and start the query
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self 
-          selector:@selector(queryControllerDidFinish:) 
-              name:kHGSQueryControllerDidFinishNotification 
+  [nc addObserver:self
+          selector:@selector(queryControllerDidFinish:)
+              name:kHGSQueryControllerDidFinishNotification
             object:queryController_];
   [self setQueryHasFinished:NO];
   [queryController_ startQuery];
-  
+
   // if we don't have a handler, we'll just spin until the search
   // is done. This could take a while and may time out
   if (!handler_) {
@@ -166,8 +168,8 @@
       child = parent;
       parent = [parent gtm_valueForProperty:propertyCode];
     } while ([parent isKindOfClass:[NSAppleScript class]]);
-    [child gtm_setValue:returnAddress_ 
-            forProperty:propertyCode 
+    [child gtm_setValue:returnAddress_
+            forProperty:propertyCode
        addingDefinition:YES];
 
     // Retain ourselves so we don't get released while the runloop spins
@@ -177,18 +179,18 @@
   }
   return results_;
 }
- 
+
 - (void)queryControllerDidFinish:(NSNotification *)notification {
   HGSQueryController *controller = [notification object];
   HGSAssert(controller == queryController_, nil);
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc removeObserver:self 
-                name:kHGSQueryControllerDidFinishNotification 
+  [nc removeObserver:self
+                name:kHGSQueryControllerDidFinishNotification
               object:queryController_];
   // Our query is finished.
   [self setQueryHasFinished:YES];
 
-  NSArray *results 
+  NSArray *results
     = [controller rankedResultsInRange:resultRange_
                             typeFilter:[HGSTypeFilter filterAllowingAllTypes]
                       removeDuplicates:NO];
@@ -202,7 +204,7 @@
       // If we have a handler, we store them as AERecords
       NSAppleEventDescriptor *urlDesc = [urlString gtm_appleEventDescriptor];
       NSAppleEventDescriptor *titleDesc = [title gtm_appleEventDescriptor];
-      NSAppleEventDescriptor *record 
+      NSAppleEventDescriptor *record
         = [NSAppleEventDescriptor recordDescriptor];
       [record setDescriptor:titleDesc forKeyword:pName];
       [record setDescriptor:urlDesc forKeyword:pURL];
@@ -210,7 +212,7 @@
     } else {
       // If we are just returning, we can use AppleScript's internal handling
       // to convert them.
-      NSDictionary *asResult 
+      NSDictionary *asResult
         = [NSDictionary dictionaryWithObjectsAndKeys:
            urlString, @"link",
            title, @"title",
@@ -224,7 +226,7 @@
     // Our inheritence chain should all be set up correctly above.
     // QSBS and ReRe are the codes from our sdef for the
     // received results command.
-    NSAppleEventDescriptor *event = 
+    NSAppleEventDescriptor *event =
       [[[NSAppleEventDescriptor alloc] initWithEventClass:'QSBS'
                                                   eventID:'ReRe'
                                          targetDescriptor:returnAddress_
@@ -233,7 +235,7 @@
        autorelease];
     NSAppleEventDescriptor *aeResults = [results_ gtm_appleEventDescriptor];
     [event setDescriptor:aeResults forKeyword:keyDirectObject];
-    HGSTokenizedString *tokenString 
+    HGSTokenizedString *tokenString
       = [[queryController_ query] tokenizedQueryString];
     NSString *query = [tokenString originalString];
     NSAppleEventDescriptor *aeQuery = [query gtm_appleEventDescriptor];

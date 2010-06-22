@@ -91,7 +91,7 @@ static NSString *const kQSBResultViewControllerClassName
 -(void)loadView {
   // Instead of loading the view by name and bundle, we use the nib we already
   // have cached.
-  BOOL loaded = [nib_ instantiateNibWithOwner:self 
+  BOOL loaded = [nib_ instantiateNibWithOwner:self
                               topLevelObjects:&topLevelObjects_];
   if (!loaded) {
     HGSLogDebug(@"Unable to instantiate %@ for %@", nib_, [self class]);
@@ -102,7 +102,7 @@ static NSString *const kQSBResultViewControllerClassName
 
 - (void)setRepresentedObject:(id)object {
   [super setRepresentedObject:object];
-  
+
   if (customResultView_) {
     // Remove any old custom view.
     if ([self isCustomResultViewInstalled]) {
@@ -114,7 +114,7 @@ static NSString *const kQSBResultViewControllerClassName
       }
     }
     [customResultView_ setHidden:YES]; // Assume it won't be shown.
-    
+
     // For now, we only support custom views for HGSResults, but this could
     // be expanded to support any type of represented object.
     if ([object isKindOfClass:[QSBSourceTableResult class]]) {
@@ -144,7 +144,7 @@ static NSString *const kQSBResultViewControllerClassName
             = NSClassFromString(resultViewControllerClassName);
           if ([resultViewNibName length] && resultViewControllerClass) {
             NSViewController *resultViewController
-              = [[[resultViewControllerClass alloc] 
+              = [[[resultViewControllerClass alloc]
                   initWithNibName:resultViewNibName bundle:sourceBundle]
                  autorelease];
             if (resultViewController) {
@@ -156,9 +156,9 @@ static NSString *const kQSBResultViewControllerClassName
               // use its custom view then it should return NO (as an NSNumber)
               // from the call to -[setResult:].
               BOOL useCustomView = YES;
-              if ([resultViewController respondsToSelector:@selector(setResult:)]) {
+              if ([resultViewController respondsToSelector:@selector(qsb_setResult:)]) {
                 NSNumber *useView = [resultViewController
-                                     performSelector:@selector(setResult:)
+                                     performSelector:@selector(qsb_setResult:)
                                           withObject:result];
                 if (useView) {
                   useCustomView = [useView boolValue];
@@ -166,7 +166,7 @@ static NSString *const kQSBResultViewControllerClassName
               }
               if (useCustomView) {
                 NSView *resultView = [resultViewController view];
-                
+
                 // Re-width the custom view and re-height the container view.
                 NSRect customFrame = [customResultView_ frame];
                 NSRect resultFrame = [resultView frame];
@@ -188,7 +188,7 @@ static NSString *const kQSBResultViewControllerClassName
                           @"for extension '%@'.", resultViewNibName,
                           [source displayName]);
             }
-            
+
           } else {
             HGSLogDebug(@"Extension '%@' has custom result view entry for '%@' "
                         @"but fails to provide a nib name and/or a "

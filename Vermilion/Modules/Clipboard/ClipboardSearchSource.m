@@ -55,6 +55,7 @@ static NSString *const kClipboardCopyAction
 }
 - (NSString *)nameFromStringValue:(NSString *)stringValue;
 - (NSString *)snippetFromStringValue:(NSString *)stringValue;
+- (void)updatePasteboard:(NSTimer *)timer;
 @end
 
 @implementation ClipboardSearchSource
@@ -102,11 +103,11 @@ static NSString *const kClipboardCopyAction
   [super dealloc];
 }
 
-- (HGSResult *)preFilterResult:(HGSResult *)result 
+- (HGSResult *)preFilterResult:(HGSResult *)result
                matchesForQuery:(HGSQuery*)query
                   pivotObjects:(HGSResultArray *)pivotObjects {
   if (pivotObjects) {
-    // We're pivoting off the persistent "Clipboard" result. 
+    // We're pivoting off the persistent "Clipboard" result.
     // Remove the persistent result from the array
     if ([result isEqual:clipboardResult_]) {
       result = nil;
@@ -136,7 +137,7 @@ static NSString *const kClipboardCopyAction
                             forKey:type];
       }
     }
-    
+
     NSString *historyName
       = [HGSLocalizedString(@"Clipboard History",
                             @"The user-visible name for the clipboard "
@@ -144,7 +145,7 @@ static NSString *const kClipboardCopyAction
          gtm_stringByEscapingForURLArgument];
     NSString *snippet = nil;
     NSImage *icon = clipboardIcon_;
-    
+
     // Create the best available representation of the pasteboard data
     // for the name, snippet, icon, etc.
     NSMutableDictionary *dictionary = nil;
@@ -170,7 +171,7 @@ static NSString *const kClipboardCopyAction
       // RTF data
       NSData *data = [pb dataForType:NSRTFPboardType];
       NSAttributedString *attributedString
-        = [[[NSAttributedString alloc] 
+        = [[[NSAttributedString alloc]
             initWithRTF:data documentAttributes:NULL] autorelease];
       NSString *value = [attributedString string];
       NSString *name = [self nameFromStringValue:value];
@@ -217,13 +218,13 @@ static NSString *const kClipboardCopyAction
       iconType = kClippingPictureType;
     }
     // TODO(hawk): more specializations, such as files
-    
+
     if (dictionary && pasteboardValue) {
       [dictionary setObject:pasteboardValue
                      forKey:kHGSObjectAttributePasteboardValueKey];
       [dictionary setObject:[NSDate date]
                      forKey:kHGSObjectAttributeLastUsedDateKey];
-      HGSAction *action 
+      HGSAction *action
         = [[HGSExtensionPoint actionsPoint]
            extensionWithIdentifier:kClipboardCopyAction];
       if (action) {
@@ -236,33 +237,33 @@ static NSString *const kClipboardCopyAction
       if (icon) {
         [dictionary setObject:icon forKey:kHGSObjectAttributeIconKey];
       }
-      
+
       NSMutableArray *cellArray = [NSMutableArray array];
-      NSString *clipboard = HGSLocalizedString(@"Clipboard", 
+      NSString *clipboard = HGSLocalizedString(@"Clipboard",
                                                @"The generic search term used "
                                                @"to bring up clipboard "
                                                @"contents and history");
-      NSDictionary *clipboardCell 
+      NSDictionary *clipboardCell
         = [NSDictionary dictionaryWithObject:clipboard
                                       forKey:kQSBPathCellDisplayTitleKey];
       [cellArray addObject:clipboardCell];
-      
+
       NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
       [formatter setDateStyle:NSDateFormatterShortStyle];
       [formatter setTimeStyle:NSDateFormatterShortStyle];
       NSString *date = [formatter stringFromDate:[NSDate date]];
-      NSDictionary *userCell 
-        = [NSDictionary dictionaryWithObject:date 
+      NSDictionary *userCell
+        = [NSDictionary dictionaryWithObject:date
                                       forKey:kQSBPathCellDisplayTitleKey];
       [cellArray addObject:userCell];
-      
-      [dictionary setObject:cellArray forKey:kQSBObjectAttributePathCellsKey]; 
-      
+
+      [dictionary setObject:cellArray forKey:kQSBObjectAttributePathCellsKey];
+
       NSWorkspace *ws = [NSWorkspace sharedWorkspace];
       NSString *nsIconType = NSFileTypeForHFSTypeCode(iconType);
       NSImage *image = [ws iconForFileType:nsIconType];
       [dictionary setObject:image forKey:kHGSObjectAttributeIconKey];
-      HGSUnscoredResult *result = [HGSUnscoredResult resultWithDictionary:dictionary 
+      HGSUnscoredResult *result = [HGSUnscoredResult resultWithDictionary:dictionary
                                                                    source:self];
       if (result) {
         // If the new pasteboard value is already in the list of results,
@@ -280,20 +281,20 @@ static NSString *const kClipboardCopyAction
         }
         [recentResults_ addObject:result];
         HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
-        [database indexResult:clipboardResult_]; 
+        [database indexResult:clipboardResult_];
         for (HGSResult *recentResult in recentResults_) {
           [database indexResult:recentResult];
         }
         [self replaceCurrentDatabaseWith:database];
       }
     }
-    
+
     lastChangeCount_ = changeCount;
   }
 }
 
 // Flatten a possibly long pasteboard value (say, the entire contents of a file)
-// into something the can be displayed on a single line in a list. 
+// into something the can be displayed on a single line in a list.
 - (NSString *)nameFromStringValue:(NSString *)stringValue {
   stringValue = [stringValue stringByTrimmingCharactersInSet:
                  [NSCharacterSet whitespaceAndNewlineCharacterSet]];

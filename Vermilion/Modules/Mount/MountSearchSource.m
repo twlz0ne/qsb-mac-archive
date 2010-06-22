@@ -52,6 +52,7 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
 @property (readwrite, assign, getter=isCancelled) BOOL cancelled;
 
 - (void)updateResultsIndex;
+- (void)mountSearchSourceTracker:(void *)ignored;
 @end
 
 @interface MountSearchSourceResolver :  NSObject {
@@ -77,16 +78,16 @@ void cancelThread(void *info) {
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    configuration_ = [configuration objectForKey:@"MountSearchSourceServices"]; 
+    configuration_ = [configuration objectForKey:@"MountSearchSourceServices"];
     browsers_ = [[NSMutableDictionary alloc] init];
     services_ = [[NSMutableArray alloc] init];
     CFRunLoopSourceContext context = {
-    0, self, NULL, NULL, NULL, NULL, NULL, NULL, NULL, cancelThread 
+    0, self, NULL, NULL, NULL, NULL, NULL, NULL, NULL, cancelThread
     };
     rlSource_ = CFRunLoopSourceCreate(NULL, 0, &context);
-    
-    [NSThread detachNewThreadSelector:@selector(mountSearchSourceTracker:) 
-                             toTarget:self 
+
+    [NSThread detachNewThreadSelector:@selector(mountSearchSourceTracker:)
+                             toTarget:self
                            withObject:nil];
   }
   return self;
@@ -133,10 +134,10 @@ void cancelThread(void *info) {
   CFRunLoopRemoveSource(rl, rlSource_, kCFRunLoopDefaultMode);
   [pool drain];
 }
-  
+
 - (void)updateResultsIndex {
   [resolver_ release];
-  resolver_ 
+  resolver_
     = [[MountSearchSourceResolver alloc] initWithMountSearchSource:self];
 }
 
@@ -177,7 +178,7 @@ void cancelThread(void *info) {
       value = [[NSWorkspace sharedWorkspace] iconForFile:[appURL path]];
       GTMCFAutorelease(appURL);
     }
-  
+
   }
   return value;
 }
@@ -191,7 +192,7 @@ void cancelThread(void *info) {
     NSArray *services = [source services];
     services_ = [services mutableCopy];
     source_ = source;
-    
+
     for (NSNetService *service in services) {
       [service setDelegate:self];
       [service resolveWithTimeout:kServiceResolutionTimeout];
@@ -239,12 +240,12 @@ void cancelThread(void *info) {
         break;
     }
     if (ipString) {
-      NSString *mount = HGSLocalizedString(@"mount", 
+      NSString *mount = HGSLocalizedString(@"mount",
                                            @"A label for a result denoting a "
                                            @"network mount point");
-      NSString *share = HGSLocalizedString(@"share", 
+      NSString *share = HGSLocalizedString(@"share",
                                            @"A label for a result denoting a "
-                                           @"network share point");    
+                                           @"network share point");
       NSMutableArray *otherTerms = [NSMutableArray arrayWithObjects:
                                     mount, share, nil];
       NSString *urlString = nil, *type = nil, *scheme = nil;
@@ -257,25 +258,25 @@ void cancelThread(void *info) {
           type = [dict objectForKey:@"type"];
           [otherTerms addObject:scheme];
           break;
-        } 
+        }
       }
-      
+
       if (urlString && type) {
         NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                     urlString,
                                     kHGSObjectAttributeSourceURLKey,
                                     nil];
         NSString *name = [service name];
-        NSString *displayName = [NSString stringWithFormat:@"%@ (%@)", 
+        NSString *displayName = [NSString stringWithFormat:@"%@ (%@)",
                                  name, scheme];
-        HGSUnscoredResult *hgsResult 
+        HGSUnscoredResult *hgsResult
           = [HGSUnscoredResult resultWithURI:urlString
                                         name:displayName
                                         type:type
                                       source:source_
                                   attributes:attributes];
-        [database_ indexResult:hgsResult 
-                          name:name 
+        [database_ indexResult:hgsResult
+                          name:name
                     otherTerms:otherTerms];
       }
     }
@@ -290,14 +291,14 @@ void cancelThread(void *info) {
      didNotResolve:(NSDictionary *)errorDict {
   NSNumber *error = [errorDict objectForKey:NSNetServicesErrorCode];
   OSStatus err = [error longValue];
-  if (err != NSNetServicesActivityInProgress 
+  if (err != NSNetServicesActivityInProgress
       && err != NSNetServicesCancelledError) {
     HGSLogDebug(@"Mount did not resolve: %@ (%d)", service, err);
   }
   [services_ removeObject:service];
   if ([services_ count] == 0) {
     [source_ replaceCurrentDatabaseWith:database_];
-  }  
+  }
 }
 
 @end

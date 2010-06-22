@@ -37,16 +37,17 @@
 #import "QSBActionSaveAsControllerProtocol.h"
 #import "QSBTableResult.h"
 
-// This constant is the name for the app that should be used w/in 
+// This constant is the name for the app that should be used w/in
 // Application Support, etc.
 static NSString *const kQSBFolderNameWithGoogleFolder = @"Quick Search Box";
-static NSString *const kWebURLsWithTitlesPboardType 
+static NSString *const kWebURLsWithTitlesPboardType
   = @"WebURLsWithTitlesPboardType";
 
-@interface QSBHGSDelegate () 
+@interface QSBHGSDelegate ()
 - (NSArray *)pathCellArrayForResult:(HGSResult *)result;
 - (NSArray *)pathCellArrayForFileURL:(NSURL *)url;
 - (NSArray *)pathCellArrayForNonFileURL:(NSURL *)url;
+- (void)queryControllerWillStart:(NSNotification*)note;
 @end
 
 @implementation QSBHGSDelegate
@@ -61,9 +62,9 @@ static NSString *const kWebURLsWithTitlesPboardType
       preferredLanguage_ = @"en";
     }
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(queryControllerWillStart:) 
-               name:kHGSQueryControllerWillStartNotification 
+    [nc addObserver:self
+           selector:@selector(queryControllerWillStart:)
+               name:kHGSQueryControllerWillStartNotification
              object:nil];
     cachedTableResults_ = [[NSMutableDictionary alloc] init];
   }
@@ -88,11 +89,11 @@ static NSString *const kWebURLsWithTitlesPboardType
                                               &folderRef));
     if (folderURL) {
       NSString *folderPath = [folderURL path];
-      
+
       // we want[App Name] with the folder
       NSString *finalPath
         = [folderPath stringByAppendingPathComponent:kQSBFolderNameWithGoogleFolder];
-      
+
       // make sure it exists
       NSFileManager *fm = [NSFileManager defaultManager];
       if ([fm fileExistsAtPath:finalPath] ||
@@ -119,10 +120,10 @@ static NSString *const kWebURLsWithTitlesPboardType
   if (!pluginPaths_) {
     NSMutableArray *buildPaths = [NSMutableArray array];
     NSFileManager *fm = [NSFileManager defaultManager];
-    
+
     // The bundled folder
     [buildPaths addObject:[[NSBundle mainBundle] builtInPlugInsPath]];
-    
+
     // The plugins w/in the user's home dir
     NSString *pluginsDir
       = [[self userApplicationSupportFolderForApp]
@@ -135,7 +136,7 @@ static NSString *const kWebURLsWithTitlesPboardType
       // it exists or we created it
       [buildPaths addObject:pluginsDir];
     }
-    
+
     // Any system wide plugins (we use the folder if it exists, but we don't
     // create it.
     FSRef folderRef;
@@ -146,21 +147,21 @@ static NSString *const kWebURLsWithTitlesPboardType
                                                 &folderRef));
       if (folderURL) {
         NSString *folderPath = [folderURL path];
-        
+
         folderPath
           = [[folderPath stringByAppendingPathComponent:kQSBFolderNameWithGoogleFolder]
              stringByAppendingPathComponent:@"PlugIns"];
-        
+
         if ([fm fileExistsAtPath:folderPath]) {
           [buildPaths addObject:folderPath];
         }
       }
     }
-    
+
     // save it
     pluginPaths_ = [buildPaths copy];
   }
-  
+
   return pluginPaths_;
 }
 
@@ -192,12 +193,12 @@ static NSString *const kWebURLsWithTitlesPboardType
       NSURL *url = [result url];
       NSString *urlString = [url absoluteString];
       NSArray *urlArray = [NSArray arrayWithObject:urlString];
-      NSArray *titleArray = [NSArray arrayWithObject:name];     
-      NSArray *webUrlsWithTitles 
+      NSArray *titleArray = [NSArray arrayWithObject:name];
+      NSArray *webUrlsWithTitles
         = [NSArray arrayWithObjects:urlArray, titleArray, nil];
-                                    
+
       [pbValues setObject:url forKey:NSURLPboardType];
-      [pbValues setObject:webUrlsWithTitles 
+      [pbValues setObject:webUrlsWithTitles
                    forKey:kWebURLsWithTitlesPboardType];
       [pbValues setObject:name forKey:@"public.url-name"];
       [pbValues setObject:urlString forKey:(NSString*)kUTTypeURL];
@@ -208,7 +209,7 @@ static NSString *const kWebURLsWithTitlesPboardType
              && [result isKindOfClass:[HGSScoredResult class]]) {
     @synchronized (cachedTableResults_) {
       HGSScoredResult *scoredResult = (HGSScoredResult *)result;
-      QSBTableResult *tableResult 
+      QSBTableResult *tableResult
         = [cachedTableResults_ objectForKey:scoredResult];
       if (!tableResult) {
         Class resultClass = Nil;
@@ -261,31 +262,31 @@ static NSString *const kWebURLsWithTitlesPboardType
         NSView *accessoryView = [accessoryViewController view];
         NSSavePanel *savePanel = [NSSavePanel savePanel];
         [savePanel setAccessoryView:accessoryView];
-        
+
         // Determine where we are going to save the file.  Here is the current
         // preference: download directory, desktop directory, home directory.
         // TOTO(mrossetti): Remember the directory chosen by the user and
         // restore for the next save as.
         HGSResult *result = [request objectForKey:kHGSSaveAsHGSResultKey];
-        NSArray *destinationDirs 
-          = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory, 
+        NSArray *destinationDirs
+          = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory,
                                                 NSUserDomainMask,
                                                 YES);
         if ([destinationDirs count] == 0) {
-          destinationDirs 
-            = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory, 
+          destinationDirs
+            = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory,
                                                   NSUserDomainMask,
                                                   YES);
         }
         if ([destinationDirs count] == 0) {
-          destinationDirs 
-          = NSSearchPathForDirectoriesInDomains(NSUserDirectory, 
+          destinationDirs
+          = NSSearchPathForDirectoriesInDomains(NSUserDirectory,
                                                 NSUserDomainMask,
                                                 YES);
         }
         NSString *path = [destinationDirs objectAtIndex:0];
         NSString *fileName = [result displayName];
-        
+
         // Present the save-as panel, forcing the app to the front.
         [NSApp activateIgnoringOtherApps:YES];
         NSInteger answer = [savePanel runModalForDirectory:path
@@ -324,8 +325,8 @@ static NSString *const kWebURLsWithTitlesPboardType
   return response;
 }
 
-- (void)dialogDidEnd:(NSWindow *)dialog 
-          returnCode:(NSInteger)returnCode 
+- (void)dialogDidEnd:(NSWindow *)dialog
+          returnCode:(NSInteger)returnCode
          contextInfo:(void *)contextInfo {
   [dialog close];
 }
@@ -343,7 +344,7 @@ static NSString *const kWebURLsWithTitlesPboardType
 
 - (NSArray *)pathCellArrayForFileURL:(NSURL *)url {
   NSMutableArray *cellArray = nil;
-  
+
   // Provide a cellArray for the path control assuming that we are
   // a file and our identifier is a file URL.
   if (url) {
@@ -367,7 +368,7 @@ static NSString *const kWebURLsWithTitlesPboardType
         subPath = [subPath stringByDeletingLastPathComponent];
       }
       // Determine if we can abbreviate the path presentation.
-      
+
       // First, see if this is in the user's home directory structure
       // and, if so, abbreviated it with 'Home'.  If not, then check
       // to see if we're on the root volume and if so, don't show
@@ -377,15 +378,15 @@ static NSString *const kWebURLsWithTitlesPboardType
       NSUInteger compCount = 0;
       NSDictionary *componentToAdd = nil;
       NSDictionary *firstCell = [cellArray objectAtIndex:0];
-      NSString *firstCellTitle 
+      NSString *firstCellTitle
         = [firstCell objectForKey:kQSBPathCellDisplayTitleKey];
       if ([firstCellTitle isEqualToString:homeDisplay]) {
         compCount = 1;
-        NSString *home = NSLocalizedString(@"Home", 
+        NSString *home = NSLocalizedString(@"Home",
                                            @"A label in a result denoting the "
                                            @"user's home folder in a generic "
                                            @"way.");
-        componentToAdd 
+        componentToAdd
           = [NSDictionary dictionaryWithObjectsAndKeys:
              home, kQSBPathCellDisplayTitleKey,
              [NSURL fileURLWithPath:homeDirectory], kQSBPathCellURLKey,
@@ -406,13 +407,13 @@ static NSString *const kWebURLsWithTitlesPboardType
       HGSLogDebug(@"Unable to get path components for path '%@'.", targetPath);
     }
   }
-  
+
   return cellArray;
 }
 
 - (NSArray *)pathCellArrayForNonFileURL:(NSURL *)url {
   NSMutableArray *cellArray = nil;
-  
+
   // See if we have a regular URL.
   NSString *absolutePath = [url absoluteString];
   if (absolutePath) {
@@ -424,7 +425,7 @@ static NSString *const kWebURLsWithTitlesPboardType
       cellArray = [NSMutableArray arrayWithCapacity:2];
       NSURL *pathURL = [NSURL URLWithString:absolutePath];
       NSString *pathString = [url path];
-      
+
       if ([pathString length] == 0 || [pathString isEqualToString:@"/"]) {
         // We just have a host cell.
         NSDictionary *hostCell = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -432,14 +433,14 @@ static NSString *const kWebURLsWithTitlesPboardType
                                   pathURL, kQSBPathCellURLKey,
                                   nil];
         [cellArray addObject: hostCell];
-      } else {          
-        // NOTE: Attempts to use -[NSURL initWithScheme:host:path:] were 
-        //       unsuccessful using (nil|@""|@"/") for the path.  Each fails to 
+      } else {
+        // NOTE: Attempts to use -[NSURL initWithScheme:host:path:] were
+        //       unsuccessful using (nil|@""|@"/") for the path.  Each fails to
         //       produce an acceptable URL or throws an exception.
         // NSURL *hostURL = [[[NSURL alloc] initWithScheme:[url scheme]
         //                                            host:hostString
         //                                            path:???] autorelease];
-        NSURL *hostURL 
+        NSURL *hostURL
           = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/",
                                   [url scheme], hostString]];
         NSDictionary *hostCell = [NSDictionary dictionaryWithObjectsAndKeys:

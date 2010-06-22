@@ -69,8 +69,26 @@ static void OpenAtLoginItemsChanged(LSSharedFileListRef inList, void *context);
 // Make each account authenticate.
 - (void)authenticateAccounts;
 
+- (void)setGlossy:(id)sender;
+- (void)changeColor:(id)sender;
+- (void)chooseOtherColor:(id)sender;
+
+
+// Notifications
+- (void)didAddAccount:(NSNotification *)notification;
+
+// Callbacks
+- (void)setUpAccountSheetDidEnd:(NSWindow *)sheet
+                     returnCode:(NSInteger)returnCode
+                    contextInfo:(void *)contextInfo;
+- (void)editAccountSheetDidEnd:(NSWindow *)sheet
+                    returnCode:(NSInteger)returnCode
+                   contextInfo:(void *)contextInfo;
+- (void)removeAccountAlertDidEnd:(NSWindow *)sheet
+                      returnCode:(int)returnCode
+                     contextInfo:(void *)contextInfo;
 @end
-  
+
 
 static NSString *const kQSBBackgroundPref = @"backgroundColor";
 static NSString *const kQSBBackgroundGlossyPref = @"backgroundIsGlossy";
@@ -82,13 +100,13 @@ typedef NSInteger CGSWindow;
 typedef NSInteger CGSWorkspace;
 
 extern CGSConnection _CGSDefaultConnection(void) WEAK_IMPORT_ATTRIBUTE;
-extern OSStatus CGSGetWorkspace(const CGSConnection cid, 
+extern OSStatus CGSGetWorkspace(const CGSConnection cid,
                                 CGSWorkspace *workspace) WEAK_IMPORT_ATTRIBUTE;
-extern OSStatus CGSGetWindowWorkspace(const CGSConnection cid, 
-                                      const CGSWindow wid, 
+extern OSStatus CGSGetWindowWorkspace(const CGSConnection cid,
+                                      const CGSWindow wid,
                                       CGSWorkspace *workspace) WEAK_IMPORT_ATTRIBUTE;
-extern OSStatus CGSMoveWorkspaceWindowList(const CGSConnection connection, 
-                                           CGSWindow *wids, 
+extern OSStatus CGSMoveWorkspaceWindowList(const CGSConnection connection,
+                                           CGSWindow *wids,
                                            NSInteger count,
                                            CGSWorkspace toWorkspace) WEAK_IMPORT_ATTRIBUTE;
 
@@ -123,14 +141,14 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 - (id)init {
   if ((self = [super initWithWindowNibName:@"PreferencesWindow"])) {
     NSSortDescriptor *sortDesc
-      = [[[NSSortDescriptor alloc] initWithKey:@"displayName" 
+      = [[[NSSortDescriptor alloc] initWithKey:@"displayName"
                                      ascending:YES
                                       selector:@selector(caseInsensitiveCompare:)]
                               autorelease];
     [self setSourceSortDescriptor:[NSArray arrayWithObject:sortDesc]];
-    openAtLoginItemsList_ 
-      = LSSharedFileListCreate(NULL, 
-                               kLSSharedFileListSessionLoginItems, 
+    openAtLoginItemsList_
+      = LSSharedFileListCreate(NULL,
+                               kLSSharedFileListSessionLoginItems,
                                NULL);
     if (!openAtLoginItemsList_) {
       HGSLog(@"Unable to create kLSSharedFileListSessionLoginItems");
@@ -140,15 +158,15 @@ GTM_METHOD_CHECK(NSColor, crayonName);
                                   kCFRunLoopDefaultMode,
                                   OpenAtLoginItemsChanged,
                                   self);
-      openAtLoginItemsSeedValue_ 
+      openAtLoginItemsSeedValue_
         = LSSharedFileListGetSeedValue(openAtLoginItemsList_);
     }
-    
+
     // Notify us when an account is added so we can highlight it.
     HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(didAddAccount:) 
+    [nc addObserver:self
+           selector:@selector(didAddAccount:)
                name:kHGSExtensionPointDidAddExtensionNotification
              object:accountsPoint];
   }
@@ -162,8 +180,8 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   [sourceSortDescriptor_ release];
   if (openAtLoginItemsList_) {
     LSSharedFileListRemoveObserver(openAtLoginItemsList_,
-                                   CFRunLoopGetMain(), 
-                                   kCFRunLoopDefaultMode, 
+                                   CFRunLoopGetMain(),
+                                   kCFRunLoopDefaultMode,
                                    OpenAtLoginItemsChanged,
                                    self);
     CFRelease(openAtLoginItemsList_);
@@ -173,42 +191,42 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 
 - (void)windowDidLoad {
   [super windowDidLoad];
-  
+
   [[colorPopUp_ menu] setDelegate:self];
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   NSData *colorData = [ud objectForKey:kQSBBackgroundPref];
   NSColor *color = colorData ? [NSUnarchiver unarchiveObjectWithData:colorData]
                              : [NSColor whiteColor];
   [self setSelectedColor:color];
-  
+
   // Add the Google color palette
   colors_ = [[NSColorList alloc] initWithName:@"Google"];
-  
-  [colors_ setColor:[NSColor whiteColor] 
+
+  [colors_ setColor:[NSColor whiteColor]
              forKey:NSLocalizedString(@"White", @"")];
-  
-  [colors_ setColor:[NSColor colorWithCalibratedRed:0 
+
+  [colors_ setColor:[NSColor colorWithCalibratedRed:0
                                               green:102.0/255.0
                                                blue:204.0/255.0
-                                              alpha:1.0] 
+                                              alpha:1.0]
              forKey:NSLocalizedString(@"Blue", @"")];
-  
-  [colors_ setColor:[NSColor redColor] 
+
+  [colors_ setColor:[NSColor redColor]
              forKey:NSLocalizedString(@"Red", @"")];
-  [colors_ setColor:[NSColor colorWithCalibratedRed:255.0/255.0 
+  [colors_ setColor:[NSColor colorWithCalibratedRed:255.0/255.0
                                               green:204.0/255.0
                                                blue:0.0
-                                              alpha:1.0] 
+                                              alpha:1.0]
              forKey:NSLocalizedString(@"Yellow", @"")];
-  [colors_ setColor:[NSColor colorWithCalibratedRed:0 
+  [colors_ setColor:[NSColor colorWithCalibratedRed:0
                                               green:153.0/255.0
                                                blue:57.0/255.0
-                                              alpha:1.0] 
-             forKey:NSLocalizedString(@"Green", @"")];  
+                                              alpha:1.0]
+             forKey:NSLocalizedString(@"Green", @"")];
 
   [colors_ setColor:[NSColor colorWithCalibratedWhite:0.75 alpha:1.0]
              forKey:NSLocalizedString(@"Silver", @"")];
-  [colors_ setColor:[NSColor blackColor] 
+  [colors_ setColor:[NSColor blackColor]
              forKey:NSLocalizedString(@"Black", @"")];
 
   [self menuNeedsUpdate:[colorPopUp_ menu]];
@@ -222,11 +240,11 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   [[advancedScrollView_ verticalScroller] setFloatValue:0.0f];
 
   [[self window] setHidesOnDeactivate:YES];
-  
+
   [tabView_ selectTabViewItemAtIndex:0];
   [sourcesTable_ setIntercellSpacing:NSMakeSize(3.0, 6.0)];
   [accountsTable_ setIntercellSpacing:NSMakeSize(3.0, 6.0)];
-  
+
   [toolbar_ setDelegate:self];
   NSString *firstIdentifier
     = [[[toolbar_ items] objectAtIndex:0] itemIdentifier];
@@ -237,18 +255,18 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 #pragma mark Color Menu
 
 - (void)menuNeedsUpdate:(NSMenu *)menu {
-  
+
   if (![[menu itemArray] count]) {
     NSArray *colorNames = [colors_ allKeys];
     for (NSUInteger i = 0; i < [colorNames count]; i++) {
       NSString *name = [colorNames objectAtIndex:i];
       NSMenuItem *item = [menu addItemWithTitle:name
-                                         action:nil 
+                                         action:nil
                                   keyEquivalent:@""];
       [item setTag:i];
       [item setRepresentedObject:[colors_ colorWithKey:name]];
     }
-    
+
     [menu addItem:[NSMenuItem separatorItem]];
     NSString *otherString = NSLocalizedString(@"Other...", @"") ;
     NSMenuItem *item = [menu addItemWithTitle:otherString
@@ -256,7 +274,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
                                 keyEquivalent:@""];
     [item setTarget:self];
     [item setTag:kCustomColorTag];
-    
+
     [menu addItem:[NSMenuItem separatorItem]];
     [[menu addItemWithTitle:NSLocalizedString(@"Glossy", @"")
                      action:@selector(setGlossy:)
@@ -278,7 +296,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   [self setSelectedColor:color];
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   NSData *colorData = [NSArchiver archivedDataWithRootObject:color];
-  [ud setObject:colorData forKey:kQSBBackgroundPref]; 
+  [ud setObject:colorData forKey:kQSBBackgroundPref];
   [self updateColorPopup];
 }
 
@@ -314,7 +332,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   BOOL glossy = [ud boolForKey:kQSBBackgroundGlossyPref];
   [ud setBool:!glossy forKey:kQSBBackgroundGlossyPref];
-  
+
   [self updateColorPopup];
 }
 
@@ -331,28 +349,28 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   [sharedColorPanel setAction:@selector(changeColor:)];
   [sharedColorPanel setTarget:self];
   [sharedColorPanel makeKeyAndOrderFront:sender];
-  
+
 }
 
 - (IBAction)showPreferences:(id)sender {
   NSWindow *prefWindow = [self window];
   // This is a little sketchy as we are using private APIs from Apple, but
-  // AFAIK there is no other way to do this. This makes sure that the 
+  // AFAIK there is no other way to do this. This makes sure that the
   // preferences open up in the current space, and doesn't jump us around
   // while using QSB. This is a privilege, not a right, so if anything
   // looks skanky we abort and fall back to the old space switching.
-  if (_CGSDefaultConnection && CGSGetWorkspace 
-      && CGSGetWindowWorkspace && CGSMoveWorkspaceWindowList) { 
+  if (_CGSDefaultConnection && CGSGetWorkspace
+      && CGSGetWindowWorkspace && CGSMoveWorkspaceWindowList) {
     NSInteger windowNumber = [prefWindow windowNumber];
     if (windowNumber != -1) {
       CGSConnection connection = _CGSDefaultConnection();
       CGSWorkspace currentWorkspace, windowWorkspace;
       OSStatus status = CGSGetWorkspace(connection, &currentWorkspace);
       if (status == noErr) {
-        status = CGSGetWindowWorkspace(connection, windowNumber, 
+        status = CGSGetWindowWorkspace(connection, windowNumber,
                                        &windowWorkspace);
         if (status == noErr && currentWorkspace != windowWorkspace) {
-          status = CGSMoveWorkspaceWindowList(connection, &windowNumber, 
+          status = CGSMoveWorkspaceWindowList(connection, &windowNumber,
                                               1, currentWorkspace);
         }
       }
@@ -364,8 +382,8 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   } else {
     HGSLogDebug(@"Unable to access weak symbols _CGSDefaultConnection:%p "
                 @"CGSGetWorkspace:%p CGSGetWindowWorkspace:%p "
-                @"CGSMoveWorkspaceWindowList:%p", 
-                _CGSDefaultConnection, CGSGetWorkspace, 
+                @"CGSMoveWorkspaceWindowList:%p",
+                _CGSDefaultConnection, CGSGetWorkspace,
                 CGSGetWindowWorkspace, CGSMoveWorkspaceWindowList);
   }
   [NSApp activateIgnoringOtherApps:YES];
@@ -390,13 +408,13 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 
 - (IBAction)setupAccount:(id)sender {
   NSWindow *preferenceWindow = [self window];
-  QSBSetUpAccountWindowController *controller 
+  QSBSetUpAccountWindowController *controller
     = [[[QSBSetUpAccountWindowController alloc]
         initWithParentWindow:preferenceWindow] autorelease];
   NSWindow *setUpWindow = [controller window];
   [NSApp beginSheet:setUpWindow
      modalForWindow:preferenceWindow
-      modalDelegate:self 
+      modalDelegate:self
      didEndSelector:@selector(setUpAccountSheetDidEnd:returnCode:contextInfo:)
         contextInfo:nil];
 }
@@ -424,7 +442,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
       NSWindow *editWindow = [editWindowController window];
       [NSApp beginSheet:editWindow
          modalForWindow:preferenceWindow
-          modalDelegate:self 
+          modalDelegate:self
          didEndSelector:@selector(editAccountSheetDidEnd:returnCode:contextInfo:)
             contextInfo:editWindowController];
     } else {
@@ -496,14 +514,14 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   }
 }
 
-- (void)setUpAccountSheetDidEnd:(NSWindow *)sheet 
-                     returnCode:(NSInteger)returnCode 
+- (void)setUpAccountSheetDidEnd:(NSWindow *)sheet
+                     returnCode:(NSInteger)returnCode
                     contextInfo:(void *)contextInfo {
   [sheet close];
 }
 
-- (void)editAccountSheetDidEnd:(NSWindow *)sheet 
-                    returnCode:(NSInteger)returnCode 
+- (void)editAccountSheetDidEnd:(NSWindow *)sheet
+                    returnCode:(NSInteger)returnCode
                    contextInfo:(void *)contextInfo {
   QSBEditAccountWindowController *editWindowController = contextInfo;
   [sheet close];
@@ -513,7 +531,7 @@ GTM_METHOD_CHECK(NSColor, crayonName);
 - (void)updateColorPopup {
   NSInteger idx = [self indexOfColor:[self selectedColor]];
   if (idx == NSNotFound) {
-    [colorPopUp_ selectItemWithTag:kCustomColorTag]; 
+    [colorPopUp_ selectItemWithTag:kCustomColorTag];
     NSMenuItem *item = [colorPopUp_ selectedItem];
     [item setTitle:[[self selectedColor] crayonName]];
   } else {
@@ -576,13 +594,13 @@ GTM_METHOD_CHECK(NSColor, crayonName);
     NSBundle *ourBundle = [NSBundle mainBundle];
     NSString *bundlePath = [ourBundle bundlePath];
     NSURL *bundleURL = [NSURL fileURLWithPath:bundlePath];
-    CFArrayRef cfItems 
-      = LSSharedFileListCopySnapshot(openAtLoginItemsList_, 
+    CFArrayRef cfItems
+      = LSSharedFileListCopySnapshot(openAtLoginItemsList_,
                                      &openAtLoginItemsSeedValue_);
     NSArray *items = GTMCFAutorelease(cfItems);
     for (id item in items) {
       CFURLRef itemURL;
-      if (LSSharedFileListItemResolve((LSSharedFileListItemRef)item, 
+      if (LSSharedFileListItemResolve((LSSharedFileListItemRef)item,
                                       0, &itemURL, NULL) == 0) {
         if ([bundleURL isEqual:(NSURL *)itemURL]) {
           opened = YES;
@@ -602,35 +620,35 @@ GTM_METHOD_CHECK(NSColor, crayonName);
   NSURL *bundleURL = [NSURL fileURLWithPath:bundlePath];
   if (opened) {
     NSNumber *nsTrue = [NSNumber numberWithBool:YES];
-    NSDictionary *propertiesToSet 
-      = [NSDictionary dictionaryWithObject:nsTrue 
+    NSDictionary *propertiesToSet
+      = [NSDictionary dictionaryWithObject:nsTrue
                                     forKey:kQSBSharedFileListLoginItemHidden];
-    LSSharedFileListItemRef item 
-      = LSSharedFileListInsertItemURL(openAtLoginItemsList_, 
-                                      kLSSharedFileListItemLast, 
+    LSSharedFileListItemRef item
+      = LSSharedFileListInsertItemURL(openAtLoginItemsList_,
+                                      kLSSharedFileListItemLast,
                                       NULL,
-                                      NULL, 
-                                      (CFURLRef)bundleURL, 
-                                      (CFDictionaryRef)propertiesToSet, 
+                                      NULL,
+                                      (CFURLRef)bundleURL,
+                                      (CFDictionaryRef)propertiesToSet,
                                       NULL);
     CFRelease(item);
-    openAtLoginItemsSeedValue_ 
+    openAtLoginItemsSeedValue_
       = LSSharedFileListGetSeedValue(openAtLoginItemsList_);
   } else {
-    CFArrayRef cfItems 
-      = LSSharedFileListCopySnapshot(openAtLoginItemsList_, 
+    CFArrayRef cfItems
+      = LSSharedFileListCopySnapshot(openAtLoginItemsList_,
                                      &openAtLoginItemsSeedValue_);
     NSArray *items = GTMCFAutorelease(cfItems);
     for (id item in items) {
       CFURLRef itemURL;
-      if (LSSharedFileListItemResolve( (LSSharedFileListItemRef)item, 
+      if (LSSharedFileListItemResolve( (LSSharedFileListItemRef)item,
                                       0, &itemURL, NULL) == 0) {
         if ([bundleURL isEqual:(NSURL *)itemURL]) {
-          OSStatus status 
-            = LSSharedFileListItemRemove(openAtLoginItemsList_, 
+          OSStatus status
+            = LSSharedFileListItemRemove(openAtLoginItemsList_,
                                          (LSSharedFileListItemRef)item);
           if (status) {
-            HGSLog(@"Unable to remove %@ from open at login (%d)", 
+            HGSLog(@"Unable to remove %@ from open at login (%d)",
                    itemURL, status);
           }
         }

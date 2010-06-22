@@ -35,10 +35,12 @@
 
 @interface DirectoryScannerSearchSource : HGSMemorySearchSource {
  @private
-  NSString *path_; 
+  NSString *path_;
   GTMFileSystemKQueue *kQueue_;
 }
 - (void)recacheContents;
+- (void)directoryChanged:(GTMFileSystemKQueue *)queue
+              eventFlags:(GTMFileSystemKQueueEvents)flags;
 @end
 
 @implementation DirectoryScannerSearchSource
@@ -82,18 +84,18 @@
 }
 
 - (NSString *)displayName {
-  return [[NSFileManager defaultManager] displayNameAtPath:path_]; 
+  return [[NSFileManager defaultManager] displayNameAtPath:path_];
 }
 - (NSImage *)icon {
-  return [[NSWorkspace sharedWorkspace] iconForFile:path_]; 
+  return [[NSWorkspace sharedWorkspace] iconForFile:path_];
 }
 
 - (void)recacheContents {
   HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
-  
+
   NSFileManager *manager = [NSFileManager defaultManager];
   NSArray *array = [manager directoryContentsAtPath:path_];
-  
+
   for (NSString *subpath in array) {
     LSItemInfoRecord infoRec;
     subpath = [path_ stringByAppendingPathComponent:subpath];
@@ -108,15 +110,15 @@
       // For some odd reason /dev always returns nsvErr.
       // Radar 6759537 - Getting URL info on /dev return -35 nsvErr
       if (![subpath isEqualToString:@"/dev"]) {
-        HGSLogDebug(@"Unable to LSCopyItemInfoForURL (%d) for %@", 
+        HGSLogDebug(@"Unable to LSCopyItemInfoForURL (%d) for %@",
                     status, subURL);
       }
       continue;
     }
     if (infoRec.flags & kLSItemInfoIsInvisible) continue;
     if ([[subpath lastPathComponent] hasPrefix:@"."]) continue;
-    
-    
+
+
     HGSUnscoredResult *result = [HGSUnscoredResult resultWithFilePath:subpath
                                                                source:self
                                                            attributes:nil];

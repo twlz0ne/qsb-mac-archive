@@ -40,8 +40,8 @@ static NSString *const kQSBDWTopResultsKey = @"Top Results";
 static NSString *const kQSBDWMoreResultsKey =@"More Results";
 static NSUInteger kQSBDWResultRowCount = 10;
 
-static NSInteger QSBDWSortOperations(HGSSearchOperation *op1, 
-                                     HGSSearchOperation *op2, 
+static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
+                                     HGSSearchOperation *op2,
                                      void* context) {
   NSInteger value = NSOrderedSame;
   HGSTypeFilter *filter = [HGSTypeFilter filterAllowingAllTypes];
@@ -54,6 +54,18 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
   }
   return value;
 }
+
+@interface QSBDebugWindowController ()
+
+- (void)queryControllerWillStart:(NSNotification *)notification;
+- (void)queryControllerDidFinish:(NSNotification *)notification;
+- (void)searchControllerDidUpdateResults:(NSNotification *)notification;
+- (void)searchOperationWillStart:(NSNotification *)notification;
+- (void)searchOperationDidFinish:(NSNotification *)notification;
+- (void)searchOperationWasCancelled:(NSNotification *)notification;
+- (void)searchOperationDidUpdateResults:(NSNotification *)notification;
+
+@end
 
 @implementation QSBDebugWindowController
 
@@ -76,37 +88,37 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
 
 - (void)windowDidLoad {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self 
-         selector:@selector(queryControllerWillStart:) 
-             name:kHGSQueryControllerWillStartNotification 
+  [nc addObserver:self
+         selector:@selector(queryControllerWillStart:)
+             name:kHGSQueryControllerWillStartNotification
            object:nil];
-  [nc addObserver:self 
-         selector:@selector(queryControllerDidFinish:) 
-             name:kHGSQueryControllerDidFinishNotification 
+  [nc addObserver:self
+         selector:@selector(queryControllerDidFinish:)
+             name:kHGSQueryControllerDidFinishNotification
            object:nil];
-  [nc addObserver:self 
-         selector:@selector(searchControllerDidUpdateResults:) 
-             name:kQSBSearchControllerDidUpdateResultsNotification 
+  [nc addObserver:self
+         selector:@selector(searchControllerDidUpdateResults:)
+             name:kQSBSearchControllerDidUpdateResultsNotification
            object:nil];
-  [nc addObserver:self 
-         selector:@selector(searchOperationWillStart:) 
-             name:kHGSSearchOperationWillStartNotification 
+  [nc addObserver:self
+         selector:@selector(searchOperationWillStart:)
+             name:kHGSSearchOperationWillStartNotification
            object:nil];
-  [nc addObserver:self 
-         selector:@selector(searchOperationDidFinish:) 
-             name:kHGSSearchOperationDidFinishNotification 
+  [nc addObserver:self
+         selector:@selector(searchOperationDidFinish:)
+             name:kHGSSearchOperationDidFinishNotification
            object:nil];
-  [nc addObserver:self 
-         selector:@selector(searchOperationWasCancelled:) 
-             name:kHGSSearchOperationWasCancelledNotification 
+  [nc addObserver:self
+         selector:@selector(searchOperationWasCancelled:)
+             name:kHGSSearchOperationWasCancelledNotification
            object:nil];
-  [nc addObserver:self 
-         selector:@selector(searchOperationDidUpdateResults:) 
-             name:kHGSSearchOperationDidUpdateResultsNotification 
+  [nc addObserver:self
+         selector:@selector(searchOperationDidUpdateResults:)
+             name:kHGSSearchOperationDidUpdateResultsNotification
            object:nil];
-  
+
   NSFont *font = [NSFont systemFontOfSize:[NSFont smallSystemFontSize]];
-  NSBrowserCell *browserCell 
+  NSBrowserCell *browserCell
     = [[[NSBrowserCell alloc] initTextCell:@""] autorelease];
   [browserCell setFont:font];
   [mixedResults_ setCellPrototype:browserCell];
@@ -147,9 +159,9 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
   NSDictionary *moreResults = nil;
   // TODO(dmaclach): fix this up somehow.
   // [controller rankedResultsByCategory];
-  NSDictionary *dictionary 
+  NSDictionary *dictionary
     = [NSDictionary dictionaryWithObjectsAndKeys:
-       topResults, kQSBDWTopResultsKey, 
+       topResults, kQSBDWTopResultsKey,
        moreResults, kQSBDWMoreResultsKey,
        nil];
   [updatedResults_ addObject:dictionary];
@@ -242,51 +254,51 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
   }
   return rowCount;
 }
-- (void)willDisplayCell:(id)cell 
-                  atRow:(NSInteger)row 
+- (void)willDisplayCell:(id)cell
+                  atRow:(NSInteger)row
               forResult:(HGSScoredResult *)result {
   NSString *cellData = nil;
   switch (row) {
     case 0:
       cellData = [result displayName];
       break;
-      
+
     case 1:
       cellData = [result type];
       break;
-      
+
     case 2:
       cellData = [NSString stringWithFormat:@"Score: %0.3f", [result score]];
       break;
-      
+
     case 3:
       cellData = [result uri];
       break;
-      
+
     case 4:
       cellData = [[result url] absoluteString];
       break;
-      
+
     case 5:
-      cellData = [NSString stringWithFormat:@"Below Fold: %@", 
+      cellData = [NSString stringWithFormat:@"Below Fold: %@",
                   [result rankFlags] & eHGSBelowFoldRankFlag ? @"Yes" : @"No"];
       break;
-    
+
     case 6:
-      cellData = [NSString stringWithFormat:@"Shortcut: %@", 
+      cellData = [NSString stringWithFormat:@"Shortcut: %@",
                   [result rankFlags] & eHGSShortcutRankFlag ? @"Yes" : @"No"];
       break;
-      
+
     case 7:
-      cellData = [NSString stringWithFormat:@"Last Used: %@", 
+      cellData = [NSString stringWithFormat:@"Last Used: %@",
                   [result valueForKey:kHGSObjectAttributeLastUsedDateKey]];
       break;
-      
+
     case 8:
-      cellData = [NSString stringWithFormat:@"Matched Term: %@", 
+      cellData = [NSString stringWithFormat:@"Matched Term: %@",
                   [[result matchedTerm] tokenizedString]];
       break;
-    
+
     case 9:
       cellData = [NSString stringWithFormat:@"Source: %@",
                   [[result source] identifier]];
@@ -296,8 +308,8 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
   [cell setLeaf:YES];
 }
 
-- (void)operationsWillDisplayCell:(id)cell 
-                            atRow:(NSInteger)row 
+- (void)operationsWillDisplayCell:(id)cell
+                            atRow:(NSInteger)row
                            column:(NSInteger)column {
   if (column == 0) {
     HGSSearchOperation *operation = [searchOperations_ objectAtIndex:row];
@@ -307,11 +319,11 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
     if ([operation isCancelled]) {
       cellData = [NSString stringWithFormat:@"%@ (Cancelled)", name];
     } else if ([operation isFinished]) {
-      cellData = [NSString stringWithFormat:@"%@ (%d - %0.3fms)", 
-                  name, [operation resultCountForFilter:filter], 
+      cellData = [NSString stringWithFormat:@"%@ (%d - %0.3fms)",
+                  name, [operation resultCountForFilter:filter],
                   [operation runTime] / 10e5];
     } else {
-      cellData = [NSString stringWithFormat:@"%@ (%d)", 
+      cellData = [NSString stringWithFormat:@"%@ (%d)",
                   name, [operation resultCountForFilter:filter]];
     }
     [cell setStringValue:cellData];
@@ -320,15 +332,15 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
     HGSSearchOperation *operation = [searchOperations_ objectAtIndex:selectedOp];
     HGSTypeFilter *allFilter = [HGSTypeFilter filterAllowingAllTypes];
     if (column == 1) {
-      HGSScoredResult *scoredResult 
+      HGSScoredResult *scoredResult
         = [operation sortedRankedResultAtIndex:row
                                     typeFilter:allFilter];
-      NSString *cellData = [NSString stringWithFormat:@"%@ (%0.3f)", 
+      NSString *cellData = [NSString stringWithFormat:@"%@ (%0.3f)",
                             [scoredResult displayName], [scoredResult score]];
       [cell setStringValue:cellData];
     } else if (column == 2) {
       NSInteger selectedResult = [operations_ selectedRowInColumn:1];
-      HGSScoredResult *result 
+      HGSScoredResult *result
         = [operation sortedRankedResultAtIndex:selectedResult
                                     typeFilter:allFilter];
       [self willDisplayCell:cell atRow:row forResult:result];
@@ -336,8 +348,8 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
   }
 }
 
-- (void)mixedResultsWillDisplayCell:(id)cell 
-                              atRow:(NSInteger)row 
+- (void)mixedResultsWillDisplayCell:(id)cell
+                              atRow:(NSInteger)row
                              column:(NSInteger)column {
   if (column == 0) {
     [cell setStringValue:[NSString stringWithFormat:@"Mix %d", row]];
@@ -393,9 +405,9 @@ static NSInteger QSBDWSortOperations(HGSSearchOperation *op1,
   }
 }
 
-- (void)browser:(NSBrowser *)sender 
-willDisplayCell:(id)cell 
-          atRow:(NSInteger)row 
+- (void)browser:(NSBrowser *)sender
+willDisplayCell:(id)cell
+          atRow:(NSInteger)row
          column:(NSInteger)column {
   if (sender == mixedResults_) {
     [self mixedResultsWillDisplayCell:cell atRow:row column:column];
@@ -403,6 +415,6 @@ willDisplayCell:(id)cell
     [self operationsWillDisplayCell:cell atRow:row column:column];
   } else {
     HGSAssert(NO, nil);
-  }  
+  }
 }
 @end

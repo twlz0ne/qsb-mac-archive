@@ -86,7 +86,7 @@ static NSString * const kQSBMainInterfaceNibName = @"MainInterfaceNibName";
 
 // NSNumber value in seconds that controls how fast the QSB clears out
 // an old query once it's put in the background.
-static NSString *const kQSBResetQueryTimeoutPrefKey 
+static NSString *const kQSBResetQueryTimeoutPrefKey
   = @"QSBResetQueryTimeoutPrefKey";
 
 // This is a tag value for corpora in the corpora menu.
@@ -116,8 +116,8 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 // is the method used by GoogleDesktop to do it. Search for "5049713"
 - (BOOL)isOurScreenCaptured;
 
-// Given a proposed frame, returns a frame that fully exposes 
-// the proposed frame on |screen| as close to it's original position as 
+// Given a proposed frame, returns a frame that fully exposes
+// the proposed frame on |screen| as close to it's original position as
 // possible.
 // Args:
 //    proposedFrame - the frame to be adjusted to fit on the screen
@@ -131,12 +131,24 @@ static const NSInteger kBaseCorporaTagValue = 10000;
 - (NSRect)fullyExposedFrameForFrame:(NSRect)proposedFrame
                      respectingDock:(BOOL)respectingDock
                            onScreen:(NSScreen *)screen;
+
+// Notifications
+- (void)aWindowDidBecomeKey:(NSNotification *)notification;
+- (void)backgroundColorChanged:(GTMKeyValueChangeNotification *)notification;
+- (void)pluginWillLoad:(NSNotification *)notification;
+- (void)pluginWillInstall:(NSNotification *)notification;
+- (void)pluginsDidInstall:(NSNotification *)notification;
+- (void)selectedTableResultDidChange:(NSNotification *)notification;
+- (void)actionPresenterDidPivot:(NSNotification *)notification;
+- (void)actionPresenterDidUnpivot:(NSNotification *)notification;
+- (void)welcomeWindowWillClose:(NSNotification *)notification;
+- (void)applicationDidReopen:(NSNotification *)notification;
 @end
 
 
 @implementation QSBSearchWindowController
 
-GTM_METHOD_CHECK(NSObject, 
+GTM_METHOD_CHECK(NSObject,
                  gtm_addObserver:forKeyPath:selector:userInfo:options:);
 GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 GTM_METHOD_CHECK(NSAppleEventDescriptor, gtm_arrayValue);
@@ -160,30 +172,30 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
                     selector:@selector(backgroundColorChanged:)
                     userInfo:nil
                      options:0];
-  
+
   [self updateLogoView];
-  
+
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc addObserver:self 
+  [nc addObserver:self
          selector:@selector(applicationDidBecomeActive:)
              name:NSApplicationDidBecomeActiveNotification
            object:NSApp];
-    
-  [nc addObserver:self 
+
+  [nc addObserver:self
          selector:@selector(applicationWillResignActive:)
              name:NSApplicationWillResignActiveNotification
            object:NSApp];
-  
-  [nc addObserver:self 
+
+  [nc addObserver:self
          selector:@selector(applicationDidChangeScreenParameters:)
              name:NSApplicationDidChangeScreenParametersNotification
            object:NSApp];
-  
+
   [nc addObserver:self
          selector:@selector(applicationDidReopen:)
              name:kQSBApplicationDidReopenNotification
            object:NSApp];
-  
+
   // named aWindowDidBecomeKey instead of windowDidBecomeKey because if we
   // used windowDidBecomeKey we would be called twice for our window (once
   // for the notification, and once because we are the search window's delegate)
@@ -193,30 +205,30 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
            object:nil];
 
   HGSPluginLoader *sharedLoader = [HGSPluginLoader sharedPluginLoader];
-  [nc addObserver:self 
-         selector:@selector(pluginWillLoad:) 
-             name:kHGSPluginLoaderWillLoadPluginNotification 
+  [nc addObserver:self
+         selector:@selector(pluginWillLoad:)
+             name:kHGSPluginLoaderWillLoadPluginNotification
            object:sharedLoader];
-  [nc addObserver:self 
-         selector:@selector(pluginWillInstall:) 
-             name:kHGSPluginLoaderWillInstallPluginNotification 
+  [nc addObserver:self
+         selector:@selector(pluginWillInstall:)
+             name:kHGSPluginLoaderWillInstallPluginNotification
            object:sharedLoader];
-  [nc addObserver:self 
-         selector:@selector(pluginsDidInstall:) 
-             name:kHGSPluginLoaderDidInstallPluginsNotification 
+  [nc addObserver:self
+         selector:@selector(pluginsDidInstall:)
+             name:kHGSPluginLoaderDidInstallPluginsNotification
            object:sharedLoader];
 
-  [nc addObserver:self 
-         selector:@selector(actionPresenterDidPivot:) 
-             name:kQSBActionPresenterDidPivotNotification 
+  [nc addObserver:self
+         selector:@selector(actionPresenterDidPivot:)
+             name:kQSBActionPresenterDidPivotNotification
            object:actionPresenter_];
-  
-  [nc addObserver:self 
-         selector:@selector(actionPresenterDidUnpivot:) 
-             name:kQSBActionPresenterDidUnpivotNotification 
+
+  [nc addObserver:self
+         selector:@selector(actionPresenterDidUnpivot:)
+             name:kQSBActionPresenterDidUnpivotNotification
            object:actionPresenter_];
-  
-  
+
+
   // get the pasteboard count and make sure we change it to something different
   // so that when the user first brings up the QSB its query is correct.
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -227,27 +239,27 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
     [userDefaults setDouble:resetInterval forKey:kQSBResetQueryTimeoutPrefKey];
     // No need to worry about synchronize here as somebody else will sync us
   }
-  
-  // subtracting one just makes sure that we are initialized to something other 
+
+  // subtracting one just makes sure that we are initialized to something other
   // than what |changeCount| is going to be. |Changecount| always increments.
   NSPasteboard *findPasteBoard = [NSPasteboard pasteboardWithName:NSFindPboard];
   findPasteBoardChangeCount_ = [findPasteBoard changeCount] - 1;
   [self checkFindPasteboard:nil];
-  findPasteBoardChangedTimer_ 
+  findPasteBoardChangedTimer_
     = [NSTimer scheduledTimerWithTimeInterval:resetInterval
                                        target:self
-                                     selector:@selector(checkFindPasteboard:) 
+                                     selector:@selector(checkFindPasteboard:)
                                      userInfo:nil
-                                      repeats:YES];  
-  [nc addObserver:self 
-         selector:@selector(selectedTableResultDidChange:) 
-             name:kQSBSelectedTableResultDidChangeNotification 
+                                      repeats:YES];
+  [nc addObserver:self
+         selector:@selector(selectedTableResultDidChange:)
+             name:kQSBSelectedTableResultDidChangeNotification
            object:nil];
   if ([self firstLaunch]) {
     welcomeController_ = [[QSBWelcomeController alloc] init];
   }
 }
-  
+
 - (void)dealloc {
   [self gtm_stopObservingAllKeyPaths];
   [queryResetTimer_ invalidate];
@@ -273,7 +285,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
                                   [[NSUserDefaults standardUserDefaults]
                                    floatForKey:kQSBSearchWindowFrameTopPrefKey]);
     [searchWindow setFrameTopLeftPoint:topLeft];
-    
+
     // Now insure that the window's frame is fully visible.
     NSRect searchFrame = [searchWindow frame];
     NSRect actualFrame = [self fullyExposedFrameForFrame:searchFrame
@@ -281,39 +293,39 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
                                                 onScreen:[searchWindow screen]];
     [searchWindow setFrame:actualFrame display:NO];
   }
-  
+
   // get us so that the IME windows appear above us as necessary.
   // http://b/issue?id=602250
-  
+
   [searchWindow setLevel:kCGStatusWindowLevel + 2];
-  // Support spaces on Leopard. 
+  // Support spaces on Leopard.
   // http://b/issue?id=648841
-  [searchWindow setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces]; 
-  
+  [searchWindow setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces];
+
   [searchWindow setMovableByWindowBackground:YES];
   [searchWindow invalidateShadow];
-  [searchWindow setAlphaValue:0.0];  
+  [searchWindow setAlphaValue:0.0];
 
-  NSString *startupString = HGSLocalizedString(@"Starting up…", 
+  NSString *startupString = HGSLocalizedString(@"Starting up…",
                                                @"A string shown "
-                                               @"at launchtime to denote that " 
+                                               @"at launchtime to denote that "
                                                @"QSB is starting up.");
-  
+
   [searchTextField_ setString:startupString];
   [searchTextField_ setEditable:NO];
-  
+
   [thumbnailView_ setHidden:YES];
-  
+
   if (welcomeController_) {
     NSWindow *welcomeWindow = [welcomeController_ window];
-    
+
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
+    [nc addObserver:self
            selector:@selector(welcomeWindowWillClose:)
                name:NSWindowWillCloseNotification
              object:welcomeWindow];
-  
-    [searchWindow addChildWindow:welcomeWindow  
+
+    [searchWindow addChildWindow:welcomeWindow
                          ordered:NSWindowBelow];
   }
 }
@@ -329,18 +341,18 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   NSImage *logoImage = nil;
   NSData *data = [[NSUserDefaults standardUserDefaults]
                   dataForKey:kQSBUserPrefBackgroundColorKey];
-  NSColor *color = data ? [NSUnarchiver unarchiveObjectWithData:data] 
+  NSColor *color = data ? [NSUnarchiver unarchiveObjectWithData:data]
                         : [NSColor whiteColor];
   color = [color colorUsingColorSpaceName:NSDeviceRGBColorSpace];
-  
+
   CGFloat brightness = [color brightnessComponent];
-  CGFloat hue = [color hueComponent];    
+  CGFloat hue = [color hueComponent];
   CGFloat saturation = [color saturationComponent];
-  
+
   // Only pastels show color logo
   if (saturation < 0.25 && brightness > 0.9) {
-    logoImage = [NSImage imageNamed:@"ColorLargeGoogle"]; 
-    menuImage = [NSImage imageNamed:@"MenuArrowBlack"]; 
+    logoImage = [NSImage imageNamed:@"ColorLargeGoogle"];
+    menuImage = [NSImage imageNamed:@"MenuArrowBlack"];
   } else {
     // If is a bright, saturated color, use the black logo
     const CGFloat kYellowHue = 1.0 / 6.0;
@@ -348,10 +360,10 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
     CGFloat yellowDistance = fabs(kYellowHue - hue);
     if (yellowDistance < kMinDistance && brightness > 0.8) {
       logoImage = [NSImage imageNamed:@"BlackLargeGoogle"];
-      menuImage = [NSImage imageNamed:@"MenuArrowBlack"]; 
+      menuImage = [NSImage imageNamed:@"MenuArrowBlack"];
     } else {
       logoImage = [NSImage imageNamed:@"WhiteLargeGoogle"];
-      menuImage = [NSImage imageNamed:@"MenuArrowWhite"]; 
+      menuImage = [NSImage imageNamed:@"MenuArrowWhite"];
     }
   }
   [logoView_ setImage:logoImage];
@@ -386,7 +398,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   NSString *text = saveText ? [searchTextField_ stringWithoutPivots] : nil;
   // Selecting destroys the stack
   [self resetActionModel];
-  
+
   // Create a pivot with the current text, and set the base query to the
   // indicated corpus.
   [actionPresenter_ pivotOnObjects:results];
@@ -403,7 +415,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
     [self hideSearchWindow:self];
   } else {
     // Check to see if the display is captured, and if so beep and don't
-    // activate. 
+    // activate.
     // For http://buganizer/issue?id=652067
     if ([self isOurScreenCaptured]) {
       NSBeep();
@@ -424,13 +436,13 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 - (NSWindow *)shieldWindow {
   if (!shieldWindow_) {
     NSRect windowRect = [[NSScreen mainScreen] frame];
-    shieldWindow_ = [[NSWindow alloc] initWithContentRect:windowRect 
-                                                styleMask:NSBorderlessWindowMask 
-                                                  backing:NSBackingStoreBuffered 
+    shieldWindow_ = [[NSWindow alloc] initWithContentRect:windowRect
+                                                styleMask:NSBorderlessWindowMask
+                                                  backing:NSBackingStoreBuffered
                                                     defer:NO];
     [shieldWindow_ setIgnoresMouseEvents:YES];
     [shieldWindow_
-       setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces]; 
+       setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces];
     [shieldWindow_ setBackgroundColor: [NSColor blackColor]];
     [shieldWindow_ setLevel:kCGStatusWindowLevel];
     [shieldWindow_ setOpaque:YES];
@@ -440,7 +452,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
     [shieldWindow_ display];
   }
   return shieldWindow_;
-  
+
 }
 
 - (NSRect)setResultsWindowFrameWithHeight:(CGFloat)newHeight {
@@ -457,17 +469,17 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   if (resultsVisible) {
     // If the results panel is visible then we first size and position it
     // and then reposition the search box.
-  
+
     // second, determine a frame that actually fits within the screen.
     actualFrame = [self fullyExposedFrameForFrame:proposedFrame
                                    respectingDock:YES
                                          onScreen:[queryWindow screen]];
     if (!NSEqualRects(actualFrame, proposedFrame)) {
       // We need to move the query window as well as the results window.
-      NSPoint deltaPoint 
+      NSPoint deltaPoint
         = NSMakePoint(actualFrame.origin.x - proposedFrame.origin.x,
                       actualFrame.origin.y - proposedFrame.origin.y);
-      
+
       NSRect queryFrame = NSOffsetRect([queryWindow frame],
                                 deltaPoint.x, deltaPoint.y);
       [[queryWindow animator] setFrame:queryFrame display:YES];
@@ -502,15 +514,15 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 
 - (IBAction)grabSelection:(id)sender {
   NSBundle *bundle = [NSBundle mainBundle];
-  NSString *path = [bundle pathForResource:@"GrabFinderSelectionAsPosixPaths" 
+  NSString *path = [bundle pathForResource:@"GrabFinderSelectionAsPosixPaths"
                                     ofType:@"scpt"
                                inDirectory:@"Scripts"];
   HGSAssert(path, @"Can't find GrabFinderSelectionAsPosixPaths.scpt");
   NSURL *url = [NSURL fileURLWithPath:path];
   NSDictionary *error = nil;
-  
+
   NSAppleScript *grabScript
-    = [[[NSAppleScript alloc] initWithContentsOfURL:url 
+    = [[[NSAppleScript alloc] initWithContentsOfURL:url
                                               error:&error] autorelease];
   if (!error) {
     NSAppleEventDescriptor *desc = [grabScript executeAndReturnError:&error];
@@ -548,7 +560,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 }
 
 - (IBAction)selectCorpus:(id)sender {
-  
+
   NSInteger tag = [sender tag] - kBaseCorporaTagValue;
   HGSScoredResult *corpus = [[self corpora] objectAtIndex:tag];
   HGSResultArray *results = [HGSResultArray arrayWithResult:corpus];
@@ -560,10 +572,10 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   if (!modalWindow) {
     // a window must be "visible" for it to be key. This makes it "visible"
     // but invisible to the user so we can accept keystrokes while we are
-    // busy opening the window. We order it front as a invisible window, and 
+    // busy opening the window. We order it front as a invisible window, and
     // then slowly fade it in.
     NSWindow *searchWindow = [self window];
-    
+
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     if ([ud boolForKey:kQSBSearchWindowDimBackground]) {
       NSWindow *shieldWindow = [self shieldWindow];
@@ -571,8 +583,8 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
       if (![shieldWindow isVisible]) {
         [shieldWindow setAlphaValue:0.0];
         [shieldWindow makeKeyAndOrderFront:nil];
-      } 
-      CGFloat fadeDuration 
+      }
+      CGFloat fadeDuration
         = [ud floatForKey:kQSBSearchWindowDimBackgroundDuration];
       CGFloat fadeAlpha = [ud floatForKey:kQSBSearchWindowDimBackgroundAlpha];
       // If fadeDuration (or fadeAlpha) < FLT_EPSILON then the user is using
@@ -589,7 +601,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
       [[shieldWindow animator] setAlphaValue:fadeAlpha];
       [NSAnimationContext endGrouping];
     }
-    
+
     [(QSBCustomPanel *)searchWindow setCanBecomeKeyWindow:YES];
     [searchWindow setIgnoresMouseEvents:NO];
     [searchWindow makeKeyAndOrderFront:self];
@@ -599,13 +611,13 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
     [NSAnimationContext endGrouping];
     [searchWindow setAlphaValue:1.0];
     [welcomeController_ setHidden:NO];
-    
+
     if ([[searchTextField_ string] length]) {
-      displayResultsTimer_ 
-        = [NSTimer scheduledTimerWithTimeInterval:kQSBReshowResultsDelay 
-                                           target:self 
-                                         selector:@selector(displayResults:) 
-                                         userInfo:nil 
+      displayResultsTimer_
+        = [NSTimer scheduledTimerWithTimeInterval:kQSBReshowResultsDelay
+                                           target:self
+                                         selector:@selector(displayResults:)
+                                         userInfo:nil
                                           repeats:NO];
     }
   } else {
@@ -620,7 +632,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   if ([searchWindow ignoresMouseEvents]) {
     return;
   }
-  
+
   // Must be called BEFORE resignAsKeyWindow otherwise we call hide again
   [searchWindow setIgnoresMouseEvents:YES];
   [searchWindow setCanBecomeKeyWindow:NO];
@@ -628,7 +640,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   [[actionPresenter_ activeSearchController] stopQuery];
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   if ([ud boolForKey:kQSBSearchWindowDimBackground]) {
-    CGFloat fadeDuration 
+    CGFloat fadeDuration
       = [ud floatForKey:kQSBSearchWindowDimBackgroundDuration];
     if (fadeDuration < FLT_EPSILON) {
       // If fadeDuration < FLT_EPSILON then the user has set the duration
@@ -681,9 +693,9 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
     NSUInteger idx = [menuItem tag] - kBaseCorporaTagValue;
     if (idx < [corpora  count]) {
       HGSScoredResult *corpus = [corpora objectAtIndex:idx];
-      QSBSearchController *activeSearchController 
+      QSBSearchController *activeSearchController
         = [actionPresenter_ activeSearchController];
-      HGSResultArray *pivotObjects 
+      HGSResultArray *pivotObjects
         = [activeSearchController pivotObjects];
       if ([pivotObjects count] == 1) {
         HGSScoredResult *result = [pivotObjects objectAtIndex:0];
@@ -693,7 +705,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
       valid = NO;
     }
   }
-  
+
   return valid;
 }
 
@@ -718,12 +730,12 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 - (void)aWindowDidBecomeKey:(NSNotification *)notification {
   NSWindow *window = [notification object];
   NSWindow *searchWindow = [self window];
-  
+
   if ([window isEqual:searchWindow]) {
     if (needToUpdatePositionOnActivation_) {
       [self centerWindowOnScreen];
       needToUpdatePositionOnActivation_ = NO;
-    }  
+    }
     [queryResetTimer_ invalidate];
     queryResetTimer_ = nil;
 
@@ -741,12 +753,12 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
         }
       }
     }
-  } else if (![window isKindOfClass:[QLPreviewPanel class]] 
+  } else if (![window isKindOfClass:[QLPreviewPanel class]]
              && [searchWindow isVisible]) {
     // We check for QLPreviewPanel because we don't want to hide for quicklook
     [self hideSearchWindow:self];
   }
-  
+
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification {
@@ -756,10 +768,10 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   NSTimeInterval resetInterval = [ud floatForKey:kQSBResetQueryTimeoutPrefKey];
   // preset previously in awakeFromNib:
-  queryResetTimer_ = [NSTimer scheduledTimerWithTimeInterval:resetInterval 
-                                                      target:self 
-                                                    selector:@selector(resetQuery:) 
-                                                    userInfo:nil 
+  queryResetTimer_ = [NSTimer scheduledTimerWithTimeInterval:resetInterval
+                                                      target:self
+                                                    selector:@selector(resetQuery:)
+                                                    userInfo:nil
                                                      repeats:NO];
   BOOL hideWhenInactive = YES;
   NSNumber *hideNumber = [[NSUserDefaults standardUserDefaults]
@@ -794,14 +806,14 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 
 #pragma mark NSMenu Delegate Methods
 
-// Delegate callback for the window menu, this propogates the dropdown of 
+// Delegate callback for the window menu, this propogates the dropdown of
 // search sites
 - (void)menuNeedsUpdate:(NSMenu *)menu {
   // We have some items at the top and bottom of the menu that we don't want
   // to delete when we refresh it.
   const NSInteger kNumberOfItemsAtStartOfMenu = 2;
   const NSInteger kNumberOfItemsAtEndOfMenu = 3;
-  
+
   // If this isn't the expected menu return
   if ([windowMenuButton_ menu] != menu) return;
   NSUInteger menuItemCount = [menu numberOfItems] - kNumberOfItemsAtEndOfMenu;
@@ -813,12 +825,12 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   for (unsigned int i = 0; i < [corpora count]; i++) {
     HGSScoredResult *corpus = [corpora objectAtIndex:i];
     NSString *key = [[NSNumber numberWithUnsignedInt:i] stringValue];
-    NSMenuItem *item 
+    NSMenuItem *item
       = [[[NSMenuItem alloc] initWithTitle:[corpus displayName]
                                     action:@selector(selectCorpus:)
                              keyEquivalent:key]
          autorelease];
-    
+
     // Insert after the everything item
     [menu insertItem:item atIndex:i + 2];
     [item setTag:i + kBaseCorporaTagValue];
@@ -884,7 +896,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 - (BOOL)textView:(NSTextView *)textView
     doCommandBySelector:(SEL)commandSelector {
   BOOL handled = NO;
-  
+
   // If our results aren't visible, make them so.
   if (sel_isEqual(commandSelector, @selector(moveDown:))) {
     if ([[resultsWindowController_ window] ignoresMouseEvents]) {
@@ -892,7 +904,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
       handled = YES;
     }
   }
-  
+
   if (!handled) {
     NSTableView *tableView = [resultsWindowController_ activeTableView];
     if ([tableView respondsToSelector:commandSelector]) {
@@ -903,9 +915,9 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   return handled;
 }
 
-- (NSArray *)textView:(NSTextView *)textView 
-          completions:(NSArray *)words 
-  forPartialWordRange:(NSRange)charRange 
+- (NSArray *)textView:(NSTextView *)textView
+          completions:(NSArray *)words
+  forPartialWordRange:(NSRange)charRange
   indexOfSelectedItem:(int *)idx {
   *idx = 0;
   NSString *completion = nil;
@@ -919,14 +931,14 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
       completion = [result displayName];
       // If the query string is not a prefix of the completion then
       // ignore the completion.
-      if (![completion qsb_hasPrefix:queryString 
-                             options:(NSWidthInsensitiveSearch 
+      if (![completion qsb_hasPrefix:queryString
+                             options:(NSWidthInsensitiveSearch
                                       | NSCaseInsensitiveSearch
                                       | NSDiacriticInsensitiveSearch)]) {
         completion = nil;
       }
     }
-  }  
+  }
   return completion ? [NSArray arrayWithObject:completion] : nil;
 }
 
@@ -937,18 +949,18 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   NSString *pluginName = [userInfo objectForKey:kHGSPluginLoaderPluginNameKey];
   NSString *startupString = nil;
   if (pluginName) {
-    NSString *format = HGSLocalizedString(@"Starting up… Loading %@", 
+    NSString *format = HGSLocalizedString(@"Starting up… Loading %@",
                                           @"A string shown "
-                                          @"at launchtime to denote that QSB " 
+                                          @"at launchtime to denote that QSB "
                                           @"is starting up and is loading a "
                                           @"plugin.");
     startupString = [NSString stringWithFormat:format, pluginName];
   } else {
-    startupString = HGSLocalizedString(@"Starting up…", 
+    startupString = HGSLocalizedString(@"Starting up…",
                                        @"A string shown "
-                                       @"at launchtime to denote that QSB " 
+                                       @"at launchtime to denote that QSB "
                                        @"is starting up.");
-    
+
   }
   [searchTextField_ setString:startupString];
   [searchTextField_ display];
@@ -974,14 +986,14 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   [[searchTextField_ window] makeFirstResponder:searchTextField_];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   HGSPluginLoader *sharedLoader = [HGSPluginLoader sharedPluginLoader];
-  [nc removeObserver:self 
-                name:kHGSPluginLoaderWillLoadPluginNotification 
+  [nc removeObserver:self
+                name:kHGSPluginLoaderWillLoadPluginNotification
               object:sharedLoader];
-  [nc removeObserver:self 
-                name:kHGSPluginLoaderWillInstallPluginNotification 
+  [nc removeObserver:self
+                name:kHGSPluginLoaderWillInstallPluginNotification
               object:sharedLoader];
-  [nc removeObserver:self 
-                name:kHGSPluginLoaderDidInstallPluginsNotification 
+  [nc removeObserver:self
+                name:kHGSPluginLoaderDidInstallPluginsNotification
               object:sharedLoader];
 }
 
@@ -989,12 +1001,12 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 
 - (void)selectedTableResultDidChange:(NSNotification *)notification {
   [thumbnailView_ unbind:NSValueBinding];
-  QSBTableResult *tableResult 
+  QSBTableResult *tableResult
     = [[notification userInfo] objectForKey:kQSBSelectedTableResultKey];
   if (tableResult) {
-    [thumbnailView_ bind:NSValueBinding 
-                toObject:tableResult 
-             withKeyPath:@"displayThumbnail" 
+    [thumbnailView_ bind:NSValueBinding
+                toObject:tableResult
+             withKeyPath:@"displayThumbnail"
                  options:nil];
     [thumbnailView_ setHidden:NO];
   } else {
@@ -1006,7 +1018,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 }
 
 - (void)actionPresenterDidPivot:(NSNotification *)notification {
-  QSBActionPresenter *actionPresenter 
+  QSBActionPresenter *actionPresenter
     = GTM_STATIC_CAST(QSBActionPresenter, [notification object]);
   NSAttributedString *pivotString = [actionPresenter pivotAttributedString];
   [searchTextField_ setAttributedStringValue:pivotString];
@@ -1014,7 +1026,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 }
 
 - (void)actionPresenterDidUnpivot:(NSNotification *)notification {
-  QSBActionPresenter *actionPresenter 
+  QSBActionPresenter *actionPresenter
     = GTM_STATIC_CAST(QSBActionPresenter, [notification object]);
   NSAttributedString *pivotString = [actionPresenter pivotAttributedString];
   [searchTextField_ setAttributedStringValue:pivotString];
@@ -1035,7 +1047,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 }
 
 - (void)checkFindPasteboard:(NSTimer *)timer {
-  NSInteger newCount 
+  NSInteger newCount
     = [[NSPasteboard pasteboardWithName:NSFindPboard] changeCount];
   insertFindPasteBoardString_ = newCount != findPasteBoardChangeCount_;
   findPasteBoardChangeCount_ = newCount;
@@ -1071,7 +1083,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
     }
     if (NSMaxX(proposedFrame) > NSMaxX(screenFrame)) {
       proposedFrame.origin.x = NSMaxX(screenFrame) - NSWidth(proposedFrame);
-    }    
+    }
     if (proposedFrame.origin.x < screenFrame.origin.x) {
       proposedFrame.origin.x = screenFrame.origin.x;
     }

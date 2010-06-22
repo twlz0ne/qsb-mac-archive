@@ -78,6 +78,8 @@
 - (void)actionPresenterWillUnpivot:(NSNotification *)notification;
 - (void)actionPresenterDidUnpivot:(NSNotification *)notification;
 - (void)updateWindowHeightBasedOnTable:(QSBResultTableView *)tableView;
+- (void)tableViewDidReloadData:(NSNotification *)notification;
+- (void)updateTableHeight:(NSTimer *)timer;
 @end
 
 @implementation QSBResultsWindowController

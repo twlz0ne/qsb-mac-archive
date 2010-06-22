@@ -48,9 +48,9 @@
 #import "HGSTokenizer.h"
 #import <mach/mach_time.h>
 
-NSString *const kHGSQueryControllerWillStartNotification 
+NSString *const kHGSQueryControllerWillStartNotification
   = @"HGSQueryControllerWillStartNotification";
-NSString *const kHGSQueryControllerDidFinishNotification 
+NSString *const kHGSQueryControllerDidFinishNotification
   = @"HGSQueryControllerDidFinishNotification";
 NSString *const kHGSQueryControllerDidUpdateResultsNotification
   = @"HGSQueryControllerDidUpdateResultsNotification";
@@ -61,7 +61,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 // There is one per type filter.
 // It caches the results that we have already found for that particular filter,
 // as well as the maximum index that we have checked for each source.
-// The indexes are in the same order as 
+// The indexes are in the same order as
 @interface HGSConformingResultCache : NSObject {
  @private
   NSMutableArray *results_;
@@ -76,6 +76,9 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 @interface HGSQueryController()
 - (void)cancelPendingSearchOperations:(NSTimer*)timer;
 - (void)invalidateSlowSourceTimer;
+- (void)searchOperationWillStart:(NSNotification *)notification;
+- (void)searchOperationDidFinish:(NSNotification *)notification;
+- (void)searchOperationDidUpdateResults:(NSNotification *)notification;
 @end
 
 @implementation HGSQueryController
@@ -117,10 +120,10 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 
 - (void)startQuery {
   // Spin through the Sources checking to see if they are valid for the source
-  // and kick off the SearchOperations.  
+  // and kick off the SearchOperations.
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc postNotificationName:kHGSQueryControllerWillStartNotification object:self];
-  HGSSearchSourceRanker *sourceRanker 
+  HGSSearchSourceRanker *sourceRanker
     = [HGSSearchSourceRanker sharedSearchSourceRanker];
   for (HGSSearchSource *source in [sourceRanker orderedSourcesByPerformance]) {
     // Check if the source likes the query string
@@ -128,17 +131,17 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
       HGSSearchOperation* operation;
       operation = [source searchOperationForQuery:parsedQuery_];
       if (operation) {
-        [nc addObserver:self 
+        [nc addObserver:self
                selector:@selector(searchOperationWillStart:)
                    name:kHGSSearchOperationWillStartNotification
                  object:operation];
-        [nc addObserver:self 
-               selector:@selector(searchOperationDidFinish:) 
-                   name:kHGSSearchOperationDidFinishNotification 
+        [nc addObserver:self
+               selector:@selector(searchOperationDidFinish:)
+                   name:kHGSSearchOperationDidFinishNotification
                  object:operation];
-        [nc addObserver:self 
-               selector:@selector(searchOperationDidUpdateResults:) 
-                   name:kHGSSearchOperationDidUpdateResultsNotification 
+        [nc addObserver:self
+               selector:@selector(searchOperationDidUpdateResults:)
+                   name:kHGSSearchOperationDidUpdateResultsNotification
                  object:operation];
         [queryOperations_ addObject:operation];
         [pendingQueryOperations_ addObject:operation];
@@ -146,7 +149,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
     }
   }
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  BOOL alwaysRunOnMainThread 
+  BOOL alwaysRunOnMainThread
     = [defaults boolForKey:@"runQSBSearchesOnMainThread"];
   UInt64 startUpTime = 0;
   // We will run up to 50 ms of queries on the main thread. This cuts
@@ -157,7 +160,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   for (HGSSearchOperation *operation in queryOperations_) {
     HGSSearchSource *source = [operation source];
     UInt64 averageTimeForSource = [sourceRanker averageTimeForSource:source];
-    BOOL runOnMainThread = ((averageTimeForSource > 0) 
+    BOOL runOnMainThread = ((averageTimeForSource > 0)
                             && ((startUpTime + averageTimeForSource) < waitTime));
     if (runOnMainThread) {
       startUpTime += averageTimeForSource;
@@ -167,14 +170,14 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 #if DEBUG
   for (HGSSearchOperation *op in pendingQueryOperations_) {
     NSString *identifier = [[op source] identifier];
-    if ([identifier isEqual:@"com.google.qsb.shortcuts.source"] 
+    if ([identifier isEqual:@"com.google.qsb.shortcuts.source"]
         || [identifier isEqual:@"com.google.qsb.plugin.Applications"]) {
       NSMutableArray *runOperations = [[queryOperations_ mutableCopy] autorelease];
       [runOperations removeObjectsInArray:pendingQueryOperations_];
-      
+
       HGSLog(@"*** APPLICATION OR SHORTCUT SOURCE NOT RUN ON MAINTHREAD ***\n"
              @"Please check for performance issue of these sources.\n"
-             @"Pending Ops: %@\n\n------\n\nRun Ops: %@", 
+             @"Pending Ops: %@\n\n------\n\nRun Ops: %@",
              pendingQueryOperations_, runOperations);
       break;
     }
@@ -184,14 +187,14 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
   // reports in; if we don't have any sources that will never happen, so just
   // call the query done immediately.
   if ([queryOperations_ count] == 0) {
-    [nc postNotificationName:kHGSQueryControllerDidFinishNotification 
+    [nc postNotificationName:kHGSQueryControllerDidFinishNotification
                       object:self];
   } else {
     // we kick off a timer to pull the plug on any really slow sources.
     NSUserDefaults *sd = [NSUserDefaults standardUserDefaults];
     NSTimeInterval slowSourceTimeout
       = [sd doubleForKey:kQuerySlowSourceTimeoutSecondsPrefKey];
-    HGSAssert(!slowSourceTimer_, 
+    HGSAssert(!slowSourceTimer_,
               @"We shouldn't start a timer without it having been invalidated");
     slowSourceTimer_
       = [NSTimer scheduledTimerWithTimeInterval:slowSourceTimeout
@@ -220,7 +223,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 
   NSUserDefaults *sd = [NSUserDefaults standardUserDefaults];
   BOOL doLog = [sd boolForKey:kHGSValidateSearchSourceBehaviorsPrefKey];
-  
+
   // Loop back to front so we can remove things as we go
   for (NSUInteger idx = [pendingQueryOperations_ count]; idx > 0; --idx) {
     HGSSearchOperation *operation
@@ -259,7 +262,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 
 - (BOOL)isCancelled {
   return cancelled_;
-}  
+}
 
 - (NSUInteger)resultCountForFilter:(HGSTypeFilter *)typeFilter {
   NSUInteger count = 0;
@@ -269,13 +272,13 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
     if ([sourceFilter intersectsWithFilter:typeFilter]) {
       NSUInteger opCount = [op resultCountForFilter:typeFilter];
       count += opCount;
-    } 
+    }
   }
   return count;
 }
 
 - (HGSConformingResultCache *)cachedResultsForFilter:(HGSTypeFilter *)filter {
-  HGSConformingResultCache *cache 
+  HGSConformingResultCache *cache
     = [conformingResultsCache_ objectForKey:filter];
   if (!cache) {
     NSUInteger opsCount = [queryOperationsWithResults_ count];
@@ -296,7 +299,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
     NSUInteger *opsIndexes = [cache indexes];
     NSUInteger rankedCount = [rankedResults count];
     if (maxRange > rankedCount) {
-      NSArray *queryOperationsWithResults 
+      NSArray *queryOperationsWithResults
         = [queryOperationsWithResults_ allObjects];
       NSUInteger opsCount = [queryOperationsWithResults count];
       NSUInteger *opsMaxIndexes = malloc(sizeof(NSUInteger) * opsCount);
@@ -307,7 +310,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
         NSUInteger maxIndex = 0;
         if ([sourceFilter intersectsWithFilter:typeFilter]) {
           maxIndex = [op resultCountForFilter:typeFilter];
-        } 
+        }
         opsMaxIndexes[j] = maxIndex;
         j = j + 1;
       }
@@ -317,18 +320,18 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
         for (NSUInteger i = 0; i < opsCount; ++i) {
           HGSScoredResult *testRankedResult = nil;
           NSUInteger opMaxIndex = opsMaxIndexes[i];
-          for (NSUInteger opIndex = opsIndexes[i]; 
-               opIndex < opMaxIndex; 
+          for (NSUInteger opIndex = opsIndexes[i];
+               opIndex < opMaxIndex;
                ++opIndex) {
             // Operations can return nil results.
-            HGSSearchOperation *op 
+            HGSSearchOperation *op
               = [queryOperationsWithResults objectAtIndex:i];
             testRankedResult = [op sortedRankedResultAtIndex:opIndex
                                                   typeFilter:typeFilter];
-            if (testRankedResult) {  
+            if (testRankedResult) {
               NSInteger compare = NSOrderedAscending;
               if (newRankedResult) {
-                compare = HGSMixerScoredResultSort(testRankedResult, 
+                compare = HGSMixerScoredResultSort(testRankedResult,
                                                    newRankedResult, nil);
               }
               if (compare == NSOrderedAscending) {
@@ -345,17 +348,17 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
             NSUInteger resultIndex = 0;
             for (HGSScoredResult *scoredResult in rankedResults) {
               if ([scoredResult isDuplicate:newRankedResult]) {
-                NSInteger order = HGSMixerScoredResultSort(newRankedResult, 
-                                                           scoredResult, 
+                NSInteger order = HGSMixerScoredResultSort(newRankedResult,
+                                                           scoredResult,
                                                            NULL);
                 if (order == NSOrderedAscending) {
-                  newRankedResult 
+                  newRankedResult
                     = [newRankedResult resultByAddingAttributesFromResult:scoredResult];
                 } else {
-                  newRankedResult 
+                  newRankedResult
                     = [scoredResult resultByAddingAttributesFromResult:newRankedResult];
                 }
-                [rankedResults replaceObjectAtIndex:resultIndex 
+                [rankedResults replaceObjectAtIndex:resultIndex
                                          withObject:newRankedResult];
                 newRankedResult = nil;
                 break;
@@ -381,14 +384,14 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
       finalRankedResults = [rankedResults subarrayWithRange:range];
     }
   }
-  return finalRankedResults;  
+  return finalRankedResults;
 }
 
 - (NSString*)description {
-  return [NSString stringWithFormat:@"%@ - Predicate:%@ Operations:%@", 
+  return [NSString stringWithFormat:@"%@ - Predicate:%@ Operations:%@",
           [super description], parsedQuery_, queryOperations_];
 }
-          
+
 #pragma mark Notifications
 
 - (void)searchOperationWillStart:(NSNotification *)notification {
@@ -415,18 +418,18 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 - (void)searchOperationDidFinish:(NSNotification *)notification {
   HGSSearchOperation *operation = [notification object];
   HGSAssert([pendingQueryOperations_ containsObject:operation],
-            @"ERROR: Received duplicate finished notifications from operation %@", 
+            @"ERROR: Received duplicate finished notifications from operation %@",
             [operation description]);
 
   [pendingQueryOperations_ removeObject:operation];
   HGSSearchSource *source = [operation source];
-  
+
   // If this is the last query operation to complete then report as overall
   // query completion and cancel our timer.
   if ([self queriesFinished]) {
     [self invalidateSlowSourceTimer];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc postNotificationName:kHGSQueryControllerDidFinishNotification 
+    [nc postNotificationName:kHGSQueryControllerDidFinishNotification
                       object:self];
   }
   if (VERMILION_SEARCH_FINISH_ENABLED()) {
@@ -442,7 +445,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
 //
 // -searchOperationDidUpdateResults:
 //
-// Called when a source has added more results. 
+// Called when a source has added more results.
 //
 - (void)searchOperationDidUpdateResults:(NSNotification *)notification {
   HGSSearchOperation *operation = [notification object];
@@ -453,7 +456,7 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
     [conformingResultsCache_ removeAllObjects];
   }
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc postNotificationName:kHGSQueryControllerDidUpdateResultsNotification 
+  [nc postNotificationName:kHGSQueryControllerDidUpdateResultsNotification
                     object:self];
 }
 

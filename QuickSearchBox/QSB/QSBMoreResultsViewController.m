@@ -42,6 +42,7 @@
 #import "QSBResultsViewTableView.h"
 #import "NSAttributedString+Attributes.h"
 #import "QSBMoreResultsResultCell.h"
+#import "QSBResultsWindowController.h"
 
 // Extra space to allow for miscellaneous rows (such as fold) in the results table.
 static const NSUInteger kCategoryRowOverhead = 3;
@@ -49,6 +50,7 @@ static const NSTimeInterval kFirstRowDownwardDelay = 0.6;
 static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 
 @interface QSBMoreResultsViewController ()
+
 // Given a category, should we show a "Show all" result for it?
 - (BOOL)shouldDisplayShowAllResultForCategory:(QSBCategory *)category;
 - (QSBTableResult *)cachedTableResultForRow:(NSInteger)row;
@@ -56,6 +58,9 @@ static const NSTimeInterval kFirstRowUpwardDelay = 0.4;
 - (void)uncacheTableResultForRow:(NSInteger)row;
 - (void)uncacheAllTableResults;
 - (void)addShowAllCategory:(QSBCategory *)category;
+- (void)moreCategoryResultCountChanged:(GTMKeyValueChangeNotification *)notification;
+- (void)maxMoreResultCountBeforeAbridgingChanged:(GTMKeyValueChangeNotification *)notification;
+
 @end
 
 @implementation QSBMoreResultsViewController
@@ -64,7 +69,7 @@ GTM_METHOD_CHECK(NSMutableAttributedString, addAttributes:);
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
 
 - (id)initWithSearchController:(QSBSearchController *)controller {
-  if ((self = [super initWithSearchController:controller 
+  if ((self = [super initWithSearchController:controller
                                       nibName:@"QSBMoreResultsView"])) {
     showAllCategoriesSet_ = [[NSMutableSet alloc] init];
     cachedRows_ = [[NSMutableDictionary alloc] init];
@@ -80,16 +85,16 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
                   selector:@selector(maxMoreResultCountBeforeAbridgingChanged:)
                   userInfo:nil
                    options:NSKeyValueObservingOptionNew];
-    
-    moreCategoryResultCount_ 
+
+    moreCategoryResultCount_
       = [prefs integerForKey:kQSBMoreCategoryResultCountKey];
-    maxMoreResultCountBeforeAbridging_ 
+    maxMoreResultCountBeforeAbridging_
       = [prefs integerForKey:kQSBMaxMoreResultCountBeforeAbridgingKey];
   }
   return self;
 }
 
-- (void)awakeFromNib {  
+- (void)awakeFromNib {
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
   [resultsTableView setIntercellSpacing:NSMakeSize(0.0, 3.0)];
   [resultsTableView setMaxTableHeight:550.0];
@@ -173,7 +178,7 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
       NSUInteger categoryIndex = [separatorRows_ countOfIndexesInRange:range];
 
       QSBCategory *category = [sortedCategories_ objectAtIndex:categoryIndex];
-      
+
       // Determine if we should add a showall.
       if (endRow == row
           && [self shouldDisplayShowAllResultForCategory:category]) {
@@ -182,7 +187,7 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
                                                           count:count];
       }
       if (!object) {
-        QSBSearchController *searchController 
+        QSBSearchController *searchController
           = [self searchController];
         NSUInteger startRow = [separatorRows_ indexLessThanIndex:endRow];
         if (startRow == NSNotFound) {
@@ -211,7 +216,7 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   NSInteger row = [tableView selectedRow];
   NSRange range = NSMakeRange(0, row);
   NSUInteger categoryIndex = [separatorRows_ countOfIndexesInRange:range];
-  
+
   QSBCategory *category = [sortedCategories_ objectAtIndex:categoryIndex];
   [self addShowAllCategory:category];
 }
@@ -222,17 +227,17 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   // Force our category lists and indexes to be regenerated.
   // The selection gets lost so save/restore the selection.
   [self updateTableData];
- 
+
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
   NSUInteger selectedRow = [resultsTableView selectedRow];
   [resultsTableView reloadData];
   [resultsTableView selectRow:selectedRow byExtendingSelection:NO];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  NSDictionary *userInfo 
-    = [NSDictionary dictionaryWithObject:category 
+  NSDictionary *userInfo
+    = [NSDictionary dictionaryWithObject:category
                                   forKey:kQSBMoreResultsCategoryKey];
-  [nc postNotificationName:kQSBMoreResultsDidShowCategoryNotification 
-                    object:self 
+  [nc postNotificationName:kQSBMoreResultsDidShowCategoryNotification
+                    object:self
                   userInfo:userInfo];
 }
 
@@ -256,8 +261,8 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
       HGSResult *hgsResult = [(QSBSourceTableResult *)result representedResult];
       HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
       [provider cancelOperationsForResult:hgsResult];
-      [result gtm_removeObserver:self 
-                      forKeyPath:@"displayIcon" 
+      [result gtm_removeObserver:self
+                      forKeyPath:@"displayIcon"
                         selector:@selector(displayIconUpdated:)];
     }
   }
@@ -268,9 +273,9 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
     NSNumber *key = [NSNumber numberWithInteger:row];
     [self removeCachedTableResultObserver:key];
     if ([result isKindOfClass:[QSBSourceTableResult class]]) {
-      [result gtm_addObserver:self forKeyPath:@"displayIcon" 
-                     selector:@selector(displayIconUpdated:) 
-                     userInfo:key 
+      [result gtm_addObserver:self forKeyPath:@"displayIcon"
+                     selector:@selector(displayIconUpdated:)
+                     userInfo:key
                       options:0];
     }
     [cachedRows_ setObject:result forKey:key];
@@ -297,13 +302,13 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
 - (void)moveUp:(id)sender {
   QSBResultsViewTableView *tableView = [self resultsTableView];
   NSInteger row = [tableView selectedRow];
-  
+
   NSTimeInterval timeToBlock = 0.0;
-  
+
   if (row == 0) {
-    timeToBlock = kFirstRowUpwardDelay; 
+    timeToBlock = kFirstRowUpwardDelay;
   }
-  
+
   NSEvent *event = [NSApp currentEvent];
   if (timeToBlock > 0
       && [event type] == NSKeyDown
@@ -312,10 +317,10 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
       blockTime_ = [NSDate timeIntervalSinceReferenceDate];
     }
     if ([NSDate timeIntervalSinceReferenceDate] - blockTime_ < timeToBlock) {
-      return; 
+      return;
     }
   }
-  
+
   if (row == 0) {
     // If we're on the first row then transition to the 'Top' results view.
     [NSApp sendAction:@selector(qsb_showTopResults:) to:nil from:self];
@@ -331,20 +336,20 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
 - (void)moveDown:(id)sender {
   QSBResultsViewTableView *tableView = [self resultsTableView];
   NSInteger row = [tableView selectedRow];
-  
+
   NSTimeInterval timeToBlock = 0.0;
-  
+
   if (row == 0) {
-    timeToBlock = kFirstRowDownwardDelay; 
+    timeToBlock = kFirstRowDownwardDelay;
   }
   // TODO(alcor): This is disabled until further experimentation can be done
   // else {
   //    NSObject *result = [self objectForRow:row - 1];
   //    if ([result isKindOfClass:[QSBSeparatorTableResult class]]) {
   //      timeToBlock = 0.2;
-  //    }    
+  //    }
   //  }
-  
+
   NSEvent *event = [NSApp currentEvent];
   if (timeToBlock > 0
       && [event type] == NSKeyDown
@@ -353,7 +358,7 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
       blockTime_ = [NSDate timeIntervalSinceReferenceDate];
     }
     if ([NSDate timeIntervalSinceReferenceDate] - blockTime_ < timeToBlock) {
-      return; 
+      return;
     }
   }
   blockTime_ = -1;
@@ -367,8 +372,8 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   return rowCount_;
 }
 
-- (id)tableView:(NSTableView *)aTableView 
-objectValueForTableColumn:(NSTableColumn *)aTableColumn 
+- (id)tableView:(NSTableView *)aTableView
+objectValueForTableColumn:(NSTableColumn *)aTableColumn
             row:(NSInteger)rowIndex {
   // Need to return something here because NSTableView requires we override
   // this method as a datasource. We actually set our cell's data in
@@ -377,7 +382,7 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn
 }
 
 - (void)qsbTableView:(NSTableView*)view
-changedVisibleRowsFrom:(NSRange)oldVisible 
+changedVisibleRowsFrom:(NSRange)oldVisible
                   to:(NSRange)newVisible {
   // Remove the rows that are no longer visible from our cache.
   NSRange indexesToRemove;
@@ -388,8 +393,8 @@ changedVisibleRowsFrom:(NSRange)oldVisible
     indexesToRemove.location = NSMaxRange(newVisible);
     indexesToRemove.length = NSMaxRange(oldVisible) - NSMaxRange(newVisible);
   }
-  for (NSUInteger i = indexesToRemove.location; 
-       i < NSMaxRange(indexesToRemove); 
+  for (NSUInteger i = indexesToRemove.location;
+       i < NSMaxRange(indexesToRemove);
        ++i) {
     [self uncacheTableResultForRow:i];
   }
@@ -399,11 +404,11 @@ changedVisibleRowsFrom:(NSRange)oldVisible
 
 - (void)searchControllerDidUpdateResults:(NSNotification *)notification {
   NSDictionary *userInfo = [notification userInfo];
-  NSDictionary *resultCountByCategory 
+  NSDictionary *resultCountByCategory
     = [userInfo objectForKey:kQSBSearchControllerResultCountByCategoryKey];
   [resultCountByCategory_ release];
   resultCountByCategory_ = [resultCountByCategory retain];
-  NSNumber *resultCount 
+  NSNumber *resultCount
     = [userInfo objectForKey:kQSBSearchControllerResultCountKey];
   resultCount_ = [resultCount unsignedIntegerValue];
   [self updateTableData];

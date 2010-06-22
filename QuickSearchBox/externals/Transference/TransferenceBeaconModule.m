@@ -47,7 +47,11 @@ NSString *const kUnknownPluginIdentifier = @"Unknown Plugin Identitifer";
 // Strips the source string description to make it more human readable.
 //
 - (NSDictionary *)searchSourceDictionaryForObject:(id)searchObject;
-
+- (void)pluginsDidInstall:(NSNotification *)aNotification;
+- (void)HGSQueryControllerWillStart:(NSNotification *)aNotification;
+- (void)HGSQueryControllerDidFinish:(NSNotification *)aNotification;
+- (void)HGSSearchOperationWillStart:(NSNotification *)aNotification;
+- (void)HGSSearchOperationDidFinish:(NSNotification *)aNotification;
 @end
 
 @implementation TransferenceBeaconModule

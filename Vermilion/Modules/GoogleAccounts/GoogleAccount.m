@@ -79,7 +79,7 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
 @property (nonatomic, assign) BOOL forceNonHosted;
 
 // Common function for preparing an authentication fetcher.
-// TODO(mrossetti): 1960732: Rework |accountType| when addressed.  
+// TODO(mrossetti): 1960732: Rework |accountType| when addressed.
 - (GDataHTTPFetcher *)authFetcherForPassword:(NSString *)password
                                   parameters:(NSDictionary *)params
                                  accountType:(NSString *)accountType;
@@ -90,6 +90,10 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
 
 // Check the authentication results to see if the account authenticated.
 - (BOOL)validateResult:(NSData *)result;
+
+// Fetched delegate methods
+- (void)fetcher:(GDataHTTPFetcher *)authFetcher finishedWithData:(NSData *)data;
+- (void)fetcher:(GDataHTTPFetcher *)authFetcher failedWithError:(NSError *)error;
 
 @end
 
@@ -142,7 +146,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 - (NSString *)adjustUserName:(NSString *)userName {
   if ([userName rangeOfString:@"@"].location == NSNotFound) {
-    NSString *countryGMailCom 
+    NSString *countryGMailCom
       = HGSLocalizedString(@"@gmail.com", @"The gmail domain extension.");
     userName = [userName stringByAppendingString:countryGMailCom];
   }
@@ -207,7 +211,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     }
     authenticated = [self authSucceeded];
   }
-  
+
   if (!authenticated && hosted) {
     // Try again, this time forcing non-hosted.
     authFetcher = [self authFetcherForPassword:password
@@ -387,7 +391,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
       if ([key isEqualToString:kGDataHTTPFetcherStatusDataKey]) {
         NSData *data = [userInfo objectForKey:kGDataHTTPFetcherStatusDataKey];
         if ([data length]) {
-          dataString = [[[NSString alloc] initWithData:data 
+          dataString = [[[NSString alloc] initWithData:data
                                               encoding:NSUTF8StringEncoding]
                         autorelease];
           if (dataString) {

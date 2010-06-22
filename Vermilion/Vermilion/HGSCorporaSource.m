@@ -40,7 +40,7 @@
 #import "HGSResult.h"
 #import "HGSType.h"
 
-NSString *const kHGSCorporaDefinitionsKey 
+NSString *const kHGSCorporaDefinitionsKey
   = @"HGSCorporaDefinitions";  // NSArray of NSDictionaries
 NSString *const kHGSCorporaSourceAttributeHideFromiPhoneKey
   = @"HGSCorporaSourceAttributeHideFromiPhone";  // BOOL
@@ -51,6 +51,7 @@ NSString *const kHGSCorporaSourceAttributeHideFromDropdownKey
 
 @interface HGSCorporaSource ()
 - (BOOL)loadCorpora:(NSArray *)corpora;
+- (void)didAddOrRemoveAccount:(NSNotification *)notification;
 @end
 
 @implementation HGSCorporaSource
@@ -67,13 +68,13 @@ NSString *const kHGSCorporaSourceAttributeHideFromDropdownKey
     }
     HGSExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(didAddOrRemoveAccount:) 
-               name:kHGSExtensionPointDidAddExtensionNotification 
+    [nc addObserver:self
+           selector:@selector(didAddOrRemoveAccount:)
+               name:kHGSExtensionPointDidAddExtensionNotification
              object:accountsPoint];
-    [nc addObserver:self 
-           selector:@selector(didAddOrRemoveAccount:) 
-               name:kHGSExtensionPointDidRemoveExtensionNotification 
+    [nc addObserver:self
+           selector:@selector(didAddOrRemoveAccount:)
+               name:kHGSExtensionPointDidRemoveExtensionNotification
              object:accountsPoint];
   }
   return self;
@@ -88,24 +89,24 @@ NSString *const kHGSCorporaSourceAttributeHideFromDropdownKey
   [super dealloc];
 }
 
-- (NSString *)uriForCorpus:(NSDictionary *)corpusDict 
+- (NSString *)uriForCorpus:(NSDictionary *)corpusDict
                    account:(HGSAccount *)account {
   return [corpusDict objectForKey:kHGSObjectAttributeURIKey];
 }
 
-- (NSString *)webSearchTemplateForCorpus:(NSDictionary *)corpusDict 
+- (NSString *)webSearchTemplateForCorpus:(NSDictionary *)corpusDict
                                  account:(HGSAccount *)account {
   return [corpusDict objectForKey:kHGSObjectAttributeWebSearchTemplateKey];
 }
 
-- (NSString *)displayNameForCorpus:(NSDictionary *)corpusDict 
+- (NSString *)displayNameForCorpus:(NSDictionary *)corpusDict
                            account:(HGSAccount *)account {
   NSBundle *bundle = [self bundle];
   NSString *name = [corpusDict objectForKey:kHGSObjectAttributeNameKey];
   return [bundle qsb_localizedInfoPListStringForKey:name];
 }
 
-- (HGSResult *)resultForCorpus:(NSDictionary *)corpusDict 
+- (HGSResult *)resultForCorpus:(NSDictionary *)corpusDict
                        account:(HGSAccount *)account {
 #if TARGET_OS_IPHONE
   if ([corpusDict objectForKey:kHGSCorporaSourceAttributeHideFromiPhoneKey]) {
@@ -116,30 +117,30 @@ NSString *const kHGSCorporaSourceAttributeHideFromDropdownKey
     return nil;
   }
 #endif  // TARGET_OS_IPHONE
-  
+
   NSString *identifier = [self uriForCorpus:corpusDict account:account];
   NSString *name = [self displayNameForCorpus:corpusDict account:account];
 
-  NSMutableDictionary *objectDict 
+  NSMutableDictionary *objectDict
     = [NSMutableDictionary dictionaryWithDictionary:corpusDict];
   [objectDict setObject:identifier forKey:kHGSObjectAttributeURIKey];
   [objectDict setObject:identifier forKey:kHGSObjectAttributeSourceURLKey];
   [objectDict setObject:name forKey:kHGSObjectAttributeNameKey];
-  
+
   NSString *webTemplate = [self webSearchTemplateForCorpus:corpusDict
                                                    account:account];
   if (webTemplate) {
-    [objectDict setObject:webTemplate 
+    [objectDict setObject:webTemplate
                    forKey:kHGSObjectAttributeWebSearchTemplateKey];
   }
-    
-  NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag];  
+
+  NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSLaunchableRankFlag];
   [objectDict setObject:rankFlags forKey:kHGSObjectAttributeRankFlagsKey];
-  
+
   [objectDict setObject:kHGSTypeWebApplication
                  forKey:kHGSObjectAttributeTypeKey];
-  
-  NSString *iconName 
+
+  NSString *iconName
     = [objectDict objectForKey:kHGSObjectAttributeIconPreviewFileKey];
   if (iconName) {
 #if TARGET_OS_IPHONE
@@ -157,7 +158,7 @@ NSString *const kHGSCorporaSourceAttributeHideFromDropdownKey
   }
   HGSUnscoredResult *corpus = [HGSUnscoredResult resultWithDictionary:objectDict
                                                                source:self];
-  return corpus;  
+  return corpus;
 }
 
 
@@ -166,9 +167,9 @@ NSString *const kHGSCorporaSourceAttributeHideFromDropdownKey
   // Initialization code
   NSMutableArray *allCorpora = [NSMutableArray array];
   HGSAccountsExtensionPoint *accountsPoint = [HGSExtensionPoint accountsPoint];
-  
+
   for (NSDictionary *corpusDict in corpora) {
-    NSString *accountType 
+    NSString *accountType
       = [corpusDict objectForKey:kHGSAccountTypeKey];
     if (accountType) {
       NSArray *accounts
@@ -182,30 +183,30 @@ NSString *const kHGSCorporaSourceAttributeHideFromDropdownKey
       if (corpus) [allCorpora addObject:corpus];
     }
   }
-  
+
   NSMutableArray *searchableCorpora = [NSMutableArray array];
-  
+
   for (HGSResult *corpus in allCorpora) {
     if ([corpus valueForKey:kHGSObjectAttributeWebSearchTemplateKey]
     && ![[corpus valueForKey:kHGSCorporaSourceAttributeHideFromDropdownKey] boolValue]) {
       [searchableCorpora addObject:corpus];
     }
   }
-  
+
   [validCorpora_ autorelease];
   [searchableCorpora_ autorelease];
-  
+
   validCorpora_ = [allCorpora retain];
   searchableCorpora_ = [searchableCorpora retain];
- 
+
   HGSMemorySearchSourceDB *db = [HGSMemorySearchSourceDB database];
-  
+
   for (HGSResult *corpus in allCorpora) {
     [db indexResult:corpus];
   }
-  
+
   [self replaceCurrentDatabaseWith:db];
-  
+
   return YES;
 }
 

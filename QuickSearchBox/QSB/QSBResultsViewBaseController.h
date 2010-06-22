@@ -59,7 +59,10 @@
 - (QSBTableResult *)tableResultForRow:(NSInteger)row;
 
 // Respond to a click in the path control.
-- (void)pathControlClick:(id)sender;
+- (IBAction)pathControlClick:(id)sender;
+
+// Pick the currently selected table result.
+- (IBAction)qsb_pickCurrentTableResult:(id)sender;
 
 // Called when the results have been updated.
 - (void)searchControllerDidUpdateResults:(NSNotification *)notification;

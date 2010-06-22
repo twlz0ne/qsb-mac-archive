@@ -79,6 +79,7 @@ enum ITunesAppPlayingState {
 }
 
 - (BOOL)isPlaying;
+- (void)iTunesPlayerInfoNotification:(NSNotification *)notification;
 @end
 
 @interface ITunesActionSupport : NSObject {
