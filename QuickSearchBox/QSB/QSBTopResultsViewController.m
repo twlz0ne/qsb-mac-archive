@@ -118,7 +118,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
   } else if ([identifier isEqual:@"Results"]) {
     value = result;
   } else {
-    HGSAssert(@"Unknown table identifier %@ for %@", identifier, tableView);
+    HGSLogDebug(@"Unknown table identifier %@ for %@", identifier, tableView);
   }
   return value;
 }

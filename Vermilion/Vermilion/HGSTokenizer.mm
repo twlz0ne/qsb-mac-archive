@@ -355,6 +355,5 @@ static NSDictionary *gHGSTokenizerExceptions = nil;
   return [self retain];
 }
 
-@synthesize tokenizedString = tokenizedString_;
 @end
 
