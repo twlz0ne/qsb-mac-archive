@@ -141,7 +141,7 @@ GTM_METHOD_CHECK(NSEnumerator,
 #pragma mark Docs Fetching
 
 - (GDataServiceTicket *)fetchTicketForService:(GDataServiceGoogle *)service {
-  NSURL *docURL = [GDataServiceGoogleDocs docsFeedURLUsingHTTPS:YES];
+  NSURL *docURL = [GDataServiceGoogleDocs docsFeedURL];
   return [service fetchFeedWithURL:docURL
                           delegate:self
                  didFinishSelector:@selector(docFeedTicket:
