@@ -62,7 +62,7 @@
 @interface FileSystemSetCommentAction : HGSAction
 @end
 
-@interface FileSystemQuickLookAction : HGSAction {
+@interface FileSystemQuickLookAction : HGSAction <NSComboBoxDataSource> {
  @private
   NSArray *urls_;
 }
@@ -89,9 +89,9 @@
 @implementation FileSystemOpenWithAction
 
 - (BOOL)performWithInfo:(NSDictionary *)info {
-  HGSResultArray *directObjects 
+  HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
-  HGSResultArray *apps 
+  HGSResultArray *apps
     = [info objectForKey:@"com.google.core.filesystem.action.openwith.application"];
   NSArray *appURLs = [apps urls];
   NSArray *directURLs = [directObjects urls];
@@ -115,7 +115,7 @@
 
 - (void)willScoreForQuery:(HGSQuery *)query {
   HGSActionOperation *actionOperation = [query actionOperation];
-  HGSResultArray *directTypes 
+  HGSResultArray *directTypes
     = [actionOperation argumentForKey:kHGSActionDirectObjectsKey];
   if ([directTypes count]) {
     HGSResult *theDirectType = [directTypes objectAtIndex:0];
@@ -126,19 +126,19 @@
     } else {
       directTypeURL = (CFURLRef)[theDirectType url];
     }
-    appURLs_ = (NSArray *)LSCopyApplicationURLsForURL(directTypeURL, 
+    appURLs_ = (NSArray *)LSCopyApplicationURLsForURL(directTypeURL,
                                                       kLSRolesAll);
-    OSStatus err = LSGetApplicationForURL(directTypeURL, 
-                                          kLSRolesAll, 
-                                          NULL, 
+    OSStatus err = LSGetApplicationForURL(directTypeURL,
+                                          kLSRolesAll,
+                                          NULL,
                                           (CFURLRef *)&defaultURL_);
-    HGSCheckDebug(err == noErr, nil);
+    HGSCheckDebug(err == noErr, @"");
   } else {
-    HGSLogDebug(@"No direct types for %@ for %@", 
+    HGSLogDebug(@"No direct types for %@ for %@",
                 actionOperation, [self class]);
   }
 }
-  
+
 - (void)didScoreForQuery:(HGSQuery *)query {
   [appURLs_ release];
   appURLs_ = nil;
@@ -146,7 +146,7 @@
   defaultURL_ = nil;
 }
 
-- (HGSScoredResult *)scoreResult:(HGSScoredResult *)result 
+- (HGSScoredResult *)scoreResult:(HGSScoredResult *)result
                         forQuery:(HGSQuery *)query {
   HGSScoredResult *outResult = nil;
   if ([result conformsToType:kHGSTypeFileApplication]) {
@@ -165,7 +165,7 @@
       if ([appURL isEqual:defaultURL_]) {
         score = HGSCalibratedScore(kHGSCalibratedPerfectScore);
       }
-      
+
       outResult = [HGSScoredResult resultWithResult:result
                                               score:score
                                          flagsToSet:0
@@ -217,13 +217,13 @@
     } else {
       HGSResult *result = [results objectAtIndex:0];
       NSURL *url = [result url];
-    
+
       BOOL isDirectory = NO;
       if ([url isFileURL]) {
         [[NSFileManager defaultManager] fileExistsAtPath:[url path]
                                              isDirectory:&isDirectory];
       }
-      
+
       if (isDirectory) {
         NSWorkspace *ws = [NSWorkspace sharedWorkspace];
         NSString *finderPath
@@ -265,39 +265,39 @@
 // from one another with the background icon faded out.
 - (NSImage *)openAgainIconFromImage:(NSImage *)image {
   NSInteger sizes[] = {128, 32};
-  NSImage *finalImage 
+  NSImage *finalImage
     = [[[NSImage alloc] initWithSize:NSMakeSize(128, 128)] autorelease];
   for (size_t i = 0; i < sizeof(sizes) / sizeof(sizes[0]); ++i) {
     NSInteger size = sizes[i];
     NSInteger quarterSize = size / 4;
-    NSBitmapImageRep *imageRep 
+    NSBitmapImageRep *imageRep
       = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL
-                                                 pixelsWide:size 
+                                                 pixelsWide:size
                                                  pixelsHigh:size
-                                              bitsPerSample:8 
-                                            samplesPerPixel:4 
-                                                   hasAlpha:YES 
-                                                   isPlanar:NO 
-                                             colorSpaceName:NSCalibratedRGBColorSpace 
-                                                bytesPerRow:32 * size 
+                                              bitsPerSample:8
+                                            samplesPerPixel:4
+                                                   hasAlpha:YES
+                                                   isPlanar:NO
+                                             colorSpaceName:NSCalibratedRGBColorSpace
+                                                bytesPerRow:32 * size
                                                bitsPerPixel:32] autorelease];
-    NSGraphicsContext *context 
+    NSGraphicsContext *context
       = [NSGraphicsContext graphicsContextWithBitmapImageRep:imageRep];
     [NSGraphicsContext saveGraphicsState];
     [NSGraphicsContext setCurrentContext:context];
     NSInteger threeQuarterSize = size - quarterSize;
-    NSRect rect1 = NSMakeRect(0, quarterSize, 
+    NSRect rect1 = NSMakeRect(0, quarterSize,
                               threeQuarterSize, threeQuarterSize);
-    NSRect rect2 = NSMakeRect(quarterSize, 0, 
+    NSRect rect2 = NSMakeRect(quarterSize, 0,
                               threeQuarterSize, threeQuarterSize);
     NSRect imageRect = GTMNSRectOfSize([image size]);
-    [image drawInRect:rect1 
-             fromRect:imageRect 
-            operation:NSCompositeSourceOver 
+    [image drawInRect:rect1
+             fromRect:imageRect
+            operation:NSCompositeSourceOver
              fraction:0.5];
-    [image drawInRect:rect2 
-             fromRect:imageRect 
-            operation:NSCompositeSourceOver 
+    [image drawInRect:rect2
+             fromRect:imageRect
+            operation:NSCompositeSourceOver
              fraction:1.0];
     [finalImage addRepresentation:imageRep];
     [NSGraphicsContext restoreGraphicsState];
@@ -308,20 +308,20 @@
 - (id)defaultObjectForKey:(NSString *)key {
   id defaultObject = nil;
   if ([key isEqualToString:kHGSExtensionIconImageKey]) {
-    
+
     IconRef iconRef = NULL;
     GetIconRef(kOnSystemDisk,
                kSystemIconsCreator,
-               kGenericApplicationIcon, 
+               kGenericApplicationIcon,
                &iconRef);
-    
+
     NSImage *image = nil;
     if (iconRef) {
       image = [[[NSImage alloc] initWithIconRef:iconRef] autorelease];
       image = [self openAgainIconFromImage:image];
       ReleaseIconRef(iconRef);
-    } 
-    
+    }
+
     defaultObject = image;
   }
   if (!defaultObject) {
@@ -333,9 +333,9 @@
 - (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
-  
+
   NSArray *filePaths = [directObjects filePaths];
-  
+
   BOOL success = YES;
   NSMutableArray *urlsToOpen
     = [NSMutableArray arrayWithCapacity:[filePaths count]];
@@ -343,11 +343,11 @@
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     [urlsToOpen addObject:fileURL];
   }
-  LSLaunchURLSpec spec = { 
-    NULL, 
-    (CFArrayRef)urlsToOpen, 
-    NULL, kLSLaunchAsync | kLSLaunchStartClassic | kLSLaunchNewInstance, 
-    NULL 
+  LSLaunchURLSpec spec = {
+    NULL,
+    (CFArrayRef)urlsToOpen,
+    NULL, kLSLaunchAsync | kLSLaunchStartClassic | kLSLaunchNewInstance,
+    NULL
   };
   OSStatus status = LSOpenFromURLSpec(&spec, NULL);
   if (status) {
@@ -385,13 +385,13 @@
   if (!fileSystemActionScript) {
     NSBundle *bundle = HGSGetPluginBundle();
     NSString *path = [bundle pathForResource:@"FileSystemActions"
-                                      ofType:@"scpt" 
+                                      ofType:@"scpt"
                                  inDirectory:@"Scripts"];
     if (path) {
       NSURL *url = [NSURL fileURLWithPath:path];
       NSDictionary *error = nil;
-      fileSystemActionScript 
-        = [[NSAppleScript alloc] initWithContentsOfURL:url 
+      fileSystemActionScript
+        = [[NSAppleScript alloc] initWithContentsOfURL:url
                                                  error:&error];
       if (error) {
         HGSLog(@"Unable to load %@. Error: %@", url, error);
@@ -455,13 +455,13 @@
 
 - (BOOL)performWithInfo:(NSDictionary *)info {
   BOOL wasGood = NO;
-  HGSResultArray *directObjects 
+  HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
   HGSResultArray *names
     = [info objectForKey:@"com.google.core.filesystem.action.rename.name"];
   if ([directObjects count] && [names count]) {
     HGSResult *nameResult = [names objectAtIndex:0];
-    NSDictionary *value 
+    NSDictionary *value
       = [nameResult valueForKey:kHGSObjectAttributePasteboardValueKey];
     if (value) {
       NSString *name = [value objectForKey:NSStringPboardType];
@@ -496,20 +496,20 @@
 
 - (BOOL)performWithInfo:(NSDictionary *)info {
   BOOL wasGood = NO;
-  HGSResultArray *directObjects 
+  HGSResultArray *directObjects
     = [info objectForKey:kHGSActionDirectObjectsKey];
   HGSResultArray *comments
     = [info objectForKey:@"com.google.core.filesystem.action.setcomments.comment"];
   if ([directObjects count] && [comments count]) {
     HGSResult *commentResult = [comments objectAtIndex:0];
-    NSDictionary *value 
+    NSDictionary *value
       = [commentResult valueForKey:kHGSObjectAttributePasteboardValueKey];
     if (value) {
       NSString *comment = [value objectForKey:NSStringPboardType];
       wasGood = YES;
       for (HGSResult *result in directObjects) {
         NSString *filePath = [result filePath];
-        NSString *source 
+        NSString *source
           = [NSString stringWithFormat:
              @"tell app \"Finder\"\r"
              @"set comment of file (posix file(\"%@\")) to \"%@\"\r"
@@ -582,7 +582,7 @@
   if (idx < [urls_ count]) {
     url = [urls_ objectAtIndex:idx];
   } else {
-    HGSLogDebug(@"%d >= max index %d in -[%@ %@]", 
+    HGSLogDebug(@"%d >= max index %d in -[%@ %@]",
                 idx, [urls_ count], [self class], NSStringFromSelector(_cmd));
   }
   return url;
@@ -607,14 +607,14 @@
   if (![panel isVisible]) {
     [NSApp activateIgnoringOtherApps:YES];
     [[panel windowController] setDelegate:self];
-    
+
     // This makes sure we are on top of our query window
     NSWindow *theKeyWindow = [NSApp keyWindow];
     NSInteger keyLevel = [theKeyWindow level];
     [panel setLevel:keyLevel + 1];
-    
+
     [panel makeKeyAndOrderFrontWithEffect:QLZoomEffect];
-  } 
+  }
   return YES;
 }
 
@@ -646,19 +646,19 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
 - (id)defaultObjectForKey:(NSString *)key {
   id defaultObject = nil;
   if ([key isEqualToString:kHGSExtensionIconImageKey]) {
-    
+
     IconRef iconRef = NULL;
     GetIconRef(kOnSystemDisk,
                kSystemIconsCreator,
-               kEjectMediaIcon, 
+               kEjectMediaIcon,
                &iconRef);
-    
+
     NSImage *image = nil;
     if (iconRef) {
       image = [[[NSImage alloc] initWithIconRef:iconRef] autorelease];
       ReleaseIconRef(iconRef);
-    } 
-    
+    }
+
     defaultObject = image;
   }
   if (!defaultObject) {
@@ -670,10 +670,10 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
 - (BOOL)performWithInfo:(NSDictionary *)info {
   HGSResultArray *directObjects
      = [info objectForKey:kHGSActionDirectObjectsKey];
-  
+
   NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
   NSArray *filePaths = [directObjects filePaths];
-  
+
   BOOL success = YES;
   for (NSString *path in filePaths) {
     // if workspace can't do it, try the finder.
@@ -683,7 +683,7 @@ GTM_METHOD_CHECK(NSAppleScript, gtm_executePositionalHandler:parameters:error:);
       NSString *source = [NSString stringWithFormat:
         @"tell application \"Finder\" to eject disk \"%@\"",displayName];
       NSAppleScript *ejectScript
-        = [[[NSAppleScript alloc] initWithSource:source] autorelease]; 
+        = [[[NSAppleScript alloc] initWithSource:source] autorelease];
       NSDictionary *errorDict = nil;
       [ejectScript executeAndReturnError:&errorDict];
       if (errorDict) {

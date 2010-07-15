@@ -34,6 +34,7 @@
 #import <objc/message.h>
 #import <Vermilion/HGSLog.h>
 #import "GTMMethodCheck.h"
+#import "GTMNSNumber+64Bit.h"
 #import "NSString+CaseInsensitive.h"
 #import "NSAttributedString+Attributes.h"
 #import "QSBSearchWindowController.h"
@@ -294,7 +295,7 @@ GTM_METHOD_CHECK(NSAttributedString, attrStringWithString:attributes:);
 
 - (void)insertCompletion:(NSString *)completion
      forPartialWordRange:(NSRange)charRange
-                movement:(int)movement
+                movement:(NSInteger)movement
                  isFinal:(BOOL)flag {
   if ([self hasMarkedText]) {
     return;
@@ -576,8 +577,9 @@ GTM_METHOD_CHECK(NSAttributedString, attrStringWithString:attributes:);
   NSMutableAttributedString *mutablePivotString
     = [[pivotString mutableCopy] autorelease];
   NSRange rangeOfPivotAttachments = [pivotString qsb_rangeOfPivotAttachments];
-  NSNumber *baseLine = [NSNumber numberWithFloat:(kQSBTextFieldTextBaselineOffset
-                                                  - kQSBTextFieldLineHeight)];
+  NSNumber *baseLine
+    = [NSNumber gtm_numberWithCGFloat:(kQSBTextFieldTextBaselineOffset
+                                       - kQSBTextFieldLineHeight)];
 
   // Set our attributes appropriately so that our text and pivots look correct.
   [mutablePivotString addAttributes:[self typingAttributes]];

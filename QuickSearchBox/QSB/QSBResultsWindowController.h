@@ -40,7 +40,7 @@
 @class QSBTableResult;
 @class QSBResultsViewControllerTrio;
 
-@interface QSBResultsWindowController : NSWindowController {
+@interface QSBResultsWindowController : NSWindowController <NSAnimationDelegate> {
  @private
   IBOutlet QSBSearchWindowController *searchWindowController_;
   IBOutlet QSBFlippedView *resultsView_;

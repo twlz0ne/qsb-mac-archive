@@ -43,18 +43,7 @@
 
 extern NSString *const kQSBBeenLaunchedPrefKey;
 
-// Currently Growl doesn't have 64 bit support. When it does, we can
-// fix this all up.
-// TODO: Remove when we have 64 bit growl
-#define QSB_BUILD_WITH_GROWL !__LP64__
-
-#if QSB_BUILD_WITH_GROWL
-#define QSBApplicationDelegateSuperclass NSObject <GrowlApplicationBridgeDelegate>
-#else  // QSB_BUILD_WITH_GROWL
-#define QSBApplicationDelegateSuperclass NSObject
-#endif  // QSB_BUILD_WITH_GROWL
-
-@interface QSBApplicationDelegate : QSBApplicationDelegateSuperclass {
+@interface QSBApplicationDelegate : NSObject <GrowlApplicationBridgeDelegate> {
  @private
   IBOutlet NSMenu *statusItemMenu_;
   IBOutlet NSMenu *dockMenu_;

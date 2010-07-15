@@ -1,5 +1,5 @@
 //
-//  QSBViewTableViewDelegateProtocol.h
+//  QSBViewTableViewDataSourceProtocol.h
 //
 //  Copyright (c) 2006-2008 Google Inc. All rights reserved.
 //
@@ -36,8 +36,8 @@
 // contentViews of any QSBViewTableViewCells that are located in
 // QSBViewTableViewColumns in your table. All other cell types will get the usual
 // tableView:willDisplayCell:forTableColumn:row: called to get their data.
-@protocol QSBViewTableViewDelegateProtocol
-  - (NSView*)tableView:(NSTableView*)tableView 
-         viewForColumn:(NSTableColumn*)column 
+@protocol QSBViewTableViewDataSourceProtocol <NSTableViewDataSource>
+  - (NSView*)tableView:(NSTableView*)tableView
+         viewForColumn:(NSTableColumn*)column
                    row:(NSInteger)row;
 @end

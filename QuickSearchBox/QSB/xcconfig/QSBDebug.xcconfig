@@ -33,7 +33,7 @@
 //
 
 // Pull in our general Google settings
-#include "../../externals/google-toolbox-for-mac/XcodeConfig/Project/DebugLeopardOrLater.xcconfig"
+#include "../../externals/google-toolbox-for-mac/XcodeConfig/Project/DebugSnowLeopardOrLater.xcconfig"
 
 // Pull in our QSB Settings
 #include "QSB.xcconfig"
@@ -42,3 +42,4 @@
 GOOGLE_VERSION_DEBUG_FLAG = $(FAKE_VARIABLE_SO_WHITESPACE_IS_ADDED) (Debug)
 
 COPY_PHASE_STRIP = NO
+

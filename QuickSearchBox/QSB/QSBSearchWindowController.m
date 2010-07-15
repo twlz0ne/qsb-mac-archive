@@ -799,7 +799,7 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
 - (void)welcomeWindowWillClose:(NSNotification *)notification {
   NSWindow *window = [self window];
   NSWindow *childWindow = [notification object];
-  HGSCheckDebug(childWindow == [welcomeController_ window], nil);
+  HGSCheckDebug(childWindow == [welcomeController_ window], @"");
   [window removeChildWindow:childWindow];
   welcomeController_ = nil;
 }

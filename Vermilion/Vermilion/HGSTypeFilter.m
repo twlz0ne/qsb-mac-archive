@@ -38,11 +38,11 @@ NSString *HGSTypeForPath(NSString *path) {
   FSRef ref;
   Boolean isDir = FALSE;
   OSStatus err = FSPathMakeRef((const UInt8 *)[path fileSystemRepresentation],
-                               &ref, 
+                               &ref,
                                &isDir);
   if (err != noErr) return nil;
   CFStringRef cfUTType = NULL;
-  err = LSCopyItemAttribute(&ref, kLSRolesAll, 
+  err = LSCopyItemAttribute(&ref, kLSRolesAll,
                             kLSItemContentType, (CFTypeRef*)&cfUTType);
   if (err != noErr || !cfUTType) return nil;
   NSString *outType = HGSTypeForUTType(cfUTType);
@@ -51,7 +51,7 @@ NSString *HGSTypeForPath(NSString *path) {
     if ([extension caseInsensitiveCompare:@"webloc"] == NSOrderedSame) {
       outType = kHGSTypeWebBookmark;
     }
-  }  
+  }
   CFRelease(cfUTType);
   return outType;
 }
@@ -87,10 +87,10 @@ NSString *HGSTypeForUTType(CFStringRef utType) {
     }
   }
   return outType;
-} 
+}
 BOOL HGSTypeConformsToType(NSString *type1, NSString *type2) {
   // Must have the exact prefix
-  HGSCheckDebug([type1 length], nil);
+  HGSCheckDebug([type1 length], @"");
   BOOL result = [type2 isEqual:kHGSTypeAllTypes];
   if (!result) {
     NSUInteger type2Len = [type2 length];
@@ -107,7 +107,7 @@ BOOL HGSTypeConformsToType(NSString *type1, NSString *type2) {
 }
 
 static BOOL HGSTypeConformsToTypeSet(NSString *type1, NSSet *types) {
-  HGSCheckDebug([type1 length], nil);
+  HGSCheckDebug([type1 length], @"");
   BOOL conforms = NO;
   for (NSString *type in types) {
     if (HGSTypeConformsToType(type1, type)) {
@@ -120,7 +120,7 @@ static BOOL HGSTypeConformsToTypeSet(NSString *type1, NSSet *types) {
 
 static BOOL HGSTypeDoesNotConformToTypeSet(NSString *type1, NSSet *types) {
   BOOL doesNotConform = YES;
-  HGSCheckDebug([type1 length], nil);
+  HGSCheckDebug([type1 length], @"");
   if ([types count] != 0) {
     for (NSString *type in types) {
       if (HGSTypeConformsToType(type1, type)) {
@@ -142,7 +142,7 @@ static HGSTypeFilter *sHGSTypeFilterAllTypes = nil;
     NSString *allTypes = @"*";
     sHGSTypeFilterAllTypesSet = [[NSSet alloc] initWithObjects:&allTypes
                                                          count:1];
-    sHGSTypeFilterAllTypes 
+    sHGSTypeFilterAllTypes
       = [[self filterWithConformTypes:sHGSTypeFilterAllTypesSet
                   doesNotConformTypes:nil] retain];
   }
@@ -174,7 +174,7 @@ static HGSTypeFilter *sHGSTypeFilterAllTypes = nil;
 
 - (id)initWithConformTypes:(NSSet *)conformTypes
        doesNotConformTypes:(NSSet *)doesNotConformTypes {
-  HGSCheckDebug(conformTypes, nil);
+  HGSCheckDebug(conformTypes, @"");
   if ((self = [super init])) {
     conformTypes_ = [conformTypes copy];
     doesNotConformTypes_ = [doesNotConformTypes copy];
@@ -189,11 +189,11 @@ static HGSTypeFilter *sHGSTypeFilterAllTypes = nil;
 #if DEBUG
     // Debug runtime check to make sure our types are sane.
     if ([doesNotConformTypes_ count]) {
-      HGSCheckDebug(![conformTypes_ intersectsSet:doesNotConformTypes_], nil);
+      HGSCheckDebug(![conformTypes_ intersectsSet:doesNotConformTypes_], @"");
       if (![conformTypes isEqual:[[self class] allTypesSet]]) {
         for (NSString *type in doesNotConformTypes) {
-          HGSCheckDebug(HGSTypeConformsToTypeSet(type, conformTypes), 
-                        @"Type: %@ does not conform to conformTypes %@", 
+          HGSCheckDebug(HGSTypeConformsToTypeSet(type, conformTypes),
+                        @"Type: %@ does not conform to conformTypes %@",
                         type, conformTypes);
         }
       }
@@ -218,9 +218,9 @@ static HGSTypeFilter *sHGSTypeFilterAllTypes = nil;
 }
 
 - (BOOL)isValidType:(NSString *)type {
-  HGSCheckDebug(type, nil);
-  
-  return HGSTypeConformsToTypeSet(type, conformTypes_) 
+  HGSCheckDebug(type, @"");
+
+  return HGSTypeConformsToTypeSet(type, conformTypes_)
     && HGSTypeDoesNotConformToTypeSet(type, doesNotConformTypes_);
 }
 
@@ -237,7 +237,7 @@ static HGSTypeFilter *sHGSTypeFilterAllTypes = nil;
 }
 
 - (BOOL)allowsAllTypes {
-  return ([doesNotConformTypes_ count] == 0 
+  return ([doesNotConformTypes_ count] == 0
           && [conformTypes_ isEqual:sHGSTypeFilterAllTypesSet]);
 }
 
@@ -273,7 +273,7 @@ static HGSTypeFilter *sHGSTypeFilterAllTypes = nil;
 }
 
 - (NSString *)description {
-  return [NSString stringWithFormat:@"<%p - %@>\n\tConforms:%@\n\tDoesNotConform:%@", 
+  return [NSString stringWithFormat:@"<%p - %@>\n\tConforms:%@\n\tDoesNotConform:%@",
           self, [self class], conformTypes_, doesNotConformTypes_];
 }
 

@@ -94,7 +94,11 @@
   HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
 
   NSFileManager *manager = [NSFileManager defaultManager];
-  NSArray *array = [manager directoryContentsAtPath:path_];
+  NSError *error = nil;
+  NSArray *array = [manager contentsOfDirectoryAtPath:path_ error:&error];
+  if (error) {
+    HGSLog(@"Unable to get contents of %@ (%@)", path_, error);
+  }
 
   for (NSString *subpath in array) {
     LSItemInfoRecord infoRec;

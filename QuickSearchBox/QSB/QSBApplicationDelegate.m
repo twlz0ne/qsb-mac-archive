@@ -1006,10 +1006,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
                  userInfo:nil
                   options:(NSKeyValueObservingOptionPrior
                            | NSKeyValueObservingOptionInitial)];
-#if QSB_BUILD_WITH_GROWL
   [GrowlApplicationBridge setGrowlDelegate:self];
-#endif  // QSB_BUILD_WITH_GROWL
-
 }
 
 - (void)pluginsValueChanged:(GTMKeyValueChangeNotification *)notification {
@@ -1191,12 +1188,8 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 - (void)presentMessageToUser:(NSNotification *)notification {
   NSDictionary *messageDict = [notification userInfo];
   if (messageDict) {
-#if QSB_BUILD_WITH_GROWL
     SEL selector = [self useGrowl] ? @selector(presentUserMessageViaGrowl:)
                                    : @selector(presentUserMessageViaMessenger:);
-#else
-    SEL selector = @selector(presentUserMessageViaMessenger:);
-#endif  // QSB_BUILD_WITH_GROWL
     [self performSelectorOnMainThread:selector
                            withObject:messageDict
                         waitUntilDone:NO];
@@ -1234,7 +1227,6 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 }
 
 - (void)presentUserMessageViaGrowl:(NSDictionary *)messageDict {
-#if QSB_BUILD_WITH_GROWL
   id summaryMessage = [messageDict objectForKey:kHGSSummaryMessageKey];
   NSImage *image = [messageDict objectForKey:kHGSImageMessageKey];
   if ([summaryMessage isKindOfClass:[NSAttributedString class]]) {
@@ -1284,30 +1276,21 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
                                  priority:priority
                                  isSticky:NO
                              clickContext:nil];
-#endif  // QSB_BUILD_WITH_GROWL
 }
 
 #pragma mark Growl Support
 
 - (BOOL)growlIsInstalledAndRunning {
-#if QSB_BUILD_WITH_GROWL
   BOOL installed = [GrowlApplicationBridge isGrowlInstalled];
   BOOL running = [GrowlApplicationBridge isGrowlRunning];
   return installed && running;
-#else
-  return NO;
-#endif  // QSB_BUILD_WITH_GROWL
 }
 
 - (BOOL)useGrowl {
-#if QSB_BUILD_WITH_GROWL
   BOOL growlRunning = [self growlIsInstalledAndRunning];
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   BOOL userWantsGrowl = [defaults boolForKey:kQSBUseGrowlKey];
   return growlRunning && userWantsGrowl;
-#else
-  return NO;
-#endif  // QSB_BUILD_WITH_GROWL
 }
 
 - (void)setUseGrowl:(BOOL)value {

@@ -33,7 +33,7 @@
 //
 
 // Pull in our general Google settings
-#include "../../externals/google-toolbox-for-mac/XcodeConfig/Project/ReleaseLeopardOrLater.xcconfig"
+#include "../../externals/google-toolbox-for-mac/XcodeConfig/Project/ReleaseSnowLeopardOrLater.xcconfig"
 
 // This is set by default in debug builds, but we want it for release as well.
 GTM_HOST_OTHER_CFLAGS = -fstack-protector -fstack-protector-all

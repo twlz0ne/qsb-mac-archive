@@ -80,7 +80,7 @@
 /*!
  Returns an argument for a given key if that argument has been set.
  @param key The key for the argument you want the value for.
-            The key for a given argument is the value set for 
+            The key for a given argument is the value set for
             kHGSActionArgumentIdentifierKey.
  @result The argument. Returns nil if there is no argument set for the key.
 */
@@ -94,16 +94,11 @@
 @interface HGSMutableActionOperation : HGSActionOperation
 
 /*!
- The action that the operation will perform.
-*/
-@property (readwrite, retain) HGSAction *action;
-
-/*!
- Set an argument for a given key to arg. If that argument has already been set 
+ Set an argument for a given key to arg. If that argument has already been set
  it will be replaced by arg. If arg is nil, the argument will be removed.
  @param arg The value to set the argument identified by key to.
  @param key The key for the argument you want the value for.
-            The key for a given argument is the value set for 
+            The key for a given argument is the value set for
             kHGSActionArgumentIdentifierKey.
 */
 - (void)setArgument:(HGSResultArray*)arg forKey:(NSString *)key;
@@ -114,4 +109,8 @@
 */
 - (void)reset;
 
+/*!
+ Set the action that the operation will perform.
+*/
+- (void)setAction:(HGSAction *)action;
 @end

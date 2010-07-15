@@ -169,35 +169,44 @@
 }
   
 - (NSDictionary *)parseIniFileAtPath:(NSString *)path {
-  NSString *profileIniString = [NSString stringWithContentsOfFile:path];
-  NSArray *profileIniLines 
-    = [profileIniString componentsSeparatedByString:@"\n"];
-  if (!profileIniLines) return nil;
-  NSMutableDictionary *profileDict = [NSMutableDictionary dictionary];
-  NSMutableDictionary *entryDict = nil;
-  NSString *entryKey = nil;
-  NSCharacterSet *wsSet = [NSCharacterSet whitespaceCharacterSet];
-  for (NSString *line in profileIniLines) {
-    line = [line stringByTrimmingCharactersInSet:wsSet];
-    if ([line length]) {
-      if ([line hasPrefix:@"["] && [line hasSuffix:@"]"]) {
-        if (entryKey && entryDict) {
-          [profileDict setObject:entryDict forKey:entryKey];
-        }
-        entryKey = [line substringWithRange:NSMakeRange(1, [line length] - 2)];
-        entryDict = [NSMutableDictionary dictionary];
-      } else {
-        NSRange keyRange = [line rangeOfString:@"="];
-        if (keyRange.length == 1) {
-          NSString *key = [line substringToIndex:keyRange.location];
-          NSString *entry = [line substringFromIndex:keyRange.location + 1];
-          [entryDict setObject:entry forKey:key];
+  NSMutableDictionary *profileDict = nil;
+  NSError *error = nil;
+  NSString *profileIniString 
+    = [NSString stringWithContentsOfFile:path 
+                                encoding:NSUTF8StringEncoding 
+                                   error:&error];
+  if (error) {
+    HGSLog(@"Unable to load %@ (%@)", path, error);
+  } else {
+    NSArray *profileIniLines 
+      = [profileIniString componentsSeparatedByString:@"\n"];
+    if (!profileIniLines) return nil;
+    profileDict = [NSMutableDictionary dictionary];
+    NSMutableDictionary *entryDict = nil;
+    NSString *entryKey = nil;
+    NSCharacterSet *wsSet = [NSCharacterSet whitespaceCharacterSet];
+    for (NSString *line in profileIniLines) {
+      line = [line stringByTrimmingCharactersInSet:wsSet];
+      if ([line length]) {
+        if ([line hasPrefix:@"["] && [line hasSuffix:@"]"]) {
+          if (entryKey && entryDict) {
+            [profileDict setObject:entryDict forKey:entryKey];
+          }
+          entryKey = [line substringWithRange:NSMakeRange(1, [line length] - 2)];
+          entryDict = [NSMutableDictionary dictionary];
+        } else {
+          NSRange keyRange = [line rangeOfString:@"="];
+          if (keyRange.length == 1) {
+            NSString *key = [line substringToIndex:keyRange.location];
+            NSString *entry = [line substringFromIndex:keyRange.location + 1];
+            [entryDict setObject:entry forKey:key];
+          }
         }
       }
     }
-  }
-  if (entryKey && entryDict) {
-    [profileDict setObject:entryDict forKey:entryKey];
+    if (entryKey && entryDict) {
+      [profileDict setObject:entryDict forKey:entryKey];
+    }
   }
   return profileDict;
 }
@@ -263,11 +272,20 @@
 }     
       
 - (NSDictionary *)bookmarksFromFile:(NSString *)path {
-  NSString *fileContents = [NSString stringWithContentsOfFile:path];
-  fileContents
-    = [fileContents stringByStrippingUnnecessaryCommasFromFirefoxJSONString];
-  NSDictionary *dict = [fileContents JSONValue];
-  NSDictionary *dictWithoutNulls = [self removeNullsFromJSONObject:dict];
+  NSError *error = nil;
+  NSDictionary *dictWithoutNulls = nil;
+  NSString *fileContents 
+    = [NSString stringWithContentsOfFile:path 
+                                encoding:NSUTF8StringEncoding 
+                                   error:&error];
+  if (error) {
+    HGSLog(@"Unable to load %@ (%@)", path, error);
+  } else {
+    fileContents
+      = [fileContents stringByStrippingUnnecessaryCommasFromFirefoxJSONString];
+    NSDictionary *dict = [fileContents JSONValue];
+    dictWithoutNulls = [self removeNullsFromJSONObject:dict];
+  }
   return dictWithoutNulls;
 }
 
@@ -322,13 +340,18 @@
 
 - (NSArray*)inventorySearchPluginsAtPath:(NSString *)path {
   NSFileManager *fm = [NSFileManager defaultManager];
-  NSArray *pluginFiles = [fm directoryContentsAtPath:path];
-  NSMutableArray *pluginEntries = [NSMutableArray array];
+  NSError *error = nil;
+  NSArray *pluginFiles = [fm contentsOfDirectoryAtPath:path error:&error];
+  if (error) {
+    HGSLog(@"Unable to read contents of %@ (%@)", path, error);
+  }
+  NSMutableArray *pluginEntries 
+    = [NSMutableArray arrayWithCapacity:[pluginFiles count]];
   for (NSString *pluginFile in pluginFiles) {
     NSString *pluginPath = [path stringByAppendingPathComponent:pluginFile];
     NSURL *pluginUrl 
       = [[[NSURL alloc] initFileURLWithPath:pluginPath] autorelease];
-    NSError *error = nil;
+    error = nil;
     NSXMLDocument *pluginDoc 
       = [[[NSXMLDocument alloc] initWithContentsOfURL:pluginUrl
                                               options:0

@@ -123,7 +123,13 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
       directoryExists = NO;
     }
     if (!directoryExists) {
-      [fm createDirectoryAtPath:directory attributes:nil];
+      if (![fm createDirectoryAtPath:directory
+         withIntermediateDirectories:YES
+                          attributes:nil
+                               error:&error]) {
+        HGSLog(@"Unable to create directory: %@", error);
+        return NO;
+      }
     }
 
     db_ = [[GTMSQLiteDatabase alloc] initWithPath:dbPath_
@@ -295,11 +301,9 @@ static NSString* const kMetaDataSchema = @"CREATE TABLE IF NOT EXISTS metadata (
                                      to:(NSUInteger)decreasedRows {
   int errorCode;
   NSUInteger toRemove = currentRows - decreasedRows;
-  static NSString* const kDeleteOldExpression =
-    @"DELETE FROM cache WHERE key IN "
-    @" (SELECT key FROM cache ORDER BY accessed LIMIT %d)";
-
-  NSString *sql = [NSString stringWithFormat:kDeleteOldExpression, toRemove];
+  NSString *sql = [NSString stringWithFormat:@"DELETE FROM cache WHERE key IN "
+                   @" (SELECT key FROM cache ORDER BY accessed LIMIT %d)",
+                   toRemove];
   GTMSQLiteStatement *statement
     = [GTMSQLiteStatement statementWithSQL:sql
                                 inDatabase:db_

@@ -38,7 +38,7 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
 
 @class MountSearchSourceResolver;
 
-@interface MountSearchSource : HGSMemorySearchSource {
+@interface MountSearchSource : HGSMemorySearchSource <NSNetServiceBrowserDelegate> {
  @private
   NSMutableArray *services_;
   NSMutableDictionary *browsers_;
@@ -55,7 +55,7 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
 - (void)mountSearchSourceTracker:(void *)ignored;
 @end
 
-@interface MountSearchSourceResolver :  NSObject {
+@interface MountSearchSourceResolver :  NSObject <NSNetServiceDelegate> {
  @private
   HGSMemorySearchSourceDB *database_;
   __weak MountSearchSource *source_;
@@ -290,10 +290,10 @@ void cancelThread(void *info) {
 - (void)netService:(NSNetService *)service
      didNotResolve:(NSDictionary *)errorDict {
   NSNumber *error = [errorDict objectForKey:NSNetServicesErrorCode];
-  OSStatus err = [error longValue];
+  NSInteger err = [error integerValue];
   if (err != NSNetServicesActivityInProgress
       && err != NSNetServicesCancelledError) {
-    HGSLogDebug(@"Mount did not resolve: %@ (%d)", service, err);
+    HGSLogDebug(@"Mount did not resolve: %@ (%ld)", service, err);
   }
   [services_ removeObject:service];
   if ([services_ count] == 0) {

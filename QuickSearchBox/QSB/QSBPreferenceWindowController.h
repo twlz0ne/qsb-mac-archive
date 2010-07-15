@@ -44,7 +44,8 @@
 /*!
  Manage the Quick Search App preferences window.
 */
-@interface QSBPreferenceWindowController : NSWindowController {
+@interface QSBPreferenceWindowController : NSWindowController
+    <NSMenuDelegate, NSToolbarDelegate> {
  @private
   IBOutlet NSPopUpButton *colorPopUp_;
   IBOutlet NSScrollView *advancedScrollView_;
@@ -52,12 +53,12 @@
   IBOutlet NSToolbar *toolbar_;
   IBOutlet NSTableView *sourcesTable_;
   IBOutlet NSTableView *accountsTable_;
-  
+
   BOOL prefsColorWellWasShowing_;  // YES if color well was showing.
   NSColorList *colors_;
   NSColor *selectedColor_;
   NSArray *sourceSortDescriptor_;
-  
+
   IBOutlet NSArrayController *accountsListController_;
   LSSharedFileListRef openAtLoginItemsList_;
   UInt32 openAtLoginItemsSeedValue_;

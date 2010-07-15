@@ -38,44 +38,44 @@
 #import "QSBApplicationDelegate.h"
 #import "QSBSearchWindowController.h"
 
-static const EventTypeSpec kModifierEventTypeSpec[] 
+static const EventTypeSpec kModifierEventTypeSpec[]
   = { { kEventClassKeyboard, kEventRawKeyModifiersChanged } };
-static const size_t kModifierEventTypeSpecSize 
+static const size_t kModifierEventTypeSpecSize
   = sizeof(kModifierEventTypeSpec) / sizeof(EventTypeSpec);
 
-static const EventTypeSpec kApplicationEventTypeSpec[] 
+static const EventTypeSpec kApplicationEventTypeSpec[]
   = { { kEventClassApplication, kEventAppFrontSwitched } };
-static const size_t kApplicationEventTypeSpecSize 
+static const size_t kApplicationEventTypeSpecSize
   = sizeof(kApplicationEventTypeSpec) / sizeof(EventTypeSpec);
 
 @implementation QSBApplication
 
-// Allows me to intercept the "control" double tap to activate QSB. There 
+// Allows me to intercept the "control" double tap to activate QSB. There
 // appears to be no way to do this from straight Cocoa.
 - (void)awakeFromNib {
-  GTMCarbonEventMonitorHandler *monitorHandler 
+  GTMCarbonEventMonitorHandler *monitorHandler
     = [GTMCarbonEventMonitorHandler sharedEventMonitorHandler];
-  [monitorHandler registerForEvents:kModifierEventTypeSpec 
+  [monitorHandler registerForEvents:kModifierEventTypeSpec
                               count:kModifierEventTypeSpecSize];
   [monitorHandler setDelegate:self];
-  
+
   GTMCarbonEventApplicationEventHandler *applicationHandler
     = [GTMCarbonEventApplicationEventHandler sharedApplicationEventHandler];
-  [applicationHandler registerForEvents:kApplicationEventTypeSpec 
+  [applicationHandler registerForEvents:kApplicationEventTypeSpec
                                   count:kApplicationEventTypeSpecSize];
   [applicationHandler setDelegate:self];
 }
 
 - (void) dealloc {
-  GTMCarbonEventMonitorHandler *monitorHandler 
+  GTMCarbonEventMonitorHandler *monitorHandler
     = [GTMCarbonEventMonitorHandler sharedEventMonitorHandler];
-  [monitorHandler unregisterForEvents:kModifierEventTypeSpec 
+  [monitorHandler unregisterForEvents:kModifierEventTypeSpec
                                 count:kModifierEventTypeSpecSize];
   [monitorHandler setDelegate:nil];
 
   GTMCarbonEventApplicationEventHandler *applicationHandler
     = [GTMCarbonEventApplicationEventHandler sharedApplicationEventHandler];
-  [applicationHandler unregisterForEvents:kApplicationEventTypeSpec 
+  [applicationHandler unregisterForEvents:kApplicationEventTypeSpec
                                     count:kApplicationEventTypeSpecSize];
   [applicationHandler setDelegate:nil];
 
@@ -85,21 +85,21 @@ static const size_t kApplicationEventTypeSpecSize
 // Verify that our delegate will respond to things it is supposed to.
 - (void)setDelegate:(id)anObject {
   if (anObject) {
-    GTMAssertSelectorNilOrImplementedWithArguments(anObject, 
-                                                   @selector(modifiersChangedWhileActive:), 
+    GTMAssertSelectorNilOrImplementedWithArguments(anObject,
+                                                   @selector(modifiersChangedWhileActive:),
                                                    @encode(NSEvent *), nil);
-    GTMAssertSelectorNilOrImplementedWithArguments(anObject, 
-                                                   @selector(modifiersChangedWhileInactive:), 
+    GTMAssertSelectorNilOrImplementedWithArguments(anObject,
+                                                   @selector(modifiersChangedWhileInactive:),
                                                    @encode(NSEvent *), nil);
-    GTMAssertSelectorNilOrImplementedWithArguments(anObject, 
-                                                   @selector(keysChangedWhileActive:), 
+    GTMAssertSelectorNilOrImplementedWithArguments(anObject,
+                                                   @selector(keysChangedWhileActive:),
                                                    @encode(NSEvent *), nil);
   }
   [super setDelegate:anObject];
 }
 
 - (void)sendEvent:(NSEvent *)theEvent {
-  QSBApplicationDelegate *delegate = [self delegate];
+  QSBApplicationDelegate *delegate = (QSBApplicationDelegate *)[self delegate];
   NSEventType type = [theEvent type];
   if (type == NSFlagsChanged) {
     [delegate modifiersChangedWhileActive:theEvent];
@@ -109,8 +109,8 @@ static const size_t kApplicationEventTypeSpecSize
   [super sendEvent:theEvent];
 }
 
-- (OSStatus)gtm_eventHandler:(GTMCarbonEventHandler *)sender 
-               receivedEvent:(GTMCarbonEvent *)event 
+- (OSStatus)gtm_eventHandler:(GTMCarbonEventHandler *)sender
+               receivedEvent:(GTMCarbonEvent *)event
                      handler:(EventHandlerCallRef)handler {
   OSStatus status = eventNotHandledErr;
   EventClass theClass = [event eventClass];
@@ -131,7 +131,9 @@ static const size_t kApplicationEventTypeSpecSize
                        charactersIgnoringModifiers:nil
                                          isARepeat:NO
                                            keyCode:0];
-      [[self delegate] modifiersChangedWhileInactive:nsEvent];
+      QSBApplicationDelegate *delegate
+        = (QSBApplicationDelegate *)[self delegate];
+      [delegate modifiersChangedWhileInactive:nsEvent];
     }
   } else if (theClass == kEventClassApplication &&
              theKind == kEventAppFrontSwitched) {
@@ -144,7 +146,8 @@ static const size_t kApplicationEventTypeSpecSize
       MacGetCurrentProcess(&myPSN);
       Boolean equal;
       if (SameProcess(&psn, &myPSN, &equal) == noErr && !equal) {
-        QSBApplicationDelegate *delegate = [self delegate];
+        QSBApplicationDelegate *delegate
+          = (QSBApplicationDelegate *)[self delegate];
         [[delegate searchWindowController] hideSearchWindow:self];
       }
     }

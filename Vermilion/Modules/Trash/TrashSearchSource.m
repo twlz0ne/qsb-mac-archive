@@ -108,9 +108,13 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           if (FSRefMakePath(&trashRef, trashPath, PATH_MAX - 1) == noErr) {
             NSString *basePath
               = [NSString stringWithUTF8String:(char *)trashPath];
+            NSFileManager *fm = [NSFileManager defaultManager];
+            NSError *error = nil;
             NSArray *contents
-              = [[NSFileManager defaultManager]
-                 directoryContentsAtPath:basePath];
+              = [fm contentsOfDirectoryAtPath:basePath error:&error];
+            if (error) {
+              HGSLog(@"Unable to read contents of %@ (%@)", basePath, error);
+            }
             NSUInteger tokenizedLength = [tokenizedQueryString tokenizedLength];
             for (NSString *file in contents) {
               CGFloat score = 0;

@@ -231,7 +231,8 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   QSBResultsViewTableView *resultsTableView = [self resultsTableView];
   NSUInteger selectedRow = [resultsTableView selectedRow];
   [resultsTableView reloadData];
-  [resultsTableView selectRow:selectedRow byExtendingSelection:NO];
+  NSIndexSet *selRowSet = [NSIndexSet indexSetWithIndex:selectedRow];
+  [resultsTableView selectRowIndexes:selRowSet byExtendingSelection:NO];
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   NSDictionary *userInfo
     = [NSDictionary dictionaryWithObject:category

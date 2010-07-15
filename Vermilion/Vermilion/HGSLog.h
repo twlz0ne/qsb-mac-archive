@@ -42,16 +42,16 @@
 
 #ifdef DEBUG
 #define HGSLogDebug(...) HGSLog(__VA_ARGS__)
-#define HGSCheckDebug(condition, format, ...)                         \
-  do {                                                                \
-    if (!(condition)) {                                               \
-      NSString *_hgsCheckDebug                                        \
-        = [NSString stringWithFormat:@"%s - %@", #condition, format]; \
-      _hgsCheckDebug                                                  \
-        = [NSString stringWithFormat:_hgsCheckDebug, ##__VA_ARGS__];  \
-      HGSLogDebug(@"%@", _hgsCheckDebug);                             \
-    }                                                                 \
-  } while(0)                                   
+#define HGSCheckDebug(condition, format, ...)                                  \
+  do {                                                                         \
+    if (!(condition)) {                                                        \
+      NSString *_hgsCheckDebug                                                 \
+        = [NSString stringWithFormat:format, ##__VA_ARGS__];                   \
+      _hgsCheckDebug                                                           \
+        = [NSString stringWithFormat:@"%s - %@", #condition, _hgsCheckDebug ]; \
+      HGSLogDebug(@"%@", _hgsCheckDebug);                                      \
+    }                                                                          \
+  } while(0)
 #else
 #define HGSLogDebug(...) do { } while (0)
 #define HGSCheckDebug(condition, format, ...) do { } while (0)

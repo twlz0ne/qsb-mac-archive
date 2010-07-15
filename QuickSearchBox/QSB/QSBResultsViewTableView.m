@@ -31,7 +31,7 @@
 //
 
 #import "QSBResultsViewTableView.h"
-#import "QSBViewTableViewDelegateProtocol.h"
+#import "QSBViewTableViewDataSourceProtocol.h"
 #import "QSBViewTableViewCell.h"
 
 @class QSBViewTableViewColumn;
@@ -43,7 +43,7 @@
 // because forwardInvocation is never called on to a delegate. We basically
 // "wrap" all of the delegate functionality, and aside from the one method, pass
 // it on through to the standard delegate.
-@interface QSBViewTableViewDelegateProxy : NSObject {
+@interface QSBViewTableViewDelegateProxy : NSObject <NSTableViewDelegate> {
  @private
   QSBResultsViewTableView *tableView_; // The table that we are a delegate for. (WEAK)
   id delegate_; // The delegate that we pass messages through to. (WEAK)
@@ -54,12 +54,12 @@
 //    view - the table this proxy applies to
 //    delegate - the client supplied delegate to pass methods onto
 //  Returns:
-//    a QSBViewTableViewDelegateProxy 
+//    a QSBViewTableViewDelegateProxy
 - (id)initWithViewTableView:(QSBResultsViewTableView *)view delegate:(id)delegate;
 
 // Get the client supplied delegate
 //  Returns:
-//    the client supplied delegate 
+//    the client supplied delegate
 - (id)delegate;
 
 // Set the delegate
@@ -156,29 +156,29 @@
 // The one method that we want to intercept. If our cell class is of type
 // QSBViewTableViewCell we want to ask our dataSource to supply a view for us to
 // show. This allows us to lazily instantiate views as necessary.
-- (void)tableView:(NSTableView *)tableView 
-  willDisplayCell:(id)cell 
-   forTableColumn:(NSTableColumn *)tableColumn 
+- (void)tableView:(NSTableView *)tableView
+  willDisplayCell:(id)cell
+   forTableColumn:(NSTableColumn *)tableColumn
               row:(NSInteger)row
 {
   if ([[cell class] isSubclassOfClass:[QSBViewTableViewCell class]]) {
     id dataSource = [tableView_ dataSource];
-    if ([dataSource respondsToSelector:@selector(tableView:viewForColumn:row:)]) { 
+    if ([dataSource respondsToSelector:@selector(tableView:viewForColumn:row:)]) {
       QSBViewTableViewCell *viewCell = (QSBViewTableViewCell *)cell;
-      NSView *view = [dataSource tableView:tableView 
-                             viewForColumn:tableColumn 
+      NSView *view = [dataSource tableView:tableView
+                             viewForColumn:tableColumn
                                        row:row];
       [viewCell setContentView:view];
-      id object = [dataSource tableView:tableView 
-              objectValueForTableColumn:tableColumn 
+      id object = [dataSource tableView:tableView
+              objectValueForTableColumn:tableColumn
                                     row:row];
       [viewCell setRepresentedObject:object];
     }
   } else {
     if ([self doesDelegateRespondToSelector:_cmd]) {
-      [[self delegate] tableView:tableView 
+      [[self delegate] tableView:tableView
                  willDisplayCell:cell
-                  forTableColumn:tableColumn 
+                  forTableColumn:tableColumn
                              row:row];
     }
   }
@@ -189,7 +189,7 @@
 - (void)tableView:(NSTableView *)tableView didClickTableColumn:(NSTableColumn *)tableColumn
 {
   if ([self doesDelegateRespondToSelector:_cmd]) {
-    [[self delegate] performSelector:_cmd withObject:tableView 
+    [[self delegate] performSelector:_cmd withObject:tableView
                           withObject:tableColumn];
   }
 }
@@ -208,13 +208,13 @@
   }
 }
 
-- (BOOL)tableView:(NSTableView *)tableView 
-shouldEditTableColumn:(NSTableColumn *)tableColumn 
+- (BOOL)tableView:(NSTableView *)tableView
+shouldEditTableColumn:(NSTableColumn *)tableColumn
               row:(NSInteger)row
 {
   BOOL shouldEdit = YES;
   if ([self doesDelegateRespondToSelector:_cmd]) {
-    shouldEdit = [[self delegate] tableView:tableView 
+    shouldEdit = [[self delegate] tableView:tableView
                       shouldEditTableColumn:tableColumn row:row];
   }
   return shouldEdit;
@@ -228,12 +228,12 @@ shouldEditTableColumn:(NSTableColumn *)tableColumn
   return shouldSelect;
 }
 
-- (BOOL)tableView:(NSTableView *)tableView 
+- (BOOL)tableView:(NSTableView *)tableView
 shouldSelectTableColumn:(NSTableColumn *)tableColumn
 {
   BOOL shouldSelect = YES;
   if ([self doesDelegateRespondToSelector:_cmd]) {
-    shouldSelect = [[self delegate] tableView:tableView 
+    shouldSelect = [[self delegate] tableView:tableView
                       shouldSelectTableColumn:tableColumn];
   }
   return shouldSelect;
@@ -263,13 +263,13 @@ shouldSelectTableColumn:(NSTableColumn *)tableColumn
   }
 }
 
-- (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell 
-                   rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tc 
+- (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell
+                   rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tc
                     row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation {
   NSString *toolTip = nil;
   if ([self doesDelegateRespondToSelector:_cmd]) {
-    toolTip = [[self delegate] tableView:tableView toolTipForCell:cell 
-                                    rect:rect tableColumn:tc row:row 
+    toolTip = [[self delegate] tableView:tableView toolTipForCell:cell
+                                    rect:rect tableColumn:tc row:row
                            mouseLocation:mouseLocation];
   }
   return toolTip;
@@ -305,7 +305,7 @@ shouldSelectTableColumn:(NSTableColumn *)tableColumn
 // because forwardInvocation is never called on to a dataSource. We basically
 // "wrap" all of the dataSource functionality, and aside from the two methods,
 // pass it on through to the standard dataSource.
-@interface QSBViewTableViewDataSourceProxy : NSObject {
+@interface QSBViewTableViewDataSourceProxy : NSObject <NSTableViewDataSource> {
   @private
   QSBResultsViewTableView *tableView_; // The table that we are a datasource for. (WEAK)
   id dataSource_; // The dataSource that we pass messages through too. (WEAK)
@@ -316,13 +316,13 @@ shouldSelectTableColumn:(NSTableColumn *)tableColumn
 //    view - the table this proxy applies to
 //    dataSource - the client supplied dataSource to pass methods onto
 //  Returns:
-//    a QSBViewTableViewDataSourceProxy 
-- (id)initWithViewTableView:(QSBResultsViewTableView *)view 
+//    a QSBViewTableViewDataSourceProxy
+- (id)initWithViewTableView:(QSBResultsViewTableView *)view
                  dataSource:(id)dataSource;
 
 // Get the client supplied dataSource
 //  Returns:
-//    the client supplied dataSource 
+//    the client supplied dataSource
 - (id)dataSource;
 
 // Set the dataSource
@@ -342,7 +342,7 @@ shouldSelectTableColumn:(NSTableColumn *)tableColumn
 
 @implementation QSBViewTableViewDataSourceProxy
 
-- (id)initWithViewTableView:(QSBResultsViewTableView *)view 
+- (id)initWithViewTableView:(QSBResultsViewTableView *)view
                  dataSource:(id)dataSource{
   self = [super init];
   if (self != nil) {
@@ -368,22 +368,22 @@ shouldSelectTableColumn:(NSTableColumn *)tableColumn
 
 #pragma mark NSTableDataSource protocol wrappers
 
-- (id)tableView:(NSTableView *)tableView 
-objectValueForTableColumn:(NSTableColumn *)tableColumn 
+- (id)tableView:(NSTableView *)tableView
+objectValueForTableColumn:(NSTableColumn *)tableColumn
             row:(NSInteger)row {
   id obj = nil;
   if ([self doesDataSourceRespondToSelector:_cmd]) {
-    obj = [[self dataSource] tableView:tableView 
-             objectValueForTableColumn:tableColumn 
+    obj = [[self dataSource] tableView:tableView
+             objectValueForTableColumn:tableColumn
                                    row:row];
   }
   return obj;
 }
 
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)obj 
+- (void)tableView:(NSTableView *)tableView setObjectValue:(id)obj
    forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
   if ([self doesDataSourceRespondToSelector:_cmd]) {
-    [[self dataSource] tableView:tableView setObjectValue:obj 
+    [[self dataSource] tableView:tableView setObjectValue:obj
                   forTableColumn:tableColumn row:row];
   }
 }
@@ -398,71 +398,71 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
   return count;
 }
 
-- (BOOL)tableView:(NSTableView *)tableView 
-       acceptDrop:(id <NSDraggingInfo>)info 
-              row:(NSInteger)row 
+- (BOOL)tableView:(NSTableView *)tableView
+       acceptDrop:(id <NSDraggingInfo>)info
+              row:(NSInteger)row
     dropOperation:(NSTableViewDropOperation)operation {
   BOOL acceptDrop = NO;
   if ([self doesDataSourceRespondToSelector:_cmd]) {
-    acceptDrop = [[self dataSource] tableView:tableView acceptDrop:info 
+    acceptDrop = [[self dataSource] tableView:tableView acceptDrop:info
                                           row:row dropOperation:operation];
   }
   return acceptDrop;
 }
 
-- (NSDragOperation)tableView:(NSTableView *)tableView 
-                validateDrop:(id <NSDraggingInfo>)info 
-                 proposedRow:(NSInteger)row 
+- (NSDragOperation)tableView:(NSTableView *)tableView
+                validateDrop:(id <NSDraggingInfo>)info
+                 proposedRow:(NSInteger)row
        proposedDropOperation:(NSTableViewDropOperation)operation {
   NSDragOperation dragOperation = NSDragOperationNone;
   if ([self doesDataSourceRespondToSelector:_cmd]) {
-    dragOperation = [[self dataSource] tableView:tableView 
-                         validateDrop:info 
-                          proposedRow:row 
+    dragOperation = [[self dataSource] tableView:tableView
+                         validateDrop:info
+                          proposedRow:row
                 proposedDropOperation:operation];
   }
   return dragOperation;
 }
 
-- (BOOL)tableView:(NSTableView *)tableView 
-        writeRows:(NSArray *)rows 
+- (BOOL)tableView:(NSTableView *)tableView
+        writeRows:(NSArray *)rows
      toPasteboard:(NSPasteboard *)pboard {
   BOOL writeRows = NO;
   if ([self doesDataSourceRespondToSelector:_cmd]) {
-    writeRows =[[self dataSource] tableView:tableView 
+    writeRows =[[self dataSource] tableView:tableView
                                   writeRows:rows toPasteboard:pboard];
   }
   return writeRows;
 }
 
-- (BOOL)tableView:(NSTableView *)tableView 
-     writeRowsWithIndexes:(NSIndexSet *)rowIndexes 
+- (BOOL)tableView:(NSTableView *)tableView
+     writeRowsWithIndexes:(NSIndexSet *)rowIndexes
      toPasteboard:(NSPasteboard*)pboard {
   BOOL writeRows = NO;
   if ([self doesDataSourceRespondToSelector:_cmd]) {
-    writeRows =[[self dataSource] tableView:tableView 
-                       writeRowsWithIndexes:rowIndexes 
+    writeRows =[[self dataSource] tableView:tableView
+                       writeRowsWithIndexes:rowIndexes
                                toPasteboard:pboard];
   }
   return writeRows;
 }
 
-- (NSArray *)tableView:(NSTableView *)tableView 
-    namesOfPromisedFilesDroppedAtDestination:(NSURL *)dropDestination 
+- (NSArray *)tableView:(NSTableView *)tableView
+    namesOfPromisedFilesDroppedAtDestination:(NSURL *)dropDestination
     forDraggedRowsWithIndexes:(NSIndexSet *)indexSet {
   NSArray *array = nil;
   if ([self doesDataSourceRespondToSelector:_cmd]) {
-    array =[[self dataSource] tableView:tableView 
-              namesOfPromisedFilesDroppedAtDestination:dropDestination 
+    array =[[self dataSource] tableView:tableView
+              namesOfPromisedFilesDroppedAtDestination:dropDestination
               forDraggedRowsWithIndexes:indexSet];
   }
   return array;
 }
 
-- (void)tableView:(NSTableView *)tableView 
+- (void)tableView:(NSTableView *)tableView
 sortDescriptorsDidChange:(NSArray *)oldDescriptors {
   if ([self doesDataSourceRespondToSelector:_cmd]) {
-    [[self dataSource] tableView:tableView 
+    [[self dataSource] tableView:tableView
         sortDescriptorsDidChange:oldDescriptors];
   }
 }
@@ -484,7 +484,8 @@ sortDescriptorsDidChange:(NSArray *)oldDescriptors {
 
 // Do the indirection through our proxy to get the client supplied delegate.
 - (id)delegate {
-  return [[super delegate] delegate];
+  id superDelegate = [super delegate];
+  return [superDelegate delegate];
 }
 
 // Set our delegate up properly. If our super delegate isn't of type
@@ -495,8 +496,8 @@ sortDescriptorsDidChange:(NSArray *)oldDescriptors {
   if (delegate) {
     id superDelegate = [super delegate];
     if (![superDelegate isKindOfClass:[QSBViewTableViewDelegateProxy class]]) {
-      delegateProxy_ 
-        = [[QSBViewTableViewDelegateProxy alloc] initWithViewTableView:self 
+      delegateProxy_
+        = [[QSBViewTableViewDelegateProxy alloc] initWithViewTableView:self
                                                               delegate:delegate];
       [super setDelegate:delegateProxy_];
     } else {
@@ -517,15 +518,15 @@ sortDescriptorsDidChange:(NSArray *)oldDescriptors {
 
 // Set our dataSource up properly. If our super dataSource isn't of type
 // QSBViewTableViewDataSourceProxy create a QSBViewTableViewDataSourceProxy and
-// install it in there with it's dataSource set to |dataSource|. Otherwise call 
+// install it in there with it's dataSource set to |dataSource|. Otherwise call
 // our super setDataSource which will call through to our proxy setDataSource.
 - (void)setDataSource:(id)dataSource {
   if (dataSource) {
     id superDataSource = [super dataSource];
     Class dsProxyClass = [QSBViewTableViewDataSourceProxy class];
     if (![superDataSource isKindOfClass:dsProxyClass]) {
-      dataSourceProxy_ 
-        = [[QSBViewTableViewDataSourceProxy alloc] initWithViewTableView:self 
+      dataSourceProxy_
+        = [[QSBViewTableViewDataSourceProxy alloc] initWithViewTableView:self
                                                               dataSource:dataSource];
       [super setDataSource:dataSourceProxy_];
     } else {
@@ -547,11 +548,12 @@ sortDescriptorsDidChange:(NSArray *)oldDescriptors {
 
 // Do the indirection through our proxy to get the client supplied dataSource.
 - (id)dataSource {
-  return [[super dataSource] dataSource];
+  id superDataSource = [super dataSource];
+  return [superDataSource dataSource];
 }
 
 
-// If we are reloading data, we have to strip out all of the views that our 
+// If we are reloading data, we have to strip out all of the views that our
 // datasource has added in preparation for refilling the table full of
 // data.
 - (void)reloadData {

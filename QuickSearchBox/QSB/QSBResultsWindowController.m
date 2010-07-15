@@ -79,6 +79,7 @@
 - (void)actionPresenterDidUnpivot:(NSNotification *)notification;
 - (void)updateWindowHeightBasedOnTable:(QSBResultTableView *)tableView;
 - (void)tableViewDidReloadData:(NSNotification *)notification;
+- (void)tableViewSelectionDidChange:(NSNotification *)notification;
 - (void)updateTableHeight:(NSTimer *)timer;
 @end
 
@@ -379,7 +380,8 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
   NSInteger row = [tableView selectedRow];
   if (row < 0) {
     if ([tableView numberOfRows]) {
-      [tableView selectRow:0 byExtendingSelection:NO];
+      NSIndexSet *zeroSet = [NSIndexSet indexSetWithIndex:0];
+      [tableView selectRowIndexes:zeroSet byExtendingSelection:NO];
       row = 0;
     }
   }
@@ -529,7 +531,7 @@ GTM_METHOD_CHECK(NSAnimation, gtm_setDuration:eventMask:);
 #pragma mark Timer Callbacks
 
 - (void)updateTableHeight:(NSTimer *)timer {
-  HGSCheckDebug(timer == resetWindowSizeTimer_, nil);
+  HGSCheckDebug(timer == resetWindowSizeTimer_, @"");
   QSBResultTableView *tableView = GTM_STATIC_CAST(QSBResultTableView,
                                                   [timer userInfo]);
 

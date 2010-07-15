@@ -58,7 +58,7 @@ static NSString *const kHGSSearchSourceRankerSourceIDKey
 - (void)addTimeDataPoint:(UInt64)machTime;
 - (void)promote;
 - (UInt64)averageTime;
-- (UInt32)promotionCount;
+- (UInt64)promotionCount;
 @end
 
 @interface HGSSearchSourceRanker ()
@@ -91,8 +91,8 @@ static NSInteger HGSSearchSourceRankerPerformanceSort(id src1,
   } else if (time1 < time2) {
     order = NSOrderedAscending;
   } else {
-    UInt32 promoteCount1 = [dp1 promotionCount];
-    UInt32 promoteCount2 = [dp2 promotionCount];
+    UInt64 promoteCount1 = [dp1 promotionCount];
+    UInt64 promoteCount2 = [dp2 promotionCount];
     if (promoteCount1 < promoteCount2) {
       order = NSOrderedDescending;
     } else if (promoteCount1 > promoteCount2) {
@@ -118,8 +118,8 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
     = [a objectForKey:kHGSSearchSourceRankerDataPointPromotionsKey];
   NSNumber *numB
     = [b objectForKey:kHGSSearchSourceRankerDataPointPromotionsKey];
-  UInt32 promoteA = [numA unsignedLongValue];
-  UInt32 promoteB = [numB unsignedLongValue];
+  unsigned long promoteA = [numA unsignedLongValue];
+  unsigned long promoteB = [numB unsignedLongValue];
   NSInteger order = NSOrderedSame;
   if (promoteA < promoteB) {
     order = NSOrderedDescending;
@@ -373,7 +373,7 @@ static NSInteger HGSSourceRangePromotionSort(id a, id b, void *context) {
   promotions_++;
 }
 
-- (UInt32)promotionCount {
+- (UInt64)promotionCount {
   return promotions_;
 }
 

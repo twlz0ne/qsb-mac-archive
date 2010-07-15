@@ -48,26 +48,26 @@ NSString *const kHGSNameMessageKey = @"HGSNameMessageKey";
 @implementation HGSUserMessenger
 GTMOBJECT_SINGLETON_BOILERPLATE(HGSUserMessenger, sharedUserMessenger);
 
-+ (void)displayUserMessage:(id)message 
-               description:(id)description 
++ (void)displayUserMessage:(id)message
+               description:(id)description
                       name:(NSString *)name
                      image:(NSImage *)image
                       type:(HGSUserMessageType)type {
   [[self sharedUserMessenger] displayUserMessage:message
-                                     description:description 
+                                     description:description
                                             name:name
                                            image:image
                                             type:type];
 }
 
-- (void)displayUserMessage:(id)message 
-               description:(id)description 
+- (void)displayUserMessage:(id)message
+               description:(id)description
                       name:(NSString *)name
                      image:(NSImage *)image
                       type:(HGSUserMessageType)type {
-  NSMutableDictionary *infoDictionary 
+  NSMutableDictionary *infoDictionary
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-       [NSNumber numberWithInt:type], kHGSTypeMessageKey,
+       [NSNumber numberWithInteger:type], kHGSTypeMessageKey,
        nil];
   if (message) {
     [infoDictionary setObject:message forKey:kHGSSummaryMessageKey];
@@ -82,8 +82,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSUserMessenger, sharedUserMessenger);
     [infoDictionary setObject:image forKey:kHGSImageMessageKey];
   }
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  [nc hgs_postOnMainThreadNotificationName:kHGSUserMessageNotification 
-                                    object:nil 
+  [nc hgs_postOnMainThreadNotificationName:kHGSUserMessageNotification
+                                    object:nil
                                   userInfo:infoDictionary];
 }
 

@@ -41,6 +41,7 @@
 
 @interface HGSActionOperation ()
 @property (readwrite, retain)  NSMutableDictionary *arguments;
+@property (readwrite, retain)  HGSAction *action;
 @end
 
 @implementation HGSActionOperation
@@ -116,9 +117,9 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
   NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
   [center postNotificationName:kHGSActionDidPerformNotification
                         object:action_
-                      userInfo:userInfo];  
+                      userInfo:userInfo];
 }
-   
+
 - (void)performActionOperation:(id)ignored {
   BOOL result = [self isValid];
   HGSResultArray *results = nil;
@@ -140,22 +141,22 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
       } else {
         result = [action_ performWithInfo:arguments];
       }
-    } 
+    }
     @catch (NSException *e) {
       result = NO;
       HGSLog(@"Exception thrown performing action: %@ (%@)", action_, e);
     }
   }
   NSNumber *success = [NSNumber numberWithBool:result ? YES : NO];
-  NSMutableDictionary *actionResults 
+  NSMutableDictionary *actionResults
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
        success, kHGSActionCompletedSuccessfullyKey, nil];
   if (results) {
     [actionResults setObject:results forKey:kHGSActionResultsKey];
   }
   [self performSelectorOnMainThread:@selector(performedAction:)
-                         withObject:actionResults   
-                      waitUntilDone:NO];  
+                         withObject:actionResults
+                      waitUntilDone:NO];
 }
 
 - (void)performAction {
@@ -163,8 +164,8 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
   if ([action_ mustRunOnMainThread]) {
     [self performSelector:selector withObject:nil afterDelay:0];
   } else {
-    NSInvocationOperation *op 
-      = [[[NSInvocationOperation alloc] initWithTarget:self 
+    NSInvocationOperation *op
+      = [[[NSInvocationOperation alloc] initWithTarget:self
                                               selector:selector
                                                 object:nil] autorelease];
     [[HGSOperationQueue sharedOperationQueue] addOperation:op];
@@ -174,7 +175,6 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
 @end
 
 @implementation HGSMutableActionOperation
-@synthesize action = action_;
 
 - (void)reset {
   [self setAction:nil];
@@ -193,6 +193,10 @@ GTM_METHOD_CHECK(NSNotificationCenter, hgs_postOnMainThreadNotificationName:obje
       [args setObject:argument forKey:key];
     }
   }
+}
+
+- (void)setAction:(HGSAction *)action {
+  [super setAction:action];
 }
 
 @end

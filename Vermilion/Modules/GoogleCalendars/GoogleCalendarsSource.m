@@ -127,9 +127,9 @@ static NSString *const kGoogleCalendarEventEndTimeKey
   if ((self = [super initWithConfiguration:configuration])) {
     // Cache the Google Calendar icon
     calendarIcon_ = [[self imageNamed:@"gcalendar"] retain];
-    HGSCheckDebug(calendarIcon_, nil);
+    HGSCheckDebug(calendarIcon_, @"");
     eventIcon_ = [[self imageNamed:@"gcalendarevent"] retain];
-    HGSCheckDebug(eventIcon_, nil);
+    HGSCheckDebug(eventIcon_, @"");
 
     // Creating NSDateFormatters is expensive, so we cache these ones.
     shortDateShortTimeFormatter_ = [[NSDateFormatter alloc] init];
@@ -548,7 +548,7 @@ static NSString *const kGoogleCalendarEventEndTimeKey
     }
     if (endTime) {
       NSString *endTimeString = [noDateShortTimeFormatter_ stringFromDate:endTime];
-      snippet = [snippet stringByAppendingFormat:@" ‚Äî %@", endTimeString];
+      snippet = [snippet stringByAppendingFormat:@" ‚ %@", endTimeString];
     }
   } else {
     NSString *allDayString

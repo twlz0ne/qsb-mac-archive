@@ -2407,7 +2407,6 @@
 		62521AB30EFAC30000A6E647 /* QSBViewTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBViewTableViewCell.m; sourceTree = "<group>"; };
 		62521AB40EFAC30000A6E647 /* QSBViewTableViewColumn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBViewTableViewColumn.h; sourceTree = "<group>"; };
 		62521AB50EFAC30000A6E647 /* QSBViewTableViewColumn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBViewTableViewColumn.m; sourceTree = "<group>"; };
-		62521AB60EFAC30000A6E647 /* QSBViewTableViewDelegateProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBViewTableViewDelegateProtocol.h; sourceTree = "<group>"; };
 		62541751102C904A00808254 /* HGSSearchTermScorer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSearchTermScorer.h; sourceTree = "<group>"; };
 		62541752102C904A00808254 /* HGSSearchTermScorer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSearchTermScorer.m; sourceTree = "<group>"; };
 		625A2C960E5614F3008CA9BF /* QSBPreferenceWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPreferenceWindowController.h; sourceTree = "<group>"; };
@@ -2650,6 +2649,10 @@
 		8B3082DB1056EE1F006C4C7A /* GTMNSNumber+64Bit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSNumber+64Bit.m"; sourceTree = "<group>"; };
 		8B3082DC1056EE1F006C4C7A /* GTMNSNumber+64Bit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSNumber+64Bit.h"; sourceTree = "<group>"; };
 		8B312E4F1057008C00D57495 /* libobjc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libobjc.dylib; path = usr/lib/libobjc.dylib; sourceTree = SDKROOT; };
+		8B31E81C11EE153600FCF3E4 /* DebugSnowLeopardOrLater.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DebugSnowLeopardOrLater.xcconfig; sourceTree = "<group>"; };
+		8B31E81D11EE153600FCF3E4 /* ReleaseSnowLeopardOrLater.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ReleaseSnowLeopardOrLater.xcconfig; sourceTree = "<group>"; };
+		8B31EA1A11EE25ED00FCF3E4 /* QSBViewTableViewDataSourceProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBViewTableViewDataSourceProtocol.h; sourceTree = "<group>"; };
+		8B31ED3311EE69F400FCF3E4 /* QSB_valgrind.supp */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; path = QSB_valgrind.supp; sourceTree = "<group>"; };
 		8B338A9311188E0C007E3342 /* QSBCategoryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCategoryTest.m; sourceTree = "<group>"; };
 		8B338AF411189477007E3342 /* QSBCategories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBCategories.h; sourceTree = "<group>"; };
 		8B3424F0114587240033A89B /* Shortcuts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shortcuts.h; sourceTree = "<group>"; };
@@ -3470,8 +3473,6 @@
 		8BA5246811212488001D2E0E /* BuildSDKProjects.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = BuildSDKProjects.sh; sourceTree = "<group>"; };
 		8BA61DBA0F0AEF78008182B5 /* AddToPartyShuffle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AddToPartyShuffle.icns; sourceTree = "<group>"; };
 		8BA61DBC0F0AEF7E008182B5 /* PlayInPartyShuffle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = PlayInPartyShuffle.icns; sourceTree = "<group>"; };
-		8BA623720F12B97E008182B5 /* DebugLeopardOrLater.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DebugLeopardOrLater.xcconfig; sourceTree = "<group>"; };
-		8BA623780F12B97E008182B5 /* ReleaseLeopardOrLater.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ReleaseLeopardOrLater.xcconfig; sourceTree = "<group>"; };
 		8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DebugUnittest.xcconfig; sourceTree = "<group>"; };
 		8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = LoadableBundle.xcconfig; sourceTree = "<group>"; };
 		8BA6238D0F12B97E008182B5 /* ReleaseUnittest.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ReleaseUnittest.xcconfig; sourceTree = "<group>"; };
@@ -4320,6 +4321,7 @@
 				F4E3C2200EBB6F3600CB713D /* GTMForQSB.pch */,
 				8BF4A7360E07324300D49C0F /* QSB.pch */,
 				8B77DF420F284AF900FA2A3C /* QuickSearchBoxReleaseNotes.html */,
+				8B31ED3311EE69F400FCF3E4 /* QSB_valgrind.supp */,
 				8BA62B350F13B128008182B5 /* externals */,
 				8B5EC6470CEE61BE00AD3BBD /* QSB */,
 				8B6F2CE50DA2B83F0052CA40 /* Vermilion */,
@@ -5101,7 +5103,7 @@
 				62521AB30EFAC30000A6E647 /* QSBViewTableViewCell.m */,
 				62521AB40EFAC30000A6E647 /* QSBViewTableViewColumn.h */,
 				62521AB50EFAC30000A6E647 /* QSBViewTableViewColumn.m */,
-				62521AB60EFAC30000A6E647 /* QSBViewTableViewDelegateProtocol.h */,
+				8B31EA1A11EE25ED00FCF3E4 /* QSBViewTableViewDataSourceProtocol.h */,
 				62FB1E4D0FB39B1A0080B342 /* QSBWelcomeController.h */,
 				62FB1E4E0FB39B1A0080B342 /* QSBWelcomeController.m */,
 				8BC5A88411405BBF000DB67C /* QSBWelcomeControllerTest.m */,
@@ -5994,8 +5996,8 @@
 		8BA6236E0F12B97E008182B5 /* Project */ = {
 			isa = PBXGroup;
 			children = (
-				8BA623720F12B97E008182B5 /* DebugLeopardOrLater.xcconfig */,
-				8BA623780F12B97E008182B5 /* ReleaseLeopardOrLater.xcconfig */,
+				8B31E81C11EE153600FCF3E4 /* DebugSnowLeopardOrLater.xcconfig */,
+				8B31E81D11EE153600FCF3E4 /* ReleaseSnowLeopardOrLater.xcconfig */,
 			);
 			path = Project;
 			sourceTree = "<group>";
@@ -12108,11 +12110,6 @@
 					"\"$(SRCROOT)/../externals/Sparkle\"",
 				);
 				INFOPLIST_FILE = Resources/Info.plist;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-weak_framework",
-					QuickLookUI,
-				);
 				PRODUCT_NAME = "Quick Search Box";
 			};
 			name = Debug;
@@ -12130,11 +12127,6 @@
 					"\"$(SRCROOT)/../externals/Sparkle\"",
 				);
 				INFOPLIST_FILE = Resources/Info.plist;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-weak_framework",
-					QuickLookUI,
-				);
 				PRODUCT_NAME = "Quick Search Box";
 			};
 			name = Release;
@@ -12566,6 +12558,7 @@
 					"VERMILLION_PLUGIN_API_VERSION=$(VERMILLION_PLUGIN_API_VERSION)",
 				);
 				OTHER_LDFLAGS = "-lgcov";
+				SDKROOT = macosx10.6;
 			};
 			name = "Debug-gcov";
 		};
@@ -12603,11 +12596,6 @@
 					"\"$(SRCROOT)/../externals/Sparkle\"",
 				);
 				INFOPLIST_FILE = Resources/Info.plist;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-weak_framework",
-					QuickLookUI,
-				);
 				PRODUCT_NAME = "Quick Search Box";
 			};
 			name = "Debug-gcov";
@@ -12771,11 +12759,6 @@
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Core/CorePlugin-Info.plist";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-weak_framework",
-					QuickLookUI,
-				);
 				PRODUCT_NAME = CorePlugin;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -13319,6 +13302,7 @@
 					"$(GTM_CONFIGURATION_GCC_PREPROCESSOR_DEFINITIONS)",
 					"VERMILLION_PLUGIN_API_VERSION=$(VERMILLION_PLUGIN_API_VERSION)",
 				);
+				SDKROOT = macosx10.6;
 			};
 			name = Debug;
 		};
@@ -13333,6 +13317,7 @@
 					"$(GTM_CONFIGURATION_GCC_PREPROCESSOR_DEFINITIONS)",
 					"VERMILLION_PLUGIN_API_VERSION=$(VERMILLION_PLUGIN_API_VERSION)",
 				);
+				SDKROOT = macosx10.6;
 			};
 			name = Release;
 		};
@@ -13457,11 +13442,6 @@
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Core/CorePlugin-Info.plist";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-weak_framework",
-					QuickLookUI,
-				);
 				PRODUCT_NAME = CorePlugin;
 				WRAPPER_EXTENSION = hgs;
 			};
@@ -13476,11 +13456,6 @@
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Modules/Core/CorePlugin-Info.plist";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-weak_framework",
-					QuickLookUI,
-				);
 				PRODUCT_NAME = CorePlugin;
 				WRAPPER_EXTENSION = hgs;
 			};

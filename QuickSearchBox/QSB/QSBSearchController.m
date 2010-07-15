@@ -92,11 +92,8 @@ GTM_METHOD_CHECK(NSString, qsb_hasPrefix:options:);
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
 GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 
-+ (void)initialize {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSArray *keys = [NSArray arrayWithObjects:@"showAllCategoriesSet", nil];
-  [self setKeys:keys triggerChangeNotificationsForDependentKey:@"moreResults"];
-  [pool release];
++ (NSSet *)keyPathsForValuesAffectingMoreResults {
+  return [NSSet setWithObject:@"showAllCategoriesSet"];
 }
 
 - (id)initWithActionPresenter:(QSBActionPresenter *)actionPresenter {

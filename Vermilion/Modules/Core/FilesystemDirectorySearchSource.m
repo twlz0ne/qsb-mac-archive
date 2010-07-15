@@ -100,7 +100,12 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       }
     }
     BOOL emptyQuery = [tokenizedQueryString tokenizedLength] == 0;
-    NSArray *contents = [fm directoryContentsAtPath:path];
+    NSError *error = nil;
+    NSArray *contents = [fm contentsOfDirectoryAtPath:path
+                                                error:&error];
+    if (error) {
+      HGSLog(@"Unable to get directory contents of %@ (%@)", path, error);
+    }
     BOOL showInvisibles = ([query flags] & eHGSQueryShowAlternatesFlag) != 0;
     // Only construct these one time, rather than each time through the loop.
     NSNumber *belowFoldRankFlag 
@@ -149,7 +154,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         if (score < FLT_EPSILON) continue;
       }
 
-      NSError *error = nil;               
+      error = nil;               
       NSDictionary *itemAttributes = [fm attributesOfItemAtPath:fullPath
                                                           error:&error];
       if (!error) {
@@ -205,10 +210,16 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         BOOL isDirectory = NO;
         if ([fm fileExistsAtPath:container isDirectory:&isDirectory]
             && isDirectory) {
-          NSArray *dirContents = [fm directoryContentsAtPath:container];
+          NSError *error = nil;
+          NSArray *dirContents = [fm contentsOfDirectoryAtPath:container 
+                                                         error:&error];
+          if (error) {
+            HGSLog(@"Unable to get directory contents of %@ (%@)", 
+                   container, error);
+          }
           NSUInteger count = [dirContents count];
           NSMutableArray *contents = [NSMutableArray arrayWithCapacity:count];
-          for (path in [fm directoryContentsAtPath:container]) {
+          for (path in dirContents) {
             if ([path qsb_hasPrefix:partialPath 
                             options:(NSWidthInsensitiveSearch 
                                    | NSCaseInsensitiveSearch
