@@ -148,6 +148,7 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
     CFRunLoopRun();
   }
   CFRunLoopRemoveSource(runloop, source, kCFRunLoopDefaultMode);
+  CFRelease(source);
   if (![context isCancelled]) {
     [self replaceCurrentDatabaseWith:database];
   }

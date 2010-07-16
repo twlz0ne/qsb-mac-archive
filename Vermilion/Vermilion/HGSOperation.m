@@ -127,6 +127,7 @@
     CFRunLoopRun();
   }
   CFRunLoopRemoveSource(runloop, source, kCFRunLoopDefaultMode);
+  CFRelease(source);
 }
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
