@@ -92,7 +92,8 @@ static const char *const kHGSPythonPerform = "Perform";
     Py_DECREF(opaqueExtension);
     if (!instance_) {
       NSString *error = [HGSPython lastErrorString];
-      HGSLogDebug(@"could instantiate Python class %@.\n%@", className, error);
+      HGSLogDebug(@"could not instantiate Python class %@.\n%@", 
+                  className, error);
       [self release];
       return nil;
     }
