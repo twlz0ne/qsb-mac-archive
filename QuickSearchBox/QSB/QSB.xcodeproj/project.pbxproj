@@ -654,6 +654,7 @@
 		8B307C421051B606006C4C7A /* SampleEmail.emlx in Resources */ = {isa = PBXBuildFile; fileRef = 8B307BDE1051B5D4006C4C7A /* SampleEmail.emlx */; };
 		8B3082DD1056EE1F006C4C7A /* GTMNSNumber+64Bit.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3082DB1056EE1F006C4C7A /* GTMNSNumber+64Bit.m */; };
 		8B3082DE1056EE1F006C4C7A /* GTMNSNumber+64Bit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B3082DC1056EE1F006C4C7A /* GTMNSNumber+64Bit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B3117A211F610CA00FCF3E4 /* HGSPythonSourceTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B3117A111F610CA00FCF3E4 /* HGSPythonSourceTest.mm */; };
 		8B312E501057008C00D57495 /* libobjc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B312E4F1057008C00D57495 /* libobjc.dylib */; };
 		8B312E57105700A100D57495 /* libobjc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B312E4F1057008C00D57495 /* libobjc.dylib */; };
 		8B312E5E105700BB00D57495 /* libobjc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B312E4F1057008C00D57495 /* libobjc.dylib */; };
@@ -663,6 +664,7 @@
 		8B31346E10581C1A00D57495 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B31346F10581C1C00D57495 /* GTMMethodCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 64C385BE0DBFDCF9005EBA69 /* GTMMethodCheck.m */; };
 		8B338A9411188E0C007E3342 /* QSBCategoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B338A9311188E0C007E3342 /* QSBCategoryTest.m */; };
+		8B37620E11F64A44002A6947 /* RoundRectAndDropShadow.10.5.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 8B37620D11F64A44002A6947 /* RoundRectAndDropShadow.10.5.tiff */; };
 		8B39EAF9116CE77600D9743F /* NSString+SymlinksAndAliases.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B39EAF6116CE77600D9743F /* NSString+SymlinksAndAliases.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B39EAFA116CE77600D9743F /* NSString+SymlinksAndAliases.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39EAF7116CE77600D9743F /* NSString+SymlinksAndAliases.m */; };
 		8B39EF33116D31C200D9743F /* ChromeBookmarksSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39EF32116D31C200D9743F /* ChromeBookmarksSource.m */; };
@@ -687,7 +689,6 @@
 		8B3EED6E0CEA86A100D933C0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E429DF760AC1907A00E747D8 /* Security.framework */; };
 		8B3EED6F0CEA86A100D933C0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		8B3EED700CEA86A100D933C0 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43C9B100AF0EFEC009E5549 /* AppKit.framework */; };
-		8B3EED710CEA86A100D933C0 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BF8909C5EF810074EFF3 /* QuickTime.framework */; };
 		8B3EED730CEA86A100D933C0 /* SecurityFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D408F9F00AEEDC2C007EE96D /* SecurityFoundation.framework */; };
 		8B3EED740CEA86A100D933C0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D44652CE0AB643110077860B /* SystemConfiguration.framework */; };
 		8B3EF8850EF2C8A80036FFBD /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
@@ -936,7 +937,6 @@
 		8B7911120F9FCAD3006BFE1E /* HGSProtoExtensionFactoringTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 621BCE950F7D9B5600F9B1BC /* HGSProtoExtensionFactoringTest.m */; };
 		8B7911130F9FCAD3006BFE1E /* HGSProtoExtensionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA20F6B09FE003BDBDD /* HGSProtoExtensionTest.m */; };
 		8B7911140F9FCAD3006BFE1E /* HGSPythonActionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA940F6B09FE003BDBDD /* HGSPythonActionTest.m */; };
-		8B7911150F9FCAD3006BFE1E /* HGSPythonSourceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA960F6B09FE003BDBDD /* HGSPythonSourceTest.m */; };
 		8B7911160F9FCAD3006BFE1E /* HGSPythonTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CAA10F6B09FE003BDBDD /* HGSPythonTest.m */; };
 		8B7911170F9FCAD3006BFE1E /* HGSQueryControllerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B95CA920F6B09FE003BDBDD /* HGSQueryControllerTest.m */; };
 		8B7911180F9FCAD3006BFE1E /* HGSQueryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D153660E9FA04400C0EAA9 /* HGSQueryTest.m */; };
@@ -2167,6 +2167,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		8B31144811F600F600FCF3E4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B3EECF90CEA86A100D933C0 /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2648,6 +2657,7 @@
 		8B307BDE1051B5D4006C4C7A /* SampleEmail.emlx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SampleEmail.emlx; sourceTree = "<group>"; };
 		8B3082DB1056EE1F006C4C7A /* GTMNSNumber+64Bit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSNumber+64Bit.m"; sourceTree = "<group>"; };
 		8B3082DC1056EE1F006C4C7A /* GTMNSNumber+64Bit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSNumber+64Bit.h"; sourceTree = "<group>"; };
+		8B3117A111F610CA00FCF3E4 /* HGSPythonSourceTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HGSPythonSourceTest.mm; sourceTree = "<group>"; };
 		8B312E4F1057008C00D57495 /* libobjc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libobjc.dylib; path = usr/lib/libobjc.dylib; sourceTree = SDKROOT; };
 		8B31E81C11EE153600FCF3E4 /* DebugSnowLeopardOrLater.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DebugSnowLeopardOrLater.xcconfig; sourceTree = "<group>"; };
 		8B31E81D11EE153600FCF3E4 /* ReleaseSnowLeopardOrLater.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ReleaseSnowLeopardOrLater.xcconfig; sourceTree = "<group>"; };
@@ -2656,6 +2666,7 @@
 		8B338A9311188E0C007E3342 /* QSBCategoryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCategoryTest.m; sourceTree = "<group>"; };
 		8B338AF411189477007E3342 /* QSBCategories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBCategories.h; sourceTree = "<group>"; };
 		8B3424F0114587240033A89B /* Shortcuts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shortcuts.h; sourceTree = "<group>"; };
+		8B37620D11F64A44002A6947 /* RoundRectAndDropShadow.10.5.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RoundRectAndDropShadow.10.5.tiff; sourceTree = "<group>"; };
 		8B39EAF6116CE77600D9743F /* NSString+SymlinksAndAliases.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+SymlinksAndAliases.h"; sourceTree = "<group>"; };
 		8B39EAF7116CE77600D9743F /* NSString+SymlinksAndAliases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+SymlinksAndAliases.m"; sourceTree = "<group>"; };
 		8B39EAF8116CE77600D9743F /* ReadMe.Google.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.Google.txt; sourceTree = "<group>"; };
@@ -3422,7 +3433,6 @@
 		8B95CA930F6B09FE003BDBDD /* HGSIconProviderTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSIconProviderTest.m; sourceTree = "<group>"; };
 		8B95CA940F6B09FE003BDBDD /* HGSPythonActionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPythonActionTest.m; sourceTree = "<group>"; };
 		8B95CA950F6B09FE003BDBDD /* HGSExtensionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSExtensionTest.m; sourceTree = "<group>"; };
-		8B95CA960F6B09FE003BDBDD /* HGSPythonSourceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPythonSourceTest.m; sourceTree = "<group>"; };
 		8B95CA970F6B09FE003BDBDD /* HGSPluginTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPluginTest.m; sourceTree = "<group>"; };
 		8B95CA980F6B09FE003BDBDD /* HGSMemorySearchSourceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSMemorySearchSourceTest.m; sourceTree = "<group>"; };
 		8B95CA990F6B09FE003BDBDD /* HGSLRUCacheTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSLRUCacheTest.m; sourceTree = "<group>"; };
@@ -4010,7 +4020,6 @@
 				8B3EED6E0CEA86A100D933C0 /* Security.framework in Frameworks */,
 				8B3EED6F0CEA86A100D933C0 /* Foundation.framework in Frameworks */,
 				8B3EED700CEA86A100D933C0 /* AppKit.framework in Frameworks */,
-				8B3EED710CEA86A100D933C0 /* QuickTime.framework in Frameworks */,
 				8B3EED730CEA86A100D933C0 /* SecurityFoundation.framework in Frameworks */,
 				8B3EED740CEA86A100D933C0 /* SystemConfiguration.framework in Frameworks */,
 				7FE602A60D91975000336364 /* CoreServices.framework in Frameworks */,
@@ -4828,6 +4837,7 @@
 				8B6AE87F112231F400D5D636 /* HGSSearchTermScorerTestData.plist */,
 				5AC3E8230F7C2F6200F171EB /* VermilionTest.py */,
 				8B5C86840FD1F0E400A6AA25 /* RoundRectAndDropShadow.tiff */,
+				8B37620D11F64A44002A6947 /* RoundRectAndDropShadow.10.5.tiff */,
 			);
 			path = TestData;
 			sourceTree = "<group>";
@@ -5800,7 +5810,7 @@
 				8B95CA940F6B09FE003BDBDD /* HGSPythonActionTest.m */,
 				5A2710B70ECA52F200C72257 /* HGSPythonSource.h */,
 				5A2710B80ECA52F200C72257 /* HGSPythonSource.mm */,
-				8B95CA960F6B09FE003BDBDD /* HGSPythonSourceTest.m */,
+				8B3117A111F610CA00FCF3E4 /* HGSPythonSourceTest.mm */,
 				8B6F2D680DA2B88E0052CA40 /* HGSQuery.h */,
 				8B6F2D690DA2B88E0052CA40 /* HGSQuery.m */,
 				F4D153660E9FA04400C0EAA9 /* HGSQueryTest.m */,
@@ -7441,6 +7451,7 @@
 				E4F5512F0DF73059008A846E /* Sources */,
 				8B6874A3101836EC00ADEA67 /* Resources */,
 				8B10AB6A0FA679C40087DE20 /* AppleScript */,
+				8B31144811F600F600FCF3E4 /* CopyFiles */,
 				E4F551300DF73059008A846E /* Frameworks */,
 				E4F551310DF73059008A846E /* ShellScript */,
 			);
@@ -8125,6 +8136,7 @@
 				8BC8A23B115D669200A6E783 /* keystone_preinstall in Resources */,
 				8BC8A23C115D669200A6E783 /* keystone_postinstall in Resources */,
 				8BC8A23D115D669200A6E783 /* keystone_install in Resources */,
+				8B37620E11F64A44002A6947 /* RoundRectAndDropShadow.10.5.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9830,7 +9842,6 @@
 				8B7911120F9FCAD3006BFE1E /* HGSProtoExtensionFactoringTest.m in Sources */,
 				8B7911130F9FCAD3006BFE1E /* HGSProtoExtensionTest.m in Sources */,
 				8B7911140F9FCAD3006BFE1E /* HGSPythonActionTest.m in Sources */,
-				8B7911150F9FCAD3006BFE1E /* HGSPythonSourceTest.m in Sources */,
 				8B7911160F9FCAD3006BFE1E /* HGSPythonTest.m in Sources */,
 				8B7911170F9FCAD3006BFE1E /* HGSQueryControllerTest.m in Sources */,
 				8B7911180F9FCAD3006BFE1E /* HGSQueryTest.m in Sources */,
@@ -9851,6 +9862,7 @@
 				62B445C4114197C80028A679 /* HGSPathCellElementTest.m in Sources */,
 				8B53352C11382B0E00B89BAA /* HGSActionArgumentTest.m in Sources */,
 				8B8481EB1149B0C1002C460B /* HGSSuggestSourceTest.m in Sources */,
+				8B3117A211F610CA00FCF3E4 /* HGSPythonSourceTest.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12109,6 +12121,7 @@
 					"\"$(SRCROOT)/../externals/Growl\"",
 					"\"$(SRCROOT)/../externals/Sparkle\"",
 				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Resources/Info.plist;
 				PRODUCT_NAME = "Quick Search Box";
 			};
@@ -12126,6 +12139,7 @@
 					"\"$(SRCROOT)/../externals/Growl\"",
 					"\"$(SRCROOT)/../externals/Sparkle\"",
 				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Resources/Info.plist;
 				PRODUCT_NAME = "Quick Search Box";
 			};
@@ -12258,15 +12272,6 @@
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"$(GTM_GENERAL_OTHER_LDFLAGS)",
-					"$(GTM_PLATFORM_OTHER_LDFLAGS)",
-					"$(GTM_CONFIGURATION_OTHER_LDFLAGS)",
-					"$(GTM_HOST_OTHER_LDFLAGS)",
-					"-undefined",
-					dynamic_lookup,
-				);
 				PRODUCT_NAME = QSBTest;
 				TEST_HOST = "$(CONFIGURATION_BUILD_DIR)/Quick Search Box.app/Contents/MacOS/Quick Search Box";
 				WRAPPER_EXTENSION = octest;
@@ -12294,8 +12299,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
-					/System/Library/Frameworks,
-					"$(FRAMEWORK_SEARCH_PATHS)",
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/Vermilion-Info.plist";
 				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
@@ -12308,8 +12313,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
-					/System/Library/Frameworks,
-					"$(FRAMEWORK_SEARCH_PATHS)",
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/Vermilion-Info.plist";
 				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
@@ -12557,6 +12562,7 @@
 					"$(GTM_CONFIGURATION_GCC_PREPROCESSOR_DEFINITIONS)",
 					"VERMILLION_PLUGIN_API_VERSION=$(VERMILLION_PLUGIN_API_VERSION)",
 				);
+				"ONLY_ACTIVE_ARCH[sdk=iphoneos*]" = NO;
 				OTHER_LDFLAGS = "-lgcov";
 				SDKROOT = macosx10.6;
 			};
@@ -12595,6 +12601,7 @@
 					"\"$(SRCROOT)/../externals/Growl\"",
 					"\"$(SRCROOT)/../externals/Sparkle\"",
 				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Resources/Info.plist;
 				PRODUCT_NAME = "Quick Search Box";
 			};
@@ -12616,8 +12623,8 @@
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
-					/System/Library/Frameworks,
-					"$(FRAMEWORK_SEARCH_PATHS)",
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/Vermilion-Info.plist";
 				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
@@ -12651,10 +12658,6 @@
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
 				);
-				OTHER_LDFLAGS = (
-					"-undefined",
-					dynamic_lookup,
-				);
 				PRODUCT_NAME = QSBTest;
 				TEST_HOST = "$(CONFIGURATION_BUILD_DIR)/Quick Search Box.app/Contents/MacOS/Quick Search Box";
 				WRAPPER_EXTENSION = octest;
@@ -12666,7 +12669,7 @@
 			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
-					/System/Library/Frameworks,
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"",
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
 				);
@@ -13302,6 +13305,7 @@
 					"$(GTM_CONFIGURATION_GCC_PREPROCESSOR_DEFINITIONS)",
 					"VERMILLION_PLUGIN_API_VERSION=$(VERMILLION_PLUGIN_API_VERSION)",
 				);
+				"ONLY_ACTIVE_ARCH[sdk=iphoneos*]" = NO;
 				SDKROOT = macosx10.6;
 			};
 			name = Debug;
@@ -13317,6 +13321,7 @@
 					"$(GTM_CONFIGURATION_GCC_PREPROCESSOR_DEFINITIONS)",
 					"VERMILLION_PLUGIN_API_VERSION=$(VERMILLION_PLUGIN_API_VERSION)",
 				);
+				"ONLY_ACTIVE_ARCH[sdk=iphoneos*]" = NO;
 				SDKROOT = macosx10.6;
 			};
 			name = Release;
@@ -13346,7 +13351,7 @@
 			baseConfigurationReference = 8BA6238A0F12B97E008182B5 /* DebugUnittest.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
-					/System/Library/Frameworks,
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"",
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
 				);
@@ -13361,7 +13366,7 @@
 			baseConfigurationReference = 8BA6238D0F12B97E008182B5 /* ReleaseUnittest.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
-					/System/Library/Frameworks,
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"",
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
 				);

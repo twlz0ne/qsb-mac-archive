@@ -259,9 +259,6 @@ GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:
   QSBTableResult *result = [cachedRows_ objectForKey:key];
   if (result) {
     if ([result isKindOfClass:[QSBSourceTableResult class]]) {
-      HGSResult *hgsResult = [(QSBSourceTableResult *)result representedResult];
-      HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
-      [provider cancelOperationsForResult:hgsResult];
       [result gtm_removeObserver:self
                       forKeyPath:@"displayIcon"
                         selector:@selector(displayIconUpdated:)];

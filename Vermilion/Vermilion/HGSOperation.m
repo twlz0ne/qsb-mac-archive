@@ -31,41 +31,9 @@
 //
 
 #import "HGSOperation.h"
-#import <GTM/GTMObjectSingleton.h>
 #import <GTM/GTMDebugSelectorValidation.h>
-#import <GTM/GTMLightweightProxy.h>
+#import <GTM/GTMObjectSingleton.h>
 #import <GData/GDataHTTPFetcher.h>
-#import "HGSLog.h"
-
-@implementation NSInvocationOperation (HGSInvocationOperation)
-
-- (id)hgs_initWithTarget:(id)target selector:(SEL)sel object:(id)arg {
-  GTMAssertSelectorNilOrImplementedWithArguments(target,
-                                                 sel,
-                                                 @encode(id),
-                                                 @encode(NSOperation *),
-                                                 NULL);
-  NSMethodSignature *sig = [target methodSignatureForSelector:sel];
-  NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
-
-  // GTMLightweightProxy is being used here because NSInvocationOperation
-  // retains its arguments according to the documentation. Since it is unclear
-  // when the retaining of the arguments occurs (at init, or just before the
-  // invocation is invoked, or elsewhere) the proxy is required to make sure
-  // that the invocation doesn't retain 'self' or else there will be a retain
-  // loop.
-  GTMLightweightProxy *proxy = [[[GTMLightweightProxy alloc] init] autorelease];
-  [invocation setTarget:target];
-  [invocation setSelector:sel];
-  [invocation setArgument:&arg atIndex:2];
-  [invocation setArgument:&proxy atIndex:3];
-  if ((self = [self initWithInvocation:invocation])) {
-    [proxy setRepresentedObject:self];
-  }
-  return self;
-}
-
-@end
 
 @interface HGSFetcherOperation ()
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher

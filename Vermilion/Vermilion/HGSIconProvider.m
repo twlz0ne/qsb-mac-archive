@@ -44,6 +44,7 @@
 #import "HGSLog.h"
 #import "GTMDebugThreadValidation.h"
 #import "GTMGarbageCollection.h"
+#import "GTMSystemVersion.h"
 
 static const void *LRURetain(CFAllocatorRef allocator, const void *value);
 static void LRURelease(CFAllocatorRef allocator, const void *value);
@@ -164,7 +165,7 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
 // Since the spotlight source gives us the majority of results, and it supplies
 // us with a  UTType, the basic cache cuts down the number of icon operations we
 // perform by almost 50%.
-@interface HGSIconProvider()
+@interface HGSIconCache ()
 // Remove an operation from our list of pending icon fetch operations.
 - (void)setValueOnMainThread:(NSDictionary *)args;
 - (NSImage *)cachedIconForKey:(NSString *)key fromCache:(HGSLRUCache *)cache;
@@ -172,26 +173,38 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
            forKey:(NSString *)key
             cache:(HGSLRUCache *)cache;
 - (void)cacheBasicIcon:(NSImage *)icon forResult:(HGSResult *)result;
-- (NSImage *)basicDiskLoad:(HGSResult *)result
-                 operation:(NSOperation *)operation;
-- (NSImage *)advancedDiskLoad:(HGSResult *)result
-                    operation:(NSOperation *)operation;
+- (NSOperationQueue *)iconOperationQueue;
+@end
+
+@interface HGSIconProvider ()
+- (id)initWithResult:(HGSResult *)result skipPlaceholder:(BOOL)skipPlaceholder;
+- (void)basicDiskLoad:(id)ignored;
+- (void)advancedDiskLoad:(id)ignored;
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData
           operation:(NSOperation *)operation;
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
     failedWithError:(NSError *)error
           operation:(NSOperation *)operation;
+
+// All of these are intentionally atomic
+@property (readwrite, retain) NSImage *icon;
+@property (readwrite, assign) HGSResult *result;
+@property (readwrite, retain) NSOperation *basicOperation;
+@property (readwrite, retain) NSOperation *advancedOperation;
+
 @end
 
-@implementation HGSIconProvider
+@implementation HGSIconCache
 
-GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
+GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconCache, sharedIconCache);
 
 - (id)init {
-  self = [super init];
-  if (self) {
+  if ((self = [super init])) {
     iconOperationQueue_ = [[NSOperationQueue alloc] init];
+    if ([GTMSystemVersion isSnowLeopardOrGreater]) {
+      [iconOperationQueue_ setName:@"com.google.qsb.hgsiconcache"];
+    }
     advancedCache_ = [[HGSLRUCache alloc] initWithCacheSize:kIconCacheSize
                                                   callBacks:&kLRUCacheCallbacks
                                                evictContext:self];
@@ -238,93 +251,10 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   return icon;
 }
 
-- (NSArray *)operationsForResult:(HGSResult *)result {
-  NSMutableArray *resultOperations = [NSMutableArray array];
-  Class invocationOperationClass = [NSInvocationOperation class];
-  Class fetcherOperationClass = [HGSFetcherOperation class];
-  NSArray *operations = [iconOperationQueue_ operations];
-  for (NSOperation *op in operations) {
-    HGSResult *opResult = nil;
-    if ([op isKindOfClass:invocationOperationClass]) {
-      // The HGSResult is passed to our invocation operations as argument #2
-      // (self is 0, _cmd is 1)
-      NSInvocation *invocation = [(NSInvocationOperation *)op invocation];
-      NSMethodSignature *sig = [invocation methodSignature];
-      if ([sig numberOfArguments] == 4
-          && strcmp([sig getArgumentTypeAtIndex:2], @encode(id)) == 0) {
-        [invocation getArgument:&opResult atIndex:2];
-      } else {
-        HGSLog(@"Bad operation signature %@ for %@ in %@",
-               sig, invocation, self);
-      }
-    } else if ([op isKindOfClass:fetcherOperationClass]) {
-      opResult = [[(HGSFetcherOperation *)op fetcher] userData];
-    }
-    if ([result isEqual:opResult]) {
-      [resultOperations addObject:op];
-      break;
-    }
-  }
-  return resultOperations;
-}
-
-- (NSImage *)provideIconForResult:(HGSResult*)result
-                  skipPlaceholder:(BOOL)skipPlaceholder {
-  // Check to see if we have a cached icon
-  NSImage *icon = [self cachedIconForResult:result];
-  if (!icon) {
-    // No cached icon
-    // Check to see if we have a cached basic icon
-    icon = [self cachedBasicIconForResult:result];
-    NSArray *alreadyFetchingOp = [self operationsForResult:result];
-    if ([alreadyFetchingOp count] == 0) {
-      if (!icon && !skipPlaceholder) {
-        NSInvocationOperation *basicOp
-          = [[[NSInvocationOperation alloc] hgs_initWithTarget:self
-                                                      selector:@selector(basicDiskLoad:operation:)
-                                                        object:result] autorelease];
-        [iconOperationQueue_ addOperation:basicOp];
-      }
-      NSString *urlString = IconURLStringForResult(result);
-      NSInvocationOperation *advancedOperation = nil;
-      if ([urlString hasPrefix:@"file:"]) {
-        advancedOperation
-          = [[[NSInvocationOperation alloc] hgs_initWithTarget:self
-                                                      selector:@selector(advancedDiskLoad:operation:)
-                                                        object:result] autorelease];
-      } else {
-        // Explicitly without the colon, as we will take https as well.
-        if ([urlString hasPrefix:@"http"]) {
-          NSURL *url = [NSURL URLWithString:urlString];
-          NSURLRequest *request = [NSURLRequest requestWithURL:url];
-          GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
-          [fetcher setUserData:result];
-          advancedOperation
-            = [[[HGSFetcherOperation alloc] initWithTarget:self
-                                                forFetcher:fetcher
-                                         didFinishSelector:@selector(httpFetcher:finishedWithData:operation:)
-                                           didFailSelector:@selector(httpFetcher:failedWithError:operation:)]
-             autorelease];
-        }
-      }
-      if (advancedOperation) {
-        [iconOperationQueue_ addOperation:advancedOperation];
-      }
-    }
-  }
-  if (!icon) {
-    if (skipPlaceholder) {
-      icon = [self basicDiskLoad:result operation:nil];
-    } else {
-      icon = [self placeHolderIcon];
-    }
-  }
-  return icon;
-}
-
-- (void)cancelOperationsForResult:(HGSResult*)result {
-  NSArray *operations = [self operationsForResult:result];
-  [operations makeObjectsPerformSelector:@selector(cancel)];
+- (HGSIconProvider *)iconProviderForResult:(HGSResult *)result
+                           skipPlaceholder:(BOOL)skipPlaceholder {
+  return [[[HGSIconProvider alloc] initWithResult:result 
+                                  skipPlaceholder:skipPlaceholder] autorelease];
 }
 
 - (NSImage *)cachedIconForKey:(NSString *)key fromCache:(HGSLRUCache *)cache {
@@ -469,9 +399,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
   NSString *key = [args objectForKey:kHGSIconProviderAttrKey];
   NSImage *icon = [args objectForKey:kHGSIconProviderValueKey];
   NSString *uri = [args objectForKey:kHGSIconProviderURIKey];
-  HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
   [result willChangeValueForKey:key];
-  [provider cacheIcon:icon forKey:uri];
+  [self cacheIcon:icon forKey:uri];
   [result didChangeValueForKey:key];
 }
 
@@ -489,11 +418,117 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
                       waitUntilDone:NO];
 }
 
-- (NSImage *)basicDiskLoad:(HGSResult *)result operation:(NSOperation *)op {
-  if ([op isCancelled]) return nil;
+- (NSOperationQueue *)iconOperationQueue {
+  return iconOperationQueue_;
+}
+@end
 
+@implementation HGSIconProvider
+
+@synthesize icon = icon_;
+@dynamic result;
+@synthesize basicOperation = basicOperation_;
+@synthesize advancedOperation = advancedOperation_;
+
+- (id)initWithResult:(HGSResult *)result skipPlaceholder:(BOOL)skipPlaceholder {
+  if ((self = [super init])) {
+    [self setResult:result];
+    HGSIconCache *cache = [HGSIconCache sharedIconCache];
+    // Check to see if we have a cached icon
+    NSImage *icon = [cache cachedIconForResult:result];
+    NSOperation *basicOp = nil;
+    NSOperation *advancedOp = nil;
+    if (!icon) {
+      // No cached icon
+      // Check to see if we have a cached basic icon
+      icon = [cache cachedBasicIconForResult:result];
+      if (!icon && !skipPlaceholder) {
+        basicOp
+          = [[[NSInvocationOperation alloc] initWithTarget:self
+                                                  selector:@selector(basicDiskLoad:)
+                                                    object:nil] autorelease];
+      }
+      NSString *urlString = IconURLStringForResult(result);
+      if ([urlString hasPrefix:@"file:"]) {
+        advancedOp
+          = [[[NSInvocationOperation alloc] initWithTarget:self
+                                                  selector:@selector(advancedDiskLoad:)
+                                                    object:nil] autorelease];
+      } else {
+        // Explicitly without the colon, as we will take https as well.
+        if ([urlString hasPrefix:@"http"]) {
+          NSURL *url = [NSURL URLWithString:urlString];
+          NSURLRequest *request = [NSURLRequest requestWithURL:url];
+          GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
+          [fetcher setUserData:result];
+          advancedOp
+            = [[[HGSFetcherOperation alloc] initWithTarget:self
+                                                forFetcher:fetcher
+                                         didFinishSelector:@selector(httpFetcher:finishedWithData:operation:)
+                                           didFailSelector:@selector(httpFetcher:failedWithError:operation:)]
+               autorelease];
+        }
+      }
+    }
+    if (!icon) {
+      if (!skipPlaceholder) {
+       icon = [cache placeHolderIcon];
+      } 
+    }
+    if (icon) {
+      [self setIcon:icon];
+    }
+    if (!icon && skipPlaceholder) {
+      [self basicDiskLoad:nil];
+    }
+    NSOperationQueue *iconOperationQueue = [cache iconOperationQueue];
+    if (basicOp) {
+      [self setBasicOperation:basicOp];
+      [iconOperationQueue addOperation:basicOp];
+    }
+    if (advancedOp) {
+      [self setAdvancedOperation:advancedOp];
+      [iconOperationQueue addOperation:advancedOp];
+    }
+  }
+  return self;
+}
+
+- (void)dealloc {
+  [self setResult:nil];
+  NSOperation *basicOperation = [self basicOperation];
+  [basicOperation cancel];
+  [self setBasicOperation:nil];
+  NSOperation *advancedOperation = [self advancedOperation];
+  [advancedOperation cancel];
+  [self setAdvancedOperation:nil];
+  [self setIcon:nil];
+  [super dealloc];
+}
+
+- (HGSResult *)result {
+  HGSResult *result = nil;
+  @synchronized (self) {
+    result = [result_ retain];
+  }
+  return [result autorelease];
+}
+
+- (void)setResult:(HGSResult *)result {
+  @synchronized (self) {
+    result_ = result;
+  }
+}
+
+- (void)basicDiskLoad:(id)ignored {
+  NSOperation *basicOperation = [self basicOperation];
+  [self setBasicOperation:nil];
+  if ([basicOperation isCancelled]) return;
+  HGSResult *result = [self result];
+  if (!result) return;
+  
   NSString *urlString = IconURLStringForResult(result);
-  if (!urlString) return nil;
+  if (!urlString) return;
   NSImage *icon = nil;
   if ([urlString hasPrefix:@"file://"]) {
     if (!icon) {
@@ -508,20 +543,24 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
     NSURL *url = [NSURL URLWithString:urlString];
     icon = FileSystemImageForURL(url);
   }
-  if ([op isCancelled]) return nil;
+  if ([basicOperation isCancelled]) return;
   if (icon) {
-    HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
-    [sharedIconProvider cacheBasicIcon:icon forResult:result];
-    [sharedIconProvider setIcon:icon
-                      forResult:result];
+    [self setIcon:icon];
+    HGSIconCache *cache = [HGSIconCache sharedIconCache];
+    [cache cacheBasicIcon:icon forResult:result];
+    [cache setIcon:icon forResult:result];
   }
-  return icon;
+  
 }
 
-- (NSImage *)advancedDiskLoad:(HGSResult *)result operation:(NSOperation *)op {
-  if ([op isCancelled]) return nil;
+- (void)advancedDiskLoad:(id)ignored {
+  NSOperation *advancedOperation = [self advancedOperation];
+  [self setAdvancedOperation:nil];
+  
+  if ([advancedOperation isCancelled]) return;
+  HGSResult *result = [self result];
+  if (!result) return;
 
-  HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
   NSString *urlString = IconURLStringForResult(result);
   NSImage *icon = nil;
   if (urlString) {
@@ -541,11 +580,11 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
                                               (CFURLRef)url,
                                               CGSizeMake(96, 96),
                                               (CFDictionaryRef)dict);
-      if ([op isCancelled]) {
+      if ([advancedOperation isCancelled]) {
         if (ref) {
           CFRelease(ref);
         }
-        return nil;
+        return;
       }
 
       if (ref) {
@@ -561,11 +600,11 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
       }
     }
     if (icon) {
-      [sharedIconProvider setIcon:icon
-                        forResult:result];
+      [self setIcon:icon];
+      HGSIconCache *cache = [HGSIconCache sharedIconCache];
+      [cache setIcon:icon forResult:result];
     }
   }
-  return icon;
 }
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
@@ -573,13 +612,13 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
           operation:(NSOperation *)operation {
   if ([operation isCancelled]) return;
 
-  HGSIconProvider *sharedIconProvider = [HGSIconProvider sharedIconProvider];
   NSImage *favicon = [[[NSImage alloc] initWithData:retrievedData] autorelease];
   NSURL *url = [[fetcher request] URL];
   NSImage *icon = nil;
+  HGSIconCache *cache = [HGSIconCache sharedIconCache];
   if ([[url absoluteString] hasSuffix:@"favicon.ico"]) {
     NSImage *baseImage = FileSystemImageForURL(url);
-    NSSize iconSize = [sharedIconProvider preferredIconSize];
+    NSSize iconSize = [cache preferredIconSize];
     NSSize baseImageSize = NSMakeSize(32, 32);
     NSSize faviconSize = NSMakeSize(16, 16);
     [baseImage setSize:baseImageSize];
@@ -650,8 +689,9 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconProvider, sharedIconProvider);
     icon = favicon;
   }
   if (icon) {
+    [self setIcon:icon];
     HGSResult *result = [fetcher userData];
-    [sharedIconProvider setIcon:icon forResult:result];
+    [cache setIcon:icon forResult:result];
   }
 }
 

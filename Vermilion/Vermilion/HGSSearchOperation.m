@@ -238,7 +238,7 @@ NSString *const kHGSSearchOperationWasCancelledNotification
   return operation_;
 }
 
-- (void)run:(BOOL)onThread {
+- (void)runOnCurrentThread:(BOOL)onThread {
   NSOperation *operation = [self searchOperation];
   queueTime_ = mach_absolute_time();
   if (onThread) {

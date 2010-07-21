@@ -228,8 +228,8 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
         if (buddyPictureData) {
           NSImage *image = [[[NSImage alloc] initWithData:buddyPictureData]
                             autorelease];
-          HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
-          value = [provider imageWithRoundRectAndDropShadow:image];
+          HGSIconCache *cache = [HGSIconCache sharedIconCache];
+          value = [cache imageWithRoundRectAndDropShadow:image];
         }
       }
     }

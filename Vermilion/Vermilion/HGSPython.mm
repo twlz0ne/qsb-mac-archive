@@ -888,9 +888,6 @@ static PyObject *QuerySetResults(Query *self, PyObject *args) {
       = [[HGSPython sharedPython] resultsFromObjects:pythonResults
                                       tokenizedQuery:queryString
                                               source:source];
-    if (pythonResults) {
-      Py_DECREF(pythonResults);
-    }
     [self->operation_ setRankedResults:results];
   }
 

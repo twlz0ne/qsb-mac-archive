@@ -35,10 +35,8 @@
 #import "HGSOperation.h"
 #import <GData/GDataHTTPFetcher.h>
 
-static const useconds_t kDiskOperationLength = 500000; // microseconds
 static const useconds_t kNetworkOperationLength = 500000; // microseconds
-static const NSInteger kMemoryOperationCount = 10;
-static const NSInteger kNormalOperationCount = 5;
+
 // Use a prefix instead of full URL in case we are running our tests in a
 // non-US based country
 static NSString * const kGoogleUrlPrefix = @"http://www.google.";
@@ -50,8 +48,6 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   BOOL          finishedWithData_;
   BOOL          failedWithStatus_;
   BOOL          failedWithError_;
-  NSInteger     memoryOperations_;
-  NSInteger     normalOperations_;
 }
 @end
 
@@ -121,19 +117,6 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   }
 }
 
-- (id)memoryOperationCounter:(id)obj operation:(NSOperation *)op {
-  @synchronized(self) {
-    memoryOperations_++;
-  }
-  return nil;
-}
-
-- (void)normalOperationCounter:(id)obj {
-  @synchronized(self) {
-    normalOperations_++;
-  }
-}
-
 - (void)testNetworkOperations {
   NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
   NSCondition *condition = [[[NSCondition alloc] init] autorelease];
@@ -193,43 +176,6 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
                @"failedWithError: not called for status by network operation");
   STAssertTrue(failedWithError_,
                @"failedWithError: not called for network error by network operation");
-}
-
-- (void)testHGSInvocationOperations {
-  NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
-  for (NSInteger i = 0; i < kMemoryOperationCount; i++) {
-    NSOperation *memoryOp 
-      = [[NSInvocationOperation alloc] hgs_initWithTarget:self
-                                                 selector:@selector(memoryOperationCounter:operation:)
-                                                   object:self];
-    STAssertNotNil(memoryOp, @"failed to create memory op");
-    [queue addOperation:memoryOp];
-    [memoryOp release];
-  }
-  
-  [queue waitUntilAllOperationsAreFinished];
-  
-  STAssertEquals(memoryOperations_, kMemoryOperationCount,
-                 @"incorrect number of memory operations completed");
-}
-
-- (void)testNSInvocationOperations {
-  // Make sure that plain NSInvocationOperations work OK with our
-  // NSOperationQueue subclass
-  NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
-  for (int i = 0; i < kNormalOperationCount; i++) {
-    NSOperation *normalOp = [[NSInvocationOperation alloc]
-                             initWithTarget:self
-                                   selector:@selector(normalOperationCounter:)
-                                     object:self];
-    STAssertNotNil(normalOp, @"failed to create memory op");
-    [queue addOperation:normalOp];
-  }
-  
-  [queue waitUntilAllOperationsAreFinished];
-  
-  STAssertEquals(normalOperations_, kNormalOperationCount,
-                 @"incorrect number of memory operations completed");
 }
 
 @end

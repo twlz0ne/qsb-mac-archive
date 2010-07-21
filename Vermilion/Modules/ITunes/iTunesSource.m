@@ -142,7 +142,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   NSMutableDictionary *genreIconCache_;
 }
 
-- (void)updateIndex:(id)sender operation:(NSOperation *)operation;
+- (void)updateIndex:(id)sender;
 - (void)updateIndexTimerFired:(NSTimer *)timer;
 - (GTMSQLiteDatabase *)createDatabase;
 - (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
@@ -262,7 +262,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return [libraryLocation stringByExpandingTildeInPath];
 }
 
-- (void)updateIndex:(id)sender operation:(NSOperation *)operation {
+- (void)updateIndex:(id)sender {
+  if ([updateOperation_ isCancelled]) return;
+  
   GTMSQLiteDatabase *db = nil;
     
   NSString *pathToITunesXml = [self libraryLocation];
@@ -284,7 +286,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   NSInteger trackCount = [tracks count];
   NSEnumerator *trackEnumerator = [tracks objectEnumerator];
   for (NSInteger chunkIteration = 0; chunkIteration < trackCount;) {
-    if ([operation isCancelled]) return;
+    if ([updateOperation_ isCancelled]) return;
     NSAutoreleasePool *loopPool = [[NSAutoreleasePool alloc] init];
     NSString *trackSql = @"BEGIN TRANSACTION;\n";
     for (NSInteger trackIteration = 0;
@@ -337,7 +339,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
   NSArray *playlists = [rootDictionary objectForKey:kPlaylistsKey];
   for (NSDictionary *playlist in playlists) {
-    if ([operation isCancelled]) return;
+    if ([updateOperation_ isCancelled]) return;
     if ([[playlist objectForKey:@"Master"] boolValue]) {
       // Don't index the master playlist, it's a rehash of everything we've
       // already indexed above
@@ -394,9 +396,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   [updateOperation_ cancel];
   [updateOperation_ release];
   updateOperation_ 
-    = [[NSInvocationOperation alloc] hgs_initWithTarget:self
-                                               selector:@selector(updateIndex:operation:)
-                                                 object:nil];
+    = [[NSInvocationOperation alloc] initWithTarget:self
+                                           selector:@selector(updateIndex:)
+                                             object:nil];
   [queue addOperation:updateOperation_];
 }
 

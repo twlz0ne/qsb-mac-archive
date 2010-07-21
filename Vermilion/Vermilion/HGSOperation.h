@@ -39,24 +39,6 @@
 @class GDataHTTPFetcher;
 
 /*!
- Simple category on NSInvocationOperation that passes the operation being run
- into the selector.
-*/
-@interface NSInvocationOperation (HGSInvocationOperation)
-
-/*!
- @param target The target for sel.
- @param sel A selector that must be of the form:
- <p><code>- (void)selector:(id)arg operation:(NSOperation *)op</code></p>
- op can then be used to check for cancellation.
- @param arg The argument to be passed to sel.
- @result The object.
-*/
-- (id)hgs_initWithTarget:(id)target selector:(SEL)sel object:(id)arg;
-
-@end
-
-/*!
  An operation that wraps around a fetcher. All callbacks will be made on the
  operation thread.
 */

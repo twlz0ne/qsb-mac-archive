@@ -55,7 +55,7 @@
                                      source:searchSourceMock
                                  attributes:nil];
   STAssertNotNil(result, nil);
-  HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
+  HGSIconCache *cache = [HGSIconCache sharedIconCache];
   [[[searchSourceMock stub] andReturn:nil]
    provideValueForKey:kHGSObjectAttributeIconPreviewFileKey result:result];
   [[[searchSourceMock expect] andReturn:nil]
@@ -63,8 +63,9 @@
   [[[searchSourceMock stub] andReturn:@"Display Name"] displayName];
   [[[searchSourceMock stub] andReturn:nil] 
    provideValueForKey:kHGSObjectAttributeUTTypeKey result:result];
-  NSImage *icon = [provider provideIconForResult:result 
-                                 skipPlaceholder:YES];
+  HGSIconProvider *provider = [cache iconProviderForResult:result 
+                                           skipPlaceholder:YES];
+  NSImage *icon = [provider icon];
   // Not using GTMAssertObjectImageEqualToImageNamed because it appears there
   // is an issue with the OS returning icons to us that aren't really
   // of generic color space. 
@@ -73,8 +74,8 @@
 }
 
 - (void)testRoundRectAndDropShadow {
-  HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
-  NSSize size = [provider preferredIconSize];
+  HGSIconCache *cache = [HGSIconCache sharedIconCache];
+  NSSize size = [cache preferredIconSize];
   STAssertEquals(size.height, (CGFloat)96.0, nil);
   STAssertEquals(size.width, (CGFloat)96.0, nil);
   // Create up NSImage using CG calls because doing it using lockFocus and
@@ -105,7 +106,7 @@
     = [[[NSBitmapImageRep alloc] initWithCGImage:cgImage] autorelease];
   NSImage *image = [[[NSImage alloc] initWithSize:size] autorelease];
   [image addRepresentation:bitmap];
-  image = [provider imageWithRoundRectAndDropShadow:image];
+  image = [cache imageWithRoundRectAndDropShadow:image];
   GTMAssertObjectImageEqualToImageNamed(image, @"RoundRectAndDropShadow", nil);
 }
   

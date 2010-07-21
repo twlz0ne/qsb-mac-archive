@@ -40,10 +40,22 @@
 @class HGSLRUCache;
 @class HGSResult;
 
+@interface HGSIconProvider : NSObject {
+ @private
+  NSOperation *basicOperation_;
+  NSOperation *advancedOperation_;
+  NSImage *icon_;
+  HGSResult *result_;
+}
+
+@property (readonly, retain) NSImage *icon;
+
+@end
+
 /*!
  A icon caching/retrieval system that will get icons lazily for HGSResults.
 */
-@interface HGSIconProvider : NSObject {
+@interface HGSIconCache : NSObject {
  @private
   NSOperationQueue *iconOperationQueue_;
   HGSLRUCache *advancedCache_;
@@ -55,7 +67,7 @@
 /*!
   Returns the singleton instance of HGSIconProvider
 */
-+ (HGSIconProvider *)sharedIconProvider;
++ (HGSIconCache *)sharedIconCache;
 
 /*!
   Returns our default placeHolderIcon. Do not change this icon. Make a copy and
@@ -70,7 +82,7 @@
 - (NSImage *)compoundPlaceHolderIcon;
 
 /*!
-  Returns an NSImage value for a HGSResult.
+  Returns an HGSIconProvider value for a HGSResult.
   Checks our cache to see if we have an icon, otherwise goes through a
   "waterfall" model to get icons.
   By default the first image returned is a placeholder image.  
@@ -82,21 +94,9 @@
   we really want a "medium" quality icon immediately.
   
   The icon retreived by this method will be cached.
-  
-  The result argument is not retained; it's very important that for icon
-  retrievals cancelOperationsForResult be called whenever a result is going
-  away.
 */
-- (NSImage *)provideIconForResult:(HGSResult *)result
-                  skipPlaceholder:(BOOL)skip;
-
-/*!
-  If provideIconForResult has been called with loadLazily:YES, then the the
-  call to provideIconForResult may be followed by a subsequent call to
-  cancelOperationsForResult if the icon is no longer needed. Calling this
-  method on a result that does not have a pending lazy load is harmless.
-*/
-- (void)cancelOperationsForResult:(HGSResult*)result;
+- (HGSIconProvider *)iconProviderForResult:(HGSResult *)result
+                           skipPlaceholder:(BOOL)skip;
 
 /*!
   Anyone can request that an icon be cached and then retrieve it later.

@@ -39,6 +39,7 @@
 
 @class HGSSearchSource;
 @class HGSTokenizedString;
+@class HGSIconProvider;
 
 // Support the icon property: the phone needs to treat this as a different class
 #if TARGET_OS_IPHONE
@@ -130,6 +131,7 @@ extern NSString* const kHGSObjectStatusStaleValue;
 @interface HGSResult : NSObject <NSCopying> {
  @public
   NSUInteger hash_;
+  HGSIconProvider *iconProvider_;
 }
 
 /*!
@@ -289,7 +291,7 @@ extern NSString* const kHGSObjectStatusStaleValue;
 /*!
  The indexes of charactes of term that |score| was matched against.
 */
-@property (readonly, assign) NSIndexSet *matchedIndexes;
+@property (readonly, retain) NSIndexSet *matchedIndexes;
 
 - (id)initWithResult:(HGSResult *)result 
                score:(CGFloat)score

@@ -37,7 +37,7 @@
 - (void)pathCheckTimer:(NSTimer *)timer;
 - (void)fileChanged:(GTMFileSystemKQueue *)queue 
               event:(GTMFileSystemKQueueEvents)event;
-- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation;
+- (void)updateIndexForPath:(NSString *)path;
 @end
 
 @implementation WebBookmarksSource
@@ -133,9 +133,9 @@
   [indexingOperation_ cancel];
   [indexingOperation_ release];
   indexingOperation_ 
-    = [[NSInvocationOperation alloc] hgs_initWithTarget:self
-                                               selector:@selector(updateIndexForPath:operation:)
-                                                 object:path_];
+    = [[NSInvocationOperation alloc] initWithTarget:self
+                                           selector:@selector(updateIndexForPath:)
+                                             object:path_];
   [[HGSOperationQueue sharedOperationQueue] addOperation:indexingOperation_];
 }
 
@@ -160,10 +160,10 @@
   return domainString;
 }
 
-- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation {
+- (void)updateIndexForPath:(NSString *)path {
   HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
-  [self updateDatabase:database forPath:path operation:operation];
-  if (![operation isCancelled]) {
+  [self updateDatabase:database forPath:path operation:indexingOperation_];
+  if (![indexingOperation_ isCancelled]) {
     [self replaceCurrentDatabaseWith:database];
   }
 }

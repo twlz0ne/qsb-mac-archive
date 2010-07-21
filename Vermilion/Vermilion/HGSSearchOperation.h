@@ -89,10 +89,10 @@
 - (void)cancel;
 
 /*!
- Called to get the operation going. |onThread| mean to run it on the current
- thread.
+ Called to get the operation going. Set |onThread| to YES to run it immediately 
+ on the current thread, otherwise it will be posted to an NSOperationQueue.
 */
-- (void)run:(BOOL)onThread;
+- (void)runOnCurrentThread:(BOOL)onThread;
 @end
 
 /*!

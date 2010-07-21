@@ -465,4 +465,11 @@ static NSString *const kWebURLsWithTitlesPboardType
   }
 }
 
+- (NSArray *)sourcesToRunOnMainThread {
+  return [NSArray arrayWithObjects:
+          @"com.google.qsb.shortcuts.source",
+          @"com.google.qsb.plugin.Applications",
+          nil];
+}
+
 @end

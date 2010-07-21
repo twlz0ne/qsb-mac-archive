@@ -68,6 +68,12 @@
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result;
 
 /*!
+  Return a set of identifiers for highspeed sources that we want to run on the
+  mainthread for queries.
+*/
+- (NSArray *)sourcesToRunOnMainThread;
+
+/*!
  Provide client-specific action save-as information to HGS.
  
  Provide save-as information requested by an HGS action given a dictionary

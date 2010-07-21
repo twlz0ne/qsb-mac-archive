@@ -118,9 +118,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   @synchronized([HGSContactsSource class]) {
     if (!sGenericImage) {
       sGenericImage = [NSImage imageNamed:@"blue-contact"];
-      HGSIconProvider *iconProvider = [HGSIconProvider sharedIconProvider];
-      sGenericImage
-        = [iconProvider imageWithRoundRectAndDropShadow:sGenericImage];
+      HGSIconCache *iconCache = [HGSIconCache sharedIconCache];
+      sGenericImage = [iconCache imageWithRoundRectAndDropShadow:sGenericImage];
       [sGenericImage retain];
     }
   }
@@ -502,10 +501,10 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
     // create an image out of the data and put it into the result
     NSImage *image = [[[NSImage alloc] initWithData:data] autorelease];
-    HGSIconProvider *iconProvider = [HGSIconProvider sharedIconProvider];
-    image = [iconProvider imageWithRoundRectAndDropShadow:image];
+    HGSIconCache *iconCache = [HGSIconCache sharedIconCache];
+    image = [iconCache imageWithRoundRectAndDropShadow:image];
     if (image) {
-      [iconProvider setIcon:image forResult:result];
+      [iconCache setIcon:image forResult:result];
     }
   }
 }
@@ -524,8 +523,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 }
 
 - (NSImage *)loadImageForObject:(HGSResult *)result {
-  NSImage *image 
-    = [[HGSIconProvider sharedIconProvider] cachedIconForResult:result];
+  NSImage *image = [[HGSIconCache sharedIconCache] cachedIconForResult:result];
   if (!image) {
     ABPerson *person = (ABPerson *)[self personForResult:result];
     NSInteger tag = [person beginLoadingImageDataForClient:self];

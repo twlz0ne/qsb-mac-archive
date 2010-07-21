@@ -129,13 +129,13 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
 #pragma mark -
 #pragma mark Album Fetching
 
-- (void)asyncFetch:(GDataServiceGooglePhotos *)service
-         operation:(NSOperation *)operation {
+- (void)asyncFetch:(GDataServiceGooglePhotos *)service {
   GDataServiceTicket *ticket = [self fetchTicketForService:service];
   HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
   HGSGDataServiceIndexContext *context
-    = [[[HGSGDataServiceIndexContext alloc]
-        initWithOperation:operation service:service database:database]
+    = [[[HGSGDataServiceIndexContext alloc] initWithOperation:indexOp_ 
+                                                      service:service 
+                                                     database:database]
        autorelease];
   [context addTicket:ticket];
   [ticket setUserData:context];
@@ -207,9 +207,9 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
   [indexOp_ cancel];
   [indexOp_ release];
   indexOp_
-    = [[NSInvocationOperation alloc] hgs_initWithTarget:self
-                                               selector:@selector(asyncFetch:operation:)
-                                                 object:service_];
+    = [[NSInvocationOperation alloc] initWithTarget:self
+                                           selector:@selector(asyncFetch:)
+                                             object:service_];
   [[HGSOperationQueue sharedOperationQueue] addOperation:indexOp_];
 
   [self setUpPeriodicRefresh];

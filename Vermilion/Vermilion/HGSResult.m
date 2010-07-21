@@ -117,7 +117,7 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
 }
 
 - (void)dealloc {
-  [[HGSIconProvider sharedIconProvider] cancelOperationsForResult:self];
+  [iconProvider_ release];
   [super dealloc];
 }
 
@@ -138,10 +138,15 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
       if ([source providesIconsForResults]) {
         value = [source provideValueForKey:key result:self];
       } else {
-        HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
-        BOOL skip = [key isEqualToString:kHGSObjectAttributeImmediateIconKey];
-        value = [provider provideIconForResult:self
-                               skipPlaceholder:skip];
+        @synchronized(self) {
+          if (!iconProvider_) {
+            HGSIconCache *cache = [HGSIconCache sharedIconCache];
+            BOOL skip = [key isEqualToString:kHGSObjectAttributeImmediateIconKey];
+            iconProvider_ = [[cache iconProviderForResult:self
+                                          skipPlaceholder:skip] retain];
+          }
+          value = [iconProvider_ icon];
+        }
       }
     }  
     if (!value) {
@@ -869,8 +874,8 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     HGSScoredResult *result = [results_ objectAtIndex:0];
     displayImage = [result valueForKey:kHGSObjectAttributeIconKey];
   } else {
-    HGSIconProvider *provider = [HGSIconProvider sharedIconProvider];
-    displayImage = [provider compoundPlaceHolderIcon];
+    HGSIconCache *cache = [HGSIconCache sharedIconCache];
+    displayImage = [cache compoundPlaceHolderIcon];
   }
   return displayImage;
 }
