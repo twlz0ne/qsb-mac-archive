@@ -44,9 +44,10 @@
 @class HGSActionArgument;
 @class HGSActionOperation;
 
-typedef enum {
+enum {
   eHGSQueryShowAlternatesFlag = 1 << 0,
-} HGSQueryFlags;
+};
+typedef NSUInteger HGSQueryFlags;
 
 /*!
  Represents a fully-parsed query string in a format that's easily digestable

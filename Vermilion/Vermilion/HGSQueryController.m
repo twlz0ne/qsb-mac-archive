@@ -46,6 +46,8 @@
 #import "HGSMemorySearchSource.h"
 #import "HGSBundle.h"
 #import "HGSTokenizer.h"
+#import "HGSPluginLoader.h"
+#import "HGSDelegate.h"
 #import <mach/mach_time.h>
 
 NSString *const kHGSQueryControllerWillStartNotification
@@ -148,41 +150,22 @@ NSString *const kQuerySlowSourceTimeoutSecondsPrefKey = @"slowSourceTimeout";
       }
     }
   }
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  BOOL alwaysRunOnMainThread
-    = [defaults boolForKey:@"runQSBSearchesOnMainThread"];
-  UInt64 startUpTime = 0;
-  // We will run up to 50 ms of queries on the main thread. This cuts
-  // down on the overhead of thread creation, and gives us really fast
-  // first results for quick sources.
-  AbsoluteTime absoluteWaitTime = DurationToAbsolute(durationMillisecond * 50);
-  UInt64 waitTime = UnsignedWideToUInt64(absoluteWaitTime);
+  NSArray *sourceIdentifiersToRunOnMainThread 
+    = [[[HGSPluginLoader sharedPluginLoader] delegate] sourcesToRunOnMainThread];
+  NSUInteger sourceCount = [sourceIdentifiersToRunOnMainThread count];
+  NSMutableArray *operationsToRunOnMainThread 
+    = [NSMutableArray arrayWithCapacity:sourceCount];
   for (HGSSearchOperation *operation in queryOperations_) {
-    HGSSearchSource *source = [operation source];
-    UInt64 averageTimeForSource = [sourceRanker averageTimeForSource:source];
-    BOOL runOnMainThread = ((averageTimeForSource > 0)
-                            && ((startUpTime + averageTimeForSource) < waitTime));
-    if (runOnMainThread) {
-      startUpTime += averageTimeForSource;
-    }
-    [operation run:alwaysRunOnMainThread || runOnMainThread];
-  }
-#if DEBUG
-  for (HGSSearchOperation *op in pendingQueryOperations_) {
-    NSString *identifier = [[op source] identifier];
-    if ([identifier isEqual:@"com.google.qsb.shortcuts.source"]
-        || [identifier isEqual:@"com.google.qsb.plugin.Applications"]) {
-      NSMutableArray *runOperations = [[queryOperations_ mutableCopy] autorelease];
-      [runOperations removeObjectsInArray:pendingQueryOperations_];
-
-      HGSLog(@"*** APPLICATION OR SHORTCUT SOURCE NOT RUN ON MAINTHREAD ***\n"
-             @"Please check for performance issue of these sources.\n"
-             @"Pending Ops: %@\n\n------\n\nRun Ops: %@",
-             pendingQueryOperations_, runOperations);
-      break;
+    NSString *identifier = [[operation source] identifier];
+    if ([sourceIdentifiersToRunOnMainThread containsObject:identifier]) {
+      [operationsToRunOnMainThread addObject:operation];
+    } else {
+      [operation runOnCurrentThread:NO];
     }
   }
-#endif  // DEBUG
+  for (HGSSearchOperation *operation in operationsToRunOnMainThread) {
+    [operation runOnCurrentThread:YES];
+  }
   // Normally we inform the observer that we are done when the last source
   // reports in; if we don't have any sources that will never happen, so just
   // call the query done immediately.
