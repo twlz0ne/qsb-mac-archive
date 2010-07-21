@@ -113,7 +113,7 @@
   // We don't know for sure which way this comparison will go depending
   // on the locale we run out tests in.
   NSComparisonResult result = [otherCategory compare:musicCategory];
-  STAssertNotEquals(result, NSOrderedSame, nil);
+  STAssertNotEquals(result, (NSComparisonResult)NSOrderedSame, nil);
 }
 
 - (void)testCategoryNames {

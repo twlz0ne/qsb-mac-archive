@@ -41,6 +41,7 @@
  @private
   int notificationCount_;
 }
+- (void)displayUserMessage:(NSNotification *)notification;
 @end
 
 @implementation HGSPythonActionTest

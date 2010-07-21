@@ -170,7 +170,7 @@
   STAssertNotNil(query, nil);
   HGSSearchOperation *operation = [[self source] searchOperationForQuery:query];
   STAssertNotNil(operation, nil);
-  [operation run:YES];
+  [operation runOnCurrentThread:YES];
   NSSet *suggestSet = [NSSet setWithObject:kHGSTypeSuggest];
   HGSTypeFilter *filter
     = [HGSTypeFilter filterWithDoesNotConformTypes:suggestSet];
@@ -218,49 +218,6 @@
 - (void)testNilOperation {
   HGSSearchOperation *operation = [[self source] searchOperationForQuery:nil];
   STAssertNil(operation, nil);
-}
-
-- (void)testSimpleOperation {
-  NSString *testFilePath = [self createTestFile:@"testSimpleOperation.txt"];
-  [self mdimportFile:testFilePath];
-  NSArray *results = [self performSearchFor:uniqueTestString_ pivotingOn:nil];
-  STAssertGreaterThan([results count], (NSUInteger)0,  
-                      @"QueryString: %@", uniqueTestString_);  
-
-}
-
-- (void)testSearchingFinderComments {  
-  NSString *commentString 
-    = [NSString stringWithFormat:@"%@%@", @"arachi", @"butyrophobia"];
-  NSString *testFilePath 
-    = [self createTestFile:@"testSearchingFinderComments.txt"];
-  NSBundle *pluginBundle = HGSGetPluginBundle();
-  NSString *scriptPath = [pluginBundle pathForResource:@"SLFilesSourceTestScript"
-                                                ofType:@"scpt"
-                                           inDirectory:@"Scripts"];
-  STAssertNotNil(scriptPath, nil);
-  NSURL *scriptURL = [NSURL fileURLWithPath:scriptPath];
-  STAssertNotNil(scriptURL, nil);
-  NSDictionary *error = nil;
-  NSAppleScript *script 
-    = [[[NSAppleScript alloc] initWithContentsOfURL:scriptURL 
-                                              error:&error] autorelease];
-  STAssertNotNil(script, @"Unable to load script %@", error);
-  NSArray *args = [NSArray arrayWithObjects:testFilePath, commentString, nil];
-  NSAppleEventDescriptor *desc 
-    = [script gtm_executePositionalHandler:@"setSpotlightComment"
-                                parameters:args
-                                     error:&error];
-  STAssertNotNil(desc, @"Script returned %@ for expression '%@' with file %@", 
-                 error, 
-                 [[script source] substringWithRange:
-                  [[error objectForKey:@"NSAppleScriptErrorRange"] rangeValue]],
-                 testFilePath);
-  [self mdimportFile:testFilePath];
-  NSArray *results = [self performSearchFor:uniqueTestString_ pivotingOn:nil];
-  STAssertGreaterThan([results count], (NSUInteger)0,  
-                      @"QueryString: %@ FilePath:%@", uniqueTestString_, testFilePath);  
-
 }
 
 - (void)testUtiFilter {
@@ -357,7 +314,7 @@
   HGSResultArray *array = [HGSResultArray arrayWithResult:mailResult];
   STAssertNotNil(array, nil);
   NSArray *results = [self performSearchFor:@"sender" pivotingOn:array];
-  STAssertEquals([results count], 0U, nil);
+  STAssertEquals([results count], (NSUInteger)0, nil);
 }
 
 - (void)testGoodMailPivot {
@@ -488,7 +445,7 @@
   [expectedTypes addObject:kHGSTypeFileApplication];
   [filePaths addObject:@"/Applications"];
   [expectedTypes addObject:kHGSTypeDirectory];
-  [filePaths addObject:@"/System/Library/Extensions.mkext"];
+  [filePaths addObject:@"/System/Library/DTDs/sdef.dtd"];
   [expectedTypes addObject:kHGSTypeFile];
   NSUInteger i = 0;
   for (NSString *path in filePaths) {

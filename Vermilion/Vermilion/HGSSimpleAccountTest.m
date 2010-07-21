@@ -50,6 +50,9 @@ static NSString *const kServiceName
 @property BOOL receivedWillBeRemovedNotification;
 @property (retain) HGSAccount *account;
 
+- (void)passwordChanged:(NSNotification *)notification;
+- (void)willBeRemoved:(NSNotification *)notification;
+
 @end
 
 @interface SimpleAccount : HGSSimpleAccount

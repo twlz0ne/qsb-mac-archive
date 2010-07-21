@@ -97,7 +97,6 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
   return self;
 }
 
-// COV_NF_START
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self cancelAllTickets];
@@ -106,7 +105,6 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
   [account_ release];
   [super dealloc];
 }
-// COV_NF_END
 
 - (void)uploadGDataEntry:(GDataEntryBase *)dataEntry
               entryTitle:(NSString *)entryTitle

@@ -92,6 +92,10 @@ static NSString *const kAccountTypeAName = @"Account Type A";
 @property (retain) HGSAccount *expectedAccount;
 
 - (void)removeAllAccountsAndTypes;
+- (void)didAddAccountExtensionNotification:(NSNotification *)notification;
+- (void)willRemoveAccountExtensionNotification:(NSNotification *)notification;
+- (void)willRemoveAccountNotification:(NSNotification *)notification;
+- (void)didRemoveAccountExtensionNotification:(NSNotification *)notification;
 
 @end
 

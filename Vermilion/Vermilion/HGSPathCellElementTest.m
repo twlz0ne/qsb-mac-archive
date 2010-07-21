@@ -87,7 +87,7 @@
        nil];
   NSArray *cellArray = [HGSPathCellElement pathCellArrayWithElements:elements];
   STAssertNotNil(cellArray, nil);
-  STAssertEquals([cellArray count], 2U, nil);
+  STAssertEquals([cellArray count], (NSUInteger)2, nil);
 
   NSDictionary *cellA = [cellArray objectAtIndex:0];
   STAssertNotNil(cellA, nil);

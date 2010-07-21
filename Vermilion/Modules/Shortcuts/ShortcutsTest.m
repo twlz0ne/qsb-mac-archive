@@ -142,7 +142,8 @@
  @private
   BOOL foundResult_;
 }
-
+- (void)emptyResults:(NSNotification *)notification;
+- (void)singlePivotDidUpdateResultsNotification:(NSNotification *)notification;
 @end
 
 @implementation ShortcutsSourceTest
@@ -167,7 +168,7 @@
              selector:@selector(emptyResults:) 
                  name:kHGSSearchOperationDidUpdateResultsNotification 
                object:op];
-  [op run:YES];
+  [op runOnCurrentThread:YES];
   NSRunLoop *rl = [NSRunLoop currentRunLoop];
   [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
   [center removeObserver:self];
@@ -220,13 +221,13 @@
                                                     queryFlags:0] autorelease];
   HGSSearchOperation *op = [[self source] searchOperationForQuery:query];
   [center addObserver:self
-             selector:@selector(testSinglePivotDidUpdateResultsNotification:) 
+             selector:@selector(singlePivotDidUpdateResultsNotification:) 
                  name:kHGSSearchOperationDidUpdateResultsNotification 
                object:op];
   foundResult_ = NO;
   
   // run ourself, and spin the runloop
-  [op run:YES];
+  [op runOnCurrentThread:YES];
 
   NSRunLoop *rl = [NSRunLoop currentRunLoop];
   [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
@@ -237,7 +238,7 @@
   STAssertTrue(foundResult_, nil);
 }
 
-- (void)testSinglePivotDidUpdateResultsNotification:(NSNotification *)notification {
+- (void)singlePivotDidUpdateResultsNotification:(NSNotification *)notification {
   HGSSearchOperation *op = [notification object];
   HGSTypeFilter *filter = [HGSTypeFilter filterAllowingAllTypes];
   NSUInteger count = [op resultCountForFilter:filter];

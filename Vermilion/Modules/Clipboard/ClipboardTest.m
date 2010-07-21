@@ -37,6 +37,7 @@ static NSString *const kClipboardTestString = @"Lazarus Long Text";
  @private
   NSArray *results_;
 }
+- (void)gotResults:(NSNotification *)notification;
 @end
 
 @interface ClipboardCopyActionTest : HGSActionAbstractTestCase
@@ -71,7 +72,7 @@ static NSString *const kClipboardTestString = @"Lazarus Long Text";
                  name:kHGSSearchOperationDidUpdateResultsNotification 
                object:op];
   STAssertNil(results_, nil);
-  [op run:YES];
+  [op runOnCurrentThread:YES];
   [rl runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
   STAssertEquals([results_ count], (NSUInteger)1, nil);
   HGSResult *result = [results_ objectAtIndex:0];

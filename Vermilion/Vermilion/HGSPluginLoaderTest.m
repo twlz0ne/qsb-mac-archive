@@ -34,6 +34,7 @@
 #import "GTMSenTestCase.h"
 #import "HGSPluginLoader.h"
 #import "HGSDelegate.h"
+#import "HGSBundle.h"
 
 @interface HGSTestLoaderPlugin : NSObject
 @end
@@ -44,9 +45,12 @@
 @implementation HGSTestLoaderDelegate
 
 - (NSArray *)pluginFolders {
-  NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+  NSBundle *bundle = HGSGetPluginBundle();
   NSString *pluginsPath = [[bundle bundlePath] stringByDeletingLastPathComponent];
-  NSArray *pluginsPaths = [NSArray arrayWithObject:pluginsPath];
+  NSArray *pluginsPaths = nil;
+  if ([pluginsPath length]) {
+    pluginsPaths = [NSArray arrayWithObject:pluginsPath];
+  }
   return pluginsPaths;
 }
 
@@ -75,6 +79,10 @@
   return nil;
 }
 
+- (NSArray *)sourcesToRunOnMainThread {
+  return nil;
+}
+
 @end
 
 
@@ -92,6 +100,7 @@
   HGSTestLoaderDelegate *loaderDelegate
     = [[[HGSTestLoaderDelegate alloc] init] autorelease];
   STAssertNotNil(loaderDelegate, nil);
+  STAssertNotNil([loaderDelegate pluginFolders], nil);
   [pluginLoader setDelegate:loaderDelegate];
   NSArray *errors;
   NSMutableArray *unexpectedErrors = [NSMutableArray array];

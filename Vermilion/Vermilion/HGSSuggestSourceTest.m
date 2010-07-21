@@ -81,18 +81,18 @@
   HGSSuggestSource *suggestSource = (HGSSuggestSource*)source_;
   results = [suggestSource suggestionsWithResponse:nil withQuery:nil];
   STAssertNotNil(results, nil);
-  STAssertEquals([results count], 0U, nil);
+  STAssertEquals([results count], (NSUInteger)0, nil);
 
   results = [suggestSource suggestionsWithResponse:[NSArray array]
                                          withQuery:nil];
   STAssertNotNil(results, nil);
-  STAssertEquals([results count], 0U, nil);
+  STAssertEquals([results count], (NSUInteger)0, nil);
 
   NSArray* noResultResponse = [NSArray arrayWithObject:[NSString string]];
   results = [suggestSource suggestionsWithResponse:noResultResponse
                                          withQuery:nil];
   STAssertNotNil(results, nil);
-  STAssertEquals([results count], 0U, nil);
+  STAssertEquals([results count], (NSUInteger)0, nil);
 
   NSArray* nonStringQueryResponse = [NSArray arrayWithObjects:
     [NSNumber numberWithInt:0],
@@ -101,7 +101,7 @@
   results = [suggestSource suggestionsWithResponse:nonStringQueryResponse
                                          withQuery:nil];
   STAssertNotNil(results, nil);
-  STAssertEquals([results count], 0U, nil);
+  STAssertEquals([results count], (NSUInteger)0, nil);
 }
 
 - (void)testResponseWithJSONData {
@@ -175,7 +175,7 @@
   NSString *nonAsciiResponse = @"[\"a\",[[\"av女郎\",\"473,500 results\",\"4\"],[\"av图片\",\"489,200 results\",\"5\"]]]";
   actualResult = [source responseWithJSONData:[nonAsciiResponse dataUsingEncoding:NSUTF8StringEncoding]];
   STAssertNotNil(actualResult, @"Failed to parse");
-  STAssertEquals([actualResult count], 2U, @"Mismatched return size");
+  STAssertEquals([actualResult count], (NSUInteger)2, @"Mismatched return size");
   NSArray *firstSuggest = [[actualResult objectAtIndex:1] objectAtIndex:0];
   STAssertEqualObjects([firstSuggest objectAtIndex:0],
                        @"av女郎",

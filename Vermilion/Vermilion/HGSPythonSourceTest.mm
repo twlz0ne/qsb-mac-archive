@@ -43,6 +43,7 @@
 @interface HGSPythonSourceTest : GTMTestCase {
   NSArray *results_;
 }
+- (void)gotResults:(NSNotification *)note;
 @end
 
 @implementation HGSPythonSourceTest
@@ -56,6 +57,7 @@
 - (void)testSource {
   HGSPython *sharedPython = [HGSPython sharedPython];
   STAssertNotNil(sharedPython, nil);
+  PythonStackLock stackLock;
 
   NSBundle *bundle = [NSBundle bundleForClass:[self class]];
   [sharedPython appendPythonPath:[bundle resourcePath]];
@@ -65,7 +67,7 @@
                           @"VermilionTest", kPythonClassNameKey,
                           @"python.test", kHGSExtensionIdentifierKey,
                           bundle, kHGSExtensionBundleKey,
-                          nil];
+                          (id)nil];
   STAssertNotNil(config, nil);
 
   HGSPythonSource *source
@@ -91,7 +93,7 @@
          selector:@selector(gotResults:)
              name:kHGSSearchOperationDidUpdateResultsNotification
            object:op];
-  [op run:YES];
+  [op runOnCurrentThread:YES];
 
   int loops = 0;
   while (![op isFinished] && loops++ < 20) {
@@ -118,7 +120,7 @@
        @"A Snippet", kHGSObjectAttributeSnippetKey,
        @"file:///icon.png", kHGSObjectAttributeIconPreviewFileKey,
        @"none.test", kHGSObjectAttributeDefaultActionKey,
-       nil];
+       (id)nil];
   HGSUnscoredResult *result 
     = [HGSUnscoredResult resultWithURI:@"http://www.google.com/"
                                   name:@"Google"
@@ -130,7 +132,7 @@
   PyList_SetItem(results, 0, [sharedPython objectForResult:result]);
   PyObject *setResults = PyString_FromString("SetResults");
   STAssertNotNULL(setResults, nil);
-  PyObject_CallMethodObjArgs(py, setResults, results, nil);
+  PyObject_CallMethodObjArgs(py, setResults, results, NULL);
 
   Py_DECREF(results);
   Py_DECREF(setResults);
