@@ -222,6 +222,10 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
   [cellArray addObject:userCell];
 
   NSRange range = [url rangeOfString:@"://"];
+  if (range.location == NSNotFound) {
+    HGSLog(@"Unable to index bookmark %@", url);
+    return;
+  }
   NSUInteger hostPos = NSMaxRange(range);
   NSString *host = [url substringFromIndex:hostPos];
   NSString *subdomain = nil;
