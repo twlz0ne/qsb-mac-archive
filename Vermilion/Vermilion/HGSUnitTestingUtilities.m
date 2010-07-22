@@ -132,6 +132,10 @@
   return nil;
 }
 
+- (NSArray *)sourcesToRunOnMainThread {
+  return nil;
+}
+
 @end
 
 @implementation HGSExtensionAbstractTestCase 
