@@ -32,7 +32,7 @@
 
 #import "HGSUnitTestingUtilities.h"
 #include <unistd.h>
-
+#import <GTM/GTMNSFileHandle+UniqueName.h>
 #import "FilesystemActions.h"
 
 @interface FileSystemRenameActionTest : HGSActionAbstractTestCase
@@ -41,45 +41,36 @@
 @implementation FileSystemRenameActionTest
 
 - (id)initWithInvocation:(NSInvocation *)invocation {
-  self = [super initWithInvocation:invocation 
-                       pluginNamed:@"CorePlugin" 
+  self = [super initWithInvocation:invocation
+                       pluginNamed:@"CorePlugin"
                extensionIdentifier:@"com.google.core.filesystem.action.rename"];
   return self;
 }
 
 - (NSString *)returnParentDirForRenameTemplate:(NSString *)template
-                                     extension:(NSString *)extension
                                      toNewName:(NSString *)newName {
   // Create a temp file to play with
-  NSString *tempFileTemplate =
-    [NSTemporaryDirectory() stringByAppendingPathComponent:template];
-  if ([extension length]) {
-    tempFileTemplate 
-      = [tempFileTemplate stringByAppendingPathExtension:extension];
-  }
-  const char *tempFileTemplateCString =
-    [tempFileTemplate fileSystemRepresentation];
-  char *tempFileNameCString = strdup(tempFileTemplateCString);
-  int fileDescriptor = mkstemps(tempFileNameCString, (int)[extension length]);
-  STAssertGreaterThan(fileDescriptor, -1, @"Unable to create file %@ (%d)", 
-                      tempFileTemplate, errno);
-  NSString *realFileName = [NSString stringWithUTF8String:tempFileNameCString];
-  free(tempFileNameCString);
-  
+  NSString *path = nil;
+  NSFileHandle *handle
+    = [NSFileHandle gtm_fileHandleForTemporaryFileBasedOn:template
+                                                finalPath:&path];
+  STAssertNotNil(handle, nil);
+  STAssertNotNil(path, nil);
+
   // Create up our file result
   NSBundle *bundle = [NSBundle bundleForClass:[self class]];
   HGSSearchSource *source = [HGSUnitTestingSource sourceWithBundle:bundle];
   STAssertNotNil(source, nil);
-  HGSScoredResult *scoredResult 
-    = [HGSScoredResult resultWithFilePath:realFileName 
+  HGSScoredResult *scoredResult
+    = [HGSScoredResult resultWithFilePath:path
                                    source:source
                                attributes:nil
                                     score:0
                                     flags:0
-                              matchedTerm:nil 
+                              matchedTerm:nil
                            matchedIndexes:nil];
   STAssertNotNil(scoredResult, nil);
-  
+
   // Create our text result
   HGSSearchSource *textSource
     = (HGSSearchSource *)[self extensionWithIdentifier:@"com.google.qsb.core.textinput.source"
@@ -87,21 +78,21 @@
                               extensionPointIdentifier:kHGSSourcesExtensionPoint
                                               delegate:nil];
   STAssertNotNil(textSource, nil);
-  
-  NSDictionary *pasteBoardValue 
+
+  NSDictionary *pasteBoardValue
     = [NSDictionary dictionaryWithObject:newName
                                   forKey:NSStringPboardType];
-  NSDictionary *attributes 
+  NSDictionary *attributes
     = [NSDictionary dictionaryWithObject:pasteBoardValue
                                   forKey:kHGSObjectAttributePasteboardValueKey];
-  
-  HGSUnscoredResult *textResult 
+
+  HGSUnscoredResult *textResult
     = [HGSUnscoredResult resultWithURI:@"userinput:text"
                                   name:newName
                                   type:kHGSTypeTextUserInput
                                 source:textSource
                             attributes:attributes];
-  
+
   // Create our action info
   STAssertNotNil(textResult, nil);
   HGSResultArray *directObjects = [HGSResultArray arrayWithResult:scoredResult];
@@ -112,30 +103,27 @@
                         directObjects, kHGSActionDirectObjectsKey,
                         names, @"com.google.core.filesystem.action.rename.name",
                         nil];
-  
+
   // Perform rename
   HGSAction *action = [self action];
   STAssertNotNil(action, nil);
   BOOL isGood = [action performWithInfo:info];
   STAssertTrue(isGood, nil);
-  return [realFileName stringByDeletingLastPathComponent];
+  return [path stringByDeletingLastPathComponent];
 }
 
 - (void)testRenameUseOldExtension {
   // New Name no extension
-  char *newNameC = strdup("FileSystemRenameActionTestNewName1XXXXXX");
-  STAssertNotNULL(newNameC, nil);
-  newNameC = mktemp(newNameC);
-  NSString *newName = [NSString stringWithUTF8String:newNameC];
-  free(newNameC);
-  NSString *parent 
-    = [self returnParentDirForRenameTemplate:@"FileSystemRenameActionTest1XXXXXX"
-                                   extension:@"txt"
+  NSString *newName
+    = GTMUniqueFileObjectPathBasedOn(@"FileSystemRenameActionTestNewName1XXXXXX");
+  STAssertNotNil(newName, nil);
+  NSString *parent
+    = [self returnParentDirForRenameTemplate:@"FileSystemRenameActionTest1XXXXXX.txt"
                                    toNewName:newName];
   NSFileManager *fm = [NSFileManager defaultManager];
   NSString *expectedPath = [parent stringByAppendingPathComponent:newName];
   expectedPath = [expectedPath stringByAppendingPathExtension:@"txt"];
-  STAssertTrue([fm fileExistsAtPath:expectedPath], @"File not at %@", 
+  STAssertTrue([fm fileExistsAtPath:expectedPath], @"File not at %@",
                expectedPath);
   NSError *error = nil;
   STAssertTrue([fm removeItemAtPath:expectedPath error:&error],
@@ -143,20 +131,15 @@
 }
 
 - (void)testRenameUseNewExtension {
-  // New Name has extension
-  char *newNameC = strdup("FileSystemRenameActionTestNewName2XXXXXX");
-  STAssertNotNULL(newNameC, nil);
-  newNameC = mktemp(newNameC);
-  NSString *newName = [NSString stringWithUTF8String:newNameC];
+  NSString *newName
+    = GTMUniqueFileObjectPathBasedOn(@"FileSystemRenameActionTestNewName2XXXXXX");
   newName = [newName stringByAppendingPathExtension:@"bar"];
-  free(newNameC);
-  NSString *parent 
-    = [self returnParentDirForRenameTemplate:@"FileSystemRenameActionTest2XXXXXX"
-                                   extension:@"txt"
+  NSString *parent
+    = [self returnParentDirForRenameTemplate:@"FileSystemRenameActionTest2XXXXXX.txt"
                                    toNewName:newName];
   NSFileManager *fm = [NSFileManager defaultManager];
   NSString *expectedPath = [parent stringByAppendingPathComponent:newName];
-  STAssertTrue([fm fileExistsAtPath:expectedPath], @"File not at %@", 
+  STAssertTrue([fm fileExistsAtPath:expectedPath], @"File not at %@",
                expectedPath);
   NSError *error = nil;
   STAssertTrue([fm removeItemAtPath:expectedPath error:&error],
@@ -165,18 +148,14 @@
 
 - (void)testRenameNoExtension {
   // No extensions
-  char *newNameC = strdup("FileSystemRenameActionTestNewName2XXXXXX");
-  STAssertNotNULL(newNameC, nil);
-  newNameC = mktemp(newNameC);
-  NSString *newName = [NSString stringWithUTF8String:newNameC];
-  free(newNameC);
-  NSString *parent 
+  NSString *newName
+    = GTMUniqueFileObjectPathBasedOn(@"FileSystemRenameActionTestNewName3XXXXXX");
+  NSString *parent
     = [self returnParentDirForRenameTemplate:@"FileSystemRenameActionTest3XXXXXX"
-                                   extension:nil
                                    toNewName:newName];
   NSFileManager *fm = [NSFileManager defaultManager];
   NSString *expectedPath = [parent stringByAppendingPathComponent:newName];
-  STAssertTrue([fm fileExistsAtPath:expectedPath], @"File not at %@", 
+  STAssertTrue([fm fileExistsAtPath:expectedPath], @"File not at %@",
                expectedPath);
   NSError *error = nil;
   STAssertTrue([fm removeItemAtPath:expectedPath error:&error],

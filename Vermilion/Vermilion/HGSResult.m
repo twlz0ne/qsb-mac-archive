@@ -31,6 +31,12 @@
 //
 
 #import "HGSResult.h"
+
+#import <GTM/GTMMethodCheck.h>
+#import <GTM/GTMNSEnumerator+Filter.h>
+#import <GTM/GTMNSString+URLArguments.h>
+#import <GTM/GTMTypeCasting.h>
+
 #import "HGSType.h"
 #import "HGSTypeFilter.h"
 #import "HGSExtensionPoint.h"
@@ -39,16 +45,13 @@
 #import "HGSIconProvider.h"
 #import "HGSSearchSource.h"
 #import "NSString+ReadableURL.h"
-#import "GTMMethodCheck.h"
 #import "HGSPluginLoader.h"
 #import "HGSDelegate.h"
 #import "HGSBundle.h"
-#import "GTMNSString+URLArguments.h"
-#import "GTMTypeCasting.h"
 #import "HGSSearchSourceRanker.h"
 
 // Notifications
-NSString *const kHGSResultDidPromoteNotification 
+NSString *const kHGSResultDidPromoteNotification
   = @"HGSResultDidPromoteNotification";
 
 // storage and initialization for value names
@@ -83,7 +86,7 @@ NSString *const kHGSObjectAttributeHideGoogleSiteSearchResultsKey
   = @"HGSObjectAttributeHideGoogleSiteSearchResults";
 
 // Contact related keys
-NSString* const kHGSObjectAttributeContactEmailKey = @"HGSObjectAttributeContactEmail";  
+NSString* const kHGSObjectAttributeContactEmailKey = @"HGSObjectAttributeContactEmail";
 NSString* const kHGSObjectAttributeEmailAddressesKey = @"HGSObjectAttributeEmailAddresses";
 NSString* const kHGSObjectAttributeContactsKey = @"HGSObjectAttributeContacts";
 NSString* const kHGSObjectAttributeAlternateActionURIKey = @"HGSObjectAttributeAlternateActionURI";
@@ -148,7 +151,7 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
           value = [iconProvider_ icon];
         }
       }
-    }  
+    }
     if (!value) {
       // If we haven't provided a value, ask our source for a value.
       value = [[self source] provideValueForKey:key result:self];
@@ -207,8 +210,8 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
 
 - (NSString*)description {
   return [NSString stringWithFormat:
-          @"<%@:%p> %@ - %@ (%@ from %@)", 
-          [self class], self, 
+          @"<%@:%p> %@ - %@ (%@ from %@)",
+          [self class], self,
           [self displayName], [self type], [self class], [self source]];
 }
 
@@ -274,30 +277,30 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
 - (id)initWithURI:(NSString *)uri
              name:(NSString *)name
              type:(NSString *)typeStr
-           source:(HGSSearchSource *)source 
+           source:(HGSSearchSource *)source
        attributes:(NSDictionary *)attributes {
-  
+
   if (!uri || !name || !typeStr) {
-    HGSLogDebug(@"Must have an uri, name and typestr for %@ of %@ (%@)", 
+    HGSLogDebug(@"Must have an uri, name and typestr for %@ of %@ (%@)",
                 name, source, uri);
     [self release];
     return nil;
   }
-  
+
   Class concreteClass = nil;
-  if (HGSTypeConformsToType(typeStr, kHGSTypeContact) 
+  if (HGSTypeConformsToType(typeStr, kHGSTypeContact)
       && ![self isKindOfClass:[HGSUnscoredContactResult class]]) {
     concreteClass = [HGSUnscoredContactResult class];
-  } else if (HGSTypeConformsToType(typeStr, kHGSTypeWebpage) 
+  } else if (HGSTypeConformsToType(typeStr, kHGSTypeWebpage)
              && ![self isKindOfClass:[HGSUnscoredWebpageResult class]]) {
     concreteClass = [HGSUnscoredWebpageResult class];
   }
   if (concreteClass) {
     [self release];
-    self = [[concreteClass alloc] initWithURI:uri 
-                                         name:name 
-                                         type:typeStr 
-                                       source:source 
+    self = [[concreteClass alloc] initWithURI:uri
+                                         name:name
+                                         type:typeStr
+                                       source:source
                                    attributes:attributes];
   } else {
     if ((self = [super init])) {
@@ -311,15 +314,15 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
         HGSLog(@"Bad URI - %@ from Source %@", uri, source);
       }
 #endif
-      NSMutableDictionary *abridgedAttrs 
+      NSMutableDictionary *abridgedAttrs
         = [NSMutableDictionary dictionaryWithDictionary:attributes];
       [abridgedAttrs removeObjectsForKeys:[NSArray arrayWithObjects:
-                                           kHGSObjectAttributeURIKey, 
-                                           kHGSObjectAttributeNameKey, 
+                                           kHGSObjectAttributeURIKey,
+                                           kHGSObjectAttributeNameKey,
                                            kHGSObjectAttributeTypeKey,
                                            nil]];
       if (![abridgedAttrs objectForKey:kHGSObjectAttributeLastUsedDateKey]) {
-        [abridgedAttrs setObject:[NSDate distantPast] 
+        [abridgedAttrs setObject:[NSDate distantPast]
                           forKey:kHGSObjectAttributeLastUsedDateKey];
       }
       uri_ = [uri retain];
@@ -327,7 +330,7 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
       displayName_ = [name retain];
       type_ = [typeStr retain];
       source_ = [source retain];
-      
+
       // If we are supplied with an icon, apply it to both immediate
       // and non-immediate icon attributes.
       NSImage *image = [abridgedAttrs objectForKey:kHGSObjectAttributeIconKey];
@@ -343,7 +346,7 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
           }
         }
       }
-      
+
       attributes_ = [abridgedAttrs retain];
     }
   }
@@ -352,8 +355,8 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
 
 - (NSString*)description {
   return [NSString stringWithFormat:
-          @"<%@:%p> [%@ - %@ (%@ from %@)]", 
-          [self class], self, 
+          @"<%@:%p> [%@ - %@ (%@ from %@)]",
+          [self class], self,
           [self displayName], [self type], [self class], [self source]];
 }
 
@@ -367,23 +370,23 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
                                name:name
                                type:typeStr
                              source:source
-                         attributes:attributes] autorelease]; 
+                         attributes:attributes] autorelease];
 }
 
 + (id)resultWithURI:(NSString*)uri
                name:(NSString *)name
                type:(NSString *)typeStr
-             source:(HGSSearchSource *)source 
+             source:(HGSSearchSource *)source
          attributes:(NSDictionary *)attributes {
   return [[[self alloc] initWithURI:uri
                                name:name
                                type:typeStr
                              source:source
-                         attributes:attributes] autorelease]; 
+                         attributes:attributes] autorelease];
 }
 
 + (id)resultWithFilePath:(NSString *)path
-                  source:(HGSSearchSource *)source 
+                  source:(HGSSearchSource *)source
               attributes:(NSDictionary *)attributes {
   id result = nil;
   NSFileManager *fm = [NSFileManager defaultManager];
@@ -392,9 +395,17 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
     if (!type) {
       type = kHGSTypeFile;
     }
-    NSString *uriPath 
-      = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSString *uri 
+
+	// Properly URL escape the components of the file path.
+    NSEnumerator *components
+      = [[path componentsSeparatedByString:@"/"] objectEnumerator];
+    SEL selector = @selector(gtm_stringByEscapingForURLArgument);
+    NSEnumerator *newComponents
+      = [components gtm_enumeratorByMakingEachObjectPerformSelector:selector
+                                                         withObject:nil];
+    NSString *uriPath
+      = [[newComponents allObjects] componentsJoinedByString:@"/"];
+    NSString *uri
       = [NSString stringWithFormat:@"%@%@", kHGSResultFileSchemePrefix, uriPath];
     result = [self resultWithURI:uri
                             name:[fm displayNameAtPath:path]
@@ -405,13 +416,13 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
   return result;
 }
 
-+ (id)resultWithDictionary:(NSDictionary *)dictionary 
++ (id)resultWithDictionary:(NSDictionary *)dictionary
                     source:(HGSSearchSource *)source {
-  return [[[self alloc] initWithDictionary:dictionary 
+  return [[[self alloc] initWithDictionary:dictionary
                                     source:source] autorelease];
 }
 
-- (id)initWithDictionary:(NSDictionary*)attributes 
+- (id)initWithDictionary:(NSDictionary*)attributes
                   source:(HGSSearchSource *)source {
   NSString *uri = [attributes objectForKey:kHGSObjectAttributeURIKey];
   if ([uri isKindOfClass:[NSURL class]]) {
@@ -424,12 +435,12 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
     if (![fm fileExistsAtPath:path]) {
       [self release];
       return nil;
-    }  
+    }
   }
   NSString *name = [attributes objectForKey:kHGSObjectAttributeNameKey];
   NSString *type = [attributes objectForKey:kHGSObjectAttributeTypeKey];
   self = [self initWithURI:uri
-                      name:name 
+                      name:name
                       type:type
                     source:source
                 attributes:attributes];
@@ -471,10 +482,10 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 }
 
 - (id)resultByAddingAttributes:(NSDictionary *)attributes {
-  NSMutableDictionary *newAttributes 
+  NSMutableDictionary *newAttributes
     = [NSMutableDictionary dictionaryWithDictionary:attributes];
   [newAttributes addEntriesFromDictionary:[self attributes]];
-  HGSUnscoredResult *newResult 
+  HGSUnscoredResult *newResult
     = [HGSUnscoredResult resultWithURI:[self uri]
                                   name:[self displayName]
                                   type:[self type]
@@ -493,12 +504,12 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 - (id)initWithURI:(NSString *)uri
              name:(NSString *)name
              type:(NSString *)typeStr
-           source:(HGSSearchSource *)source 
+           source:(HGSSearchSource *)source
        attributes:(NSDictionary *)attributes {
-  if ((self = [super initWithURI:uri 
-                            name:name 
-                            type:typeStr 
-                          source:source 
+  if ((self = [super initWithURI:uri
+                            name:name
+                            type:typeStr
+                          source:source
                       attributes:attributes])) {
     normalizedIdentifier_ = [[uri readableURLString] retain];
   }
@@ -512,7 +523,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
 - (BOOL)isDuplicate:(HGSResult*)compareTo {
   BOOL isDupe = NO;
-  HGSUnscoredWebpageResult *webpageResult 
+  HGSUnscoredWebpageResult *webpageResult
     = GTM_DYNAMIC_CAST([HGSUnscoredWebpageResult class], compareTo);
   if (webpageResult) {
     // URL get special checks to enable matches to reduce duplicates, we remove
@@ -534,16 +545,16 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 
 - (BOOL)isDuplicate:(HGSResult*)compareTo {
   BOOL isDupe = NO;
-  HGSUnscoredContactResult *contactResult 
+  HGSUnscoredContactResult *contactResult
     = GTM_DYNAMIC_CAST([HGSUnscoredContactResult class], compareTo);
   if (contactResult) {
     // Running through the identifers ourself is faster than creating two
     // NSSets and calling intersectsSet on them.
-    NSArray *identifiers 
+    NSArray *identifiers
       = [self valueForKey:kHGSObjectAttributeUniqueIdentifiersKey];
-    NSArray *identifiers2 
+    NSArray *identifiers2
       = [contactResult valueForKey:kHGSObjectAttributeUniqueIdentifiersKey];
-    
+
     for (id a in identifiers) {
       for (id b in identifiers2) {
         if ([a isEqual:b]) {
@@ -571,17 +582,17 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 @synthesize matchedTerm = matchedTerm_;
 @synthesize matchedIndexes = matchedIndexes_;
 
-+ (id)resultWithResult:(HGSResult *)result 
++ (id)resultWithResult:(HGSResult *)result
                  score:(CGFloat)score
             flagsToSet:(HGSRankFlags)setFlags
           flagsToClear:(HGSRankFlags)clearFlags
            matchedTerm:(HGSTokenizedString *)term
         matchedIndexes:(NSIndexSet *)indexes {
-  return [[[[self class] alloc] initWithResult:result 
-                                         score:score 
-                                    flagsToSet:setFlags 
-                                  flagsToClear:clearFlags 
-                                   matchedTerm:term 
+  return [[[[self class] alloc] initWithResult:result
+                                         score:score
+                                    flagsToSet:setFlags
+                                  flagsToClear:clearFlags
+                                   matchedTerm:term
                                 matchedIndexes:indexes] autorelease];
 }
 
@@ -595,36 +606,36 @@ GTM_METHOD_CHECK(NSString, readableURLString);
               flags:(HGSRankFlags)flags
         matchedTerm:(HGSTokenizedString *)term
      matchedIndexes:(NSIndexSet *)indexes {
-  return [[[[self class] alloc] initWithURI:uri 
+  return [[[[self class] alloc] initWithURI:uri
                                        name:name
-                                       type:type 
-                                     source:source 
-                                 attributes:attributes 
-                                       score:score 
+                                       type:type
+                                     source:source
+                                 attributes:attributes
+                                       score:score
                                       flags:flags
-                                matchedTerm:term 
+                                matchedTerm:term
                              matchedIndexes:indexes] autorelease];
 }
 
 + (id)resultWithFilePath:(NSString *)path
-                  source:(HGSSearchSource *)source 
+                  source:(HGSSearchSource *)source
               attributes:(NSDictionary *)attributes
                    score:(CGFloat)score
                    flags:(HGSRankFlags)flags
             matchedTerm:(HGSTokenizedString *)term
           matchedIndexes:(NSIndexSet *)indexes {
-  HGSUnscoredResult *result = [HGSUnscoredResult resultWithFilePath:path 
-                                                             source:source 
+  HGSUnscoredResult *result = [HGSUnscoredResult resultWithFilePath:path
+                                                             source:source
                                                          attributes:attributes];
-  return [self resultWithResult:result 
-                          score:score 
+  return [self resultWithResult:result
+                          score:score
                      flagsToSet:flags
                    flagsToClear:~flags
                     matchedTerm:term
                  matchedIndexes:indexes];
 }
 
-- (id)initWithResult:(HGSResult *)result 
+- (id)initWithResult:(HGSResult *)result
                score:(CGFloat)score
           flagsToSet:(HGSRankFlags)setFlags
         flagsToClear:(HGSRankFlags)clearFlags
@@ -639,7 +650,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     rankFlags_ &= ~clearFlags;
     matchedTerm_ = [term retain];
     matchedIndexes_ = [indexes retain];
-    
+
     HGSAssert(result_, @"Must have a result argument");
     if (!result_) {
       [self release];
@@ -658,16 +669,16 @@ GTM_METHOD_CHECK(NSString, readableURLString);
             flags:(HGSRankFlags)flags
      matchedTerm:(HGSTokenizedString *)term
    matchedIndexes:(NSIndexSet *)indexes {
-  HGSUnscoredResult *result = [HGSUnscoredResult resultWithURI:uri 
-                                                          name:name 
-                                                          type:type 
-                                                        source:source 
+  HGSUnscoredResult *result = [HGSUnscoredResult resultWithURI:uri
+                                                          name:name
+                                                          type:type
+                                                        source:source
                                                     attributes:attributes];
-  return [self initWithResult:result 
+  return [self initWithResult:result
                          score:score
-                   flagsToSet:flags 
-                 flagsToClear:~flags 
-                  matchedTerm:term 
+                   flagsToSet:flags
+                 flagsToClear:~flags
+                  matchedTerm:term
                matchedIndexes:indexes];
 }
 
@@ -682,7 +693,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
     HGSSearchSourceRanker *ranker = [HGSSearchSourceRanker sharedSearchSourceRanker];
     UInt64 promotionCount = [ranker promotionCount];
     UInt64 promotionForSource = [ranker promotionCountForSource:source];
-    CGFloat promotionMultiplier 
+    CGFloat promotionMultiplier
       = ((CGFloat)promotionForSource / (CGFloat)promotionCount);
     score = score + 1.0 * promotionMultiplier;
   }
@@ -726,7 +737,7 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 }
 
 - (id)resultByAddingAttributes:(NSDictionary *)attributes {
-  NSMutableDictionary *newAttributes 
+  NSMutableDictionary *newAttributes
     = [NSMutableDictionary dictionaryWithDictionary:attributes];
   [newAttributes addEntriesFromDictionary:[self attributes]];
   HGSScoredResult *newResult = [HGSScoredResult resultWithURI:[self uri]
@@ -770,11 +781,11 @@ GTM_METHOD_CHECK(NSString, readableURLString);
 }
 
 - (id)initWithFilePaths:(NSArray *)filePaths {
-  NSMutableArray *results 
+  NSMutableArray *results
     = [NSMutableArray arrayWithCapacity:[filePaths count]];
   for (NSString *path in filePaths) {
     HGSUnscoredResult *result = [HGSUnscoredResult resultWithFilePath:path
-                                                               source:nil 
+                                                               source:nil
                                                            attributes:nil];
     HGSAssert(result, @"Unable to create result from %@", path);
     if (result) {
@@ -790,11 +801,11 @@ GTM_METHOD_CHECK(NSString, readableURLString);
   [super dealloc];
 }
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state 
-                                  objects:(id *)stackbuf 
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(id *)stackbuf
                                     count:(NSUInteger)len {
-  return [results_ countByEnumeratingWithState:state 
-                                       objects:stackbuf 
+  return [results_ countByEnumeratingWithState:state
+                                       objects:stackbuf
                                          count:len];
 }
 
