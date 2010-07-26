@@ -647,6 +647,7 @@
 		8B23300E1062C12700AF7287 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B23300C1062C12700AF7287 /* Localizable.strings */; };
 		8B2334731062FF5E00AF7287 /* image_search.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B2334721062FF5E00AF7287 /* image_search.icns */; };
 		8B2334811063013600AF7287 /* wikipedia.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8B2334801063013600AF7287 /* wikipedia.icns */; };
+		8B29060B11F89B8B0064F50F /* FileSystemActionsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B29060A11F89B8B0064F50F /* FileSystemActionsTest.m */; };
 		8B2B01911071813D00427404 /* HGSSimpleArraySearchOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B2B018F1071813C00427404 /* HGSSimpleArraySearchOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B2B01921071813D00427404 /* HGSSimpleArraySearchOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2B01901071813D00427404 /* HGSSimpleArraySearchOperation.m */; };
 		8B2B01961071815700427404 /* HGSSimpleArraySearchOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2B01951071815700427404 /* HGSSimpleArraySearchOperationTest.m */; };
@@ -2651,6 +2652,7 @@
 		8B23300D1062C12700AF7287 /* en_US */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en_US; path = en_US.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8B2334721062FF5E00AF7287 /* image_search.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = image_search.icns; sourceTree = "<group>"; };
 		8B2334801063013600AF7287 /* wikipedia.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = wikipedia.icns; sourceTree = "<group>"; };
+		8B29060A11F89B8B0064F50F /* FileSystemActionsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileSystemActionsTest.m; sourceTree = "<group>"; };
 		8B2B018F1071813C00427404 /* HGSSimpleArraySearchOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSSimpleArraySearchOperation.h; sourceTree = "<group>"; };
 		8B2B01901071813D00427404 /* HGSSimpleArraySearchOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleArraySearchOperation.m; sourceTree = "<group>"; };
 		8B2B01951071815700427404 /* HGSSimpleArraySearchOperationTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSSimpleArraySearchOperationTest.m; sourceTree = "<group>"; };
@@ -4759,6 +4761,7 @@
 				8B8478B21149870A002C460B /* FilesystemDirectorySearchSource.m */,
 				8B8478B31149870A002C460B /* FilesystemActions.h */,
 				8B8478B41149870A002C460B /* FilesystemActions.m */,
+				8B29060A11F89B8B0064F50F /* FileSystemActionsTest.m */,
 				8B8478B51149870A002C460B /* FileSystemActions.applescript */,
 				8BC89320115A873F00A6E783 /* GoogleActions.m */,
 				8BC8931F115A873F00A6E783 /* GoogleActions.h */,
@@ -9690,6 +9693,7 @@
 				8B847C34114996CD002C460B /* NSArray+CommonPrefixDetectionTest.m in Sources */,
 				8BE34077114FF1B8002D047A /* TextActionsTest.m in Sources */,
 				8BC89323115A874D00A6E783 /* GoogleActionsTest.m in Sources */,
+				8B29060B11F89B8B0064F50F /* FileSystemActionsTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -475,7 +475,7 @@
         NSString *newPath = [directory stringByAppendingPathComponent:name];
         // If the user hasn't supplied us with an extension, use the one that
         // is already there.
-        if (location == 0 || location == NSNotFound) {
+        if ([extension length] && (location == 0 || location == NSNotFound)) {
           newPath = [newPath stringByAppendingPathExtension:extension];
         }
         NSError *error = nil;
