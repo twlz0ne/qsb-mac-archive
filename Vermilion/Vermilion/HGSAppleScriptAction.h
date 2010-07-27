@@ -31,16 +31,16 @@
 //
 
 /*!
- @header HGSAppleScriptAction
- @discussion
+ @header
+ @discussion HGSAppleScriptAction
 */
 
 #import "HGSAction.h"
 
 /*!
- A wrapper for an action that is implemented with AppleScript. 
- 
- All the information required to configure the action is in the configuration 
+ A wrapper for an action that is implemented with AppleScript.
+
+ All the information required to configure the action is in the configuration
  dictionary passed in to initWithConfiguration.
 */
 @interface HGSAppleScriptAction : HGSAction {
