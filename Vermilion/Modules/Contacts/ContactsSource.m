@@ -47,8 +47,6 @@
 #import "GTMNSNumber+64Bit.h"
 #import "GTMMethodCheck.h"
 
-static NSString *const kMetaDataFilePath
-  = @"~/Library/Application Support/AddressBook/Metadata/%@.abcdp";
 static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 
 #define kTypeContactAddressBook HGS_SUBTYPE(kHGSTypeContact, @"addressbook")
@@ -76,11 +74,11 @@ static NSString *const kHGSGenericContactIconName = @"HGSGenericContactImage";
 // to match. You can specify the type of the HGSObjects, how to create the
 // URL, and an appropriate cleaner method [(NSString *)cleaner:(NSString *)]
 // to help create the URL.
-- (NSArray *)objectsForMultiValueProperty:(NSString *)property 
-                               fromPerson:(ABPerson *)person 
-                                     type:(NSString *)type 
+- (NSArray *)objectsForMultiValueProperty:(NSString *)property
+                               fromPerson:(ABPerson *)person
+                                     type:(NSString *)type
                          valueCleanMethod:(SEL)valueCleaner
-                                urlFormat:(NSString *)urlFormat 
+                                urlFormat:(NSString *)urlFormat
                            urlCleanMethod:(SEL)urlCleaner
                                  iconName:(NSString *)name;
 
@@ -105,9 +103,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                        autorelease];
     [[HGSOperationQueue sharedOperationQueue] addOperation:op];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self 
-           selector:@selector(addressBookChanged:) 
-               name:kABDatabaseChangedExternallyNotification 
+    [nc addObserver:self
+           selector:@selector(addressBookChanged:)
+               name:kABDatabaseChangedExternallyNotification
              object:nil];
   }
   return self;
@@ -123,17 +121,17 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       [sGenericImage retain];
     }
   }
-  return sGenericImage; 
+  return sGenericImage;
 }
 
 - (void)loadAddressBookContactsOperation {
   [condition_ lock];
   indexing_ = YES;
-  
+
   // clear the existing info
   HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
   NSMutableArray *newResults = [NSMutableArray array];
-  
+
   ABAddressBook *sab = [ABAddressBook sharedAddressBook];
   for (ABPerson *person in [sab people]) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -154,12 +152,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       name = [person valueForProperty:kABOrganizationProperty];
     }
     if (name) {
-      NSString *urlString = [NSString stringWithFormat:kMetaDataFilePath, 
-                             [person uniqueId]];
-      urlString = [urlString stringByExpandingTildeInPath];
-      urlString 
-        = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-      urlString = [@"file://localhost" stringByAppendingString:urlString];
+      NSString *uniqueID = [person uniqueId];
+      NSString *urlString
+        = [@"addressbook://" stringByAppendingString:uniqueID];
       NSString *multiValueKeys[] = {
         kABEmailProperty,
         kABAIMInstantProperty,
@@ -168,7 +163,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         kABYahooInstantProperty,
         kABICQInstantProperty
       };
-    
+
       NSMutableArray *otherTermStrings = [NSMutableArray array];
       for (unsigned i = 0; i < sizeof(multiValueKeys) / sizeof(NSString *); i++) {
         ABMultiValue *multiValues = [person valueForProperty:multiValueKeys[i]];
@@ -180,22 +175,23 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           }
         }
       }
-      
+
       NSString *nickname = [person valueForProperty:kABNicknameProperty];
       if (nickname) {
         [otherTermStrings addObject:nickname];
       }
-      
+
       NSString *companyName = [person valueForProperty:kABOrganizationProperty];
       if (companyName && ![companyName isEqualToString:name]) {
         [otherTermStrings addObject:companyName];
       }
-      
+
       NSDictionary *attributes
         = [NSDictionary dictionaryWithObjectsAndKeys:
            otherTermStrings, kHGSObjectAttributeUniqueIdentifiersKey,
+           uniqueID, kHGSObjectAttributeAddressBookRecordIdentifierKey,
            nil];
-      HGSUnscoredResult* hgsResult 
+      HGSUnscoredResult* hgsResult
         = [HGSUnscoredResult resultWithURI:urlString
                                       name:name
                                       type:kTypeContactAddressBook
@@ -208,7 +204,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     }
     [pool release];
   }
-  
+
   @synchronized(self) {
     [results_ release];
     results_ = [newResults retain];
@@ -220,7 +216,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 }
 
 - (void)addressBookChanged:(NSNotification *)notification {
-  NSOperation *op 
+  NSOperation *op
     = [[[NSInvocationOperation alloc] initWithTarget:self
                                             selector:@selector(loadAddressBookContactsOperation)
                                               object:nil] autorelease];
@@ -235,7 +231,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 }
 
 #pragma mark -
-- (HGSResult *)preFilterResult:(HGSResult *)result 
+- (HGSResult *)preFilterResult:(HGSResult *)result
                matchesForQuery:(HGSQuery*)query
                   pivotObjects:(HGSResultArray *)pivotObjects {
   // if we had a pivot object, we filter the results w/ the pivot info
@@ -246,11 +242,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     // address.
     NSArray *emailAddresses
       = [pivotObject valueForKey:kHGSObjectAttributeEmailAddressesKey];
-    
+
     ABRecord *person = [self personForResult:result];
-    if (person) {      
+    if (person) {
       BOOL isMatch = NO;
-      
+
       // check for email match
       ABMultiValue *multiValues = [person valueForProperty:kABEmailProperty];
       NSUInteger valueCount = [multiValues count];
@@ -264,7 +260,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         }
       }
       if (!isMatch) result = nil;
-      
+
       // NOTE: it would be really nice to kHGSObjectAttributeContactsKey off the
       // pivot to turn authors into contacts, etc.  But, the format of that key
       // is a "name" so it could be "john doe", "doe, john", "john k. doe",
@@ -278,11 +274,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return result;
 }
 
-- (NSArray *)objectsForMultiValueProperty:(NSString *)property 
-                               fromPerson:(ABPerson *)person 
-                                     type:(NSString *)type 
+- (NSArray *)objectsForMultiValueProperty:(NSString *)property
+                               fromPerson:(ABPerson *)person
+                                     type:(NSString *)type
                          valueCleanMethod:(SEL)valueCleaner
-                                urlFormat:(NSString *)urlFormat 
+                                urlFormat:(NSString *)urlFormat
                            urlCleanMethod:(SEL)urlCleaner
                                  iconName:(NSString *)iconName {
   NSMutableArray *results = [NSMutableArray array];
@@ -300,7 +296,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       NSString *label = [multiValue labelAtIndex:i];
       if (label) {
         CFStringRef cfLabel = (CFStringRef)label;
-        NSString *localizedLabel 
+        NSString *localizedLabel
           = GTMCFAutorelease(ABCopyLocalizedPropertyOrLabel(cfLabel));
         if (!localizedLabel) {
           localizedLabel = label;
@@ -314,19 +310,19 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         }
         NSString *cleanURLValue;
         if (urlCleaner) {
-          cleanURLValue = [self performSelector:urlCleaner 
+          cleanURLValue = [self performSelector:urlCleaner
                                      withObject:value];
         } else {
           cleanURLValue = value;
         }
-        NSString *urlString = [NSString stringWithFormat:urlFormat, 
+        NSString *urlString = [NSString stringWithFormat:urlFormat,
                                cleanURLValue];
 
         // Snippets look like phone: home
         NSString *snippet = [NSString stringWithFormat:@"%@: %@",
                              localizedProperty, localizedLabel];
-        
-        NSMutableDictionary *attr 
+
+        NSMutableDictionary *attr
           = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              snippet, kHGSObjectAttributeSnippetKey,
              nil];
@@ -335,9 +331,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
           [attr setObject:image forKey:kHGSObjectAttributeIconKey];
         }
         HGSUnscoredResult *result = [HGSUnscoredResult resultWithURI:urlString
-                                                                name:cleanValue 
+                                                                name:cleanValue
                                                                 type:type
-                                                              source:self 
+                                                              source:self
                                                           attributes:attr];
         [results addObject:result];
       }
@@ -345,7 +341,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
   return results;
 }
-    
+
 - (NSArray *)explodeContactForSearchOperation:(HGSResult *)contact {
   struct ContactMap {
     NSString *property_;
@@ -355,92 +351,92 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     NSString *valueCleanerSel_;
     NSString *iconName_;
   };
-  
+
   struct ContactMap contactMap[] = {
-    { 
-      kABAddressProperty, 
-      kHGSTypeTextAddress, 
-      @"http://maps.google.com/maps?q=%@", 
-      @"cleanMapURL:", 
+    {
+      kABAddressProperty,
+      kHGSTypeTextAddress,
+      @"http://maps.google.com/maps?q=%@",
+      @"cleanMapURL:",
       @"cleanMapValue:",
       @"maps.icns"
     },
     {
       kABPhoneProperty,
-      kHGSTypeTextPhoneNumber, 
-      @"callto:+%@", 
-      @"cleanPhoneNumber:", 
+      kHGSTypeTextPhoneNumber,
+      @"callto:+%@",
+      @"cleanPhoneNumber:",
       nil,
       @"goog411.icns"
     },
-    { 
-      kABEmailProperty, 
-      kHGSTypeTextEmailAddress, 
-      @"mailto:%@", 
-      nil, 
+    {
+      kABEmailProperty,
+      kHGSTypeTextEmailAddress,
+      @"mailto:%@",
+      nil,
       nil,
       @"gmail.icns"
     },
-    { 
-      kABJabberInstantProperty, 
-      kHGSTypeTextInstantMessage, 
-      @"xmpp:%@", 
+    {
+      kABJabberInstantProperty,
+      kHGSTypeTextInstantMessage,
+      @"xmpp:%@",
       nil,
       nil,
       @"talk.icns"
     },
-    { 
-      kABAIMInstantProperty, 
-      kHGSTypeTextInstantMessage, 
-      @"aim:goim?screenname=%@", 
-      nil, 
+    {
+      kABAIMInstantProperty,
+      kHGSTypeTextInstantMessage,
+      @"aim:goim?screenname=%@",
+      nil,
       nil,
       @"talk.icns"
     },
-    { 
-      kABICQInstantProperty, 
-      kHGSTypeTextInstantMessage, 
-      @"icq:%@", 
-      nil, 
+    {
+      kABICQInstantProperty,
+      kHGSTypeTextInstantMessage,
+      @"icq:%@",
       nil,
-      @"talk.icns" 
-    },
-    { 
-      kABYahooInstantProperty, 
-      kHGSTypeTextInstantMessage, 
-      @"ymsgr:sendim?%@", 
-      nil, 
-      nil,
-      @"talk.icns" 
-    },
-    { 
-      kABMSNInstantProperty, 
-      kHGSTypeTextInstantMessage, 
-      @"msn:chat?contact=%@", 
-      nil, 
       nil,
       @"talk.icns"
     },
-    { 
-      kABURLsProperty, 
-      kHGSTypeWebpage, 
-      @"%@", 
-      @"cleanURL:", 
+    {
+      kABYahooInstantProperty,
+      kHGSTypeTextInstantMessage,
+      @"ymsgr:sendim?%@",
+      nil,
+      nil,
+      @"talk.icns"
+    },
+    {
+      kABMSNInstantProperty,
+      kHGSTypeTextInstantMessage,
+      @"msn:chat?contact=%@",
+      nil,
+      nil,
+      @"talk.icns"
+    },
+    {
+      kABURLsProperty,
+      kHGSTypeWebpage,
+      @"%@",
+      @"cleanURL:",
       nil,
       @"blue-nav.icns"
     },
   };
-  NSString *tempQuery = [[GTMGoogleSearch sharedInstance] searchURLFor:@"Query" 
+  NSString *tempQuery = [[GTMGoogleSearch sharedInstance] searchURLFor:@"Query"
                                                                 ofType:@"maps"
                                                              arguments:nil];
-  contactMap[0].urlFormat_ 
+  contactMap[0].urlFormat_
     = [tempQuery stringByReplacingOccurrencesOfString:@"Query"
                                            withString:@"%@"];
-  
+
   NSMutableArray *results = [NSMutableArray array];
   ABPerson *person = (ABPerson *)[self personForResult:contact];
   if (!person) return results;
-  
+
   for (size_t i = 0; i < sizeof(contactMap) / sizeof(contactMap[0]); ++i) {
     SEL valueCleaner = NULL;
     if (contactMap[i].valueCleanerSel_) {
@@ -450,9 +446,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     if (contactMap[i].urlCleanerSel_) {
       urlCleaner = NSSelectorFromString(contactMap[i].urlCleanerSel_);
     }
-    NSArray *objectResults 
+    NSArray *objectResults
       = [self objectsForMultiValueProperty:contactMap[i].property_
-                                fromPerson:person 
+                                fromPerson:person
                                       type:contactMap[i].type_
                           valueCleanMethod:valueCleaner
                                  urlFormat:contactMap[i].urlFormat_
@@ -493,7 +489,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
       // give it a retain since we're gonna remove it from the collection
       result = [[imageLoadingTags_ objectForKey:tagNum] retain];
     }
-    [imageLoadingTags_ removeObjectForKey:tagNum]; 
+    [imageLoadingTags_ removeObjectForKey:tagNum];
   }
   if (result) {
     // balance our retain
@@ -512,9 +508,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 - (ABRecord *)personForResult:(HGSResult *)result {
   ABRecord *person = nil;
   if ([result conformsToType:kTypeContactAddressBook]) {
-    NSString *uid = [result filePath];
-    uid = [uid lastPathComponent];
-    uid = [uid stringByDeletingPathExtension];
+    NSString *uid
+      = [result valueForKey:kHGSObjectAttributeAddressBookRecordIdentifierKey];
     if (uid) {
       person = [[ABAddressBook sharedAddressBook] recordForUniqueId:uid];
     }
@@ -543,10 +538,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (id)provideValueForKey:(NSString *)key result:(HGSResult *)result {
   id value = nil;
-  if ([key isEqualToString:kHGSObjectAttributeAddressBookRecordIdentifierKey]) {
-    ABRecord *person = [self personForResult:result];
-    value = [person uniqueId];
-  } else if ([key isEqualToString:kHGSObjectAttributeContactEmailKey]) {
+  if ([key isEqualToString:kHGSObjectAttributeContactEmailKey]) {
     ABRecord *person = [self personForResult:result];
     ABMultiValue *emails = [person valueForProperty:kABEmailProperty];
     if ([emails count]) {
@@ -559,7 +551,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     value = [self loadImageForObject:result];
   } else if ([key isEqualToString:kHGSObjectAttributeSnippetKey]) {
     ABRecord *person = [self personForResult:result];
-    
+
     NSMutableArray *snippetArray = [NSMutableArray array];
     NSString * const propertiesToCheck[] = {
       kABEmailProperty,
@@ -583,7 +575,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         // numbers because we decided that having more different information
         // (email/phone/im) was easier to differentiate between people than
         // having more similar info (home phone/work phone).
-        // We anticipate that the "primary" result is the one that the 
+        // We anticipate that the "primary" result is the one that the
         // "searcher" uses the most often, therefore will be the most
         // recognizable.
         NSString *primaryID = [snippetValue primaryIdentifier];
@@ -594,7 +586,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         }
       }
     }
-     
+
     value = [snippetArray componentsJoinedByString:@", "];
   }
 #if !TARGET_OS_IPHONE
@@ -602,7 +594,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     // Build two cells, the first with Address Book or Google Contacts,
     // the second with the contact entry.
     // TODO(mrossetti): Accommodate Google Contacts when available.
-    NSString *serviceName = HGSLocalizedString(@"Contact", 
+    NSString *serviceName = HGSLocalizedString(@"Contact",
                                                @"A label denoting that this "
                                                @"result is a contact.");
     NSURL *serviceURL = nil;
@@ -623,7 +615,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         }
       }
     }
-    
+
     NSMutableDictionary *baseCell = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                      serviceName, kQSBPathCellDisplayTitleKey,
                                      nil];
@@ -640,15 +632,15 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   if (!value) {
     value = [super provideValueForKey:key result:result];
   }
-  
+
   return value;
 }
 
 - (BOOL)isValidSourceForQuery:(HGSQuery *)query {
   BOOL isValidSource = [super isValidSourceForQuery:query];
   // Limit the pivot support to just things w/ an email address.  We do this in
-  // isValidSourceForQuery instead of 
-  // preFilterResult:matchesForQuery:pivotObject: because we want to avoid 
+  // isValidSourceForQuery instead of
+  // preFilterResult:matchesForQuery:pivotObject: because we want to avoid
   // the extra work when this attribute isn't present at all.
   if (isValidSource) {
     HGSResult *pivotObject = [query pivotObject];
@@ -721,7 +713,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
   return cleanPhone;
 }
-  
+
 - (NSString *)cleanURL:(NSString *)dirtyURL {
   NSString *cleanURL = dirtyURL;
   NSString *lowerDirty = [dirtyURL lowercaseString];
@@ -733,8 +725,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (NSString *)cleanMapURL:(NSDictionary *)dirtyAddress {
   NSString *keys[] = {
-    kABAddressStreetKey, kABAddressCityKey, kABAddressStateKey, 
-    kABAddressCountryKey, kABAddressZIPKey 
+    kABAddressStreetKey, kABAddressCityKey, kABAddressStateKey,
+    kABAddressCountryKey, kABAddressZIPKey
   };
   NSMutableArray *array = [NSMutableArray array];
   for (size_t i =0; i < sizeof(keys) / sizeof(keys[0]); ++i) {
@@ -750,8 +742,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
 - (NSString *)cleanMapValue:(NSDictionary *)dirtyAddress {
   NSString *keys[] = {
-    kABAddressStreetKey, kABAddressCityKey, kABAddressStateKey, 
-    kABAddressCountryKey, kABAddressZIPKey 
+    kABAddressStreetKey, kABAddressCityKey, kABAddressStateKey,
+    kABAddressCountryKey, kABAddressZIPKey
   };
   NSMutableArray *array = [NSMutableArray array];
   for (size_t i =0; i < sizeof(keys) / sizeof(keys[0]); ++i) {
