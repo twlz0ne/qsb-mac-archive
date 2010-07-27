@@ -76,6 +76,9 @@
 @interface FileSystemMoveToAction : FileSystemScriptAction
 @end
 
+@interface FileSystemCopyToAction : FileSystemScriptAction
+@end
+
 @interface FileSystemShowInFinderAction : FileSystemScriptAction
 @end
 
@@ -558,6 +561,37 @@
 
 - (NSString *)handlerName {
   return @"moveto";
+}
+
+@end
+
+@implementation FileSystemCopyToAction
+
+- (BOOL)performWithInfo:(NSDictionary *)info {
+  HGSResultArray *directObjects
+    = [info objectForKey:kHGSActionDirectObjectsKey];
+  HGSResultArray *directories
+    = [info objectForKey:@"com.google.core.filesystem.action.copyto.location"];
+  NSArray *froms = [directObjects filePaths];
+  NSArray *tos = [directories filePaths];
+  NSArray *args = [NSArray arrayWithObjects:froms, [tos objectAtIndex:0], nil];
+  NSDictionary *error = nil;
+  NSAppleScript *script = [FileSystemScriptAction fileSystemActionScript];
+  NSString *handlerName = [self handlerName];
+  NSAppleEventDescriptor *answer
+    = [script gtm_executePositionalHandler:handlerName
+                                parameters:args
+                                     error:&error];
+  BOOL isGood = YES;
+  if (!answer || error) {
+    HGSLogDebug(@"Unable to execute handler '%@': %@", handlerName, error);
+    isGood = NO;
+  }
+  return isGood;
+}
+
+- (NSString *)handlerName {
+  return @"copyto";
 }
 
 @end

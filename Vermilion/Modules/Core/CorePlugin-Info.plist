@@ -294,6 +294,25 @@
 		</dict>
 		<dict>
 			<key>HGSExtensionClass</key>
+			<string>FileSystemCopyToAction</string>
+			<key>HGSExtensionPoint</key>
+			<string>HGSActionsExtensionPoint</string>
+			<key>HGSExtensionUserVisibleName</key>
+			<string>^Copy To…</string>
+			<key>HGSActionDirectObjectTypes</key>
+			<string>file</string>
+			<key>HGSActionArguments</key>
+			<dict>
+				<key>HGSActionArgumentIdentifier</key>
+				<string>com.google.core.filesystem.action.copyto.location</string>
+				<key>HGSActionArgumentSupportedTypes</key>
+				<string>file.directory</string>
+			</dict>
+			<key>HGSExtensionIdentifier</key>
+			<string>com.google.core.filesystem.action.copyto</string>
+		</dict>
+		<dict>
+			<key>HGSExtensionClass</key>
 			<string>TextAppendToFileAction</string>
 			<key>HGSExtensionPoint</key>
 			<string>HGSActionsExtensionPoint</string>

@@ -49,6 +49,9 @@
 /* A label denoting the name of the Move To action which allows you to move a file. Do not include ^ in localization. */
 "^Move To…" = "Move To…";
 
+/* A label denoting the name of the Copy To action which allows you to copy a file. Do not include ^ in localization. */
+"^Copy To…" = "Copy To…";
+
 /* A label denoting the name of the Append To file action which allows you to append text to a file. Do not include ^ in localization. */
 "^Append To File…" = "Append To File…";
 
