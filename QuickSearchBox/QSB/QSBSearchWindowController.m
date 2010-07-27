@@ -34,6 +34,7 @@
 #import "QSBSearchWindowController.h"
 
 #import <objc/runtime.h>
+#import <Quartz/Quartz.h>
 #import <GTM/GTMTypeCasting.h>
 #import <GTM/GTMMethodCheck.h>
 #import <GTM/GTMNSImage+Scaling.h>
@@ -47,12 +48,14 @@
 #import "QSBPreferences.h"
 #import "QSBSearchController.h"
 #import "QSBResultsViewBaseController.h"
-#import "QLUIPrivate.h"
 #import "NSString+CaseInsensitive.h"
 #import "QSBTableResult.h"
 #import "QSBWelcomeController.h"
 #import "QSBResultsWindowController.h"
 #import "QSBResultTableView.h"
+
+// Adds a weak reference to QLPreviewPanel so that we work on Leopard.
+__asm__(".weak_reference _OBJC_CLASS_$_QLPreviewPanel");
 
 const NSTimeInterval kQSBShowDuration = 0.1;
 const NSTimeInterval kQSBHideDuration = 0.3;

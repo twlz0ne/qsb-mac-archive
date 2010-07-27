@@ -30,8 +30,9 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Python/Python.h>
-
+// We need to use Python 2.5 that is available on Leopard and Snow Leopard.
+// 2.6 is the default on SL, so we need to work around that.
+#import <Python.framework/Versions/2.5/Headers/Python.h>
 
 #ifdef __cplusplus
 
@@ -82,8 +83,8 @@ public:
 - (PyObject *)loadModule:(NSString *)moduleName;
 - (void)appendPythonPath:(NSString *)path;
 - (PyObject *)objectForExtension:(HGSExtension *)extension;
-- (NSArray *)resultsFromObjects:(PyObject *)pythonResults 
-                 tokenizedQuery:(HGSTokenizedString *)tokenizedQuery 
+- (NSArray *)resultsFromObjects:(PyObject *)pythonResults
+                 tokenizedQuery:(HGSTokenizedString *)tokenizedQuery
                          source:(HGSSearchSource *)source;
 @end
 

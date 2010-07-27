@@ -31,14 +31,25 @@
 //
 
 #import <Vermilion/Vermilion.h>
+#import <Quartz/Quartz.h>
 #import "FilesystemActions.h"
 #import "GTMMethodCheck.h"
 #import "GTMNSAppleScript+Handler.h"
 #import "GTMGarbageCollection.h"
-#import "QLUIPrivate.h"
 #import "GTMSystemVersion.h"
 #import "GTMNSWorkspace+Running.h"
 #import "GTMGeometryUtils.h"
+
+// Adds a weak reference to QLPreviewPanel so that we work on Leopard.
+__asm__(".weak_reference _OBJC_CLASS_$_QLPreviewPanel");
+
+// Expose an SPI on Leopard that we need that has a different
+// interface on 10.6.
+@interface QLPreviewPanel (QLPrivates)
+- (void)setURLs:(id)fp8
+    currentIndex:(unsigned int)fp12
+    preservingDisplayState:(BOOL)fp16;
+@end
 
 @interface FileSystemOpenAction : HGSAction
 @end
@@ -62,7 +73,8 @@
 @interface FileSystemSetCommentAction : HGSAction
 @end
 
-@interface FileSystemQuickLookAction : HGSAction <NSComboBoxDataSource> {
+@interface FileSystemQuickLookAction : HGSAction
+    <NSComboBoxDataSource, QLPreviewPanelDataSource> {
  @private
   NSArray *urls_;
 }
@@ -627,15 +639,21 @@
     = [info objectForKey:kHGSActionDirectObjectsKey];
   [urls_ autorelease];
   urls_ = [[directObjects urls] copy];
-  QLPreviewPanel *panel = [QLPreviewPanel sharedPreviewPanel];
+  // Need to use NSClassFromString so that we work on Leopard.
+#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5
+#error Clean up this mess now that we don't support Leopard
+#endif //  MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5
+  QLPreviewPanel *panel
+    = [NSClassFromString(@"QLPreviewPanel") sharedPreviewPanel];
+  NSLog(@"%@", panel);
   [panel setHidesOnDeactivate:NO];
   if ([GTMSystemVersion isSnowLeopardOrGreater]) {
+    [panel setDataSource:self];
+    [panel reloadData];
+  } else {
     // SnowLeopard revamped QuickLookUI. This is a bit of a hack to convince
     // the compiler to look the other way while we call methods it doesn't
-    // know about, so we can compile on Leopard.
-    [(id)panel setDataSource:self];
-    [(id)panel reloadData];
-  } else {
+    // know about, so we can run on Leopard.
     [panel setURLs:urls_ currentIndex:0 preservingDisplayState:YES];
   }
   if (![panel isVisible]) {
@@ -647,7 +665,7 @@
     NSInteger keyLevel = [theKeyWindow level];
     [panel setLevel:keyLevel + 1];
 
-    [panel makeKeyAndOrderFrontWithEffect:QLZoomEffect];
+    [panel makeKeyAndOrderFront:self];
   }
   return YES;
 }

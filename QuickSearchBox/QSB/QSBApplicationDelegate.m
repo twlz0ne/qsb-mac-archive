@@ -36,6 +36,7 @@
 #import <unistd.h>
 #import <Vermilion/Vermilion.h>
 #import <Sparkle/Sparkle.h>
+#import <Quartz/Quartz.h>
 
 #import <GTM/GTMCarbonEvent.h>
 #import <GTM/GTMGarbageCollection.h>
@@ -56,10 +57,12 @@
 #import "QSBSearchWindowController.h"
 #import "QSBHGSDelegate.h"
 #import "QSBResultsWindowController.h"
-#import "QLUIPrivate.h"
 #import "PFMoveApplication.h"
 #import "QSBDebugWindowController.h"
 #import "QSBActionPresenter.h"
+
+// Adds a weak reference to QLPreviewPanel so that we work on Leopard.
+__asm__(".weak_reference _OBJC_CLASS_$_QLPreviewPanel");
 
 // Local pref set once we've been launched. Used to control whether or not we
 // show the help window at startup.
@@ -770,6 +773,25 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 #pragma mark Application Delegate Methods
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
+  if ([GTMSystemVersion isLeopard]) {
+    // Force load the private framework that has the QuickLook APIs
+    // On Leopard.
+#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5
+  #error Clean up this mess now that we don't support Leopard
+#endif //  MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5
+    NSBundle *qlUI = [NSBundle bundleWithPath:@"/System/Library/"
+                      @"PrivateFrameworks/QuickLookUI.framework"];
+    _GTMDevAssert(qlUI, @"Unable to load qlUI");
+    NSError *error = nil;
+    BOOL didLoad = [qlUI loadAndReturnError:&error];
+    if (!didLoad) {
+      NSLog(@"Unable to load QuickLookUI.framework (%@)", error);
+    }
+    Class cls = NSClassFromString(@"QLPreviewPanel");
+    if (!cls) {
+      NSLog(@"Unable to load QLPreviewPanel class");
+    }
+  }
   // If the user launches us hidden we don't want to activate.
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
   NSDictionary *processDict
@@ -859,8 +881,12 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 }
 
 - (void)applicationWillResignActive:(NSNotification *)notification {
-  QLPreviewPanel *panel = [QLPreviewPanel sharedPreviewPanel];
-  if ([panel isOpen]) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5
+  #error Clean up this mess now that we don't support Leopard
+#endif //  MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5
+  QLPreviewPanel *panel
+    = [NSClassFromString(@"QLPreviewPanel") sharedPreviewPanel];
+  if ([panel isVisible]) {
     [panel close];
   }
 }

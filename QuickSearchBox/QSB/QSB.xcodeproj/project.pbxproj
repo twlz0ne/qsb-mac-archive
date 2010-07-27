@@ -327,8 +327,6 @@
 		5A2710BD0ECA52F200C72257 /* HGSPythonAction.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5A2710B60ECA52F200C72257 /* HGSPythonAction.mm */; };
 		5A2710BE0ECA52F200C72257 /* HGSPythonSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A2710B70ECA52F200C72257 /* HGSPythonSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A2710BF0ECA52F200C72257 /* HGSPythonSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5A2710B80ECA52F200C72257 /* HGSPythonSource.mm */; };
-		5A2711030ECA567B00C72257 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A2711020ECA567B00C72257 /* Python.framework */; };
-		5A4D237C0F462D2000F5C05B /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A4D237B0F462D2000F5C05B /* libcrypto.dylib */; };
 		5A583243100BFC4D00EC32CF /* ClipboardSearchSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A58323D100BFC4D00EC32CF /* ClipboardSearchSource.m */; };
 		5A58326A100BFD2100EC32CF /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		5A5832C2100BFD7100EC32CF /* Clipboard.hgs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */; };
@@ -347,7 +345,6 @@
 		5A8A3B180E71BCBB00A0DB4F /* Pause.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B0F0E71BCBB00A0DB4F /* Pause.icns */; };
 		5A8A3B190E71BCBB00A0DB4F /* Play.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B100E71BCBB00A0DB4F /* Play.icns */; };
 		5A8A3B1A0E71BCBB00A0DB4F /* PreviousSong.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5A8A3B110E71BCBB00A0DB4F /* PreviousSong.icns */; };
-		5AC3E77A0F7C29A900F171EB /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A2711020ECA567B00C72257 /* Python.framework */; };
 		5AC3E8240F7C2F7300F171EB /* VermilionTest.py in Resources */ = {isa = PBXBuildFile; fileRef = 5AC3E8230F7C2F6200F171EB /* VermilionTest.py */; };
 		5AEC5C5B0FBA2897005608EA /* SharedScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEC5C580FBA283C005608EA /* SharedScript.m */; };
 		5AEC5C720FBA2A29005608EA /* SharedScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEC5C580FBA283C005608EA /* SharedScript.m */; };
@@ -1265,6 +1262,8 @@
 		8BF627C5110A6743000AB941 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8BF627C6110A6749000AB941 /* HGSBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B8B13050EEBADE400E543D0 /* HGSBundle.m */; };
 		8BF62F0C110E5EC6000AB941 /* Categories.plistsrc in Sources */ = {isa = PBXBuildFile; fileRef = 8BF62F0B110E5EC6000AB941 /* Categories.plistsrc */; };
+		8BFC753211FE19EB002CB4DC /* Python in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFC753011FE19E1002CB4DC /* Python */; };
+		8BFC753311FE19EC002CB4DC /* Python in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFC753011FE19E1002CB4DC /* Python */; };
 		E4617A900DC23BE300CE7C0F /* HGSMixer.h in Headers */ = {isa = PBXBuildFile; fileRef = E4617A8E0DC23BE300CE7C0F /* HGSMixer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E4617A910DC23BE300CE7C0F /* HGSMixer.m in Sources */ = {isa = PBXBuildFile; fileRef = E4617A8F0DC23BE300CE7C0F /* HGSMixer.m */; };
 		E46932FD0DDB7A0200C5A64A /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
@@ -2322,8 +2321,6 @@
 		5A2710B60ECA52F200C72257 /* HGSPythonAction.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HGSPythonAction.mm; sourceTree = "<group>"; };
 		5A2710B70ECA52F200C72257 /* HGSPythonSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSPythonSource.h; sourceTree = "<group>"; };
 		5A2710B80ECA52F200C72257 /* HGSPythonSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HGSPythonSource.mm; sourceTree = "<group>"; };
-		5A2711020ECA567B00C72257 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
-		5A4D237B0F462D2000F5C05B /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		5A5831DA100BFBBB00EC32CF /* Clipboard.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Clipboard.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A58323C100BFC4D00EC32CF /* Clipboard-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Clipboard-Info.plist"; sourceTree = "<group>"; };
 		5A58323D100BFC4D00EC32CF /* ClipboardSearchSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClipboardSearchSource.m; sourceTree = "<group>"; };
@@ -2709,7 +2706,6 @@
 		8B488A460F15DE6A00786C1E /* QSBMenuButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBMenuButton.m; sourceTree = "<group>"; };
 		8B488A470F15DE6A00786C1E /* QSBMenuButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBMenuButton.h; sourceTree = "<group>"; };
 		8B488EAF0F16842500786C1E /* CalculatePrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CalculatePrivate.h; sourceTree = "<group>"; };
-		8B488EBD0F16842500786C1E /* QLUIPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QLUIPrivate.h; sourceTree = "<group>"; };
 		8B4893FF0F16EA5300786C1E /* QSBIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = QSBIcon.icns; sourceTree = "<group>"; };
 		8B4894540F16EB1E00786C1E /* QSBPlugin.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = QSBPlugin.icns; sourceTree = "<group>"; };
 		8B48945F0F16EB9900786C1E /* QSBStatusMenuIconGrayInverted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = QSBStatusMenuIconGrayInverted.png; sourceTree = "<group>"; };
@@ -3696,6 +3692,7 @@
 		8BF62EA9110E593B000AB941 /* QSBCategory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBCategory.h; sourceTree = "<group>"; };
 		8BF62EAA110E593B000AB941 /* QSBCategory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCategory.m; sourceTree = "<group>"; };
 		8BF62F0B110E5EC6000AB941 /* Categories.plistsrc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Categories.plistsrc; sourceTree = "<group>"; };
+		8BFC753011FE19E1002CB4DC /* Python */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = Python; path = /System/Library/Frameworks/Python.framework/Versions/2.5/Python; sourceTree = "<absolute>"; };
 		D408F9F00AEEDC2C007EE96D /* SecurityFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityFoundation.framework; path = System/Library/Frameworks/SecurityFoundation.framework; sourceTree = SDKROOT; };
 		D44652CE0AB643110077860B /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E429DF760AC1907A00E747D8 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -4085,11 +4082,10 @@
 				8B6F2EEC0DA2B9DF0052CA40 /* Foundation.framework in Frameworks */,
 				62D5B51E0E648FF400C66E15 /* InstantMessage.framework in Frameworks */,
 				5AF4E0400EB7DB5C00B26194 /* AppKit.framework in Frameworks */,
-				5A2711030ECA567B00C72257 /* Python.framework in Frameworks */,
 				8B3EFA360EF2CB1D0036FFBD /* QuickLook.framework in Frameworks */,
-				5A4D237C0F462D2000F5C05B /* libcrypto.dylib in Frameworks */,
 				8BC6735E0F58A3AB003B5C6A /* GData.framework in Frameworks */,
 				5A0BB3B20FABB1F500AA4858 /* PubSub.framework in Frameworks */,
+				8BFC753211FE19EB002CB4DC /* Python in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4231,7 +4227,7 @@
 				8BD990060DF84ECC0068565A /* Carbon.framework in Frameworks */,
 				8B55DB030E78832300D39CB0 /* SenTestingKit.framework in Frameworks */,
 				8BC673940F58A48E003B5C6A /* GData.framework in Frameworks */,
-				5AC3E77A0F7C29A900F171EB /* Python.framework in Frameworks */,
+				8BFC753311FE19EC002CB4DC /* Python in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4355,7 +4351,6 @@
 				5AB442230FFC36E800001976 /* DirectoryService.framework */,
 				5A0BB3B10FABB1F500AA4858 /* PubSub.framework */,
 				8BD83CAE0F1EC46400098475 /* Quartz.framework */,
-				5A2711020ECA567B00C72257 /* Python.framework */,
 				7F5717A80DB7C84F00D95EBD /* Cocoa.framework */,
 				7F5717900DB7C83F00D95EBD /* AddressBook.framework */,
 				7F379C740D8FFD5C00A47C98 /* QuickLook.framework */,
@@ -4373,6 +4368,7 @@
 				8B4D76AA0E3FE97400EFEDD8 /* QuartzCore.framework */,
 				629A95630E5F244D005AE855 /* InstantMessage.framework */,
 				8B55DB010E78832300D39CB0 /* SenTestingKit.framework */,
+				8BFC753011FE19E1002CB4DC /* Python */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -4976,7 +4972,6 @@
 		8B488EBC0F16842500786C1E /* QuickLookUI */ = {
 			isa = PBXGroup;
 			children = (
-				8B488EBD0F16842500786C1E /* QLUIPrivate.h */,
 			);
 			path = QuickLookUI;
 			sourceTree = "<group>";
@@ -6337,7 +6332,6 @@
 			children = (
 				8B312E4F1057008C00D57495 /* libobjc.dylib */,
 				8BB275AB0D6F81EA008DC1CA /* libsqlite3.dylib */,
-				5A4D237B0F462D2000F5C05B /* libcrypto.dylib */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -12314,8 +12308,13 @@
 					"$(inherited)",
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"";
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/Vermilion-Info.plist";
 				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5\"",
+				);
 				PRODUCT_NAME = Vermilion;
 			};
 			name = Debug;
@@ -12328,8 +12327,13 @@
 					"$(inherited)",
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"";
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/Vermilion-Info.plist";
 				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5\"",
+				);
 				PRODUCT_NAME = Vermilion;
 			};
 			name = Release;
@@ -12569,9 +12573,6 @@
 				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					"$(GTM_GENERAL_GCC_PREPROCESSOR_DEFINITIONS)",
-					"$(GTM_PLATFORM_GCC_PREPROCESSOR_DEFINITIONS)",
-					"$(GTM_CONFIGURATION_GCC_PREPROCESSOR_DEFINITIONS)",
 					"VERMILLION_PLUGIN_API_VERSION=$(VERMILLION_PLUGIN_API_VERSION)",
 				);
 				"ONLY_ACTIVE_ARCH[sdk=iphoneos*]" = NO;
@@ -12638,8 +12639,13 @@
 					"$(inherited)",
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"";
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/Vermilion-Info.plist";
 				LD_DYLIB_INSTALL_NAME = "@executable_path/../Frameworks/$(EXECUTABLE_PATH)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5\"",
+				);
 				PRODUCT_NAME = Vermilion;
 			};
 			name = "Debug-gcov";
@@ -12685,7 +12691,12 @@
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"";
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/TestData/Resources/Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5\"",
+				);
 				PRODUCT_NAME = VermilionTest;
 				WRAPPER_EXTENSION = octest;
 			};
@@ -13312,9 +13323,6 @@
 			buildSettings = {
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					"$(GTM_GENERAL_GCC_PREPROCESSOR_DEFINITIONS)",
-					"$(GTM_PLATFORM_GCC_PREPROCESSOR_DEFINITIONS)",
-					"$(GTM_CONFIGURATION_GCC_PREPROCESSOR_DEFINITIONS)",
 					"VERMILLION_PLUGIN_API_VERSION=$(VERMILLION_PLUGIN_API_VERSION)",
 				);
 				"ONLY_ACTIVE_ARCH[sdk=iphoneos*]" = NO;
@@ -13328,9 +13336,6 @@
 			buildSettings = {
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					"$(GTM_GENERAL_GCC_PREPROCESSOR_DEFINITIONS)",
-					"$(GTM_PLATFORM_GCC_PREPROCESSOR_DEFINITIONS)",
-					"$(GTM_CONFIGURATION_GCC_PREPROCESSOR_DEFINITIONS)",
 					"VERMILLION_PLUGIN_API_VERSION=$(VERMILLION_PLUGIN_API_VERSION)",
 				);
 				"ONLY_ACTIVE_ARCH[sdk=iphoneos*]" = NO;
@@ -13367,7 +13372,12 @@
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"";
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/TestData/Resources/Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5\"",
+				);
 				PRODUCT_NAME = VermilionTest;
 				WRAPPER_EXTENSION = octest;
 			};
@@ -13382,7 +13392,12 @@
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/Frameworks\"";
 				INFOPLIST_FILE = "$(SRCROOT)/../../Vermilion/Vermilion/TestData/Resources/Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5\"",
+				);
 				PRODUCT_NAME = VermilionTest;
 				WRAPPER_EXTENSION = octest;
 			};

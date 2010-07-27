@@ -45,7 +45,9 @@
 #import "GTMObjectSingleton.h"
 #import "GTMNSNumber+64Bit.h"
 #import "GTMMethodCheck.h"
-#import <Python/structmember.h>
+// We need to use Python 2.5 that is available on Leopard and Snow Leopard.
+// 2.6 is the default on SL, so we need to work around that.
+#import <Python.framework/Versions/2.5/Headers/structmember.h>
 
 const NSString *kHGSPythonPrivateValuesKey = @"kHGSPythonPrivateValuesKey";
 const NSString *kHGSPythonThreadExtensionKey = @"HGSPythonThreadExtensionKey";
@@ -228,7 +230,6 @@ static PyTypeObject QueryType = {
   0,                            // tp_subclasses
   0,                            // tp_weaklist
   0,                            // tp_del
-  0,                            // tp_version_tag
 };
 
 static PyMethodDef LocalizeMethods[] = {
