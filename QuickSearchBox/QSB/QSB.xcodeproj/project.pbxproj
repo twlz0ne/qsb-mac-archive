@@ -1221,8 +1221,6 @@
 		8BDB889E1152B68B00C411B1 /* GTM.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */; };
 		8BDC55F8112F4D1400988421 /* QSBPivotTextAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC55F6112F4D1400988421 /* QSBPivotTextAttachment.m */; };
 		8BDCC73F0F1827E000CDDA78 /* gmail.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BC3F4730F17C7BF00896770 /* gmail.icns */; };
-		8BDCCA8A0F18646700CDDA78 /* GoogleBreakpad.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BDCCA840F18645800CDDA78 /* GoogleBreakpad.framework */; };
-		8BDCCC0A0F18700200CDDA78 /* GoogleBreakpad.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8BDCCA840F18645800CDDA78 /* GoogleBreakpad.framework */; };
 		8BE34077114FF1B8002D047A /* TextActionsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BE34076114FF1B8002D047A /* TextActionsTest.m */; };
 		8BE340D0114FF1F1002D047A /* HGSUnitTestingUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B852E401007B1DE00880329 /* HGSUnitTestingUtilities.m */; };
 		8BE3428111501D5A002D047A /* HGSCorporaSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BE3427F11501D5A002D047A /* HGSCorporaSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1264,6 +1262,8 @@
 		8BF62F0C110E5EC6000AB941 /* Categories.plistsrc in Sources */ = {isa = PBXBuildFile; fileRef = 8BF62F0B110E5EC6000AB941 /* Categories.plistsrc */; };
 		8BFC753211FE19EB002CB4DC /* Python in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFC753011FE19E1002CB4DC /* Python */; };
 		8BFC753311FE19EC002CB4DC /* Python in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFC753011FE19E1002CB4DC /* Python */; };
+		8BFC8C301200A16F002CB4DC /* Breakpad.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFC85F311FFA7D5002CB4DC /* Breakpad.framework */; };
+		8BFC8C801200A188002CB4DC /* Breakpad.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFC85F311FFA7D5002CB4DC /* Breakpad.framework */; };
 		E4617A900DC23BE300CE7C0F /* HGSMixer.h in Headers */ = {isa = PBXBuildFile; fileRef = E4617A8E0DC23BE300CE7C0F /* HGSMixer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E4617A910DC23BE300CE7C0F /* HGSMixer.m in Sources */ = {isa = PBXBuildFile; fileRef = E4617A8F0DC23BE300CE7C0F /* HGSMixer.m */; };
 		E46932FD0DDB7A0200C5A64A /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
@@ -1977,6 +1977,202 @@
 			remoteGlobalIDString = 8BF62022110A60C2000AB941;
 			remoteInfo = "Transference Beacon";
 		};
+		8BFC85F211FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = Breakpad;
+		};
+		8BFC85F411FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F92C53540ECCE349009BE4BA;
+			remoteInfo = Inspector;
+		};
+		8BFC85F611FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F92C563C0ECD10B3009BE4BA;
+			remoteInfo = breakpadUtilities;
+		};
+		8BFC85F811FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F92C56A00ECE04A7009BE4BA;
+			remoteInfo = crash_report_sender;
+		};
+		8BFC85FA11FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F9C44DA50EF060A8003AEBAA;
+			remoteInfo = BreakpadTest;
+		};
+		8BFC85FC11FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F9C77DDA0F7DD5CF0045F7DB;
+			remoteInfo = UnitTests;
+		};
+		8BFC85FE11FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F93803BE0F80820F004D428B;
+			remoteInfo = generator_test;
+		};
+		8BFC860011FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F93DE2D10F82A67300608B94;
+			remoteInfo = minidump_file_writer_unittest;
+		};
+		8BFC860211FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F93DE32C0F82C55600608B94;
+			remoteInfo = handler_test;
+		};
+		8BFC891A11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88EB11FFAA73002CB4DC /* crash_report.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DD76FA10486AA7600D96B5E;
+			remoteInfo = crash_report;
+		};
+		8BFC892C11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B8C5B5111166531A00D34F4E;
+			remoteInfo = dump_syms;
+		};
+		8BFC892E11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B89E0E741166575200DD08C9;
+			remoteInfo = macho_dump;
+		};
+		8BFC893011FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B88FB024116BDFFF00407530;
+			remoteInfo = gtestmockall;
+		};
+		8BFC893211FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B88FB14B116CF4A700407530;
+			remoteInfo = byte_cursor_unittest;
+		};
+		8BFC893411FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B89E0E9511665A6400DD08C9;
+			remoteInfo = macho_reader_unittest;
+		};
+		8BFC893611FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B88FB007116BDE8300407530;
+			remoteInfo = stabs_reader_unittest;
+		};
+		8BFC893811FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B88FB135116CF30F00407530;
+			remoteInfo = bytereader_unittest;
+		};
+		8BFC893A11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B88FAF2F116A591E00407530;
+			remoteInfo = dwarf2reader_cfi_unittest;
+		};
+		8BFC893C11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B88FB0DF116CEEA800407530;
+			remoteInfo = dwarf2diehandler_unittest;
+		};
+		8BFC893E11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B88FB10A116CF07900407530;
+			remoteInfo = dwarf_cu_to_module_unittest;
+		};
+		8BFC894011FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B88FB0F2116CEF1900407530;
+			remoteInfo = dwarf_line_to_module_unittest;
+		};
+		8BFC894211FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B88FB11F116CF27F00407530;
+			remoteInfo = dwarf_cfi_to_module_unittest;
+		};
+		8BFC894411FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B84A91F4116CF784006C210E;
+			remoteInfo = stabs_to_module_unittest;
+		};
+		8BFC894611FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B88FB0B9116CEABF00407530;
+			remoteInfo = module_unittest;
+		};
+		8BFC894811FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D21F97D211CBA0F200239E38;
+			remoteInfo = test_assembler_unittest;
+		};
+		8BFC894C11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DD76FA10486AA7600D96B5E;
+			remoteInfo = symupload;
+		};
+		8BFC894E11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9BD835FB0B0544950055103E;
+			remoteInfo = minidump_upload;
+		};
+		8BFC8C231200A15E002CB4DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* Breakpad */;
+			remoteInfo = Breakpad;
+		};
 		E46932F70DDB7A0200C5A64A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -2184,11 +2380,11 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				8BFC8C801200A188002CB4DC /* Breakpad.framework in Copy Frameworks */,
 				8B445B0F10EBDF8500561E62 /* Sparkle.framework in Copy Frameworks */,
 				620CB3870FAA84060029801C /* QSBPluginUI.framework in Copy Frameworks */,
 				8B6128F90F4642C100E29B40 /* JSON.framework in Copy Frameworks */,
 				8B6C0D060F32C86100E51E5D /* GData.framework in Copy Frameworks */,
-				8BDCCC0A0F18700200CDDA78 /* GoogleBreakpad.framework in Copy Frameworks */,
 				8BD97DAE0E636E2600F5C83B /* GTM.framework in Copy Frameworks */,
 				8B6F2F710DA2C42C0052CA40 /* Vermilion.framework in Copy Frameworks */,
 				62E72AB80F4F6E6700A68815 /* Growl.framework in Copy Frameworks */,
@@ -3637,11 +3833,6 @@
 		8BDC55F6112F4D1400988421 /* QSBPivotTextAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBPivotTextAttachment.m; sourceTree = "<group>"; };
 		8BDC55F7112F4D1400988421 /* QSBPivotTextAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPivotTextAttachment.h; sourceTree = "<group>"; };
 		8BDCC8A20F183BA200CDDA78 /* QSB.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = QSB.xcconfig; sourceTree = "<group>"; };
-		8BDCCA810F18645800CDDA78 /* crash_process */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = crash_process; sourceTree = "<group>"; };
-		8BDCCA820F18645800CDDA78 /* crash_report */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = crash_report; sourceTree = "<group>"; };
-		8BDCCA830F18645800CDDA78 /* dump_syms */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = dump_syms; sourceTree = "<group>"; };
-		8BDCCA840F18645800CDDA78 /* GoogleBreakpad.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleBreakpad.framework; sourceTree = "<group>"; };
-		8BDCCA850F18645800CDDA78 /* symupload */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = symupload; sourceTree = "<group>"; };
 		8BE34069114FF0E9002D047A /* TextActions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextActions.h; sourceTree = "<group>"; };
 		8BE34076114FF1B8002D047A /* TextActionsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextActionsTest.m; sourceTree = "<group>"; };
 		8BE3427F11501D5A002D047A /* HGSCorporaSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSCorporaSource.h; sourceTree = "<group>"; };
@@ -3693,6 +3884,18 @@
 		8BF62EAA110E593B000AB941 /* QSBCategory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCategory.m; sourceTree = "<group>"; };
 		8BF62F0B110E5EC6000AB941 /* Categories.plistsrc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Categories.plistsrc; sourceTree = "<group>"; };
 		8BFC753011FE19E1002CB4DC /* Python */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = Python; path = /System/Library/Frameworks/Python.framework/Versions/2.5/Python; sourceTree = "<absolute>"; };
+		8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Breakpad.xcodeproj; sourceTree = "<group>"; };
+		8BFC88EA11FFAA73002CB4DC /* crash_report.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = crash_report.mm; sourceTree = "<group>"; };
+		8BFC88EB11FFAA73002CB4DC /* crash_report.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = crash_report.xcodeproj; sourceTree = "<group>"; };
+		8BFC88EE11FFAA73002CB4DC /* on_demand_symbol_supplier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = on_demand_symbol_supplier.h; sourceTree = "<group>"; };
+		8BFC88EF11FFAA73002CB4DC /* on_demand_symbol_supplier.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = on_demand_symbol_supplier.mm; sourceTree = "<group>"; };
+		8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dump_syms.xcodeproj; sourceTree = "<group>"; };
+		8BFC88F411FFAA73002CB4DC /* dump_syms_tool.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = dump_syms_tool.mm; sourceTree = "<group>"; };
+		8BFC88F511FFAA73002CB4DC /* macho_dump.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = macho_dump.cc; sourceTree = "<group>"; };
+		8BFC88F711FFAA73002CB4DC /* minidump_upload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = minidump_upload.m; sourceTree = "<group>"; };
+		8BFC88F811FFAA73002CB4DC /* symupload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = symupload.m; sourceTree = "<group>"; };
+		8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = symupload.xcodeproj; sourceTree = "<group>"; };
+		8BFC8B0112009736002CB4DC /* Breakpad-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Breakpad-Info.plist"; sourceTree = "<group>"; };
 		D408F9F00AEEDC2C007EE96D /* SecurityFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityFoundation.framework; path = System/Library/Frameworks/SecurityFoundation.framework; sourceTree = SDKROOT; };
 		D44652CE0AB643110077860B /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E429DF760AC1907A00E747D8 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -4014,6 +4217,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8BFC8C301200A16F002CB4DC /* Breakpad.framework in Frameworks */,
 				8B627CDF10D81BA900F166D1 /* Sparkle.framework in Frameworks */,
 				620CB3920FAA84260029801C /* QSBPluginUI.framework in Frameworks */,
 				8B6129B30F46446D00E29B40 /* JSON.framework in Frameworks */,
@@ -4026,7 +4230,6 @@
 				8B3EED730CEA86A100D933C0 /* SecurityFoundation.framework in Frameworks */,
 				8B3EED740CEA86A100D933C0 /* SystemConfiguration.framework in Frameworks */,
 				7FE602A60D91975000336364 /* CoreServices.framework in Frameworks */,
-				8BDCCA8A0F18646700CDDA78 /* GoogleBreakpad.framework in Frameworks */,
 				8BD83CAF0F1EC46400098475 /* Quartz.framework in Frameworks */,
 				62E72A7B0F4F4ADE00A68815 /* Growl.framework in Frameworks */,
 				5A20A2AF0FD71946009F0A92 /* SecurityInterface.framework in Frameworks */,
@@ -4339,6 +4542,7 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				D45B92550A3F6E68003A5A05 /* Libraries */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				8BFC8B0112009736002CB4DC /* Breakpad-Info.plist */,
 			);
 			comments = "Do not set build independent targets in parallel because the disk images creating targets (SDK vs QSB) will conflict and screw each other up.";
 			name = GoogleDesktop;
@@ -6049,7 +6253,7 @@
 				8B6127B00F46299900E29B40 /* json-framework */,
 				8B488EAA0F16842500786C1E /* UndocumentedGoodness */,
 				5AF274610F155D3700C087B2 /* GData */,
-				8BDCCA800F18645800CDDA78 /* GoogleBreakpad */,
+				8BFC81E011FFA793002CB4DC /* breakpad */,
 				F435DAAD0DBE4B900069CDE8 /* google-toolbox-for-mac */,
 				62E729390F4F1C9400A68815 /* Growl */,
 				8B148F5D0F715696002E05FA /* OCMock */,
@@ -6288,18 +6492,6 @@
 			path = Keystone;
 			sourceTree = "<group>";
 		};
-		8BDCCA800F18645800CDDA78 /* GoogleBreakpad */ = {
-			isa = PBXGroup;
-			children = (
-				8BDCCA810F18645800CDDA78 /* crash_process */,
-				8BDCCA820F18645800CDDA78 /* crash_report */,
-				8BDCCA830F18645800CDDA78 /* dump_syms */,
-				8BDCCA840F18645800CDDA78 /* GoogleBreakpad.framework */,
-				8BDCCA850F18645800CDDA78 /* symupload */,
-			);
-			path = GoogleBreakpad;
-			sourceTree = "<group>";
-		};
 		8BF620CE110A60F5000AB941 /* Transference */ = {
 			isa = PBXGroup;
 			children = (
@@ -6325,6 +6517,143 @@
 				8BF6244D110A610A000AB941 /* TransferenceServerProtocol.h */,
 			);
 			path = Transference;
+			sourceTree = "<group>";
+		};
+		8BFC81E011FFA793002CB4DC /* breakpad */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC81ED11FFA7CB002CB4DC /* src */,
+			);
+			path = breakpad;
+			sourceTree = "<group>";
+		};
+		8BFC81ED11FFA7CB002CB4DC /* src */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC81EE11FFA7CB002CB4DC /* client */,
+				8BFC871B11FFAA6F002CB4DC /* tools */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		8BFC81EE11FFA7CB002CB4DC /* client */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC820C11FFA7CC002CB4DC /* mac */,
+			);
+			path = client;
+			sourceTree = "<group>";
+		};
+		8BFC820C11FFA7CC002CB4DC /* mac */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */,
+			);
+			path = mac;
+			sourceTree = "<group>";
+		};
+		8BFC820E11FFA7CC002CB4DC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC85F311FFA7D5002CB4DC /* Breakpad.framework */,
+				8BFC85F511FFA7D5002CB4DC /* Inspector */,
+				8BFC85F711FFA7D5002CB4DC /* breakpadUtilities.dylib */,
+				8BFC85F911FFA7D5002CB4DC /* crash_report_sender.app */,
+				8BFC85FB11FFA7D5002CB4DC /* BreakpadTest.app */,
+				8BFC85FD11FFA7D5002CB4DC /* UnitTests.octest */,
+				8BFC85FF11FFA7D5002CB4DC /* generator_test */,
+				8BFC860111FFA7D5002CB4DC /* minidump_file_writer_unittest */,
+				8BFC860311FFA7D5002CB4DC /* handler_test */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8BFC871B11FFAA6F002CB4DC /* tools */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC88E811FFAA73002CB4DC /* mac */,
+			);
+			path = tools;
+			sourceTree = "<group>";
+		};
+		8BFC88E811FFAA73002CB4DC /* mac */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC88E911FFAA73002CB4DC /* crash_report */,
+				8BFC88F011FFAA73002CB4DC /* dump_syms */,
+				8BFC88F611FFAA73002CB4DC /* symupload */,
+			);
+			path = mac;
+			sourceTree = "<group>";
+		};
+		8BFC88E911FFAA73002CB4DC /* crash_report */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC88EA11FFAA73002CB4DC /* crash_report.mm */,
+				8BFC88EB11FFAA73002CB4DC /* crash_report.xcodeproj */,
+				8BFC88EE11FFAA73002CB4DC /* on_demand_symbol_supplier.h */,
+				8BFC88EF11FFAA73002CB4DC /* on_demand_symbol_supplier.mm */,
+			);
+			path = crash_report;
+			sourceTree = "<group>";
+		};
+		8BFC88EC11FFAA73002CB4DC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC891B11FFAA74002CB4DC /* crash_report */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8BFC88F011FFAA73002CB4DC /* dump_syms */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */,
+				8BFC88F411FFAA73002CB4DC /* dump_syms_tool.mm */,
+				8BFC88F511FFAA73002CB4DC /* macho_dump.cc */,
+			);
+			path = dump_syms;
+			sourceTree = "<group>";
+		};
+		8BFC88F211FFAA73002CB4DC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC892D11FFAA74002CB4DC /* dump_syms */,
+				8BFC892F11FFAA74002CB4DC /* macho_dump */,
+				8BFC893111FFAA74002CB4DC /* libgtestmockall.a */,
+				8BFC893311FFAA74002CB4DC /* byte_cursor_unittest */,
+				8BFC893511FFAA74002CB4DC /* macho_reader_unittest */,
+				8BFC893711FFAA74002CB4DC /* stabs_reader_unittest */,
+				8BFC893911FFAA74002CB4DC /* bytereader_unittest */,
+				8BFC893B11FFAA74002CB4DC /* dwarf2reader_cfi_unittest */,
+				8BFC893D11FFAA74002CB4DC /* dwarf2diehandler_unittest */,
+				8BFC893F11FFAA74002CB4DC /* dwarf_cu_to_module_unittest */,
+				8BFC894111FFAA74002CB4DC /* dwarf_line_to_module_unittest */,
+				8BFC894311FFAA74002CB4DC /* dwarf_cfi_to_module_unittest */,
+				8BFC894511FFAA74002CB4DC /* stabs_to_module_unittest */,
+				8BFC894711FFAA74002CB4DC /* module_unittest */,
+				8BFC894911FFAA74002CB4DC /* test_assembler_unittest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8BFC88F611FFAA73002CB4DC /* symupload */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC88F711FFAA73002CB4DC /* minidump_upload.m */,
+				8BFC88F811FFAA73002CB4DC /* symupload.m */,
+				8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */,
+			);
+			path = symupload;
+			sourceTree = "<group>";
+		};
+		8BFC88FA11FFAA73002CB4DC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC894D11FFAA74002CB4DC /* symupload */,
+				8BFC894F11FFAA74002CB4DC /* minidump_upload */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		D45B92550A3F6E68003A5A05 /* Libraries */ = {
@@ -7041,6 +7370,7 @@
 			dependencies = (
 				620CB3630FAA838F0029801C /* PBXTargetDependency */,
 				8B6128E90F46427800E29B40 /* PBXTargetDependency */,
+				8BFC8C241200A15E002CB4DC /* PBXTargetDependency */,
 			);
 			name = "QSB Core";
 			productName = QSB;
@@ -7567,6 +7897,8 @@
 				ru,
 				sv,
 				English,
+				sl,
+				tr,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* GoogleDesktop */;
 			projectDirPath = "";
@@ -7584,6 +7916,18 @@
 					ProjectRef = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
+					ProductGroup = 8BFC820E11FFA7CC002CB4DC /* Products */;
+					ProjectRef = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
+				},
+				{
+					ProductGroup = 8BFC88EC11FFAA73002CB4DC /* Products */;
+					ProjectRef = 8BFC88EB11FFAA73002CB4DC /* crash_report.xcodeproj */;
+				},
+				{
+					ProductGroup = 8BFC88F211FFAA73002CB4DC /* Products */;
+					ProjectRef = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
+				},
+				{
 					ProductGroup = 8B637B4D0F2777C300997738 /* Products */;
 					ProjectRef = 8B637B4C0F2777C300997738 /* GData.xcodeproj */;
 				},
@@ -7594,6 +7938,10 @@
 				{
 					ProductGroup = 620054520F77F0FD00C806A1 /* Products */;
 					ProjectRef = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
+				},
+				{
+					ProductGroup = 8BFC88FA11FFAA73002CB4DC /* Products */;
+					ProjectRef = 8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -7768,6 +8116,195 @@
 			fileType = archive.ar;
 			path = libGDataTouchStaticLib.a;
 			remoteRef = 8BCCB03B10348ABE0051B567 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC85F311FFA7D5002CB4DC /* Breakpad.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Breakpad.framework;
+			remoteRef = 8BFC85F211FFA7D5002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC85F511FFA7D5002CB4DC /* Inspector */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = Inspector;
+			remoteRef = 8BFC85F411FFA7D5002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC85F711FFA7D5002CB4DC /* breakpadUtilities.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = breakpadUtilities.dylib;
+			remoteRef = 8BFC85F611FFA7D5002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC85F911FFA7D5002CB4DC /* crash_report_sender.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = crash_report_sender.app;
+			remoteRef = 8BFC85F811FFA7D5002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC85FB11FFA7D5002CB4DC /* BreakpadTest.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = BreakpadTest.app;
+			remoteRef = 8BFC85FA11FFA7D5002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC85FD11FFA7D5002CB4DC /* UnitTests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = UnitTests.octest;
+			remoteRef = 8BFC85FC11FFA7D5002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC85FF11FFA7D5002CB4DC /* generator_test */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = generator_test;
+			remoteRef = 8BFC85FE11FFA7D5002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC860111FFA7D5002CB4DC /* minidump_file_writer_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = minidump_file_writer_unittest;
+			remoteRef = 8BFC860011FFA7D5002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC860311FFA7D5002CB4DC /* handler_test */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = handler_test;
+			remoteRef = 8BFC860211FFA7D5002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC891B11FFAA74002CB4DC /* crash_report */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = crash_report;
+			remoteRef = 8BFC891A11FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC892D11FFAA74002CB4DC /* dump_syms */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = dump_syms;
+			remoteRef = 8BFC892C11FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC892F11FFAA74002CB4DC /* macho_dump */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = macho_dump;
+			remoteRef = 8BFC892E11FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC893111FFAA74002CB4DC /* libgtestmockall.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libgtestmockall.a;
+			remoteRef = 8BFC893011FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC893311FFAA74002CB4DC /* byte_cursor_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = byte_cursor_unittest;
+			remoteRef = 8BFC893211FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC893511FFAA74002CB4DC /* macho_reader_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = macho_reader_unittest;
+			remoteRef = 8BFC893411FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC893711FFAA74002CB4DC /* stabs_reader_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = stabs_reader_unittest;
+			remoteRef = 8BFC893611FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC893911FFAA74002CB4DC /* bytereader_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = bytereader_unittest;
+			remoteRef = 8BFC893811FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC893B11FFAA74002CB4DC /* dwarf2reader_cfi_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = dwarf2reader_cfi_unittest;
+			remoteRef = 8BFC893A11FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC893D11FFAA74002CB4DC /* dwarf2diehandler_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = dwarf2diehandler_unittest;
+			remoteRef = 8BFC893C11FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC893F11FFAA74002CB4DC /* dwarf_cu_to_module_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = dwarf_cu_to_module_unittest;
+			remoteRef = 8BFC893E11FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC894111FFAA74002CB4DC /* dwarf_line_to_module_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = dwarf_line_to_module_unittest;
+			remoteRef = 8BFC894011FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC894311FFAA74002CB4DC /* dwarf_cfi_to_module_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = dwarf_cfi_to_module_unittest;
+			remoteRef = 8BFC894211FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC894511FFAA74002CB4DC /* stabs_to_module_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = stabs_to_module_unittest;
+			remoteRef = 8BFC894411FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC894711FFAA74002CB4DC /* module_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = module_unittest;
+			remoteRef = 8BFC894611FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC894911FFAA74002CB4DC /* test_assembler_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test_assembler_unittest;
+			remoteRef = 8BFC894811FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC894D11FFAA74002CB4DC /* symupload */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = symupload;
+			remoteRef = 8BFC894C11FFAA74002CB4DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BFC894F11FFAA74002CB4DC /* minidump_upload */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = minidump_upload;
+			remoteRef = 8BFC894E11FFAA74002CB4DC /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -10264,6 +10801,11 @@
 			target = 8BF62022110A60C2000AB941 /* Transference Beacon */;
 			targetProxy = 8BF627B5110A6637000AB941 /* PBXContainerItemProxy */;
 		};
+		8BFC8C241200A15E002CB4DC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Breakpad;
+			targetProxy = 8BFC8C231200A15E002CB4DC /* PBXContainerItemProxy */;
+		};
 		E46932F60DDB7A0200C5A64A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
@@ -12122,10 +12664,11 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
-					"\"$(SRCROOT)/../externals/GoogleBreakpad\"",
+					"\"$(SRCROOT)/../externals/breakpad/src/client/mac/build/Debug\"",
 					"\"$(SRCROOT)/../externals/Keystone\"",
 					"\"$(SRCROOT)/../externals/Growl\"",
 					"\"$(SRCROOT)/../externals/Sparkle\"",
+					"\"$(SRCROOT)/build/Debug\"",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Resources/Info.plist;
@@ -12140,10 +12683,11 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
-					"\"$(SRCROOT)/../externals/GoogleBreakpad\"",
+					"\"$(SRCROOT)/../externals/breakpad/src/client/mac/build/Debug\"",
 					"\"$(SRCROOT)/../externals/Keystone\"",
 					"\"$(SRCROOT)/../externals/Growl\"",
 					"\"$(SRCROOT)/../externals/Sparkle\"",
+					"\"$(SRCROOT)/build/Debug\"",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Resources/Info.plist;
@@ -12609,10 +13153,11 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
-					"\"$(SRCROOT)/../externals/GoogleBreakpad\"",
+					"\"$(SRCROOT)/../externals/breakpad/src/client/mac/build/Debug\"",
 					"\"$(SRCROOT)/../externals/Keystone\"",
 					"\"$(SRCROOT)/../externals/Growl\"",
 					"\"$(SRCROOT)/../externals/Sparkle\"",
+					"\"$(SRCROOT)/build/Debug\"",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Resources/Info.plist;

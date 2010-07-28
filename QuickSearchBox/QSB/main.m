@@ -32,29 +32,21 @@
 
 #import <Cocoa/Cocoa.h>
 #import "HGSLog.h"
-#import <GoogleBreakpad/GoogleBreakpad.h>
-
-// Breakpad is currently not 64 bits.
-// TODO: Get rid of this when we have a 64 bit breakpad.
-#define QSB_BUILD_WITH_BREAKPAD !__LP64__
+#import <Breakpad/Breakpad.h>
 
 int main(int argc, const char *argv[]) {
   // Need a local pool for breakpad plumbing
   NSAutoreleasePool *localPool = [[NSAutoreleasePool alloc] init];
   NSDictionary *plist = [[NSBundle mainBundle] infoDictionary];
   HGSAssert(plist, @"Unable to get our Info.plist");
-#if QSB_BUILD_WITH_BREAKPAD
-  GoogleBreakpadRef breakpad = GoogleBreakpadCreate(plist);
+  BreakpadRef breakpad = BreakpadCreate(plist);
   HGSAssert(breakpad, @"Unable to initialize breakpad");
-#endif  // QSB_BUILD_WITH_BREAKPAD
-  
+
   // Go!
   int appValue = NSApplicationMain(argc,  (const char **) argv);
-#if QSB_BUILD_WITH_BREAKPAD
   if (breakpad) {
-    GoogleBreakpadRelease(breakpad);
+    BreakpadRelease(breakpad);
   }
-#endif  // QSB_BUILD_WITH_BREAKPAD
   [localPool release];
   return appValue;
 }
