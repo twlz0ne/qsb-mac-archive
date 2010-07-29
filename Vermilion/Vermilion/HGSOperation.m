@@ -96,6 +96,8 @@
   }
   CFRunLoopRemoveSource(runloop, source, kCFRunLoopDefaultMode);
   CFRelease(source);
+  [target_ release];
+  target_ = nil;
 }
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
