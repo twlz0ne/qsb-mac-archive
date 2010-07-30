@@ -120,6 +120,7 @@ NSString* const kHGSObjectStatusStaleValue = @"HGSObjectStatusStaleValue";
 }
 
 - (void)dealloc {
+  [iconProvider_ setResult:nil];
   [iconProvider_ release];
   [super dealloc];
 }

@@ -49,6 +49,7 @@
 }
 
 @property (readonly, retain) NSImage *icon;
+@property (readwrite, assign) HGSResult *result;
 
 @end
 
@@ -85,14 +86,14 @@
   Returns an HGSIconProvider value for a HGSResult.
   Checks our cache to see if we have an icon, otherwise goes through a
   "waterfall" model to get icons.
-  By default the first image returned is a placeholder image.  
+  By default the first image returned is a placeholder image.
   We will then start up an operation to return a default filesystem image.
   Finally we will then start up an operation to return a high quality image if
   one is available.
-  If skipPlaceholder is YES then we will immediately go for the default 
-  filesystem image. Note that this can be slow, so should not be used unless 
+  If skipPlaceholder is YES then we will immediately go for the default
+  filesystem image. Note that this can be slow, so should not be used unless
   we really want a "medium" quality icon immediately.
-  
+
   The icon retreived by this method will be cached.
 */
 - (HGSIconProvider *)iconProviderForResult:(HGSResult *)result
@@ -122,6 +123,6 @@
 /*!
   Size of the largest icon used in the UI
 */
-- (NSSize)preferredIconSize; 
+- (NSSize)preferredIconSize;
 
 @end

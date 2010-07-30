@@ -189,7 +189,6 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
 
 // All of these are intentionally atomic
 @property (readwrite, retain) NSImage *icon;
-@property (readwrite, assign) HGSResult *result;
 @property (readwrite, retain) NSOperation *basicOperation;
 @property (readwrite, retain) NSOperation *advancedOperation;
 
@@ -611,6 +610,8 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconCache, sharedIconCache);
           operation:(NSOperation *)operation {
   [self setAdvancedOperation:nil];
   if ([operation isCancelled]) return;
+  HGSResult *result = [self result];
+  if (!result) return;
 
   NSImage *favicon = [[[NSImage alloc] initWithData:retrievedData] autorelease];
   NSURL *url = [[fetcher request] URL];
@@ -690,7 +691,7 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconCache, sharedIconCache);
   }
   if (icon) {
     [self setIcon:icon];
-    [cache setIcon:icon forResult:[self result]];
+    [cache setIcon:icon forResult:result];
   }
 }
 
