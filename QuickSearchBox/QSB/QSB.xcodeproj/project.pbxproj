@@ -9819,11 +9819,14 @@
 			inputPaths = (
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/JSON.framework",
+				"$(BUILT_PRODUCTS_DIR)/crash_report_sender.app",
+				"$(BUILT_PRODUCTS_DIR)/Inspector",
+				"$(BUILT_PRODUCTS_DIR)/breakpadUtilities.dylib",
+				"$(BUILT_PRODUCTS_DIR)/Breakpad.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build breakpad the way we want into our build folder\ncd \"${SRCROOT}/../externals/breakpad/src/client/mac\"\n/usr/bin/xcodebuild -project Breakpad.xcodeproj -target crash_report_sender -configuration \"${CONFIGURATION}\" -sdk \"${SDKROOT}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\n/usr/bin/xcodebuild -project Breakpad.xcodeproj -target breakpadUtilities -configuration \"${CONFIGURATION}\" -sdk \"${SDKROOT}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\n/usr/bin/xcodebuild -project Breakpad.xcodeproj -target Inspector -configuration \"${CONFIGURATION}\" -sdk \"${SDKROOT}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\n/usr/bin/xcodebuild -project Breakpad.xcodeproj -target Breakpad -configuration \"${CONFIGURATION}\" -sdk \"${SDKROOT}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\ncd \"${SRCROOT}\"";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\nbreakpad_targets=( \"crash_report_sender\" \"breakpadUtilities\" \"Inspector\" \"Breakpad\" )\nfor breakpad_target in \"${breakpad_targets[@]}\"; do\n\t# Build breakpad the way we want into our build folder\n\techo \"Building Breakpad:${LINENO}: note: Breakpad Target: ${breakpad_target}\"\n\tcd \"${SRCROOT}/../externals/breakpad/src/client/mac\"\n\t/usr/bin/xcodebuild -project Breakpad.xcodeproj -target \"${breakpad_target}\" -configuration \"${CONFIGURATION}\" -sdk macosx10.5 CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\n\tcd \"${SRCROOT}\"\ndone";
 		};
 		E4F551310DF73059008A846E /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -12767,7 +12770,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
-					"\"$(SRCROOT)/../externals/breakpad/src/client/mac/build/Debug\"",
 					"\"$(SRCROOT)/../externals/Keystone\"",
 					"\"$(SRCROOT)/../externals/Growl\"",
 					"\"$(SRCROOT)/../externals/Sparkle\"",
@@ -12786,7 +12788,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
-					"\"$(SRCROOT)/../externals/breakpad/src/client/mac/build/Debug\"",
 					"\"$(SRCROOT)/../externals/Keystone\"",
 					"\"$(SRCROOT)/../externals/Growl\"",
 					"\"$(SRCROOT)/../externals/Sparkle\"",
@@ -13256,7 +13257,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
-					"\"$(SRCROOT)/../externals/breakpad/src/client/mac/build/Debug\"",
 					"\"$(SRCROOT)/../externals/Keystone\"",
 					"\"$(SRCROOT)/../externals/Growl\"",
 					"\"$(SRCROOT)/../externals/Sparkle\"",
