@@ -1592,6 +1592,13 @@
 			remoteGlobalIDString = 8B148F940F7156B6002E05FA;
 			remoteInfo = OCMock;
 		};
+		8B2AB2501203623100C84242 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BFC92E31201CEFE002CB4DC /* Breakpad */;
+			remoteInfo = Breakpad;
+		};
 		8B2E2A440F9901C700F80E11 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -2166,32 +2173,25 @@
 			remoteGlobalIDString = 9BD835FB0B0544950055103E;
 			remoteInfo = minidump_upload;
 		};
-		8BFC8C231200A15E002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
-			remoteInfo = Breakpad;
-		};
 		8BFC92BB1201CE57002CB4DC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8BFC92601201CD6F002CB4DC /* dumpsyms */;
+			remoteGlobalIDString = 8BFC92601201CD6F002CB4DC;
 			remoteInfo = dumpsyms;
 		};
 		8BFC92BD1201CE64002CB4DC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8BFC92601201CD6F002CB4DC /* dumpsyms */;
+			remoteGlobalIDString = 8BFC92601201CD6F002CB4DC;
 			remoteInfo = dumpsyms;
 		};
 		8BFC92C71201CEBB002CB4DC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8BFC92601201CD6F002CB4DC /* dump_syms */;
+			remoteGlobalIDString = 8BFC92601201CD6F002CB4DC;
 			remoteInfo = dump_syms;
 		};
 		E46932F70DDB7A0200C5A64A /* PBXContainerItemProxy */ = {
@@ -3918,7 +3918,7 @@
 		8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = symupload.xcodeproj; sourceTree = "<group>"; };
 		8BFC8B0112009736002CB4DC /* Breakpad-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Breakpad-Info.plist"; sourceTree = "<group>"; };
 		8BFC92661201CD6F002CB4DC /* JSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8BFC92E91201CEFE002CB4DC /* JSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BFC92E91201CEFE002CB4DC /* Breakpad.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Breakpad.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D408F9F00AEEDC2C007EE96D /* SecurityFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityFoundation.framework; path = System/Library/Frameworks/SecurityFoundation.framework; sourceTree = SDKROOT; };
 		D44652CE0AB643110077860B /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E429DF760AC1907A00E747D8 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -4549,7 +4549,7 @@
 				6210450E113C85AA00AF95F8 /* GoogleCalendars.hgs */,
 				8B847B9711499653002C460B /* CorePlugin Test.octest */,
 				8BFC92661201CD6F002CB4DC /* JSON.framework */,
-				8BFC92E91201CEFE002CB4DC /* JSON.framework */,
+				8BFC92E91201CEFE002CB4DC /* Breakpad.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -7395,7 +7395,7 @@
 			dependencies = (
 				620CB3630FAA838F0029801C /* PBXTargetDependency */,
 				8B6128E90F46427800E29B40 /* PBXTargetDependency */,
-				8BFC8C241200A15E002CB4DC /* PBXTargetDependency */,
+				8B2AB2511203623100C84242 /* PBXTargetDependency */,
 			);
 			name = "QSB Core";
 			productName = QSB;
@@ -7814,7 +7814,7 @@
 			);
 			name = Breakpad;
 			productName = test;
-			productReference = 8BFC92E91201CEFE002CB4DC /* JSON.framework */;
+			productReference = 8BFC92E91201CEFE002CB4DC /* Breakpad.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		E46932F50DDB7A0200C5A64A /* Actions */ = {
@@ -9823,7 +9823,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build breakpad the way we want into our build folder\ncd \"${SRCROOT}/../externals/breakpad/src/client/mac\"\n/usr/bin/xcodebuild -project Breakpad.xcodeproj -target Breakpad -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\ncd \"${SRCROOT}\"";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build breakpad the way we want into our build folder\ncd \"${SRCROOT}/../externals/breakpad/src/client/mac\"\n/usr/bin/xcodebuild -project Breakpad.xcodeproj -target crash_report_sender -configuration \"${CONFIGURATION}\" -sdk \"${SDKROOT}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\n/usr/bin/xcodebuild -project Breakpad.xcodeproj -target breakpadUtilities -configuration \"${CONFIGURATION}\" -sdk \"${SDKROOT}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\n/usr/bin/xcodebuild -project Breakpad.xcodeproj -target Inspector -configuration \"${CONFIGURATION}\" -sdk \"${SDKROOT}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\n/usr/bin/xcodebuild -project Breakpad.xcodeproj -target Breakpad -configuration \"${CONFIGURATION}\" -sdk \"${SDKROOT}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\ncd \"${SRCROOT}\"";
 		};
 		E4F551310DF73059008A846E /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -10674,6 +10674,11 @@
 			target = 8B148F940F7156B6002E05FA /* OCMock */;
 			targetProxy = 8B1490640F71576B002E05FA /* PBXContainerItemProxy */;
 		};
+		8B2AB2511203623100C84242 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BFC92E31201CEFE002CB4DC /* Breakpad */;
+			targetProxy = 8B2AB2501203623100C84242 /* PBXContainerItemProxy */;
+		};
 		8B2E2A450F9901C700F80E11 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
@@ -10888,11 +10893,6 @@
 			isa = PBXTargetDependency;
 			target = 8BF62022110A60C2000AB941 /* Transference Beacon */;
 			targetProxy = 8BF627B5110A6637000AB941 /* PBXContainerItemProxy */;
-		};
-		8BFC8C241200A15E002CB4DC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Breakpad;
-			targetProxy = 8BFC8C231200A15E002CB4DC /* PBXContainerItemProxy */;
 		};
 		8BFC92BC1201CE57002CB4DC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -13993,7 +13993,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
 			buildSettings = {
-				PRODUCT_NAME = JSON;
+				PRODUCT_NAME = Breakpad;
 			};
 			name = Debug;
 		};
@@ -14001,7 +14001,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
 			buildSettings = {
-				PRODUCT_NAME = JSON;
+				PRODUCT_NAME = Breakpad;
 			};
 			name = "Debug-gcov";
 		};
@@ -14009,7 +14009,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
 			buildSettings = {
-				PRODUCT_NAME = JSON;
+				PRODUCT_NAME = Breakpad;
 			};
 			name = Release;
 		};
