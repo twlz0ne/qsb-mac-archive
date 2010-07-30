@@ -13,9 +13,8 @@ set -o nounset
 set -o verbose
 
 #Expected location for dump_syms
-DUMP_SYMS_PATH="${SRCROOT}/../externals/breakpad/src/tools/mac/dump_syms/build/Debug/dump_syms"
+DUMP_SYMS_PATH="${BUILT_PRODUCTS_DIR}/dump_syms"
 #Root of dump_syms project
-DUMP_SYMS_SRCROOT="${SRCROOT}/../externals/breakpad/src/tools/mac/dump_syms"
 
 if [ $# -eq 1 ]; then
   SYMBOL_FILE_BASE_NAME="$1"
@@ -26,14 +25,6 @@ fi
 BREAKPAD_FILE="${BUILT_PRODUCTS_DIR}/${SYMBOL_FILE_BASE_NAME}_${GOOGLE_VERSIONINFO_LONG}"
 BREAKPAD_FILE_PPC="${BREAKPAD_FILE}_ppc.breakpad"
 BREAKPAD_FILE_386="${BREAKPAD_FILE}_i386.breakpad"
-
-# Check to see if dump_syms exists
-if [ ! -f "${DUMP_SYMS_PATH}" ]; then
-  # Build it if it doesn't.
-  pushd ${DUMP_SYMS_SRCROOT}
-  xcodebuild -project dump_syms.xcodeproj -target dump_syms -configuration Debug OTHER_CFLAGS="" SDKROOT[arch=*]=macosx10.6
-  popd
-fi
 
 # Handle clean vs build (not usually used, but could be if used as a separate
 # target).
