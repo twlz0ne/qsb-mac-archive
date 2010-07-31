@@ -3916,7 +3916,6 @@
 		8BFC88F711FFAA73002CB4DC /* minidump_upload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = minidump_upload.m; sourceTree = "<group>"; };
 		8BFC88F811FFAA73002CB4DC /* symupload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = symupload.m; sourceTree = "<group>"; };
 		8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = symupload.xcodeproj; sourceTree = "<group>"; };
-		8BFC8B0112009736002CB4DC /* Breakpad-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Breakpad-Info.plist"; sourceTree = "<group>"; };
 		8BFC92661201CD6F002CB4DC /* JSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BFC92E91201CEFE002CB4DC /* Breakpad.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Breakpad.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D408F9F00AEEDC2C007EE96D /* SecurityFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityFoundation.framework; path = System/Library/Frameworks/SecurityFoundation.framework; sourceTree = SDKROOT; };
@@ -4567,7 +4566,6 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				D45B92550A3F6E68003A5A05 /* Libraries */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				8BFC8B0112009736002CB4DC /* Breakpad-Info.plist */,
 			);
 			comments = "Do not set build independent targets in parallel because the disk images creating targets (SDK vs QSB) will conflict and screw each other up.";
 			name = GoogleDesktop;
