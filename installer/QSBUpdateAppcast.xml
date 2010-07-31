@@ -6,16 +6,16 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
          <item>
-            <title>Version 2.0.0.3328</title>
+            <title>Version 2.0.0.3766</title>
 						<sparkle:releaseNotesLink>
-							http://qsb-mac.googlecode.com/svn/trunk/release_notes/QuickSearchBoxReleaseNotes_2.0.0.3328_Cobalt.html
+							http://qsb-mac.googlecode.com/svn/trunk/release_notes/QuickSearchBoxReleaseNotes_2.0.0.3766_Cobalt.html
 						</sparkle:releaseNotesLink>
-            <pubDate>Wed, 14 Apr 2010 10:37:53 -0700</pubDate>
-            <enclosure url="http://qsb-mac.googlecode.com/files/QuickSearchBox-2.0.0.3328.Release.dmg"
-              sparkle:version="2.0.0.3328"
-              length="4860378"
+            <pubDate>Sat, 31 Jul 2010 13:40:37 -0700</pubDate>
+            <enclosure url="http://qsb-mac.googlecode.com/files/QuickSearchBox-2.0.0.3766.Release.dmg"
+              sparkle:version="2.0.0.3766"
+              length="6117404"
               type="application/octet-stream"
-              sparkle:dsaSignature="MCwCFDE9+881T6MYZV+E6gvaEI8/QqAUAhQ88n4w47xpp/L/SmLGvUNEt1IYCQ==" />
+              sparkle:dsaSignature="MCwCFA4/dSEcGX0+hPaueBPnAzaO7kr6AhR0yniOQMOsYdNaQyPK5Nz53h+GeA==" />
          </item>
    </channel>
 </rss>
