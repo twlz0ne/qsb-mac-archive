@@ -94,6 +94,9 @@ void cancelThread(void *info) {
 }
 
 - (void)dealloc {
+  if (rlSource_) {
+    CFRelease(rlSource_);
+  }
   [browsers_ release];
   [configuration_ release];
   [services_ release];
@@ -121,7 +124,7 @@ void cancelThread(void *info) {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   for (NSString *key in configuration_) {
     NSNetServiceBrowser *browser
-    = [[[NSNetServiceBrowser alloc] init] autorelease];
+      = [[[NSNetServiceBrowser alloc] init] autorelease];
     [browser setDelegate:self];
     [browser searchForServicesOfType:key inDomain:@""];
     [browsers_ setObject:browser forKey:key];
