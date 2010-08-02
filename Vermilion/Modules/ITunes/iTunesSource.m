@@ -132,7 +132,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
  @private
   GTMSQLiteDatabase *db_;
   NSTimer *updateTimer_;
-  NSInvocationOperation *updateOperation_;
+  HGSInvocationOperation *updateOperation_;
   // TODO(hawk): Should these all go in the icon cache?
   NSImage *albumIcon_;
   NSImage *artistIcon_;
@@ -142,7 +142,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
   NSMutableDictionary *genreIconCache_;
 }
 
-- (void)updateIndex:(id)sender;
+- (void)updateIndex:(id)sender operation:(NSOperation *)operation;
 - (void)updateIndexTimerFired:(NSTimer *)timer;
 - (GTMSQLiteDatabase *)createDatabase;
 - (void)performPivotOperation:(HGSCallbackSearchOperation *)operation
@@ -180,7 +180,7 @@ static NSString* const kPlaylistUrlFormat = @"googletunes://playlist/%@";
 - (HGSScoredResult *)playListResult:(NSString *)playlist
                          playlistId:(NSString *)playlistId
                           matchedBy:(HGSTokenizedString *)queryString;
-- (CGFloat)scoreForString:(NSString *)string 
+- (CGFloat)scoreForString:(NSString *)string
                 matchedBy:(HGSTokenizedString *)queryString
            matchedIndexes:(NSIndexSet **)matchedIndexes;
 - (HGSAction *)defaultAction;
@@ -210,12 +210,12 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                         selector:@selector(updateIndexTimerFired:)
                                         userInfo:nil
                                          repeats:YES] retain];
-    
+
     // Perform the first index of the iTunes library after a small delay
     // to avoid the synchronous hit at startup time
     NSDate *fireDate = [NSDate dateWithTimeIntervalSinceNow:kInitialIndexDelay];
     [updateTimer_ setFireDate:fireDate];
-    
+
     genreIconCache_ = [[NSMutableDictionary alloc] init];
 
     HGSAssert(db_, nil);
@@ -262,11 +262,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return [libraryLocation stringByExpandingTildeInPath];
 }
 
-- (void)updateIndex:(id)sender {
-  if ([updateOperation_ isCancelled]) return;
-  
+- (void)updateIndex:(id)sender operation:(NSOperation *)operation {
+  if ([operation isCancelled]) return;
+
   GTMSQLiteDatabase *db = nil;
-    
+
   NSString *pathToITunesXml = [self libraryLocation];
   NSDictionary *rootDictionary
     = [NSDictionary dictionaryWithContentsOfFile:pathToITunesXml];
@@ -286,7 +286,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   NSInteger trackCount = [tracks count];
   NSEnumerator *trackEnumerator = [tracks objectEnumerator];
   for (NSInteger chunkIteration = 0; chunkIteration < trackCount;) {
-    if ([updateOperation_ isCancelled]) return;
+    if ([operation isCancelled]) return;
     NSAutoreleasePool *loopPool = [[NSAutoreleasePool alloc] init];
     NSString *trackSql = @"BEGIN TRANSACTION;\n";
     for (NSInteger trackIteration = 0;
@@ -339,7 +339,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
   NSArray *playlists = [rootDictionary objectForKey:kPlaylistsKey];
   for (NSDictionary *playlist in playlists) {
-    if ([updateOperation_ isCancelled]) return;
+    if ([operation isCancelled]) return;
     if ([[playlist objectForKey:@"Master"] boolValue]) {
       // Don't index the master playlist, it's a rehash of everything we've
       // already indexed above
@@ -395,10 +395,10 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
   [updateOperation_ cancel];
   [updateOperation_ release];
-  updateOperation_ 
-    = [[NSInvocationOperation alloc] initWithTarget:self
-                                           selector:@selector(updateIndex:)
-                                             object:nil];
+  updateOperation_
+    = [[HGSInvocationOperation alloc] initWithTarget:self
+                                            selector:@selector(updateIndex:operation:)
+                                              object:nil];
   [queue addOperation:updateOperation_];
 }
 
@@ -466,7 +466,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                   inDatabase:db_
                                    errorCode:&sqliteErr];
     if (statement && !sqliteErr) {
-      while ((![operation isCancelled]) 
+      while ((![operation isCancelled])
              && ([statement stepRow] == SQLITE_ROW)) {
         NSString *playlistId = [statement resultStringAtPosition:0];
         NSString *playlist = [statement resultStringAtPosition:1];
@@ -499,7 +499,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                    errorCode:&sqliteErr];
     NSMutableArray *results = [NSMutableArray array];
     if (statement && !sqliteErr) {
-      while ((![operation isCancelled]) 
+      while ((![operation isCancelled])
              && ([statement stepRow] == SQLITE_ROW)) {
         NSString *track = [statement resultStringAtPosition:1];
         if (![query originalLength]
@@ -546,7 +546,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                    errorCode:&sqliteErr];
     NSMutableArray *results = [NSMutableArray array];
     if (statement && !sqliteErr) {
-      while ((![operation isCancelled]) 
+      while ((![operation isCancelled])
              && ([statement stepRow] == SQLITE_ROW)) {
         NSString *track = [statement resultStringAtPosition:1];
         if (![query originalLength]
@@ -613,7 +613,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                    errorCode:&sqliteErr];
     NSMutableArray *results = [NSMutableArray array];
     if (statement && !sqliteErr) {
-      while ((![operation isCancelled]) 
+      while ((![operation isCancelled])
              && ([statement stepRow] == SQLITE_ROW)
              && ([results count] < kMaxSearchResults)) {
         NSString *album = [statement resultStringAtPosition:0];
@@ -716,7 +716,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                         options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Artist matched
-            [results addObject:[self artistResult:artist 
+            [results addObject:[self artistResult:artist
                                         matchedBy:tokenizedQuery]];
           }
           range = [album rangeOfString:originalString
@@ -734,7 +734,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                   options:kResultStringCompareOptions];
           if (range.location != NSNotFound) {
             // Composer matched
-            [results addObject:[self composerResult:composer 
+            [results addObject:[self composerResult:composer
                                           matchedBy:tokenizedQuery]];
           }
           range = [genre rangeOfString:originalString
@@ -760,7 +760,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                             inDatabase:db_
                                              errorCode:&sqliteErr];
       if (statement && !sqliteErr) {
-        while ((![operation isCancelled]) 
+        while ((![operation isCancelled])
                && ([statement stepRow] == SQLITE_ROW)) {
           NSString *playlistId = [statement resultStringAtPosition:0];
           NSString *playlist = [statement resultStringAtPosition:1];
@@ -775,7 +775,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
 
     // We can get a pile of dupes from above, and our mixer assumes
     // that a source does not return dupes in itself, so we must dedupe here.
-    NSMutableArray *dedupedResults 
+    NSMutableArray *dedupedResults
       = [NSMutableArray arrayWithCapacity:[results count]];
     for (HGSResult *result in results) {
       BOOL isDupe = NO;
@@ -789,7 +789,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
         [dedupedResults addObject:result];
       }
     }
-    
+
     [operation setRankedResults:dedupedResults];
   }
 }
@@ -818,8 +818,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                       playListID:(NSString *)playListID
                        matchedBy:(HGSTokenizedString *)queryString {
   NSIndexSet *matchedIndexes = nil;
-  CGFloat score = [self scoreForString:track 
-                             matchedBy:queryString 
+  CGFloat score = [self scoreForString:track
+                             matchedBy:queryString
                         matchedIndexes:&matchedIndexes];
   NSMutableDictionary *attributes
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -857,7 +857,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                 attributes:attributes
                                                      score:score
                                                      flags:0
-                                               matchedTerm:queryString 
+                                               matchedTerm:queryString
                                             matchedIndexes:matchedIndexes];
   return result;
 }
@@ -872,7 +872,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     = [NSString stringWithFormat:kAlbumUrlFormat,
        [album stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
   NSIndexSet *matchedIndexes = nil;
-  CGFloat score = [self scoreForString:album 
+  CGFloat score = [self scoreForString:album
                              matchedBy:queryString
                         matchedIndexes:&matchedIndexes];
   NSMutableDictionary *attributes
@@ -900,12 +900,12 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                       type:kTypeITunesAlbum
                                                     source:self
                                                 attributes:attributes
-                                                     score:score 
+                                                     score:score
                                                      flags:0
-                                               matchedTerm:queryString 
+                                               matchedTerm:queryString
                                             matchedIndexes:matchedIndexes];
   return result;
-  
+
 }
 
 - (HGSScoredResult *)artistResult:(NSString *)artist
@@ -915,7 +915,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
        [artist stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
   HGSAction *action = [self defaultAction];
   NSIndexSet *matchedIndexes = nil;
-  CGFloat score = [self scoreForString:artist 
+  CGFloat score = [self scoreForString:artist
                              matchedBy:queryString
                         matchedIndexes:&matchedIndexes];
   NSDictionary *attributes
@@ -929,9 +929,9 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                       type:kTypeITunesArtist
                                                     source:self
                                                 attributes:attributes
-                                                     score:score 
+                                                     score:score
                                                      flags:0
-                                              matchedTerm:queryString 
+                                              matchedTerm:queryString
                                             matchedIndexes:matchedIndexes];
   return result;
 }
@@ -943,7 +943,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
        [composer stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
   HGSAction *action = [self defaultAction];
   NSIndexSet *matchedIndexes = nil;
-  CGFloat score = [self scoreForString:composer 
+  CGFloat score = [self scoreForString:composer
                              matchedBy:queryString
                         matchedIndexes:&matchedIndexes];
   NSDictionary *attributes
@@ -957,10 +957,10 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                       type:kTypeITunesComposer
                                                     source:self
                                                 attributes:attributes
-                                                     score:score 
+                                                     score:score
                                                      flags:0
-                                              matchedTerm:queryString 
-                                            matchedIndexes:matchedIndexes]; 
+                                              matchedTerm:queryString
+                                            matchedIndexes:matchedIndexes];
   return result;
 }
 
@@ -1011,11 +1011,11 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                       name:genre
                                                       type:kTypeITunesGenre
                                                     source:self
-                                                attributes:attributes      
-                                                     score:score 
+                                                attributes:attributes
+                                                     score:score
                                                      flags:0
-                                              matchedTerm:queryString 
-                                            matchedIndexes:matchedIndexes]; 
+                                              matchedTerm:queryString
+                                            matchedIndexes:matchedIndexes];
   return result;
 }
 
@@ -1026,7 +1026,7 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
     = [NSString stringWithFormat:kPlaylistUrlFormat,
        [playlist stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
   NSIndexSet *matchedIndexes = nil;
-  CGFloat score = [self scoreForString:playlist 
+  CGFloat score = [self scoreForString:playlist
                              matchedBy:queryString
                         matchedIndexes:&matchedIndexes];
   NSDictionary *attributes
@@ -1041,10 +1041,10 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
                                                       type:kTypeITunesPlaylist
                                                     source:self
                                                 attributes:attributes
-                                                     score:score 
+                                                     score:score
                                                      flags:0
-                                              matchedTerm:queryString 
-                                            matchedIndexes:matchedIndexes]; 
+                                              matchedTerm:queryString
+                                            matchedIndexes:matchedIndexes];
   return result;
 }
 
@@ -1059,8 +1059,8 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   return action;
 }
 
-- (CGFloat)scoreForString:(NSString *)string 
-                matchedBy:(HGSTokenizedString *)queryString 
+- (CGFloat)scoreForString:(NSString *)string
+                matchedBy:(HGSTokenizedString *)queryString
            matchedIndexes:(NSIndexSet **)matchedIndexes {
   CGFloat score = 0;
   NSUInteger length = [queryString tokenizedLength];

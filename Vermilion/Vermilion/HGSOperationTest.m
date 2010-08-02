@@ -43,7 +43,8 @@ static NSString * const kGoogleUrlPrefix = @"http://www.google.";
 static NSString * const kGoogle404Url = @"http://www.google.com/dfhasjhdfkhdgkshg";
 static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.google.com/";
 
-@interface HGSOperationTest : GTMTestCase {
+@interface HGSFetcherOperationTest : GTMTestCase {
+ @private
   BOOL          finishedWithDataIsRunning_;
   BOOL          finishedWithData_;
   BOOL          failedWithStatus_;
@@ -51,10 +52,10 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
 }
 @end
 
-@implementation HGSOperationTest
+@implementation HGSFetcherOperationTest
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   finishedWithData:(NSData *)retrievedData 
+   finishedWithData:(NSData *)retrievedData
           operation:(NSOperation *)operation {
   finishedWithData_ = YES;
   STAssertNotNil(fetcher, @"finishedWithData got a nil GDataHTTPFetcher");
@@ -82,7 +83,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
 }
 
 - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-    failedWithError:(NSError *)error 
+    failedWithError:(NSError *)error
           operation:(NSOperation *)operation {
   // Just confirm that both GDataHTTPFetcher's status errors and network errors
   // come to this callback.
@@ -101,7 +102,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
       [condition signal];
       [condition unlock];
     } else if ([urlString isEqual:kGoogleNonExistentUrl]) {
-      // Depending on how DNS is done, we could get a 503 or a non 
+      // Depending on how DNS is done, we could get a 503 or a non
       // kGDataHTTPFetcherStatusDomain error. So we set failedWithError_ in
       // both cases.
       failedWithError_ = YES;
@@ -120,14 +121,14 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
 - (void)testNetworkOperations {
   NSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
   NSCondition *condition = [[[NSCondition alloc] init] autorelease];
-  
+
   // Request Google's home page
   NSString *googleURL = [kGoogleUrlPrefix stringByAppendingString:@"com"];
   NSURL *url = [NSURL URLWithString:googleURL];
   NSURLRequest *request = [NSURLRequest requestWithURL:url];
   GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
   [fetcher setUserData:condition];
-  NSOperation *networkOp 
+  NSOperation *networkOp
     = [[[HGSFetcherOperation alloc] initWithTarget:self
                                         forFetcher:fetcher
                                  didFinishSelector:@selector(httpFetcher:finishedWithData:operation:)
@@ -141,7 +142,7 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
   }
   [networkOp cancel];
   [condition unlock];
-  
+
   // Request a non-existent Google page
   url = [NSURL URLWithString:kGoogle404Url];
   request = [NSURLRequest requestWithURL:url];
@@ -154,12 +155,12 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
        autorelease];
   STAssertNotNil(networkOp, @"failed to create network op for %@", kGoogle404Url);
   [queue addOperation:networkOp];
-  
+
   // Request a non-existent web site
   url = [NSURL URLWithString:kGoogleNonExistentUrl];
   request = [NSURLRequest requestWithURL:url];
   fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
-  networkOp 
+  networkOp
      = [[[HGSFetcherOperation alloc] initWithTarget:self
                                          forFetcher:fetcher
                                   didFinishSelector:@selector(httpFetcher:finishedWithData:operation:)
@@ -167,9 +168,9 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
        autorelease];
   STAssertNotNil(networkOp, @"failed to create network op for %@", kGoogleNonExistentUrl);
   [queue addOperation:networkOp];
-  
+
   [queue waitUntilAllOperationsAreFinished];
-  
+
   STAssertTrue(finishedWithData_,
                @"finishedWithData: not called by network operation");
   STAssertTrue(failedWithStatus_,
@@ -179,3 +180,11 @@ static NSString * const kGoogleNonExistentUrl = @"http://sgdfgsdfsewfgsd.corp.go
 }
 
 @end
+
+@interface HGSInvocationOperationTest : GTMTestCase
+@end
+
+@implementation HGSInvocationOperationTest
+// TODO(dmaclach): Flesh this out.
+@end
+

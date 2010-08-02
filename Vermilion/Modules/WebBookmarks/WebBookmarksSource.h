@@ -47,7 +47,7 @@
   GTMFileSystemKQueue *fileKQueue_;
   NSString *browserTypeName_;
   NSString *path_;
-  NSInvocationOperation *indexingOperation_;
+  HGSInvocationOperation *indexingOperation_;
   NSTimer *pathCheckTimer_;
 }
 - (id)initWithConfiguration:(NSDictionary *)configuration

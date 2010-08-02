@@ -1060,17 +1060,15 @@ GTM_METHOD_CHECK(NSImage, gtm_duplicateOfSize:);
   BOOL captured = NO;
   NSScreen *screen = [[self window] screen];
   NSDictionary *deviceDescription = [screen deviceDescription];
-  NSValue *displayIDValue = [deviceDescription objectForKey:@"NSScreenNumber"];
+  NSNumber *displayIDValue = [deviceDescription objectForKey:@"NSScreenNumber"];
   if (displayIDValue) {
-    CGDirectDisplayID displayID = 0;
-    [displayIDValue getValue:&displayID];
+    CGDirectDisplayID displayID = [displayIDValue unsignedIntValue];
     if (displayID) {
       captured = CGDisplayIsCaptured(displayID) ? YES : NO;
     }
   }
   return captured;
 }
-
 
 - (NSRect)fullyExposedFrameForFrame:(NSRect)proposedFrame
                      respectingDock:(BOOL)respectingDock

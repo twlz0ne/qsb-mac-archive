@@ -39,6 +39,26 @@
 @class GDataHTTPFetcher;
 
 /*!
+ An operation that releases its target and userData immediately after it is
+ finished either by finishing or cancelling.
+
+ NSInvocationOperations retain their targets until they are released. This
+ makes it easy to cause retain loops, by doing something like this:
+ myMemberVar = [[NSInvocationOperation alloc] initWithTarget:self...];
+ Even if you cancel an NSInvocationOperation it doesn't release its target.
+*/
+@interface HGSInvocationOperation : NSOperation {
+ @private
+  id target_;
+  SEL selector_;
+  id userData_;
+}
+
+- (id)initWithTarget:(id)target selector:(SEL)sel object:(id)userData;
+
+@end
+
+/*!
  An operation that wraps around a fetcher. All callbacks will be made on the
  operation thread.
 */
@@ -48,7 +68,7 @@
   id target_;
   SEL didFinishSel_;
   SEL didFailSel_;
-  BOOL didFinish_;
+  BOOL finished_;
 }
 
 @property (readonly, retain) GDataHTTPFetcher *fetcher;

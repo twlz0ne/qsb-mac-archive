@@ -35,14 +35,14 @@
 
 @interface WebBookmarksSource ()
 - (void)pathCheckTimer:(NSTimer *)timer;
-- (void)fileChanged:(GTMFileSystemKQueue *)queue 
+- (void)fileChanged:(GTMFileSystemKQueue *)queue
               event:(GTMFileSystemKQueueEvents)event;
-- (void)updateIndexForPath:(NSString *)path;
+- (void)updateIndexForPath:(NSString *)path operation:(NSOperation*)op;
 @end
 
 @implementation WebBookmarksSource
 
-- (id)initWithConfiguration:(NSDictionary *)configuration 
+- (id)initWithConfiguration:(NSDictionary *)configuration
             browserTypeName:(NSString *)browserTypeName
                 fileToWatch:(NSString *)path {
   if ((self = [super initWithConfiguration:configuration])) {
@@ -56,7 +56,7 @@
       [self fileChanged:fileKQueue_ event:kGTMFileSystemKQueueWriteEvent];
     }
   }
-  return self;  
+  return self;
 }
 
 - (void)dealloc {
@@ -74,10 +74,10 @@
 }
 
 - (void)pathCheckTimer:(NSTimer *)timer {
-  GTMFileSystemKQueueEvents queueEvents = (kGTMFileSystemKQueueDeleteEvent 
+  GTMFileSystemKQueueEvents queueEvents = (kGTMFileSystemKQueueDeleteEvent
                                            | kGTMFileSystemKQueueWriteEvent
                                            | kGTMFileSystemKQueueRenameEvent);
-  fileKQueue_ 
+  fileKQueue_
     = [[GTMFileSystemKQueue alloc] initWithPath:path_
                                       forEvents:queueEvents
                                   acrossReplace:YES
@@ -87,16 +87,16 @@
     // the file we are looking for isn't around, so we'll set a timer
     // so we can look for it in the future
     [pathCheckTimer_ release];
-    pathCheckTimer_ 
+    pathCheckTimer_
       = [[NSTimer scheduledTimerWithTimeInterval:60
-                                          target:self 
-                                        selector:@selector(pathCheckTimer:) 
-                                        userInfo:nil 
+                                          target:self
+                                        selector:@selector(pathCheckTimer:)
+                                        userInfo:nil
                                          repeats:NO] retain];
   }
 }
 
-- (void)indexResultNamed:(NSString *)name 
+- (void)indexResultNamed:(NSString *)name
                      URL:(NSString *)urlString
          otherAttributes:(NSDictionary *)otherAttributes
                     into:(HGSMemorySearchSourceDB *)database {
@@ -105,7 +105,7 @@
                 name, urlString, self);
     return;
   }
-  NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSUnderHomeRankFlag 
+  NSNumber *rankFlags = [NSNumber numberWithUnsignedInt:eHGSUnderHomeRankFlag
                          | eHGSNameMatchRankFlag];
   NSMutableDictionary *attributes
     = [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -116,10 +116,10 @@
   if (otherAttributes) {
     [attributes addEntriesFromDictionary:otherAttributes];
   }
-  
-  NSString* type = [NSString stringWithFormat:@"%@.%@", 
+
+  NSString* type = [NSString stringWithFormat:@"%@.%@",
                     kHGSTypeWebBookmark, browserTypeName_];
-  HGSUnscoredResult* result 
+  HGSUnscoredResult* result
     = [HGSUnscoredResult resultWithURI:urlString
                                   name:name
                                   type:type
@@ -128,14 +128,14 @@
   [database indexResult:result];
 }
 
-- (void)fileChanged:(GTMFileSystemKQueue *)queue 
+- (void)fileChanged:(GTMFileSystemKQueue *)queue
               event:(GTMFileSystemKQueueEvents)event {
   [indexingOperation_ cancel];
   [indexingOperation_ release];
-  indexingOperation_ 
-    = [[NSInvocationOperation alloc] initWithTarget:self
-                                           selector:@selector(updateIndexForPath:)
-                                             object:path_];
+  indexingOperation_
+    = [[HGSInvocationOperation alloc] initWithTarget:self
+                                            selector:@selector(updateIndexForPath:operation:)
+                                              object:path_];
   [[HGSOperationQueue sharedOperationQueue] addOperation:indexingOperation_];
 }
 
@@ -160,16 +160,16 @@
   return domainString;
 }
 
-- (void)updateIndexForPath:(NSString *)path {
+- (void)updateIndexForPath:(NSString *)path operation:(NSOperation *)operation {
   HGSMemorySearchSourceDB *database = [HGSMemorySearchSourceDB database];
-  [self updateDatabase:database forPath:path operation:indexingOperation_];
+  [self updateDatabase:database forPath:path operation:operation];
   if (![indexingOperation_ isCancelled]) {
     [self replaceCurrentDatabaseWith:database];
   }
 }
 
 - (void)updateDatabase:(HGSMemorySearchSourceDB *)database
-               forPath:(NSString *)path 
+               forPath:(NSString *)path
              operation:(NSOperation *)operation {
   [self doesNotRecognizeSelector:_cmd];
 }

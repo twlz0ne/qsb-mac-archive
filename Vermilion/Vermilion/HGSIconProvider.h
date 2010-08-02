@@ -49,8 +49,8 @@
 }
 
 @property (readonly, retain) NSImage *icon;
-@property (readwrite, assign) HGSResult *result;
 
+- (void)invalidate;
 @end
 
 /*!

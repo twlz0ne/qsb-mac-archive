@@ -41,6 +41,7 @@
 @class GDataServiceGoogle;
 @class GDataServiceTicket;
 @class HGSGDataServiceIndexContext;
+@class HGSInvocationOperation;
 
 extern NSString *const kHGSGDataServiceSourceRefreshIntervalKey;
 extern NSString *const kHGSGDataServiceSourceRefreshJitterKey;
@@ -55,7 +56,7 @@ extern NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey;
   NSTimeInterval refreshJitter_;
   NSTimeInterval errorReportingInterval_;
   GDataServiceGoogle *service_;
-  NSInvocationOperation *indexOp_;
+  HGSInvocationOperation *indexOp_;
   NSTimer *updateTimer_;
   HGSAccount *account_;
   NSTimeInterval previousErrorReportingTime_;
@@ -95,7 +96,7 @@ extern NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey;
 
 @property (readonly, retain) GDataServiceGoogle *service;
 @property (readonly, retain) HGSMemorySearchSourceDB *database;
-/*! 
+/*!
  Is the operation done (either finished or cancelled).
 */
 @property (readonly, assign, getter=isFinished) BOOL finished;
@@ -111,7 +112,7 @@ extern NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey;
 - (void)addTicket:(GDataServiceTicket *)ticket;
 - (void)removeTicket:(GDataServiceTicket *)ticket;
 
-/*! 
+/*!
  Cancel outstanding tickets
 */
 - (void)cancelTickets;
