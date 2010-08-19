@@ -82,29 +82,29 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
   return categoryIndex;
 }
 
-- (void)main {    
+- (void)main {
   NSMutableArray *predicateSegments = [NSMutableArray array];
-  
+
   HGSQuery* query = [self query];
   HGSResult *pivotObject = [query pivotObject];
   SLFilesSource *slSource = (SLFilesSource *)[self source];
   if (pivotObject) {
-    HGSAssert([pivotObject conformsToType:kHGSTypeContact], 
+    HGSAssert([pivotObject conformsToType:kHGSTypeContact],
               @"Bad pivotObject: %@", pivotObject);
-    
+
     NSString *emailAddress = [pivotObject valueForKey:kHGSObjectAttributeContactEmailKey];
     NSString *name = [pivotObject valueForKey:kHGSObjectAttributeNameKey];
-    HGSAssert(name, 
-              @"How did we get a pivotObject without a name? %@", 
+    HGSAssert(name,
+              @"How did we get a pivotObject without a name? %@",
               pivotObject);
     NSString *predString = nil;
     if (emailAddress) {
-      predString 
+      predString
         = [NSString stringWithFormat:@"(* = \"%@\"cdw || * = \"%@\"cdw)",
            name, emailAddress];
     } else {
       predString = [NSString stringWithFormat:@"(* = \"%@\"cdw)", name];
-    } 
+    }
     [predicateSegments addObject:predString];
   }
   NSString *rawQueryString = [[query tokenizedQueryString] originalString];
@@ -112,17 +112,17 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
     = GTMCFAutorelease(_MDQueryCreateQueryString(NULL,
                                                  (CFStringRef)rawQueryString));
   [predicateSegments addObject:spotlightString];
-  
+
   // if we have a uti filter, add it
   NSString *utiFilter = [slSource utiFilter];
   if (utiFilter) {
     [predicateSegments addObject:utiFilter];
   }
-  
+
   // Make the final predicate string
-  NSString *predicateString 
+  NSString *predicateString
     = [predicateSegments componentsJoinedByString:@" && "];
-  
+
   // Build the query
   NSArray *valueListAttrs = [slSource valueListAttributes];
   @synchronized(self) {
@@ -140,8 +140,8 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
     if (!mdCategoryQuery_) return;
     MDQuerySetMatchesSupportFiles(mdTopQuery_, NO);
     MDQuerySetMatchesSupportFiles(mdCategoryQuery_, NO);
-    _MDQuerySetGroupComparator(mdCategoryQuery_, 
-                               SLFilesCategoryIndexForItem, 
+    _MDQuerySetGroupComparator(mdCategoryQuery_,
+                               SLFilesCategoryIndexForItem,
                                [slSource groupToCategoryIndexMap]);
   }
   BOOL goodQuery = NO;
@@ -151,7 +151,7 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
   if (goodQuery && ![self isCancelled]) {
     goodQuery = MDQueryExecute(mdCategoryQuery_, kMDQuerySynchronous);
   }
-  
+
   if (!goodQuery && ![self isCancelled]) {
     // COV_NF_START
     CFStringRef queryString = MDQueryCopyQueryString(mdTopQuery_);
@@ -175,11 +175,11 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
     }
     NSUInteger count = MDQueryGetResultCount(mdTopQuery_);
     NSNumber *nsCount = [NSNumber numberWithUnsignedInteger:count];
-    
+
     // Two common sets we get asked for is the complete set and the set
     // without suggestions. We will return the same value for both.
     NSSet *suggestSet = [NSSet setWithObject:kHGSTypeSuggest];
-    HGSTypeFilter *filter 
+    HGSTypeFilter *filter
       = [HGSTypeFilter filterWithDoesNotConformTypes:suggestSet];
     [resultCountByFilter setObject:nsCount
                             forKey:filter];
@@ -198,18 +198,20 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
   [super cancel];
   @synchronized(self) {
     if (mdTopQuery_) {
+      MDQueryDisableUpdates(mdTopQuery_);
       MDQueryStop(mdTopQuery_);
     }
     if (mdCategoryQuery_) {
+      MDQueryDisableUpdates(mdCategoryQuery_);
       MDQueryStop(mdCategoryQuery_);
     }
   }
 }
 
-- (id)getAttribute:(CFStringRef)attribute 
+- (id)getAttribute:(CFStringRef)attribute
              query:(MDQueryRef)query
               item:(MDItemRef)item
-             index:(NSUInteger)idx 
+             index:(NSUInteger)idx
              group:(NSUInteger)group {
   id value = nil;
   if (query) {
@@ -224,7 +226,7 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
 #if DEBUG
   // Some objects don't have dates and display names.
   if (attribute != kMDItemLastUsedDate && attribute != kMDItemDisplayName) {
-    HGSAssert(value, @"Query: %@ item: %@ idx: %d group %d attr: %@", 
+    HGSAssert(value, @"Query: %@ item: %@ idx: %d group %d attr: %@",
               query, item, idx, group, attribute);
   }
 #endif // DEBUG
@@ -240,10 +242,10 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
   if (!scoredResult) {
     HGSAssert(mdItem, @"Query: %@ idx: %d group %d", query, idx, group);
     NSString *path = nil;
-    NSString *name = [self getAttribute:kMDItemDisplayName 
+    NSString *name = [self getAttribute:kMDItemDisplayName
                                   query:query
                                    item:mdItem
-                                  index:idx 
+                                  index:idx
                                   group:group];
     if (!name) {
       // COV_NF_START
@@ -262,27 +264,27 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
       // COV_NF_END
     }
     BOOL isURL = NO;
-    NSString *contentType = [self getAttribute:kMDItemContentType 
+    NSString *contentType = [self getAttribute:kMDItemContentType
                                          query:query
                                           item:mdItem
-                                         index:idx 
+                                         index:idx
                                          group:group];
     NSString *resultType = nil;
     if (contentType) {
-      NSNumber *typeGroupNumber = [self getAttribute:kMDItemPrivateAttributeGroupId 
+      NSNumber *typeGroupNumber = [self getAttribute:kMDItemPrivateAttributeGroupId
                                                query:query
                                                 item:mdItem
-                                               index:idx 
+                                               index:idx
                                                group:group];
       if (typeGroupNumber) {
         int typeGroup = [typeGroupNumber intValue];
-        
+
         // TODO: further subdivide the result types.
         switch (typeGroup) {
           case MDItemPrivateGroupApplication:
           case MDItemPrivateGroupSystemPref:
             // TODO: do we want a different type for prefpanes?
-            resultType = kHGSTypeFileApplication; 
+            resultType = kHGSTypeFileApplication;
             break;
           case MDItemPrivateGroupMessage:
             resultType = kHGSTypeEmail;
@@ -319,12 +321,12 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
             resultType = kHGSTypeFileCalendar;
             break;
           case MDItemPrivateGroupDocument:
-          default: 
+          default:
           {
-            if ([[name pathExtension] caseInsensitiveCompare:@"webloc"] 
+            if ([[name pathExtension] caseInsensitiveCompare:@"webloc"]
                 == NSOrderedSame) {
               resultType = kHGSTypeWebBookmark;
-            } else if (UTTypeConformsTo((CFStringRef)contentType, 
+            } else if (UTTypeConformsTo((CFStringRef)contentType,
                                         kUTTypePlainText)) {
               resultType = kHGSTypeTextFile;
             } else {
@@ -333,14 +335,14 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
           }
             break;
         }
-      } 
+      }
     }
-    
+
     NSString *uri = nil;
     // We want to avoid getting the path if at all possible,
     // and we only really need the path if it isn't a URL.
     if (isURL) {
-      NSString *uriPath = GTMCFAutorelease(MDItemCopyAttribute(mdItem, 
+      NSString *uriPath = GTMCFAutorelease(MDItemCopyAttribute(mdItem,
                                                                kMDItemURL));
       if (uriPath) {
         uri = uriPath;
@@ -353,45 +355,45 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
       if (!path) {
         return nil;
       }
-      NSString *escaped 
+      NSString *escaped
         = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
       uri = [@"file://localhost" stringByAppendingString:escaped];
     }
-    
+
     if (!resultType && path) {
       resultType = HGSTypeForPath(path);
       if ([resultType isEqual:kHGSTypeWebHistory]) {
         isURL = YES;
-        NSString *uriPath = GTMCFAutorelease(MDItemCopyAttribute(mdItem, 
+        NSString *uriPath = GTMCFAutorelease(MDItemCopyAttribute(mdItem,
                                                                  kMDItemURL));
         if (uriPath) {
           uri = uriPath;
         }
       }
     }
-    
+
     NSString *iconFlagName = nil;
     if ([resultType isEqual:kHGSTypeWebHistory]) {
       // TODO(alcor): are there any items that are not history
       iconFlagName = @"history-flag";
     }
-    
+
     HGSAssert(resultType != 0, nil);
-    
+
     // Cache values the query has already copied
-    NSDate *lastUsedDate = [self getAttribute:kMDItemLastUsedDate 
+    NSDate *lastUsedDate = [self getAttribute:kMDItemLastUsedDate
                                         query:query
                                          item:mdItem
-                                        index:idx 
+                                        index:idx
                                         group:group];
     if (!lastUsedDate) {
       lastUsedDate = [NSDate distantPast];  // COV_NF_LINE
     }
     const NSTimeInterval kSLOneMonth = 60 * 60 * 24 * 31;
-    CGFloat insignificantScore 
+    CGFloat insignificantScore
       = HGSCalibratedScore(kHGSCalibratedInsignificantScore);
     NSDate *nowDate = [NSDate date];
-    NSTimeInterval timeSinceLastUsed 
+    NSTimeInterval timeSinceLastUsed
       = [nowDate timeIntervalSinceDate:lastUsedDate];
     CGFloat score = insignificantScore;
     if (timeSinceLastUsed < kSLOneMonth) {
@@ -400,12 +402,12 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
       addOn *= 1 - (timeSinceLastUsed / kSLOneMonth);
       score += addOn;
     }
-    NSMutableDictionary *hgsAttributes 
+    NSMutableDictionary *hgsAttributes
       = [NSMutableDictionary dictionaryWithObjectsAndKeys:
          lastUsedDate, kHGSObjectAttributeLastUsedDateKey,
          contentType, kHGSObjectAttributeUTTypeKey, nil];
     if (iconFlagName) {
-      [hgsAttributes setObject:iconFlagName 
+      [hgsAttributes setObject:iconFlagName
                         forKey:kHGSObjectAttributeFlagIconNameKey];
     }
     if (isURL) {
@@ -413,16 +415,16 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
     }
     HGSTokenizedString *matchedTerm = [[self query] tokenizedQueryString];
     NSRange matchRange = NSMakeRange(0, [matchedTerm originalLength]);
-    NSIndexSet *matchedIndexes 
+    NSIndexSet *matchedIndexes
       = [NSIndexSet indexSetWithIndexesInRange:matchRange];
-    scoredResult = [HGSScoredResult resultWithURI:uri 
+    scoredResult = [HGSScoredResult resultWithURI:uri
                                              name:name
                                              type:resultType
                                            source:[self source]
                                        attributes:hgsAttributes
                                             score:score
                                             flags:0
-                                      matchedTerm:matchedTerm 
+                                      matchedTerm:matchedTerm
                                    matchedIndexes:matchedIndexes];
     [hgsResults_ setObject:scoredResult forKey:key];
   }
@@ -471,7 +473,7 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
   if ((self = [super initWithConfiguration:configuration])) {
     // we need to build the filter
     rebuildUTIFilter_ = YES;
-    
+
     NSNotificationCenter *dc = [NSNotificationCenter defaultCenter];
     HGSExtensionPoint *sourcesPoint = [HGSExtensionPoint sourcesPoint];
     [dc addObserver:self
@@ -482,28 +484,28 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
            selector:@selector(extensionPointSourcesChanged:)
                name:kHGSExtensionPointDidRemoveExtensionNotification
              object:sourcesPoint];
-    valueListAttributes_ 
-      = [[NSArray alloc] initWithObjects:(id)kMDItemPrivateAttributeGroupId, 
+    valueListAttributes_
+      = [[NSArray alloc] initWithObjects:(id)kMDItemPrivateAttributeGroupId,
          kMDItemLastUsedDate, kMDItemDisplayName, kMDItemContentType, nil];
     QSBCategoryManager *mgr = [QSBCategoryManager sharedManager];
     categories_ = [[mgr categories] copy];
-    NSMutableDictionary *filterToCategoryIndexMap 
+    NSMutableDictionary *filterToCategoryIndexMap
       = [NSMutableDictionary dictionary];
     for (CFIndex i = 1; i <  MDItemPrivateGroupLast; ++i) {
       NSString *type = [self typeFromGroup:i];
       HGSAssert(type, nil);
       QSBCategory *category = [mgr categoryForType:type];
-      NSUInteger categoryIndex 
+      NSUInteger categoryIndex
         = [categories_ indexOfObjectIdenticalTo:category];
       groupToCategoryIndexMap_[i] = categoryIndex;
       HGSTypeFilter *typeFilter = [category typeFilter];
-      NSNumber *nsCategoryIndex 
+      NSNumber *nsCategoryIndex
         = [NSNumber numberWithUnsignedInteger:categoryIndex];
       [filterToCategoryIndexMap setObject:nsCategoryIndex
                                    forKey:typeFilter];
     }
     NSSet *suggestSet = [NSSet setWithObject:kHGSTypeSuggest];
-    HGSTypeFilter *filter 
+    HGSTypeFilter *filter
       = [HGSTypeFilter filterWithDoesNotConformTypes:suggestSet];
     NSNumber *last = [NSNumber numberWithUnsignedInt:MDItemPrivateGroupLast];
     [filterToCategoryIndexMap setObject:last forKey:filter];
@@ -521,7 +523,7 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
   [valueListAttributes_ release];
   [super dealloc];
 }
-  
+
 - (NSString*)typeFromGroup:(MDItemPrivateGroup)group {
   struct {
     MDItemPrivateGroup group;
@@ -543,8 +545,8 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
     { MDItemPrivateGroupDocument, kHGSTypeFile }
   };
   NSString *type = nil;
-  for (size_t i = 0; 
-       i < sizeof(groupToTypeMap) / sizeof(groupToTypeMap[0]); 
+  for (size_t i = 0;
+       i < sizeof(groupToTypeMap) / sizeof(groupToTypeMap[0]);
        ++i) {
     if (group == groupToTypeMap[i].group) {
       type = groupToTypeMap[i].type;
@@ -608,7 +610,7 @@ CFIndex SLFilesCategoryIndexForItem(const CFTypeRef attrs[], void *context) {
       }
     }
     // make the filter string
-    NSMutableArray *utiFilterArray 
+    NSMutableArray *utiFilterArray
       = [NSMutableArray arrayWithCapacity:[utiSet count]];
     for (NSString *uti in utiSet) {
       NSString *utiFilterStr
