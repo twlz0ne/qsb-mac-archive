@@ -45,14 +45,11 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
   NSDictionary *configuration_;
   CFRunLoopSourceRef rlSource_;
   MountSearchSourceResolver *resolver_;
-  BOOL cancelled_;
 }
-@property (readonly, retain) NSDictionary *configuration;
-@property (readonly, retain) NSArray *services;
-@property (readwrite, assign, getter=isCancelled) BOOL cancelled;
+@property (readwrite, retain) NSDictionary *configuration;
+@property (readwrite, retain) NSMutableArray *services;
 
 - (void)updateResultsIndex;
-- (void)mountSearchSourceTracker:(void *)ignored;
 @end
 
 @interface MountSearchSourceResolver :  NSObject <NSNetServiceDelegate> {
@@ -69,38 +66,26 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
 
 @synthesize configuration = configuration_;
 @synthesize services = services_;
-@synthesize cancelled = cancelled_;
-
-void cancelThread(void *info) {
-  MountSearchSource *source = (MountSearchSource *)info;
-  [source setCancelled:YES];
-}
 
 - (id)initWithConfiguration:(NSDictionary *)configuration {
   if ((self = [super initWithConfiguration:configuration])) {
-    configuration_ = [configuration objectForKey:@"MountSearchSourceServices"];
+    [self setConfiguration:[configuration objectForKey:@"MountSearchSourceServices"]];
     browsers_ = [[NSMutableDictionary alloc] init];
-    services_ = [[NSMutableArray alloc] init];
-    CFRunLoopSourceContext context = {
-    0, self, NULL, NULL, NULL, NULL, NULL, NULL, NULL, cancelThread
-    };
-    rlSource_ = CFRunLoopSourceCreate(NULL, 0, &context);
-
-    [NSThread detachNewThreadSelector:@selector(mountSearchSourceTracker:)
-                             toTarget:self
-                           withObject:nil];
+    [self setServices:[NSMutableArray array]];
+    for (NSString *key in [self configuration]) {
+      NSNetServiceBrowser *browser
+        = [[[NSNetServiceBrowser alloc] init] autorelease];
+      [browser setDelegate:self];
+      [browser searchForServicesOfType:key inDomain:@""];
+      [browsers_ setObject:browser forKey:key];
+    }
   }
   return self;
 }
 
 - (void)dealloc {
-  if (rlSource_) {
-    CFRelease(rlSource_);
-  }
-  [browsers_ release];
-  [configuration_ release];
-  [services_ release];
-  [resolver_ release];
+  HGSAssert(!browsers_, @"Uninstall not called?");
+  [self setConfiguration:nil];
   [super dealloc];
 }
 
@@ -108,34 +93,16 @@ void cancelThread(void *info) {
   for (NSString *key in browsers_) {
     NSNetServiceBrowser *browser = [browsers_ objectForKey:key];
     [browser stop];
+    [browser setDelegate:nil];
   }
   [browsers_ release];
   browsers_ = nil;
-  for (NSNetService *service in services_) {
+  for (NSNetService *service in [self services]) {
     [service setDelegate:nil];
   }
-  [services_ release];
-  services_ = nil;
+  [self setServices:nil];
   [resolver_ release];
   resolver_ = nil;
-}
-
-- (void)mountSearchSourceTracker:(void *)ignored {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  for (NSString *key in configuration_) {
-    NSNetServiceBrowser *browser
-      = [[[NSNetServiceBrowser alloc] init] autorelease];
-    [browser setDelegate:self];
-    [browser searchForServicesOfType:key inDomain:@""];
-    [browsers_ setObject:browser forKey:key];
-  }
-  CFRunLoopRef rl = CFRunLoopGetCurrent();
-  CFRunLoopAddSource(rl, rlSource_, kCFRunLoopDefaultMode);
-  while (![self isCancelled]) {
-    CFRunLoopRun();
-  }
-  CFRunLoopRemoveSource(rl, rlSource_, kCFRunLoopDefaultMode);
-  [pool drain];
 }
 
 - (void)updateResultsIndex {
@@ -153,7 +120,7 @@ void cancelThread(void *info) {
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
            didFindService:(NSNetService *)service
                moreComing:(BOOL)moreComing {
-  [services_ addObject:service];
+  [[self services] addObject:service];
   if (!moreComing) {
     [self updateResultsIndex];
   }
@@ -162,7 +129,7 @@ void cancelThread(void *info) {
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
          didRemoveService:(NSNetService *)service
                moreComing:(BOOL)moreComing {
-  [services_ removeObject:service];
+  [[self services] removeObject:service];
   if (!moreComing) {
     [self updateResultsIndex];
   }
@@ -196,7 +163,7 @@ void cancelThread(void *info) {
     services_ = [services mutableCopy];
     source_ = source;
 
-    for (NSNetService *service in services) {
+    for (NSNetService *service in services_) {
       [service setDelegate:self];
       [service resolveWithTimeout:kServiceResolutionTimeout];
     }
