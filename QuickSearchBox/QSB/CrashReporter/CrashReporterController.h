@@ -1,7 +1,4 @@
-//
-//  main.m
-//
-//  Copyright (c) 2006-2008 Google Inc. All rights reserved.
+//  Copyright (c) 2010 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -29,23 +26,36 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+//  Portions Copyright (c) 2004 Claus Broch, Infinite Loop. All rights reserved.
 
-#import <Cocoa/Cocoa.h>
-#import "HGSLog.h"
-#import "CrashReporter.h"
+#import <AppKit/AppKit.h>
 
-int main(int argc, const char *argv[]) {
-  // Need a local pool for CrashReporter
-  NSAutoreleasePool *localPool = [[NSAutoreleasePool alloc] init];
-  NSBundle *bundle = [NSBundle mainBundle];
-  CrashReporter *reporter = [[[CrashReporter alloc] init] autorelease];
-  [reporter setUrl:[bundle objectForInfoDictionaryKey:@"CrashReporterURL"]];
-  [reporter setCompanyName:[bundle objectForInfoDictionaryKey:@"CrashReporterCompany"]];
-  BOOL launchedReporter = [reporter launchReporter];
-  HGSAssert(launchedReporter, @"Unable to launch CrashReporter");
+@protocol CrashReporterControllerDelegate<NSObject>
+- (void)userDidSubmitCrashReport:(NSDictionary*)report;
+- (void)userDidCancelCrashReport;
+@end
 
-  // Go!
-  int appValue = NSApplicationMain(argc,  (const char **) argv);
-  [localPool release];
-  return appValue;
+@interface CrashReporterController : NSWindowController {
+ @private
+  IBOutlet NSTextField *descriptionHeader_;
+  IBOutlet NSTextView *descriptionTextView_;
+  IBOutlet NSTextView *crashLogTextView_;
+  IBOutlet NSTextView *consoleLogTextView_;
+  IBOutlet NSImageView *crashedAppImageView_;
+  IBOutlet NSTabView *reportsTabView_;
+  IBOutlet NSButton *submitButton_;
+  IBOutlet NSButton *cancelButton_;
+
+  id<CrashReporterControllerDelegate>  delegate_;
+  BOOL hasSubmittedReport_;
 }
+
+- (void)prepareReportForApplication:(NSString*)appName
+                            process:(NSInteger)processID
+                        companyName:(NSString*)companyName;
+- (IBAction)submitReport:(id)sender;
+
+- (NSString*)versionStringForApplication:(NSString*)appName;
+
+@end
+

@@ -1,7 +1,4 @@
-//
-//  main.m
-//
-//  Copyright (c) 2006-2008 Google Inc. All rights reserved.
+//  Copyright (c) 2010 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -31,21 +28,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "HGSLog.h"
-#import "CrashReporter.h"
 
 int main(int argc, const char *argv[]) {
-  // Need a local pool for CrashReporter
-  NSAutoreleasePool *localPool = [[NSAutoreleasePool alloc] init];
-  NSBundle *bundle = [NSBundle mainBundle];
-  CrashReporter *reporter = [[[CrashReporter alloc] init] autorelease];
-  [reporter setUrl:[bundle objectForInfoDictionaryKey:@"CrashReporterURL"]];
-  [reporter setCompanyName:[bundle objectForInfoDictionaryKey:@"CrashReporterCompany"]];
-  BOOL launchedReporter = [reporter launchReporter];
-  HGSAssert(launchedReporter, @"Unable to launch CrashReporter");
-
-  // Go!
-  int appValue = NSApplicationMain(argc,  (const char **) argv);
-  [localPool release];
-  return appValue;
+  return NSApplicationMain(argc, argv);
 }

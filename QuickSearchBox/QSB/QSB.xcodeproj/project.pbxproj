@@ -654,8 +654,6 @@
 		8B29060B11F89B8B0064F50F /* FileSystemActionsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B29060A11F89B8B0064F50F /* FileSystemActionsTest.m */; };
 		8B2908EF11F8EA770064F50F /* GTMNSFileHandle+UniqueName.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B2908ED11F8EA770064F50F /* GTMNSFileHandle+UniqueName.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B2908F011F8EA770064F50F /* GTMNSFileHandle+UniqueName.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2908EE11F8EA770064F50F /* GTMNSFileHandle+UniqueName.m */; };
-		8B2ABC0912072FCE00C84242 /* Breakpad.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFC92E91201CEFE002CB4DC /* Breakpad.framework */; };
-		8B2ABC231207301700C84242 /* Breakpad.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFC92E91201CEFE002CB4DC /* Breakpad.framework */; };
 		8B2B01911071813D00427404 /* HGSSimpleArraySearchOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B2B018F1071813C00427404 /* HGSSimpleArraySearchOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B2B01921071813D00427404 /* HGSSimpleArraySearchOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2B01901071813D00427404 /* HGSSimpleArraySearchOperation.m */; };
 		8B2B01961071815700427404 /* HGSSimpleArraySearchOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B2B01951071815700427404 /* HGSSimpleArraySearchOperationTest.m */; };
@@ -1237,6 +1235,15 @@
 		8BE8488F0E9425C200C611B0 /* QSBKeyMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BE8488E0E9425C200C611B0 /* QSBKeyMap.m */; };
 		8BE848B40E94313A00C611B0 /* QSBKeyMapTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BE848B30E94313A00C611B0 /* QSBKeyMapTest.m */; };
 		8BE84A790E94575000C611B0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
+		8BEDED66121B1CFF00ABD57F /* crash_report_sender.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BEDED65121B1CFF00ABD57F /* crash_report_sender.icns */; };
+		8BEDEE5D121B1D2B00ABD57F /* CrashReporterMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8BEDEE5C121B1D2B00ABD57F /* CrashReporterMain.xib */; };
+		8BEDEEB5121B1D6900ABD57F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BEDEEB3121B1D6900ABD57F /* Localizable.strings */; };
+		8BEDF0EB121B1E3D00ABD57F /* CrashReporterAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF0E7121B1E3D00ABD57F /* CrashReporterAppDelegate.m */; };
+		8BEDF0EC121B1E3D00ABD57F /* CrashReporterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF0E9121B1E3D00ABD57F /* CrashReporterController.m */; };
+		8BEDF0ED121B1E3D00ABD57F /* CrashReporterMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF0EA121B1E3D00ABD57F /* CrashReporterMain.m */; };
+		8BEDF3B5121B378800ABD57F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5717A80DB7C84F00D95EBD /* Cocoa.framework */; };
+		8BEDF3C9121B37E300ABD57F /* CrashReporter.app in Copy CrashReporter */ = {isa = PBXBuildFile; fileRef = 8BEDECFD121B1BEB00ABD57F /* CrashReporter.app */; };
+		8BEDF6C6121B3ACD00ABD57F /* CrashReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF6C5121B3ACD00ABD57F /* CrashReporter.m */; };
 		8BF2573A10F67CBD000490C8 /* GTMTypeCasting.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BF2573910F67CBD000490C8 /* GTMTypeCasting.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BF25C0510F7A5FD000490C8 /* HGSTokenizerExceptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BF25C0410F7A5FD000490C8 /* HGSTokenizerExceptions.plist */; };
 		8BF2607B10FB9DB9000490C8 /* HGSType.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BF2607A10FB9DB9000490C8 /* HGSType.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1599,13 +1606,6 @@
 			remoteGlobalIDString = 8B148F940F7156B6002E05FA;
 			remoteInfo = OCMock;
 		};
-		8B2AB2501203623100C84242 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8BFC92E31201CEFE002CB4DC;
-			remoteInfo = Breakpad;
-		};
 		8B2E2A440F9901C700F80E11 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1659,56 +1659,56 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B852B981007AD1B00880329 /* Web Bookmarks Test */;
+			remoteGlobalIDString = 8B852B981007AD1B00880329;
 			remoteInfo = "Web Bookmarks Test";
 		};
 		8B52D6901207559F0041D6C9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B48108D1046345700BB6A2D /* Spotlight Files Test */;
+			remoteGlobalIDString = 8B48108D1046345700BB6A2D;
 			remoteInfo = "Spotlight Files Test";
 		};
 		8B52D6921207559F0041D6C9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B0FFC6B10C6033800C1A6FD /* Shortcuts Test */;
+			remoteGlobalIDString = 8B0FFC6B10C6033800C1A6FD;
 			remoteInfo = "Shortcuts Test";
 		};
 		8B52D6941207559F0041D6C9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B847B8011499653002C460B /* CorePlugin Test */;
+			remoteGlobalIDString = 8B847B8011499653002C460B;
 			remoteInfo = "CorePlugin Test";
 		};
 		8B52D6961207559F0041D6C9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B95A9F010642867000C4C6B /* Clipboard Test */;
+			remoteGlobalIDString = 8B95A9F010642867000C4C6B;
 			remoteInfo = "Clipboard Test";
 		};
 		8B52D698120755A00041D6C9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = E4F551320DF73059008A846E /* Vermilion Test */;
+			remoteGlobalIDString = E4F551320DF73059008A846E;
 			remoteInfo = "Vermilion Test";
 		};
 		8B52D69A120755A00041D6C9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B63DD670D9458E500395A2B /* QSB Core Test */;
+			remoteGlobalIDString = 8B63DD670D9458E500395A2B;
 			remoteInfo = "QSB Core Test";
 		};
 		8B52D6A6120756D40041D6C9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B148F940F7156B6002E05FA /* OCMock */;
+			remoteGlobalIDString = 8B148F940F7156B6002E05FA;
 			remoteInfo = OCMock;
 		};
 		8B5544CE1058719100D23AD2 /* PBXContainerItemProxy */ = {
@@ -2012,6 +2012,13 @@
 			remoteGlobalIDString = 8B3EECE20CEA86A100D933C0;
 			remoteInfo = "QSB Core";
 		};
+		8BEDF3B9121B37AE00ABD57F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BEDECFC121B1BEB00ABD57F;
+			remoteInfo = CrashReporter;
+		};
 		8BF25C5610F7A798000490C8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -2046,216 +2053,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8BF62022110A60C2000AB941;
 			remoteInfo = "Transference Beacon";
-		};
-		8BFC85F211FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
-			remoteInfo = Breakpad;
-		};
-		8BFC85F411FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F92C53540ECCE349009BE4BA;
-			remoteInfo = Inspector;
-		};
-		8BFC85F611FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F92C563C0ECD10B3009BE4BA;
-			remoteInfo = breakpadUtilities;
-		};
-		8BFC85F811FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F92C56A00ECE04A7009BE4BA;
-			remoteInfo = crash_report_sender;
-		};
-		8BFC85FA11FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F9C44DA50EF060A8003AEBAA;
-			remoteInfo = BreakpadTest;
-		};
-		8BFC85FC11FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F9C77DDA0F7DD5CF0045F7DB;
-			remoteInfo = UnitTests;
-		};
-		8BFC85FE11FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F93803BE0F80820F004D428B;
-			remoteInfo = generator_test;
-		};
-		8BFC860011FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F93DE2D10F82A67300608B94;
-			remoteInfo = minidump_file_writer_unittest;
-		};
-		8BFC860211FFA7D5002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F93DE32C0F82C55600608B94;
-			remoteInfo = handler_test;
-		};
-		8BFC891A11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88EB11FFAA73002CB4DC /* crash_report.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8DD76FA10486AA7600D96B5E;
-			remoteInfo = crash_report;
-		};
-		8BFC892C11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B8C5B5111166531A00D34F4E;
-			remoteInfo = dump_syms;
-		};
-		8BFC892E11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B89E0E741166575200DD08C9;
-			remoteInfo = macho_dump;
-		};
-		8BFC893011FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B88FB024116BDFFF00407530;
-			remoteInfo = gtestmockall;
-		};
-		8BFC893211FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B88FB14B116CF4A700407530;
-			remoteInfo = byte_cursor_unittest;
-		};
-		8BFC893411FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B89E0E9511665A6400DD08C9;
-			remoteInfo = macho_reader_unittest;
-		};
-		8BFC893611FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B88FB007116BDE8300407530;
-			remoteInfo = stabs_reader_unittest;
-		};
-		8BFC893811FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B88FB135116CF30F00407530;
-			remoteInfo = bytereader_unittest;
-		};
-		8BFC893A11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B88FAF2F116A591E00407530;
-			remoteInfo = dwarf2reader_cfi_unittest;
-		};
-		8BFC893C11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B88FB0DF116CEEA800407530;
-			remoteInfo = dwarf2diehandler_unittest;
-		};
-		8BFC893E11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B88FB10A116CF07900407530;
-			remoteInfo = dwarf_cu_to_module_unittest;
-		};
-		8BFC894011FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B88FB0F2116CEF1900407530;
-			remoteInfo = dwarf_line_to_module_unittest;
-		};
-		8BFC894211FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B88FB11F116CF27F00407530;
-			remoteInfo = dwarf_cfi_to_module_unittest;
-		};
-		8BFC894411FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B84A91F4116CF784006C210E;
-			remoteInfo = stabs_to_module_unittest;
-		};
-		8BFC894611FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B88FB0B9116CEABF00407530;
-			remoteInfo = module_unittest;
-		};
-		8BFC894811FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D21F97D211CBA0F200239E38;
-			remoteInfo = test_assembler_unittest;
-		};
-		8BFC894C11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8DD76FA10486AA7600D96B5E;
-			remoteInfo = symupload;
-		};
-		8BFC894E11FFAA74002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9BD835FB0B0544950055103E;
-			remoteInfo = minidump_upload;
-		};
-		8BFC92BB1201CE57002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8BFC92601201CD6F002CB4DC;
-			remoteInfo = dumpsyms;
-		};
-		8BFC92BD1201CE64002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8BFC92601201CD6F002CB4DC;
-			remoteInfo = dumpsyms;
-		};
-		8BFC92C71201CEBB002CB4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8BFC92601201CD6F002CB4DC;
-			remoteInfo = dump_syms;
 		};
 		E46932F70DDB7A0200C5A64A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2464,7 +2261,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				8B2ABC0912072FCE00C84242 /* Breakpad.framework in Copy Frameworks */,
 				8B445B0F10EBDF8500561E62 /* Sparkle.framework in Copy Frameworks */,
 				620CB3870FAA84060029801C /* QSBPluginUI.framework in Copy Frameworks */,
 				8B6128F90F4642C100E29B40 /* JSON.framework in Copy Frameworks */,
@@ -2513,6 +2309,17 @@
 				8BDB889E1152B68B00C411B1 /* GTM.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BEDF3EC121B37EF00ABD57F /* Copy CrashReporter */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				8BEDF3C9121B37E300ABD57F /* CrashReporter.app in Copy CrashReporter */,
+			);
+			name = "Copy CrashReporter";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F4EF8F730ECB3EFF008DD6DA /* CopyFiles */ = {
@@ -2890,7 +2697,6 @@
 		8B062F041135A2D30003CC70 /* HGSActionArgument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSActionArgument.m; sourceTree = "<group>"; };
 		8B0634401135ECDC0003CC70 /* QSBAnimatedScroll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBAnimatedScroll.h; sourceTree = "<group>"; };
 		8B0634411135ECDC0003CC70 /* QSBAnimatedScroll.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBAnimatedScroll.m; sourceTree = "<group>"; };
-		8B07C41C0B69234900827344 /* GenerateBreakpadSymbols.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = GenerateBreakpadSymbols.sh; sourceTree = "<group>"; };
 		8B07C41D0B69234900827344 /* StripHeaders.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = StripHeaders.sh; sourceTree = "<group>"; };
 		8B0CA2B20E48A6580004BFB2 /* GTMFourCharCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMFourCharCode.m; sourceTree = "<group>"; };
 		8B0CA2B30E48A6580004BFB2 /* GTMFourCharCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMFourCharCode.h; sourceTree = "<group>"; };
@@ -3928,6 +3734,25 @@
 		8BE9BF8909C5EF810074EFF3 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = System/Library/Frameworks/QuickTime.framework; sourceTree = SDKROOT; };
 		8BE9BFD109C5EFCE0074EFF3 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		8BEB40F40C34822800AA2572 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		8BEDECFD121B1BEB00ABD57F /* CrashReporter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CrashReporter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BEDED59121B1C3100ABD57F /* CrashReporter-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "CrashReporter-Info.plist"; sourceTree = "<group>"; };
+		8BEDED65121B1CFF00ABD57F /* crash_report_sender.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = crash_report_sender.icns; sourceTree = "<group>"; };
+		8BEDEE5C121B1D2B00ABD57F /* CrashReporterMain.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CrashReporterMain.xib; sourceTree = "<group>"; };
+		8BEDEEB4121B1D6900ABD57F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8BEDF007121B1E1300ABD57F /* da */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8BEDF093121B1E2100ABD57F /* French */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8BEDF094121B1E2100ABD57F /* German */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = German; path = German.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8BEDF095121B1E2100ABD57F /* Italian */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Italian; path = Italian.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8BEDF096121B1E2100ABD57F /* Japanese */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Japanese; path = Japanese.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8BEDF097121B1E2100ABD57F /* Spanish */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Spanish; path = Spanish.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8BEDF098121B1E2100ABD57F /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8BEDF0E6121B1E3D00ABD57F /* CrashReporterAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrashReporterAppDelegate.h; sourceTree = "<group>"; };
+		8BEDF0E7121B1E3D00ABD57F /* CrashReporterAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CrashReporterAppDelegate.m; sourceTree = "<group>"; };
+		8BEDF0E8121B1E3D00ABD57F /* CrashReporterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrashReporterController.h; sourceTree = "<group>"; };
+		8BEDF0E9121B1E3D00ABD57F /* CrashReporterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CrashReporterController.m; sourceTree = "<group>"; };
+		8BEDF0EA121B1E3D00ABD57F /* CrashReporterMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CrashReporterMain.m; sourceTree = "<group>"; };
+		8BEDF6C4121B3ACD00ABD57F /* CrashReporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrashReporter.h; sourceTree = "<group>"; };
+		8BEDF6C5121B3ACD00ABD57F /* CrashReporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CrashReporter.m; sourceTree = "<group>"; };
 		8BF2573910F67CBD000490C8 /* GTMTypeCasting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GTMTypeCasting.h; path = DebugUtils/GTMTypeCasting.h; sourceTree = "<group>"; };
 		8BF25C0410F7A5FD000490C8 /* HGSTokenizerExceptions.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = HGSTokenizerExceptions.plist; sourceTree = "<group>"; };
 		8BF2607A10FB9DB9000490C8 /* HGSType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSType.h; sourceTree = "<group>"; };
@@ -3968,19 +3793,6 @@
 		8BF62EAA110E593B000AB941 /* QSBCategory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCategory.m; sourceTree = "<group>"; };
 		8BF62F0B110E5EC6000AB941 /* Categories.plistsrc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Categories.plistsrc; sourceTree = "<group>"; };
 		8BFC753011FE19E1002CB4DC /* Python */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = Python; path = /System/Library/Frameworks/Python.framework/Versions/2.5/Python; sourceTree = "<absolute>"; };
-		8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Breakpad.xcodeproj; sourceTree = "<group>"; };
-		8BFC88EA11FFAA73002CB4DC /* crash_report.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = crash_report.mm; sourceTree = "<group>"; };
-		8BFC88EB11FFAA73002CB4DC /* crash_report.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = crash_report.xcodeproj; sourceTree = "<group>"; };
-		8BFC88EE11FFAA73002CB4DC /* on_demand_symbol_supplier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = on_demand_symbol_supplier.h; sourceTree = "<group>"; };
-		8BFC88EF11FFAA73002CB4DC /* on_demand_symbol_supplier.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = on_demand_symbol_supplier.mm; sourceTree = "<group>"; };
-		8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dump_syms.xcodeproj; sourceTree = "<group>"; };
-		8BFC88F411FFAA73002CB4DC /* dump_syms_tool.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = dump_syms_tool.mm; sourceTree = "<group>"; };
-		8BFC88F511FFAA73002CB4DC /* macho_dump.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = macho_dump.cc; sourceTree = "<group>"; };
-		8BFC88F711FFAA73002CB4DC /* minidump_upload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = minidump_upload.m; sourceTree = "<group>"; };
-		8BFC88F811FFAA73002CB4DC /* symupload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = symupload.m; sourceTree = "<group>"; };
-		8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = symupload.xcodeproj; sourceTree = "<group>"; };
-		8BFC92661201CD6F002CB4DC /* JSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8BFC92E91201CEFE002CB4DC /* Breakpad.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Breakpad.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D408F9F00AEEDC2C007EE96D /* SecurityFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityFoundation.framework; path = System/Library/Frameworks/SecurityFoundation.framework; sourceTree = SDKROOT; };
 		D44652CE0AB643110077860B /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E429DF760AC1907A00E747D8 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -4302,7 +4114,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B2ABC231207301700C84242 /* Breakpad.framework in Frameworks */,
 				8B627CDF10D81BA900F166D1 /* Sparkle.framework in Frameworks */,
 				620CB3920FAA84260029801C /* QSBPluginUI.framework in Frameworks */,
 				8B6129B30F46446D00E29B40 /* JSON.framework in Frameworks */,
@@ -4471,6 +4282,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8BEDECFB121B1BEB00ABD57F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BEDF3B5121B378800ABD57F /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8BF6202C110A60C2000AB941 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -4610,8 +4429,7 @@
 				8BF62716110A6519000AB941 /* Transference Demo.app */,
 				6210450E113C85AA00AF95F8 /* GoogleCalendars.hgs */,
 				8B847B9711499653002C460B /* CorePlugin Test.octest */,
-				8BFC92661201CD6F002CB4DC /* JSON.framework */,
-				8BFC92E91201CEFE002CB4DC /* Breakpad.framework */,
+				8BEDECFD121B1BEB00ABD57F /* CrashReporter.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -5115,7 +4933,6 @@
 				8BDB893F1152C2BB00C411B1 /* CreateKeystoneConfig.sh */,
 				8B6870871017DF6600ADEA67 /* PostBuild.sh */,
 				8B3F6F73101A5C4C004FACA9 /* Localization.sh */,
-				8B07C41C0B69234900827344 /* GenerateBreakpadSymbols.sh */,
 				8B07C41D0B69234900827344 /* StripHeaders.sh */,
 			);
 			path = BuildScripts;
@@ -5409,6 +5226,7 @@
 				62FB1E4D0FB39B1A0080B342 /* QSBWelcomeController.h */,
 				62FB1E4E0FB39B1A0080B342 /* QSBWelcomeController.m */,
 				8BC5A88411405BBF000DB67C /* QSBWelcomeControllerTest.m */,
+				8BEDED58121B1C3100ABD57F /* CrashReporter */,
 				8B67278610F502AA00F62D01 /* DebugWindow */,
 				62D5150710DAD701007ECA33 /* installer */,
 				620CB5600FAA84970029801C /* QSBPluginUI */,
@@ -6339,7 +6157,6 @@
 				8B6127B00F46299900E29B40 /* json-framework */,
 				8B488EAA0F16842500786C1E /* UndocumentedGoodness */,
 				5AF274610F155D3700C087B2 /* GData */,
-				8BFC81E011FFA793002CB4DC /* breakpad */,
 				F435DAAD0DBE4B900069CDE8 /* google-toolbox-for-mac */,
 				62E729390F4F1C9400A68815 /* Growl */,
 				8B148F5D0F715696002E05FA /* OCMock */,
@@ -6578,6 +6395,24 @@
 			path = Keystone;
 			sourceTree = "<group>";
 		};
+		8BEDED58121B1C3100ABD57F /* CrashReporter */ = {
+			isa = PBXGroup;
+			children = (
+				8BEDF6C4121B3ACD00ABD57F /* CrashReporter.h */,
+				8BEDF6C5121B3ACD00ABD57F /* CrashReporter.m */,
+				8BEDF0E6121B1E3D00ABD57F /* CrashReporterAppDelegate.h */,
+				8BEDF0E7121B1E3D00ABD57F /* CrashReporterAppDelegate.m */,
+				8BEDF0E8121B1E3D00ABD57F /* CrashReporterController.h */,
+				8BEDF0E9121B1E3D00ABD57F /* CrashReporterController.m */,
+				8BEDF0EA121B1E3D00ABD57F /* CrashReporterMain.m */,
+				8BEDEEB3121B1D6900ABD57F /* Localizable.strings */,
+				8BEDEE5C121B1D2B00ABD57F /* CrashReporterMain.xib */,
+				8BEDED65121B1CFF00ABD57F /* crash_report_sender.icns */,
+				8BEDED59121B1C3100ABD57F /* CrashReporter-Info.plist */,
+			);
+			path = CrashReporter;
+			sourceTree = "<group>";
+		};
 		8BF620CE110A60F5000AB941 /* Transference */ = {
 			isa = PBXGroup;
 			children = (
@@ -6603,143 +6438,6 @@
 				8BF6244D110A610A000AB941 /* TransferenceServerProtocol.h */,
 			);
 			path = Transference;
-			sourceTree = "<group>";
-		};
-		8BFC81E011FFA793002CB4DC /* breakpad */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC81ED11FFA7CB002CB4DC /* src */,
-			);
-			path = breakpad;
-			sourceTree = "<group>";
-		};
-		8BFC81ED11FFA7CB002CB4DC /* src */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC81EE11FFA7CB002CB4DC /* client */,
-				8BFC871B11FFAA6F002CB4DC /* tools */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
-		8BFC81EE11FFA7CB002CB4DC /* client */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC820C11FFA7CC002CB4DC /* mac */,
-			);
-			path = client;
-			sourceTree = "<group>";
-		};
-		8BFC820C11FFA7CC002CB4DC /* mac */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */,
-			);
-			path = mac;
-			sourceTree = "<group>";
-		};
-		8BFC820E11FFA7CC002CB4DC /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC85F311FFA7D5002CB4DC /* Breakpad.framework */,
-				8BFC85F511FFA7D5002CB4DC /* Inspector */,
-				8BFC85F711FFA7D5002CB4DC /* breakpadUtilities.dylib */,
-				8BFC85F911FFA7D5002CB4DC /* crash_report_sender.app */,
-				8BFC85FB11FFA7D5002CB4DC /* BreakpadTest.app */,
-				8BFC85FD11FFA7D5002CB4DC /* UnitTests.octest */,
-				8BFC85FF11FFA7D5002CB4DC /* generator_test */,
-				8BFC860111FFA7D5002CB4DC /* minidump_file_writer_unittest */,
-				8BFC860311FFA7D5002CB4DC /* handler_test */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		8BFC871B11FFAA6F002CB4DC /* tools */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC88E811FFAA73002CB4DC /* mac */,
-			);
-			path = tools;
-			sourceTree = "<group>";
-		};
-		8BFC88E811FFAA73002CB4DC /* mac */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC88E911FFAA73002CB4DC /* crash_report */,
-				8BFC88F011FFAA73002CB4DC /* dump_syms */,
-				8BFC88F611FFAA73002CB4DC /* symupload */,
-			);
-			path = mac;
-			sourceTree = "<group>";
-		};
-		8BFC88E911FFAA73002CB4DC /* crash_report */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC88EA11FFAA73002CB4DC /* crash_report.mm */,
-				8BFC88EB11FFAA73002CB4DC /* crash_report.xcodeproj */,
-				8BFC88EE11FFAA73002CB4DC /* on_demand_symbol_supplier.h */,
-				8BFC88EF11FFAA73002CB4DC /* on_demand_symbol_supplier.mm */,
-			);
-			path = crash_report;
-			sourceTree = "<group>";
-		};
-		8BFC88EC11FFAA73002CB4DC /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC891B11FFAA74002CB4DC /* crash_report */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		8BFC88F011FFAA73002CB4DC /* dump_syms */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */,
-				8BFC88F411FFAA73002CB4DC /* dump_syms_tool.mm */,
-				8BFC88F511FFAA73002CB4DC /* macho_dump.cc */,
-			);
-			path = dump_syms;
-			sourceTree = "<group>";
-		};
-		8BFC88F211FFAA73002CB4DC /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC892D11FFAA74002CB4DC /* dump_syms */,
-				8BFC892F11FFAA74002CB4DC /* macho_dump */,
-				8BFC893111FFAA74002CB4DC /* libgtestmockall.a */,
-				8BFC893311FFAA74002CB4DC /* byte_cursor_unittest */,
-				8BFC893511FFAA74002CB4DC /* macho_reader_unittest */,
-				8BFC893711FFAA74002CB4DC /* stabs_reader_unittest */,
-				8BFC893911FFAA74002CB4DC /* bytereader_unittest */,
-				8BFC893B11FFAA74002CB4DC /* dwarf2reader_cfi_unittest */,
-				8BFC893D11FFAA74002CB4DC /* dwarf2diehandler_unittest */,
-				8BFC893F11FFAA74002CB4DC /* dwarf_cu_to_module_unittest */,
-				8BFC894111FFAA74002CB4DC /* dwarf_line_to_module_unittest */,
-				8BFC894311FFAA74002CB4DC /* dwarf_cfi_to_module_unittest */,
-				8BFC894511FFAA74002CB4DC /* stabs_to_module_unittest */,
-				8BFC894711FFAA74002CB4DC /* module_unittest */,
-				8BFC894911FFAA74002CB4DC /* test_assembler_unittest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		8BFC88F611FFAA73002CB4DC /* symupload */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC88F711FFAA73002CB4DC /* minidump_upload.m */,
-				8BFC88F811FFAA73002CB4DC /* symupload.m */,
-				8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */,
-			);
-			path = symupload;
-			sourceTree = "<group>";
-		};
-		8BFC88FA11FFAA73002CB4DC /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8BFC894D11FFAA74002CB4DC /* symupload */,
-				8BFC894F11FFAA74002CB4DC /* minidump_upload */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		D45B92550A3F6E68003A5A05 /* Libraries */ = {
@@ -7180,7 +6878,7 @@
 				620CB3060FAA827E0029801C /* Sources */,
 				8BC6E3470FAAA29F005A0F6F /* Resources */,
 				620CB3070FAA827E0029801C /* Frameworks */,
-				620CB5340FAA84680029801C /* Breakpad */,
+				620CB5340FAA84680029801C /* PostBuildScript */,
 			);
 			buildRules = (
 				8B9C0F9F111BE726008C869F /* PBXBuildRule */,
@@ -7443,6 +7141,7 @@
 			buildConfigurationList = 8B3EED790CEA86A100D933C0 /* Build configuration list for PBXNativeTarget "QSB Core" */;
 			buildPhases = (
 				8B3EECF90CEA86A100D933C0 /* Copy Frameworks */,
+				8BEDF3EC121B37EF00ABD57F /* Copy CrashReporter */,
 				8B3EECFB0CEA86A100D933C0 /* Sources */,
 				8B611D560F43BF3000E29B40 /* AppleScript */,
 				8B3EECE70CEA86A100D933C0 /* Resources */,
@@ -7454,9 +7153,9 @@
 				8B559BB41069322B00DB256C /* PBXBuildRule */,
 			);
 			dependencies = (
+				8BEDF3BA121B37AE00ABD57F /* PBXTargetDependency */,
 				620CB3630FAA838F0029801C /* PBXTargetDependency */,
 				8B6128E90F46427800E29B40 /* PBXTargetDependency */,
-				8B2AB2511203623100C84242 /* PBXTargetDependency */,
 			);
 			name = "QSB Core";
 			productName = QSB;
@@ -7530,7 +7229,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				8BFC92C81201CEBB002CB4DC /* PBXTargetDependency */,
 			);
 			name = JSON;
 			productName = test;
@@ -7566,7 +7264,7 @@
 				8B6F2CDD0DA2B7F50052CA40 /* Resources */,
 				8B6F2CDE0DA2B7F50052CA40 /* Sources */,
 				8B6F2CDF0DA2B7F50052CA40 /* Frameworks */,
-				8B4888110F15D37D00786C1E /* Breakpad */,
+				8B4888110F15D37D00786C1E /* PostBuildScript */,
 			);
 			buildRules = (
 			);
@@ -7667,7 +7365,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				8BFC92BE1201CE64002CB4DC /* PBXTargetDependency */,
 			);
 			name = GData;
 			productName = test;
@@ -7800,17 +7497,33 @@
 				8BD97D060E636D8C00F5C83B /* Resources */,
 				8BD97D070E636D8C00F5C83B /* Sources */,
 				8BD97D080E636D8C00F5C83B /* Frameworks */,
-				8B637BA20F27783A00997738 /* Breakpad */,
+				8B637BA20F27783A00997738 /* PostBuildScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				8BFC92BC1201CE57002CB4DC /* PBXTargetDependency */,
 			);
 			name = GTM;
 			productName = GTM;
 			productReference = 8BD97D0A0E636D8C00F5C83B /* GTM.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		8BEDECFC121B1BEB00ABD57F /* CrashReporter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8BEDED03121B1BEC00ABD57F /* Build configuration list for PBXNativeTarget "CrashReporter" */;
+			buildPhases = (
+				8BEDECF9121B1BEB00ABD57F /* Resources */,
+				8BEDECFA121B1BEB00ABD57F /* Sources */,
+				8BEDECFB121B1BEB00ABD57F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CrashReporter;
+			productName = CrashReporter;
+			productReference = 8BEDECFD121B1BEB00ABD57F /* CrashReporter.app */;
+			productType = "com.apple.product-type.application";
 		};
 		8BF62022110A60C2000AB941 /* Transference Beacon */ = {
 			isa = PBXNativeTarget;
@@ -7848,36 +7561,6 @@
 			productName = "Transference Demo";
 			productReference = 8BF62716110A6519000AB941 /* Transference Demo.app */;
 			productType = "com.apple.product-type.application";
-		};
-		8BFC92601201CD6F002CB4DC /* dump_syms */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8BFC92621201CD6F002CB4DC /* Build configuration list for PBXNativeTarget "dump_syms" */;
-			buildPhases = (
-				8BFC92611201CD6F002CB4DC /* ShellScript */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = dump_syms;
-			productName = test;
-			productReference = 8BFC92661201CD6F002CB4DC /* JSON.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		8BFC92E31201CEFE002CB4DC /* Breakpad */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8BFC92E51201CEFE002CB4DC /* Build configuration list for PBXNativeTarget "Breakpad" */;
-			buildPhases = (
-				8BFC92E41201CEFE002CB4DC /* ShellScript */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Breakpad;
-			productName = test;
-			productReference = 8BFC92E91201CEFE002CB4DC /* Breakpad.framework */;
-			productType = "com.apple.product-type.framework";
 		};
 		E46932F50DDB7A0200C5A64A /* Actions */ = {
 			isa = PBXNativeTarget;
@@ -8019,6 +7702,8 @@
 				English,
 				sl,
 				tr,
+				Italian,
+				Spanish,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* GoogleDesktop */;
 			projectDirPath = "";
@@ -8036,18 +7721,6 @@
 					ProjectRef = 8B989F140FA7B93C009DC652 /* ___PROJECTNAME___.xcodeproj */;
 				},
 				{
-					ProductGroup = 8BFC820E11FFA7CC002CB4DC /* Products */;
-					ProjectRef = 8BFC820D11FFA7CC002CB4DC /* Breakpad.xcodeproj */;
-				},
-				{
-					ProductGroup = 8BFC88EC11FFAA73002CB4DC /* Products */;
-					ProjectRef = 8BFC88EB11FFAA73002CB4DC /* crash_report.xcodeproj */;
-				},
-				{
-					ProductGroup = 8BFC88F211FFAA73002CB4DC /* Products */;
-					ProjectRef = 8BFC88F111FFAA73002CB4DC /* dump_syms.xcodeproj */;
-				},
-				{
 					ProductGroup = 8B637B4D0F2777C300997738 /* Products */;
 					ProjectRef = 8B637B4C0F2777C300997738 /* GData.xcodeproj */;
 				},
@@ -8058,10 +7731,6 @@
 				{
 					ProductGroup = 620054520F77F0FD00C806A1 /* Products */;
 					ProjectRef = 8B148F720F715697002E05FA /* OCMock.xcodeproj */;
-				},
-				{
-					ProductGroup = 8BFC88FA11FFAA73002CB4DC /* Products */;
-					ProjectRef = 8BFC88F911FFAA73002CB4DC /* symupload.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -8081,14 +7750,13 @@
 				8B53EB3410DC0E84007E6AF2 /* Open Build Folder */,
 				8B3EECE20CEA86A100D933C0 /* QSB Core */,
 				8BF62715110A6519000AB941 /* Transference Demo */,
+				8BEDECFC121B1BEB00ABD57F /* CrashReporter */,
 				620CB3080FAA827E0029801C /* QSBPluginUI */,
 				8BD97D090E636D8C00F5C83B /* GTM */,
 				8B6F2CE00DA2B7F50052CA40 /* Vermilion */,
 				8B77E0DB0F28FC3B00FA2A3C /* GData */,
 				8B61289E0F4641BF00E29B40 /* JSON */,
 				8B148F940F7156B6002E05FA /* OCMock */,
-				8BFC92601201CD6F002CB4DC /* dump_syms */,
-				8BFC92E31201CEFE002CB4DC /* Breakpad */,
 				8B63DD670D9458E500395A2B /* QSB Core Test */,
 				E4F551320DF73059008A846E /* Vermilion Test */,
 				E46932F50DDB7A0200C5A64A /* Actions */,
@@ -8238,195 +7906,6 @@
 			fileType = archive.ar;
 			path = libGDataTouchStaticLib.a;
 			remoteRef = 8BCCB03B10348ABE0051B567 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC85F311FFA7D5002CB4DC /* Breakpad.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Breakpad.framework;
-			remoteRef = 8BFC85F211FFA7D5002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC85F511FFA7D5002CB4DC /* Inspector */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = Inspector;
-			remoteRef = 8BFC85F411FFA7D5002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC85F711FFA7D5002CB4DC /* breakpadUtilities.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = breakpadUtilities.dylib;
-			remoteRef = 8BFC85F611FFA7D5002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC85F911FFA7D5002CB4DC /* crash_report_sender.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = crash_report_sender.app;
-			remoteRef = 8BFC85F811FFA7D5002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC85FB11FFA7D5002CB4DC /* BreakpadTest.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = BreakpadTest.app;
-			remoteRef = 8BFC85FA11FFA7D5002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC85FD11FFA7D5002CB4DC /* UnitTests.octest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = UnitTests.octest;
-			remoteRef = 8BFC85FC11FFA7D5002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC85FF11FFA7D5002CB4DC /* generator_test */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = generator_test;
-			remoteRef = 8BFC85FE11FFA7D5002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC860111FFA7D5002CB4DC /* minidump_file_writer_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = minidump_file_writer_unittest;
-			remoteRef = 8BFC860011FFA7D5002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC860311FFA7D5002CB4DC /* handler_test */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = handler_test;
-			remoteRef = 8BFC860211FFA7D5002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC891B11FFAA74002CB4DC /* crash_report */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = crash_report;
-			remoteRef = 8BFC891A11FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC892D11FFAA74002CB4DC /* dump_syms */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = dump_syms;
-			remoteRef = 8BFC892C11FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC892F11FFAA74002CB4DC /* macho_dump */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = macho_dump;
-			remoteRef = 8BFC892E11FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC893111FFAA74002CB4DC /* libgtestmockall.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libgtestmockall.a;
-			remoteRef = 8BFC893011FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC893311FFAA74002CB4DC /* byte_cursor_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = byte_cursor_unittest;
-			remoteRef = 8BFC893211FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC893511FFAA74002CB4DC /* macho_reader_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = macho_reader_unittest;
-			remoteRef = 8BFC893411FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC893711FFAA74002CB4DC /* stabs_reader_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = stabs_reader_unittest;
-			remoteRef = 8BFC893611FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC893911FFAA74002CB4DC /* bytereader_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = bytereader_unittest;
-			remoteRef = 8BFC893811FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC893B11FFAA74002CB4DC /* dwarf2reader_cfi_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = dwarf2reader_cfi_unittest;
-			remoteRef = 8BFC893A11FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC893D11FFAA74002CB4DC /* dwarf2diehandler_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = dwarf2diehandler_unittest;
-			remoteRef = 8BFC893C11FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC893F11FFAA74002CB4DC /* dwarf_cu_to_module_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = dwarf_cu_to_module_unittest;
-			remoteRef = 8BFC893E11FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC894111FFAA74002CB4DC /* dwarf_line_to_module_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = dwarf_line_to_module_unittest;
-			remoteRef = 8BFC894011FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC894311FFAA74002CB4DC /* dwarf_cfi_to_module_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = dwarf_cfi_to_module_unittest;
-			remoteRef = 8BFC894211FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC894511FFAA74002CB4DC /* stabs_to_module_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = stabs_to_module_unittest;
-			remoteRef = 8BFC894411FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC894711FFAA74002CB4DC /* module_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = module_unittest;
-			remoteRef = 8BFC894611FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC894911FFAA74002CB4DC /* test_assembler_unittest */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_assembler_unittest;
-			remoteRef = 8BFC894811FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC894D11FFAA74002CB4DC /* symupload */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = symupload;
-			remoteRef = 8BFC894C11FFAA74002CB4DC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8BFC894F11FFAA74002CB4DC /* minidump_upload */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = minidump_upload;
-			remoteRef = 8BFC894E11FFAA74002CB4DC /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -8963,6 +8442,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8BEDECF9121B1BEB00ABD57F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BEDED66121B1CFF00ABD57F /* crash_report_sender.icns in Resources */,
+				8BEDEE5D121B1D2B00ABD57F /* CrashReporterMain.xib in Resources */,
+				8BEDEEB5121B1D6900ABD57F /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8BF62712110A6519000AB941 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -9025,8 +8514,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9041,8 +8528,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9057,21 +8542,19 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/PostBuild.sh\"";
 		};
-		620CB5340FAA84680029801C /* Breakpad */ = {
+		620CB5340FAA84680029801C /* PostBuildScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = Breakpad;
+			name = PostBuildScript;
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9087,8 +8570,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9103,8 +8584,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9149,7 +8628,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build OCMock the way we want into our build folder\ncd \"${SRCROOT}/../externals/OCMock/Source\"\n/usr/bin/xcodebuild -project OCMock.xcodeproj -target OCMock -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"OCMock\"\nOBJECT_FILE_DIR_normal=\"${CONFIGURATION_TEMP_DIR}/OCMock.build/Objects-normal\"\nif [ -d ${OBJECT_FILE_DIR_normal} ]; then\n  \"${SRCROOT}/BuildScripts/PostBuild.sh\"\nelse\n  ERROR_TITLE=\"OCMockBuildScript:0:\"\n  echo $ERROR_TITLE error: Missing $OBJECT_FILE_DIR_normal\n  exit 1\nfi\n";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build OCMock the way we want into our build folder\ncd \"${SRCROOT}/../externals/OCMock/Source\"\n/usr/bin/xcodebuild -project OCMock.xcodeproj -target OCMock -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Localize appropriately.\nEXECUTABLE_NAME=\"OCMock\"\nOBJECT_FILE_DIR_normal=\"${CONFIGURATION_TEMP_DIR}/OCMock.build/Objects-normal\"\nif [ -d ${OBJECT_FILE_DIR_normal} ]; then\n  \"${SRCROOT}/BuildScripts/PostBuild.sh\"\nelse\n  ERROR_TITLE=\"OCMockBuildScript:0:\"\n  echo $ERROR_TITLE error: Missing $OBJECT_FILE_DIR_normal\n  exit 1\nfi\n";
 		};
 		8B2E2A3F0F99018600F80E11 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -9179,8 +8658,6 @@
 			);
 			name = "Post Build Script";
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9199,14 +8676,14 @@
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\nset -o errexit\nset -o nounset\nset -o verbose\n\n# TODO turn these on once all system leaks have been identified.\n# export GTM_DISABLE_ZOMBIES=1\n# export GTM_ENABLE_LEAKS=1\n\n\"${SRCROOT}/../externals/google-toolbox-for-mac/UnitTesting/RunMacOSUnitTests.sh\"\n";
 		};
-		8B4888110F15D37D00786C1E /* Breakpad */ = {
+		8B4888110F15D37D00786C1E /* PostBuildScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = Breakpad;
+			name = PostBuildScript;
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9238,16 +8715,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build JSON the way we want into our build folder\ncd \"${SRCROOT}/../externals/json-framework\"\n/usr/bin/xcodebuild -project JSON.xcodeproj -target JSON -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"JSON\"\nOBJECT_FILE_DIR_normal=\"${CONFIGURATION_TEMP_DIR}/JSON.build/Objects-normal\"\nif [ -d ${OBJECT_FILE_DIR_normal} ]; then\n  \"${SRCROOT}/BuildScripts/PostBuild.sh\"\nelse\n  ERROR_TITLE=\"JSONBuildScript:0:\"\n  echo $ERROR_TITLE error: Missing $OBJECT_FILE_DIR_normal\n  exit 1\nfi";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build JSON the way we want into our build folder\ncd \"${SRCROOT}/../externals/json-framework\"\n/usr/bin/xcodebuild -project JSON.xcodeproj -target JSON -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Localize appropriately.\nEXECUTABLE_NAME=\"JSON\"\nOBJECT_FILE_DIR_normal=\"${CONFIGURATION_TEMP_DIR}/JSON.build/Objects-normal\"\nif [ -d ${OBJECT_FILE_DIR_normal} ]; then\n  \"${SRCROOT}/BuildScripts/PostBuild.sh\"\nelse\n  ERROR_TITLE=\"JSONBuildScript:0:\"\n  echo $ERROR_TITLE error: Missing $OBJECT_FILE_DIR_normal\n  exit 1\nfi";
 		};
-		8B637BA20F27783A00997738 /* Breakpad */ = {
+		8B637BA20F27783A00997738 /* PostBuildScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = Breakpad;
+			name = PostBuildScript;
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9320,7 +8797,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Generate the Breakpad symbols appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${CONFIGURATION_TEMP_DIR}/GDataFramework.build/Objects-normal\"\nif [ -d ${OBJECT_FILE_DIR_normal} ]; then\n  \"${SRCROOT}/BuildScripts/PostBuild.sh\"\nelse\n  ERROR_TITLE=\"GDataBuildScript:0:\"\n  echo $ERROR_TITLE error: Missing $OBJECT_FILE_DIR_normal\n  exit 1\nfi";
+			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build GData the way we want into our build folder\ncd \"${SRCROOT}/../externals/GData/Source\"\n/usr/bin/xcodebuild -project GData.xcodeproj -target GDataFramework -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\"\ncd \"${SRCROOT}\"\n\n# Localize appropriately.\nEXECUTABLE_NAME=\"GData\"\nOBJECT_FILE_DIR_normal=\"${CONFIGURATION_TEMP_DIR}/GDataFramework.build/Objects-normal\"\nif [ -d ${OBJECT_FILE_DIR_normal} ]; then\n  \"${SRCROOT}/BuildScripts/PostBuild.sh\"\nelse\n  ERROR_TITLE=\"GDataBuildScript:0:\"\n  echo $ERROR_TITLE error: Missing $OBJECT_FILE_DIR_normal\n  exit 1\nfi";
 		};
 		8B847B9211499653002C460B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -9370,8 +8847,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9386,8 +8861,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9402,8 +8875,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9418,8 +8889,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9434,8 +8903,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9450,8 +8917,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9466,8 +8931,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9482,8 +8945,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9498,8 +8959,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9514,8 +8973,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9530,8 +8987,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9546,8 +9001,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9562,8 +9015,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9578,8 +9029,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9594,8 +9043,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9610,8 +9057,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9626,8 +9071,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9642,8 +9085,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9658,8 +9099,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9674,8 +9113,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9690,8 +9127,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9706,8 +9141,6 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -9852,43 +9285,10 @@
 				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_i386.breakpad",
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_NAME)_$(GOOGLE_VERSIONINFO_LONG)_ppc.breakpad",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n\"${SRCROOT}/BuildScripts/PostBuild.sh\"";
-		};
-		8BFC92611201CD6F002CB4DC /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/JSON.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\n# Build dump_syms the way we want into our build folder\ncd \"${SRCROOT}/../externals/breakpad/src/tools/mac/dump_syms\"\n/usr/bin/xcodebuild -project dump_syms.xcodeproj -target dump_syms -configuration \"${CONFIGURATION}\" CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" SDKROOT=\"${SDKROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\ncd \"${SRCROOT}\"";
-		};
-		8BFC92E41201CEFE002CB4DC /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/crash_report_sender.app",
-				"$(BUILT_PRODUCTS_DIR)/Inspector",
-				"$(BUILT_PRODUCTS_DIR)/breakpadUtilities.dylib",
-				"$(BUILT_PRODUCTS_DIR)/Breakpad.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -o errexit\nset -o nounset\nset -o verbose\n\nbreakpad_targets=( \"crash_report_sender\" \"breakpadUtilities\" \"Inspector\" \"Breakpad\" )\nfor breakpad_target in \"${breakpad_targets[@]}\"; do\n\t# Build breakpad the way we want into our build folder\n\techo \"Building Breakpad:${LINENO}: note: Breakpad Target: ${breakpad_target}\"\n\tcd \"${SRCROOT}/../externals/breakpad/src/client/mac\"\n\t/usr/bin/xcodebuild -project Breakpad.xcodeproj -target \"${breakpad_target}\" -configuration \"${CONFIGURATION}\" -sdk macosx10.5 CONFIGURATION_BUILD_DIR=\"${SYMROOT}/${CONFIGURATION}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}\" OBJROOT=\"${OBJROOT}\" SYMROOT=\"${SYMROOT}\" CACHE_ROOT=\"${CACHE_ROOT}\" DYLIB_INSTALL_NAME_BASE=\"@executable_path/../Frameworks\" ONLY_ACTIVE_ARCH=\"${ONLY_ACTIVE_ARCH}\" ARCHS=\"${ARCHS}\" MACOSX_DEPLOYMENT_TARGET=\"${MACOSX_DEPLOYMENT_TARGET}\" OTHER_CFLAGS=\"\"\n\tcd \"${SRCROOT}\"\ndone";
 		};
 		E4F551310DF73059008A846E /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -10244,6 +9644,7 @@
 				8B06240B113452F20003CC70 /* QSBActionPresenter.m in Sources */,
 				8B0634421135ECDC0003CC70 /* QSBAnimatedScroll.m in Sources */,
 				8BC88EAF115971A200A6E783 /* QSBKeystoneRemover.m in Sources */,
+				8BEDF6C6121B3ACD00ABD57F /* CrashReporter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10471,6 +9872,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				8BDB79791150374900C411B1 /* GoogleCorporaSource.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BEDECFA121B1BEB00ABD57F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BEDF0EB121B1E3D00ABD57F /* CrashReporterAppDelegate.m in Sources */,
+				8BEDF0EC121B1E3D00ABD57F /* CrashReporterController.m in Sources */,
+				8BEDF0ED121B1E3D00ABD57F /* CrashReporterMain.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10739,11 +10150,6 @@
 			target = 8B148F940F7156B6002E05FA /* OCMock */;
 			targetProxy = 8B1490640F71576B002E05FA /* PBXContainerItemProxy */;
 		};
-		8B2AB2511203623100C84242 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8BFC92E31201CEFE002CB4DC /* Breakpad */;
-			targetProxy = 8B2AB2501203623100C84242 /* PBXContainerItemProxy */;
-		};
 		8B2E2A450F9901C700F80E11 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8B6F2CE00DA2B7F50052CA40 /* Vermilion */;
@@ -10974,6 +10380,11 @@
 			target = 8B3EECE20CEA86A100D933C0 /* QSB Core */;
 			targetProxy = 8BEB03BB10FD95D700034CE1 /* PBXContainerItemProxy */;
 		};
+		8BEDF3BA121B37AE00ABD57F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BEDECFC121B1BEB00ABD57F /* CrashReporter */;
+			targetProxy = 8BEDF3B9121B37AE00ABD57F /* PBXContainerItemProxy */;
+		};
 		8BF25C5710F7A798000490C8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F4EF8F740ECB3EFF008DD6DA /* QSB Application */;
@@ -10998,21 +10409,6 @@
 			isa = PBXTargetDependency;
 			target = 8BF62022110A60C2000AB941 /* Transference Beacon */;
 			targetProxy = 8BF627B5110A6637000AB941 /* PBXContainerItemProxy */;
-		};
-		8BFC92BC1201CE57002CB4DC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8BFC92601201CD6F002CB4DC /* dump_syms */;
-			targetProxy = 8BFC92BB1201CE57002CB4DC /* PBXContainerItemProxy */;
-		};
-		8BFC92BE1201CE64002CB4DC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8BFC92601201CD6F002CB4DC /* dump_syms */;
-			targetProxy = 8BFC92BD1201CE64002CB4DC /* PBXContainerItemProxy */;
-		};
-		8BFC92C81201CEBB002CB4DC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8BFC92601201CD6F002CB4DC /* dump_syms */;
-			targetProxy = 8BFC92C71201CEBB002CB4DC /* PBXContainerItemProxy */;
 		};
 		E46932F60DDB7A0200C5A64A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -12259,6 +11655,21 @@
 				8BD11566112C5B2F00B246F2 /* en_US */,
 			);
 			name = QSBTopResultsView.xib;
+			sourceTree = "<group>";
+		};
+		8BEDEEB3121B1D6900ABD57F /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8BEDEEB4121B1D6900ABD57F /* English */,
+				8BEDF007121B1E1300ABD57F /* da */,
+				8BEDF093121B1E2100ABD57F /* French */,
+				8BEDF094121B1E2100ABD57F /* German */,
+				8BEDF095121B1E2100ABD57F /* Italian */,
+				8BEDF096121B1E2100ABD57F /* Japanese */,
+				8BEDF097121B1E2100ABD57F /* Spanish */,
+				8BEDF098121B1E2100ABD57F /* zh_CN */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -13977,6 +13388,30 @@
 			};
 			name = Release;
 		};
+		8BEDED00121B1BEC00ABD57F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "CrashReporter/CrashReporter-Info.plist";
+				PRODUCT_NAME = CrashReporter;
+			};
+			name = Debug;
+		};
+		8BEDED01121B1BEC00ABD57F /* Debug-gcov */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "CrashReporter/CrashReporter-Info.plist";
+				PRODUCT_NAME = CrashReporter;
+			};
+			name = "Debug-gcov";
+		};
+		8BEDED02121B1BEC00ABD57F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "CrashReporter/CrashReporter-Info.plist";
+				PRODUCT_NAME = CrashReporter;
+			};
+			name = Release;
+		};
 		8BF62034110A60C2000AB941 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8BA624BE0F12C79E008182B5 /* BreakpadLoadableBundle.xcconfig */;
@@ -14064,54 +13499,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = Transference;
-			};
-			name = Release;
-		};
-		8BFC92631201CD6F002CB4DC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
-			buildSettings = {
-				PRODUCT_NAME = JSON;
-			};
-			name = Debug;
-		};
-		8BFC92641201CD6F002CB4DC /* Debug-gcov */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
-			buildSettings = {
-				PRODUCT_NAME = JSON;
-			};
-			name = "Debug-gcov";
-		};
-		8BFC92651201CD6F002CB4DC /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
-			buildSettings = {
-				PRODUCT_NAME = JSON;
-			};
-			name = Release;
-		};
-		8BFC92E61201CEFE002CB4DC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
-			buildSettings = {
-				PRODUCT_NAME = Breakpad;
-			};
-			name = Debug;
-		};
-		8BFC92E71201CEFE002CB4DC /* Debug-gcov */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
-			buildSettings = {
-				PRODUCT_NAME = Breakpad;
-			};
-			name = "Debug-gcov";
-		};
-		8BFC92E81201CEFE002CB4DC /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BA6238B0F12B97E008182B5 /* LoadableBundle.xcconfig */;
-			buildSettings = {
-				PRODUCT_NAME = Breakpad;
 			};
 			name = Release;
 		};
@@ -14824,6 +14211,16 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		8BEDED03121B1BEC00ABD57F /* Build configuration list for PBXNativeTarget "CrashReporter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BEDED00121B1BEC00ABD57F /* Debug */,
+				8BEDED01121B1BEC00ABD57F /* Debug-gcov */,
+				8BEDED02121B1BEC00ABD57F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		8BF62033110A60C2000AB941 /* Build configuration list for PBXNativeTarget "Transference Beacon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -14850,26 +14247,6 @@
 				8BF627B0110A661B000AB941 /* Debug */,
 				8BF627B1110A661B000AB941 /* Debug-gcov */,
 				8BF627B2110A661B000AB941 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		8BFC92621201CD6F002CB4DC /* Build configuration list for PBXNativeTarget "dump_syms" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8BFC92631201CD6F002CB4DC /* Debug */,
-				8BFC92641201CD6F002CB4DC /* Debug-gcov */,
-				8BFC92651201CD6F002CB4DC /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		8BFC92E51201CEFE002CB4DC /* Build configuration list for PBXNativeTarget "Breakpad" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8BFC92E61201CEFE002CB4DC /* Debug */,
-				8BFC92E71201CEFE002CB4DC /* Debug-gcov */,
-				8BFC92E81201CEFE002CB4DC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -1,7 +1,4 @@
-//
-//  main.m
-//
-//  Copyright (c) 2006-2008 Google Inc. All rights reserved.
+//  Copyright (c) 2010 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -29,23 +26,22 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+//  Portions Copyright (c) 2004 Claus Broch, Infinite Loop. All rights reserved.
 
-#import <Cocoa/Cocoa.h>
-#import "HGSLog.h"
-#import "CrashReporter.h"
+#import <AppKit/AppKit.h>
+#import "CrashReporterController.h"
 
-int main(int argc, const char *argv[]) {
-  // Need a local pool for CrashReporter
-  NSAutoreleasePool *localPool = [[NSAutoreleasePool alloc] init];
-  NSBundle *bundle = [NSBundle mainBundle];
-  CrashReporter *reporter = [[[CrashReporter alloc] init] autorelease];
-  [reporter setUrl:[bundle objectForInfoDictionaryKey:@"CrashReporterURL"]];
-  [reporter setCompanyName:[bundle objectForInfoDictionaryKey:@"CrashReporterCompany"]];
-  BOOL launchedReporter = [reporter launchReporter];
-  HGSAssert(launchedReporter, @"Unable to launch CrashReporter");
+@interface CrashReporterAppDelegate : NSObject {
+ @private
+  NSInteger processToWatch_;
+  NSString *processName_;
+  NSString *companyName_;
+  NSURL *postURL_;
+  NSString *userInfo_;
+  id alertPanel_;
+  NSModalSession alertSession_;
 
-  // Go!
-  int appValue = NSApplicationMain(argc,  (const char **) argv);
-  [localPool release];
-  return appValue;
+  IBOutlet CrashReporterController *reportController_;
 }
+
+@end

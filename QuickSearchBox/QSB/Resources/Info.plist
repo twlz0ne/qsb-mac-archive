@@ -132,13 +132,9 @@
 	<string>http://groups.google.com/group/qsb-mac-discuss</string>
 	<key>QSBHomepageURL</key>
 	<string>http://code.google.com/p/qsb-mac</string>
-	<key>BreakpadSendAndExit</key>
-	<string>NO</string>
-	<key>BreakpadProduct</key>
-	<string>Google_QuickSearchBox_Mac</string>
-	<key>BreakpadURL</key>
-	<string>https://clients2.google.com/cr</string>
-	<key>BreakpadVendor</key>
+	<key>CrashReporterURL</key>
+	<string>http://qsb-mac-crashes.appspot.com/crashreport</string>
+	<key>CrashReporterCompany</key>
 	<string>QSB Team</string>
 	<key>GTMGoogleSearchClientAppArgs</key>
 	<dict>
