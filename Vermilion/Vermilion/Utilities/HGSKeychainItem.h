@@ -39,17 +39,16 @@
 #import <Security/Security.h>
 
 /*!
- Temporary shim code for accessing the keychain. The real product should use
- something along the lines of GMAuthCredential instead of this class.
+ Code for accessing the keychain.
 */
-@interface HGSKeychainItem : NSObject
-{
+@interface HGSKeychainItem : NSObject {
  @private
-  SecKeychainItemRef mKeychainItemRef;
-  BOOL mDataLoaded;
-  NSString* mUsername;
-  NSString* mPassword;
+  SecKeychainItemRef keychainItemRef_;
 }
+
+@property (readonly) NSString *username;
+@property (readonly) NSString *password;
+@property (readonly) NSString *label;
 
 /*!
  Returns the first keychain item matching the service.
@@ -72,11 +71,8 @@
                                  withUsername:(NSString*)username
                                      password:(NSString*)password;
 
-/*! Returns the username associated with a keychain item. */
-- (NSString*)username;
-
-/*! Returns the password associated with a keychain item. */
-- (NSString*)password;
+/*! Designated initializer */
+- (HGSKeychainItem*)initWithRef:(SecKeychainItemRef)ref;
 
 /*! Updates the username and password associated with a keychain item. */
 - (void)setUsername:(NSString*)username password:(NSString*)password;

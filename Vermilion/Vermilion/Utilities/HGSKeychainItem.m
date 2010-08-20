@@ -33,11 +33,6 @@
 #import "HGSKeychainItem.h"
 #import "HGSLog.h"
 
-@interface HGSKeychainItem()
-- (HGSKeychainItem*)initWithRef:(SecKeychainItemRef)ref;
-- (void)loadKeychainData;
-@end
-
 @implementation HGSKeychainItem
 + (HGSKeychainItem*)keychainItemForService:(NSString*)serviceName
                                   username:(NSString*)username {
@@ -46,16 +41,18 @@
   UInt32 serviceLength = serviceCString ? (UInt32)strlen(serviceCString) : 0;
   const char* accountCString = [username UTF8String];
   UInt32 accountLength = accountCString ? (UInt32)strlen(accountCString) : 0;
+  HGSKeychainItem *item = nil;
   OSStatus result = SecKeychainFindGenericPassword(NULL,
                                                    serviceLength, serviceCString,
                                                    accountLength, accountCString,
                                                    0, NULL,
                                                    &itemRef);
-  if ([self reportIfKeychainError:result]) {
-      return nil;
+  if (![self reportIfKeychainError:result]) {
+    item = [[[self alloc] initWithRef:itemRef] autorelease];
+    CFRelease(itemRef);
   }
 
-  return [[[self alloc] initWithRef:itemRef] autorelease];
+  return item;
 }
 
 + (HGSKeychainItem*)keychainItemForHost:(NSString*)host
@@ -65,15 +62,17 @@
   UInt32 serverLength = serverCString ? (UInt32)strlen(serverCString) : 0;
   const char* accountCString = [username UTF8String];
   UInt32 accountLength = accountCString ? (UInt32)strlen(accountCString) : 0;
+  HGSKeychainItem *item = nil;
   OSStatus result = SecKeychainFindInternetPassword(NULL, serverLength, serverCString,
                                                     0, NULL, accountLength, accountCString,
                                                     0, NULL, kAnyPort, 0, 0,
                                                     NULL, NULL, &itemRef);
-  if ([self reportIfKeychainError:result]) {
-    return nil;
+  if (![self reportIfKeychainError:result]) {
+    item = [[[self alloc] initWithRef:itemRef] autorelease];
+    CFRelease(itemRef);
   }
 
-  return [[[self alloc] initWithRef:itemRef] autorelease];
+  return item;
 }
 
 + (NSArray*)allKeychainItemsForService:(NSString*)serviceName {
@@ -96,12 +95,13 @@
   if ([self reportIfKeychainError:result]) {
     return nil;
   }
-  
+
   NSMutableArray* matchingItems = [NSMutableArray array];
   SecKeychainItemRef keychainItemRef;
   while (SecKeychainSearchCopyNext(searchRef, &keychainItemRef) == noErr) {
-    HGSKeychainItem *item 
+    HGSKeychainItem *item
       = [[[self alloc] initWithRef:keychainItemRef] autorelease];
+    CFRelease(keychainItemRef);
     [matchingItems addObject:item];
   }
   CFRelease(searchRef);
@@ -122,88 +122,102 @@
   OSStatus result = SecKeychainAddGenericPassword(NULL, serviceLength, serviceCString,
                                                   accountLength, accountCString,
                                                   passwordLength, passwordData, &keychainItemRef);
-  if ([self reportIfKeychainError:result]) {
-    return nil;
+  HGSKeychainItem *item = nil;
+  if (![self reportIfKeychainError:result]) {
+    item = [[[self alloc] initWithRef:keychainItemRef] autorelease];
+    CFRelease(keychainItemRef);
   }
 
-  return [[[self alloc] initWithRef:keychainItemRef] autorelease];
+  return item;
 }
 
 - (HGSKeychainItem*)initWithRef:(SecKeychainItemRef)ref {
   if ((self = [super init])) {
-    mKeychainItemRef = ref;
-    mDataLoaded = NO;
+    if (ref) {
+      keychainItemRef_ = ref;
+      CFRetain(keychainItemRef_);
+    } else {
+      [self release];
+      self = nil;
+    }
   }
   return self;
 }
 
 - (void)dealloc {
-  if (mKeychainItemRef)
-    CFRelease(mKeychainItemRef);
-  [mUsername release];
-  [mPassword release];
+  if (keychainItemRef_) {
+    CFRelease(keychainItemRef_);
+  }
   [super dealloc];
 }
 
-- (void)loadKeychainData {
-  if (!mKeychainItemRef)
-    return;
-  SecKeychainAttributeInfo attrInfo;
-  UInt32 tags[1];
-  tags[0] = kSecAccountItemAttr;
-  attrInfo.count = (UInt32)(sizeof(tags)/sizeof(UInt32));
-  attrInfo.tag = tags;
-  attrInfo.format = NULL;
+- (NSString *)keychainStringForAttribute:(UInt32)attribute {
+  NSString *string = nil;
+  if (keychainItemRef_) {
+    SecKeychainAttributeInfo attrInfo;
+    UInt32 tags[1];
+    tags[0] = attribute;
+    attrInfo.count = (UInt32)(sizeof(tags)/sizeof(UInt32));
+    attrInfo.tag = tags;
+    attrInfo.format = NULL;
 
-  SecKeychainAttributeList *attrList;
-  UInt32 passwordLength;
-  char* passwordData;
-  OSStatus result = SecKeychainItemCopyAttributesAndData(mKeychainItemRef,
-                                                         &attrInfo,
-                                                         NULL,
-                                                         &attrList,
-                                                         &passwordLength,
-                                                         (void**)(&passwordData));
+    SecKeychainAttributeList *attrList;
+    OSStatus result = SecKeychainItemCopyAttributesAndData(keychainItemRef_,
+                                                           &attrInfo,
+                                                           NULL,
+                                                           &attrList,
+                                                           NULL,
+                                                           NULL);
 
-  [mUsername autorelease];
-  mUsername = nil;
-  [mPassword autorelease];
-  mPassword = nil;
-
-  if ([[self class] reportIfKeychainError:result]) {
-    HGSLog(@"Couldn't load keychain data (error %d)", result);
-    mUsername = [[NSString alloc] init];
-    mPassword = [[NSString alloc] init];
-    return;
-  }
-
-  for (unsigned int i = 0; i < attrList->count; i++) {
-    SecKeychainAttribute attr = attrList->attr[i];
-    if (attr.tag == kSecAccountItemAttr) {
-      mUsername = [[NSString alloc] initWithBytes:(char*)(attr.data)
-                                           length:attr.length
-                                         encoding:NSUTF8StringEncoding];
+    if (![[self class] reportIfKeychainError:result]) {
+      for (unsigned int i = 0; i < attrList->count; i++) {
+        SecKeychainAttribute attr = attrList->attr[i];
+        if (attr.tag == attribute) {
+          string = [[[NSString alloc] initWithBytes:(char*)(attr.data)
+                                             length:attr.length
+                                           encoding:NSUTF8StringEncoding]
+                    autorelease];
+          break;
+        }
+      }
+      OSStatus status = SecKeychainItemFreeAttributesAndData(attrList, NULL);
+      [[self class] reportIfKeychainError:status];
     }
   }
-  mPassword = [[NSString alloc] initWithBytes:passwordData
-                                       length:passwordLength
-                                     encoding:NSUTF8StringEncoding];
-  OSStatus status = SecKeychainItemFreeAttributesAndData(attrList,
-                                                         (void*)passwordData);
-  [[self class] reportIfKeychainError:status];
-  mDataLoaded = YES;
+  return string;
 }
 
-- (NSString*)username {
-  if (!mDataLoaded)
-    [self loadKeychainData];
-  return mUsername;
+- (NSString *)username {
+  return [self keychainStringForAttribute:kSecAccountItemAttr];
+}
+
+- (NSString *)label {
+  return [self keychainStringForAttribute:kSecLabelItemAttr];
 }
 
 - (NSString*)password {
-  if (!mDataLoaded)
-    [self loadKeychainData];
-  return mPassword;
+  NSString *password = nil;
+  if (keychainItemRef_) {
+    UInt32 passwordLength;
+    void* passwordData;
+    OSStatus result = SecKeychainItemCopyAttributesAndData(keychainItemRef_,
+                                                           NULL,
+                                                           NULL,
+                                                           NULL,
+                                                           &passwordLength,
+                                                           &passwordData);
+
+    if (![[self class] reportIfKeychainError:result]) {
+      password = [[[NSString alloc] initWithBytes:passwordData
+                                           length:passwordLength
+                                         encoding:NSUTF8StringEncoding]
+                  autorelease];
+      OSStatus status = SecKeychainItemFreeAttributesAndData(NULL,
+                                                             passwordData);
+      [[self class] reportIfKeychainError:status];
+    }
+  }
+  return password;
 }
 
 - (void)setUsername:(NSString*)username password:(NSString*)password {
@@ -217,23 +231,18 @@
   attrList.attr = &user;
   const char* passwordData = [password UTF8String];
   UInt32 passwordLength = passwordData ? (UInt32)strlen(passwordData) : 0;
-  OSStatus status = SecKeychainItemModifyAttributesAndData(mKeychainItemRef,
+  OSStatus status = SecKeychainItemModifyAttributesAndData(keychainItemRef_,
                                                            &attrList,
                                                            passwordLength,
                                                            passwordData);
-  if (![[self class] reportIfKeychainError:status]) {
-    [mUsername autorelease];
-    mUsername = [username copy];
-    [mPassword autorelease];
-    mPassword = [password copy];
-  }
+  [[self class] reportIfKeychainError:status];
 }
 
 - (void)removeFromKeychain {
-  OSStatus status = SecKeychainItemDelete(mKeychainItemRef);
-  if (![[self class] reportIfKeychainError:status]) {
-    mKeychainItemRef = nil;
-  }
+  OSStatus status = SecKeychainItemDelete(keychainItemRef_);
+  [[self class] reportIfKeychainError:status];
+  CFRelease(keychainItemRef_);
+  keychainItemRef_ = nil;
 }
 
 + (BOOL)reportIfKeychainError:(OSStatus)status {
