@@ -163,7 +163,11 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
     services_ = [services mutableCopy];
     source_ = source;
 
-    for (NSNetService *service in services_) {
+    // Must use services and not services_ in this for loop.
+    // Our callbacks (from resolveWithTimeout) can modify services_ immediately
+    // and since we are iterating it, we would get a  
+    // "Collection was mutated while being enumerated." exception.
+    for (NSNetService *service in services) {
       [service setDelegate:self];
       [service resolveWithTimeout:kServiceResolutionTimeout];
     }
@@ -173,8 +177,11 @@ static const NSTimeInterval kServiceResolutionTimeout = 5.0;
 
 - (void)dealloc {
   for (NSNetService *service in services_) {
-    [service stop];
+    // We must "unset" our delegate first because our callbacks
+    // can modify services_ and since we are iterating it, we would get a  
+    // "Collection was mutated while being enumerated." exception.
     [service setDelegate:nil];
+    [service stop];
   }
   [services_ release];
   [database_ release];
