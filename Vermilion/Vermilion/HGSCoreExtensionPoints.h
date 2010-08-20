@@ -30,18 +30,17 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <Foundation/Foundation.h>
-
-#import "HGSExtensionPoint.h"
+#import <Vermilion/HGSExtensionPoint.h>
+#import <GTM/GTMDefines.h>
 
 @class HGSAccountsExtensionPoint;
 
-extern NSString* const kHGSActionsExtensionPoint;
-extern NSString* const kHGSSourcesExtensionPoint;
-extern NSString* const kHGSServicesExtensionPoint;
-extern NSString* const kHGSAccountsExtensionPoint;
-extern NSString* const kHGSPluginsExtensionPoint;
-extern NSString* const kHGSAccountTypesExtensionPoint;
+GTM_EXTERN NSString* const kHGSActionsExtensionPoint;
+GTM_EXTERN NSString* const kHGSSourcesExtensionPoint;
+GTM_EXTERN NSString* const kHGSServicesExtensionPoint;
+GTM_EXTERN NSString* const kHGSAccountsExtensionPoint;
+GTM_EXTERN NSString* const kHGSPluginsExtensionPoint;
+GTM_EXTERN NSString* const kHGSAccountTypesExtensionPoint;
 
 @interface HGSExtensionPoint (HGSCoreExtensionPoints)
 

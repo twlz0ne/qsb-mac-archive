@@ -35,8 +35,8 @@
  @discussion HGSCallbackSearchSource
 */
 
-#import "HGSSearchSource.h"
-#import "HGSSimpleArraySearchOperation.h"
+#import <Vermilion/HGSSearchSource.h>
+#import <Vermilion/HGSSimpleArraySearchOperation.h>
 
 @class HGSSearchOperation;
 /*!

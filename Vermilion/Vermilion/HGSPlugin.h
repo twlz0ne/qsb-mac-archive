@@ -35,8 +35,7 @@
  @discussion HGSPlugin
 */
 
-#import <Foundation/Foundation.h>
-#import "HGSExtension.h"
+#import <Vermilion/HGSExtension.h>
 
 @class HGSProtoExtension;
 

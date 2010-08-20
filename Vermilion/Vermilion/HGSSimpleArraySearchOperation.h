@@ -35,7 +35,7 @@
  @discussion HGSSimpleArraySearchOperation
  */
 
-#import "HGSSearchOperation.h"
+#import <Vermilion/HGSSearchOperation.h>
 
 /*!
  A search operation that stores it's results in a simple NSArray of HGSResults.

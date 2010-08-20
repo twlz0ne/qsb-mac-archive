@@ -30,8 +30,12 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#import <Vermilion/HGSQuery.h>
+#import <Vermilion/HGSResult.h>
+#import <Vermilion/HGSSearchTermScorer.h>
 #import <Vermilion/HGSSuggestSource.h>
-
+#import <Vermilion/HGSTokenizer.h>
+#import <Vermilion/HGSType.h>
 #import <GTM/GTMMethodCheck.h>
 #import <GTM/GTMNSString+URLArguments.h>
 

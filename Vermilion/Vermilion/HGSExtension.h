@@ -35,7 +35,6 @@
  @discussion HGSExtension
 */
 
-#import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 
 @class HGSProtoExtension;

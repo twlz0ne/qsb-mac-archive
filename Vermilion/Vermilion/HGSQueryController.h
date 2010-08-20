@@ -32,7 +32,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "GTMDefines.h"
+#import <GTM/GTMDefines.h>
 
 @class HGSQuery;
 @class HGSTypeFilter;

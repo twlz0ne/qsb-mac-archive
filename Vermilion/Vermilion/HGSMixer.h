@@ -30,12 +30,13 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#import <Foundation/Foundation.h>
+
 /*!
  @header
  @discussion HGSMixer
 */
 
-#import <Foundation/Foundation.h>
 @class HGSScoredResult;
 
 /*! 

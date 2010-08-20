@@ -37,9 +37,7 @@
  account extensions and active accounts.
  */
 
-#import <Foundation/Foundation.h>
-
-#import "HGSExtensionPoint.h"
+#import <Vermilion/HGSExtensionPoint.h>
 
 /*!
   An extension point that maintains an inventory of all accounts

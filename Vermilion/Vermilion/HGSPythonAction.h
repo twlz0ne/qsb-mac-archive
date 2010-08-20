@@ -30,8 +30,8 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSAction.h"
-#import "HGSPython.h"
+#import <Vermilion/HGSAction.h>
+#import <Vermilion/HGSPython.h>
 
 @interface HGSPythonAction : HGSAction {
  @private

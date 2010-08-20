@@ -35,7 +35,7 @@
  @discussion HGSCorporaSource
 */
 
-#import "HGSMemorySearchSource.h"
+#import <Vermilion/HGSMemorySearchSource.h>
 
 @class HGSAccount;
 

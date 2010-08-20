@@ -30,8 +30,8 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "HGSCallbackSearchSource.h"
-#import "HGSPython.h"
+#import <Vermilion/HGSCallbackSearchSource.h>
+#import <Vermilion/HGSPython.h>
 
 // TODO(hawk): probably want to eventually drop this and let the sources
 // return any sort of type.

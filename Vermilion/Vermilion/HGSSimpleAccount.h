@@ -35,7 +35,7 @@
  @discussion HGSSimpleAccount
 */
 
-#import "HGSAccount.h"
+#import <Vermilion/HGSAccount.h>
 
 @class HGSKeychainItem;
 

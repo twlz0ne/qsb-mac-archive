@@ -31,6 +31,15 @@
 //
 
 #import "HGSSuggestSource.h"
+#import "HGSLog.h"
+#import "HGSQuery.h"
+#import "HGSTokenizer.h"
+#import "HGSSearchTermScorer.h"
+#import "HGSResult.h"
+#import "HGSMixer.h"
+#import "HGSPluginLoader.h"
+#import "HGSDelegate.h"
+#import "HGSType.h"
 
 #import <GData/GDataHTTPFetcher.h>
 #import "GTMDefines.h"

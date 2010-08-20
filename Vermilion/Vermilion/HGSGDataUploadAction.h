@@ -35,9 +35,9 @@
  @discussion HGSGDataUploadAction
 */
 
-#import "HGSAction.h"
-#import "HGSAccount.h"
-#import "HGSUserMessage.h"
+#import <Vermilion/HGSAction.h>
+#import <Vermilion/HGSAccount.h>
+#import <Vermilion/HGSUserMessage.h>
 
 @class HGSSimpleAccount;
 @class GDataServiceGoogle;

@@ -35,8 +35,7 @@
  @discussion HGSAction
 */
 
-#import <Foundation/Foundation.h>
-#import "HGSExtension.h"
+#import <Vermilion/HGSExtension.h>
 
 @class HGSTypeFilter;
 @class HGSResult;

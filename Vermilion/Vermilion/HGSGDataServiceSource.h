@@ -35,8 +35,8 @@
  @discussion HGSGDataServiceSource
 */
 
-#import "HGSMemorySearchSource.h"
-#import "HGSAccount.h"
+#import <Vermilion/HGSMemorySearchSource.h>
+#import <Vermilion/HGSAccount.h>
 
 @class GDataServiceGoogle;
 @class GDataServiceTicket;

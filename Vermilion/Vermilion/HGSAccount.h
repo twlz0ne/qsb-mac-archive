@@ -35,8 +35,7 @@
   @discussion HGSAccount
 */
 
-#import <Foundation/Foundation.h>
-#import "HGSExtension.h"
+#import <Vermilion/HGSExtension.h>
 
 /*!
   Information about accounts that a UI can display and which source or actions

@@ -31,8 +31,7 @@
 //
 // TODO(altse): Invalidate cache periodically
 
-#import <Foundation/Foundation.h>
-#import <Vermilion/Vermilion.h>
+#import <Vermilion/HGSCallbackSearchSource.h>
 
 @class HGSSQLiteBackedCache;
 

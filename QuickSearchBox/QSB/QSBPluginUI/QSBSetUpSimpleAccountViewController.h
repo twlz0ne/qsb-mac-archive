@@ -38,7 +38,7 @@
  password.
  */
 
-#import "QSBSetUpAccountViewController.h"
+#import <QSBPluginUI/QSBSetUpAccountViewController.h>
 
 /*!
  A controller which manages a view used to specify a new account's

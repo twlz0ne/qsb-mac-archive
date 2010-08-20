@@ -35,7 +35,7 @@
   @discussion HGSSearchSource
 */
 
-#import "HGSExtension.h"
+#import <Vermilion/HGSExtension.h>
 
 @class HGSResult;
 @class HGSQuery;

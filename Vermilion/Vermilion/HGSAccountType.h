@@ -35,7 +35,7 @@
   @discussion HGSAccountType
 */
 
-#import "HGSExtension.h"
+#import <Vermilion/HGSExtension.h>
 
 /*!
  A class that specifies a type of account that can be instantiated into an

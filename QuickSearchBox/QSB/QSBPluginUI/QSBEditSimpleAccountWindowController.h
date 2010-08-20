@@ -38,7 +38,7 @@
  password.
  */
 
-#import "QSBEditAccountWindowController.h"
+#import <QSBPluginUI/QSBEditAccountWindowController.h>
 
 /*!
   A controller which manages a window used to update the password

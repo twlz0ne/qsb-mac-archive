@@ -35,7 +35,7 @@
  @discussion HGSAppleScriptAction
 */
 
-#import "HGSAction.h"
+#import <Vermilion/HGSAction.h>
 
 /*!
  A wrapper for an action that is implemented with AppleScript.
