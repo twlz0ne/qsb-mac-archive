@@ -125,7 +125,7 @@
 	<key>OSAScriptingDefinition</key>
 	<string>dynamic</string>
 	<key>NSSupportsSuddenTermination</key>
-	<true/>
+	<false/>
 	<key>LSHasLocalizedDisplayName</key>
 	<true/>
 	<key>QSBFeedbackURL</key>
@@ -143,8 +143,11 @@
 		<key>source</key>
 		<string>qsb-mac</string>
 	</dict>
-	<key>com.apple.PreferenceSync.ExcludeAllSyncKeys</key>
-	<true/>
+	<key>com.apple.PreferenceSync.ExcludeSyncKeys</key>
+	<array>
+		<string>moveToApplicationsFolderAlertSuppress</string>
+		<string>SULastCheckTime</string>
+	</array>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 	<key>SUFeedURL</key>

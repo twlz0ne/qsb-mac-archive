@@ -30,6 +30,7 @@
 
 
 #import "CrashReporterAppDelegate.h"
+#import "GTMDefines.h"
 
 #include "asl.h"
 
@@ -37,7 +38,7 @@
 #include <sys/sysctl.h>
 
 @interface CrashReporterAppDelegate()
-- (void)watchForAppleCrashNotication;
+- (void)watchForAppleCrashNotification;
 - (void)appTerminated:(NSNotification *)notification;
 - (void)displayCrashNotificationForProcess:(NSString*)processName;
 - (void)serviceCrashAlert;
@@ -134,9 +135,6 @@
   postURL_ = [[NSURL alloc] initWithString:url];
   userInfo_ = [[defaults stringForKey:@"userInfo"] copy];
 
-  NSLog(@"%d %@", processToWatch_, postURL_);
-
-
   NSNotificationCenter *nc = [[NSWorkspace sharedWorkspace] notificationCenter];
   [nc addObserver:self
          selector:@selector(appTerminated:)
@@ -200,19 +198,35 @@
   }
 }
 
-- (void)watchForAppleCrashNotication {
+- (void)watchForAppleCrashNotification {
   static int noOfRuns = 0;
   static BOOL displayedOurCrashNotification = NO;
 
   if (!displayedOurCrashNotification) {
     aslmsg query = asl_new(ASL_TYPE_QUERY);
-    if (!query) return;
+    if (!query) {
+      _GTMDevLog(@"asl_new failed");
+      return;
+    }
 
-    const uint32_t facilityQueryOptions = ASL_QUERY_OP_EQUAL;
-    const int aslSetFacilityQueryOptionsReturnCode
-      = asl_set_query(query, ASL_KEY_SENDER,
-                      "ReportCrash", facilityQueryOptions);
-    if (aslSetFacilityQueryOptionsReturnCode != 0) return;
+    int err
+      = asl_set_query(query, ASL_KEY_SENDER,"ReportCrash", ASL_QUERY_OP_EQUAL);
+    if (err) {
+      _GTMDevLog(@"asl_set_query failed (%d)", err);
+      return;
+    }
+
+    NSTimeInterval currTime = [[NSDate date ]timeIntervalSince1970] - 10;
+    const char *timeString = [[NSString stringWithFormat:@"%lf", currTime]
+                              UTF8String];
+    err = asl_set_query(query,
+                        ASL_KEY_TIME,
+                        timeString,
+                        ASL_QUERY_OP_GREATER_EQUAL);
+    if (err) {
+      _GTMDevLog(@"asl_set_query failed (%d)", err);
+      return;
+    }
 
     aslresponse response = asl_search(NULL, query);
 
@@ -244,10 +258,10 @@
     aslresponse_free(response);
   }
 
-  if (!displayedOurCrashNotification && (noOfRuns++ < 100)) {
-    [self performSelector:@selector(watchForAppleCrashNotication)
+  if (!displayedOurCrashNotification && (noOfRuns++ < 10)) {
+    [self performSelector:@selector(watchForAppleCrashNotification)
                withObject:nil
-               afterDelay:0.1 + ((NSTimeInterval)noOfRuns / 50.0)];
+               afterDelay:((NSTimeInterval)noOfRuns / 5.0) - 0.2];
   } else {
     if (!displayedOurCrashNotification) {
       [NSApp terminate:self];
@@ -267,7 +281,7 @@
     }
     [processName_ retain];
 
-    [self watchForAppleCrashNotication];
+    [self watchForAppleCrashNotification];
   }
 }
 

@@ -3767,8 +3767,6 @@
 		8BF52F640EE2250600D981A0 /* QSBCustomPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCustomPanel.m; sourceTree = "<group>"; };
 		8BF60FE611079035000AB941 /* HGSUserMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSUserMessage.h; sourceTree = "<group>"; };
 		8BF60FE711079035000AB941 /* HGSUserMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSUserMessage.m; sourceTree = "<group>"; };
-		8BF61F86110A5D2E000AB941 /* Transference Beacon-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Transference Beacon-Info.plist"; path = "../../QSB/Transference Beacon-Info.plist"; sourceTree = "<group>"; };
-		8BF61FF6110A5DD1000AB941 /* Transference Demo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Transference Demo-Info.plist"; path = "../../QSB/Transference Demo-Info.plist"; sourceTree = "<group>"; };
 		8BF62037110A60C2000AB941 /* TransferenceBeacon.hgs */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TransferenceBeacon.hgs; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BF620CF110A60F5000AB941 /* BeaconServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BeaconServer.h; sourceTree = "<group>"; };
 		8BF620D0110A60F5000AB941 /* BeaconServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BeaconServer.m; sourceTree = "<group>"; };
@@ -6416,8 +6414,6 @@
 		8BF620CE110A60F5000AB941 /* Transference */ = {
 			isa = PBXGroup;
 			children = (
-				8BF61F86110A5D2E000AB941 /* Transference Beacon-Info.plist */,
-				8BF61FF6110A5DD1000AB941 /* Transference Demo-Info.plist */,
 				8BF620CF110A60F5000AB941 /* BeaconServer.h */,
 				8BF620D0110A60F5000AB941 /* BeaconServer.m */,
 				8BF6243A110A6109000AB941 /* Transference.icns */,

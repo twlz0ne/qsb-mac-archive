@@ -38,6 +38,7 @@
 #import <JSON/JSON.h>
 
 #import "HGSSuggestSource.h"
+#import "HGSBundle.h"
 
 @interface HGSSuggestSourceTest : GTMTestCase {
  @private
