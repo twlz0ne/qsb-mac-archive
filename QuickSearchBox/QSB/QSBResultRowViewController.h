@@ -37,8 +37,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class HGSScoredResult;
-
 /*!
  The abstract base view controller class for the various nibs used to present
  a row in a results table.  There are several child classes which support
@@ -72,14 +70,8 @@
 @property (readonly, nonatomic, getter=isCustomResultViewInstalled)
   BOOL customResultViewInstalled;
 
-// Designated initializer.
+/*! Designated initializer. */
 - (id)initWithNib:(NSNib *)nib;
 
 @end
 
-/*!
- Methods that a custom result view may want to implement
-*/
-@protocol QSBCustomResultView
-- (NSNumber *)qsb_setResult:(HGSScoredResult *)result;
-@end

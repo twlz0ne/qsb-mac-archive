@@ -1,7 +1,7 @@
 //
-//  QSBPluginUI.h
+//  QSBCustomResultView.h
 //
-//  Copyright (c) 2009 Google Inc. All rights reserved.
+//  Copyright (c) 2010 Google Inc. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are
@@ -30,11 +30,18 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <QSBPluginUI/QSBActionSaveAsControllerProtocol.h>
-#import <QSBPluginUI/QSBCustomResultView.h>
-#import <QSBPluginUI/QSBEditAccountWindowController.h>
-#import <QSBPluginUI/QSBEditSimpleAccountWindowController.h>
-#import <QSBPluginUI/QSBSetUpAccountViewController.h>
-#import <QSBPluginUI/QSBSetUpSimpleAccountViewController.h>
-#import <QSBPluginUI/QSBHGSResultAttributeKeys.h>
-#import <QSBPluginUI/QSBCategory.h>
+/*!
+ @header
+ @discussion QSBCustomResultView
+*/
+
+@class HGSScoredResult;
+
+/*!
+ Methods that a custom result view must implement.
+ See QSBResultRowViewController.h for more details.
+ Use StockQuoter plugin as an example.
+*/
+@protocol QSBCustomResultView
+- (BOOL)qsb_setResult:(HGSScoredResult *)result;
+@end

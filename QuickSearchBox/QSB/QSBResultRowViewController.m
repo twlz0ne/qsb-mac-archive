@@ -31,9 +31,11 @@
 //
 
 #import "QSBResultRowViewController.h"
-#import "QSBTableResult.h"
+#import <QSBPluginUI/QSBPluginUI.h>
+#import <GTM/GTMMethodCheck.h>
 #import <Vermilion/Vermilion.h>
-#import "GTMMethodCheck.h"
+
+#import "QSBTableResult.h"
 
 // An extension wishing to present a result in a custom view will provide
 // a dictionary in its plist with the following key.  This dictionary
@@ -143,7 +145,7 @@ static NSString *const kQSBResultViewControllerClassName
           Class resultViewControllerClass
             = NSClassFromString(resultViewControllerClassName);
           if ([resultViewNibName length] && resultViewControllerClass) {
-            NSViewController *resultViewController
+            NSViewController<QSBCustomResultView> *resultViewController
               = [[[resultViewControllerClass alloc]
                   initWithNibName:resultViewNibName bundle:sourceBundle]
                  autorelease];
@@ -153,18 +155,9 @@ static NSString *const kQSBResultViewControllerClassName
               // however, where the result might not be necessary in order
               // to properly render the custom view -- a clock, for example.
               // If the source determines that it cannot or does not want to
-              // use its custom view then it should return NO (as an NSNumber)
-              // from the call to -[setResult:].
-              BOOL useCustomView = YES;
-              if ([resultViewController respondsToSelector:@selector(qsb_setResult:)]) {
-                NSNumber *useView = [resultViewController
-                                     performSelector:@selector(qsb_setResult:)
-                                          withObject:result];
-                if (useView) {
-                  useCustomView = [useView boolValue];
-                }
-              }
-              if (useCustomView) {
+              // use its custom view then it should return NO
+              // from the call to -[qsb_setResult:].
+              if ([resultViewController qsb_setResult:result]) {
                 NSView *resultView = [resultViewController view];
 
                 // Re-width the custom view and re-height the container view.

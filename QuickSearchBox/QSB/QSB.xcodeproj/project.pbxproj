@@ -454,7 +454,6 @@
 		623FA3660E5C8DC1003630C1 /* ChatBuddiesSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 623FA33F0E5C8C8C003630C1 /* ChatBuddiesSource.m */; };
 		624137530F2A657B009229E6 /* QSBSetUpAccountWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 624137520F2A657B009229E6 /* QSBSetUpAccountWindowController.m */; };
 		6242D0C10DC78E7300EFEF22 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6242D0BF0DC78E7300EFEF22 /* MainMenu.xib */; };
-		624DD9ED0E9EA5D90029EF72 /* QSBResultRowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 624DD9EC0E9EA5D90029EF72 /* QSBResultRowViewController.m */; };
 		624DD9F90E9EAA150029EF72 /* QSBTopResultsRowViewControllers.m in Sources */ = {isa = PBXBuildFile; fileRef = 624DD9F80E9EAA150029EF72 /* QSBTopResultsRowViewControllers.m */; };
 		62521AB70EFAC30000A6E647 /* QSBViewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 62521AB30EFAC30000A6E647 /* QSBViewTableViewCell.m */; };
 		62521AB80EFAC30000A6E647 /* QSBViewTableViewColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = 62521AB50EFAC30000A6E647 /* QSBViewTableViewColumn.m */; };
@@ -1181,7 +1180,6 @@
 		8BCCD3CB0EC8FA3A00688D64 /* getExternalIP.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD3C70EC8FA3A00688D64 /* getExternalIP.icns */; };
 		8BCCD3CC0EC8FA3A00688D64 /* getIP.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8BCCD3C80EC8FA3A00688D64 /* getIP.icns */; };
 		8BCCD3CD0EC8FA3A00688D64 /* main.applescript in AppleScript */ = {isa = PBXBuildFile; fileRef = 8BCCD3C90EC8FA3A00688D64 /* main.applescript */; settings = {ATTRIBUTES = (Debug, ); }; };
-		8BCFD1820D34004F003A33F4 /* QSBTableResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BCFD1810D34004F003A33F4 /* QSBTableResult.m */; };
 		8BD114BE112C5A6D00B246F2 /* QSBBooleanToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BD114BD112C5A6D00B246F2 /* QSBBooleanToColorTransformer.m */; };
 		8BD11567112C5B2F00B246F2 /* QSBMoreResultsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8BD11563112C5B2F00B246F2 /* QSBMoreResultsView.xib */; };
 		8BD11568112C5B2F00B246F2 /* QSBTopResultsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8BD11565112C5B2F00B246F2 /* QSBTopResultsView.xib */; };
@@ -1278,6 +1276,9 @@
 		8BF62F0C110E5EC6000AB941 /* Categories.plistsrc in Sources */ = {isa = PBXBuildFile; fileRef = 8BF62F0B110E5EC6000AB941 /* Categories.plistsrc */; };
 		8BFC753211FE19EB002CB4DC /* Python in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFC753011FE19E1002CB4DC /* Python */; };
 		8BFC753311FE19EC002CB4DC /* Python in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFC753011FE19E1002CB4DC /* Python */; };
+		8BFE1AAC1222EA0400D61955 /* QSBTableResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BCFD1810D34004F003A33F4 /* QSBTableResult.m */; };
+		8BFE1AB61222EAD800D61955 /* QSBCustomResultView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BFE1AB51222EAD800D61955 /* QSBCustomResultView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8BFE1B061222EBE600D61955 /* QSBResultRowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 624DD9EC0E9EA5D90029EF72 /* QSBResultRowViewController.m */; };
 		E4617A900DC23BE300CE7C0F /* HGSMixer.h in Headers */ = {isa = PBXBuildFile; fileRef = E4617A8E0DC23BE300CE7C0F /* HGSMixer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E4617A910DC23BE300CE7C0F /* HGSMixer.m in Sources */ = {isa = PBXBuildFile; fileRef = E4617A8F0DC23BE300CE7C0F /* HGSMixer.m */; };
 		E46932FD0DDB7A0200C5A64A /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE9BEE109C5EF770074EFF3 /* Carbon.framework */; };
@@ -3791,6 +3792,7 @@
 		8BF62EAA110E593B000AB941 /* QSBCategory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSBCategory.m; sourceTree = "<group>"; };
 		8BF62F0B110E5EC6000AB941 /* Categories.plistsrc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Categories.plistsrc; sourceTree = "<group>"; };
 		8BFC753011FE19E1002CB4DC /* Python */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = Python; path = /System/Library/Frameworks/Python.framework/Versions/2.5/Python; sourceTree = "<absolute>"; };
+		8BFE1AB51222EAD800D61955 /* QSBCustomResultView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBCustomResultView.h; sourceTree = "<group>"; };
 		D408F9F00AEEDC2C007EE96D /* SecurityFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityFoundation.framework; path = System/Library/Frameworks/SecurityFoundation.framework; sourceTree = SDKROOT; };
 		D44652CE0AB643110077860B /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E429DF760AC1907A00E747D8 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -5144,6 +5146,7 @@
 				8BF52F630EE2250600D981A0 /* QSBCustomPanel.h */,
 				8BF52F640EE2250600D981A0 /* QSBCustomPanel.m */,
 				8BC5A69F11402F86000DB67C /* QSBCustomPanelTest.m */,
+				8BFE1AB51222EAD800D61955 /* QSBCustomResultView.h */,
 				8B21631D0EB9022300183DE4 /* QSBDetailedRowViewController.h */,
 				8B21631E0EB9022300183DE4 /* QSBDetailedRowViewController.m */,
 				7FA450BB0EF88741006FD4E9 /* QSBDraggableImageView.h */,
@@ -6570,6 +6573,7 @@
 				8B4463A310F2783200561E62 /* QSBActionSaveAsControllerProtocol.h in Headers */,
 				8B6724F910F3F6CD00F62D01 /* QSBHGSResultAttributeKeys.h in Headers */,
 				8B9C0FB4111BE777008C869F /* QSBCategory.h in Headers */,
+				8BFE1AB61222EAD800D61955 /* QSBCustomResultView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9585,7 +9589,6 @@
 				8B5EC6DB0CEE61BF00AD3BBD /* QSBResultTableView.m in Sources */,
 				8B5EC6E30CEE61BF00AD3BBD /* main.m in Sources */,
 				8B8257990D189EA6002A6C3C /* QSBGrayView.m in Sources */,
-				8BCFD1820D34004F003A33F4 /* QSBTableResult.m in Sources */,
 				7F68BCC70D8ADE7E00712459 /* NSColor+Lighting.m in Sources */,
 				64C3866D0DBFE247005EBA69 /* GTMMethodCheck.m in Sources */,
 				6282B2230DD8985000AC9C3C /* QSBSearchWindowController.m in Sources */,
@@ -9600,7 +9603,6 @@
 				6223CC890E76EC4E00F61030 /* QSBResultsViewTableView.m in Sources */,
 				8BE8488F0E9425C200C611B0 /* QSBKeyMap.m in Sources */,
 				623AFDBE0E9ABBEF002A8401 /* QSBTopResultsViewController.m in Sources */,
-				624DD9ED0E9EA5D90029EF72 /* QSBResultRowViewController.m in Sources */,
 				624DD9F90E9EAA150029EF72 /* QSBTopResultsRowViewControllers.m in Sources */,
 				7F4BE5350EA7A9CC0025D57D /* NSColor+Naming.m in Sources */,
 				8B21631F0EB9022300183DE4 /* QSBDetailedRowViewController.m in Sources */,
@@ -9641,6 +9643,8 @@
 				8B0634421135ECDC0003CC70 /* QSBAnimatedScroll.m in Sources */,
 				8BC88EAF115971A200A6E783 /* QSBKeystoneRemover.m in Sources */,
 				8BEDF6C6121B3ACD00ABD57F /* CrashReporter.m in Sources */,
+				8BFE1AAC1222EA0400D61955 /* QSBTableResult.m in Sources */,
+				8BFE1B061222EBE600D61955 /* QSBResultRowViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
