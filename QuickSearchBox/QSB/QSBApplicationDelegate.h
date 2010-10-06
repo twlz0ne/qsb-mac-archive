@@ -40,6 +40,8 @@
 @class QSBPreferenceWindowController;
 @class QSBHGSDelegate;
 @class QSBUserMessenger;
+@class GTMCarbonHotKey;
+@class GTMHotKey;
 
 extern NSString *const kQSBBeenLaunchedPrefKey;
 
@@ -51,7 +53,8 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
   IBOutlet NSMenuItem *dockShowSearchBoxItem_;
 
   QSBSearchWindowController *searchWindowController_;
-  EventHotKeyRef hotKey_;  // the hot key we're looking for.
+  GTMCarbonHotKey *carbonHotKey_;  // the hot key we're looking for.
+  GTMHotKey *hotKey_;
   NSUInteger hotModifiers_;  // if we are getting double taps, the mods to look for.
   NSUInteger hotModifiersState_;
   NSUInteger oldHotModifiers_;  // Keep track of the last modifier state
@@ -66,6 +69,8 @@ extern NSString *const kQSBBeenLaunchedPrefKey;
 }
 
 @property (readonly, retain, nonatomic) QSBSearchWindowController *searchWindowController;
+
+@property (retain, nonatomic) GTMHotKey *hotKey;
 
 // Manage our application preferences.
 - (IBAction)showPreferences:(id)sender;

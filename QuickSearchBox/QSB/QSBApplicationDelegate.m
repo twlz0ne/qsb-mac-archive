@@ -183,12 +183,13 @@ static NSString *const kGrowlNotificationName = @"QSB User Message";
 @implementation QSBApplicationDelegate
 
 GTM_METHOD_CHECK(NSWorkspace, gtm_processInfoDictionaryForActiveApp);
-GTM_METHOD_CHECK(GTMHotKeyTextField, stringForKeycode:useGlyph:resourceBundle:);
+GTM_METHOD_CHECK(GTMHotKeyTextFieldCell, stringForKeycode:useGlyph:resourceBundle:);
 GTM_METHOD_CHECK(NSObject, gtm_addObserver:forKeyPath:selector:userInfo:options:);
 GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 
 @synthesize applicationASDictionary = applicationASDictionary_;
 @synthesize searchWindowController = searchWindowController_;
+@synthesize hotKey = hotKey_;
 
 + (NSSet *)keyPathsForValuesAffectingSourceExtensions {
   NSSet *affectingKeys = [NSSet setWithObject:kQSBPluginsScriptingKVOKey];
@@ -475,14 +476,18 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   }
 }
 
+- (void)setHotKey:(GTMHotKey *)hotKey {
+
+}
 - (void)updateHotKeyRegistration {
   GTMCarbonEventDispatcherHandler *dispatcher
     = [GTMCarbonEventDispatcherHandler sharedEventDispatcherHandler];
 
   // Remove any hotkey we currently have.
-  if (hotKey_) {
-    [dispatcher unregisterHotKey:hotKey_];
-    hotKey_ = nil;
+  if (carbonHotKey_) {
+    [dispatcher unregisterHotKey:carbonHotKey_];
+    [carbonHotKey_ release];
+    carbonHotKey_ = nil;
   }
 
   NSMenuItem *statusMenuItem = [statusItemMenu_ itemAtIndex:0];
@@ -492,7 +497,7 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   [statusMenuItem setKeyEquivalentModifierMask:statusMenuItemModifiers];
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
   NSDictionary *newKey = [ud valueForKeyPath:kQSBHotKeyKey];
-  NSNumber *value = [newKey objectForKey:kGTMHotKeyDoubledModifierKey];
+  NSNumber *value = [newKey objectForKey:kQSBHotKeyDoubledModifierKey];
   BOOL hotKey1UseDoubleModifier = [value boolValue];
   BOOL hotkey1Enabled = [ud boolForKey:kQSBHotKeyKeyEnabled];
   BOOL hotkey2Enabled = [ud boolForKey:kQSBHotKeyKey2Enabled];
@@ -506,20 +511,21 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
   }
   if (hotkey1Enabled && !hotKey1UseDoubleModifier) {
     // setting hotModifiers_ means we're not looking for a double tap
-    value = [newKey objectForKey:kGTMHotKeyModifierFlagsKey];
+    value = [newKey objectForKey:kQSBHotKeyModifierFlagsKey];
     uint modifiers = [value unsignedIntValue];
-    value = [newKey objectForKey:kGTMHotKeyKeyCodeKey];
+    value = [newKey objectForKey:kQSBHotKeyKeyCodeKey];
     uint keycode = [value unsignedIntValue];
-    hotKey_ = [dispatcher registerHotKey:keycode
-                               modifiers:modifiers
-                                  target:self
-                                  action:@selector(hitHotKey:)
-                             whenPressed:YES];
+    carbonHotKey_ = [[dispatcher registerHotKey:keycode
+                                      modifiers:modifiers
+                                         target:self
+                                         action:@selector(hitHotKey:)
+                                       userInfo:nil
+                                    whenPressed:YES] retain];
 
     NSBundle *bundle = [NSBundle bundleForClass:[GTMHotKeyTextField class]];
-    statusMenuItemKey = [GTMHotKeyTextField stringForKeycode:keycode
-                                                    useGlyph:YES
-                                              resourceBundle:bundle];
+    statusMenuItemKey = [GTMHotKeyTextFieldCell stringForKeycode:keycode
+                                                        useGlyph:YES
+                                                  resourceBundle:bundle];
     statusMenuItemModifiers = modifiers;
   }
   [statusMenuItem setKeyEquivalent:statusMenuItemKey];
@@ -892,11 +898,12 @@ GTM_METHOD_CHECK(NSObject, gtm_stopObservingAllKeyPaths);
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
-  if (hotKey_) {
+  if (carbonHotKey_) {
     GTMCarbonEventDispatcherHandler *dispatcher
       = [GTMCarbonEventDispatcherHandler sharedEventDispatcherHandler];
-    [dispatcher unregisterHotKey:hotKey_];
-    hotKey_ = nil;
+    [dispatcher unregisterHotKey:carbonHotKey_];
+    [carbonHotKey_ release];
+    carbonHotKey_ = nil;
   }
 
   // Clean up our dock tile in case it got modified when

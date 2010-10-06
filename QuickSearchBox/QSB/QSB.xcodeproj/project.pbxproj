@@ -708,14 +708,12 @@
 		8B4099FF0F93DC0100DF540E /* GTMUILocalizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B4099FD0F93DC0100DF540E /* GTMUILocalizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B409A000F93DC0100DF540E /* GTMUILocalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4099FE0F93DC0100DF540E /* GTMUILocalizer.m */; };
 		8B445B0F10EBDF8500561E62 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8B627CD610D81B9700F166D1 /* Sparkle.framework */; };
-		8B44636710F2740100561E62 /* GTMBase64.h in Headers */ = {isa = PBXBuildFile; fileRef = 62A4AEAA0F30DF9F0007CD99 /* GTMBase64.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B44636A10F2740C00561E62 /* GTMUnitTestDevLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B95CCB30F6EDD8C003BDBDD /* GTMUnitTestDevLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B44638810F2769B00561E62 /* QSBPluginUI.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B44638710F2769B00561E62 /* QSBPluginUI.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B4463A310F2783200561E62 /* QSBActionSaveAsControllerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 62F595090FEB15DF0076CDDA /* QSBActionSaveAsControllerProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B4463F910F278FC00561E62 /* HGSKeychainItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4463F710F278FC00561E62 /* HGSKeychainItem.m */; };
 		8B4463FA10F278FC00561E62 /* HGSKeychainItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B4463F810F278FC00561E62 /* HGSKeychainItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B4463FD10F2790700561E62 /* HGSKeychainItemTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4463FC10F2790700561E62 /* HGSKeychainItemTest.m */; };
-		8B44661B10F2874C00561E62 /* GTMBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = 62A4AEAB0F30DF9F0007CD99 /* GTMBase64.m */; };
 		8B453B390FB9EFA900C0E951 /* QSBWelcomeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62FB1E4E0FB39B1A0080B342 /* QSBWelcomeController.m */; };
 		8B459D890DA4417C001148C5 /* Vermilion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6F2CE10DA2B7F50052CA40 /* Vermilion.framework */; };
 		8B48109D1046345700BB6A2D /* GTMSenTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B55D9110E786B5D00D39CB0 /* GTMSenTestCase.m */; };
@@ -2535,8 +2533,6 @@
 		62A16A8E0ED484DF0074F41B /* HGSPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSPlugin.m; sourceTree = "<group>"; };
 		62A16A930ED485A60074F41B /* HGSProtoExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HGSProtoExtension.h; sourceTree = "<group>"; };
 		62A16A960ED485C50074F41B /* HGSProtoExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HGSProtoExtension.m; sourceTree = "<group>"; };
-		62A4AEAA0F30DF9F0007CD99 /* GTMBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMBase64.h; sourceTree = "<group>"; };
-		62A4AEAB0F30DF9F0007CD99 /* GTMBase64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMBase64.m; sourceTree = "<group>"; };
 		62A5B282107E570200444AC9 /* GoogleAccountObjectSpecifiers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountObjectSpecifiers.m; sourceTree = "<group>"; };
 		62A5B288107E576E00444AC9 /* GoogleAccountRegisterAccountCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleAccountRegisterAccountCommand.m; sourceTree = "<group>"; };
 		62AD18A40F16B034000D380C /* QSBPathControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSBPathControl.h; sourceTree = "<group>"; };
@@ -6477,8 +6473,6 @@
 				64C385BA0DBFDCF9005EBA69 /* GTMObjectSingleton.h */,
 				8B834B530FBCD00000862FF5 /* GTMAbstractDOListener.h */,
 				8B834AFA0FBCCFE200862FF5 /* GTMAbstractDOListener.m */,
-				62A4AEAA0F30DF9F0007CD99 /* GTMBase64.h */,
-				62A4AEAB0F30DF9F0007CD99 /* GTMBase64.m */,
 				332AD8AB0DC93EB60009A7E9 /* GTMCalculatedRange.h */,
 				332AD8AC0DC93EB60009A7E9 /* GTMCalculatedRange.m */,
 				8B1B49340E5F994800A08972 /* GTMExceptionalInlines.h */,
@@ -6684,7 +6678,6 @@
 				623B19261003E19C009B702D /* GTMNSScanner+JSON.h in Headers */,
 				8B3082DE1056EE1F006C4C7A /* GTMNSNumber+64Bit.h in Headers */,
 				8B0F073210C7465E00C1A6FD /* NSString+CaseInsensitive.h in Headers */,
-				8B44636710F2740100561E62 /* GTMBase64.h in Headers */,
 				8B44636A10F2740C00561E62 /* GTMUnitTestDevLog.h in Headers */,
 				8BF2573A10F67CBD000490C8 /* GTMTypeCasting.h in Headers */,
 				8BC5AEBF1141C02C000DB67C /* GTMNSAnimation+Duration.h in Headers */,
@@ -9857,7 +9850,6 @@
 				623B19251003E19C009B702D /* GTMNSScanner+JSON.m in Sources */,
 				8B3082DD1056EE1F006C4C7A /* GTMNSNumber+64Bit.m in Sources */,
 				8B0F073110C7465900C1A6FD /* NSString+CaseInsensitive.m in Sources */,
-				8B44661B10F2874C00561E62 /* GTMBase64.m in Sources */,
 				8BC5AEBE1141C029000DB67C /* GTMNSAnimation+Duration.m in Sources */,
 				8BC88EAC1159706A00A6E783 /* GTMScriptRunner.m in Sources */,
 				8BA0DBAA11667FAC00839F5C /* GTMLightweightProxy.m in Sources */,

@@ -30,8 +30,7 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-
-#import "GTMHotKeyTextField.h"
+#import <Foundation/Foundation.h>
 
 @interface QSBPreferences : NSObject
 + (BOOL)registerDefaults; // register the default w/ NSUserDefaults
@@ -63,16 +62,32 @@
 #define kQSBMaxMoreResultCountBeforeAbridgingKey @"kQSBMaxMoreResultCountBeforeAbridging"
 #define kQSBMaxMoreResultCountBeforeAbridgingDefault    20
 
-// Dictionary - Hot key information, see GMHotKeyUtils for keys
+// Dictionary - Hot key information
 #define kQSBHotKeyKey                         @"QSBHotKey"
+
+// Dictionary key for hot key configuration information modifier flags.
+// NSNumber of a unsigned int. Modifier flags are stored using Cocoa constants
+// (same as NSEvent) you will need to translate them to Carbon modifier flags
+// for use with RegisterEventHotKey()
+#define kQSBHotKeyModifierFlagsKey @"Modifiers"
+
+// Dictionary key for hot key configuration of virtual key code.  NSNumber of
+// unsigned int. For double-modifier hotkeys (see below) this value is ignored.
+#define kQSBHotKeyKeyCodeKey @"KeyCode"
+
+// Dictionary key for hot key configuration of double-modifier tap. NSNumber
+// BOOL value. Double-tap modifier keys cannot be used with
+// RegisterEventHotKey(), you must implement your own Carbon event handler.
+#define kQSBHotKeyDoubledModifierKey @"DoubleModifier"
+
 // Default hotkey is ControlSpace
 #define kQSBHotKeyKeyDefault                  [NSDictionary dictionaryWithObjectsAndKeys: \
                                                  [NSNumber numberWithUnsignedInt:NSControlKeyMask], \
-                                                 kGTMHotKeyModifierFlagsKey, \
+                                                 kQSBHotKeyModifierFlagsKey, \
                                                  [NSNumber numberWithUnsignedInt:49], \
-                                                 kGTMHotKeyKeyCodeKey, \
+                                                 kQSBHotKeyKeyCodeKey, \
                                                  [NSNumber numberWithBool:NO], \
-                                                 kGTMHotKeyDoubledModifierKey, \
+                                                 kQSBHotKeyDoubledModifierKey, \
                                                  nil]
 #define kQSBHotKeyKeyEnabled                  @"QSBHotKeyKeyEnabled"
 #define kQSBHotKeyKeyEnabledDefault           YES
@@ -80,11 +95,11 @@
 #define kQSBHotKeyKey2                         @"QSBHotKey2"
 #define kQSBHotKeyKey2Default                 [NSDictionary dictionaryWithObjectsAndKeys: \
                                                  [NSNumber numberWithUnsignedInt:NSCommandKeyMask], \
-                                                 kGTMHotKeyModifierFlagsKey, \
+                                                 kQSBHotKeyModifierFlagsKey, \
                                                  [NSNumber numberWithUnsignedInt:0], \
-                                                 kGTMHotKeyKeyCodeKey, \
+                                                 kQSBHotKeyKeyCodeKey, \
                                                  [NSNumber numberWithBool:YES], \
-                                                 kGTMHotKeyDoubledModifierKey, \
+                                                 kQSBHotKeyDoubledModifierKey, \
                                                  nil]
 #define kQSBHotKeyKey2Enabled                  @"QSBHotKeyKey2Enabled"
 #define kQSBHotKeyKey2EnabledDefault           YES
