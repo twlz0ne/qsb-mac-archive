@@ -33,14 +33,12 @@
 #import "HGSOperation.h"
 #import <GTM/GTMDebugSelectorValidation.h>
 #import <GTM/GTMObjectSingleton.h>
-#import <GData/GDataHTTPFetcher.h>
+#import <GData/GTMHTTPFetcher.h>
 
 @interface HGSFetcherOperation ()
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   finishedWithData:(NSData *)retrievedData;
-
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-    failedWithError:(NSError *)error;
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)retrievedData
+              error:(NSError *)error;
 
 - (void)fetcherStoppedNotification:(NSNotification *)notification;
 
@@ -114,10 +112,9 @@
 
 static void HGSFetcherOperationStartFetch(void *info) {
   HGSFetcherOperation *op = (HGSFetcherOperation *)info;
-  GDataHTTPFetcher *fetcher = [op fetcher];
+  GTMHTTPFetcher *fetcher = [op fetcher];
   [fetcher beginFetchWithDelegate:op
-                didFinishSelector:@selector(httpFetcher:finishedWithData:)
-                  didFailSelector:@selector(httpFetcher:failedWithError:)];
+                didFinishSelector:@selector(httpFetcher:finishedWithData:error:)];
 }
 
 @implementation HGSFetcherOperation
@@ -127,31 +124,24 @@ static void HGSFetcherOperationStartFetch(void *info) {
 @synthesize fetcher = fetcher_;
 
 - (id)initWithTarget:(id)target
-          forFetcher:(GDataHTTPFetcher *)fetcher
-   didFinishSelector:(SEL)didFinishSel
-     didFailSelector:(SEL)failedSel {
+          forFetcher:(GTMHTTPFetcher *)fetcher
+   didFinishSelector:(SEL)didFinishSel {
   GTMAssertSelectorNilOrImplementedWithArguments(target,
                                                  didFinishSel,
-                                                 @encode(GDataHTTPFetcher *),
+                                                 @encode(GTMHTTPFetcher *),
                                                  @encode(NSData *),
                                                  @encode(NSOperation *),
-                                                 NULL);
-  GTMAssertSelectorNilOrImplementedWithArguments(target,
-                                                 failedSel,
-                                                 @encode(GDataHTTPFetcher *),
                                                  @encode(NSError *),
-                                                 @encode(NSOperation *),
                                                  NULL);
   if ((self = [super init])) {
     fetcher_ = [fetcher retain];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self
            selector:@selector(fetcherStoppedNotification:)
-               name:kGDataHTTPFetcherStoppedNotification
+               name:kGTMHTTPFetcherStoppedNotification
              object:fetcher_];
     [self setTarget:target];
     didFinishSel_ = didFinishSel;
-    didFailSel_ = failedSel;
   }
   return self;
 }
@@ -165,7 +155,7 @@ static void HGSFetcherOperationStartFetch(void *info) {
 - (void)dealloc {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   [nc removeObserver:self
-                name:kGDataHTTPFetcherStoppedNotification
+                name:kGTMHTTPFetcherStoppedNotification
               object:fetcher_];
   [fetcher_ release];
   [self setTarget:nil];
@@ -208,8 +198,9 @@ static void HGSFetcherOperationStartFetch(void *info) {
   target_ = nil;
 }
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   finishedWithData:(NSData *)retrievedData {
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)retrievedData
+              error:(NSError *)error {
   id target = [self target];
   if (target) {
     NSMethodSignature *sig = [target_ methodSignatureForSelector:didFinishSel_];
@@ -219,22 +210,7 @@ static void HGSFetcherOperationStartFetch(void *info) {
     [invocation setArgument:&fetcher_ atIndex:2];
     [invocation setArgument:&retrievedData atIndex:3];
     [invocation setArgument:&self atIndex:4];
-    [invocation invoke];
-  }
-
-}
-
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-    failedWithError:(NSError *)error {
-  id target = [self target];
-  if (target) {
-    NSMethodSignature *sig = [target_ methodSignatureForSelector:didFailSel_];
-    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
-    [invocation setTarget:target_];
-    [invocation setSelector:didFailSel_];
-    [invocation setArgument:&fetcher_ atIndex:2];
-    [invocation setArgument:&error atIndex:3];
-    [invocation setArgument:&self atIndex:4];
+    [invocation setArgument:&error atIndex:5];
     [invocation invoke];
   }
 }

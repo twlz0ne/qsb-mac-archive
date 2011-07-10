@@ -31,7 +31,7 @@
 //
 
 #import <Vermilion/Vermilion.h>
-#import <GData/GDataHTTPFetcher.h>
+#import <GData/GTMHTTPFetcher.h>
 #import <QSBPluginUI/QSBHGSResultAttributeKeys.h>
 #import "HGSKeychainItem.h"
 #import "GTMGoogleSearch.h"
@@ -57,12 +57,11 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                 operation:(NSOperation *)op
                      into:(HGSMemorySearchSourceDB*)database;
 - (void)loginCredentialsChanged:(NSNotification *)notification;
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData
-          operation:(NSOperation *)operation;
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-            didFail:(NSError *)error
-          operation:(NSOperation *)operation;
+          operation:(NSOperation *)operation
+              error:(NSError *)error;
+
 @end
 
 @implementation GoogleBookmarksSource
@@ -129,11 +128,10 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
          requestWithURL:bookmarkRequestURL
             cachePolicy:NSURLRequestReloadIgnoringCacheData
         timeoutInterval:15.0];
-    GDataHTTPFetcher *fetcher
-      = [GDataHTTPFetcher httpFetcherWithRequest:bookmarkRequest];
+    GTMHTTPFetcher *fetcher = [GTMHTTPFetcher fetcherWithRequest:bookmarkRequest];
 
     if (!fetcher) {
-      HGSLog(@"Failed to allocate GDataHTTPFetcher.");
+      HGSLog(@"Failed to allocate GTMHTTPFetcher.");
     }
     HGSKeychainItem* keychainItem
       = [HGSKeychainItem keychainItemForService:[account_ identifier]
@@ -145,15 +143,14 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
                                 password:password
                              persistence:NSURLCredentialPersistenceNone]];
     [bookmarkRequest setHTTPMethod:@"POST"];
-    [fetcher setRequest:bookmarkRequest];
+    [fetcher setMutableRequest:bookmarkRequest];
 
     HGSOperationQueue *queue = [HGSOperationQueue sharedOperationQueue];
     [fetchOperation_ release];
     fetchOperation_
       = [[HGSFetcherOperation alloc] initWithTarget:self
                                          forFetcher:fetcher
-                                  didFinishSelector:@selector(httpFetcher:finishedWithData:operation:)
-                                    didFailSelector:@selector(httpFetcher:didFail:operation:)];
+                                  didFinishSelector:@selector(httpFetcher:finishedWithData:operation:error:)];
    [queue addOperation:fetchOperation_];
   }
 }
@@ -272,18 +269,17 @@ static const NSTimeInterval kErrorReportingInterval = 3600.0;  // 1 hour
 }
 
 #pragma mark -
-#pragma mark GDataHTTPFetcher Helpers
+#pragma mark GTMHTTPFetcher Helpers
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData
-          operation:(NSOperation *)operation {
-  [self indexBookmarksFromData:retrievedData operation:operation];
-}
-
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-            didFail:(NSError *)error
-          operation:(NSOperation *)operation {
-  HGSLog(@"httpFetcher failed: %@ %@", error, [[fetcher request] URL]);
+          operation:(NSOperation *)operation
+              error:(NSError *)error {
+  if (error) {
+    HGSLog(@"httpFetcher failed: %@ %@", error, [[fetcher mutableRequest] URL]);
+  } else {
+    [self indexBookmarksFromData:retrievedData operation:operation];
+  }
 }
 
 #pragma mark -

@@ -233,7 +233,7 @@ NSString *const kHGSGDataServiceSourceErrorReportingIntervalKey
 - (void)handleErrorForFetchType:(NSString *)fetchType
                           error:(NSError *)error {
   NSInteger errorCode = [error code];
-  if (errorCode != kGDataHTTPFetcherStatusNotModified) {
+  if (errorCode != kGTMHTTPFetcherStatusNotModified) {
     // Don't report not-connected errors.
     if (errorCode == kGDataBadAuthentication) {
       // If the login credentials are bad, don't keep trying.

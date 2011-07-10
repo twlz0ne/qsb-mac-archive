@@ -40,7 +40,7 @@
 #import "GTMGeometryUtils.h"
 #import "GTMNSImage+Scaling.h"
 #import "GTMNSBezierPath+CGPath.h"
-#import <GData/GDataHTTPFetcher.h>
+#import <GData/GTMHTTPFetcher.h>
 #import "HGSLog.h"
 #import "GTMDebugThreadValidation.h"
 #import "GTMGarbageCollection.h"
@@ -180,12 +180,10 @@ static NSImage *FileSystemImageForURL(NSURL *url) {
 - (id)initWithResult:(HGSResult *)result skipPlaceholder:(BOOL)skipPlaceholder;
 - (void)basicDiskLoad:(id)ignored operation:(NSOperation *)op;
 - (void)advancedDiskLoad:(id)ignored operation:(NSOperation *)op;
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData
-          operation:(NSOperation *)operation;
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-    failedWithError:(NSError *)error
-          operation:(NSOperation *)operation;
+          operation:(NSOperation *)operation
+              error:(NSError *)error;
 
 // All of these are intentionally atomic
 @property (readwrite, retain) NSImage *icon;
@@ -453,12 +451,11 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconCache, sharedIconCache);
         if ([urlString hasPrefix:@"http"]) {
           NSURL *url = [NSURL URLWithString:urlString];
           NSURLRequest *request = [NSURLRequest requestWithURL:url];
-          GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
+          GTMHTTPFetcher *fetcher = [GTMHTTPFetcher fetcherWithRequest:request];
           advancedOperation_
             = [[HGSFetcherOperation alloc] initWithTarget:self
                                                forFetcher:fetcher
-                                        didFinishSelector:@selector(httpFetcher:finishedWithData:operation:)
-                                          didFailSelector:@selector(httpFetcher:failedWithError:operation:)];
+                                        didFinishSelector:@selector(httpFetcher:finishedWithData:operation:error:)];
         }
       }
     }
@@ -593,15 +590,20 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconCache, sharedIconCache);
   }
 }
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
    finishedWithData:(NSData *)retrievedData
-          operation:(NSOperation *)operation {
+          operation:(NSOperation *)operation
+             error:(NSError *)error {
+  if (error) {
+    HGSLog(@"%@", error);
+    return;
+  }
   if ([operation isCancelled]) return;
   HGSResult *result = [self result];
   if (!result) return;
 
   NSImage *favicon = [[[NSImage alloc] initWithData:retrievedData] autorelease];
-  NSURL *url = [[fetcher request] URL];
+  NSURL *url = [[fetcher mutableRequest] URL];
   NSImage *icon = nil;
   HGSIconCache *cache = [HGSIconCache sharedIconCache];
   if ([[url absoluteString] hasSuffix:@"favicon.ico"]) {
@@ -680,11 +682,6 @@ GTMOBJECT_SINGLETON_BOILERPLATE(HGSIconCache, sharedIconCache);
     [self setIcon:icon];
     [cache setIcon:icon forResult:result];
   }
-}
-
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-    failedWithError:(NSError *)error
-          operation:(NSOperation *)operation {
 }
 
 @end

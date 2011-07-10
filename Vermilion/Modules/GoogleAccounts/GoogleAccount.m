@@ -80,9 +80,9 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
 
 // Common function for preparing an authentication fetcher.
 // TODO(mrossetti): 1960732: Rework |accountType| when addressed.
-- (GDataHTTPFetcher *)authFetcherForPassword:(NSString *)password
-                                  parameters:(NSDictionary *)params
-                                 accountType:(NSString *)accountType;
+- (GTMHTTPFetcher *)authFetcherForPassword:(NSString *)password
+                                parameters:(NSDictionary *)params
+                               accountType:(NSString *)accountType;
 
 // Determine the default account type based on the class and composition
 // of the account name (called |userName|).
@@ -92,9 +92,9 @@ static const NSTimeInterval kAuthenticationGiveUpInterval = 30.0;
 - (BOOL)validateResult:(NSData *)result;
 
 // Fetched delegate methods
-- (void)fetcher:(GDataHTTPFetcher *)authFetcher finishedWithData:(NSData *)data;
-- (void)fetcher:(GDataHTTPFetcher *)authFetcher failedWithError:(NSError *)error;
-
+- (void)fetcher:(GTMHTTPFetcher *)authFetcher
+    finishedWithData:(NSData *)data
+          error:(NSError *)error;
 @end
 
 
@@ -172,14 +172,13 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   if ([self forceNonHosted]) {
     accountType = kGoogleCorpAccountType;
   }
-  GDataHTTPFetcher *authFetcher = [self authFetcherForPassword:password
-                                                    parameters:parameters
-                                                   accountType:accountType];
+  GTMHTTPFetcher *authFetcher = [self authFetcherForPassword:password
+                                                  parameters:parameters
+                                                 accountType:accountType];
   if (authFetcher) {
     [authFetcher setProperty:@"YES" forKey:kGoogleAccountAsynchAuth];
     [authFetcher beginFetchWithDelegate:self
-                      didFinishSelector:@selector(fetcher:finishedWithData:)
-                        didFailSelector:@selector(fetcher:failedWithError:)];
+                      didFinishSelector:@selector(fetcher:finishedWithData:error:)];
   } else {
     // Failed to authenticate because we could not compose an authRequest.
     [self setAuthenticated:NO];
@@ -191,18 +190,17 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   BOOL authenticated = NO;
   BOOL hosted = [self isKindOfClass:[GoogleAppsAccount class]];
   NSString *accountType = [self accountType];
-  GDataHTTPFetcher *authFetcher = [self authFetcherForPassword:password
-                                                    parameters:nil
-                                                   accountType:accountType];
+  GTMHTTPFetcher *authFetcher = [self authFetcherForPassword:password
+                                                  parameters:nil
+                                                 accountType:accountType];
   if (authFetcher) {
     [self setAuthCompleted:NO];
     [self setAuthSucceeded:NO];
     [authFetcher beginFetchWithDelegate:self
-                      didFinishSelector:@selector(fetcher:finishedWithData:)
-                        didFailSelector:@selector(fetcher:failedWithError:)];
+                      didFinishSelector:@selector(fetcher:finishedWithData:error:)];
     // Block until this fetch is done to make it appear synchronous.  Just in
     // case, put an upper limit of 30 seconds before we bail.
-    [[authFetcher request] setTimeoutInterval:kAuthenticationGiveUpInterval];
+    [[authFetcher mutableRequest] setTimeoutInterval:kAuthenticationGiveUpInterval];
     NSRunLoop* loop = [NSRunLoop currentRunLoop];
     while (![self authCompleted]) {
       NSDate *sleepTilDate
@@ -220,11 +218,10 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
     if (authFetcher) {
       [self setAuthCompleted:NO];
       [authFetcher beginFetchWithDelegate:self
-                        didFinishSelector:@selector(fetcher:finishedWithData:)
-                          didFailSelector:@selector(fetcher:failedWithError:)];
+                        didFinishSelector:@selector(fetcher:finishedWithData:error:)];
       // Block until this fetch is done to make it appear synchronous.  Just in
       // case, put an upper limit of 30 seconds before we bail.
-      [[authFetcher request] setTimeoutInterval:kAuthenticationGiveUpInterval];
+      [[authFetcher mutableRequest] setTimeoutInterval:kAuthenticationGiveUpInterval];
       NSRunLoop* loop = [NSRunLoop currentRunLoop];
       while (![self authCompleted]) {
         NSDate *sleepTilDate
@@ -244,9 +241,9 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   return authenticated;
 }
 
-- (GDataHTTPFetcher *)authFetcherForPassword:(NSString *)password
-                                  parameters:(NSDictionary *)params
-                                 accountType:(NSString *)accountType {
+- (GTMHTTPFetcher *)authFetcherForPassword:(NSString *)password
+                                parameters:(NSDictionary *)params
+                               accountType:(NSString *)accountType {
   NSString *userName = [self userName];
 #ifdef REENABLE_WHEN_1960732_HAS_BEEN_ADDRESSED
   NSString *accountType = kHostedAccountType;
@@ -266,7 +263,7 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   // Validate the account using the contacts service since a basic account
   // should have at least mail service with contacts.
   NSString *serviceID = [GDataServiceGoogleContact serviceID];
-  GDataHTTPFetcher *authFetcher
+  GTMHTTPFetcher *authFetcher
     = [GDataAuthenticationFetcher authTokenFetcherWithUsername:userName
                                                       password:password
                                                        service:serviceID
@@ -364,20 +361,23 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
 
 #pragma mark GDataAuthenticationFetcher Delegate Methods
 
-- (void)fetcher:(GDataHTTPFetcher *)authFetcher finishedWithData:(NSData *)data {
-  // An authentication may be synchronous or asynchronous.  The latter is
-  // indicated by the presence of the property key below.
-  BOOL authenticated = [self validateResult:data];
-  if ([authFetcher propertyForKey:kGoogleAccountAsynchAuth]) {
-    [self setAuthenticated:authenticated];
-  } else {
-    // Signal the runLoop that the fetch has completed.
-    [self setAuthCompleted:YES];
-    [self setAuthSucceeded:authenticated];
+- (void)fetcher:(GTMHTTPFetcher *)authFetcher
+  finishedWithData:(NSData *)data
+          error:(NSError *)error {
+  if (!error) {
+    // An authentication may be synchronous or asynchronous.  The latter is
+    // indicated by the presence of the property key below.
+    BOOL authenticated = [self validateResult:data];
+    if ([authFetcher propertyForKey:kGoogleAccountAsynchAuth]) {
+      [self setAuthenticated:authenticated];
+    } else {
+      // Signal the runLoop that the fetch has completed.
+      [self setAuthCompleted:YES];
+      [self setAuthSucceeded:authenticated];
+    }
+    return;
   }
-}
 
-- (void)fetcher:(GDataHTTPFetcher *)authFetcher failedWithError:(NSError *)error {
   // An authentication may be synchronous or asynchronous.  The latter is
   // indicated by the presence of the property key below. Extract information
   // from the header for logging purposes as well as to detect a captcha
@@ -388,10 +388,10 @@ GTM_METHOD_CHECK(NSString, gtm_stringByEscapingForURLArgument);
   if (userInfo) {
     // Add a string to the diagnostic message for each item in userInfo.
     for (NSString *key in userInfo) {
-      if ([key isEqualToString:kGDataHTTPFetcherStatusDataKey]) {
-        NSData *data = [userInfo objectForKey:kGDataHTTPFetcherStatusDataKey];
-        if ([data length]) {
-          dataString = [[[NSString alloc] initWithData:data
+      if ([key isEqualToString:kGTMHTTPFetcherStatusDataKey]) {
+        NSData *statusData = [userInfo objectForKey:kGTMHTTPFetcherStatusDataKey];
+        if ([statusData length]) {
+          dataString = [[[NSString alloc] initWithData:statusData
                                               encoding:NSUTF8StringEncoding]
                         autorelease];
           if (dataString) {

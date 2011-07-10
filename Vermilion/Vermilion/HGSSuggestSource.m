@@ -41,7 +41,7 @@
 #import "HGSDelegate.h"
 #import "HGSType.h"
 
-#import <GData/GDataHTTPFetcher.h>
+#import <GData/GTMHTTPFetcher.h>
 #import "GTMDefines.h"
 #import "GTMGarbageCollection.h"
 #import "GTMMethodCheck.h"
@@ -106,10 +106,9 @@ typedef enum {
 - (NSString *)clientID;
 
 - (void)processQueue:(id)sender;
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   finishedWithData:(NSData *)retrievedData;
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher didFail:(NSError *)error;
-
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)retrievedData
+              error:(NSError *)error;
 @end
 
 @interface HGSSuggestSource (Filtering)
@@ -409,19 +408,27 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   [request setHTTPShouldHandleCookies:NO];
 
   // Start the http fetch.
-  GDataHTTPFetcher *fetcher = [GDataHTTPFetcher httpFetcherWithRequest:request];
+  GTMHTTPFetcher *fetcher = [GTMHTTPFetcher fetcherWithRequest:request];
   [fetcher setUserData:operation];
   [fetcher beginFetchWithDelegate:self
-                didFinishSelector:@selector(httpFetcher:finishedWithData:)
-                  didFailSelector:@selector(httpFetcher:didFail:)];
+                didFinishSelector:@selector(httpFetcher:finishedWithData:error:)];
 
 #if TARGET_OS_IPHONE
   [[GMONetworkIndicator sharedNetworkIndicator] pushEvent];
 #endif  // TARGET_OS_IPHONE
 }
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   finishedWithData:(NSData *)retrievedData {
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)retrievedData
+              error:(NSError *)error {
+  if (error) {
+    HGSLog(@"httpFetcher failed: %@ %@", [error description], [[fetcher mutableRequest] URL]);
+    [self signalOperationCompletion];
+
+    HGSSearchOperation *fetchedOperation = (HGSSearchOperation *)[fetcher userData];
+    [self suggestionsRequestFailed:fetchedOperation];
+    return;
+  }
   HGSSearchOperation *fetchedOperation = (HGSSearchOperation *)[[[fetcher userData] retain] autorelease];
   [fetcher setUserData:nil];  // Make sure this operation isn't retained.
 
@@ -436,15 +443,6 @@ GTM_METHOD_CHECK(NSNumber, gtm_numberWithCGFloat:);
   }
 
   [self signalOperationCompletion];
-}
-
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-            didFail:(NSError *)error {
-  HGSLog(@"httpFetcher failed: %@ %@", [error description], [[fetcher request] URL]);
-  [self signalOperationCompletion];
-
-  HGSSearchOperation *fetchedOperation = (HGSSearchOperation *)[fetcher userData];
-  [self suggestionsRequestFailed:fetchedOperation];
 }
 
 #pragma mark -

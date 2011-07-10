@@ -70,9 +70,10 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
 // Send a user notification to the Vermilion client.
 - (void)informUserWithDescription:(NSString *)description
                              type:(HGSUserMessageType)type
-                          fetcher:(GDataHTTPFetcher *)fetcher;
-- (void)fetcher:(GDataHTTPFetcher *)fetcher finishedWithData:(NSData *)data;
-- (void)fetcher:(GDataHTTPFetcher *)fetcher failedWithError:(NSError *)error;
+                          fetcher:(GTMHTTPFetcher *)fetcher;
+- (void)fetcher:(GTMHTTPFetcher *)fetcher
+  finishedWithData:(NSData *)data
+          error:(NSError *)error;
 @end
 
 
@@ -164,21 +165,35 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
   NSURLRequest *request = [service requestForURL:downloadURL
                                             ETag:nil
                                       httpMethod:nil];
-  GDataHTTPFetcher *fetcher = [GDataHTTPFetcher
-                               httpFetcherWithRequest:request];
+  GTMHTTPFetcher *fetcher = [GTMHTTPFetcher fetcherWithRequest:request];
   [fetcher setProperties:saveAsInfo];
   [fetcher beginFetchWithDelegate:self
-                didFinishSelector:@selector(fetcher:finishedWithData:)
-                  didFailSelector:@selector(fetcher:failedWithError:)];
+                didFinishSelector:@selector(fetcher:finishedWithData:error:)];
 }
 
-- (void)fetcher:(GDataHTTPFetcher *)fetcher finishedWithData:(NSData *)data {
+- (void)fetcher:(GTMHTTPFetcher *)fetcher
+  finishedWithData:(NSData *)data
+          error:(NSError *)error {
+  if (error) {
+    NSString *errorFormat
+      = HGSLocalizedString(@"Could not fetch Google Doc! (%d)",
+                           @"A dialog label explaining to the user that we could "
+                           @"not fetch a Google Doc. %d is an error code.");
+    NSString *errorString = [NSString stringWithFormat:errorFormat,
+                             [error code]];
+    [self informUserWithDescription:errorString
+                               type:kHGSUserMessageErrorType
+                            fetcher:fetcher];
+    HGSLog(@"GoogleDocsSaveAsActions download of file failed: error=%d '%@'.",
+           [error code], [error localizedDescription]);
+    return;
+  }
   // save the file to the local path specified by the user
   NSURL *saveURL = [fetcher propertyForKey:kHGSSaveAsURLKey];
   NSString *extension = [fetcher propertyForKey:kGoogleDocsDocSaveAsExtensionKey];
   NSString *savePath = [saveURL path];
   savePath = [savePath stringByAppendingPathExtension:extension];
-  NSError *error = nil;
+  error = nil;
   BOOL didWrite = [data writeToFile:savePath
                             options:NSAtomicWrite
                               error:&error];
@@ -197,23 +212,9 @@ static NSString *const kGoogleDocsUserMessageName = @"GoogleDocsUserMessageName"
   }
 }
 
-- (void)fetcher:(GDataHTTPFetcher *)fetcher failedWithError:(NSError *)error {
-  NSString *errorFormat
-    = HGSLocalizedString(@"Could not fetch Google Doc! (%d)",
-                         @"A dialog label explaining to the user that we could "
-                         @"not fetch a Google Doc. %d is an error code.");
-  NSString *errorString = [NSString stringWithFormat:errorFormat,
-                           [error code]];
-  [self informUserWithDescription:errorString
-                             type:kHGSUserMessageErrorType
-                          fetcher:fetcher];
-  HGSLog(@"GoogleDocsSaveAsActions download of file failed: error=%d '%@'.",
-         [error code], [error localizedDescription]);
-}
-
 - (void)informUserWithDescription:(NSString *)description
                              type:(HGSUserMessageType)type
-                          fetcher:(GDataHTTPFetcher *)fetcher {
+                          fetcher:(GTMHTTPFetcher *)fetcher {
   HGSResult *result = [fetcher propertyForKey:kHGSSaveAsHGSResultKey];
   NSString *category = [result valueForKey:kGoogleDocsDocCategoryKey];
   HGSAssert(category, nil);

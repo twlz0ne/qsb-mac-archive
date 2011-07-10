@@ -36,7 +36,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class GDataHTTPFetcher;
+@class GTMHTTPFetcher;
 
 /*!
  An operation that releases its target and userData immediately after it is
@@ -64,14 +64,13 @@
 */
 @interface HGSFetcherOperation : NSOperation {
  @private
-  GDataHTTPFetcher *fetcher_;
+  GTMHTTPFetcher *fetcher_;
   id target_;
   SEL didFinishSel_;
-  SEL didFailSel_;
   BOOL finished_;
 }
 
-@property (readonly, retain) GDataHTTPFetcher *fetcher;
+@property (readonly, retain) GTMHTTPFetcher *fetcher;
 
 /*!
  @param target The target for the finished and failed selectors.
@@ -79,24 +78,16 @@
  @param didFinishSel A selector to run when the fetcher is done. Must be of the
         form:
  <p><code>
-   - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
+   - (void)httpFetcher:(GTMHTTPFetcher *)fetcher
       finishedWithData:(NSData *)retrievedData
-             operation:(NSOperation *)operation;
- </code></p>
-        This selector will be called on the operation thread.
- @param failedSel A selector to run when the fetcher has an error. Must be of the
-        form:
- <p><code>
-   - (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-       failedWithError:(NSError *)error
-             operation:(NSOperation *)operation;
+             operation:(NSOperation *)operation
+                 error:(NSError *)error;
  </code></p>
         This selector will be called on the operation thread.
 */
 - (id)initWithTarget:(id)target
-          forFetcher:(GDataHTTPFetcher *)fetcher
-   didFinishSelector:(SEL)didFinishSel
-     didFailSelector:(SEL)failedSel;
+          forFetcher:(GTMHTTPFetcher *)fetcher
+   didFinishSelector:(SEL)didFinishSel;
 @end
 
 /*!

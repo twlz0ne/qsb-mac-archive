@@ -320,7 +320,7 @@ static const NSTimeInterval kMaxUploadRetryDelay = 120;
       [uploadService setUserCredentialsWithUsername:username
                                            password:password];
       [uploadService setUserAgent:@"google-qsb-1.0"];
-      [uploadService setShouldCacheDatedData:YES];
+      [uploadService setShouldCacheResponseData:YES];
       [uploadService setServiceShouldFollowNextLinks:YES];
       [uploadService setIsServiceRetryEnabled:YES];
       SEL progressSel = @selector(inputStream:bytesSent:totalBytes:);

@@ -32,7 +32,7 @@
 
 #import "Vermilion/Vermilion.h"
 #import <JSON/JSON.h>
-#import <GData/GDataHTTPFetcher.h>
+#import <GData/GTMHTTPFetcher.h>
 #import <GTM/GTMMethodCheck.h>
 #import <GTM/GTMNSDictionary+URLArguments.h>
 #import <GTM/GTMNSString+HTML.h>
@@ -49,13 +49,12 @@
 
 @interface HGSGoogleWebSearchOperation : HGSSimpleArraySearchOperation {
  @private
-  GDataHTTPFetcher *fetcher_;
+  GTMHTTPFetcher *fetcher_;
 }
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   finishedWithData:(NSData *)retrievedData;
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher didFail:(NSError *)error;
-
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)retrievedData
+              error:(NSError *)error;
 @end
 
 @interface GoogleWebResultsSource : HGSSearchSource
@@ -188,16 +187,24 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
   [request setValue:@"http://google-mobile-internal.google.com" forHTTPHeaderField:@"Referer"];
 
   if (!fetcher_) {
-    fetcher_ = [[GDataHTTPFetcher httpFetcherWithRequest:request] retain];
+    fetcher_ = [[GTMHTTPFetcher fetcherWithRequest:request] retain];
     [fetcher_ setUserData:self];
     [fetcher_ beginFetchWithDelegate:self
-                   didFinishSelector:@selector(httpFetcher:finishedWithData:)
-                     didFailSelector:@selector(httpFetcher:didFail:)];
+                   didFinishSelector:@selector(httpFetcher:finishedWithData:error:)];
   }
 }
 
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-   finishedWithData:(NSData *)retrievedData {
+- (void)httpFetcher:(GTMHTTPFetcher *)fetcher
+   finishedWithData:(NSData *)retrievedData
+              error:(NSError *)error {
+  if (error) {
+    HGSLog(@"httpFetcher failed: %@ %@", error, [[fetcher mutableRequest] URL]);
+    [self finishQuery];
+    [fetcher_ release];
+    fetcher_ = nil;
+    return;
+  }
+
   NSString *jsonResponse = [[[NSString alloc] initWithData:retrievedData
                                                   encoding:NSUTF8StringEncoding]
                             autorelease];
@@ -324,14 +331,6 @@ GTM_METHOD_CHECK(NSString, gtm_stringByUnescapingFromURLArgument);
   }
 
   [self setRankedResults:results];
-  [self finishQuery];
-  [fetcher_ release];
-  fetcher_ = nil;
-}
-
-- (void)httpFetcher:(GDataHTTPFetcher *)fetcher
-            didFail:(NSError *)error {
-  HGSLog(@"httpFetcher failed: %@ %@", error, [[fetcher request] URL]);
   [self finishQuery];
   [fetcher_ release];
   fetcher_ = nil;
